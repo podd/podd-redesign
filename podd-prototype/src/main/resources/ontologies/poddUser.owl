@@ -521,9 +521,6 @@ A user has exactly one name (username).</rdfs:comment>
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <rdf:Description rdf:about="&owl;topObjectProperty">
-        <rdfs:label>Top Object Property</rdfs:label>
-    </rdf:Description>
     <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#hasNotes">
         <rdfs:label>has Notes</rdfs:label>
     </rdf:Description>
@@ -547,9 +544,6 @@ A user has exactly one name (username).</rdfs:comment>
     </rdf:Description>
     <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#refersTo">
         <rdfs:label>refers to</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="&owl;topDataProperty">
-        <rdfs:label>Top Data Property</rdfs:label>
     </rdf:Description>
     <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#hasTime">
         <rdfs:label>has Time</rdfs:label>

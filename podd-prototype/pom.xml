@@ -13,7 +13,7 @@
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-model</artifactId>
-      </dependency>
+        </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-repository-api</artifactId>
@@ -34,10 +34,13 @@
             <groupId>com.github.ansell.owlapi</groupId>
             <artifactId>owlapi-rio</artifactId>
         </dependency>
+        <!-- NOTE: The prototype is test driven, but some classes are on 
+            the compile classpath and they need JUnit to run assertions. Do not put JUnit 
+            on the compile classpath after the prototype is complete. -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.github.ansell.pellet</groupId>
