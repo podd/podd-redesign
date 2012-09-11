@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
-        <uri id="Automatically generated entry, Timestamp=1347339047743" name="http://purl.org/podd/ns/poddModelAnimal" uri="poddModelAnimal.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1347339047743" name="http://purl.org/podd/ns/poddModelPlant" uri="poddModelPlant.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1347339047743" name="http://purl.org/podd/ns/poddScience" uri="poddScience.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1347339047743" name="http://purl.org/podd/ns/poddUser" uri="poddUser.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1347340001475" name="http://purl.org/podd/ns/poddBase" uri="poddBase.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1347340001475" name="http://purl.org/podd/ns/poddModelAnimal" uri="poddModelAnimal.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1347340001475" name="http://purl.org/podd/ns/poddModelPlant" uri="poddModelPlant.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1347340001475" name="http://purl.org/podd/ns/poddScience" uri="poddScience.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1347340001475" name="http://purl.org/podd/ns/poddUser" uri="poddUser.owl"/>
     </group>
 </catalog>

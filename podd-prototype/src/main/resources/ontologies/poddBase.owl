@@ -35,11 +35,10 @@
      -->
 
     <owl:AnnotationProperty rdf:about="&poddBase;hasUser">
-        <rdfs:label>User</rdfs:label>
+        <rdfs:label>has User</rdfs:label>
         <rdfs:domain rdf:resource="&poddBase;Project"/>
     </owl:AnnotationProperty>
     <owl:AnnotationProperty rdf:about="&poddBase;hasTopObjectStatus">
-        <rdfs:label>Project Status</rdfs:label>
         <rdfs:domain rdf:resource="&poddBase;Project"/>
     </owl:AnnotationProperty>
     <owl:AnnotationProperty rdf:about="&poddBase;weight"/>
@@ -77,7 +76,7 @@
     <!-- http://purl.org/podd/ns/poddBase#containedBy -->
 
     <owl:ObjectProperty rdf:about="&poddBase;containedBy">
-        <rdfs:label>Contained By</rdfs:label>
+        <rdfs:label>contained by</rdfs:label>
         <owl:inverseOf rdf:resource="&poddBase;contains"/>
     </owl:ObjectProperty>
     
@@ -126,7 +125,7 @@
     <!-- http://purl.org/podd/ns/poddBase#hasPublicationStatus -->
 
     <owl:ObjectProperty rdf:about="&poddBase;hasPublicationStatus">
-        <rdfs:label>Publication Status</rdfs:label>
+        <rdfs:label>has Publication Status</rdfs:label>
         <rdfs:range rdf:resource="&poddBase;PublicationStatus"/>
     </owl:ObjectProperty>
     
@@ -135,7 +134,6 @@
     <!-- http://purl.org/podd/ns/poddBase#hasTopObjectStatus -->
 
     <owl:ObjectProperty rdf:about="&poddBase;hasTopObjectStatus">
-        <rdfs:label>Project Status</rdfs:label>
         <rdfs:range rdf:resource="&poddBase;TopObjectStatus"/>
     </owl:ObjectProperty>
     
@@ -144,7 +142,7 @@
     <!-- http://purl.org/podd/ns/poddBase#hasUser -->
 
     <owl:ObjectProperty rdf:about="&poddBase;hasUser">
-        <rdfs:label>User</rdfs:label>
+        <rdfs:label>has User</rdfs:label>
         <rdfs:range rdf:resource="&poddBase;User"/>
     </owl:ObjectProperty>
     
@@ -356,8 +354,16 @@
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasURL"/>
-                <owl:allValuesFrom rdf:resource="&xsd;anyURI"/>
+                <owl:onProperty rdf:resource="&poddBase;hasPURL"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;containedBy"/>
+                <owl:onClass rdf:resource="&poddBase;PoddTopObject"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -369,36 +375,17 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasPURL"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;anyURI"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;hasNotes"/>
                 <owl:allValuesFrom rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;containedBy"/>
-                <owl:onClass rdf:resource="&poddBase;PoddTopObject"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onProperty rdf:resource="&poddBase;hasURL"/>
+                <owl:allValuesFrom rdf:resource="&xsd;anyURI"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
-    <owl:Axiom>
-        <weight>19</weight>
-        <owl:annotatedSource rdf:resource="&poddBase;PoddTopObject"/>
-        <owl:annotatedProperty rdf:resource="&rdfs;subClassOf"/>
-        <owl:annotatedTarget>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasNotes"/>
-                <owl:allValuesFrom rdf:resource="&xsd;string"/>
-            </owl:Restriction>
-        </owl:annotatedTarget>
-    </owl:Axiom>
     <owl:Axiom>
         <weight>1</weight>
         <owl:annotatedSource rdf:resource="&poddBase;PoddTopObject"/>
@@ -419,6 +406,17 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;hasURL"/>
                 <owl:allValuesFrom rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </owl:annotatedTarget>
+    </owl:Axiom>
+    <owl:Axiom>
+        <weight>19</weight>
+        <owl:annotatedSource rdf:resource="&poddBase;PoddTopObject"/>
+        <owl:annotatedProperty rdf:resource="&rdfs;subClassOf"/>
+        <owl:annotatedTarget>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasNotes"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
             </owl:Restriction>
         </owl:annotatedTarget>
     </owl:Axiom>
