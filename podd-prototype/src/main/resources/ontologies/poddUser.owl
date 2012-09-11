@@ -143,6 +143,7 @@
     <!-- http://purl.org/podd/ns/poddUser#lastLoginTime -->
 
     <owl:DatatypeProperty rdf:about="&user;lastLoginTime">
+        <rdfs:label>has Last Login TIme</rdfs:label>
         <rdfs:range rdf:resource="&xsd;dateTime"/>
     </owl:DatatypeProperty>
     
@@ -151,6 +152,7 @@
     <!-- http://purl.org/podd/ns/poddUser#phoneNumber -->
 
     <owl:DatatypeProperty rdf:about="&user;phoneNumber">
+        <rdfs:label>has Phone Number</rdfs:label>
         <rdfs:range rdf:resource="&rdfs;Literal"/>
     </owl:DatatypeProperty>
     
@@ -159,6 +161,7 @@
     <!-- http://purl.org/podd/ns/poddUser#postalAddress -->
 
     <owl:DatatypeProperty rdf:about="&user;postalAddress">
+        <rdfs:label>has Postal Address</rdfs:label>
         <rdfs:range rdf:resource="&rdfs;Literal"/>
         <rdfs:domain rdf:resource="&foaf;Agent"/>
     </owl:DatatypeProperty>
@@ -167,13 +170,17 @@
 
     <!-- http://xmlns.com/foaf/0.1/name -->
 
-    <owl:DatatypeProperty rdf:about="&foaf;name"/>
+    <owl:DatatypeProperty rdf:about="&foaf;name">
+        <rdfs:label>has Name</rdfs:label>
+    </owl:DatatypeProperty>
     
 
 
     <!-- http://xmlns.com/foaf/0.1/title -->
 
-    <owl:DatatypeProperty rdf:about="&foaf;title"/>
+    <owl:DatatypeProperty rdf:about="&foaf;title">
+        <rdfs:label>has Title</rdfs:label>
+    </owl:DatatypeProperty>
     
 
 
@@ -516,11 +523,14 @@ A user has exactly one name (username).</rdfs:comment>
     <rdf:Description rdf:about="&owl;topObjectProperty">
         <rdfs:label>Top Object Property</rdfs:label>
     </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#weight">
-        <rdfs:label>has Weight</rdfs:label>
+    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#hasNotes">
+        <rdfs:label>has Notes</rdfs:label>
     </rdf:Description>
     <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#contains">
         <rdfs:label>contains</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#weight">
+        <rdfs:label>has Weight</rdfs:label>
     </rdf:Description>
     <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#hasTopObjectStatus">
         <rdfs:label>has Top Object Status</rdfs:label>
@@ -536,6 +546,12 @@ A user has exactly one name (username).</rdfs:comment>
     </rdf:Description>
     <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#refersTo">
         <rdfs:label>refers to</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="&owl;topDataProperty">
+        <rdfs:label>Top Data Property</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#hasTime">
+        <rdfs:label>has Time</rdfs:label>
     </rdf:Description>
     <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#Assertion">
         <rdfs:label>Assertion</rdfs:label>
