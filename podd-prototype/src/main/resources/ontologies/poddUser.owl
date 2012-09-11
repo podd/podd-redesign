@@ -206,6 +206,7 @@
     <!-- http://purl.org/podd/ns/poddUser#RepositoryRole -->
 
     <owl:Class rdf:about="&user;RepositoryRole">
+        <rdfs:label>Repository Role</rdfs:label>
         <owl:equivalentClass>
             <owl:Class>
                 <owl:oneOf rdf:parseType="Collection">
