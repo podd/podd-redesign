@@ -180,7 +180,9 @@
 
     <!-- http://purl.org/podd/ns/podd#TopObject -->
 
-    <owl:Class rdf:about="&poddModel;TopObject"/>
+    <owl:Class rdf:about="&poddModel;TopObject">
+        <rdfs:label>Top Object</rdfs:label>
+    </owl:Class>
     
 
 
@@ -212,6 +214,7 @@
     <!-- http://purl.org/podd/ns/poddUser#TopObjectRole -->
 
     <owl:Class rdf:about="&user;TopObjectRole">
+        <rdfs:label>Top Object Role</rdfs:label>
         <owl:equivalentClass>
             <owl:Class>
                 <owl:oneOf rdf:parseType="Collection">
@@ -229,6 +232,7 @@
     <!-- http://purl.org/podd/ns/poddUser#TopObjectRoleBundle -->
 
     <owl:Class rdf:about="&user;TopObjectRoleBundle">
+        <rdfs:label>Top Object Role Bundle</rdfs:label>
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -332,6 +336,7 @@ A user has exactly one name (username).</rdfs:comment>
     <!-- http://purl.org/podd/ns/poddUser#UserStatus -->
 
     <owl:Class rdf:about="&user;UserStatus">
+        <rdfs:label>User Status</rdfs:label>
         <owl:equivalentClass>
             <owl:Class>
                 <owl:oneOf rdf:parseType="Collection">
@@ -359,13 +364,17 @@ A user has exactly one name (username).</rdfs:comment>
 
     <!-- http://xmlns.com/foaf/0.1/Organization -->
 
-    <owl:Class rdf:about="&foaf;Organization"/>
+    <owl:Class rdf:about="&foaf;Organization">
+        <rdfs:label>Organisation</rdfs:label>
+    </owl:Class>
     
 
 
     <!-- http://xmlns.com/foaf/0.1/Person -->
 
-    <owl:Class rdf:about="&foaf;Person"/>
+    <owl:Class rdf:about="&foaf;Person">
+        <rdfs:label>Person</rdfs:label>
+    </owl:Class>
     
 
 
@@ -480,6 +489,26 @@ A user has exactly one name (username).</rdfs:comment>
         <rdf:type rdf:resource="&user;UserStatus"/>
         <rdfs:label>Blocked Status</rdfs:label>
     </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotations
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#User">
+        <rdfs:label>User</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#PoddTopObject">
+        <rdfs:label>Podd Top Object</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#TopObjectStatus">
+        <rdfs:label>Top Object Status</rdfs:label>
+    </rdf:Description>
     
 
 
