@@ -1,0 +1,611 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY poddBase "http://purl.org/podd/ns/poddBase#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://purl.org/podd/ns/poddBase#"
+     xml:base="http://purl.org/podd/ns/poddBase"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://purl.org/podd/ns/poddBase">
+        <rdfs:label>The PODD Science Ontology</rdfs:label>
+        <owl:versionIRI rdf:resource="http://purl.org/podd/ns/version/poddBase/1"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:AnnotationProperty rdf:about="&poddBase;hasUser">
+        <rdfs:label>User</rdfs:label>
+        <rdfs:domain rdf:resource="&poddBase;Project"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&poddBase;hasTopObjectStatus">
+        <rdfs:label>Project Status</rdfs:label>
+        <rdfs:domain rdf:resource="&poddBase;Project"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&poddBase;weight"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.w3.org/2001/XMLSchema#date -->
+
+    <rdfs:Datatype rdf:about="&xsd;date"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#containedBy -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;containedBy">
+        <rdfs:label>Contained By</rdfs:label>
+        <owl:inverseOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#contains -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;contains">
+        <rdfs:range rdf:resource="&poddBase;PoddTopObject"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;hasPrincipalInvestigator">
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasUser"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasProjectAdministrator -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;hasProjectAdministrator">
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasUser"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasProjectMember -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;hasProjectMember">
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasUser"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasProjectObserver -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;hasProjectObserver">
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasUser"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasPublicationStatus -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;hasPublicationStatus">
+        <rdfs:label>Publication Status</rdfs:label>
+        <rdfs:range rdf:resource="&poddBase;PublicationStatus"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasTopObjectStatus -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;hasTopObjectStatus">
+        <rdfs:label>Project Status</rdfs:label>
+        <rdfs:range rdf:resource="&poddBase;TopObjectStatus"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasUser -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;hasUser">
+        <rdfs:label>User</rdfs:label>
+        <rdfs:range rdf:resource="&poddBase;User"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#refersTo -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;refersTo">
+        <rdfs:range rdf:resource="&poddBase;PoddTopObject"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#createdAt -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;createdAt">
+        <rdfs:label>Created at</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasTime"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasCompletionDate -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasCompletionDate">
+        <rdfs:label>Completion Date  (DD/MM/YYYY)</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasTime"/>
+        <rdfs:range rdf:resource="&xsd;date"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasDescription -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasDescription">
+        <rdfs:label>Description</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasDuration -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasDuration">
+        <rdfs:label>Duration</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasEndDateTime -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasEndDateTime">
+        <rdfs:label>End Date and Time  (DD/MM/YYYY hh:mm:ss)</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasTime"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasIssue -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasIssue">
+        <rdfs:label>Issue</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasLeadInstitution -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasLeadInstitution">
+        <rdfs:label>Lead Institution</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasNotes -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasNotes"/>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasPURL -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasPURL">
+        <rdfs:label>Persistant URL</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasURL"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasPublicationDate -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasPublicationDate">
+        <rdfs:label>Publication Date  (DD/MM/YYYY)</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasTime"/>
+        <rdfs:range rdf:resource="&xsd;date"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasStartDate -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasStartDate">
+        <rdfs:label>Start Date  (DD/MM/YYYY)</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasTime"/>
+        <rdfs:range rdf:resource="&xsd;date"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasStartDateTime -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasStartDateTime">
+        <rdfs:label>Start Date and Time  (DD/MM/YYYY hh:mm:ss)</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasTime"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasTime -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasTime"/>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasTimePoint -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasTimePoint">
+        <rdfs:label>Relative Time</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasTime"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasTimestamp -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasTimestamp">
+        <rdfs:label>Real Time  (DD/MM/YYYY hh:mm:ss)</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasTime"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasURL -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasURL">
+        <rdfs:label>URL</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;anyURI"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#lastModified -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;lastModified">
+        <rdfs:label>Last modified at</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;hasTime"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#Assertion -->
+
+    <owl:Class rdf:about="&poddBase;Assertion"/>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#PoddObject -->
+
+    <owl:Class rdf:about="&poddBase;PoddObject">
+        <rdfs:label>Podd Object</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#PoddTopObject -->
+
+    <owl:Class rdf:about="&poddBase;PoddTopObject">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasURL"/>
+                <owl:allValuesFrom rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;lastModified"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasPURL"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasNotes"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;containedBy"/>
+                <owl:onClass rdf:resource="&poddBase;PoddTopObject"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <owl:Axiom>
+        <weight>19</weight>
+        <owl:annotatedSource rdf:resource="&poddBase;PoddTopObject"/>
+        <owl:annotatedProperty rdf:resource="&rdfs;subClassOf"/>
+        <owl:annotatedTarget>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasNotes"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:annotatedTarget>
+    </owl:Axiom>
+    <owl:Axiom>
+        <weight>1</weight>
+        <owl:annotatedSource rdf:resource="&poddBase;PoddTopObject"/>
+        <owl:annotatedProperty rdf:resource="&rdfs;subClassOf"/>
+        <owl:annotatedTarget>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasPURL"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </owl:annotatedTarget>
+    </owl:Axiom>
+    <owl:Axiom>
+        <weight>17</weight>
+        <owl:annotatedSource rdf:resource="&poddBase;PoddTopObject"/>
+        <owl:annotatedProperty rdf:resource="&rdfs;subClassOf"/>
+        <owl:annotatedTarget>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasURL"/>
+                <owl:allValuesFrom rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </owl:annotatedTarget>
+    </owl:Axiom>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#PublicationStatus -->
+
+    <owl:Class rdf:about="&poddBase;PublicationStatus">
+        <rdfs:label>Publication Status</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&poddBase;NotPublished"/>
+                    <rdf:Description rdf:about="&poddBase;Published"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#TopObjectStatus -->
+
+    <owl:Class rdf:about="&poddBase;TopObjectStatus">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&poddBase;Inactive"/>
+                    <rdf:Description rdf:about="&poddBase;Active"/>
+                    <rdf:Description rdf:about="&poddBase;Completed"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#User -->
+
+    <owl:Class rdf:about="&poddBase;User">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#Thing -->
+
+    <owl:Class rdf:about="&owl;Thing"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#Active -->
+
+    <owl:Thing rdf:about="&poddBase;Active">
+        <rdf:type rdf:resource="&poddBase;TopObjectStatus"/>
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Active</rdfs:label>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#Completed -->
+
+    <owl:Thing rdf:about="&poddBase;Completed">
+        <rdf:type rdf:resource="&poddBase;TopObjectStatus"/>
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Completed</rdfs:label>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#Inactive -->
+
+    <owl:Thing rdf:about="&poddBase;Inactive">
+        <rdf:type rdf:resource="&poddBase;TopObjectStatus"/>
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Inactive</rdfs:label>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#No -->
+
+    <owl:Thing rdf:about="&poddBase;No">
+        <rdf:type rdf:resource="&poddBase;Assertion"/>
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>No</rdfs:label>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#NotApplicable -->
+
+    <owl:Thing rdf:about="&poddBase;NotApplicable">
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Not Applicable</rdfs:label>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#NotPublished -->
+
+    <owl:Thing rdf:about="&poddBase;NotPublished">
+        <rdf:type rdf:resource="&poddBase;PublicationStatus"/>
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Not Published</rdfs:label>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#Published -->
+
+    <owl:Thing rdf:about="&poddBase;Published">
+        <rdf:type rdf:resource="&poddBase;PublicationStatus"/>
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Published</rdfs:label>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#Unknown -->
+
+    <owl:Thing rdf:about="&poddBase;Unknown">
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Unknown</rdfs:label>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#Yes -->
+
+    <owl:Thing rdf:about="&poddBase;Yes">
+        <rdf:type rdf:resource="&poddBase;Assertion"/>
+        <rdf:type rdf:resource="&owl;NamedIndividual"/>
+        <rdfs:label>Yes</rdfs:label>
+    </owl:Thing>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="&poddBase;NotPublished"/>
+            <rdf:Description rdf:about="&poddBase;Published"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="&poddBase;No"/>
+            <rdf:Description rdf:about="&poddBase;NotApplicable"/>
+            <rdf:Description rdf:about="&poddBase;Unknown"/>
+            <rdf:Description rdf:about="&poddBase;Yes"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="&poddBase;Active"/>
+            <rdf:Description rdf:about="&poddBase;Completed"/>
+            <rdf:Description rdf:about="&poddBase;Inactive"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.3.1957) http://owlapi.sourceforge.net -->
+

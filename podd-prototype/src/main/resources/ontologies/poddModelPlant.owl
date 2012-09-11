@@ -1,0 +1,342 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY podd "http://purl.org/podd/ns/podd#" >
+    <!ENTITY poddScience "http://purl.org/podd/ns/poddScience#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY poddModelPlant "http://purl.org/podd/ns/poddModelPlant#" >
+    <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://purl.org/podd/ns/poddModelPlant#"
+     xml:base="http://purl.org/podd/ns/poddModelPlant"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:poddModelPlant="http://purl.org/podd/ns/poddModelPlant#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:podd="http://purl.org/podd/ns/podd#"
+     xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
+    <owl:Ontology rdf:about="">
+        <owl:imports rdf:resource="http://purl.org/podd/ns/podd"/>
+        <owl:imports rdf:resource="http://purl.org/podd/ns/poddScience"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:AnnotationProperty rdf:about="&poddScience;weight"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddModelPlant#hasSubstrate -->
+
+    <owl:ObjectProperty rdf:about="#hasSubstrate">
+        <rdfs:label>Substrate</rdfs:label>
+        <rdfs:range rdf:resource="#Substrate"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasDescription -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasDescription"/>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasName -->
+
+    <owl:DatatypeProperty rdf:about="&poddScience;hasName"/>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddModelPlant#hasEcotype -->
+
+    <owl:DatatypeProperty rdf:about="#hasEcotype">
+        <rdfs:label>Ecotype</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddModelPlant#hasFieldDescription -->
+
+    <owl:DatatypeProperty rdf:about="#hasFieldDescription">
+        <rdfs:label
+            >Field Description</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddModelPlant#hasFieldSoilType -->
+
+    <owl:DatatypeProperty rdf:about="#hasFieldSoilType">
+        <rdfs:label>Field Soil Type</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#ANZSRC -->
+
+    <owl:Class rdf:about="&poddScience;ANZSRC">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#ANZSRC07-Agriculture-and-Veterinary-Sciences"/>
+                    <rdf:Description rdf:about="&poddScience;NotApplicable"/>
+                    <rdf:Description rdf:about="#ANZSRC06-Biological-Sciences"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Environment -->
+
+    <owl:Class rdf:about="&poddScience;Environment"/>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Genotype -->
+
+    <owl:Class rdf:about="&poddScience;Genotype">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEcotype"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <podd:weight>10</podd:weight>
+        <owl:subject rdf:resource="&poddScience;Genotype"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEcotype"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddModelPlant#FieldConditions -->
+
+    <owl:Class rdf:about="#FieldConditions">
+        <rdfs:label
+            >Field Conditions</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddScience;Environment"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasFieldDescription"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasFieldSoilType"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <podd:weight>8</podd:weight>
+        <owl:subject rdf:resource="#FieldConditions"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasFieldDescription"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <podd:weight>7</podd:weight>
+        <owl:subject rdf:resource="#FieldConditions"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasFieldSoilType"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddModelPlant#GrowthConditions -->
+
+    <owl:Class rdf:about="#GrowthConditions">
+        <rdfs:label
+            >Growth Conditions</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddScience;Environment"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSubstrate"/>
+                <owl:allValuesFrom rdf:resource="#Substrate"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <podd:weight>7</podd:weight>
+        <owl:subject rdf:resource="#GrowthConditions"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSubstrate"/>
+                <owl:allValuesFrom rdf:resource="#Substrate"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddModelPlant#Substrate -->
+
+    <owl:Class rdf:about="#Substrate">
+        <rdfs:label>Substrate</rdfs:label>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasDescription"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <podd:weight>5</podd:weight>
+        <owl:subject rdf:resource="#Substrate"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasDescription"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <podd:weight>3</podd:weight>
+        <owl:subject rdf:resource="#Substrate"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddScience;hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#Thing -->
+
+    <owl:Class rdf:about="&owl;Thing"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#NotApplicable -->
+
+    <owl:Thing rdf:about="&poddScience;NotApplicable">
+        <rdf:type rdf:resource="&poddScience;ANZSRC"/>
+        <podd:weight>1</podd:weight>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddModelPlant#ANZSRC06-Biological-Sciences -->
+
+    <owl:Thing rdf:about="#ANZSRC06-Biological-Sciences">
+        <rdf:type rdf:resource="&poddScience;ANZSRC"/>
+        <podd:weight>2</podd:weight>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddModelPlant#ANZSRC07-Agriculture-and-Veterinary-Sciences -->
+
+    <owl:Thing rdf:about="#ANZSRC07-Agriculture-and-Veterinary-Sciences">
+        <rdf:type rdf:resource="&poddScience;ANZSRC"/>
+        <podd:weight>3</podd:weight>
+    </owl:Thing>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 2.2.1.1138) http://owlapi.sourceforge.net -->
+

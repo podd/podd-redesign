@@ -1,0 +1,3451 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY poddBase "http://purl.org/podd/ns/poddBase#" >
+    <!ENTITY poddScience "http://purl.org/podd/ns/poddScience#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://purl.org/podd/ns/poddScience#"
+     xml:base="http://purl.org/podd/ns/poddScience"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
+     xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
+    <owl:Ontology rdf:about="http://purl.org/podd/ns/poddScience">
+        <owl:imports rdf:resource="http://purl.org/podd/ns/version/poddBase/1"/>
+        <owl:versionIRI rdf:resource="http://purl.org/podd/ns/version/poddScience/1"/>
+        <rdfs:label>The PODD Science Ontology</rdfs:label>
+    </owl:Ontology>
+    
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasANZSRC -->
+
+    <owl:ObjectProperty rdf:about="#hasANZSRC">
+        <rdfs:label>ANZSRC FOR Code</rdfs:label>
+        <rdfs:range rdf:resource="#ANZSRC"/>
+        <rdfs:domain rdf:resource="#Project"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAccession -->
+
+    <owl:ObjectProperty rdf:about="#hasAccession">
+        <rdfs:label>Accession</rdfs:label>
+        <rdfs:range rdf:resource="#Accession"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAllele -->
+
+    <owl:ObjectProperty rdf:about="#hasAllele">
+        <rdfs:label>Allele</rdfs:label>
+        <rdfs:range rdf:resource="#Allele"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAnalysis -->
+
+    <owl:ObjectProperty rdf:about="#hasAnalysis">
+        <rdfs:label>has Analysis</rdfs:label>
+        <rdfs:range rdf:resource="#Analysis"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasContainer -->
+
+    <owl:ObjectProperty rdf:about="#hasContainer">
+        <rdfs:label>has Container</rdfs:label>
+        <rdfs:range rdf:resource="#Container"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasControl -->
+
+    <owl:ObjectProperty rdf:about="#hasControl">
+        <rdfs:label>Control</rdfs:label>
+        <rdfs:range rdf:resource="#Assertion"/>
+        <rdfs:domain rdf:resource="#Material"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasData -->
+
+    <owl:ObjectProperty rdf:about="#hasData">
+        <rdfs:label>has Data</rdfs:label>
+        <rdfs:range rdf:resource="#Data"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasDesign -->
+
+    <owl:ObjectProperty rdf:about="#hasDesign">
+        <rdfs:label>has Design</rdfs:label>
+        <rdfs:range rdf:resource="#Design"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasEnvironment -->
+
+    <owl:ObjectProperty rdf:about="#hasEnvironment">
+        <rdfs:label>has Environment</rdfs:label>
+        <rdfs:range rdf:resource="#Environment"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasEvent -->
+
+    <owl:ObjectProperty rdf:about="#hasEvent">
+        <rdfs:label>has Event</rdfs:label>
+        <rdfs:range rdf:resource="#Event"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasGene -->
+
+    <owl:ObjectProperty rdf:about="#hasGene">
+        <rdfs:label>has Gene</rdfs:label>
+        <rdfs:range rdf:resource="#Gene"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasGenotype -->
+
+    <owl:ObjectProperty rdf:about="#hasGenotype">
+        <rdfs:label>has Genotype</rdfs:label>
+        <rdfs:range rdf:resource="#Genotype"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasInvestigation -->
+
+    <owl:ObjectProperty rdf:about="#hasInvestigation">
+        <rdfs:label
+            >has Investigation</rdfs:label>
+        <rdfs:range rdf:resource="#Investigation"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasMarker -->
+
+    <owl:ObjectProperty rdf:about="#hasMarker">
+        <rdfs:label>Marker</rdfs:label>
+        <rdfs:range rdf:resource="#Marker"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasMaterial -->
+
+    <owl:ObjectProperty rdf:about="#hasMaterial">
+        <rdfs:label>has Material</rdfs:label>
+        <rdfs:range rdf:resource="#Material"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasMeasurement -->
+
+    <owl:ObjectProperty rdf:about="#hasMeasurement">
+        <rdfs:label>has Measurement</rdfs:label>
+        <rdfs:range rdf:resource="#Measurement"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasMeasurementParameter -->
+
+    <owl:ObjectProperty rdf:about="#hasMeasurementParameter">
+        <rdfs:label
+            >Measurement Parameter</rdfs:label>
+        <rdfs:range rdf:resource="#MeasurementParameter"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasObservation -->
+
+    <owl:ObjectProperty rdf:about="#hasObservation">
+        <rdfs:label>has Observation</rdfs:label>
+        <rdfs:range rdf:resource="#Observation"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPhenotype -->
+
+    <owl:ObjectProperty rdf:about="#hasPhenotype">
+        <rdfs:label>has Phenotype</rdfs:label>
+        <rdfs:range rdf:resource="#Phenotype"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPlatform -->
+
+    <owl:ObjectProperty rdf:about="#hasPlatform">
+        <rdfs:label>has Platform</rdfs:label>
+        <rdfs:range rdf:resource="#Platform"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPlatformType -->
+
+    <owl:ObjectProperty rdf:about="#hasPlatformType">
+        <rdfs:label>Platform Type</rdfs:label>
+        <rdfs:domain rdf:resource="#Platform"/>
+        <rdfs:range rdf:resource="#PlatformType"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasProcess -->
+
+    <owl:ObjectProperty rdf:about="#hasProcess">
+        <rdfs:label>has Process</rdfs:label>
+        <rdfs:range rdf:resource="#Process"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasProjectPlan -->
+
+    <owl:ObjectProperty rdf:about="#hasProjectPlan">
+        <rdfs:label
+            >has Project Plan</rdfs:label>
+        <rdfs:range rdf:resource="#ProjectPlan"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasProtocol -->
+
+    <owl:ObjectProperty rdf:about="#hasProtocol">
+        <rdfs:label>has Protocol</rdfs:label>
+        <rdfs:range rdf:resource="#Protocol"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPublication -->
+
+    <owl:ObjectProperty rdf:about="#hasPublication">
+        <rdfs:label>has Publication</rdfs:label>
+        <rdfs:range rdf:resource="#Publication"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasSequence -->
+
+    <owl:ObjectProperty rdf:about="#hasSequence">
+        <rdfs:label>has Sequence</rdfs:label>
+        <rdfs:range rdf:resource="#Sequence"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasSex -->
+
+    <owl:ObjectProperty rdf:about="#hasSex">
+        <rdfs:label>Sex</rdfs:label>
+        <rdfs:range rdf:resource="#Sex"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasSoftware -->
+
+    <owl:ObjectProperty rdf:about="#hasSoftware">
+        <rdfs:label>Software</rdfs:label>
+        <rdfs:range rdf:resource="#Software"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasTreatment -->
+
+    <owl:ObjectProperty rdf:about="#hasTreatment">
+        <rdfs:label>has Treatment</rdfs:label>
+        <rdfs:range rdf:resource="#Treatment"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasTreatmentMaterial -->
+
+    <owl:ObjectProperty rdf:about="#hasTreatmentMaterial">
+        <rdfs:label
+            >has Treatment Material</rdfs:label>
+        <rdfs:range rdf:resource="#TreatmentMaterial"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasWildType -->
+
+    <owl:ObjectProperty rdf:about="#hasWildType">
+        <rdfs:label>Wild Type</rdfs:label>
+        <rdfs:range rdf:resource="#Assertion"/>
+        <rdfs:domain rdf:resource="#Genotype"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToAnalysis -->
+
+    <owl:ObjectProperty rdf:about="#refersToAnalysis">
+        <rdfs:label
+            >Refers To Analysis</rdfs:label>
+        <rdfs:range rdf:resource="#Analysis"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToContainer -->
+
+    <owl:ObjectProperty rdf:about="#refersToContainer">
+        <rdfs:label
+            >Refers To Container</rdfs:label>
+        <rdfs:range rdf:resource="#Container"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToData -->
+
+    <owl:ObjectProperty rdf:about="#refersToData">
+        <rdfs:comment>Refers To Data</rdfs:comment>
+        <rdfs:range rdf:resource="#Data"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToEnvironment -->
+
+    <owl:ObjectProperty rdf:about="#refersToEnvironment">
+        <rdfs:label
+            >Refers To Environment</rdfs:label>
+        <rdfs:range rdf:resource="#Environment"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToGenotype -->
+
+    <owl:ObjectProperty rdf:about="#refersToGenotype">
+        <rdfs:label
+            >Refers To Genotype</rdfs:label>
+        <rdfs:range rdf:resource="#Genotype"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToMaterial -->
+
+    <owl:ObjectProperty rdf:about="#refersToMaterial">
+        <rdfs:label
+            >Refers To Material</rdfs:label>
+        <rdfs:range rdf:resource="#Material"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToPlatform -->
+
+    <owl:ObjectProperty rdf:about="#refersToPlatform">
+        <rdfs:label
+            >Refers To Platform</rdfs:label>
+        <rdfs:range rdf:resource="#Platform"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToProcess -->
+
+    <owl:ObjectProperty rdf:about="#refersToProcess">
+        <rdfs:label
+            >RefersTo Process</rdfs:label>
+        <rdfs:range rdf:resource="#Process"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToProtocol -->
+
+    <owl:ObjectProperty rdf:about="#refersToProtocol">
+        <rdfs:label
+            >Refers To Protocol</rdfs:label>
+        <rdfs:range rdf:resource="#Protocol"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#refersToTreatmentMaterial -->
+
+    <owl:ObjectProperty rdf:about="#refersToTreatmentMaterial">
+        <rdfs:label
+            >Refers To Treatment Material</rdfs:label>
+        <rdfs:range rdf:resource="#TreatmentMaterial"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;refersTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAbstract -->
+
+    <owl:DatatypeProperty rdf:about="#hasAbstract">
+        <rdfs:label>Abstract</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAccessionSource -->
+
+    <owl:DatatypeProperty rdf:about="#hasAccessionSource">
+        <rdfs:label>Source</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAge -->
+
+    <owl:DatatypeProperty rdf:about="#hasAge">
+        <rdfs:label>Age</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAlias -->
+
+    <owl:DatatypeProperty rdf:about="#hasAlias">
+        <rdfs:label>Alias</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAlleleSymbol -->
+
+    <owl:DatatypeProperty rdf:about="#hasAlleleSymbol">
+        <rdfs:label>Symbol</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAnatomicalPart -->
+
+    <owl:DatatypeProperty rdf:about="#hasAnatomicalPart">
+        <rdfs:label>Anatomical Part</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasAuthors -->
+
+    <owl:DatatypeProperty rdf:about="#hasAuthors">
+        <rdfs:label>Authors</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasBarcode -->
+
+    <owl:DatatypeProperty rdf:about="#hasBarcode">
+        <rdfs:label>Barcode</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasChromosome -->
+
+    <owl:DatatypeProperty rdf:about="#hasChromosome">
+        <rdfs:label>Chromosome</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasChromosomeLocation -->
+
+    <owl:DatatypeProperty rdf:about="#hasChromosomeLocation">
+        <rdfs:label
+            >Chromosome Location</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasDOB -->
+
+    <owl:DatatypeProperty rdf:about="#hasDOB">
+        <rdfs:label>DOB</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;date"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasDesignType -->
+
+    <owl:DatatypeProperty rdf:about="#hasDesignType">
+        <rdfs:label>Design Type</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasEventDescription -->
+
+    <owl:DatatypeProperty rdf:about="#hasEventDescription">
+        <rdfs:label
+            >Description of the Event</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasGenusSpecies -->
+
+    <owl:DatatypeProperty rdf:about="#hasGenusSpecies">
+        <rdfs:label
+            >Genus and Species</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasIssue -->
+
+    <owl:DatatypeProperty rdf:about="#hasIssue">
+        <rdfs:label>Issue</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasLine -->
+
+    <owl:DatatypeProperty rdf:about="#hasLine">
+        <rdfs:label>Line</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasMarkerDirection -->
+
+    <owl:DatatypeProperty rdf:about="#hasMarkerDirection">
+        <rdfs:label>Direction</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasMarkerType -->
+
+    <owl:DatatypeProperty rdf:about="#hasMarkerType">
+        <rdfs:label>Marker Type</rdfs:label>
+        <rdfs:comment
+            >Type of the Marker (e.g. QTL, phenotypic marker)</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasMaterialStatus -->
+
+    <owl:DatatypeProperty rdf:about="#hasMaterialStatus">
+        <rdfs:label>Status</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasMutation -->
+
+    <owl:DatatypeProperty rdf:about="#hasMutation">
+        <rdfs:label>Mutation</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasName -->
+
+    <owl:DatatypeProperty rdf:about="#hasName">
+        <rdfs:label>Name</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasNickname -->
+
+    <owl:DatatypeProperty rdf:about="#hasNickname">
+        <rdfs:label>Nickname</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasNotes -->
+
+    <owl:DatatypeProperty rdf:about="#hasNotes">
+        <rdfs:label>Notes</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasPages -->
+
+    <owl:DatatypeProperty rdf:about="#hasPages">
+        <rdfs:label>Pages</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasProcessVariation -->
+
+    <owl:DatatypeProperty rdf:about="#hasProcessVariation">
+        <rdfs:label
+            >Process Variation</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasProtocolVariation -->
+
+    <owl:DatatypeProperty rdf:about="#hasProtocolVariation">
+        <rdfs:label
+            >Protocol Variation</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasReplicate -->
+
+    <owl:DatatypeProperty rdf:about="#hasReplicate">
+        <rdfs:label
+            >Replicate Number</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasSequenceString -->
+
+    <owl:DatatypeProperty rdf:about="#hasSequenceString">
+        <rdfs:label>Sequence</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasSoftwareVersion -->
+
+    <owl:DatatypeProperty rdf:about="#hasSoftwareVersion">
+        <rdfs:label>Version</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasSpeciesCommonName -->
+
+    <owl:DatatypeProperty rdf:about="#hasSpeciesCommonName">
+        <rdfs:label
+            >Species Common Name</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasSubspecies -->
+
+    <owl:DatatypeProperty rdf:about="#hasSubspecies">
+        <rdfs:label>Subspecies</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasSystem -->
+
+    <owl:DatatypeProperty rdf:about="#hasSystem">
+        <rdfs:label>System</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasUnit -->
+
+    <owl:DatatypeProperty rdf:about="#hasUnit">
+        <rdfs:label>Unit</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasValue -->
+
+    <owl:DatatypeProperty rdf:about="#hasValue">
+        <rdfs:label>Value</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasVariationType -->
+
+    <owl:DatatypeProperty rdf:about="#hasVariationType">
+        <rdfs:label>Variation Type</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasVolume -->
+
+    <owl:DatatypeProperty rdf:about="#hasVolume">
+        <rdfs:label>Volume</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#hasYear -->
+
+    <owl:DatatypeProperty rdf:about="#hasYear">
+        <rdfs:label>Year</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#publishedIn -->
+
+    <owl:DatatypeProperty rdf:about="#publishedIn">
+        <rdfs:label
+            >Publication Title</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#ANZSRC -->
+
+    <owl:Class rdf:about="#ANZSRC">
+        <rdfs:comment
+            >&quot;ANZSRC FOR Code&quot;</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Accession -->
+
+    <owl:Class rdf:about="#Accession">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasID"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccessionSource"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasURL"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Accession"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasID"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Accession"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasURL"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Accession"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccessionSource"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Allele -->
+
+    <owl:Class rdf:about="#Allele">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAlleleSymbol"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccession"/>
+                <owl:allValuesFrom rdf:resource="#Accession"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Allele"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAlleleSymbol"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Allele"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Allele"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccession"/>
+                <owl:allValuesFrom rdf:resource="#Accession"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Analysis -->
+
+    <owl:Class rdf:about="#Analysis">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToProtocol"/>
+                <owl:allValuesFrom rdf:resource="#Protocol"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToData"/>
+                <owl:allValuesFrom rdf:resource="#Data"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToPlatform"/>
+                <owl:allValuesFrom rdf:resource="#Platform"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>11</weight>
+        <owl:subject rdf:resource="#Analysis"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Assertion -->
+
+    <owl:Class rdf:about="#Assertion">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&poddBase;No"/>
+                    <rdf:Description rdf:about="&poddBase;NotApplicable"/>
+                    <rdf:Description rdf:about="&poddBase;Yes"/>
+                    <rdf:Description rdf:about="&poddBase;Unknown"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Container -->
+
+    <owl:Class rdf:about="#Container">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasBarcode"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTreatment"/>
+                <owl:allValuesFrom rdf:resource="#Treatment"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasContainer"/>
+                <owl:allValuesFrom rdf:resource="#Container"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToMaterial"/>
+                <owl:allValuesFrom rdf:resource="#Material"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>13</weight>
+        <owl:subject rdf:resource="#Container"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Container"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Container"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasBarcode"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>15</weight>
+        <owl:subject rdf:resource="#Container"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Data -->
+
+    <owl:Class rdf:about="#Data">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddTopObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToContainer"/>
+                <owl:allValuesFrom rdf:resource="#Container"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToEnvironment"/>
+                <owl:allValuesFrom rdf:resource="#Environment"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToMaterial"/>
+                <owl:allValuesFrom rdf:resource="#Material"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToPlatform"/>
+                <owl:allValuesFrom rdf:resource="#Platform"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToProtocol"/>
+                <owl:allValuesFrom rdf:resource="#Protocol"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Data"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>11</weight>
+        <owl:subject rdf:resource="#Data"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>13</weight>
+        <owl:subject rdf:resource="#Data"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Design -->
+
+    <owl:Class rdf:about="#Design">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDesignType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>13</weight>
+        <owl:subject rdf:resource="#Design"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Design"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDesignType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Environment -->
+
+    <owl:Class rdf:about="#Environment">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToPlatform"/>
+                <owl:allValuesFrom rdf:resource="#Platform"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEndDateTime"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasStartDateTime"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>15</weight>
+        <owl:subject rdf:resource="#Environment"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Environment"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEndDateTime"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Environment"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasStartDateTime"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>13</weight>
+        <owl:subject rdf:resource="#Environment"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Event -->
+
+    <owl:Class rdf:about="#Event">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEventDescription"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimePoint"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDuration"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>4</weight>
+        <owl:subject rdf:resource="#Event"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEventDescription"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Event"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>9</weight>
+        <owl:subject rdf:resource="#Event"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDuration"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Event"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Event"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimePoint"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Gene -->
+
+    <owl:Class rdf:about="#Gene">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccession"/>
+                <owl:allValuesFrom rdf:resource="#Accession"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAlias"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasChromosome"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAllele"/>
+                <owl:allValuesFrom rdf:resource="#Allele"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSequence"/>
+                <owl:allValuesFrom rdf:resource="#Sequence"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasChromosomeLocation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasVariationType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMarker"/>
+                <owl:allValuesFrom rdf:resource="#Marker"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>12</weight>
+        <owl:subject rdf:resource="#Gene"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMarker"/>
+                <owl:allValuesFrom rdf:resource="#Marker"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Gene"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccession"/>
+                <owl:allValuesFrom rdf:resource="#Accession"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>8</weight>
+        <owl:subject rdf:resource="#Gene"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAllele"/>
+                <owl:allValuesFrom rdf:resource="#Allele"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>10</weight>
+        <owl:subject rdf:resource="#Gene"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasVariationType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>6</weight>
+        <owl:subject rdf:resource="#Gene"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAlias"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Gene"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasChromosomeLocation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>4</weight>
+        <owl:subject rdf:resource="#Gene"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasChromosome"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Genotype -->
+
+    <owl:Class rdf:about="#Genotype">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasNickname"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasGenusSpecies"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSubspecies"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccession"/>
+                <owl:allValuesFrom rdf:resource="#Accession"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSpeciesCommonName"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasGene"/>
+                <owl:allValuesFrom rdf:resource="#Gene"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasWildType"/>
+                <owl:onClass rdf:resource="#Assertion"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMutation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasLine"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Genotype"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasNickname"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>9</weight>
+        <owl:subject rdf:resource="#Genotype"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSubspecies"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>14</weight>
+        <owl:subject rdf:resource="#Genotype"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccession"/>
+                <owl:allValuesFrom rdf:resource="#Accession"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>12</weight>
+        <owl:subject rdf:resource="#Genotype"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMutation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>11</weight>
+        <owl:subject rdf:resource="#Genotype"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasLine"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>8</weight>
+        <owl:subject rdf:resource="#Genotype"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSpeciesCommonName"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Genotype"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasGenusSpecies"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Genotype"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasWildType"/>
+                <owl:onClass rdf:resource="#Assertion"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Investigation -->
+
+    <owl:Class rdf:about="#Investigation">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTreatmentMaterial"/>
+                <owl:allValuesFrom rdf:resource="#TreatmentMaterial"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDesign"/>
+                <owl:allValuesFrom rdf:resource="#Design"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasData"/>
+                <owl:allValuesFrom rdf:resource="#Data"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAnalysis"/>
+                <owl:allValuesFrom rdf:resource="#Analysis"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProcessVariation"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEnvironment"/>
+                <owl:allValuesFrom rdf:resource="#Environment"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToProcess"/>
+                <owl:allValuesFrom rdf:resource="#Process"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasStartDateTime"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasContainer"/>
+                <owl:allValuesFrom rdf:resource="#Container"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasInvestigation"/>
+                <owl:allValuesFrom rdf:resource="#Investigation"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMaterial"/>
+                <owl:allValuesFrom rdf:resource="#Material"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasReferenceID"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Investigation"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasStartDateTime"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Investigation"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasReferenceID"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>13</weight>
+        <owl:subject rdf:resource="#Investigation"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>9</weight>
+        <owl:subject rdf:resource="#Investigation"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProcessVariation"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Marker -->
+
+    <owl:Class rdf:about="#Marker">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSequenceString"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMarkerType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMarkerDirection"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Marker"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMarkerType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>9</weight>
+        <owl:subject rdf:resource="#Marker"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMarkerDirection"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Marker"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSequenceString"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Marker"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Material -->
+
+    <owl:Class rdf:about="#Material">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasObservation"/>
+                <owl:allValuesFrom rdf:resource="#Observation"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMaterial"/>
+                <owl:allValuesFrom rdf:resource="#Material"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToProtocol"/>
+                <owl:allValuesFrom rdf:resource="#Protocol"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMaterialStatus"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasControl"/>
+                <owl:onClass rdf:resource="#Assertion"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDOB"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAnatomicalPart"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSex"/>
+                <owl:onClass rdf:resource="#Sex"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTreatment"/>
+                <owl:allValuesFrom rdf:resource="#Treatment"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToEnvironment"/>
+                <owl:allValuesFrom rdf:resource="#Environment"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasBarcode"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAge"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSystem"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToGenotype"/>
+                <owl:onClass rdf:resource="#Genotype"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasReplicate"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;int"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPhenotype"/>
+                <owl:allValuesFrom rdf:resource="#Phenotype"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAnatomicalPart"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>15</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>6</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasControl"/>
+                <owl:onClass rdf:resource="#Assertion"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>10</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDOB"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasBarcode"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSystem"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>8</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMaterialStatus"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>4</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasReplicate"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;int"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>13</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>9</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSex"/>
+                <owl:onClass rdf:resource="#Sex"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>12</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>11</weight>
+        <owl:subject rdf:resource="#Material"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAge"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Measurement -->
+
+    <owl:Class rdf:about="#Measurement">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDescription"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasUnit"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasValue"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimePoint"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurementParameter"/>
+                <owl:allValuesFrom rdf:resource="#MeasurementParameter"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>10</weight>
+        <owl:subject rdf:resource="#Measurement"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurementParameter"/>
+                <owl:allValuesFrom rdf:resource="#MeasurementParameter"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>8</weight>
+        <owl:subject rdf:resource="#Measurement"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasUnit"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Measurement"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDescription"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Measurement"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimePoint"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>9</weight>
+        <owl:subject rdf:resource="#Measurement"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasValue"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Measurement"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>6</weight>
+        <owl:subject rdf:resource="#Measurement"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#MeasurementParameter -->
+
+    <owl:Class rdf:about="#MeasurementParameter">
+        <rdfs:label
+            >Measurement Parameter</rdfs:label>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasValue"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#MeasurementParameter"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasValue"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#MeasurementParameter"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Observation -->
+
+    <owl:Class rdf:about="#Observation">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToAnalysis"/>
+                <owl:allValuesFrom rdf:resource="#Analysis"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Observation"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Observation"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Phenotype -->
+
+    <owl:Class rdf:about="#Phenotype">
+        <rdfs:subClassOf rdf:resource="#Observation"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Platform -->
+
+    <owl:Class rdf:about="#Platform">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSoftware"/>
+                <owl:allValuesFrom rdf:resource="#Software"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPlatformType"/>
+                <owl:onClass rdf:resource="#PlatformType"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPlatform"/>
+                <owl:allValuesFrom rdf:resource="#Platform"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Platform"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSoftware"/>
+                <owl:allValuesFrom rdf:resource="#Software"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Platform"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPlatformType"/>
+                <owl:onClass rdf:resource="#PlatformType"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#PlatformType -->
+
+    <owl:Class rdf:about="#PlatformType">
+        <rdfs:label>Platform Type</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#HardwareSoftware"/>
+                    <rdf:Description rdf:about="#Hardware"/>
+                    <rdf:Description rdf:about="#Software"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Process -->
+
+    <owl:Class rdf:about="#Process">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocol"/>
+                <owl:allValuesFrom rdf:resource="#Protocol"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Project -->
+
+    <owl:Class rdf:about="#Project">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddTopObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasStartDate"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasCompletionDate"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPrincipalInvestigator"/>
+                <owl:onClass rdf:resource="#User"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAnalysis"/>
+                <owl:allValuesFrom rdf:resource="#Analysis"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProjectStatus"/>
+                <owl:onClass rdf:resource="#ProjectStatus"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasGenotype"/>
+                <owl:allValuesFrom rdf:resource="#Genotype"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProjectPlan"/>
+                <owl:allValuesFrom rdf:resource="#ProjectPlan"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasLeadInstitution"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasInvestigation"/>
+                <owl:allValuesFrom rdf:resource="#Investigation"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPublication"/>
+                <owl:allValuesFrom rdf:resource="#Publication"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPublicationDate"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPlatform"/>
+                <owl:allValuesFrom rdf:resource="#Platform"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProcess"/>
+                <owl:allValuesFrom rdf:resource="#Process"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProjectObserver"/>
+                <owl:allValuesFrom rdf:resource="#User"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDuration"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProjectMember"/>
+                <owl:allValuesFrom rdf:resource="#User"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPublicationStatus"/>
+                <owl:onClass rdf:resource="#PublicationStatus"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProjectAdministrator"/>
+                <owl:allValuesFrom rdf:resource="#User"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasANZSRC"/>
+                <owl:onClass rdf:resource="#ANZSRC"/>
+                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>13</weight>
+        <owl:subject rdf:resource="#Project"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPublicationDate"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Project"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasStartDate"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>12</weight>
+        <owl:subject rdf:resource="#Project"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPublicationStatus"/>
+                <owl:onClass rdf:resource="#PublicationStatus"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>10</weight>
+        <owl:subject rdf:resource="#Project"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasCompletionDate"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;date"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Project"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasDuration"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>9</weight>
+        <owl:subject rdf:resource="#Project"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProjectStatus"/>
+                <owl:onClass rdf:resource="#ProjectStatus"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Project"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasLeadInstitution"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#ProjectPlan -->
+
+    <owl:Class rdf:about="#ProjectPlan">
+        <rdfs:label>Project Plan</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Protocol -->
+
+    <owl:Class rdf:about="#Protocol">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Publication -->
+
+    <owl:Class rdf:about="#Publication">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#publishedIn"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasVolume"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAbstract"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasYear"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;int"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPages"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasIssue"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAuthors"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Publication"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAuthors"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Publication"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#publishedIn"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>6</weight>
+        <owl:subject rdf:resource="#Publication"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasYear"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;int"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>7</weight>
+        <owl:subject rdf:resource="#Publication"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasVolume"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Publication"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAbstract"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>8</weight>
+        <owl:subject rdf:resource="#Publication"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasIssue"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>9</weight>
+        <owl:subject rdf:resource="#Publication"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasPages"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Sequence -->
+
+    <owl:Class rdf:about="#Sequence">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccession"/>
+                <owl:allValuesFrom rdf:resource="#Accession"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSequenceString"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Sequence"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAccession"/>
+                <owl:allValuesFrom rdf:resource="#Accession"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Sequence"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSequenceString"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Sex -->
+
+    <owl:Class rdf:about="#Sex">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Male"/>
+                    <rdf:Description rdf:about="&poddBase;NotApplicable"/>
+                    <rdf:Description rdf:about="#Female"/>
+                    <rdf:Description rdf:about="&poddBase;Unknown"/>
+                    <rdf:Description rdf:about="#Hermaphrodite"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Software -->
+
+    <owl:Class rdf:about="#Software">
+        <rdfs:label>Software</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSoftwareVersion"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>5</weight>
+        <owl:subject rdf:resource="#Software"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasSoftwareVersion"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Software"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasName"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Treatment -->
+
+    <owl:Class rdf:about="#Treatment">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToProtocol"/>
+                <owl:allValuesFrom rdf:resource="#Protocol"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToTreatmentMaterial"/>
+                <owl:allValuesFrom rdf:resource="#TreatmentMaterial"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>11</weight>
+        <owl:subject rdf:resource="#Treatment"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:allValuesFrom rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#Treatment"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>13</weight>
+        <owl:subject rdf:resource="#Treatment"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>15</weight>
+        <owl:subject rdf:resource="#Treatment"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#TreatmentMaterial -->
+
+    <owl:Class rdf:about="#TreatmentMaterial">
+        <rdfs:label
+            >Treatment Material</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasBarcode"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#refersToProtocol"/>
+                <owl:allValuesFrom rdf:resource="#Protocol"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>3</weight>
+        <owl:subject rdf:resource="#TreatmentMaterial"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasType"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>11</weight>
+        <owl:subject rdf:resource="#TreatmentMaterial"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasProtocolVariation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>13</weight>
+        <owl:subject rdf:resource="#TreatmentMaterial"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasEvent"/>
+                <owl:allValuesFrom rdf:resource="#Event"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>15</weight>
+        <owl:subject rdf:resource="#TreatmentMaterial"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMeasurement"/>
+                <owl:allValuesFrom rdf:resource="#Measurement"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <weight>4</weight>
+        <owl:subject rdf:resource="#TreatmentMaterial"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasBarcode"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;string"/>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#Thing -->
+
+    <owl:Class rdf:about="&owl;Thing"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Female -->
+
+    <Sex rdf:about="#Female">
+        <rdf:type rdf:resource="#Sex"/>
+    </Sex>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Hardware -->
+
+    <owl:Thing rdf:about="#Hardware">
+        <rdf:type rdf:resource="#PlatformType"/>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#HardwareSoftware -->
+
+    <owl:Thing rdf:about="#HardwareSoftware">
+        <rdf:type rdf:resource="#PlatformType"/>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Hermaphrodite -->
+
+    <owl:Thing rdf:about="#Hermaphrodite">
+        <rdf:type rdf:resource="#Sex"/>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Male -->
+
+    <owl:Thing rdf:about="#Male">
+        <rdf:type rdf:resource="#Sex"/>
+    </owl:Thing>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddScience#Software -->
+
+    <owl:Thing rdf:about="#Software">
+        <rdf:type rdf:resource="#PlatformType"/>
+    </owl:Thing>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="#Male"/>
+            <rdf:Description rdf:about="#Female"/>
+            <rdf:Description rdf:about="&poddBase;Unknown"/>
+            <rdf:Description rdf:about="#Hermaphrodite"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="#HardwareSoftware"/>
+            <rdf:Description rdf:about="#Hardware"/>
+            <rdf:Description rdf:about="#Software"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    
+</rdf:RDF>
+
+
+
+
