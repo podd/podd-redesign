@@ -2856,7 +2856,7 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
         <weight>3</weight>
-        <owl:subject rdf:resource="&poddBase;TopObject"/>
+        <owl:subject rdf:resource="&poddBase;PoddTopObject"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
