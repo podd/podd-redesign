@@ -51,9 +51,9 @@ public class PoddPrototypeUtils
             final OWLReasonerFactory nextReasonerFactory) throws Exception
     {
         final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(nextProfileIRI);
-        Assert.assertNotNull("Could not find profile in registry", nextProfile);
+        Assert.assertNotNull("Could not find profile in registry: "+nextProfileIRI.toQuotedString(), nextProfile);
         final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
-        Assert.assertTrue("Schema Ontology was not in the given profile", profileReport.isInProfile());
+        Assert.assertTrue("Schema Ontology was not in the given profile: "+nextOntology.getOntologyID().toString(), profileReport.isInProfile());
         
         // create an OWL Reasoner using the Pellet library and ensure that the reasoner thinks the
         // ontology is consistent so far
@@ -62,7 +62,7 @@ public class PoddPrototypeUtils
         
         // Test that the ontology was consistent with this reasoner
         // This ensures in the case of Pellet that it is in the OWL2-DL profile
-        Assert.assertTrue("Ontology was not consistent", nextReasoner.isConsistent());
+        Assert.assertTrue("Ontology was not consistent: "+nextOntology.getOntologyID().toString(), nextReasoner.isConsistent());
         
         return nextReasoner;
     }
