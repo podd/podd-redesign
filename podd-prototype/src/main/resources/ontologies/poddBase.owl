@@ -102,25 +102,25 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddBase#hasProjectAdministrator -->
+    <!-- http://purl.org/podd/ns/poddBase#hasTopObjectAdministrator -->
 
-    <owl:ObjectProperty rdf:about="&poddBase;hasProjectAdministrator">
+    <owl:ObjectProperty rdf:about="&poddBase;hasTopObjectAdministrator">
         <rdfs:subPropertyOf rdf:resource="&poddBase;hasUser"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://purl.org/podd/ns/poddBase#hasProjectMember -->
+    <!-- http://purl.org/podd/ns/poddBase#hasTopObjectMember -->
 
-    <owl:ObjectProperty rdf:about="&poddBase;hasProjectMember">
+    <owl:ObjectProperty rdf:about="&poddBase;hasTopObjectMember">
         <rdfs:subPropertyOf rdf:resource="&poddBase;hasUser"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://purl.org/podd/ns/poddBase#hasProjectObserver -->
+    <!-- http://purl.org/podd/ns/poddBase#hasTopObjectObserver -->
 
-    <owl:ObjectProperty rdf:about="&poddBase;hasProjectObserver">
+    <owl:ObjectProperty rdf:about="&poddBase;hasTopObjectObserver">
         <rdfs:subPropertyOf rdf:resource="&poddBase;hasUser"/>
     </owl:ObjectProperty>
     

@@ -266,12 +266,12 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddScience#hasProjectPlan -->
+    <!-- http://purl.org/podd/ns/poddScience&poddBase;hasTopObjectPlan -->
 
-    <owl:ObjectProperty rdf:about="#hasProjectPlan">
+    <owl:ObjectProperty rdf:about="&poddBase;hasTopObjectPlan">
         <rdfs:label
             >has Project Plan</rdfs:label>
-        <rdfs:range rdf:resource="#ProjectPlan"/>
+        <rdfs:range rdf:resource="&poddBase;TopObjectPlan"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
     </owl:ObjectProperty>
     
@@ -2680,8 +2680,8 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasProjectStatus"/>
-                <owl:onClass rdf:resource="#ProjectStatus"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectStatus"/>
+                <owl:onClass rdf:resource="&poddBase;TopObjectStatus"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -2693,8 +2693,8 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasProjectPlan"/>
-                <owl:allValuesFrom rdf:resource="#ProjectPlan"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectPlan"/>
+                <owl:allValuesFrom rdf:resource="&poddBase;TopObjectPlan"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -2737,7 +2737,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasProjectObserver"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectObserver"/>
                 <owl:allValuesFrom rdf:resource="#User"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -2750,7 +2750,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasProjectMember"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectMember"/>
                 <owl:allValuesFrom rdf:resource="#User"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -2763,7 +2763,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasProjectAdministrator"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectAdministrator"/>
                 <owl:allValuesFrom rdf:resource="#User"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -2847,8 +2847,8 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasProjectStatus"/>
-                <owl:onClass rdf:resource="#ProjectStatus"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTopObjectStatus"/>
+                <owl:onClass rdf:resource="&poddBase;TopObjectStatus"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </owl:object>
@@ -2856,7 +2856,7 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
         <weight>3</weight>
-        <owl:subject rdf:resource="#Project"/>
+        <owl:subject rdf:resource="&poddBase;TopObject"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
@@ -2869,9 +2869,9 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddScience#ProjectPlan -->
+    <!-- http://purl.org/podd/ns/poddScience&poddBase;TopObjectPlan -->
 
-    <owl:Class rdf:about="#ProjectPlan">
+    <owl:Class rdf:about="&poddBase;TopObjectPlan">
         <rdfs:label>Project Plan</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
     </owl:Class>

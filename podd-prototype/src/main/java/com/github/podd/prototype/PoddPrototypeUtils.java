@@ -29,6 +29,8 @@ import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 import org.semanticweb.owlapi.reasoner.TimeOutException;
 import org.semanticweb.owlapi.rio.RioRenderer;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A selection of utilities used to create the prototype.
@@ -38,6 +40,7 @@ import org.semanticweb.owlapi.util.InferredOntologyGenerator;
  */
 public class PoddPrototypeUtils
 {
+    private final Logger log = LoggerFactory.getLogger(PoddPrototypeUtils.class);
     
     /**
      * 
@@ -53,8 +56,13 @@ public class PoddPrototypeUtils
         final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(nextProfileIRI);
         Assert.assertNotNull("Could not find profile in registry: "+nextProfileIRI.toQuotedString(), nextProfile);
         final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
+        if(!profileReport.isInProfile())
+        {
+            log.error("Bad profile report count: {}", profileReport.getViolations().size());
+            log.error("Bad profile report: {}", profileReport);
+        }
         Assert.assertTrue("Schema Ontology was not in the given profile: "+nextOntology.getOntologyID().toString(), profileReport.isInProfile());
-        
+            
         // create an OWL Reasoner using the Pellet library and ensure that the reasoner thinks the
         // ontology is consistent so far
         // Use the factory that we found to create a reasoner over the ontology
