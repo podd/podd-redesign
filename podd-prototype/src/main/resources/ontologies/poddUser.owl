@@ -65,13 +65,14 @@
 
     
 
-
     <!-- http://purl.org/podd/ns/poddUser#hasAffiliation -->
 
     <owl:ObjectProperty rdf:about="&user;hasAffiliation">
         <rdfs:label>has Affiliation</rdfs:label>
+        <rdfs:range rdf:resource="&foaf;Organization"/>
     </owl:ObjectProperty>
     
+
 
 
     <!-- http://purl.org/podd/ns/poddUser#hasPastTopObject -->
@@ -128,15 +129,6 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
-
-
-    <!-- http://purl.org/podd/ns/poddUser#hasAffiliation -->
-
-    <owl:DatatypeProperty rdf:about="&user;hasAffiliation">
-        <rdfs:label>has Affiliation</rdfs:label>
-        <rdfs:range rdf:resource="&xsd;string"/>
-    </owl:DatatypeProperty>
     
 
 

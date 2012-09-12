@@ -363,7 +363,7 @@
 
     <owl:Class rdf:about="&poddBase;PoddTopObject">
         <rdfs:label>Podd Top Object</rdfs:label>
-        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;hasPURL"/>
