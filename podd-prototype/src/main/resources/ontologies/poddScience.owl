@@ -717,6 +717,16 @@
     
 
 
+    <!-- http://purl.org/podd/ns/poddScience#hasReferenceID -->
+
+    <owl:DatatypeProperty rdf:about="#hasReferenceID">
+        <rdfs:label
+            >Reference ID</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://purl.org/podd/ns/poddScience#hasReplicate -->
 
     <owl:DatatypeProperty rdf:about="#hasReplicate">
