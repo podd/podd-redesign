@@ -2668,7 +2668,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="#hasPrincipalInvestigator"/>
-                <owl:onClass rdf:resource="#User"/>
+                <owl:onClass rdf:resource="&poddBase;User"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -2738,7 +2738,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;hasTopObjectObserver"/>
-                <owl:allValuesFrom rdf:resource="#User"/>
+                <owl:allValuesFrom rdf:resource="&poddBase;User"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -2751,7 +2751,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;hasTopObjectMember"/>
-                <owl:allValuesFrom rdf:resource="#User"/>
+                <owl:allValuesFrom rdf:resource="&poddBase;User"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -2764,7 +2764,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;hasTopObjectAdministrator"/>
-                <owl:allValuesFrom rdf:resource="#User"/>
+                <owl:allValuesFrom rdf:resource="&poddBase;User"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
