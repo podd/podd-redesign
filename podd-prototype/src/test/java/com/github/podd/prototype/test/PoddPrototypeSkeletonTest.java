@@ -6,7 +6,6 @@ package com.github.podd.prototype.test;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -68,7 +67,51 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.manager = null;
     }
     
-    @Ignore
+    @Test
+    public final void testBaseAndUserOntologies() throws Exception
+    {
+        final URI testBaseContextUri = this.getTestValueFactory().createURI("urn:test:poddBase:context");
+        final URI testBaseInferredContextUri =
+                this.getTestValueFactory().createURI("urn:test:poddBase:inferred:context");
+        final IRI testBaseInferredOntologyVersionUri = IRI.create("urn:test:poddBase:inferred:axioms:version-0.0.1");
+        
+        final OWLOntology testBaseOntology = this.utils.loadOntology("/ontologies/poddBase.owl", this.manager);
+        final OWLReasoner reasoner =
+                this.utils.checkConsistency(testBaseOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
+        this.utils.dumpOntologyToRepository(testBaseContextUri, testBaseOntology, this.getTestRepositoryConnection(),
+                this.manager);
+        final OWLOntology testBaseInferredOntology =
+                this.utils.computeInferences(reasoner, IRI.create(testBaseInferredContextUri),
+                        testBaseInferredOntologyVersionUri, this.manager);
+        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
+        // Sesame Repository
+        this.utils.dumpOntologyToRepository(testBaseInferredContextUri, testBaseInferredOntology,
+                this.getTestRepositoryConnection(), this.manager);
+        
+        final URI testUserContextUri = this.getTestValueFactory().createURI("urn:test:poddUser:context");
+        final URI testUserInferredContextUri =
+                this.getTestValueFactory().createURI("urn:test:poddUser:inferred:context");
+        final IRI testUserInferredOntologyVersionUri = IRI.create("urn:test:poddUser:inferred:axioms:version-0.0.1");
+        
+        this.log.info("About to load user ontology");
+        final OWLOntology testUserOntology = this.utils.loadOntology("/ontologies/poddUser.owl", this.manager);
+        this.log.info("Loaded user ontology");
+        final OWLReasoner userOntologyReasoner =
+                this.utils.checkConsistency(testUserOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
+        this.log.info("Completed reasoning consistency for user ontology");
+        this.utils.dumpOntologyToRepository(testUserContextUri, testUserOntology, this.getTestRepositoryConnection(),
+                this.manager);
+        
+        final OWLOntology testUserInferredOntology =
+                this.utils.computeInferences(userOntologyReasoner, IRI.create(testUserInferredContextUri),
+                        testUserInferredOntologyVersionUri, this.manager);
+        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
+        // Sesame Repository
+        this.utils.dumpOntologyToRepository(testUserInferredContextUri, testUserInferredOntology,
+                this.getTestRepositoryConnection(), this.manager);
+        
+    }
+    
     @Test
     public final void testBaseOntology() throws Exception
     {
@@ -90,64 +133,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                 this.getTestRepositoryConnection(), this.manager);
     }
     
-    @Test
-    public final void testUserOntology() throws Exception
-    {
-        final URI testContextUri = this.getTestValueFactory().createURI("urn:test:poddUser:context");
-        final URI testInferredContextUri = this.getTestValueFactory().createURI("urn:test:poddUser:inferred:context");
-        final IRI testInferredOntologyVersionUri = IRI.create("urn:test:poddUser:inferred:axioms:version-0.0.1");
-        
-        this.log.info("About to load base ontology");
-        final OWLOntology testBaseOntology = this.utils.loadOntology("/ontologies/poddBase.owl", this.manager);
-        this.log.info("About to load user ontology");
-        final OWLOntology testUserOntology = this.utils.loadOntology("/ontologies/poddUser.owl", this.manager);
-        this.log.info("Loaded user ontology");
-        final OWLReasoner userOntologyReasoner =
-                this.utils.checkConsistency(testUserOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
-        this.log.info("Completed reasoning consistency for user ontology");
-        this.utils.dumpOntologyToRepository(testContextUri, testUserOntology, this.getTestRepositoryConnection(),
-                this.manager);
-
-        final OWLOntology testBaseInferredOntology =
-                this.utils.computeInferences(userOntologyReasoner, IRI.create(testInferredContextUri),
-                        testInferredOntologyVersionUri, this.manager);
-        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
-        // Sesame Repository
-        this.utils.dumpOntologyToRepository(testInferredContextUri, testBaseInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
-        
-    }
-    
-    @Ignore
-    @Test
-    public final void testBaseAndUserOntologies() throws Exception
-    {
-        final URI testContextUri = this.getTestValueFactory().createURI("urn:test:poddBase:context");
-        final URI testInferredContextUri = this.getTestValueFactory().createURI("urn:test:poddBase:inferred:context");
-        final IRI testInferredOntologyVersionUri = IRI.create("urn:test:poddBase:inferred:axioms:version-0.0.1");
-        
-        final OWLOntology testBaseOntology = this.utils.loadOntology("/ontologies/poddBase.owl", this.manager);
-        final OWLReasoner reasoner =
-                this.utils.checkConsistency(testBaseOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
-        this.utils.dumpOntologyToRepository(testContextUri, testBaseOntology, this.getTestRepositoryConnection(),
-                this.manager);
-        final OWLOntology testBaseInferredOntology =
-                this.utils.computeInferences(reasoner, IRI.create(testInferredContextUri),
-                        testInferredOntologyVersionUri, this.manager);
-        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
-        // Sesame Repository
-        this.utils.dumpOntologyToRepository(testInferredContextUri, testBaseInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
-        
-        this.log.info("About to load user ontology");
-        final OWLOntology testUserOntology = this.utils.loadOntology("/ontologies/poddUser.owl", this.manager);
-        this.log.info("Loaded user ontology");
-        final OWLReasoner userOntologyReasoner =
-                this.utils.checkConsistency(testUserOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
-        this.log.info("Completed reasoning consistency for user ontology");
-    }
-    
-    @Ignore
     @Test
     public final void testPlantOntology() throws Exception
     {
@@ -237,6 +222,34 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         // Verify that the original version can be loaded and references the first version of the
         // ontology schema
+    }
+    
+    @Test
+    public final void testUserOntology() throws Exception
+    {
+        final URI testContextUri = this.getTestValueFactory().createURI("urn:test:poddUser:context");
+        final URI testInferredContextUri = this.getTestValueFactory().createURI("urn:test:poddUser:inferred:context");
+        final IRI testInferredOntologyVersionUri = IRI.create("urn:test:poddUser:inferred:axioms:version-0.0.1");
+        
+        this.log.info("About to load base ontology");
+        final OWLOntology testBaseOntology = this.utils.loadOntology("/ontologies/poddBase.owl", this.manager);
+        this.log.info("About to load user ontology");
+        final OWLOntology testUserOntology = this.utils.loadOntology("/ontologies/poddUser.owl", this.manager);
+        this.log.info("Loaded user ontology");
+        final OWLReasoner userOntologyReasoner =
+                this.utils.checkConsistency(testUserOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
+        this.log.info("Completed reasoning consistency for user ontology");
+        this.utils.dumpOntologyToRepository(testContextUri, testUserOntology, this.getTestRepositoryConnection(),
+                this.manager);
+        
+        final OWLOntology testUserInferredOntology =
+                this.utils.computeInferences(userOntologyReasoner, IRI.create(testInferredContextUri),
+                        testInferredOntologyVersionUri, this.manager);
+        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
+        // Sesame Repository
+        this.utils.dumpOntologyToRepository(testInferredContextUri, testUserInferredOntology,
+                this.getTestRepositoryConnection(), this.manager);
+        
     }
     
 }
