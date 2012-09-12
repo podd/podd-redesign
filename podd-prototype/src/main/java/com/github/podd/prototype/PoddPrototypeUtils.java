@@ -106,18 +106,26 @@ public class PoddPrototypeUtils
             final RepositoryConnection nextRepositoryConnection, final OWLOntologyManager ontologyManager)
         throws IOException, RepositoryException
     {
-        // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI into
-        // a single context in the Sesame Repository
-        final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
-        repositoryHandler.enforceContext(nextContextUri);
-        
-        // Render the triples out from OWLAPI into a Sesame Repository
-        final RioRenderer renderer =
-                new RioRenderer(nextOntology, ontologyManager, repositoryHandler, null, nextContextUri);
-        renderer.render();
-        
-        // Commit the current repository connection
-        nextRepositoryConnection.commit();
+        try
+        {
+            // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI into
+            // a single context in the Sesame Repository
+            final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
+            repositoryHandler.enforceContext(nextContextUri);
+            
+            // Render the triples out from OWLAPI into a Sesame Repository
+            final RioRenderer renderer =
+                    new RioRenderer(nextOntology, ontologyManager, repositoryHandler, null, nextContextUri);
+            renderer.render();
+            
+            // Commit the current repository connection
+            nextRepositoryConnection.commit();
+        }
+        catch(Exception e)
+        {
+            nextRepositoryConnection.rollback();
+            throw e;
+        }
     }
     
     public OWLOntology loadOntology(final String ontologyResource, final OWLOntologyManager ontologyManager)
