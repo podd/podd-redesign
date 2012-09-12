@@ -36,12 +36,15 @@
 
     <owl:AnnotationProperty rdf:about="&poddBase;hasUser">
         <rdfs:label>has User</rdfs:label>
-        <rdfs:domain rdf:resource="&poddBase;Project"/>
+        <rdfs:domain rdf:resource="&poddBase;TopObject"/>
     </owl:AnnotationProperty>
     <owl:AnnotationProperty rdf:about="&poddBase;hasTopObjectStatus">
-        <rdfs:domain rdf:resource="&poddBase;Project"/>
+        <rdfs:label>has Top Object Status</rdfs:label>
+        <rdfs:domain rdf:resource="&poddBase;TopObject"/>
     </owl:AnnotationProperty>
-    <owl:AnnotationProperty rdf:about="&poddBase;weight"/>
+    <owl:AnnotationProperty rdf:about="&poddBase;weight">
+        <rdfs:label>has Weight</rdfs:label>
+    </owl:AnnotationProperty>
     
 
 
@@ -85,6 +88,7 @@
     <!-- http://purl.org/podd/ns/poddBase#contains -->
 
     <owl:ObjectProperty rdf:about="&poddBase;contains">
+        <rdfs:label>contains</rdfs:label>
         <rdfs:range rdf:resource="&poddBase;PoddTopObject"/>
     </owl:ObjectProperty>
     
@@ -151,6 +155,7 @@
     <!-- http://purl.org/podd/ns/poddBase#refersTo -->
 
     <owl:ObjectProperty rdf:about="&poddBase;refersTo">
+        <rdfs:label>refers to</rdfs:label>
         <rdfs:range rdf:resource="&poddBase;PoddTopObject"/>
     </owl:ObjectProperty>
     
@@ -235,7 +240,9 @@
 
     <!-- http://purl.org/podd/ns/poddBase#hasNotes -->
 
-    <owl:DatatypeProperty rdf:about="&poddBase;hasNotes"/>
+    <owl:DatatypeProperty rdf:about="&poddBase;hasNotes">
+        <rdfs:label>has Notes</rdfs:label>
+    </owl:DatatypeProperty>
     
 
 
@@ -280,7 +287,9 @@
 
     <!-- http://purl.org/podd/ns/poddBase#hasTime -->
 
-    <owl:DatatypeProperty rdf:about="&poddBase;hasTime"/>
+    <owl:DatatypeProperty rdf:about="&poddBase;hasTime">
+        <rdfs:label>has Time</rdfs:label>
+    </owl:DatatypeProperty>
     
 
 
@@ -336,7 +345,9 @@
 
     <!-- http://purl.org/podd/ns/poddBase#Assertion -->
 
-    <owl:Class rdf:about="&poddBase;Assertion"/>
+    <owl:Class rdf:about="&poddBase;Assertion">
+        <rdfs:label>Assertion</rdfs:label>
+    </owl:Class>
     
 
 
@@ -351,6 +362,7 @@
     <!-- http://purl.org/podd/ns/poddBase#PoddTopObject -->
 
     <owl:Class rdf:about="&poddBase;PoddTopObject">
+        <rdfs:label>Podd Top Object</rdfs:label>
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -443,6 +455,7 @@
     <!-- http://purl.org/podd/ns/poddBase#TopObjectStatus -->
 
     <owl:Class rdf:about="&poddBase;TopObjectStatus">
+        <rdfs:label>Top Object Status</rdfs:label>
         <owl:equivalentClass>
             <owl:Class>
                 <owl:oneOf rdf:parseType="Collection">
@@ -459,6 +472,7 @@
     <!-- http://purl.org/podd/ns/poddBase#User -->
 
     <owl:Class rdf:about="&poddBase;User">
+        <rdfs:label>User</rdfs:label>
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
     </owl:Class>
     

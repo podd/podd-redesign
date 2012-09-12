@@ -3,7 +3,7 @@
 
 <!DOCTYPE rdf:RDF [
     <!ENTITY foaf "http://xmlns.com/foaf/0.1/" >
-    <!ENTITY poddModel "http://purl.org/podd/ns/podd#" >
+    <!ENTITY poddModel "http://purl.org/podd/ns/poddBase#" >
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY user "http://purl.org/podd/ns/poddUser#" >
@@ -24,7 +24,7 @@
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:skos="http://www.w3.org/2004/02/skos/core#"
      xmlns:user="http://purl.org/podd/ns/poddUser#"
-     xmlns:poddModel="http://purl.org/podd/ns/podd#">
+     xmlns:poddModel="http://purl.org/podd/ns/poddBase#">
     <owl:Ontology rdf:about="http://purl.org/podd/ns/poddUser">
         <rdfs:label>The PODD User Ontology</rdfs:label>
         <owl:imports rdf:resource="http://purl.org/podd/ns/version/poddBase/1"/>
@@ -195,7 +195,7 @@
     
 
 
-    <!-- http://purl.org/podd/ns/podd#TopObject -->
+    <!-- http://purl.org/podd/ns/poddBase#TopObject -->
 
     <owl:Class rdf:about="&poddModel;TopObject">
         <rdfs:label>Top Object</rdfs:label>
@@ -521,37 +521,6 @@ A user has exactly one name (username).</rdfs:comment>
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#hasNotes">
-        <rdfs:label>has Notes</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#contains">
-        <rdfs:label>contains</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#weight">
-        <rdfs:label>has Weight</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#hasTopObjectStatus">
-        <rdfs:label>has Top Object Status</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#User">
-        <rdfs:label>User</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#PoddTopObject">
-        <rdfs:label>Podd Top Object</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#TopObjectStatus">
-        <rdfs:label>Top Object Status</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#refersTo">
-        <rdfs:label>refers to</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#hasTime">
-        <rdfs:label>has Time</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://purl.org/podd/ns/poddBase#Assertion">
-        <rdfs:label>Assertion</rdfs:label>
-    </rdf:Description>
-    
 
 
     <!-- 
