@@ -131,7 +131,7 @@ public class PoddPrototypeUtils
     /**
      * Dump the triples representing a given ontology into a Sesame Repository.
      * 
-     * @param nextContextUri
+     * @param nextOntologyContextUri
      *            The context URI to dump the ontology triples into.
      * @param nextOntology
      *            The ontology to dump into the repository.
@@ -139,24 +139,30 @@ public class PoddPrototypeUtils
      *            The repository connection to dump the triples into.
      * @param ontologyManager
      *            The ontology manager containing the given ontology.
+     * @param managementContextUri
+     *            The URI of a context in the repository that is used to track Schema Ontologies and
+     *            their current versions
      * @throws IOException
      * @throws RepositoryException
      */
-    public void dumpOntologyToRepository(final URI nextContextUri, final OWLOntology nextOntology,
-            final RepositoryConnection nextRepositoryConnection, final OWLOntologyManager ontologyManager)
-        throws IOException, RepositoryException
+    public void dumpSchemaOntologyToRepository(final URI nextOntologyContextUri, final OWLOntology nextOntology,
+            final RepositoryConnection nextRepositoryConnection, final OWLOntologyManager ontologyManager,
+            final URI managementContextUri) throws IOException, RepositoryException
     {
         try
         {
             // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
             // into a single context in the Sesame Repository
             final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
-            repositoryHandler.enforceContext(nextContextUri);
+            repositoryHandler.enforceContext(nextOntologyContextUri);
             
             // Render the triples out from OWLAPI into a Sesame Repository
             final RioRenderer renderer =
-                    new RioRenderer(nextOntology, ontologyManager, repositoryHandler, null, nextContextUri);
+                    new RioRenderer(nextOntology, ontologyManager, repositoryHandler, null, nextOntologyContextUri);
             renderer.render();
+            
+            // TODO: Store the ontology IRI and ontology version IRI into managementContextUri
+            // context and overwrite any previous currentVersion links
             
             // Commit the current repository connection
             nextRepositoryConnection.commit();

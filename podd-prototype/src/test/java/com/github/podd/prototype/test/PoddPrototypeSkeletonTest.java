@@ -39,6 +39,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     
     private PoddPrototypeUtils utils;
     
+    private URI schemaOntologyManagementGraph;
+    
     @Override
     @Before
     public void setUp() throws Exception
@@ -56,6 +58,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         this.utils = new PoddPrototypeUtils();
         
+        this.schemaOntologyManagementGraph = this.getTestValueFactory().createURI("urn:test:schema:managementgraph");
     }
     
     @Override
@@ -86,15 +89,15 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLOntology testBaseOntology = this.utils.loadOntology("/ontologies/poddBase.owl", this.manager);
         final OWLReasoner reasoner =
                 this.utils.checkConsistency(testBaseOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
-        this.utils.dumpOntologyToRepository(testBaseContextUri, testBaseOntology, this.getTestRepositoryConnection(),
-                this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testBaseContextUri, testBaseOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         final OWLOntology testBaseInferredOntology =
                 this.utils.computeInferences(reasoner, IRI.create(testBaseInferredContextUri),
                         testBaseInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testBaseInferredContextUri, testBaseInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testBaseInferredContextUri, testBaseInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final URI testScienceContextUri = this.getTestValueFactory().createURI("urn:test:poddScience:context");
         final URI testScienceInferredContextUri =
@@ -108,16 +111,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLReasoner scienceOntologyReasoner =
                 this.utils.checkConsistency(testScienceOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
         this.log.info("Completed reasoning consistency for science ontology");
-        this.utils.dumpOntologyToRepository(testScienceContextUri, testScienceOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testScienceContextUri, testScienceOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final OWLOntology testScienceInferredOntology =
                 this.utils.computeInferences(scienceOntologyReasoner, IRI.create(testScienceInferredContextUri),
                         testScienceInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testScienceInferredContextUri, testScienceInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testScienceInferredContextUri, testScienceInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final URI testPoddAnimalContextUri = this.getTestValueFactory().createURI("urn:test:poddAnimal:context");
         final URI testPoddAnimalInferredContextUri =
@@ -131,16 +134,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLReasoner poddAnimalOntologyReasoner =
                 this.utils.checkConsistency(testPoddAnimalOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
         this.log.info("Completed reasoning consistency for PODD animal ontology");
-        this.utils.dumpOntologyToRepository(testPoddAnimalContextUri, testPoddAnimalOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testPoddAnimalContextUri, testPoddAnimalOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final OWLOntology testPoddAnimalInferredOntology =
                 this.utils.computeInferences(poddAnimalOntologyReasoner, IRI.create(testPoddAnimalInferredContextUri),
                         testPoddAnimalInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testPoddAnimalInferredContextUri, testPoddAnimalInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testPoddAnimalInferredContextUri, testPoddAnimalInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
     }
     
@@ -161,15 +164,15 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLOntology testBaseOntology = this.utils.loadOntology("/ontologies/poddBase.owl", this.manager);
         final OWLReasoner reasoner =
                 this.utils.checkConsistency(testBaseOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
-        this.utils.dumpOntologyToRepository(testBaseContextUri, testBaseOntology, this.getTestRepositoryConnection(),
-                this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testBaseContextUri, testBaseOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         final OWLOntology testBaseInferredOntology =
                 this.utils.computeInferences(reasoner, IRI.create(testBaseInferredContextUri),
                         testBaseInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testBaseInferredContextUri, testBaseInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testBaseInferredContextUri, testBaseInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final URI testScienceContextUri = this.getTestValueFactory().createURI("urn:test:poddScience:context");
         final URI testScienceInferredContextUri =
@@ -183,16 +186,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLReasoner scienceOntologyReasoner =
                 this.utils.checkConsistency(testScienceOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
         this.log.info("Completed reasoning consistency for science ontology");
-        this.utils.dumpOntologyToRepository(testScienceContextUri, testScienceOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testScienceContextUri, testScienceOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final OWLOntology testScienceInferredOntology =
                 this.utils.computeInferences(scienceOntologyReasoner, IRI.create(testScienceInferredContextUri),
                         testScienceInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testScienceInferredContextUri, testScienceInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testScienceInferredContextUri, testScienceInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final URI testPoddPlantContextUri = this.getTestValueFactory().createURI("urn:test:poddPlant:context");
         final URI testPoddPlantInferredContextUri =
@@ -206,16 +209,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLReasoner poddPlantOntologyReasoner =
                 this.utils.checkConsistency(testPoddPlantOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
         this.log.info("Completed reasoning consistency for PODD plant ontology");
-        this.utils.dumpOntologyToRepository(testPoddPlantContextUri, testPoddPlantOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testPoddPlantContextUri, testPoddPlantOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final OWLOntology testPoddPlantInferredOntology =
                 this.utils.computeInferences(poddPlantOntologyReasoner, IRI.create(testPoddPlantInferredContextUri),
                         testPoddPlantInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testPoddPlantInferredContextUri, testPoddPlantInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testPoddPlantInferredContextUri, testPoddPlantInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
     }
     
@@ -236,15 +239,15 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLOntology testBaseOntology = this.utils.loadOntology("/ontologies/poddBase.owl", this.manager);
         final OWLReasoner reasoner =
                 this.utils.checkConsistency(testBaseOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
-        this.utils.dumpOntologyToRepository(testBaseContextUri, testBaseOntology, this.getTestRepositoryConnection(),
-                this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testBaseContextUri, testBaseOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         final OWLOntology testBaseInferredOntology =
                 this.utils.computeInferences(reasoner, IRI.create(testBaseInferredContextUri),
                         testBaseInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testBaseInferredContextUri, testBaseInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testBaseInferredContextUri, testBaseInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final URI testScienceContextUri = this.getTestValueFactory().createURI("urn:test:poddScience:context");
         final URI testScienceInferredContextUri =
@@ -258,16 +261,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLReasoner scienceOntologyReasoner =
                 this.utils.checkConsistency(testScienceOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
         this.log.info("Completed reasoning consistency for science ontology");
-        this.utils.dumpOntologyToRepository(testScienceContextUri, testScienceOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testScienceContextUri, testScienceOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final OWLOntology testScienceInferredOntology =
                 this.utils.computeInferences(scienceOntologyReasoner, IRI.create(testScienceInferredContextUri),
                         testScienceInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testScienceInferredContextUri, testScienceInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testScienceInferredContextUri, testScienceInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
     }
     
@@ -287,15 +290,15 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLOntology testBaseOntology = this.utils.loadOntology("/ontologies/poddBase.owl", this.manager);
         final OWLReasoner reasoner =
                 this.utils.checkConsistency(testBaseOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
-        this.utils.dumpOntologyToRepository(testBaseContextUri, testBaseOntology, this.getTestRepositoryConnection(),
-                this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testBaseContextUri, testBaseOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         final OWLOntology testBaseInferredOntology =
                 this.utils.computeInferences(reasoner, IRI.create(testBaseInferredContextUri),
                         testBaseInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testBaseInferredContextUri, testBaseInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testBaseInferredContextUri, testBaseInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final URI testUserContextUri = this.getTestValueFactory().createURI("urn:test:poddUser:context");
         final URI testUserInferredContextUri =
@@ -308,16 +311,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLReasoner userOntologyReasoner =
                 this.utils.checkConsistency(testUserOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
         this.log.info("Completed reasoning consistency for user ontology");
-        this.utils.dumpOntologyToRepository(testUserContextUri, testUserOntology, this.getTestRepositoryConnection(),
-                this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testUserContextUri, testUserOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         final OWLOntology testUserInferredOntology =
                 this.utils.computeInferences(userOntologyReasoner, IRI.create(testUserInferredContextUri),
                         testUserInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testUserInferredContextUri, testUserInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testUserInferredContextUri, testUserInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
     }
     
@@ -336,15 +339,15 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLOntology testBaseOntology = this.utils.loadOntology("/ontologies/poddBase.owl", this.manager);
         final OWLReasoner reasoner =
                 this.utils.checkConsistency(testBaseOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
-        this.utils.dumpOntologyToRepository(testContextUri, testBaseOntology, this.getTestRepositoryConnection(),
-                this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testContextUri, testBaseOntology, this.getTestRepositoryConnection(),
+                this.manager, this.schemaOntologyManagementGraph);
         final OWLOntology testBaseInferredOntology =
                 this.utils.computeInferences(reasoner, IRI.create(testInferredContextUri),
                         testInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testInferredContextUri, testBaseInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testInferredContextUri, testBaseInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
     }
     
     /**
@@ -376,8 +379,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.manager.applyChange(new SetOntologyID(testOntology, fullId));
         Assert.assertEquals(fullId, testOntology.getOntologyID());
         
-        this.utils.dumpOntologyToRepository(testContextUri, testOntology, this.getTestRepositoryConnection(),
-                this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testContextUri, testOntology, this.getTestRepositoryConnection(),
+                this.manager, this.schemaOntologyManagementGraph);
         
         // Then test to ensure that the expected number of triples were added,
         // and ensure that no other triples are in the repository at this point
@@ -396,8 +399,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testInferredContextUri, inferredAxiomsOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testInferredContextUri, inferredAxiomsOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
         // verify that the triples were inserted into the repository correctly
         Assert.assertEquals(2995, this.getTestRepositoryConnection().size(testInferredContextUri));
@@ -457,16 +460,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLReasoner userOntologyReasoner =
                 this.utils.checkConsistency(testUserOntology, OWLProfile.OWL2_DL, this.reasonerFactory);
         this.log.info("Completed reasoning consistency for user ontology");
-        this.utils.dumpOntologyToRepository(testContextUri, testUserOntology, this.getTestRepositoryConnection(),
-                this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testContextUri, testUserOntology, this.getTestRepositoryConnection(),
+                this.manager, this.schemaOntologyManagementGraph);
         
         final OWLOntology testUserInferredOntology =
                 this.utils.computeInferences(userOntologyReasoner, IRI.create(testInferredContextUri),
                         testInferredOntologyVersionUri, this.manager);
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.utils.dumpOntologyToRepository(testInferredContextUri, testUserInferredOntology,
-                this.getTestRepositoryConnection(), this.manager);
+        this.utils.dumpSchemaOntologyToRepository(testInferredContextUri, testUserInferredOntology,
+                this.getTestRepositoryConnection(), this.manager, this.schemaOntologyManagementGraph);
         
     }
     
