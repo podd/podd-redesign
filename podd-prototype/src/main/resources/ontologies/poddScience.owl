@@ -2324,7 +2324,7 @@
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDescription"/>
+                <owl:onProperty rdf:resource="&poddBase;hasDescription"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -2403,7 +2403,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDescription"/>
+                <owl:onProperty rdf:resource="&poddBase;hasDescription"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
