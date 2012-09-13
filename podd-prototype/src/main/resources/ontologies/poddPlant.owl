@@ -3,7 +3,7 @@
 
 <!DOCTYPE rdf:RDF [
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
-    <!ENTITY podd "http://purl.org/podd/ns/poddBase#" >
+    <!ENTITY poddBase "http://purl.org/podd/ns/poddBase#" >
     <!ENTITY poddScience "http://purl.org/podd/ns/poddScience#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY poddPlant "http://purl.org/podd/ns/poddPlant#" >
@@ -21,7 +21,7 @@
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:podd="http://purl.org/podd/ns/poddBase#"
+     xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
      xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
     <owl:Ontology rdf:about="http://purl.org/podd/ns/poddPlant">
         <owl:imports rdf:resource="http://purl.org/podd/ns/version/poddBase/1"/>
@@ -69,12 +69,6 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
-
-
-    <!-- http://purl.org/podd/ns/poddScience#hasDescription -->
-
-    <owl:DatatypeProperty rdf:about="&poddScience;hasDescription"/>
     
 
 
@@ -157,7 +151,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <podd:weight>10</podd:weight>
+        <poddBase:weight>10</poddBase:weight>
         <owl:subject rdf:resource="&poddScience;Genotype"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -191,7 +185,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <podd:weight>8</podd:weight>
+        <poddBase:weight>8</poddBase:weight>
         <owl:subject rdf:resource="#FieldConditions"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -203,7 +197,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <podd:weight>7</podd:weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#FieldConditions"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -231,7 +225,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <podd:weight>7</podd:weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#GrowthConditions"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -257,7 +251,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasDescription"/>
+                <owl:onProperty rdf:resource="&poddBase;hasDescription"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -265,12 +259,12 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <podd:weight>5</podd:weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Substrate"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddScience;hasDescription"/>
+                <owl:onProperty rdf:resource="&poddBase;hasDescription"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -278,7 +272,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <podd:weight>3</podd:weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Substrate"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -313,7 +307,7 @@
 
     <owl:Thing rdf:about="&poddScience;NotApplicable">
         <rdf:type rdf:resource="&poddScience;ANZSRC"/>
-        <podd:weight>1</podd:weight>
+        <poddBase:weight>1</poddBase:weight>
     </owl:Thing>
     
 
@@ -322,7 +316,7 @@
 
     <owl:Thing rdf:about="#ANZSRC06-Biological-Sciences">
         <rdf:type rdf:resource="&poddScience;ANZSRC"/>
-        <podd:weight>2</podd:weight>
+        <poddBase:weight>2</poddBase:weight>
     </owl:Thing>
     
 
@@ -331,7 +325,7 @@
 
     <owl:Thing rdf:about="#ANZSRC07-Agriculture-and-Veterinary-Sciences">
         <rdf:type rdf:resource="&poddScience;ANZSRC"/>
-        <podd:weight>3</podd:weight>
+        <poddBase:weight>3</poddBase:weight>
     </owl:Thing>
 </rdf:RDF>
 
