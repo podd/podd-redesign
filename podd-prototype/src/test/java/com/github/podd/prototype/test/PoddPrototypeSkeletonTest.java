@@ -351,7 +351,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
      * @throws Exception
      */
     @Test
-    public final void testPlantOntology() throws Exception
+    public final void testOBOPlantOntology() throws Exception
     {
         // create owl class objects to use in queries
         final OWLClass phylomeStomatalComplex = OWL.Class(IRI.create("http://purl.obolibrary.org/obo/PO_0025215"));
@@ -366,7 +366,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                 this.getTestValueFactory().createURI("urn:test:plantontology:inferred:context");
         
         final OWLOntology testOntology =
-                this.utils.loadOntology("/test/ontologies/plant_ontology-v16.owl", this.manager);
+                this.utils.loadOntology("/ontologies/plant_ontology-v16.owl", this.manager);
         
         // fix up the ontology id that was parsed using the values that we wish to use here
         final OWLOntologyID fullId =
