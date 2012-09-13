@@ -65,6 +65,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         super.tearDown();
         
         this.manager = null;
+        this.reasonerFactory = null;
+        this.utils = null;
     }
     
     /**
