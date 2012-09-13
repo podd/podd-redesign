@@ -266,12 +266,12 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddScience&poddBase;hasTopObjectPlan -->
+    <!-- http://purl.org/podd/ns/poddScience#hasProjectPlan -->
 
-    <owl:ObjectProperty rdf:about="&poddBase;hasTopObjectPlan">
+    <owl:ObjectProperty rdf:about="#hasProjectPlan">
         <rdfs:label
             >has Project Plan</rdfs:label>
-        <rdfs:range rdf:resource="&poddBase;TopObjectPlan"/>
+        <rdfs:range rdf:resource="#ProjectPlan"/>
         <rdfs:subPropertyOf rdf:resource="&poddBase;contains"/>
     </owl:ObjectProperty>
     
@@ -878,7 +878,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Accession"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -891,7 +891,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Accession"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -930,7 +930,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Allele"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -942,7 +942,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Allele"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -955,7 +955,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Allele"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1000,7 +1000,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>11</weight>
+        <poddBase:weight>11</poddBase:weight>
         <owl:subject rdf:resource="#Analysis"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1082,7 +1082,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>13</weight>
+        <poddBase:weight>13</poddBase:weight>
         <owl:subject rdf:resource="#Container"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1094,7 +1094,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Container"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1107,7 +1107,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Container"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1120,7 +1120,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>15</weight>
+        <poddBase:weight>15</poddBase:weight>
         <owl:subject rdf:resource="#Container"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1190,7 +1190,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Data"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1203,7 +1203,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>11</weight>
+        <poddBase:weight>11</poddBase:weight>
         <owl:subject rdf:resource="#Data"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1216,7 +1216,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>13</weight>
+        <poddBase:weight>13</poddBase:weight>
         <owl:subject rdf:resource="#Data"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1249,7 +1249,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>13</weight>
+        <poddBase:weight>13</poddBase:weight>
         <owl:subject rdf:resource="#Design"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1261,7 +1261,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Design"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1314,7 +1314,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>15</weight>
+        <poddBase:weight>15</poddBase:weight>
         <owl:subject rdf:resource="#Environment"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1326,7 +1326,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Environment"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1339,7 +1339,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Environment"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1352,7 +1352,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>13</weight>
+        <poddBase:weight>13</poddBase:weight>
         <owl:subject rdf:resource="#Environment"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1407,7 +1407,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>4</weight>
+        <poddBase:weight>4</poddBase:weight>
         <owl:subject rdf:resource="#Event"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1420,7 +1420,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Event"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1433,7 +1433,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>9</weight>
+        <poddBase:weight>9</poddBase:weight>
         <owl:subject rdf:resource="#Event"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1446,7 +1446,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Event"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1459,7 +1459,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Event"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1531,7 +1531,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>12</weight>
+        <poddBase:weight>12</poddBase:weight>
         <owl:subject rdf:resource="#Gene"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1543,7 +1543,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Gene"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1555,7 +1555,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>8</weight>
+        <poddBase:weight>8</poddBase:weight>
         <owl:subject rdf:resource="#Gene"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1567,7 +1567,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>10</weight>
+        <poddBase:weight>10</poddBase:weight>
         <owl:subject rdf:resource="#Gene"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1580,7 +1580,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>6</weight>
+        <poddBase:weight>6</poddBase:weight>
         <owl:subject rdf:resource="#Gene"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1592,7 +1592,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Gene"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1605,7 +1605,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>4</weight>
+        <poddBase:weight>4</poddBase:weight>
         <owl:subject rdf:resource="#Gene"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1686,7 +1686,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Genotype"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1698,7 +1698,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>9</weight>
+        <poddBase:weight>9</poddBase:weight>
         <owl:subject rdf:resource="#Genotype"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1711,7 +1711,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>14</weight>
+        <poddBase:weight>14</poddBase:weight>
         <owl:subject rdf:resource="#Genotype"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1723,7 +1723,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>12</weight>
+        <poddBase:weight>12</poddBase:weight>
         <owl:subject rdf:resource="#Genotype"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1736,7 +1736,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>11</weight>
+        <poddBase:weight>11</poddBase:weight>
         <owl:subject rdf:resource="#Genotype"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1749,7 +1749,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>8</weight>
+        <poddBase:weight>8</poddBase:weight>
         <owl:subject rdf:resource="#Genotype"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1762,7 +1762,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Genotype"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1775,7 +1775,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Genotype"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1875,7 +1875,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Investigation"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1888,7 +1888,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Investigation"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1900,7 +1900,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>13</weight>
+        <poddBase:weight>13</poddBase:weight>
         <owl:subject rdf:resource="#Investigation"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1912,7 +1912,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>9</weight>
+        <poddBase:weight>9</poddBase:weight>
         <owl:subject rdf:resource="#Investigation"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1960,7 +1960,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Marker"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1973,7 +1973,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>9</weight>
+        <poddBase:weight>9</poddBase:weight>
         <owl:subject rdf:resource="#Marker"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1986,7 +1986,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Marker"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -1999,7 +1999,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Marker"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2144,7 +2144,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2157,7 +2157,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>15</weight>
+        <poddBase:weight>15</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2169,7 +2169,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>6</weight>
+        <poddBase:weight>6</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2182,7 +2182,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>10</weight>
+        <poddBase:weight>10</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2195,7 +2195,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2208,7 +2208,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2220,7 +2220,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>8</weight>
+        <poddBase:weight>8</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2233,7 +2233,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>4</weight>
+        <poddBase:weight>4</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2246,7 +2246,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>13</weight>
+        <poddBase:weight>13</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2258,7 +2258,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>9</weight>
+        <poddBase:weight>9</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2271,7 +2271,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>12</weight>
+        <poddBase:weight>12</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2284,7 +2284,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>11</weight>
+        <poddBase:weight>11</poddBase:weight>
         <owl:subject rdf:resource="#Material"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2353,7 +2353,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>10</weight>
+        <poddBase:weight>10</poddBase:weight>
         <owl:subject rdf:resource="#Measurement"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2365,7 +2365,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>8</weight>
+        <poddBase:weight>8</poddBase:weight>
         <owl:subject rdf:resource="#Measurement"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2378,7 +2378,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Measurement"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2391,7 +2391,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Measurement"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2404,7 +2404,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>9</weight>
+        <poddBase:weight>9</poddBase:weight>
         <owl:subject rdf:resource="#Measurement"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2417,7 +2417,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Measurement"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2430,7 +2430,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>6</weight>
+        <poddBase:weight>6</poddBase:weight>
         <owl:subject rdf:resource="#Measurement"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2466,7 +2466,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#MeasurementParameter"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2479,7 +2479,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#MeasurementParameter"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2519,7 +2519,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Observation"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2532,7 +2532,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Observation"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2580,7 +2580,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Platform"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2592,7 +2592,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Platform"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2683,8 +2683,8 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasTopObjectPlan"/>
-                <owl:allValuesFrom rdf:resource="&poddBase;TopObjectPlan"/>
+                <owl:onProperty rdf:resource="#hasProjectPlan"/>
+                <owl:allValuesFrom rdf:resource="#ProjectPlan"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -2767,7 +2767,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>13</weight>
+        <poddBase:weight>13</poddBase:weight>
         <owl:subject rdf:resource="#Project"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2780,7 +2780,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Project"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2793,7 +2793,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>12</weight>
+        <poddBase:weight>12</poddBase:weight>
         <owl:subject rdf:resource="#Project"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2806,7 +2806,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>10</weight>
+        <poddBase:weight>10</poddBase:weight>
         <owl:subject rdf:resource="#Project"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2819,7 +2819,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Project"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2832,7 +2832,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>9</weight>
+        <poddBase:weight>9</poddBase:weight>
         <owl:subject rdf:resource="#Project"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2845,7 +2845,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="&poddBase;PoddTopObject"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2859,10 +2859,10 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddScience&poddBase;TopObjectPlan -->
+    <!-- http://purl.org/podd/ns/poddScience#ProjectPlan -->
 
-    <owl:Class rdf:about="&poddBase;TopObjectPlan">
-        <rdfs:label>Top Object Plan</rdfs:label>
+    <owl:Class rdf:about="#ProjectPlan">
+        <rdfs:label>Project Plan</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
     </owl:Class>
     
@@ -2932,7 +2932,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Publication"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2945,7 +2945,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Publication"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2958,7 +2958,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>6</weight>
+        <poddBase:weight>6</poddBase:weight>
         <owl:subject rdf:resource="#Publication"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2971,7 +2971,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>7</weight>
+        <poddBase:weight>7</poddBase:weight>
         <owl:subject rdf:resource="#Publication"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2984,7 +2984,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Publication"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -2997,7 +2997,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>8</weight>
+        <poddBase:weight>8</poddBase:weight>
         <owl:subject rdf:resource="#Publication"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3010,7 +3010,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>9</weight>
+        <poddBase:weight>9</poddBase:weight>
         <owl:subject rdf:resource="#Publication"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3044,7 +3044,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Sequence"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3056,7 +3056,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Sequence"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3110,7 +3110,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>5</weight>
+        <poddBase:weight>5</poddBase:weight>
         <owl:subject rdf:resource="#Software"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3123,7 +3123,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Software"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3181,7 +3181,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>11</weight>
+        <poddBase:weight>11</poddBase:weight>
         <owl:subject rdf:resource="#Treatment"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3193,7 +3193,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#Treatment"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3206,7 +3206,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>13</weight>
+        <poddBase:weight>13</poddBase:weight>
         <owl:subject rdf:resource="#Treatment"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3218,7 +3218,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>15</weight>
+        <poddBase:weight>15</poddBase:weight>
         <owl:subject rdf:resource="#Treatment"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3279,7 +3279,7 @@
     </owl:Class>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>3</weight>
+        <poddBase:weight>3</poddBase:weight>
         <owl:subject rdf:resource="#TreatmentMaterial"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3292,7 +3292,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>11</weight>
+        <poddBase:weight>11</poddBase:weight>
         <owl:subject rdf:resource="#TreatmentMaterial"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3305,7 +3305,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>13</weight>
+        <poddBase:weight>13</poddBase:weight>
         <owl:subject rdf:resource="#TreatmentMaterial"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3317,7 +3317,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>15</weight>
+        <poddBase:weight>15</poddBase:weight>
         <owl:subject rdf:resource="#TreatmentMaterial"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
@@ -3329,7 +3329,7 @@
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;Axiom"/>
-        <weight>4</weight>
+        <poddBase:weight>4</poddBase:weight>
         <owl:subject rdf:resource="#TreatmentMaterial"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
