@@ -312,6 +312,15 @@
     </owl:DatatypeProperty>
     
 
+    <!-- http://purl.org/podd/ns/poddBase#hasType -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasType">
+        <rdfs:label>has Type</rdfs:label>
+        <rdfs:comment>FIXME: Confirm the semantics of this datatype property</rdfs:comment>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
 
     <!-- http://purl.org/podd/ns/poddBase#hasURL -->
 
