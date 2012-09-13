@@ -119,8 +119,7 @@ public class PoddPrototypeUtils
         try
         {
             // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
-            // into
-            // a single context in the Sesame Repository
+            // into a single context in the Sesame Repository
             final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
             repositoryHandler.enforceContext(nextContextUri);
             

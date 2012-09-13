@@ -367,8 +367,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final URI testInferredContextUri =
                 this.getTestValueFactory().createURI("urn:test:plantontology:inferred:context");
         
-        final OWLOntology testOntology =
-                this.utils.loadOntology("/ontologies/plant_ontology-v16.owl", this.manager);
+        final OWLOntology testOntology = this.utils.loadOntology("/ontologies/plant_ontology-v16.owl", this.manager);
         
         // fix up the ontology id that was parsed using the values that we wish to use here
         final OWLOntologyID fullId =
