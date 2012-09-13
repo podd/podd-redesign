@@ -54,15 +54,16 @@ public class PoddPrototypeUtils
             final OWLReasonerFactory nextReasonerFactory) throws Exception
     {
         final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(nextProfileIRI);
-        Assert.assertNotNull("Could not find profile in registry: "+nextProfileIRI.toQuotedString(), nextProfile);
+        Assert.assertNotNull("Could not find profile in registry: " + nextProfileIRI.toQuotedString(), nextProfile);
         final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
         if(!profileReport.isInProfile())
         {
-            log.error("Bad profile report count: {}", profileReport.getViolations().size());
-            log.error("Bad profile report: {}", profileReport);
+            this.log.error("Bad profile report count: {}", profileReport.getViolations().size());
+            this.log.error("Bad profile report: {}", profileReport);
         }
-        Assert.assertTrue("Schema Ontology was not in the given profile: "+nextOntology.getOntologyID().toString(), profileReport.isInProfile());
-            
+        Assert.assertTrue("Schema Ontology was not in the given profile: " + nextOntology.getOntologyID().toString(),
+                profileReport.isInProfile());
+        
         // create an OWL Reasoner using the Pellet library and ensure that the reasoner thinks the
         // ontology is consistent so far
         // Use the factory that we found to create a reasoner over the ontology
@@ -70,7 +71,8 @@ public class PoddPrototypeUtils
         
         // Test that the ontology was consistent with this reasoner
         // This ensures in the case of Pellet that it is in the OWL2-DL profile
-        Assert.assertTrue("Ontology was not consistent: "+nextOntology.getOntologyID().toString(), nextReasoner.isConsistent());
+        Assert.assertTrue("Ontology was not consistent: " + nextOntology.getOntologyID().toString(),
+                nextReasoner.isConsistent());
         
         return nextReasoner;
     }
@@ -116,7 +118,8 @@ public class PoddPrototypeUtils
     {
         try
         {
-            // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI into
+            // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
+            // into
             // a single context in the Sesame Repository
             final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
             repositoryHandler.enforceContext(nextContextUri);
@@ -129,7 +132,7 @@ public class PoddPrototypeUtils
             // Commit the current repository connection
             nextRepositoryConnection.commit();
         }
-        catch(Exception e)
+        catch(final Exception e)
         {
             nextRepositoryConnection.rollback();
             throw e;
