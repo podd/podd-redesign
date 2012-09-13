@@ -8,6 +8,9 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
@@ -42,6 +45,33 @@ import org.slf4j.LoggerFactory;
  */
 public class PoddPrototypeUtils
 {
+    /**
+     * This URI is not currently in the Sesame OWL namespace, so we create a constant here as it is
+     * vital to our strategy.
+     */
+    public static final URI OWL_VERSION_IRI = ValueFactoryImpl.getInstance().createURI(OWL.NAMESPACE, "versionIRI");
+    
+    /**
+     * The OMV vocabulary defines a property for the current version of an ontology, so we are
+     * reusing it here.
+     */
+    public static final URI OMV_CURRENT_VERSION = ValueFactoryImpl.getInstance().createURI(
+            "http://omv.ontoware.org/ontology#", "currentVersion");
+    
+    /**
+     * Creating a property for PODD to track the currentInferredVersion for the inferred axioms
+     * ontology when linking from the ontology IRI.
+     */
+    public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "currentInferredVersion");
+    
+    /**
+     * Creating a property for PODD to track the inferredVersion for the inferred axioms ontology of
+     * a particular versioned ontology.
+     */
+    public static final URI PODD_BASE_INFERRED_VERSION = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "inferredVersion");
+    
     private final Logger log = LoggerFactory.getLogger(PoddPrototypeUtils.class);
     
     /**
@@ -139,15 +169,12 @@ public class PoddPrototypeUtils
      *            The repository connection to dump the triples into.
      * @param ontologyManager
      *            The ontology manager containing the given ontology.
-     * @param managementContextUri
-     *            The URI of a context in the repository that is used to track Schema Ontologies and
-     *            their current versions
      * @throws IOException
      * @throws RepositoryException
      */
     public void dumpSchemaOntologyToRepository(final URI nextOntologyContextUri, final OWLOntology nextOntology,
-            final RepositoryConnection nextRepositoryConnection, final OWLOntologyManager ontologyManager,
-            final URI managementContextUri) throws IOException, RepositoryException
+            final RepositoryConnection nextRepositoryConnection, final OWLOntologyManager ontologyManager)
+        throws IOException, RepositoryException
     {
         try
         {
@@ -161,14 +188,12 @@ public class PoddPrototypeUtils
                     new RioRenderer(nextOntology, ontologyManager, repositoryHandler, null, nextOntologyContextUri);
             renderer.render();
             
-            // TODO: Store the ontology IRI and ontology version IRI into managementContextUri
-            // context and overwrite any previous currentVersion links
-            
             // Commit the current repository connection
             nextRepositoryConnection.commit();
         }
         catch(final Exception e)
         {
+            // if anything failed, rollback the connection before rethrowing the exception
             nextRepositoryConnection.rollback();
             throw e;
         }
@@ -221,6 +246,59 @@ public class PoddPrototypeUtils
         Assert.assertFalse(nextOntology.isEmpty());
         
         return nextOntology;
+    }
+    
+    public void updateCurrentManagedSchemaOntologyVersion(final RepositoryConnection nextRepositoryConnection,
+            final OWLOntologyID nextOntologyID, final OWLOntologyID nextInferredOntologyID,
+            final URI managementContextUri) throws RepositoryException
+    {
+        final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
+        final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
+        // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must be
+        // generated for each new inferred ontology generation.
+        final URI nextInferredOntologyUri = nextInferredOntologyID.getOntologyIRI().toOpenRDFURI();
+        
+        try
+        {
+            // type the ontology
+            nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, managementContextUri);
+            // setup a version number link for this version
+            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, nextVersionUri,
+                    managementContextUri);
+            
+            // remove whatever was previously there for the current version marker
+            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, null,
+                    managementContextUri);
+            
+            // then insert the new current version marker
+            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, nextVersionUri,
+                    managementContextUri);
+            
+            // then do a similar process with the inferred axioms ontology
+            nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, managementContextUri);
+            
+            // remove whatever was previously there for the current inferred version marker
+            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
+                    null, managementContextUri);
+            
+            // link from the ontology IRI to the current inferred axioms ontology version
+            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
+                    nextInferredOntologyUri, managementContextUri);
+            
+            // link from the ontology version IRI to the matching inferred axioms ontology version
+            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
+                    nextInferredOntologyUri, managementContextUri);
+            
+            // if everything went well commit the connection
+            nextRepositoryConnection.commit();
+        }
+        catch(final Exception e)
+        {
+            // if anything failed, rollback the connection before rethrowing the exception
+            nextRepositoryConnection.rollback();
+            throw e;
+        }
+        
     }
     
 }
