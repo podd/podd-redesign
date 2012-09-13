@@ -1326,7 +1326,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasStartDateTime"/>
+                <owl:onProperty rdf:resource="&poddBase;hasStartDateTime"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
@@ -1364,7 +1364,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasStartDateTime"/>
+                <owl:onProperty rdf:resource="&poddBase;hasStartDateTime"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
@@ -1412,14 +1412,14 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTimestamp"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDuration"/>
+                <owl:onProperty rdf:resource="&poddBase;hasDuration"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -1445,7 +1445,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTimestamp"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
@@ -1458,7 +1458,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDuration"/>
+                <owl:onProperty rdf:resource="&poddBase;hasDuration"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -1863,7 +1863,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasStartDateTime"/>
+                <owl:onProperty rdf:resource="&poddBase;hasStartDateTime"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
@@ -1900,7 +1900,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasStartDateTime"/>
+                <owl:onProperty rdf:resource="&poddBase;hasStartDateTime"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
@@ -2331,7 +2331,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTimestamp"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
@@ -2455,7 +2455,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTimestamp"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
@@ -2531,7 +2531,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTimestamp"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
@@ -2544,7 +2544,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasTimestamp"/>
+                <owl:onProperty rdf:resource="&poddBase;hasTimestamp"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
@@ -2663,21 +2663,21 @@
         <rdfs:subClassOf rdf:resource="&poddBase;PoddTopObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasStartDate"/>
+                <owl:onProperty rdf:resource="&poddBase;hasStartDate"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;date"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasCompletionDate"/>
+                <owl:onProperty rdf:resource="&poddBase;hasCompletionDate"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;date"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasPrincipalInvestigator"/>
+                <owl:onProperty rdf:resource="&poddBase;hasPrincipalInvestigator"/>
                 <owl:onClass rdf:resource="&poddBase;User"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
@@ -2709,7 +2709,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasLeadInstitution"/>
+                <owl:onProperty rdf:resource="&poddBase;hasLeadInstitution"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -2728,7 +2728,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasPublicationDate"/>
+                <owl:onProperty rdf:resource="&poddBase;hasPublicationDate"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;date"/>
             </owl:Restriction>
@@ -2753,7 +2753,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDuration"/>
+                <owl:onProperty rdf:resource="&poddBase;hasDuration"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -2766,8 +2766,8 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasPublicationStatus"/>
-                <owl:onClass rdf:resource="#PublicationStatus"/>
+                <owl:onProperty rdf:resource="&poddBase;hasPublicationStatus"/>
+                <owl:onClass rdf:resource="&poddBase;PublicationStatus"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -2792,7 +2792,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasPublicationDate"/>
+                <owl:onProperty rdf:resource="&poddBase;hasPublicationDate"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;date"/>
             </owl:Restriction>
@@ -2805,7 +2805,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasStartDate"/>
+                <owl:onProperty rdf:resource="&poddBase;hasStartDate"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;date"/>
             </owl:Restriction>
@@ -2818,8 +2818,8 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasPublicationStatus"/>
-                <owl:onClass rdf:resource="#PublicationStatus"/>
+                <owl:onProperty rdf:resource="&poddBase;hasPublicationStatus"/>
+                <owl:onClass rdf:resource="&poddBase;PublicationStatus"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </owl:object>
@@ -2831,7 +2831,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasCompletionDate"/>
+                <owl:onProperty rdf:resource="&poddBase;hasCompletionDate"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;date"/>
             </owl:Restriction>
@@ -2844,7 +2844,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasDuration"/>
+                <owl:onProperty rdf:resource="&poddBase;hasDuration"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -2870,7 +2870,7 @@
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
         <owl:object>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#hasLeadInstitution"/>
+                <owl:onProperty rdf:resource="&poddBase;hasLeadInstitution"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onDataRange rdf:resource="&xsd;string"/>
             </owl:Restriction>
@@ -2882,7 +2882,7 @@
     <!-- http://purl.org/podd/ns/poddScience&poddBase;TopObjectPlan -->
 
     <owl:Class rdf:about="&poddBase;TopObjectPlan">
-        <rdfs:label>Project Plan</rdfs:label>
+        <rdfs:label>Top Object Plan</rdfs:label>
         <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
     </owl:Class>
     
