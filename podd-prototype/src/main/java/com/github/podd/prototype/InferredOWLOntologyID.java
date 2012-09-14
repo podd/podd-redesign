@@ -10,6 +10,12 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
  * Extends the OWLOntologyID class to provide for another variable to track the inferred ontology
  * IRI that matches this ontology ID.
  * 
+ * Use getBaseOWLOntologyID to get a typical OWLOntologyID instance representing the base portion of
+ * this object.
+ * 
+ * Use getInferredOWLOntologyID to get a typical OWLOntologyID instance representing the inferred
+ * portion of this object.
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
@@ -83,11 +89,36 @@ public class InferredOWLOntologyID extends OWLOntologyID
     }
     
     /**
+     * Returns the OWLOntologyID representing the base ontology, ie, without the inferred ontology,
+     * so that the hashcode will match that of the real OWLOntologyID for the base ontology.
+     * 
+     * @return
+     */
+    public OWLOntologyID getBaseOWLOntologyID()
+    {
+        return new OWLOntologyID(this.getOntologyIRI(), this.getVersionIRI());
+    }
+    
+    /**
      * @return the inferredOntologyIRI
      */
     public IRI getInferredOntologyIRI()
     {
         return this.inferredOntologyIRI;
+    }
+    
+    /**
+     * Returns the OWLOntologyID representing the inferred ontology. ie, without the base ontology,
+     * so that the hashcode will match that of the real OWLOntologyID for the inferred ontology.
+     * 
+     * NOTE: We make the assumption that the ontology IRI and version IRI for versioned ontologies
+     * are the same.
+     * 
+     * @return
+     */
+    public OWLOntologyID getInferredOWLOntologyID()
+    {
+        return new OWLOntologyID(this.getInferredOntologyIRI(), this.getInferredOntologyIRI());
     }
     
     @Override

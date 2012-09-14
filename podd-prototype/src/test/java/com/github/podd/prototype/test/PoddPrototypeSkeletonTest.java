@@ -63,8 +63,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         this.schemaOntologyManagementGraph =
                 this.getTestValueFactory().createURI("urn:test:schemaOntologiesManagementGraph");
-        this.poddArtifactManagementGraph =
-                this.getTestValueFactory().createURI("urn:test:poddArtifactManagementGraph");
+        this.poddArtifactManagementGraph = this.getTestValueFactory().createURI("urn:test:poddArtifactManagementGraph");
         
         this.utils =
                 new PoddPrototypeUtils(this.manager, this.pelletOwlProfile, this.reasonerFactory,
@@ -151,15 +150,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         this.getTestRepositoryConnection().commit();
         
-        InferredOWLOntologyID poddArtifact =
+        final InferredOWLOntologyID poddArtifact =
                 this.utils.loadPoddArtifact("/test/artifacts/testArtifact-1.rdf", this.getTestRepositoryConnection());
         
         // Final: Remove the PODD Artifact Ontology from the manager cache
         Assert.assertTrue(this.manager.contains(poddArtifact));
-        this.manager.removeOntology(poddArtifact);
         
-        // FIXME: The following is failing currently, possibly due to the fact that poddArtifact is not a typical OWLOntologyID
-        //Assert.assertFalse(this.manager.contains(poddArtifact));
+        this.manager.removeOntology(poddArtifact.getBaseOWLOntologyID());
+        Assert.assertFalse(this.manager.contains(poddArtifact.getBaseOWLOntologyID()));
+        this.manager.removeOntology(poddArtifact.getInferredOWLOntologyID());
+        Assert.assertFalse(this.manager.contains(poddArtifact.getInferredOWLOntologyID()));
         
         // TODO: May eventually need to create a super-class of OWLOntologyManagerImpl that knows
         // how to fetch PODD Artifact ontologies from a repository if they are not currently in
