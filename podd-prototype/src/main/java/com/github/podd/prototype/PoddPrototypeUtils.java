@@ -428,36 +428,30 @@ public class PoddPrototypeUtils
     public InferredOWLOntologyID loadPoddArtifact(final String artifactResourcePath,
             final RepositoryConnection nextRepositoryConnection) throws Exception
     {
-        
-        // 1. create permanent identifiers for any impermanent identifiers in the object...
-        
-        // 2. validate the object in terms of the OWL profile
-        
-        // 3. Validate the object using a reasoner
-        
-        // 4. Store the object
-        
-        // 5. Infer extra statements about the object using a reasoner
-        
-        // 6. Store the inferred statements
-        
-        // 7. Update the PODD Artifact management graph to contain the latest
-        
+        // 1. Create permanent identifiers for any impermanent identifiers in the object...
         this.log.info("Loading podd artifact from: {}", artifactResourcePath);
         final OWLOntology nextOntology = this.loadOntology(artifactResourcePath);
         
+        // 2. Validate the object in terms of the OWL profile
+        // 3. Validate the object using a reasoner
         this.log.info("Checking consistency of podd artifact");
         final OWLReasoner reasoner = this.checkConsistency(nextOntology);
+        
+        // 4. Store the object
         this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
+        
+        // 5. Infer extra statements about the object using a reasoner
         this.log.info("Computing inferences for podd artifact");
         final OWLOntology nextInferredOntology =
                 this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
+        
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
+        // 6. Store the inferred statements
         this.dumpOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
         
-        // update the link in the schema ontology management graph
-        // TODO: create a similar method for artifacts
+        // 7. Update the PODD Artifact management graph to contain the latest
+        // update the link in the PODD Artifact management graph
         // this.updateCurrentManagedSchemaOntologyVersion(nextRepositoryConnection,
         // nextOntology.getOntologyID(),
         // nextInferredOntology.getOntologyID());
