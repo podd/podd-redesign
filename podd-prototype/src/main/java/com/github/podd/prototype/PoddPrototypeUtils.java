@@ -407,6 +407,9 @@ public class PoddPrototypeUtils
      * Loads an ontology from a Java Resource on the classpath. This is useful for loading test
      * resources.
      * 
+     * NOTE: We currently assume that the ontology will be in RDF/XML. Outside of the prototype we
+     * cannot make this assumption as any RDF or OWL format may be used.
+     * 
      * @param ontologyResource
      *            The classpath location of the test resource to load.
      * @return An OWLOntology instance populated with the triples from the classpath resource.
@@ -422,13 +425,28 @@ public class PoddPrototypeUtils
         return nextOntology;
     }
     
+    /**
+     * This method adds information to the Schema Ontology management graph, and updates the links
+     * for the current version for both the ontology and the inferred ontology.
+     * 
+     * @param nextRepositoryConnection
+     *            The repository connection to use for updating the code. The schema graph/context
+     *            to use is setup as a member variable.
+     * @param nextOntologyID
+     *            The ontology ID that contains the information about the original ontology.
+     * @param nextInferredOntologyID
+     *            The ontology ID that contains the information about the inferred ontology.
+     * @throws RepositoryException
+     */
     public void updateCurrentManagedSchemaOntologyVersion(final RepositoryConnection nextRepositoryConnection,
             final OWLOntologyID nextOntologyID, final OWLOntologyID nextInferredOntologyID) throws RepositoryException
     {
         final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
         // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must be
-        // generated for each new inferred ontology generation.
+        // generated for each new inferred ontology generation. For reference though, the version is
+        // equal to the ontology IRI in the prototype code. See generateInferredOntologyID method
+        // for the corresponding code.
         final URI nextInferredOntologyUri = nextInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         
         try
