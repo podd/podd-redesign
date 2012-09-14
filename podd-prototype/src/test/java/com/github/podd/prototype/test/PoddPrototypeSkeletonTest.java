@@ -148,12 +148,18 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         this.getTestRepositoryConnection().commit();
         
-        this.utils.loadPoddArtifact("/test/artifacts/testArtifact-1.rdf", this.getTestRepositoryConnection());
+        InferredOWLOntologyID poddArtifact =
+                this.utils.loadPoddArtifact("/test/artifacts/testArtifact-1.rdf", this.getTestRepositoryConnection());
         
         // Final: Remove the PODD Artifact Ontology from the manager cache
-        // TODO: May need to create a super-class of OWLOntologyManagerImpl that knows how to fetch
-        // PODD Artifact ontologies from a repository if they are not currently in memory
-        // Cannot use an IRI mapper for this process as far as I can tell
+        Assert.assertTrue(this.manager.contains(poddArtifact));
+        this.manager.removeOntology(poddArtifact);
+        Assert.assertFalse(this.manager.contains(poddArtifact));
+        
+        // TODO: May eventually need to create a super-class of OWLOntologyManagerImpl that knows
+        // how to fetch PODD Artifact ontologies from a repository if they are not currently in
+        // memory
+        // Cannot (easily?) use an IRI mapper for this process as far as I can tell
     }
     
     /**

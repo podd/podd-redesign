@@ -113,6 +113,12 @@ public class PoddPrototypeUtils
     private URI schemaGraph;
     
     /**
+     * The graph used to manage PODD Artifacts. This is distinct from the graph used to manage
+     * Schema Ontologies.
+     */
+    private URI artifactGraph;
+    
+    /**
      * The OWLProfile that matches the reasoners produced by the reasonerFactory. This enables a
      * faster pre-reasoner check to very that the ontology is in the profile before attempting to
      * reason over the entire ontology.
@@ -452,9 +458,9 @@ public class PoddPrototypeUtils
         
         // 7. Update the PODD Artifact management graph to contain the latest
         // update the link in the PODD Artifact management graph
-        // this.updateCurrentManagedSchemaOntologyVersion(nextRepositoryConnection,
-        // nextOntology.getOntologyID(),
-        // nextInferredOntology.getOntologyID());
+        this.updateCurrentManagedPoddArtifactOntologyVersion(nextRepositoryConnection,
+         nextOntology.getOntologyID(),
+         nextInferredOntology.getOntologyID());
         
         return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology.getOntologyID()
                 .getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
@@ -514,6 +520,73 @@ public class PoddPrototypeUtils
             // link from the ontology version IRI to the matching inferred axioms ontology version
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
                     nextInferredOntologyUri, this.schemaGraph);
+            
+            // if everything went well commit the connection
+            nextRepositoryConnection.commit();
+        }
+        catch(final Exception e)
+        {
+            // if anything failed, rollback the connection before rethrowing the exception
+            nextRepositoryConnection.rollback();
+            throw e;
+        }
+        
+    }
+    
+    /**
+     * This method adds information to the Schema Ontology management graph, and updates the links
+     * for the current version for both the ontology and the inferred ontology.
+     * 
+     * @param nextRepositoryConnection
+     *            The repository connection to use for updating the code. The schema graph/context
+     *            to use is setup as a member variable.
+     * @param nextOntologyID
+     *            The ontology ID that contains the information about the original ontology.
+     * @param nextInferredOntologyID
+     *            The ontology ID that contains the information about the inferred ontology.
+     * @throws RepositoryException
+     */
+    public void updateCurrentManagedPoddArtifactOntologyVersion(final RepositoryConnection nextRepositoryConnection,
+            final OWLOntologyID nextOntologyID, final OWLOntologyID nextInferredOntologyID) throws RepositoryException
+    {
+        final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
+        final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
+        // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must be
+        // generated for each new inferred ontology generation. For reference though, the version is
+        // equal to the ontology IRI in the prototype code. See generateInferredOntologyID method
+        // for the corresponding code.
+        final URI nextInferredOntologyUri = nextInferredOntologyID.getOntologyIRI().toOpenRDFURI();
+        
+        try
+        {
+            // type the ontology
+            nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, artifactGraph);
+            // setup a version number link for this version
+            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, nextVersionUri,
+                    artifactGraph);
+            
+            // remove whatever was previously there for the current version marker
+            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, null,
+                    artifactGraph);
+            
+            // then insert the new current version marker
+            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, nextVersionUri,
+                    artifactGraph);
+            
+            // then do a similar process with the inferred axioms ontology
+            nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, artifactGraph);
+            
+            // remove whatever was previously there for the current inferred version marker
+            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
+                    null, artifactGraph);
+            
+            // link from the ontology IRI to the current inferred axioms ontology version
+            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
+                    nextInferredOntologyUri, artifactGraph);
+            
+            // link from the ontology version IRI to the matching inferred axioms ontology version
+            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
+                    nextInferredOntologyUri, artifactGraph);
             
             // if everything went well commit the connection
             nextRepositoryConnection.commit();
