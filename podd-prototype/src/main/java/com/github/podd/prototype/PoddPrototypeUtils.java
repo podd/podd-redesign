@@ -127,26 +127,29 @@ public class PoddPrototypeUtils
     
     /**
      * 
-     * @param nextSchemaGraph
-     *            The Graph URI that will be used for storing the schema ontology management
-     *            statements.
-     * @param nextReasonerFactory
-     *            The reasoner factory that will be used to create reasoners for consistency checks
-     *            and for inferring extra triples.
+     * @param nextManager
+     *            The OWLOntologyManager instance that will be used to store ontologies in memory.
      * @param nextOwlProfile
      *            The IRI of the OWL Profile that matches the reasoner factory, and will be used to
      *            check for basic consistency before using the reasoner.
-     * @param nextManager
-     *            The OWLOntologyManager instance that will be used to store ontologies in memory.
+     * @param nextReasonerFactory
+     *            The reasoner factory that will be used to create reasoners for consistency checks
+     *            and for inferring extra triples.
+     * @param nextSchemaGraph
+     *            The Graph URI that will be used for storing the schema ontology management
+     *            statements.
+     * @param nextPoddArtifactGraph
+     *            TODO
      * 
      */
     public PoddPrototypeUtils(final OWLOntologyManager nextManager, final IRI nextOwlProfile,
-            final OWLReasonerFactory nextReasonerFactory, final URI nextSchemaGraph)
+            final OWLReasonerFactory nextReasonerFactory, final URI nextSchemaGraph, URI nextPoddArtifactGraph)
     {
         this.manager = nextManager;
         this.owlProfile = nextOwlProfile;
         this.reasonerFactory = nextReasonerFactory;
         this.schemaGraph = nextSchemaGraph;
+        this.artifactGraph = nextPoddArtifactGraph;
     }
     
     /**
@@ -458,9 +461,8 @@ public class PoddPrototypeUtils
         
         // 7. Update the PODD Artifact management graph to contain the latest
         // update the link in the PODD Artifact management graph
-        this.updateCurrentManagedPoddArtifactOntologyVersion(nextRepositoryConnection,
-         nextOntology.getOntologyID(),
-         nextInferredOntology.getOntologyID());
+        this.updateCurrentManagedPoddArtifactOntologyVersion(nextRepositoryConnection, nextOntology.getOntologyID(),
+                nextInferredOntology.getOntologyID());
         
         return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology.getOntologyID()
                 .getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
