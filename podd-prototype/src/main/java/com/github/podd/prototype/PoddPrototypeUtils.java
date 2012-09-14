@@ -411,11 +411,8 @@ public class PoddPrototypeUtils
         owlSource.setNamespaces(conn.getNamespaces());
         
         final RioParserImpl owlParser = new RioParserImpl(new RDFXMLOntologyFormatFactory());
-        
         final OWLOntology nextOntology = this.manager.createOntology();
-        
         owlParser.parse(owlSource, nextOntology);
-        
         Assert.assertFalse(nextOntology.isEmpty());
         
         return nextOntology;
