@@ -80,7 +80,7 @@ public class PoddPrototypeUtils
      */
     private static final String INFERRED_PREFIX = "urn:podd:inferred:ontologyiriprefix:";
     
-    private final Logger log = LoggerFactory.getLogger(PoddPrototypeUtils.class);
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     /**
      * The manager that will be used to manage the Schema Ontologies.
@@ -423,6 +423,34 @@ public class PoddPrototypeUtils
         Assert.assertFalse(nextOntology.isEmpty());
         
         return nextOntology;
+    }
+    
+    public InferredOWLOntologyID loadPoddArtifact(final String artifactResourcePath,
+            final RepositoryConnection nextRepositoryConnection) throws Exception
+    {
+        this.log.info("Loading podd artifact from: {}", artifactResourcePath);
+        final OWLOntology nextOntology = this.loadOntology(artifactResourcePath);
+        
+        this.log.info("Checking consistency of podd artifact");
+        final OWLReasoner reasoner = this.checkConsistency(nextOntology);
+        // TODO: create a similar method for artifacts
+        // this.dumpSchemaOntologyToRepository(nextOntology, nextRepositoryConnection);
+        this.log.info("Computing inferences for podd artifact");
+        final OWLOntology nextInferredOntology =
+                this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
+        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
+        // Sesame Repository
+        // TODO: create a similar method for artifacts
+        // this.dumpSchemaOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
+        
+        // update the link in the schema ontology management graph
+        // TODO: create a similar method for artifacts
+        // this.updateCurrentManagedSchemaOntologyVersion(nextRepositoryConnection,
+        // nextOntology.getOntologyID(),
+        // nextInferredOntology.getOntologyID());
+        
+        return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology.getOntologyID()
+                .getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
     }
     
     /**

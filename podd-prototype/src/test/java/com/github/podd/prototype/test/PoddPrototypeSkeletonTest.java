@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -157,6 +158,44 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
     
     /**
+     * Tests the base ontology to verify its internal consistency.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testBaseOntologyAndSingleArtifact() throws Exception
+    {
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        
+        this.getTestRepositoryConnection().commit();
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        
+        this.getTestRepositoryConnection().commit();
+        
+        // 1. create permanent identifiers for any impermanent identifiers in the object...
+        
+        // 2. validate the object in terms of the OWL profile
+        
+        // 3. Validate the object using a reasoner
+        
+        // 4. Store the object
+        
+        // 5. Infer extra statements about the object using a reasoner
+        
+        // 6. Store the inferred statements
+        
+        // 7. Update the PODD Artifact management graph to contain the latest
+        
+        this.utils.loadPoddArtifact("/test/artifacts/testArtifact-1.rdf", this.getTestRepositoryConnection());
+        
+        // Final: Remove the PODD Artifact Ontology from the manager cache
+        // TODO: May need to create a super-class of OWLOntologyManagerImpl that knows how to fetch
+        // PODD Artifact ontologies from a repository if they are not currently in memory
+        // Cannot use an IRI mapper for this process as far as I can tell
+    }
+    
+    /**
      * Tests the Open Biomedical Ontologies Plant Ontology to verify its consistency with OWL2-DL.
      * 
      * @throws Exception
@@ -218,6 +257,30 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         // Verify that the original version can be loaded and references the first version of the
         // ontology schema
+    }
+    
+    /**
+     * Tests whether the file is valid RDF according to Sesame.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testRdf() throws Exception
+    {
+        try
+        {
+            this.getTestRepositoryConnection().add(
+                    this.getClass().getResourceAsStream("/test/artifacts/testArtifact-1.rdf"), "", RDFFormat.RDFXML);
+            this.getTestRepositoryConnection().commit();
+            
+            Assert.assertEquals(24, this.getTestRepositoryConnection().size());
+        }
+        catch(final Exception ex)
+        {
+            this.getTestRepositoryConnection().rollback();
+            ex.printStackTrace();
+            Assert.fail("Found unexpected exception: " + ex.getMessage());
+        }
     }
     
 }
