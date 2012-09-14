@@ -158,12 +158,12 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
     
     /**
-     * Tests the base ontology to verify its internal consistency.
+     * Tests the loading of the base and science ontologies followed by loading a single artifact.
      * 
      * @throws Exception
      */
     @Test
-    public final void testBaseOntologyAndSingleArtifact() throws Exception
+    public final void testBaseAndScienceOntologyAndSingleArtifact() throws Exception
     {
         this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
         
@@ -193,6 +193,38 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         // TODO: May need to create a super-class of OWLOntologyManagerImpl that knows how to fetch
         // PODD Artifact ontologies from a repository if they are not currently in memory
         // Cannot use an IRI mapper for this process as far as I can tell
+    }
+    
+    /**
+     * Tests an inconsistent semantic ontology, containing two hasLeadInstitution statements on a
+     * single Project.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testBaseOntologyAndSingleArtifactInconsistent() throws Exception
+    {
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        
+        this.getTestRepositoryConnection().commit();
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        
+        this.getTestRepositoryConnection().commit();
+        
+        try
+        {
+            this.utils.loadPoddArtifact("/test/artifacts/testInconsistentArtifact-1.rdf",
+                    this.getTestRepositoryConnection());
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(final AssertionError ae)
+        {
+            Assert.assertTrue(ae
+                    .getMessage()
+                    .contains(
+                            "Ontology was not consistent: <urn:temp:inconsistentArtifact:1><urn:temp:inconsistentArtifact:version:1>"));
+        }
     }
     
     /**

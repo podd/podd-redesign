@@ -8,9 +8,9 @@
 	xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
 	xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
 
-<rdf:Description rdf:about="urn:temp:artifact:1">
+<rdf:Description rdf:about="urn:temp:inconsistentArtifact:1">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
-	<owl:versionIRI rdf:resource="urn:temp:artifact:version:1" />
+	<owl:versionIRI rdf:resource="urn:temp:inconsistentArtifact:version:1" />
 	<poddBase:artifactHasTopObject rdf:resource="urn:temp:object:1960"/>
 	<owl:imports rdf:resource="http://purl.org/podd/ns/poddBase" />
 	<owl:imports rdf:resource="http://purl.org/podd/ns/poddScience" />
@@ -53,6 +53,8 @@
 	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
 	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-06-05T01:57:16.643Z</poddBase:createdAt>
 	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CSIRO HRPPC</poddBase:hasLeadInstitution>
+	<!-- NOTE: It is inconsistent to have two lead institutions attached to a Project, so this ontology should not validate -->
+	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">UQ</poddBase:hasLeadInstitution>
 	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-05-22</poddBase:hasStartDate>
 	<poddBase:hasTopObjectStatus rdf:resource="http://purl.org/podd/ns/poddBase#Active"/>
 	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddBase#NotApplicable"/>
