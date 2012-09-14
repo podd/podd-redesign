@@ -469,6 +469,41 @@ public class PoddPrototypeUtils
     }
     
     /**
+     * Removes the PODD Artifact from the OWLOntologyManager.
+     * 
+     * NOTE: The Artifact is still in the database after this point, it is just no longer in memory.
+     * 
+     * @param poddArtifact
+     *            The InferredOWLOntologyID of the PODD Artifact to remove
+     */
+    public void removePoddArtifactFromManager(final InferredOWLOntologyID poddArtifact)
+    {
+        Assert.assertTrue(this.manager.contains(poddArtifact));
+        this.removePoddArtifactFromManager(poddArtifact.getBaseOWLOntologyID(), poddArtifact.getInferredOWLOntologyID());
+    }
+    
+    /**
+     * Removes the PODD Artifact from the OWLOntologyManager using two different OWLOntologyID
+     * references for the base and inferred ontologies respectively.
+     * 
+     * NOTE: The Artifact is still in the database after this point, it is just no longer in memory.
+     * 
+     * @param baseOntologyID
+     *            The base OWLOntologyID of the Artifact to be removed.
+     * @param inferredOntologyID
+     *            The inferred OWLOntologyID of the Artifact to be removed.
+     */
+    public void removePoddArtifactFromManager(final OWLOntologyID baseOntologyID, final OWLOntologyID inferredOntologyID)
+    {
+        Assert.assertTrue(this.manager.contains(baseOntologyID));
+        Assert.assertTrue(this.manager.contains(inferredOntologyID));
+        this.manager.removeOntology(baseOntologyID);
+        Assert.assertFalse(this.manager.contains(baseOntologyID));
+        this.manager.removeOntology(inferredOntologyID);
+        Assert.assertFalse(this.manager.contains(inferredOntologyID));
+    }
+    
+    /**
      * This method adds information to the Schema Ontology management graph, and updates the links
      * for the current version for both the ontology and the inferred ontology.
      * 
