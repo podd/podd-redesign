@@ -82,12 +82,41 @@ public class PoddPrototypeUtils
     
     private final Logger log = LoggerFactory.getLogger(PoddPrototypeUtils.class);
     
+    /**
+     * The manager that will be used to manage the Schema Ontologies.
+     * 
+     * TODO: Decide how to manage PODD Artifact ontologies that will typically have smaller
+     * lifetimes than Schema Ontologies which will stay in the manager for the lifetime of the
+     * manager, until the next shutdown or maintenance period when they may be changed. PODD
+     * Artifact ontologies may import Schema Ontologies so their manager needs to be able to access
+     * the list of Schema Ontologies. However, PODD Artifact ontologies must not stay in the manager
+     * for long periods of time or they will cause unsustainable memory growth, particularly for
+     * large ontologies with many versions.
+     * 
+     * TODO: How does an edit conflict resolution strategy work in relation to this manager.
+     * Ideally, we should also only be storing the latest version of a PODD Artifact in the manager.
+     * If we are performing edit conflict resolution based solely on RDF triples and not OWL Axioms,
+     * then we may be able to perform the diff externally. See the Protege OWL Diff code for
+     * examples of how to diff ontologies.
+     */
     private OWLOntologyManager manager;
     
+    /**
+     * A factory for producing reasoners that are suitable according to owlProfile.
+     */
     private OWLReasonerFactory reasonerFactory;
     
+    /**
+     * The graph used to manage Schema Ontologies. This is distinct from the graph used to manage
+     * PODD Artifacts.
+     */
     private URI schemaGraph;
     
+    /**
+     * The OWLProfile that matches the reasoners produced by the reasonerFactory. This enables a
+     * faster pre-reasoner check to very that the ontology is in the profile before attempting to
+     * reason over the entire ontology.
+     */
     private IRI owlProfile;
     
     /**
