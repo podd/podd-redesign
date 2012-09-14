@@ -34,6 +34,11 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    <owl:AnnotationProperty rdf:about="&poddBase;artifactHasTopObject">
+        <rdfs:label>has User</rdfs:label>
+        <rdfs:domain rdf:resource="owl:Ontology"/>
+        <rdfs:range rdf:resource="&poddBase;TopObject"/>
+    </owl:AnnotationProperty>
     <owl:AnnotationProperty rdf:about="&poddBase;hasUser">
         <rdfs:label>has User</rdfs:label>
         <rdfs:domain rdf:resource="&poddBase;TopObject"/>
