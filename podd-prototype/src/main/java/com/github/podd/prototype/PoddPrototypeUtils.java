@@ -4,6 +4,9 @@
 package com.github.podd.prototype;
 
 import java.io.IOException;
+import java.util.UUID;
+
+import net.fortytwo.sesametools.URITranslator;
 
 import org.junit.Assert;
 import org.openrdf.model.Resource;
@@ -14,6 +17,7 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
+import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.formats.RDFXMLOntologyFormatFactory;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -33,6 +37,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 import org.semanticweb.owlapi.reasoner.TimeOutException;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
+import org.semanticweb.owlapi.rio.RioParserImpl;
 import org.semanticweb.owlapi.rio.RioRenderer;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.slf4j.Logger;
@@ -401,11 +406,15 @@ public class PoddPrototypeUtils
      */
     public OWLOntology loadOntology(final RepositoryConnection conn, final Resource... contexts) throws Exception
     {
-        final RioMemoryTripleSource tripleSource =
+        final RioMemoryTripleSource owlSource =
                 new RioMemoryTripleSource(conn.getStatements(null, null, null, true, contexts));
-        tripleSource.setNamespaces(conn.getNamespaces());
+        owlSource.setNamespaces(conn.getNamespaces());
         
-        final OWLOntology nextOntology = this.manager.loadOntologyFromOntologyDocument(tripleSource);
+        final RioParserImpl owlParser = new RioParserImpl(new RDFXMLOntologyFormatFactory());
+        
+        final OWLOntology nextOntology = this.manager.createOntology();
+        
+        owlParser.parse(owlSource, nextOntology);
         
         Assert.assertFalse(nextOntology.isEmpty());
         
@@ -450,12 +459,22 @@ public class PoddPrototypeUtils
             final RepositoryConnection nextRepositoryConnection) throws Exception
     {
         // 1. Create permanent identifiers for any impermanent identifiers in the object...
+        final URI randomURN =
+                nextRepositoryConnection.getValueFactory().createURI("urn:random:" + UUID.randomUUID().toString());
+        
+        nextRepositoryConnection.add(this.getClass().getResourceAsStream(artifactResourcePath), "", RDFFormat.RDFXML,
+                randomURN);
+        nextRepositoryConnection.commit();
+        
+        // FIXME: Rough hack translating them all to a fixed URI structure
+        URITranslator.doTranslation(nextRepositoryConnection, "urn:temp:", "http://example.org/permanenturl/",
+                randomURN);
         
         // FIXME: May need to load the triples into a temporary location to rewrite the impermanent
         // identifiers before loading it into the OWLOntologyManager
         
-        this.log.info("Loading podd artifact from: {}", artifactResourcePath);
-        final OWLOntology nextOntology = this.loadOntology(artifactResourcePath);
+        this.log.info("Loading podd artifact from repository: {}", randomURN);
+        final OWLOntology nextOntology = this.loadOntology(nextRepositoryConnection, randomURN);
         
         // 2. Validate the object in terms of the OWL profile
         // 3. Validate the object using a reasoner

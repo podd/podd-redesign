@@ -186,10 +186,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         }
         catch(final AssertionError ae)
         {
-            Assert.assertTrue(ae
-                    .getMessage()
-                    .contains(
-                            "Ontology was not consistent: <urn:temp:inconsistentArtifact:1><urn:temp:inconsistentArtifact:version:1>"));
+            Assert.assertTrue(ae.getMessage().contains("Ontology was not consistent:"));
         }
     }
     

@@ -199,6 +199,11 @@
                 <artifactId>pellet-explanation</artifactId>
                 <version>${pellet.version}</version>
             </dependency>
+            <dependency>
+                <groupId>net.fortytwo.sesametools</groupId>
+                <artifactId>uritranslator</artifactId>
+                <version>${sesametools.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     
