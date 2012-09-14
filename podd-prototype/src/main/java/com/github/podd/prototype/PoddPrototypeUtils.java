@@ -245,7 +245,7 @@ public class PoddPrototypeUtils
             // Commit the current repository connection
             nextRepositoryConnection.commit();
         }
-        catch(final Exception e)
+        catch(final RepositoryException e)
         {
             // if anything failed, rollback the connection before rethrowing the exception
             nextRepositoryConnection.rollback();
@@ -577,7 +577,7 @@ public class PoddPrototypeUtils
             // if everything went well commit the connection
             nextRepositoryConnection.commit();
         }
-        catch(final Exception e)
+        catch(final RepositoryException e)
         {
             // if anything failed, rollback the connection before rethrowing the exception
             nextRepositoryConnection.rollback();
@@ -644,7 +644,7 @@ public class PoddPrototypeUtils
             // if everything went well commit the connection
             nextRepositoryConnection.commit();
         }
-        catch(final Exception e)
+        catch(final RepositoryException e)
         {
             // if anything failed, rollback the connection before rethrowing the exception
             nextRepositoryConnection.rollback();
