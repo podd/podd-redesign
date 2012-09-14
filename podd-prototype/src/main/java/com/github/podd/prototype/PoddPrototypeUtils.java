@@ -217,7 +217,7 @@ public class PoddPrototypeUtils
      * @throws IOException
      * @throws RepositoryException
      */
-    public void dumpSchemaOntologyToRepository(final OWLOntology nextOntology,
+    public void dumpOntologyToRepository(final OWLOntology nextOntology,
             final RepositoryConnection nextRepositoryConnection) throws IOException, RepositoryException
     {
         try
@@ -311,12 +311,12 @@ public class PoddPrototypeUtils
         this.manager.applyChange(new SetOntologyID(nextOntology, newOWLOntologyID));
         
         final OWLReasoner reasoner = this.checkConsistency(nextOntology);
-        this.dumpSchemaOntologyToRepository(nextOntology, nextRepositoryConnection);
+        this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
         final OWLOntology nextInferredOntology =
                 this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.dumpSchemaOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
+        this.dumpOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
         
         // update the link in the schema ontology management graph
         this.updateCurrentManagedSchemaOntologyVersion(nextRepositoryConnection, nextOntology.getOntologyID(),
@@ -364,12 +364,12 @@ public class PoddPrototypeUtils
         final OWLOntology nextOntology = this.loadOntology(ontologyResourcePath);
         
         final OWLReasoner reasoner = this.checkConsistency(nextOntology);
-        this.dumpSchemaOntologyToRepository(nextOntology, nextRepositoryConnection);
+        this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
         final OWLOntology nextInferredOntology =
                 this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        this.dumpSchemaOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
+        this.dumpOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
         
         // update the link in the schema ontology management graph
         this.updateCurrentManagedSchemaOntologyVersion(nextRepositoryConnection, nextOntology.getOntologyID(),
@@ -428,20 +428,33 @@ public class PoddPrototypeUtils
     public InferredOWLOntologyID loadPoddArtifact(final String artifactResourcePath,
             final RepositoryConnection nextRepositoryConnection) throws Exception
     {
+        
+        // 1. create permanent identifiers for any impermanent identifiers in the object...
+        
+        // 2. validate the object in terms of the OWL profile
+        
+        // 3. Validate the object using a reasoner
+        
+        // 4. Store the object
+        
+        // 5. Infer extra statements about the object using a reasoner
+        
+        // 6. Store the inferred statements
+        
+        // 7. Update the PODD Artifact management graph to contain the latest
+        
         this.log.info("Loading podd artifact from: {}", artifactResourcePath);
         final OWLOntology nextOntology = this.loadOntology(artifactResourcePath);
         
         this.log.info("Checking consistency of podd artifact");
         final OWLReasoner reasoner = this.checkConsistency(nextOntology);
-        // TODO: create a similar method for artifacts
-        // this.dumpSchemaOntologyToRepository(nextOntology, nextRepositoryConnection);
+        this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
         this.log.info("Computing inferences for podd artifact");
         final OWLOntology nextInferredOntology =
                 this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
         // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
         // Sesame Repository
-        // TODO: create a similar method for artifacts
-        // this.dumpSchemaOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
+        this.dumpOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
         
         // update the link in the schema ontology management graph
         // TODO: create a similar method for artifacts

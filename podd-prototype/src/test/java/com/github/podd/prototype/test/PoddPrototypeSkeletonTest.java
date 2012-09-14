@@ -133,31 +133,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
     
     /**
-     * Tests the combination of the base and user ontologies to verify their internal consistency.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public final void testBaseAndUserOntologies() throws Exception
-    {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
-        
-        this.utils.loadInferAndStoreSchemaOntology(this.poddUserPath, this.getTestRepositoryConnection());
-        
-    }
-    
-    /**
-     * Tests the base ontology to verify its internal consistency.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public final void testBaseOntology() throws Exception
-    {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
-    }
-    
-    /**
      * Tests the loading of the base and science ontologies followed by loading a single artifact.
      * 
      * @throws Exception
@@ -172,20 +147,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
         
         this.getTestRepositoryConnection().commit();
-        
-        // 1. create permanent identifiers for any impermanent identifiers in the object...
-        
-        // 2. validate the object in terms of the OWL profile
-        
-        // 3. Validate the object using a reasoner
-        
-        // 4. Store the object
-        
-        // 5. Infer extra statements about the object using a reasoner
-        
-        // 6. Store the inferred statements
-        
-        // 7. Update the PODD Artifact management graph to contain the latest
         
         this.utils.loadPoddArtifact("/test/artifacts/testArtifact-1.rdf", this.getTestRepositoryConnection());
         
@@ -202,7 +163,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
      * @throws Exception
      */
     @Test
-    public final void testBaseOntologyAndSingleArtifactInconsistent() throws Exception
+    public final void testBaseAndScienceOntologyAndSingleArtifactInconsistent() throws Exception
     {
         this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
         
@@ -225,6 +186,31 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                     .contains(
                             "Ontology was not consistent: <urn:temp:inconsistentArtifact:1><urn:temp:inconsistentArtifact:version:1>"));
         }
+    }
+    
+    /**
+     * Tests the combination of the base and user ontologies to verify their internal consistency.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testBaseAndUserOntologies() throws Exception
+    {
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddUserPath, this.getTestRepositoryConnection());
+        
+    }
+    
+    /**
+     * Tests the base ontology to verify its internal consistency.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testBaseOntology() throws Exception
+    {
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
     }
     
     /**
