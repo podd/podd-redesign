@@ -22,6 +22,7 @@ import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.SetOntologyID;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.profiles.OWLProfileRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
@@ -72,14 +73,45 @@ public class PoddPrototypeUtils
     public static final URI PODD_BASE_INFERRED_VERSION = ValueFactoryImpl.getInstance().createURI(
             "http://purl.org/podd/ns/poddBase#", "inferredVersion");
     
+    /**
+     * An arbitrary prefix to use for automatically assigning ontology IRIs to inferred ontologies.
+     * There are no versions delegated to inferred ontologies, and the ontology IRI is generated
+     * using the version IRI of the original ontology, which must be unique.
+     */
+    private static final String INFERRED_PREFIX = "urn:podd:inferred:ontologyiriprefix:";
+    
     private final Logger log = LoggerFactory.getLogger(PoddPrototypeUtils.class);
+    
+    private OWLOntologyManager manager;
+    
+    private OWLReasonerFactory reasonerFactory;
+    
+    private URI schemaGraph;
+    
+    private IRI owlProfile;
     
     /**
      * 
+     * @param nextSchemaGraph
+     *            The Graph URI that will be used for storing the schema ontology management
+     *            statements.
+     * @param nextReasonerFactory
+     *            The reasoner factory that will be used to create reasoners for consistency checks
+     *            and for inferring extra triples.
+     * @param nextOwlProfile
+     *            The IRI of the OWL Profile that matches the reasoner factory, and will be used to
+     *            check for basic consistency before using the reasoner.
+     * @param nextManager
+     *            The OWLOntologyManager instance that will be used to store ontologies in memory.
+     * 
      */
-    public PoddPrototypeUtils()
+    public PoddPrototypeUtils(final OWLOntologyManager nextManager, final IRI nextOwlProfile,
+            final OWLReasonerFactory nextReasonerFactory, final URI nextSchemaGraph)
     {
-        // TODO Auto-generated constructor stub
+        this.manager = nextManager;
+        this.owlProfile = nextOwlProfile;
+        this.reasonerFactory = nextReasonerFactory;
+        this.schemaGraph = nextSchemaGraph;
     }
     
     /**
@@ -88,19 +120,13 @@ public class PoddPrototypeUtils
      * 
      * @param nextOntology
      *            The ontology to check for consistency.
-     * @param nextProfileIRI
-     *            The IRI of the OWL Profile to use for checking consistency.
-     * @param nextReasonerFactory
-     *            The OWLReasonerFactory that is able to create instances of an OWLReasoner that are
-     *            compatible with the given OWL Profile.
      * @return An instance of OWLreasoner that was used to check the consistency.s
      * @throws Exception
      */
-    public OWLReasoner checkConsistency(final OWLOntology nextOntology, final IRI nextProfileIRI,
-            final OWLReasonerFactory nextReasonerFactory) throws Exception
+    public OWLReasoner checkConsistency(final OWLOntology nextOntology) throws Exception
     {
-        final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(nextProfileIRI);
-        Assert.assertNotNull("Could not find profile in registry: " + nextProfileIRI.toQuotedString(), nextProfile);
+        final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(this.owlProfile);
+        Assert.assertNotNull("Could not find profile in registry: " + this.owlProfile.toQuotedString(), nextProfile);
         final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
         if(!profileReport.isInProfile())
         {
@@ -113,7 +139,7 @@ public class PoddPrototypeUtils
         // create an OWL Reasoner using the Pellet library and ensure that the reasoner thinks the
         // ontology is consistent so far
         // Use the factory that we found to create a reasoner over the ontology
-        final OWLReasoner nextReasoner = nextReasonerFactory.createReasoner(nextOntology);
+        final OWLReasoner nextReasoner = this.reasonerFactory.createReasoner(nextOntology);
         
         // Test that the ontology was consistent with this reasoner
         // This ensures in the case of Pellet that it is in the OWL2-DL profile
@@ -129,13 +155,9 @@ public class PoddPrototypeUtils
      * 
      * @param nextReasoner
      *            The reasoner to use to compute the inferences.
-     * @param inferredOntologyUri
-     *            The IRI to use for the resulting OWLOntology containing the inferred statements.
-     * @param inferredOntologyVersionUri
-     *            The IRI to use for the version of the resulting OWLOntology containing the
-     *            inferred statements.
-     * @param ontologyManager
-     *            The OWLOntologyManager to use for the process.
+     * @param inferredOntologyID
+     *            The OWLOntologyID to use for the inferred ontology. This must be unique and not
+     *            previously used in either the repository or the OWLOntologyManager
      * @return An OWLOntology instance containing the axioms that were inferred from the original
      *         ontology.
      * @throws ReasonerInterruptedException
@@ -144,16 +166,14 @@ public class PoddPrototypeUtils
      * @throws OWLOntologyCreationException
      * @throws OWLOntologyChangeException
      */
-    public OWLOntology computeInferences(final OWLReasoner nextReasoner, final IRI inferredOntologyUri,
-            final IRI inferredOntologyVersionUri, final OWLOntologyManager ontologyManager)
+    public OWLOntology computeInferences(final OWLReasoner nextReasoner, final OWLOntologyID inferredOntologyID)
         throws ReasonerInterruptedException, TimeOutException, InconsistentOntologyException,
         OWLOntologyCreationException, OWLOntologyChangeException
     {
         nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
         final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner);
-        final OWLOntology nextInferredAxiomsOntology =
-                ontologyManager.createOntology(new OWLOntologyID(inferredOntologyUri, inferredOntologyVersionUri));
-        iog.fillOntology(ontologyManager, nextInferredAxiomsOntology);
+        final OWLOntology nextInferredAxiomsOntology = this.manager.createOntology(inferredOntologyID);
+        iog.fillOntology(this.manager, nextInferredAxiomsOntology);
         
         return nextInferredAxiomsOntology;
     }
@@ -161,31 +181,27 @@ public class PoddPrototypeUtils
     /**
      * Dump the triples representing a given ontology into a Sesame Repository.
      * 
-     * @param nextOntologyContextUri
-     *            The context URI to dump the ontology triples into.
      * @param nextOntology
      *            The ontology to dump into the repository.
      * @param nextRepositoryConnection
      *            The repository connection to dump the triples into.
-     * @param ontologyManager
-     *            The ontology manager containing the given ontology.
      * @throws IOException
      * @throws RepositoryException
      */
-    public void dumpSchemaOntologyToRepository(final URI nextOntologyContextUri, final OWLOntology nextOntology,
-            final RepositoryConnection nextRepositoryConnection, final OWLOntologyManager ontologyManager)
-        throws IOException, RepositoryException
+    public void dumpSchemaOntologyToRepository(final OWLOntology nextOntology,
+            final RepositoryConnection nextRepositoryConnection) throws IOException, RepositoryException
     {
         try
         {
             // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
             // into a single context in the Sesame Repository
             final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
-            repositoryHandler.enforceContext(nextOntologyContextUri);
+            repositoryHandler.enforceContext(nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
             
             // Render the triples out from OWLAPI into a Sesame Repository
             final RioRenderer renderer =
-                    new RioRenderer(nextOntology, ontologyManager, repositoryHandler, null, nextOntologyContextUri);
+                    new RioRenderer(nextOntology, this.manager, repositoryHandler, null, nextOntology.getOntologyID()
+                            .getVersionIRI().toOpenRDFURI());
             renderer.render();
             
             // Commit the current repository connection
@@ -200,26 +216,158 @@ public class PoddPrototypeUtils
     }
     
     /**
+     * Generates a unique inferred ontology ID based on the original ontology ID version IRI.
+     * 
+     * Both ontology IRI and version IRI for the resulting ontology ID are the same to ensure
+     * consistency.
+     * 
+     * @param originalOntologyID
+     *            The original ontology ID to use for naming the inferred ontology.
+     * @return An instance of OWLOntologyID that can be used to name an inferred ontology.
+     */
+    public OWLOntologyID generateInferredOntologyID(final OWLOntologyID originalOntologyID)
+    {
+        return new OWLOntologyID(IRI.create(PoddPrototypeUtils.INFERRED_PREFIX + originalOntologyID.getVersionIRI()),
+                IRI.create(PoddPrototypeUtils.INFERRED_PREFIX + originalOntologyID.getVersionIRI()));
+    }
+    
+    /**
+     * Loads an ontology from a classpath resource, renames the ontology using the given
+     * OWLOntologyID, checks the consistency of the ontology, infers statements from the ontology,
+     * and stores the inferred statements.
+     * 
+     * <br />
+     * 
+     * The given OWLOntologyID will be assigned to the ontology after it is loaded.
+     * 
+     * <br />
+     * 
+     * IMPORTANT: The inferred ontology has an ontology IRI that is derived from the version IRI of
+     * the loaded ontology. The version IRI in the given OWLOntologyID must be unique for this
+     * process to succeed.
+     * 
+     * @param ontologyResourcePath
+     *            The classpath resource to load the ontology from.
+     * @param nextRepositoryConnection
+     *            The repository connection to use for storing the ontology and the inferred
+     *            statements.
+     * @throws Exception
+     * @throws IOException
+     * @throws RepositoryException
+     * @throws ReasonerInterruptedException
+     * @throws TimeOutException
+     * @throws InconsistentOntologyException
+     * @throws OWLOntologyCreationException
+     * @throws OWLOntologyChangeException
+     */
+    public InferredOWLOntologyID loadInferAndStoreOntology(final String ontologyResourcePath,
+            final OWLOntologyID newOWLOntologyID, final RepositoryConnection nextRepositoryConnection)
+        throws Exception, IOException, RepositoryException, ReasonerInterruptedException, TimeOutException,
+        InconsistentOntologyException, OWLOntologyCreationException, OWLOntologyChangeException
+    {
+        // TODO: Create a version of this method that utilises the
+        // loadOntology(RepositoryConnection...) method
+        final OWLOntology nextOntology = this.loadOntology(ontologyResourcePath);
+        
+        // rename the ontology
+        // This step is necessary for cases where the loaded ontology either does not have an
+        // owl:versionIRI statement, or the versionIRI will not be unique in the repository.
+        
+        // IMPORTANT NOTE:
+        // The version IRI must be unique in the manager before this step or the load will fail due
+        // to the ontology already existing!
+        // FIXME: To get around this we would need to load the ontology into memory as RDF
+        // statements and modify it before loading it out of the in-memory ontology, which is very
+        // possible...
+        this.manager.applyChange(new SetOntologyID(nextOntology, newOWLOntologyID));
+        
+        final OWLReasoner reasoner = this.checkConsistency(nextOntology);
+        this.dumpSchemaOntologyToRepository(nextOntology, nextRepositoryConnection);
+        final OWLOntology nextInferredOntology =
+                this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
+        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
+        // Sesame Repository
+        this.dumpSchemaOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
+        
+        // update the link in the schema ontology management graph
+        this.updateCurrentManagedSchemaOntologyVersion(nextRepositoryConnection, nextOntology.getOntologyID(),
+                nextInferredOntology.getOntologyID());
+        
+        return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology.getOntologyID()
+                .getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
+    }
+    
+    /**
+     * Loads an ontology from a classpath resource, checks the consistency of the ontology, infers
+     * statements from the ontology, and stores the inferred statements.
+     * 
+     * <br />
+     * 
+     * The ontology IRI and version IRI are taken from inside the ontology after it is loaded.
+     * 
+     * <br />
+     * 
+     * IMPORTANT: The inferred ontology has an ontology IRI that is derived from the version IRI of
+     * the loaded ontology. The version IRI of the loaded ontology must be unique for this process
+     * to succeed.
+     * 
+     * @param ontologyResourcePath
+     *            The classpath resource to load the ontology from.
+     * @param nextRepositoryConnection
+     *            The repository connection to use for storing the ontology and the inferred
+     *            statements.
+     * @throws Exception
+     * @throws IOException
+     * @throws RepositoryException
+     * @throws ReasonerInterruptedException
+     * @throws TimeOutException
+     * @throws InconsistentOntologyException
+     * @throws OWLOntologyCreationException
+     * @throws OWLOntologyChangeException
+     */
+    public InferredOWLOntologyID loadInferAndStoreOntology(final String ontologyResourcePath,
+            final RepositoryConnection nextRepositoryConnection) throws Exception, IOException, RepositoryException,
+        ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, OWLOntologyCreationException,
+        OWLOntologyChangeException
+    {
+        // TODO: Create a version of this method that utilises the
+        // loadOntology(RepositoryConnection...) method
+        final OWLOntology nextOntology = this.loadOntology(ontologyResourcePath);
+        
+        final OWLReasoner reasoner = this.checkConsistency(nextOntology);
+        this.dumpSchemaOntologyToRepository(nextOntology, nextRepositoryConnection);
+        final OWLOntology nextInferredOntology =
+                this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
+        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
+        // Sesame Repository
+        this.dumpSchemaOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
+        
+        // update the link in the schema ontology management graph
+        this.updateCurrentManagedSchemaOntologyVersion(nextRepositoryConnection, nextOntology.getOntologyID(),
+                nextInferredOntology.getOntologyID());
+        
+        return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology.getOntologyID()
+                .getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
+    }
+    
+    /**
      * Loads an ontology from a Sesame RepositoryConnection, given an optional set of contexts.
      * 
      * @param conn
      *            The Sesame RepositoryConnection object to use when loading the ontology.
-     * @param ontologyManager
-     *            The ontology manager to use when loading the ontology.
      * @param contexts
      *            An optional varargs array of contexts specifying the contexts to use when loading
      *            the ontology. If this is missing the entire repository will be used.
      * @return An OWLOntology instance populated with the triples from the repository.
      * @throws Exception
      */
-    public OWLOntology loadOntology(final RepositoryConnection conn, final OWLOntologyManager ontologyManager,
-            final Resource... contexts) throws Exception
+    public OWLOntology loadOntology(final RepositoryConnection conn, final Resource... contexts) throws Exception
     {
         final RioMemoryTripleSource tripleSource =
                 new RioMemoryTripleSource(conn.getStatements(null, null, null, true, contexts));
         tripleSource.setNamespaces(conn.getNamespaces());
         
-        final OWLOntology nextOntology = ontologyManager.loadOntologyFromOntologyDocument(tripleSource);
+        final OWLOntology nextOntology = this.manager.loadOntologyFromOntologyDocument(tripleSource);
         
         Assert.assertFalse(nextOntology.isEmpty());
         
@@ -232,16 +380,13 @@ public class PoddPrototypeUtils
      * 
      * @param ontologyResource
      *            The classpath location of the test resource to load.
-     * @param ontologyManager
-     *            The ontology manager to use when loading the ontology.
      * @return An OWLOntology instance populated with the triples from the classpath resource.
      * @throws Exception
      */
-    public OWLOntology loadOntology(final String ontologyResource, final OWLOntologyManager ontologyManager)
-        throws Exception
+    public OWLOntology loadOntology(final String ontologyResource) throws Exception
     {
         final OWLOntology nextOntology =
-                ontologyManager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
+                this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
                         .getResourceAsStream(ontologyResource), new RDFXMLOntologyFormatFactory()));
         Assert.assertFalse(nextOntology.isEmpty());
         
@@ -249,8 +394,7 @@ public class PoddPrototypeUtils
     }
     
     public void updateCurrentManagedSchemaOntologyVersion(final RepositoryConnection nextRepositoryConnection,
-            final OWLOntologyID nextOntologyID, final OWLOntologyID nextInferredOntologyID,
-            final URI managementContextUri) throws RepositoryException
+            final OWLOntologyID nextOntologyID, final OWLOntologyID nextInferredOntologyID) throws RepositoryException
     {
         final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
@@ -261,33 +405,33 @@ public class PoddPrototypeUtils
         try
         {
             // type the ontology
-            nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, managementContextUri);
+            nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
             // setup a version number link for this version
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, nextVersionUri,
-                    managementContextUri);
+                    this.schemaGraph);
             
             // remove whatever was previously there for the current version marker
             nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, null,
-                    managementContextUri);
+                    this.schemaGraph);
             
             // then insert the new current version marker
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, nextVersionUri,
-                    managementContextUri);
+                    this.schemaGraph);
             
             // then do a similar process with the inferred axioms ontology
-            nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, managementContextUri);
+            nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
             
             // remove whatever was previously there for the current inferred version marker
             nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    null, managementContextUri);
+                    null, this.schemaGraph);
             
             // link from the ontology IRI to the current inferred axioms ontology version
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    nextInferredOntologyUri, managementContextUri);
+                    nextInferredOntologyUri, this.schemaGraph);
             
             // link from the ontology version IRI to the matching inferred axioms ontology version
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
-                    nextInferredOntologyUri, managementContextUri);
+                    nextInferredOntologyUri, this.schemaGraph);
             
             // if everything went well commit the connection
             nextRepositoryConnection.commit();
