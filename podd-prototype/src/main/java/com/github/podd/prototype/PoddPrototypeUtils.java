@@ -434,10 +434,26 @@ public class PoddPrototypeUtils
         return nextOntology;
     }
     
+    /**
+     * Loads a PODD Artifact from the given classpath resource into the database and into the
+     * OWLOntologyManager.
+     * 
+     * This includes verifying that it fits with the expected profile, and verifying that it is
+     * consistent with the configured reasoner.
+     * 
+     * @param artifactResourcePath
+     * @param nextRepositoryConnection
+     * @return
+     * @throws Exception
+     */
     public InferredOWLOntologyID loadPoddArtifact(final String artifactResourcePath,
             final RepositoryConnection nextRepositoryConnection) throws Exception
     {
         // 1. Create permanent identifiers for any impermanent identifiers in the object...
+        
+        // FIXME: May need to load the triples into a temporary location to rewrite the impermanent
+        // identifiers before loading it into the OWLOntologyManager
+        
         this.log.info("Loading podd artifact from: {}", artifactResourcePath);
         final OWLOntology nextOntology = this.loadOntology(artifactResourcePath);
         
