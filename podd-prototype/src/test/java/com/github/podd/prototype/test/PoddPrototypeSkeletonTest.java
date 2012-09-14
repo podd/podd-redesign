@@ -94,11 +94,11 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndScienceAndPoddAnimalOntologies() throws Exception
     {
-        this.utils.loadInferAndStoreOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreOntology(this.poddAnimalPath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddAnimalPath, this.getTestRepositoryConnection());
     }
     
     /**
@@ -110,11 +110,11 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndScienceAndPoddPlantOntologies() throws Exception
     {
-        this.utils.loadInferAndStoreOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreOntology(this.poddPlantPath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddPlantPath, this.getTestRepositoryConnection());
     }
     
     /**
@@ -126,9 +126,9 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndScienceOntologies() throws Exception
     {
-        this.utils.loadInferAndStoreOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
     }
     
     /**
@@ -139,9 +139,9 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndUserOntologies() throws Exception
     {
-        this.utils.loadInferAndStoreOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreOntology(this.poddUserPath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddUserPath, this.getTestRepositoryConnection());
         
     }
     
@@ -153,7 +153,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseOntology() throws Exception
     {
-        this.utils.loadInferAndStoreOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
     }
     
     /**
@@ -175,7 +175,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                         IRI.create("urn:test:plantontology:version:16.0"));
         
         final InferredOWLOntologyID inferredOWLOntologyID =
-                this.utils.loadInferAndStoreOntology("/ontologies/plant_ontology-v16.owl", modifiedId,
+                this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl", modifiedId,
                         this.getTestRepositoryConnection());
         
         // verify that the triples were inserted into the repository correctly

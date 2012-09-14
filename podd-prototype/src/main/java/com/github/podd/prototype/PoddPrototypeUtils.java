@@ -289,7 +289,7 @@ public class PoddPrototypeUtils
      * @throws OWLOntologyCreationException
      * @throws OWLOntologyChangeException
      */
-    public InferredOWLOntologyID loadInferAndStoreOntology(final String ontologyResourcePath,
+    public InferredOWLOntologyID loadInferAndStoreSchemaOntology(final String ontologyResourcePath,
             final OWLOntologyID newOWLOntologyID, final RepositoryConnection nextRepositoryConnection)
         throws Exception, IOException, RepositoryException, ReasonerInterruptedException, TimeOutException,
         InconsistentOntologyException, OWLOntologyCreationException, OWLOntologyChangeException
@@ -354,7 +354,7 @@ public class PoddPrototypeUtils
      * @throws OWLOntologyCreationException
      * @throws OWLOntologyChangeException
      */
-    public InferredOWLOntologyID loadInferAndStoreOntology(final String ontologyResourcePath,
+    public InferredOWLOntologyID loadInferAndStoreSchemaOntology(final String ontologyResourcePath,
             final RepositoryConnection nextRepositoryConnection) throws Exception, IOException, RepositoryException,
         ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, OWLOntologyCreationException,
         OWLOntologyChangeException
