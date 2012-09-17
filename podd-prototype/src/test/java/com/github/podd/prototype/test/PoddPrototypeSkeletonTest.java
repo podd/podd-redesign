@@ -24,6 +24,14 @@ import com.github.podd.prototype.InferredOWLOntologyID;
 import com.github.podd.prototype.PoddPrototypeUtils;
 
 /**
+ * This class performs some basic actions that are necessary for the PODD Prototype.
+ * 
+ * It also validates that the Schema Ontologies we are using can be loaded in using the OWL2-DL
+ * profile, which is necessary to use the Schema Ontologies with the Pellet OWLReasoner.
+ * 
+ * This class also tests that a valid PODD Artifact can be loaded into PODD, and that an invalid
+ * PODD Artifact will fail to be loaded into PODD.
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
