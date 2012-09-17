@@ -237,7 +237,9 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                 this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl", modifiedId,
                         this.getTestRepositoryConnection());
         
-        // verify that the triples were inserted into the repository correctly
+        // verify that the triples were inserted into the repository correctly by testing the size
+        // of different contexts and then testing the size of the complete repository to verify that
+        // no other triples were inserted
         Assert.assertEquals(2995,
                 this.getTestRepositoryConnection().size(inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI()));
         Assert.assertEquals(44333,
