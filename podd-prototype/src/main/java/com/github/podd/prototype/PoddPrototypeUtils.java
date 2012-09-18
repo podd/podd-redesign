@@ -569,6 +569,10 @@ public class PoddPrototypeUtils
         {
             // type the ontology
             nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
+            
+            // TODO: remove previous versionIRI statements
+            // TODO: remove the content of any contexts that are the object of versionIRI statements
+            
             // setup a version number link for this version
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, nextVersionUri,
                     this.artifactGraph);
@@ -591,6 +595,16 @@ public class PoddPrototypeUtils
             // link from the ontology IRI to the current inferred axioms ontology version
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
                     nextInferredOntologyUri, this.artifactGraph);
+            
+            // TODO: Implement this code to get the statements and then remove the statements
+            // Remove the content for all previous inferred versions
+            // NOTE: This list should not ever be very large, as we perform this step every time
+            // this method is called to update the version
+            // nextRepositoryConnection.getStatements(nextOntologyUri, PODD_BASE_INFERRED_VERSION,
+            // null, false, this.artifactGraph);
+            
+            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
+                    null, this.artifactGraph);
             
             // link from the ontology version IRI to the matching inferred axioms ontology version
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
