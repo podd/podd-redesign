@@ -107,6 +107,8 @@ public class PoddPrototypeUtils
      * If we are performing edit conflict resolution based solely on RDF triples and not OWL Axioms,
      * then we may be able to perform the diff externally. See the Protege OWL Diff code for
      * examples of how to diff ontologies.
+     * https://github.com/ansell/protege-owl-diff/blob/master/src
+     * /main/java/org/protege/owl/diff/Engine.java
      */
     private OWLOntologyManager manager;
     
