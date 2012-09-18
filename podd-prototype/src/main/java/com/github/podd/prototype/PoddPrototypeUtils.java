@@ -67,6 +67,8 @@ public class PoddPrototypeUtils
     /**
      * Creating a property for PODD to track the currentInferredVersion for the inferred axioms
      * ontology when linking from the ontology IRI.
+     * 
+     * TODO: Put this in an external ontology somewhere so it isn't dependent on PODD.
      */
     public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = ValueFactoryImpl.getInstance().createURI(
             "http://purl.org/podd/ns/poddBase#", "currentInferredVersion");
@@ -74,6 +76,8 @@ public class PoddPrototypeUtils
     /**
      * Creating a property for PODD to track the inferredVersion for the inferred axioms ontology of
      * a particular versioned ontology.
+     * 
+     * TODO: Put this in an external ontology somewhere so it isn't dependent on PODD.
      */
     public static final URI PODD_BASE_INFERRED_VERSION = ValueFactoryImpl.getInstance().createURI(
             "http://purl.org/podd/ns/poddBase#", "inferredVersion");
