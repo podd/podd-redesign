@@ -3,24 +3,52 @@
  */
 package com.github.podd.prototype.test;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationObjectVisitorEx;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfile;
+import org.semanticweb.owlapi.reasoner.ConsoleProgressMonitor;
+import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
+import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.NodeSet;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
+import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
+import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
+import org.semanticweb.owlapi.reasoner.TimeOutException;
+import org.semanticweb.owlapi.util.OWLObjectVisitorExAdapter;
+import org.semanticweb.owlapi.util.OWLOntologyWalker;
+import org.semanticweb.owlapi.util.OWLOntologyWalkerVisitor;
 
 import com.clarkparsia.owlapiv3.OWL;
 import com.github.podd.prototype.InferredOWLOntologyID;
+import com.github.podd.prototype.PoddException;
 import com.github.podd.prototype.PoddPrototypeUtils;
 
 /**
@@ -95,6 +123,87 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.reasonerFactory = null;
         this.utils = null;
     }
+    
+    
+    @Test
+    public void testOne() throws Exception 
+    {
+		OWLOntologyID id = this.utils.loadInferAndStoreSchemaOntology(
+				this.poddBasePath, this.getTestRepositoryConnection());
+		this.getTestRepositoryConnection().commit();
+		
+		OWLOntology o = this.utils.loadOntology(this.poddPlantPath);
+		this.getTestRepositoryConnection().commit();
+
+		  // Create the walker
+        OWLOntologyWalker walker = new OWLOntologyWalker(Collections.singleton(o));
+        // Now ask our walker to walk over the ontology
+        OWLOntologyWalkerVisitor<Object> visitor = new OWLOntologyWalkerVisitor<Object>(
+                walker) {
+            @Override
+            public Object visit(OWLObjectSomeValuesFrom desc) {
+                // Print out the restriction
+                 System.out.println(desc);
+                // Print out the axiom where the restriction is used
+                 System.out.println("         " + getCurrentAxiom());
+                 System.out.println();
+                // We don't need to return anything here.
+                return null;
+            }
+        };
+        // Now ask the walker to walk over the ontology structure using our
+        // visitor instance.
+        walker.walkStructure(visitor);
+    }
+
+    /**
+     * Not a very good test as it hard codes poddBase ontology concepts.
+     * Created just to familiarize myself.
+     * Query contents of poddBase ontology to ensure that it is loaded correctly
+     *  - [KG]
+     */
+    @Test
+    public void testBaseOntologyContent() 
+    {
+        try 
+        {
+			OWLOntology o = this.utils.loadOntology(this.poddBasePath);
+	        assertNotNull(o);
+			OWLReasoner reasoner = this.utils.checkConsistency(o);
+			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+			
+			IRI poddTopObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddTopObject");
+			IRI poddObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddObject");
+			boolean topObjExists = false;
+			boolean topObjHierarcyExists = false;
+	        // These are the named classes referenced by axioms in the ontology.
+	        for (OWLClass cls : o.getClassesInSignature()) 
+	        {
+	        	if (poddTopObjIRI.equals(cls.getIRI())) 
+	        	{
+	        		topObjExists = true;
+	        	}
+	        	
+	        	if (cls.getIRI().equals(poddObjIRI))
+	        	{
+		            NodeSet<OWLClass> subClasses = reasoner.getSubClasses(cls, true);
+		            for (OWLClass subClass : subClasses.getFlattened()) {
+			        	if (poddTopObjIRI.equals(subClass.getIRI())) 
+			        	{
+			        		topObjHierarcyExists = true;
+			        	}
+		            }
+	        	}
+	        }			
+			Assert.assertTrue("Top Object not found.", topObjExists);
+			Assert.assertTrue("Top Object hierarchy not found.", topObjHierarcyExists);
+        }
+        catch (Exception e) 
+        {
+			Assert.fail("Unexpected exception: " + e.toString());
+		}
+    }
+    
     
     /**
      * Tests the combination of the base, science, and the podd animal ontologies to verify their
@@ -192,9 +301,10 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                     this.getTestRepositoryConnection());
             Assert.fail("Did not receive expected exception");
         }
-        catch(final AssertionError ae)
+        catch(final PoddException pe)
         {
-            Assert.assertTrue(ae.getMessage().contains("Ontology was not consistent:"));
+            Assert.assertTrue("Exception does not have expected code",
+            		pe.getCode() == PoddException.ERR_INCONSISTENT_ONTOLOGY);
         }
     }
     
@@ -243,7 +353,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         final InferredOWLOntologyID inferredOWLOntologyID =
                 this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl", modifiedId,
-                        this.getTestRepositoryConnection());
+                        this.getTestRepositoryConnection()); 
         
         // verify that the triples were inserted into the repository correctly by testing the size
         // of different contexts and then testing the size of the complete repository to verify that
