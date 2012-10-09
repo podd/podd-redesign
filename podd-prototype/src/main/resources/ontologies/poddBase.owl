@@ -34,18 +34,18 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <owl:AnnotationProperty rdf:about="&poddBase;artifactHasTopObject">
-        <rdfs:label>has User</rdfs:label>
-        <rdfs:domain rdf:resource="owl:Ontology"/>
-        <rdfs:range rdf:resource="&poddBase;TopObject"/>
-    </owl:AnnotationProperty>
     <owl:AnnotationProperty rdf:about="&poddBase;hasUser">
         <rdfs:label>has User</rdfs:label>
-        <rdfs:domain rdf:resource="&poddBase;TopObject"/>
+        <rdfs:domain rdf:resource="&poddBase;PoddTopObject"/>
     </owl:AnnotationProperty>
     <owl:AnnotationProperty rdf:about="&poddBase;hasTopObjectStatus">
         <rdfs:label>has Top Object Status</rdfs:label>
-        <rdfs:domain rdf:resource="&poddBase;TopObject"/>
+        <rdfs:domain rdf:resource="&poddBase;PoddTopObject"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&poddBase;artifactHasTopObject">
+        <rdfs:label>has User</rdfs:label>
+        <rdfs:range rdf:resource="&poddBase;PoddTopObject"/>
+        <rdfs:domain rdf:resource="owl:Ontology"/>
     </owl:AnnotationProperty>
     <owl:AnnotationProperty rdf:about="&poddBase;weight">
         <rdfs:label>has Weight</rdfs:label>
@@ -85,7 +85,10 @@
 
     <owl:ObjectProperty rdf:about="&poddBase;containedBy">
         <rdfs:label>contained by</rdfs:label>
+        <rdfs:domain rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:range rdf:resource="&poddBase;PoddObject"/>
         <owl:inverseOf rdf:resource="&poddBase;contains"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;poddObjectProperty"/>
     </owl:ObjectProperty>
     
 
@@ -94,7 +97,9 @@
 
     <owl:ObjectProperty rdf:about="&poddBase;contains">
         <rdfs:label>contains</rdfs:label>
-        <rdfs:range rdf:resource="&poddBase;PoddTopObject"/>
+        <rdfs:domain rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:range rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;poddObjectProperty"/>
     </owl:ObjectProperty>
     
 
@@ -103,6 +108,17 @@
 
     <owl:ObjectProperty rdf:about="&poddBase;hasPrincipalInvestigator">
         <rdfs:subPropertyOf rdf:resource="&poddBase;hasUser"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasPublicationStatus -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;hasPublicationStatus">
+        <rdfs:label>has Publication Status</rdfs:label>
+        <rdfs:domain rdf:resource="&poddBase;PoddTopObject"/>
+        <rdfs:range rdf:resource="&poddBase;PublicationStatus"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;poddTopObjectProperty"/>
     </owl:ObjectProperty>
     
 
@@ -131,19 +147,13 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddBase#hasPublicationStatus -->
-
-    <owl:ObjectProperty rdf:about="&poddBase;hasPublicationStatus">
-        <rdfs:label>has Publication Status</rdfs:label>
-        <rdfs:range rdf:resource="&poddBase;PublicationStatus"/>
-    </owl:ObjectProperty>
-    
-
-
     <!-- http://purl.org/podd/ns/poddBase#hasTopObjectStatus -->
 
     <owl:ObjectProperty rdf:about="&poddBase;hasTopObjectStatus">
+        <rdfs:label>has Top Object Status</rdfs:label>
+        <rdfs:domain rdf:resource="&poddBase;PoddTopObject"/>
         <rdfs:range rdf:resource="&poddBase;TopObjectStatus"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;poddTopObjectProperty"/>
     </owl:ObjectProperty>
     
 
@@ -152,7 +162,23 @@
 
     <owl:ObjectProperty rdf:about="&poddBase;hasUser">
         <rdfs:label>has User</rdfs:label>
+        <rdfs:domain rdf:resource="&poddBase;PoddTopObject"/>
         <rdfs:range rdf:resource="&poddBase;User"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;poddTopObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#poddObjectProperty -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;poddObjectProperty"/>
+    
+
+
+    <!-- http://purl.org/podd/ns/poddBase#poddTopObjectProperty -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;poddTopObjectProperty">
+        <rdfs:subPropertyOf rdf:resource="&poddBase;poddObjectProperty"/>
     </owl:ObjectProperty>
     
 
@@ -161,7 +187,9 @@
 
     <owl:ObjectProperty rdf:about="&poddBase;refersTo">
         <rdfs:label>refers to</rdfs:label>
-        <rdfs:range rdf:resource="&poddBase;PoddTopObject"/>
+        <rdfs:range rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:domain rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;poddObjectProperty"/>
     </owl:ObjectProperty>
     
 
@@ -317,6 +345,7 @@
     </owl:DatatypeProperty>
     
 
+
     <!-- http://purl.org/podd/ns/poddBase#hasType -->
 
     <owl:DatatypeProperty rdf:about="&poddBase;hasType">
@@ -380,13 +409,6 @@
         <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasPURL"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;anyURI"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
                 <owl:onProperty rdf:resource="&poddBase;containedBy"/>
                 <owl:onClass rdf:resource="&poddBase;PoddTopObject"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
@@ -394,9 +416,15 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;lastModified"/>
+                <owl:onProperty rdf:resource="&poddBase;hasURL"/>
+                <owl:allValuesFrom rdf:resource="&xsd;anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&poddBase;hasPURL"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
+                <owl:onDataRange rdf:resource="&xsd;anyURI"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -407,8 +435,9 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&poddBase;hasURL"/>
-                <owl:allValuesFrom rdf:resource="&xsd;anyURI"/>
+                <owl:onProperty rdf:resource="&poddBase;lastModified"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="&xsd;dateTime"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -608,8 +637,9 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDifferent"/>
         <owl:distinctMembers rdf:parseType="Collection">
-            <rdf:Description rdf:about="&poddBase;NotPublished"/>
-            <rdf:Description rdf:about="&poddBase;Published"/>
+            <rdf:Description rdf:about="&poddBase;Active"/>
+            <rdf:Description rdf:about="&poddBase;Completed"/>
+            <rdf:Description rdf:about="&poddBase;Inactive"/>
         </owl:distinctMembers>
     </rdf:Description>
     <rdf:Description>
@@ -624,9 +654,8 @@
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDifferent"/>
         <owl:distinctMembers rdf:parseType="Collection">
-            <rdf:Description rdf:about="&poddBase;Active"/>
-            <rdf:Description rdf:about="&poddBase;Completed"/>
-            <rdf:Description rdf:about="&poddBase;Inactive"/>
+            <rdf:Description rdf:about="&poddBase;NotPublished"/>
+            <rdf:Description rdf:about="&poddBase;Published"/>
         </owl:distinctMembers>
     </rdf:Description>
 </rdf:RDF>
