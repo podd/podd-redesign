@@ -110,7 +110,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
     /**
      * Returns the OWLOntologyID representing the inferred ontology. ie, without the base ontology,
      * so that the hashcode will match that of the real OWLOntologyID for the inferred ontology.
-     * 
+     * <br/>
      * NOTE: We make the assumption that the ontology IRI and version IRI for versioned ontologies
      * are the same.
      * 
