@@ -12,11 +12,13 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationObjectVisitorEx;
@@ -31,6 +33,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfile;
+import org.semanticweb.owlapi.profiles.OWLProfileReport;
 import org.semanticweb.owlapi.reasoner.ConsoleProgressMonitor;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
@@ -124,7 +127,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.utils = null;
     }
     
-    
+
+    @Ignore
     @Test
     public void testOne() throws Exception 
     {
@@ -157,54 +161,131 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
 
     /**
-     * Not a very good test as it hard codes poddBase ontology concepts.
-     * Created just to familiarize myself.
-     * Query contents of poddBase ontology to ensure that it is loaded correctly
-     *  - [KG]
+     * Tests that consistency checks fail when a non-existent OWL Profile is specified.
+     */
+    @Test
+    public void testNonsensicalOWLProfile() 
+    {
+        final IRI nonsensicalOwlProfile = IRI.create("http://no.such/profile");
+        PoddException e = runConsistencyCheck(nonsensicalOwlProfile);
+        assertNotNull(e);
+        Assert.assertEquals("Unexpected error code",  
+                PoddException.ERR_PROFILE_NOT_FOUND, e.getCode());
+    }
+    
+    /**
+     * Tests that consistency checks fail when a an unsupported OWL Profile is specified.
+     */
+    @Test
+    public void testUnsupportedOWLProfile() 
+    {
+        final IRI unsupportedOwlProfile = OWLProfile.OWL2_RL;
+        PoddException e = runConsistencyCheck(unsupportedOwlProfile);
+        assertNotNull(e);
+        Assert.assertEquals("Unexpected error code",  
+                PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE, e.getCode());
+    }
+    
+    /**
+     * Helper method to check consistency based on different OWL profiles 
+     * @param owlProfile
+     * @return The PoddException that was thrown
+     */
+    private PoddException runConsistencyCheck(IRI owlProfile) 
+    {
+        try 
+        {
+            this.utils = new PoddPrototypeUtils(this.manager, owlProfile, this.reasonerFactory,
+                    this.schemaOntologyManagementGraph, this.poddArtifactManagementGraph);    	
+            OWLOntology o = this.utils.loadOntology(this.poddBasePath);
+            assertNotNull(o);
+            this.utils.checkConsistency(o);
+            Assert.fail("Consistency check should have failed.");
+        }
+        catch (PoddException e)
+        {
+            return e;
+        }
+        catch (Exception e) 
+        {
+            Assert.fail("Unexpected exception: " + e.toString());
+        }
+        return null; //won't get here really
+    }
+    
+    /**
+     * Tests that loading an empty OWL ontology fails with the appropriate PoddException.
+     */
+    @Test
+    public void testLoadEmptyOntology()
+    {
+        try 
+        {
+            OWLOntology o = this.utils.loadOntology("/test/ontologies/empty.owl");
+            Assert.fail("Should have failed to load empty ontology.");
+        }
+        catch (PoddException e)
+        {
+            Assert.assertEquals(PoddException.ERR_EMPTY_ONTOLOGY, e.getCode());
+            
+        }
+        catch (Exception e)
+        {
+            Assert.fail("Unexpected exception: " + e.toString());
+        }
+    }
+    
+    
+    /**
+     * Tests that the contents of an ontology (PoddBase) are correctly loaded
+     * by querying its contents.
+     * 
+     * Test will FAIL if poddBase ontology is modified.
      */
     @Test
     public void testBaseOntologyContent() 
     {
         try 
         {
-			OWLOntology o = this.utils.loadOntology(this.poddBasePath);
-	        assertNotNull(o);
-			OWLReasoner reasoner = this.utils.checkConsistency(o);
-			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-			
-			IRI poddTopObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddTopObject");
-			IRI poddObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddObject");
-			boolean topObjExists = false;
-			boolean topObjHierarcyExists = false;
-	        // These are the named classes referenced by axioms in the ontology.
-	        for (OWLClass cls : o.getClassesInSignature()) 
-	        {
-	        	if (poddTopObjIRI.equals(cls.getIRI())) 
-	        	{
-	        		topObjExists = true;
-	        	}
-	        	
-	        	if (cls.getIRI().equals(poddObjIRI))
-	        	{
-		            NodeSet<OWLClass> subClasses = reasoner.getSubClasses(cls, true);
-		            for (OWLClass subClass : subClasses.getFlattened()) {
-			        	if (poddTopObjIRI.equals(subClass.getIRI())) 
-			        	{
-			        		topObjHierarcyExists = true;
-			        	}
-		            }
-	        	}
-	        }			
-			Assert.assertTrue("Top Object not found.", topObjExists);
-			Assert.assertTrue("Top Object hierarchy not found.", topObjHierarcyExists);
+            OWLOntology o = this.utils.loadOntology(this.poddBasePath);
+            assertNotNull(o);
+            OWLReasoner reasoner = this.utils.checkConsistency(o);
+            reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+            
+            IRI poddTopObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddTopObject");
+            IRI poddObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddObject");
+            boolean topObjExists = false;
+            boolean topObjHierarcyExists = false;
+            // These are the named classes referenced by axioms in the ontology.
+            for (OWLClass cls : o.getClassesInSignature()) 
+            {
+                if (poddTopObjIRI.equals(cls.getIRI())) 
+                {
+                    topObjExists = true;
+                }
+                
+                if (cls.getIRI().equals(poddObjIRI))
+                {
+                    NodeSet<OWLClass> subClasses = reasoner.getSubClasses(cls, true);
+                    for (OWLClass subClass : subClasses.getFlattened()) 
+                    {
+                        if (poddTopObjIRI.equals(subClass.getIRI())) 
+                        {
+                            topObjHierarcyExists = true;
+                        }
+                    }
+                }
+            }			
+            Assert.assertTrue("Top Object not found.", topObjExists);
+            Assert.assertTrue("Top Object hierarchy not found.", topObjHierarcyExists);
         }
         catch (Exception e) 
         {
-			Assert.fail("Unexpected exception: " + e.toString());
-		}
+            Assert.fail("Unexpected exception: " + e.toString());
+        }
     }
     
-    
+   
     /**
      * Tests the combination of the base, science, and the podd animal ontologies to verify their
      * internal consistency.
