@@ -53,7 +53,7 @@
 	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
 	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-06-05T01:57:16.643Z</poddBase:createdAt>
 	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CSIRO HRPPC</poddBase:hasLeadInstitution>
-	<!-- NOTE: It is inconsistent to have two lead institutions attached to a Project, so this ontology should not validate -->
+	<!-- ERROR: It is inconsistent to have two lead institutions attached to a Project, so this ontology should not validate -->
 	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">UQ</poddBase:hasLeadInstitution>
 	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-05-22</poddBase:hasStartDate>
 	<poddBase:hasTopObjectStatus rdf:resource="http://purl.org/podd/ns/poddBase#Active"/>
