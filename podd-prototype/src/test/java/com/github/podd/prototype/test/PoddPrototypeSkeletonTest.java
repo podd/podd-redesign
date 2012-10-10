@@ -363,7 +363,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
      * 
      * @throws Exception
      */
-    @Ignore
     @Test
     public final void testBaseAndScienceOntologyAndSingleArtifactInconsistentNotTopObject() throws Exception
     {
@@ -385,6 +384,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         {
             Assert.assertTrue("Exception does not have expected code",
                     pe.getCode() == PoddException.ERR_INCONSISTENT_ONTOLOGY);
+            this.log.info(pe.getMessage());
         }
     }
     
