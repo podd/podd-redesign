@@ -6,7 +6,6 @@ package com.github.podd.prototype.test;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -281,13 +280,13 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
             this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
             Assert.fail("Did not fail as expected.");
         }
-        catch (PoddException e)
+        catch(final PoddException e)
         {
             Assert.assertEquals(PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE, e.getCode());
             // TODO: error code has to change to be made more meaningful
         }
     }
-
+    
     /**
      * Tests the combination of the base, science, and the podd plant ontologies to verify their
      * internal consistency.
@@ -376,11 +375,11 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
     
     /**
-     * Tests an inconsistent semantic ontology, where the artifactHasTopObject statements does not refer 
-     * to a subclass of poddBase:PoddTopObject.
+     * Tests an inconsistent semantic ontology, where the artifactHasTopObject statements does not
+     * refer to a subclass of poddBase:PoddTopObject.
      * 
-     * NOTE: This is difficult with OWL-DL, so temporarily ignoring this test until we have native rules 
-     * to validate this constraint.
+     * NOTE: This is difficult with OWL-DL, so temporarily ignoring this test until we have native
+     * rules to validate this constraint.
      * 
      * @throws Exception
      */

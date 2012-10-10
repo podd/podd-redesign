@@ -43,7 +43,6 @@ import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * A selection of utilities used to create the prototype.
  * 
@@ -175,19 +174,19 @@ public class PoddPrototypeUtils
      */
     public OWLReasoner checkConsistency(final OWLOntology nextOntology) throws PoddException
     {
-    	final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(this.owlProfile);
-    	if (nextProfile == null) 
-    	{
-    		throw new PoddException("Could not find profile in registry: " + this.owlProfile.toQuotedString(),
-    				null, PoddException.ERR_PROFILE_NOT_FOUND);
-    	}
+        final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(this.owlProfile);
+        if(nextProfile == null)
+        {
+            throw new PoddException("Could not find profile in registry: " + this.owlProfile.toQuotedString(), null,
+                    PoddException.ERR_PROFILE_NOT_FOUND);
+        }
         
         final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
         if(!profileReport.isInProfile())
         {
-            //TODO - could be due to incomplete imports also
+            // TODO - could be due to incomplete imports also
             throw new PoddException("Ontology not in given profile: " + nextOntology.getOntologyID().toString(),
-            		profileReport, PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE);
+                    profileReport, PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE);
         }
         
         // create an OWL Reasoner using the Pellet library and ensure that the reasoner thinks the
@@ -197,11 +196,12 @@ public class PoddPrototypeUtils
         
         // Test that the ontology was consistent with this reasoner
         // This ensures in the case of Pellet that it is in the OWL2-DL profile
-        if (!nextReasoner.isConsistent()) 
+        if(!nextReasoner.isConsistent())
         {
-        	throw new PoddException("Ontology not consistent: " + nextOntology.getOntologyID().toString(),
-            		profileReport, PoddException.ERR_INCONSISTENT_ONTOLOGY);
+            throw new PoddException("Ontology not consistent: " + nextOntology.getOntologyID().toString(),
+                    profileReport, PoddException.ERR_INCONSISTENT_ONTOLOGY);
         }
+        
         return nextReasoner;
     }
     
@@ -244,8 +244,7 @@ public class PoddPrototypeUtils
      * @throws IOException
      * @throws RepositoryException
      */
-    public void dumpOntologyToRepository(
-    		final OWLOntology nextOntology,
+    public void dumpOntologyToRepository(final OWLOntology nextOntology,
             final RepositoryConnection nextRepositoryConnection) throws IOException, RepositoryException
     {
         try
@@ -299,14 +298,14 @@ public class PoddPrototypeUtils
      * 
      * <br/>
      * 
-     * <b>IMPORTANT:</b> The inferred ontology has an ontology IRI that is derived from the version IRI of
-     * the loaded ontology. The version IRI in the given OWLOntologyID must be unique for this
-     * process to succeed.
+     * <b>IMPORTANT:</b> The inferred ontology has an ontology IRI that is derived from the version
+     * IRI of the loaded ontology. The version IRI in the given OWLOntologyID must be unique for
+     * this process to succeed.
      * 
      * @param ontologyResourcePath
      *            The classpath resource to load the ontology from.
      * @param newOWLOntologyID
-     * 			  The OWLOntologyID to be assigned to the ontology after it is loaded.	
+     *            The OWLOntologyID to be assigned to the ontology after it is loaded.
      * @param nextRepositoryConnection
      *            The repository connection to use for storing the ontology and the inferred
      *            statements.
@@ -319,12 +318,10 @@ public class PoddPrototypeUtils
      * @throws OWLOntologyCreationException
      * @throws OWLOntologyChangeException
      */
-    public InferredOWLOntologyID loadInferAndStoreSchemaOntology(
-    		final String ontologyResourcePath,
-    		final OWLOntologyID newOWLOntologyID, 
-    		final RepositoryConnection nextRepositoryConnection)
-    				throws Exception, IOException, RepositoryException, ReasonerInterruptedException, TimeOutException,
-    				InconsistentOntologyException, OWLOntologyCreationException, OWLOntologyChangeException
+    public InferredOWLOntologyID loadInferAndStoreSchemaOntology(final String ontologyResourcePath,
+            final OWLOntologyID newOWLOntologyID, final RepositoryConnection nextRepositoryConnection)
+        throws Exception, IOException, RepositoryException, ReasonerInterruptedException, TimeOutException,
+        InconsistentOntologyException, OWLOntologyCreationException, OWLOntologyChangeException
     {
         // TODO: Create a version of this method that utilises the
         // loadOntology(RepositoryConnection...) method
@@ -386,12 +383,10 @@ public class PoddPrototypeUtils
      * @throws OWLOntologyCreationException
      * @throws OWLOntologyChangeException
      */
-    public InferredOWLOntologyID loadInferAndStoreSchemaOntology(
-    		final String ontologyResourcePath,
-    		final RepositoryConnection nextRepositoryConnection) 
-    				throws Exception, IOException, RepositoryException,
-    				ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, 
-    				OWLOntologyCreationException, OWLOntologyChangeException
+    public InferredOWLOntologyID loadInferAndStoreSchemaOntology(final String ontologyResourcePath,
+            final RepositoryConnection nextRepositoryConnection) throws Exception, IOException, RepositoryException,
+        ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, OWLOntologyCreationException,
+        OWLOntologyChangeException
     {
         // TODO: Create a version of this method that utilises the
         // loadOntology(RepositoryConnection...) method
@@ -433,9 +428,9 @@ public class PoddPrototypeUtils
         final RioParserImpl owlParser = new RioParserImpl(new RDFXMLOntologyFormatFactory());
         final OWLOntology nextOntology = this.manager.createOntology();
         owlParser.parse(owlSource, nextOntology);
-        if (nextOntology.isEmpty()) 
+        if(nextOntology.isEmpty())
         {
-        	throw new PoddException("Loaded ontology is empty", null, PoddException.ERR_EMPTY_ONTOLOGY);
+            throw new PoddException("Loaded ontology is empty", null, PoddException.ERR_EMPTY_ONTOLOGY);
         }
         
         return nextOntology;
@@ -458,9 +453,9 @@ public class PoddPrototypeUtils
         final OWLOntology nextOntology =
                 this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
                         .getResourceAsStream(ontologyResource), new RDFXMLOntologyFormatFactory()));
-        if (nextOntology.isEmpty()) 
+        if(nextOntology.isEmpty())
         {
-        	throw new PoddException("Loaded ontology is empty", null, PoddException.ERR_EMPTY_ONTOLOGY);
+            throw new PoddException("Loaded ontology is empty", null, PoddException.ERR_EMPTY_ONTOLOGY);
         }
         return nextOntology;
     }
@@ -487,7 +482,6 @@ public class PoddPrototypeUtils
         nextRepositoryConnection.add(this.getClass().getResourceAsStream(artifactResourcePath), "", RDFFormat.RDFXML,
                 randomURN);
         nextRepositoryConnection.commit();
-         
         
         // FIXME: Rough hack translating them all to a fixed URI structure
         URITranslator.doTranslation(nextRepositoryConnection, "urn:temp:", "http://example.org/permanenturl/",
@@ -574,10 +568,8 @@ public class PoddPrototypeUtils
      *            The ontology ID that contains the information about the inferred ontology.
      * @throws RepositoryException
      */
-    public void updateCurrentManagedPoddArtifactOntologyVersion(
-    		final RepositoryConnection nextRepositoryConnection,
-            final OWLOntologyID nextOntologyID, 
-            final OWLOntologyID nextInferredOntologyID) throws RepositoryException
+    public void updateCurrentManagedPoddArtifactOntologyVersion(final RepositoryConnection nextRepositoryConnection,
+            final OWLOntologyID nextOntologyID, final OWLOntologyID nextInferredOntologyID) throws RepositoryException
     {
         final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
@@ -590,8 +582,8 @@ public class PoddPrototypeUtils
         try
         {
             // type the ontology
-        	//1st 3 parameters represent the triple. 
-        	//4th (the artifactGraph) is the "context" in which the triple is stored
+            // 1st 3 parameters represent the triple.
+            // 4th (the artifactGraph) is the "context" in which the triple is stored
             nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
             
             // TODO: remove previous versionIRI statements
