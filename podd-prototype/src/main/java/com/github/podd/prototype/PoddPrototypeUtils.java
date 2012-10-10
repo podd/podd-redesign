@@ -174,33 +174,24 @@ public class PoddPrototypeUtils
      */
     public OWLReasoner checkConsistency(final OWLOntology nextOntology) throws PoddException
     {
-        //KG - we could validate profile earlier in the constructor?
     	final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(this.owlProfile);
     	if (nextProfile == null) 
     	{
     		throw new PoddException("Could not find profile in registry: " + this.owlProfile.toQuotedString(),
     				null, PoddException.ERR_PROFILE_NOT_FOUND);
     	}
-//        Assert.assertNotNull("Could not find profile in registry: " + this.owlProfile.toQuotedString(), nextProfile);
-        
         
         final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
         if(!profileReport.isInProfile())
         {
-//            this.log.error("Bad profile report count: {}", profileReport.getViolations().size());
-//            this.log.error("Bad profile report: {}", profileReport);
             throw new PoddException("Schema Ontology not in given profile: " + nextOntology.getOntologyID().toString(),
             		profileReport, PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE);
-            
         }
-//        Assert.assertTrue("Schema Ontology was not in the given profile: " + nextOntology.getOntologyID().toString(),
-//                profileReport.isInProfile());
         
         // create an OWL Reasoner using the Pellet library and ensure that the reasoner thinks the
         // ontology is consistent so far
         // Use the factory that we found to create a reasoner over the ontology
         final OWLReasoner nextReasoner = this.reasonerFactory.createReasoner(nextOntology);
-        
         
         // Test that the ontology was consistent with this reasoner
         // This ensures in the case of Pellet that it is in the OWL2-DL profile
@@ -209,9 +200,6 @@ public class PoddPrototypeUtils
         	throw new PoddException("Ontology not consistent: " + nextOntology.getOntologyID().toString(),
             		profileReport, PoddException.ERR_INCONSISTENT_ONTOLOGY);
         }
-//        Assert.assertTrue("Ontology was not consistent: " + nextOntology.getOntologyID().toString(),
-//                nextReasoner.isConsistent());
-        
         return nextReasoner;
     }
     
@@ -254,7 +242,7 @@ public class PoddPrototypeUtils
      * @throws IOException
      * @throws RepositoryException
      */
-    protected void dumpOntologyToRepository(
+    public void dumpOntologyToRepository(
     		final OWLOntology nextOntology,
             final RepositoryConnection nextRepositoryConnection) throws IOException, RepositoryException
     {
@@ -400,8 +388,8 @@ public class PoddPrototypeUtils
     		final String ontologyResourcePath,
     		final RepositoryConnection nextRepositoryConnection) 
     				throws Exception, IOException, RepositoryException,
-    				ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, OWLOntologyCreationException,
-    				OWLOntologyChangeException
+    				ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, 
+    				OWLOntologyCreationException, OWLOntologyChangeException
     {
         // TODO: Create a version of this method that utilises the
         // loadOntology(RepositoryConnection...) method
@@ -472,8 +460,6 @@ public class PoddPrototypeUtils
         {
         	throw new PoddException("Loaded ontology is empty", null, PoddException.ERR_EMPTY_ONTOLOGY);
         }
-//        Assert.assertFalse(nextOntology.isEmpty());
-        
         return nextOntology;
     }
     
