@@ -139,7 +139,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
             this.utils =
                     new PoddPrototypeUtils(this.manager, owlProfile, this.reasonerFactory,
                             this.schemaOntologyManagementGraph, this.poddArtifactManagementGraph);
-            final OWLOntology o = this.utils.loadOntology(this.poddBasePath);
+            final OWLOntology o = this.utils.loadOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType());
             Assert.assertNotNull(o);
             this.utils.checkConsistency(o);
             Assert.fail("Consistency check should have failed.");
@@ -163,7 +163,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     {
         try
         {
-            final OWLOntology o = this.utils.loadOntology("/test/ontologies/empty.owl");
+            final OWLOntology o =
+                    this.utils.loadOntology("/test/ontologies/empty.owl", RDFFormat.RDFXML.getDefaultMIMEType());
             Assert.fail("Should have failed to load empty ontology.");
         }
         catch(final PoddException e)
@@ -182,48 +183,43 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
      * contents.
      * 
      * Test will FAIL if poddBase ontology is modified.
+     * 
+     * @throws Exception
      */
     @Test
-    public final void testBaseOntologyContent()
+    public final void testBaseOntologyContent() throws Exception
     {
-        try
+        final OWLOntology o = this.utils.loadOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType());
+        Assert.assertNotNull(o);
+        final OWLReasoner reasoner = this.utils.checkConsistency(o);
+        reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+        
+        final IRI poddTopObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddTopObject");
+        final IRI poddObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddObject");
+        boolean topObjExists = false;
+        boolean topObjHierarcyExists = false;
+        // These are the named classes referenced by axioms in the ontology.
+        for(final OWLClass cls : o.getClassesInSignature())
         {
-            final OWLOntology o = this.utils.loadOntology(this.poddBasePath);
-            Assert.assertNotNull(o);
-            final OWLReasoner reasoner = this.utils.checkConsistency(o);
-            reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-            
-            final IRI poddTopObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddTopObject");
-            final IRI poddObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddObject");
-            boolean topObjExists = false;
-            boolean topObjHierarcyExists = false;
-            // These are the named classes referenced by axioms in the ontology.
-            for(final OWLClass cls : o.getClassesInSignature())
+            if(poddTopObjIRI.equals(cls.getIRI()))
             {
-                if(poddTopObjIRI.equals(cls.getIRI()))
+                topObjExists = true;
+            }
+            
+            if(cls.getIRI().equals(poddObjIRI))
+            {
+                final NodeSet<OWLClass> subClasses = reasoner.getSubClasses(cls, true);
+                for(final OWLClass subClass : subClasses.getFlattened())
                 {
-                    topObjExists = true;
-                }
-                
-                if(cls.getIRI().equals(poddObjIRI))
-                {
-                    final NodeSet<OWLClass> subClasses = reasoner.getSubClasses(cls, true);
-                    for(final OWLClass subClass : subClasses.getFlattened())
+                    if(poddTopObjIRI.equals(subClass.getIRI()))
                     {
-                        if(poddTopObjIRI.equals(subClass.getIRI()))
-                        {
-                            topObjHierarcyExists = true;
-                        }
+                        topObjHierarcyExists = true;
                     }
                 }
             }
-            Assert.assertTrue("Top Object not found.", topObjExists);
-            Assert.assertTrue("Top Object hierarchy not found.", topObjHierarcyExists);
         }
-        catch(final Exception e)
-        {
-            Assert.fail("Unexpected exception: " + e.toString());
-        }
+        Assert.assertTrue("Top Object not found.", topObjExists);
+        Assert.assertTrue("Top Object hierarchy not found.", topObjHierarcyExists);
     }
     
     /**
@@ -234,7 +230,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     {
         try
         {
-            final OWLOntology nextOntology = this.utils.loadOntology("/test/ontologies/lonely.owl");
+            final OWLOntology nextOntology =
+                    this.utils.loadOntology("/test/ontologies/lonely.owl", RDFFormat.RDFXML.getDefaultMIMEType());
             Assert.assertEquals(2, nextOntology.getAxiomCount(AxiomType.SUBCLASS_OF));
             
             final OWLReasoner reasoner = this.utils.checkConsistency(nextOntology);
@@ -259,11 +256,14 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndScienceAndPoddAnimalOntologies() throws Exception
     {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddAnimalPath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddAnimalPath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
     }
     
     /**
@@ -277,7 +277,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         try
         {
             // we're not loading PoddBase which is needed by PoddScience
-            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
             Assert.fail("Did not fail as expected.");
         }
         catch(final PoddException e)
@@ -296,11 +297,14 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndScienceAndPoddPlantOntologies() throws Exception
     {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddPlantPath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddPlantPath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
     }
     
     /**
@@ -312,9 +316,11 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndScienceOntologies() throws Exception
     {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
     }
     
     /**
@@ -325,16 +331,19 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndScienceOntologyAndSingleArtifact() throws Exception
     {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
         this.getTestRepositoryConnection().commit();
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
         this.getTestRepositoryConnection().commit();
         
         final InferredOWLOntologyID poddArtifact =
-                this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf", this.getTestRepositoryConnection());
+                this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf",
+                        RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
         
         // Final: Remove the PODD Artifact Ontology from the manager cache
         this.utils.removePoddArtifactFromManager(poddArtifact);
@@ -353,18 +362,20 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndScienceOntologyAndSingleArtifactInconsistent() throws Exception
     {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
         this.getTestRepositoryConnection().commit();
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
         this.getTestRepositoryConnection().commit();
         
         try
         {
             this.utils.loadPoddArtifact("/test/artifacts/error-twoLeadInstitutions-1.rdf",
-                    this.getTestRepositoryConnection());
+                    RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             Assert.fail("Did not receive expected exception");
         }
         catch(final PoddException pe)
@@ -386,18 +397,20 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndScienceOntologyAndSingleArtifactInconsistentNotTopObject() throws Exception
     {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
         this.getTestRepositoryConnection().commit();
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
         this.getTestRepositoryConnection().commit();
         
         try
         {
             this.utils.loadPoddArtifact("/test/artifacts/error-badTopObjectReference-1.rdf",
-                    this.getTestRepositoryConnection());
+                    RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             Assert.fail("Did not receive expected exception");
         }
         catch(final PoddException pe)
@@ -416,9 +429,11 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseAndUserOntologies() throws Exception
     {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddUserPath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddUserPath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
         
     }
     
@@ -430,7 +445,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     @Test
     public final void testBaseOntology() throws Exception
     {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
     }
     
     /**
@@ -452,8 +468,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                         IRI.create("urn:test:plantontology:version:16.0"));
         
         final InferredOWLOntologyID inferredOWLOntologyID =
-                this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl", modifiedId,
-                        this.getTestRepositoryConnection());
+                this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl",
+                        RDFFormat.RDFXML.getDefaultMIMEType(), modifiedId, this.getTestRepositoryConnection());
         
         // verify that the triples were inserted into the repository correctly by testing the size
         // of different contexts and then testing the size of the complete repository to verify that

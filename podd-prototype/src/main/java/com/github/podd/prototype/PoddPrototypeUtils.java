@@ -17,8 +17,9 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
-import org.openrdf.rio.RDFFormat;
-import org.semanticweb.owlapi.formats.RDFXMLOntologyFormatFactory;
+import org.openrdf.rio.Rio;
+import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
+import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -304,6 +305,8 @@ public class PoddPrototypeUtils
      * 
      * @param ontologyResourcePath
      *            The classpath resource to load the ontology from.
+     * @param mimeType
+     *            The MIME type of the ontology to load.
      * @param newOWLOntologyID
      *            The OWLOntologyID to be assigned to the ontology after it is loaded.
      * @param nextRepositoryConnection
@@ -319,13 +322,14 @@ public class PoddPrototypeUtils
      * @throws OWLOntologyChangeException
      */
     public InferredOWLOntologyID loadInferAndStoreSchemaOntology(final String ontologyResourcePath,
-            final OWLOntologyID newOWLOntologyID, final RepositoryConnection nextRepositoryConnection)
-        throws Exception, IOException, RepositoryException, ReasonerInterruptedException, TimeOutException,
-        InconsistentOntologyException, OWLOntologyCreationException, OWLOntologyChangeException
+            final String mimeType, final OWLOntologyID newOWLOntologyID,
+            final RepositoryConnection nextRepositoryConnection) throws Exception, IOException, RepositoryException,
+        ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, OWLOntologyCreationException,
+        OWLOntologyChangeException
     {
         // TODO: Create a version of this method that utilises the
         // loadOntology(RepositoryConnection...) method
-        final OWLOntology nextOntology = this.loadOntology(ontologyResourcePath);
+        final OWLOntology nextOntology = this.loadOntology(ontologyResourcePath, mimeType);
         
         // rename the ontology
         // This step is necessary for cases where the loaded ontology either does not have an
@@ -371,6 +375,8 @@ public class PoddPrototypeUtils
      * 
      * @param ontologyResourcePath
      *            The classpath resource to load the ontology from.
+     * @param mimeType
+     *            The MIME type of the ontology to load.
      * @param nextRepositoryConnection
      *            The repository connection to use for storing the ontology and the inferred
      *            statements.
@@ -384,13 +390,13 @@ public class PoddPrototypeUtils
      * @throws OWLOntologyChangeException
      */
     public InferredOWLOntologyID loadInferAndStoreSchemaOntology(final String ontologyResourcePath,
-            final RepositoryConnection nextRepositoryConnection) throws Exception, IOException, RepositoryException,
-        ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, OWLOntologyCreationException,
-        OWLOntologyChangeException
+            final String mimeType, final RepositoryConnection nextRepositoryConnection) throws Exception, IOException,
+        RepositoryException, ReasonerInterruptedException, TimeOutException, InconsistentOntologyException,
+        OWLOntologyCreationException, OWLOntologyChangeException
     {
         // TODO: Create a version of this method that utilises the
         // loadOntology(RepositoryConnection...) method
-        final OWLOntology nextOntology = this.loadOntology(ontologyResourcePath);
+        final OWLOntology nextOntology = this.loadOntology(ontologyResourcePath, mimeType);
         
         final OWLReasoner reasoner = this.checkConsistency(nextOntology);
         this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
@@ -413,19 +419,24 @@ public class PoddPrototypeUtils
      * 
      * @param conn
      *            The Sesame RepositoryConnection object to use when loading the ontology.
+     * @param mimeType
+     *            The MIME type of the ontology to load.
      * @param contexts
      *            An optional varargs array of contexts specifying the contexts to use when loading
      *            the ontology. If this is missing the entire repository will be used.
      * @return An OWLOntology instance populated with the triples from the repository.
      * @throws Exception
      */
-    protected OWLOntology loadOntology(final RepositoryConnection conn, final Resource... contexts) throws Exception
+    protected OWLOntology loadOntology(final RepositoryConnection conn, final String mimeType,
+            final Resource... contexts) throws Exception
     {
         final RioMemoryTripleSource owlSource =
                 new RioMemoryTripleSource(conn.getStatements(null, null, null, true, contexts));
         owlSource.setNamespaces(conn.getNamespaces());
         
-        final RioParserImpl owlParser = new RioParserImpl(new RDFXMLOntologyFormatFactory());
+        final RioParserImpl owlParser =
+                new RioParserImpl((RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance()
+                        .getByMIMEType(mimeType));
         final OWLOntology nextOntology = this.manager.createOntology();
         owlParser.parse(owlSource, nextOntology);
         if(nextOntology.isEmpty())
@@ -440,19 +451,19 @@ public class PoddPrototypeUtils
      * Loads an ontology from a Java Resource on the classpath. This is useful for loading test
      * resources.
      * 
-     * NOTE: We currently assume that the ontology will be in RDF/XML. Outside of the prototype we
-     * cannot make this assumption as any RDF or OWL format may be used.
-     * 
      * @param ontologyResource
      *            The classpath location of the test resource to load.
+     * @param mimeType
+     *            The MIME type of the ontology file to load.
      * @return An OWLOntology instance populated with the triples from the classpath resource.
      * @throws Exception
      */
-    public OWLOntology loadOntology(final String ontologyResource) throws Exception
+    public OWLOntology loadOntology(final String ontologyResource, final String mimeType) throws Exception
     {
         final OWLOntology nextOntology =
                 this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
-                        .getResourceAsStream(ontologyResource), new RDFXMLOntologyFormatFactory()));
+                        .getResourceAsStream(ontologyResource), OWLOntologyFormatFactoryRegistry.getInstance()
+                        .getByMIMEType(mimeType)));
         if(nextOntology.isEmpty())
         {
             throw new PoddException("Loaded ontology is empty", null, PoddException.ERR_EMPTY_ONTOLOGY);
@@ -468,19 +479,20 @@ public class PoddPrototypeUtils
      * consistent with the configured reasoner.
      * 
      * @param artifactResourcePath
+     * @param mimeType
      * @param nextRepositoryConnection
      * @return
      * @throws Exception
      */
-    public InferredOWLOntologyID loadPoddArtifact(final String artifactResourcePath,
+    public InferredOWLOntologyID loadPoddArtifact(final String artifactResourcePath, final String mimeType,
             final RepositoryConnection nextRepositoryConnection) throws Exception
     {
         // 1. Create permanent identifiers for any impermanent identifiers in the object...
         final URI randomURN =
                 nextRepositoryConnection.getValueFactory().createURI("urn:random:" + UUID.randomUUID().toString());
         
-        nextRepositoryConnection.add(this.getClass().getResourceAsStream(artifactResourcePath), "", RDFFormat.RDFXML,
-                randomURN);
+        nextRepositoryConnection.add(this.getClass().getResourceAsStream(artifactResourcePath), "",
+                Rio.getParserFormatForMIMEType(mimeType), randomURN);
         nextRepositoryConnection.commit();
         
         // FIXME: Rough hack translating them all to a fixed URI structure
@@ -491,7 +503,7 @@ public class PoddPrototypeUtils
         // identifiers before loading it into the OWLOntologyManager
         
         this.log.info("Loading podd artifact from repository: {}", randomURN);
-        final OWLOntology nextOntology = this.loadOntology(nextRepositoryConnection, randomURN);
+        final OWLOntology nextOntology = this.loadOntology(nextRepositoryConnection, mimeType, randomURN);
         
         // 2. Validate the object in terms of the OWL profile
         // 3. Validate the object using a reasoner
