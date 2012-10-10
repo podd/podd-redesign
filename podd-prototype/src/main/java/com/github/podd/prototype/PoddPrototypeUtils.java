@@ -43,6 +43,7 @@ import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * A selection of utilities used to create the prototype.
  * 
@@ -184,7 +185,8 @@ public class PoddPrototypeUtils
         final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
         if(!profileReport.isInProfile())
         {
-            throw new PoddException("Schema Ontology not in given profile: " + nextOntology.getOntologyID().toString(),
+            //TODO - could be due to incomplete imports also
+            throw new PoddException("Ontology not in given profile: " + nextOntology.getOntologyID().toString(),
             		profileReport, PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE);
         }
         
@@ -485,6 +487,7 @@ public class PoddPrototypeUtils
         nextRepositoryConnection.add(this.getClass().getResourceAsStream(artifactResourcePath), "", RDFFormat.RDFXML,
                 randomURN);
         nextRepositoryConnection.commit();
+         
         
         // FIXME: Rough hack translating them all to a fixed URI structure
         URITranslator.doTranslation(nextRepositoryConnection, "urn:temp:", "http://example.org/permanenturl/",

@@ -268,6 +268,27 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
     
     /**
+     * Tests that when required base ontologies are not loaded, consistency checks will fail.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testIncompleteOntologyImportClosure() throws Exception
+    {
+        try
+        {
+            // we're not loading PoddBase which is needed by PoddScience
+            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+            Assert.fail("Did not fail as expected.");
+        }
+        catch (PoddException e)
+        {
+            Assert.assertEquals(PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE, e.getCode());
+            // TODO: error code has to change to be made more meaningful
+        }
+    }
+
+    /**
      * Tests the combination of the base, science, and the podd plant ontologies to verify their
      * internal consistency.
      * 
