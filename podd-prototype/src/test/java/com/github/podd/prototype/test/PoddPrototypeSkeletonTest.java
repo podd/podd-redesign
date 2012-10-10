@@ -268,7 +268,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.getTestRepositoryConnection().commit();
         
         final InferredOWLOntologyID poddArtifact =
-                this.utils.loadPoddArtifact("/test/artifacts/testArtifact-1.rdf", this.getTestRepositoryConnection());
+                this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf", this.getTestRepositoryConnection());
         
         // Final: Remove the PODD Artifact Ontology from the manager cache
         this.utils.removePoddArtifactFromManager(poddArtifact);
@@ -297,7 +297,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         try
         {
-            this.utils.loadPoddArtifact("/test/artifacts/testInconsistentArtifact-1.rdf",
+            this.utils.loadPoddArtifact("/test/artifacts/error-twoLeadInstitutions-1.rdf",
                     this.getTestRepositoryConnection());
             Assert.fail("Did not receive expected exception");
         }
@@ -410,7 +410,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         try
         {
             this.getTestRepositoryConnection().add(
-                    this.getClass().getResourceAsStream("/test/artifacts/testArtifact-1.rdf"), "", RDFFormat.RDFXML);
+                    this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf"), "", RDFFormat.RDFXML);
             this.getTestRepositoryConnection().commit();
             
             Assert.assertEquals(24, this.getTestRepositoryConnection().size());
