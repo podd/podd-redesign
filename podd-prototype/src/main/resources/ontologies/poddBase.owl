@@ -38,15 +38,14 @@
         <rdfs:label>has User</rdfs:label>
         <rdfs:domain rdf:resource="&poddBase;PoddTopObject"/>
     </owl:AnnotationProperty>
-    <owl:AnnotationProperty rdf:about="&poddBase;artifactHasTopObject">
-        <rdfs:label>has User</rdfs:label>
-        <rdfs:range rdf:resource="&poddBase;PoddTopObject"/>
-        <rdfs:domain rdf:resource="owl:Ontology"/>
-    </owl:AnnotationProperty>
     <owl:AnnotationProperty rdf:about="&poddBase;weight">
         <rdfs:label>has Weight</rdfs:label>
     </owl:AnnotationProperty>
-    
+    <owl:AnnotationProperty rdf:about="&poddBase;artifactHasTopObject">
+        <rdfs:label>artifact has top object</rdfs:label>
+        <rdfs:range rdf:resource="&poddBase;PoddTopObject"/>
+        <rdfs:domain rdf:resource="&owl;Ontology"/>
+    </owl:AnnotationProperty>
 
 
     <!-- 
@@ -73,9 +72,6 @@
     //
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
-
-    
-
 
     <!-- http://purl.org/podd/ns/poddBase#containedBy -->
 
