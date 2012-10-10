@@ -3,51 +3,26 @@
  */
 package com.github.podd.prototype.test;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationObjectVisitorEx;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLiteral;
-import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChangeException;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfile;
-import org.semanticweb.owlapi.profiles.OWLProfileReport;
-import org.semanticweb.owlapi.reasoner.ConsoleProgressMonitor;
-import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
-import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
-import org.semanticweb.owlapi.reasoner.TimeOutException;
-import org.semanticweb.owlapi.util.OWLObjectVisitorExAdapter;
-import org.semanticweb.owlapi.util.OWLOntologyWalker;
-import org.semanticweb.owlapi.util.OWLOntologyWalkerVisitor;
 
 import com.clarkparsia.owlapiv3.OWL;
 import com.github.podd.prototype.InferredOWLOntologyID;
@@ -127,165 +102,154 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.utils = null;
     }
     
-
-    @Ignore
-    @Test
-    public void testOne() throws Exception 
-    {
-		OWLOntologyID id = this.utils.loadInferAndStoreSchemaOntology(
-				this.poddBasePath, this.getTestRepositoryConnection());
-		this.getTestRepositoryConnection().commit();
-		
-		OWLOntology o = this.utils.loadOntology(this.poddPlantPath);
-		this.getTestRepositoryConnection().commit();
-
-		  // Create the walker
-        OWLOntologyWalker walker = new OWLOntologyWalker(Collections.singleton(o));
-        // Now ask our walker to walk over the ontology
-        OWLOntologyWalkerVisitor<Object> visitor = new OWLOntologyWalkerVisitor<Object>(
-                walker) {
-            @Override
-            public Object visit(OWLObjectSomeValuesFrom desc) {
-                // Print out the restriction
-                 System.out.println(desc);
-                // Print out the axiom where the restriction is used
-                 System.out.println("         " + getCurrentAxiom());
-                 System.out.println();
-                // We don't need to return anything here.
-                return null;
-            }
-        };
-        // Now ask the walker to walk over the ontology structure using our
-        // visitor instance.
-        walker.walkStructure(visitor);
-    }
-
     /**
      * Tests that consistency checks fail when a non-existent OWL Profile is specified.
      */
     @Test
-    public void testNonsensicalOWLProfile() 
+    public final void testNonsensicalOWLProfile()
     {
         final IRI nonsensicalOwlProfile = IRI.create("http://no.such/profile");
-        PoddException e = runConsistencyCheck(nonsensicalOwlProfile);
-        assertNotNull(e);
-        Assert.assertEquals("Unexpected error code",  
-                PoddException.ERR_PROFILE_NOT_FOUND, e.getCode());
+        final PoddException e = this.runConsistencyCheck(nonsensicalOwlProfile);
+        Assert.assertNotNull(e);
+        Assert.assertEquals("Unexpected error code", PoddException.ERR_PROFILE_NOT_FOUND, e.getCode());
     }
     
     /**
      * Tests that consistency checks fail when a an unsupported OWL Profile is specified.
      */
     @Test
-    public void testUnsupportedOWLProfile() 
+    public final void testUnsupportedOWLProfile()
     {
         final IRI unsupportedOwlProfile = OWLProfile.OWL2_RL;
-        PoddException e = runConsistencyCheck(unsupportedOwlProfile);
-        assertNotNull(e);
-        Assert.assertEquals("Unexpected error code",  
-                PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE, e.getCode());
+        final PoddException e = this.runConsistencyCheck(unsupportedOwlProfile);
+        Assert.assertNotNull(e);
+        Assert.assertEquals("Unexpected error code", PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE, e.getCode());
     }
     
     /**
-     * Helper method to check consistency based on different OWL profiles 
+     * Helper method to check consistency based on different OWL profiles
+     * 
      * @param owlProfile
      * @return The PoddException that was thrown
      */
-    private PoddException runConsistencyCheck(IRI owlProfile) 
+    private PoddException runConsistencyCheck(final IRI owlProfile)
     {
-        try 
+        try
         {
-            this.utils = new PoddPrototypeUtils(this.manager, owlProfile, this.reasonerFactory,
-                    this.schemaOntologyManagementGraph, this.poddArtifactManagementGraph);    	
-            OWLOntology o = this.utils.loadOntology(this.poddBasePath);
-            assertNotNull(o);
+            this.utils =
+                    new PoddPrototypeUtils(this.manager, owlProfile, this.reasonerFactory,
+                            this.schemaOntologyManagementGraph, this.poddArtifactManagementGraph);
+            final OWLOntology o = this.utils.loadOntology(this.poddBasePath);
+            Assert.assertNotNull(o);
             this.utils.checkConsistency(o);
             Assert.fail("Consistency check should have failed.");
         }
-        catch (PoddException e)
+        catch(final PoddException e)
         {
             return e;
         }
-        catch (Exception e) 
+        catch(final Exception e)
         {
             Assert.fail("Unexpected exception: " + e.toString());
         }
-        return null; //won't get here really
+        return null; // won't get here really
     }
     
     /**
      * Tests that loading an empty OWL ontology fails with the appropriate PoddException.
      */
     @Test
-    public void testLoadEmptyOntology()
+    public final void testLoadEmptyOntology()
     {
-        try 
+        try
         {
-            OWLOntology o = this.utils.loadOntology("/test/ontologies/empty.owl");
+            final OWLOntology o = this.utils.loadOntology("/test/ontologies/empty.owl");
             Assert.fail("Should have failed to load empty ontology.");
         }
-        catch (PoddException e)
+        catch(final PoddException e)
         {
             Assert.assertEquals(PoddException.ERR_EMPTY_ONTOLOGY, e.getCode());
             
         }
-        catch (Exception e)
+        catch(final Exception e)
         {
             Assert.fail("Unexpected exception: " + e.toString());
         }
     }
     
-    
     /**
-     * Tests that the contents of an ontology (PoddBase) are correctly loaded
-     * by querying its contents.
+     * Tests that the contents of an ontology (PoddBase) are correctly loaded by querying its
+     * contents.
      * 
      * Test will FAIL if poddBase ontology is modified.
      */
     @Test
-    public void testBaseOntologyContent() 
+    public final void testBaseOntologyContent()
     {
-        try 
+        try
         {
-            OWLOntology o = this.utils.loadOntology(this.poddBasePath);
-            assertNotNull(o);
-            OWLReasoner reasoner = this.utils.checkConsistency(o);
+            final OWLOntology o = this.utils.loadOntology(this.poddBasePath);
+            Assert.assertNotNull(o);
+            final OWLReasoner reasoner = this.utils.checkConsistency(o);
             reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
             
-            IRI poddTopObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddTopObject");
-            IRI poddObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddObject");
+            final IRI poddTopObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddTopObject");
+            final IRI poddObjIRI = IRI.create("http://purl.org/podd/ns/poddBase#PoddObject");
             boolean topObjExists = false;
             boolean topObjHierarcyExists = false;
             // These are the named classes referenced by axioms in the ontology.
-            for (OWLClass cls : o.getClassesInSignature()) 
+            for(final OWLClass cls : o.getClassesInSignature())
             {
-                if (poddTopObjIRI.equals(cls.getIRI())) 
+                if(poddTopObjIRI.equals(cls.getIRI()))
                 {
                     topObjExists = true;
                 }
                 
-                if (cls.getIRI().equals(poddObjIRI))
+                if(cls.getIRI().equals(poddObjIRI))
                 {
-                    NodeSet<OWLClass> subClasses = reasoner.getSubClasses(cls, true);
-                    for (OWLClass subClass : subClasses.getFlattened()) 
+                    final NodeSet<OWLClass> subClasses = reasoner.getSubClasses(cls, true);
+                    for(final OWLClass subClass : subClasses.getFlattened())
                     {
-                        if (poddTopObjIRI.equals(subClass.getIRI())) 
+                        if(poddTopObjIRI.equals(subClass.getIRI()))
                         {
                             topObjHierarcyExists = true;
                         }
                     }
                 }
-            }			
+            }
             Assert.assertTrue("Top Object not found.", topObjExists);
             Assert.assertTrue("Top Object hierarchy not found.", topObjHierarcyExists);
         }
-        catch (Exception e) 
+        catch(final Exception e)
         {
             Assert.fail("Unexpected exception: " + e.toString());
         }
     }
     
-   
+    /**
+     * Test that computing inferences of a very simple ontology works.
+     */
+    @Test
+    public final void testComputeInferences()
+    {
+        try
+        {
+            final OWLOntology nextOntology = this.utils.loadOntology("/test/ontologies/lonely.owl");
+            Assert.assertEquals(2, nextOntology.getAxiomCount(AxiomType.SUBCLASS_OF));
+            
+            final OWLReasoner reasoner = this.utils.checkConsistency(nextOntology);
+            final OWLOntology nextInferredOntology =
+                    this.utils.computeInferences(reasoner,
+                            this.utils.generateInferredOntologyID(nextOntology.getOntologyID()));
+            
+            Assert.assertEquals(3, nextInferredOntology.getAxiomCount(AxiomType.SUBCLASS_OF));
+        }
+        catch(final Exception e)
+        {
+            Assert.fail("Unexpected exception: " + e.toString());
+        }
+    }
+    
     /**
      * Tests the combination of the base, science, and the podd animal ontologies to verify their
      * internal consistency.
@@ -385,7 +349,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         catch(final PoddException pe)
         {
             Assert.assertTrue("Exception does not have expected code",
-            		pe.getCode() == PoddException.ERR_INCONSISTENT_ONTOLOGY);
+                    pe.getCode() == PoddException.ERR_INCONSISTENT_ONTOLOGY);
         }
     }
     
@@ -434,7 +398,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         final InferredOWLOntologyID inferredOWLOntologyID =
                 this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl", modifiedId,
-                        this.getTestRepositoryConnection()); 
+                        this.getTestRepositoryConnection());
         
         // verify that the triples were inserted into the repository correctly by testing the size
         // of different contexts and then testing the size of the complete repository to verify that
