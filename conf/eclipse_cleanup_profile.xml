@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <profiles version="2">
-	<profile kind="CleanUpProfile" name="QueryAll Cleanup Profile"
+	<profile kind="CleanUpProfile" name="PODD Redesign Cleanup Profile"
 		version="2">
 		<setting id="cleanup.remove_unused_private_fields" value="true" />
 		<setting id="cleanup.always_use_parentheses_in_expressions"
@@ -11,7 +11,7 @@
 			value="true" />
 		<setting id="cleanup.convert_to_enhanced_for_loop" value="true" />
 		<setting id="cleanup.remove_unnecessary_nls_tags" value="true" />
-		<setting id="cleanup.sort_members" value="true" />
+		<setting id="cleanup.sort_members" value="false" />
 		<setting id="cleanup.remove_unused_local_variables" value="false" />
 		<setting id="cleanup.never_use_parentheses_in_expressions"
 			value="false" />
