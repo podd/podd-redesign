@@ -390,6 +390,17 @@
     
 
 
+    <!-- http://purl.org/podd/ns/poddBase#PoddInternalObject -->
+
+    <owl:Class rdf:about="&poddBase;PoddInternalObject">
+        <rdfs:subClassOf rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:label>Podd Internal Object</rdfs:label>
+        <rdfs:comment>A PODD object which is not designed to be a top object.</rdfs:comment>
+        <owl:disjointWith rdf:resource="&poddBase;PoddTopObject"/>
+    </owl:Class>
+    
+
+
     <!-- http://purl.org/podd/ns/poddBase#PoddObject -->
 
     <owl:Class rdf:about="&poddBase;PoddObject">
