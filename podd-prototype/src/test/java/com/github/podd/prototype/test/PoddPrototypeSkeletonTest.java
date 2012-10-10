@@ -12,6 +12,7 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -305,6 +306,40 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         {
             Assert.assertTrue("Exception does not have expected code",
             		pe.getCode() == PoddException.ERR_INCONSISTENT_ONTOLOGY);
+        }
+    }
+    
+    /**
+     * Tests an inconsistent semantic ontology, where the artifactHasTopObject statements does not refer 
+     * to a subclass of poddBase:PoddTopObject.
+     * 
+     * NOTE: This is difficult with OWL-DL, so temporarily ignoring this test until we have native rules 
+     * to validate this constraint.
+     * 
+     * @throws Exception
+     */
+    @Ignore
+    @Test
+    public final void testBaseAndScienceOntologyAndSingleArtifactInconsistentNotTopObject() throws Exception
+    {
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, this.getTestRepositoryConnection());
+        
+        this.getTestRepositoryConnection().commit();
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, this.getTestRepositoryConnection());
+        
+        this.getTestRepositoryConnection().commit();
+        
+        try
+        {
+            this.utils.loadPoddArtifact("/test/artifacts/error-badTopObjectReference-1.rdf",
+                    this.getTestRepositoryConnection());
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(final PoddException pe)
+        {
+            Assert.assertTrue("Exception does not have expected code",
+                    pe.getCode() == PoddException.ERR_INCONSISTENT_ONTOLOGY);
         }
     }
     
