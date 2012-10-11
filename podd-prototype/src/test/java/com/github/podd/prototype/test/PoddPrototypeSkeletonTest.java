@@ -601,4 +601,76 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         }
     }
     
+    /**
+     * Tests loading 2 versions of the poddScience ontology and loading artifacts that are validated
+     * against each one.
+     * 
+     * TODO: loadPoddArtifact() should modify the artifacts to refer to the current version of the
+     * schema ontology specified in the schema graph.
+     */
+    @Test
+    public final void testMultipleSchemaOntologyVersions()
+    {
+        try
+        {
+            this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            // poddScience allows 1 lead institution
+            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            // poddScience-v2 allows 2 lead institutions
+            this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-v2.owl",
+                    RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+            
+            // artifact 1 imports poddScience (v1) and has 1 lead institution
+            this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf", RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            // artifact 2 imports poddScience-v2 and has 2 lead institutions
+            this.utils.loadPoddArtifact("/test/artifacts/basicProject-2.rdf", RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            // printGraph(this.schemaOntologyManagementGraph);
+        }
+        catch(final PoddException e)
+        {
+            System.out.println("        Details " + e.getDetails());
+            Assert.fail("Unexpected PoddException");
+        }
+        catch(final Exception e)
+        {
+            e.printStackTrace();
+            Assert.fail("Unexpected exception");
+        }
+        
+    }
+    
+    // ///////////////////// some helper methods for debugging////////////////////////
+    
+    private void printGraph(final URI context)
+    {
+        org.openrdf.repository.RepositoryResult<Statement> results;
+        try
+        {
+            results = this.getTestRepositoryConnection().getStatements(null, null, null, false, context);
+            while(results.hasNext())
+            {
+                final Statement triple = results.next();
+                System.out.println(" --- " + triple);
+            }
+        }
+        catch(final org.openrdf.repository.RepositoryException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    private void countTriplesInRepository(final String msg) throws Exception
+    {
+        final long size = this.getTestRepositoryConnection().size();
+        System.out.println(size + " triples in repository " + msg);
+    }
+    
 }
