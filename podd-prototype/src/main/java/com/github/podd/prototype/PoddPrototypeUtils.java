@@ -509,9 +509,9 @@ public class PoddPrototypeUtils
                     Rio.getParserFormatForMIMEType(mimeType), randomURN);
             tempRepositoryConnection.commit();
             
-            // FIXME: Rough hack translating them all to a fixed URI structure
-            URITranslator.doTranslation(tempRepositoryConnection, "urn:temp:", "http://example.org/permanenturl/",
-                    randomURN);
+            // TODO: improve the permanent URI rather than using http://example.org
+            URITranslator.doTranslation(tempRepositoryConnection, "urn:temp:", "http://example.org/permanenturl/"
+                    + UUID.randomUUID().toString() + "/", randomURN);
             
             this.log.info("Loading podd artifact from repository: {}", randomURN);
             final OWLOntology nextOntology = this.loadOntology(tempRepositoryConnection, mimeType, randomURN);

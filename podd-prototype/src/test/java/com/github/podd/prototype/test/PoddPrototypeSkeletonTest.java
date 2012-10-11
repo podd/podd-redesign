@@ -354,6 +354,68 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
     
     /**
+     * Tests that loading an artifact fails when schema ontologies are not available.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testSingleArtifactMissingSchemaOntologies()
+    {
+        try
+        {
+            this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf", RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            Assert.fail("Did not fail loading as expected");
+        }
+        catch(final PoddException e)
+        {
+            Assert.assertEquals(PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE, e.getCode());
+        }
+        catch(final Exception e)
+        {
+            Assert.fail("Unexpected exception: " + e.toString());
+        }
+    }
+    
+    /**
+     * Tests the loading two artifacts (after loading base and science schema ontologies). This test
+     * verifies that each artifact is given a unique permanent URI
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testBaseAndScienceOntologyAndTwoArtifacts() throws Exception
+    {
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        this.getTestRepositoryConnection().commit();
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        this.getTestRepositoryConnection().commit();
+        
+        // load artifact 1
+        final InferredOWLOntologyID poddArtifact1 =
+                this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf",
+                        RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+        
+        // load artifact 2 (using the same resource)
+        final InferredOWLOntologyID poddArtifact2 =
+                this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf",
+                        RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+        
+        // Final: Remove the PODD Artifact Ontology from the manager cache
+        this.utils.removePoddArtifactFromManager(poddArtifact1);
+        this.utils.removePoddArtifactFromManager(poddArtifact2);
+        // TODO: May eventually need to create a super-class of OWLOntologyManagerImpl that knows
+        // how to fetch PODD Artifact ontologies from a repository if they are not currently in
+        // memory
+        // Cannot (easily?) use an IRI mapper for this process as far as I can tell
+    }
+    
+    /**
      * Tests an inconsistent semantic ontology, containing two hasLeadInstitution statements on a
      * single Project.
      * 
