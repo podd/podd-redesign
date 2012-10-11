@@ -14,10 +14,13 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.util.RDFInserter;
 import org.openrdf.rio.Rio;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
@@ -487,49 +490,74 @@ public class PoddPrototypeUtils
     public InferredOWLOntologyID loadPoddArtifact(final String artifactResourcePath, final String mimeType,
             final RepositoryConnection nextRepositoryConnection) throws Exception
     {
-        // 1. Create permanent identifiers for any impermanent identifiers in the object...
-        final URI randomURN =
-                nextRepositoryConnection.getValueFactory().createURI("urn:random:" + UUID.randomUUID().toString());
+        // load into temporary in memory repository to create persistent URLs
+        Repository tempRepository = null;
+        RepositoryConnection tempRepositoryConnection = null;
         
-        nextRepositoryConnection.add(this.getClass().getResourceAsStream(artifactResourcePath), "",
-                Rio.getParserFormatForMIMEType(mimeType), randomURN);
-        nextRepositoryConnection.commit();
-        
-        // FIXME: Rough hack translating them all to a fixed URI structure
-        URITranslator.doTranslation(nextRepositoryConnection, "urn:temp:", "http://example.org/permanenturl/",
-                randomURN);
-        
-        // FIXME: May need to load the triples into a temporary location to rewrite the impermanent
-        // identifiers before loading it into the OWLOntologyManager
-        
-        this.log.info("Loading podd artifact from repository: {}", randomURN);
-        final OWLOntology nextOntology = this.loadOntology(nextRepositoryConnection, mimeType, randomURN);
-        
-        // 2. Validate the object in terms of the OWL profile
-        // 3. Validate the object using a reasoner
-        this.log.info("Checking consistency of podd artifact");
-        final OWLReasoner reasoner = this.checkConsistency(nextOntology);
-        
-        // 4. Store the object
-        this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
-        
-        // 5. Infer extra statements about the object using a reasoner
-        this.log.info("Computing inferences for podd artifact");
-        final OWLOntology nextInferredOntology =
-                this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
-        
-        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
-        // Sesame Repository
-        // 6. Store the inferred statements
-        this.dumpOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
-        
-        // 7. Update the PODD Artifact management graph to contain the latest
-        // update the link in the PODD Artifact management graph
-        this.updateCurrentManagedPoddArtifactOntologyVersion(nextRepositoryConnection, nextOntology.getOntologyID(),
-                nextInferredOntology.getOntologyID());
-        
-        return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology.getOntologyID()
-                .getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
+        try
+        {
+            tempRepository = new SailRepository(new MemoryStore());
+            tempRepository.initialize();
+            tempRepositoryConnection = tempRepository.getConnection();
+            tempRepositoryConnection.setAutoCommit(false);
+            
+            // 1. Create permanent identifiers for any impermanent identifiers in the object...
+            final URI randomURN =
+                    tempRepositoryConnection.getValueFactory().createURI("urn:random:" + UUID.randomUUID().toString());
+            
+            tempRepositoryConnection.add(this.getClass().getResourceAsStream(artifactResourcePath), "",
+                    Rio.getParserFormatForMIMEType(mimeType), randomURN);
+            tempRepositoryConnection.commit();
+            
+            // FIXME: Rough hack translating them all to a fixed URI structure
+            URITranslator.doTranslation(tempRepositoryConnection, "urn:temp:", "http://example.org/permanenturl/",
+                    randomURN);
+            
+            this.log.info("Loading podd artifact from repository: {}", randomURN);
+            final OWLOntology nextOntology = this.loadOntology(tempRepositoryConnection, mimeType, randomURN);
+            
+            // regain memory after loading the ontology into OWLAPI
+            tempRepositoryConnection.clear();
+            
+            // 2. Validate the object in terms of the OWL profile
+            // 3. Validate the object using a reasoner
+            this.log.info("Checking consistency of podd artifact");
+            final OWLReasoner reasoner = this.checkConsistency(nextOntology);
+            
+            // 4. Store the object
+            this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
+            
+            // 5. Infer extra statements about the object using a reasoner
+            this.log.info("Computing inferences for podd artifact");
+            final OWLOntology nextInferredOntology =
+                    this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
+            
+            // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
+            // Sesame Repository
+            // 6. Store the inferred statements
+            this.dumpOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
+            
+            // 7. Update the PODD Artifact management graph to contain the latest
+            // update the link in the PODD Artifact management graph
+            this.updateCurrentManagedPoddArtifactOntologyVersion(nextRepositoryConnection,
+                    nextOntology.getOntologyID(), nextInferredOntology.getOntologyID());
+            
+            return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology
+                    .getOntologyID().getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
+        }
+        finally
+        {
+            if(tempRepositoryConnection != null)
+            {
+                tempRepositoryConnection.rollback();
+                tempRepositoryConnection.close();
+            }
+            if(tempRepository != null)
+            {
+                tempRepository.shutDown();
+            }
+            
+        }
     }
     
     /**
