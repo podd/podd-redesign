@@ -13,8 +13,7 @@
 	<owl:versionIRI rdf:resource="urn:temp:artifact:version:1" />
 	<poddBase:artifactHasTopObject rdf:resource="urn:temp:object:1961"/>
 	<owl:imports rdf:resource="http://purl.org/podd/ns/poddBase" />
-	<!-- Imports poddScience version 2 -->
-	<owl:imports rdf:resource="http://purl.org/podd/ns/version/poddScience/2" />
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddScience" />
 </rdf:Description>
 
 <!-- FIXME: Is there any standard OWL2-DL ontology we can import to get dublin core terms -->

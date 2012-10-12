@@ -6,6 +6,7 @@ package com.github.podd.prototype.test;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -602,15 +603,127 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
     
     /**
-     * Tests loading 2 versions of the poddScience ontology and loading artifacts that are validated
-     * against each one.
+     * Tests loading a Science schema ontology without any version info set.
      * 
-     * TODO: loadPoddArtifact() should modify the artifacts to refer to the current version of the
-     * schema ontology specified in the schema graph.
+     * FIXME: loadInferAndStoreSchemaOntology() needs to be modified to check the ontology for
+     * version information and add if none exists, or what exists is not unique
+     * 
+     */
+    @Ignore
+    @Test
+    public final void testScienceOntologyWithNoVersionInfo()
+    {
+        try
+        {
+            this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-v1-noVersionSet.owl",
+                    RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+            
+            // verify a version IRI has been correctly assigned
+            
+        }
+        catch(final Exception e)
+        {
+            e.printStackTrace();
+            Assert.fail("Unexpected exception");
+        }
+    }
+    
+    /**
+     * Tests loading a Science schema ontology with a non-unique version IRI set.
+     * 
+     * FIXME: loadInferAndStoreSchemaOntology() needs to be modified to check the ontology for
+     * version information and add one if none exists, or change it if the existing one is not
+     * unique
+     * 
+     */
+    @Ignore
+    @Test
+    public final void testScienceOntologyWithNonUniqueVersion()
+    {
+        try
+        {
+            this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            // verify version IRIs have been correctly assigned
+            
+        }
+        catch(final Exception e)
+        {
+            e.printStackTrace();
+            Assert.fail("Unexpected exception");
+        }
+    }
+    
+    /**
+     * Tests loading a new version of the Science schema ontology and loading a PODD artifact that
+     * is only valid against the on version.
      */
     @Test
-    public final void testMultipleSchemaOntologyVersions()
+    public final void testTwoScienceOntologyVersionsOneArtifact()
     {
+        InferredOWLOntologyID poddArtifact1 = null;
+        try
+        {
+            this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            
+            // loading artifact with 2 lead institutions - fails
+            try
+            {
+                poddArtifact1 =
+                        this.utils.loadPoddArtifact("/test/artifacts/error-twoLeadInstitutions-1.rdf",
+                                RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+                Assert.fail("Did not receive expected exception");
+            }
+            catch(final PoddException e)
+            {
+                Assert.assertEquals(PoddException.ERR_INCONSISTENT_ONTOLOGY, e.getCode());
+            }
+            
+            // load poddScience-v2 which allows 2 lead institutions
+            this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-v2.owl",
+                    RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+            
+            // load artifact with 2 lead institutions - successful
+            this.utils.loadPoddArtifact("/test/artifacts/error-twoLeadInstitutions-1.rdf",
+                    RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+        }
+        catch(final Exception e)
+        {
+            Assert.fail("Unexpected exception");
+        }
+        finally
+        {
+            if(poddArtifact1 != null)
+            {
+                this.utils.removePoddArtifactFromManager(poddArtifact1);
+            }
+        }
+    }
+    
+    /**
+     * Loads two PODD artifacts that are validated against different versions of the Science schema
+     * ontology. Test that the artifacts are modified to import the correct version of the schema
+     * ontology.
+     */
+    @Test
+    public final void testArtifactsImportCorrectSchemaOntologyVersion()
+    {
+        InferredOWLOntologyID poddArtifact1 = null;
+        InferredOWLOntologyID poddArtifact2 = null;
         try
         {
             this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
@@ -620,19 +733,23 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
             this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                     this.getTestRepositoryConnection());
             
+            // artifact 1
+            poddArtifact1 =
+                    this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf",
+                            RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+            
             // poddScience-v2 allows 2 lead institutions
             this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-v2.owl",
                     RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
-            // artifact 1 imports poddScience (v1) and has 1 lead institution
-            this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf", RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
+            // artifact 2 has 2 lead institutions
+            poddArtifact2 =
+                    this.utils.loadPoddArtifact("/test/artifacts/basicProject-2.rdf",
+                            RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
-            // artifact 2 imports poddScience-v2 and has 2 lead institutions
-            this.utils.loadPoddArtifact("/test/artifacts/basicProject-2.rdf", RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
+            // TODO - verify that artifact 1 is consistent and validates against Science v1
+            // TODO - verify that artifact 2 is consistent and validates against Science v2
             
-            // printGraph(this.schemaOntologyManagementGraph);
         }
         catch(final PoddException e)
         {
@@ -643,6 +760,17 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         {
             e.printStackTrace();
             Assert.fail("Unexpected exception");
+        }
+        finally
+        {
+            if(poddArtifact1 != null)
+            {
+                this.utils.removePoddArtifactFromManager(poddArtifact1);
+            }
+            if(poddArtifact2 != null)
+            {
+                this.utils.removePoddArtifactFromManager(poddArtifact2);
+            }
         }
         
     }
@@ -658,10 +786,11 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
             while(results.hasNext())
             {
                 final Statement triple = results.next();
-                System.out.println(" --- " + triple);
+                final String tripleStr = java.net.URLDecoder.decode(triple.toString(), "UTF-8");
+                System.out.println(" --- " + tripleStr);
             }
         }
-        catch(final org.openrdf.repository.RepositoryException e)
+        catch(final Exception e)
         {
             e.printStackTrace();
         }

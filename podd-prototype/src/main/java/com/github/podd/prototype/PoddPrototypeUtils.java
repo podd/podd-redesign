@@ -10,13 +10,16 @@ import net.fortytwo.sesametools.URITranslator;
 
 import org.junit.Assert;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.util.RDFInserter;
 import org.openrdf.rio.Rio;
@@ -430,8 +433,8 @@ public class PoddPrototypeUtils
      * @return An OWLOntology instance populated with the triples from the repository.
      * @throws Exception
      */
-    protected OWLOntology loadOntology(final RepositoryConnection conn, final String mimeType,
-            final Resource... contexts) throws Exception
+    public OWLOntology loadOntology(final RepositoryConnection conn, final String mimeType, final Resource... contexts)
+        throws Exception
     {
         final RioMemoryTripleSource owlSource =
                 new RioMemoryTripleSource(conn.getStatements(null, null, null, true, contexts));
@@ -513,6 +516,30 @@ public class PoddPrototypeUtils
             URITranslator.doTranslation(tempRepositoryConnection, "urn:temp:", "http://example.org/permanenturl/"
                     + UUID.randomUUID().toString() + "/", randomURN);
             
+            // retrieve list of ontology imports in this artifact
+            final URI importURI = IRI.create("http://www.w3.org/2002/07/owl#imports").toOpenRDFURI();
+            final RepositoryResult<Statement> importStatements =
+                    tempRepositoryConnection.getStatements(null, importURI, null, false, randomURN);
+            
+            while(importStatements.hasNext())
+            {
+                final Statement stmt = importStatements.next();
+                // get current version IRI for imported ontology
+                final RepositoryResult<Statement> currentVersionStatements =
+                        nextRepositoryConnection.getStatements(IRI.create(stmt.getObject().stringValue())
+                                .toOpenRDFURI(), IRI.create("http://omv.ontoware.org/ontology#currentVersion")
+                                .toOpenRDFURI(), null, false, this.schemaGraph);
+                
+                // update the import statement in artifact to the "current version"
+                if(currentVersionStatements.hasNext())
+                {
+                    final Value currentVersion = currentVersionStatements.next().getObject();
+                    tempRepositoryConnection.remove(stmt, randomURN);
+                    tempRepositoryConnection.add(stmt.getSubject(), importURI, currentVersion, randomURN);
+                }
+            }
+            tempRepositoryConnection.commit();
+            
             this.log.info("Loading podd artifact from repository: {}", randomURN);
             final OWLOntology nextOntology = this.loadOntology(tempRepositoryConnection, mimeType, randomURN);
             
@@ -559,6 +586,7 @@ public class PoddPrototypeUtils
             
         }
     }
+    
     
     /**
      * Removes the PODD Artifact from the OWLOntologyManager.
