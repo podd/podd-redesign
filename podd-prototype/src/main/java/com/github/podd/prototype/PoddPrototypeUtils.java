@@ -191,6 +191,8 @@ public class PoddPrototypeUtils
         final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
         if(!profileReport.isInProfile())
         {
+            this.removeOntologyFromManager(nextOntology.getOntologyID());
+            
             // TODO - could be due to incomplete imports also
             throw new PoddException("Ontology not in given profile: " + nextOntology.getOntologyID().toString(),
                     profileReport, PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE);
@@ -205,6 +207,8 @@ public class PoddPrototypeUtils
         // This ensures in the case of Pellet that it is in the OWL2-DL profile
         if(!nextReasoner.isConsistent())
         {
+            this.removeOntologyFromManager(nextOntology.getOntologyID());
+            
             throw new PoddException("Ontology not consistent: " + nextOntology.getOntologyID().toString(),
                     profileReport, PoddException.ERR_INCONSISTENT_ONTOLOGY);
         }
@@ -236,7 +240,7 @@ public class PoddPrototypeUtils
         nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
         final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner);
         final OWLOntology nextInferredAxiomsOntology = this.manager.createOntology(inferredOntologyID);
-        iog.fillOntology(this.manager, nextInferredAxiomsOntology);
+        iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
         
         return nextInferredAxiomsOntology;
     }
@@ -263,8 +267,8 @@ public class PoddPrototypeUtils
             
             // Render the triples out from OWLAPI into a Sesame Repository
             final RioRenderer renderer =
-                    new RioRenderer(nextOntology, this.manager, repositoryHandler, null, nextOntology.getOntologyID()
-                            .getVersionIRI().toOpenRDFURI());
+                    new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
+                            nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
             renderer.render();
             
             // Commit the current repository connection
@@ -333,6 +337,7 @@ public class PoddPrototypeUtils
         ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, OWLOntologyCreationException,
         OWLOntologyChangeException
     {
+        
         // TODO: Create a version of this method that utilises the
         // loadOntology(RepositoryConnection...) method
         final OWLOntology nextOntology = this.loadOntology(ontologyResourcePath, mimeType);
@@ -347,7 +352,7 @@ public class PoddPrototypeUtils
         // FIXME: To get around this we would need to load the ontology into memory as RDF
         // statements and modify it before loading it out of the in-memory ontology, which is very
         // possible...
-        this.manager.applyChange(new SetOntologyID(nextOntology, newOWLOntologyID));
+        nextOntology.getOWLOntologyManager().applyChange(new SetOntologyID(nextOntology, newOWLOntologyID));
         
         final OWLReasoner reasoner = this.checkConsistency(nextOntology);
         this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
@@ -400,24 +405,41 @@ public class PoddPrototypeUtils
         RepositoryException, ReasonerInterruptedException, TimeOutException, InconsistentOntologyException,
         OWLOntologyCreationException, OWLOntologyChangeException
     {
-        // TODO: Create a version of this method that utilises the
-        // loadOntology(RepositoryConnection...) method
-        final OWLOntology nextOntology = this.loadOntology(ontologyResourcePath, mimeType);
-        
-        final OWLReasoner reasoner = this.checkConsistency(nextOntology);
-        this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
-        final OWLOntology nextInferredOntology =
-                this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
-        // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
-        // Sesame Repository
-        this.dumpOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
-        
-        // update the link in the schema ontology management graph
-        this.updateCurrentManagedSchemaOntologyVersion(nextRepositoryConnection, nextOntology.getOntologyID(),
-                nextInferredOntology.getOntologyID());
-        
-        return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology.getOntologyID()
-                .getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
+        OWLOntology nextOntology = null;
+        try
+        {
+            // TODO: Create a version of this method that utilises the
+            // loadOntology(RepositoryConnection...) method
+            nextOntology = this.loadOntology(ontologyResourcePath, mimeType);
+            
+            final OWLReasoner reasoner = this.checkConsistency(nextOntology);
+            this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
+            final OWLOntology nextInferredOntology =
+                    this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
+            
+            // TODO: Check that nextInferredOntology imports nextOntology - write a test from the
+            // Repository/RDF view
+            // to verify (16/10/2012)
+            
+            // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
+            // Sesame Repository
+            this.dumpOntologyToRepository(nextInferredOntology, nextRepositoryConnection);
+            
+            // update the link in the schema ontology management graph
+            this.updateCurrentManagedSchemaOntologyVersion(nextRepositoryConnection, nextOntology.getOntologyID(),
+                    nextInferredOntology.getOntologyID());
+            
+            return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology
+                    .getOntologyID().getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
+        }
+        catch(Exception e)
+        {
+            if(nextOntology != null)
+            {
+                this.removeOntologyFromManager(nextOntology);
+            }
+            throw e;
+        }
     }
     
     /**
@@ -587,7 +609,6 @@ public class PoddPrototypeUtils
         }
     }
     
-    
     /**
      * Removes the PODD Artifact from the OWLOntologyManager.
      * 
@@ -595,11 +616,20 @@ public class PoddPrototypeUtils
      * 
      * @param poddArtifact
      *            The InferredOWLOntologyID of the PODD Artifact to remove
+     * @return true if the manager contains the artifact and a remove attempt is made, false
+     *         otherwise.
      */
-    public void removePoddArtifactFromManager(final InferredOWLOntologyID poddArtifact)
+    public boolean removePoddArtifactFromManager(final InferredOWLOntologyID poddArtifact)
     {
-        Assert.assertTrue(this.manager.contains(poddArtifact));
-        this.removePoddArtifactFromManager(poddArtifact.getBaseOWLOntologyID(), poddArtifact.getInferredOWLOntologyID());
+        if(this.manager.contains(poddArtifact))
+        {
+            return this.removePoddArtifactFromManager(poddArtifact.getBaseOWLOntologyID(),
+                    poddArtifact.getInferredOWLOntologyID());
+        }
+        else
+        {
+            return false;
+        }
     }
     
     /**
@@ -612,15 +642,66 @@ public class PoddPrototypeUtils
      *            The base OWLOntologyID of the Artifact to be removed.
      * @param inferredOntologyID
      *            The inferred OWLOntologyID of the Artifact to be removed.
+     * @return true if both the Ontology and Inferred Ontology were successfully removed, false
+     *         otherwise.
      */
-    public void removePoddArtifactFromManager(final OWLOntologyID baseOntologyID, final OWLOntologyID inferredOntologyID)
+    public boolean removePoddArtifactFromManager(final OWLOntologyID baseOntologyID,
+            final OWLOntologyID inferredOntologyID)
     {
-        Assert.assertTrue(this.manager.contains(baseOntologyID));
-        Assert.assertTrue(this.manager.contains(inferredOntologyID));
-        this.manager.removeOntology(baseOntologyID);
-        Assert.assertFalse(this.manager.contains(baseOntologyID));
-        this.manager.removeOntology(inferredOntologyID);
-        Assert.assertFalse(this.manager.contains(inferredOntologyID));
+        if(this.manager.contains(baseOntologyID) && this.manager.contains(inferredOntologyID))
+        {
+            this.manager.removeOntology(baseOntologyID);
+            if(!this.manager.contains(baseOntologyID))
+            {
+                this.manager.removeOntology(inferredOntologyID);
+                if(!this.manager.contains(inferredOntologyID))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * If this ontology is contained in the OWLOntologyManager, removes it from the Manager.
+     * 
+     * @param ontologyID
+     * @return True if the specified ontology was successfully removed. False is returned if the
+     *         ontology was not in the manager or it could not be removed.
+     */
+    protected boolean removeOntologyFromManager(final OWLOntologyID ontologyID)
+    {
+        if(this.manager.contains(ontologyID))
+        {
+            this.manager.removeOntology(ontologyID);
+            if(!this.manager.contains(ontologyID))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Attempts to remove the specified Ontology from its OWLOntologyManager.
+     * 
+     * @param nextOntology
+     * @return True if the Ontology was in the Manager and it was successfully removed.
+     */
+    protected boolean removeOntologyFromManager(final OWLOntology nextOntology)
+    {
+        OWLOntologyManager nextManager = nextOntology.getOWLOntologyManager();
+        OWLOntologyID ontologyID = nextOntology.getOntologyID();
+        if(nextManager.contains(ontologyID))
+        {
+            nextManager.removeOntology(ontologyID);
+            if(!nextManager.contains(ontologyID))
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**

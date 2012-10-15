@@ -3,6 +3,8 @@
  */
 package com.github.podd.prototype.test;
 
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -105,9 +107,11 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     
     /**
      * Tests that consistency checks fail when a non-existent OWL Profile is specified.
+     * 
+     * @throws Exception
      */
     @Test
-    public final void testNonsensicalOWLProfile()
+    public final void testNonsensicalOWLProfile() throws Exception
     {
         final IRI nonsensicalOwlProfile = IRI.create("http://no.such/profile");
         final PoddException e = this.runConsistencyCheck(nonsensicalOwlProfile);
@@ -117,9 +121,11 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     
     /**
      * Tests that consistency checks fail when a an unsupported OWL Profile is specified.
+     * 
+     * @throws Exception
      */
     @Test
-    public final void testUnsupportedOWLProfile()
+    public final void testUnsupportedOWLProfile() throws Exception
     {
         final IRI unsupportedOwlProfile = OWLProfile.OWL2_RL;
         final PoddException e = this.runConsistencyCheck(unsupportedOwlProfile);
@@ -132,8 +138,9 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
      * 
      * @param owlProfile
      * @return The PoddException that was thrown
+     * @throws Exception
      */
-    private PoddException runConsistencyCheck(final IRI owlProfile)
+    private PoddException runConsistencyCheck(final IRI owlProfile) throws Exception
     {
         try
         {
@@ -149,18 +156,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         {
             return e;
         }
-        catch(final Exception e)
-        {
-            Assert.fail("Unexpected exception: " + e.toString());
-        }
         return null; // won't get here really
     }
     
     /**
      * Tests that loading an empty OWL ontology fails with the appropriate PoddException.
+     * 
+     * @throws Exception
      */
     @Test
-    public final void testLoadEmptyOntology()
+    public final void testLoadEmptyOntology() throws Exception
     {
         try
         {
@@ -172,10 +177,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         {
             Assert.assertEquals(PoddException.ERR_EMPTY_ONTOLOGY, e.getCode());
             
-        }
-        catch(final Exception e)
-        {
-            Assert.fail("Unexpected exception: " + e.toString());
         }
     }
     
@@ -227,25 +228,18 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
      * Test that computing inferences of a very simple ontology works.
      */
     @Test
-    public final void testComputeInferences()
+    public final void testComputeInferences() throws Exception
     {
-        try
-        {
-            final OWLOntology nextOntology =
-                    this.utils.loadOntology("/test/ontologies/lonely.owl", RDFFormat.RDFXML.getDefaultMIMEType());
-            Assert.assertEquals(2, nextOntology.getAxiomCount(AxiomType.SUBCLASS_OF));
-            
-            final OWLReasoner reasoner = this.utils.checkConsistency(nextOntology);
-            final OWLOntology nextInferredOntology =
-                    this.utils.computeInferences(reasoner,
-                            this.utils.generateInferredOntologyID(nextOntology.getOntologyID()));
-            
-            Assert.assertEquals(3, nextInferredOntology.getAxiomCount(AxiomType.SUBCLASS_OF));
-        }
-        catch(final Exception e)
-        {
-            Assert.fail("Unexpected exception: " + e.toString());
-        }
+        final OWLOntology nextOntology =
+                this.utils.loadOntology("/test/ontologies/lonely.owl", RDFFormat.RDFXML.getDefaultMIMEType());
+        Assert.assertEquals(2, nextOntology.getAxiomCount(AxiomType.SUBCLASS_OF));
+        
+        final OWLReasoner reasoner = this.utils.checkConsistency(nextOntology);
+        final OWLOntology nextInferredOntology =
+                this.utils.computeInferences(reasoner,
+                        this.utils.generateInferredOntologyID(nextOntology.getOntologyID()));
+        
+        Assert.assertEquals(3, nextInferredOntology.getAxiomCount(AxiomType.SUBCLASS_OF));
     }
     
     /**
@@ -270,8 +264,13 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     /**
      * Tests that when required base ontologies are not loaded, consistency checks will fail.
      * 
+     * NOTE: this test took 210 seconds to run on Kutila's PC. Indicates a possible performance
+     * issue if attempts are made to add schema ontologies in the wrong order. Test is currently
+     * skipped due to the length of time taken.
+     * 
      * @throws Exception
      */
+    @Ignore
     @Test
     public final void testIncompleteOntologyImportClosure() throws Exception
     {
@@ -347,7 +346,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                         RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
         
         // Final: Remove the PODD Artifact Ontology from the manager cache
-        this.utils.removePoddArtifactFromManager(poddArtifact);
+        final boolean removed = this.utils.removePoddArtifactFromManager(poddArtifact);
+        Assert.assertTrue("Could not remove artifact from Manager", removed);
         // TODO: May eventually need to create a super-class of OWLOntologyManagerImpl that knows
         // how to fetch PODD Artifact ontologies from a repository if they are not currently in
         // memory
@@ -361,9 +361,9 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
      * 
      * @throws Exception
      */
-    @Ignore 
+    @Ignore
     @Test
-    public final void testSingleArtifactMissingSchemaOntologies()
+    public final void testSingleArtifactMissingSchemaOntologies() throws Exception
     {
         try
         {
@@ -374,10 +374,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         catch(final PoddException e)
         {
             Assert.assertEquals(PoddException.ERR_ONTOLOGY_NOT_IN_PROFILE, e.getCode());
-        }
-        catch(final Exception e)
-        {
-            Assert.fail("Unexpected exception: " + e.toString());
         }
     }
     
@@ -606,32 +602,34 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
     
     /**
-     * Tests loading a Science schema ontology without any version info set.
+     * Tests loading a schema ontology which does not have a version IRI.
      * 
-     * FIXME: loadInferAndStoreSchemaOntology() needs to be modified to check the ontology for
-     * version information and add if none exists, or what exists is not unique
-     * 
+     * @throws Exception
      */
-    @Ignore
     @Test
-    public final void testScienceOntologyWithNoVersionInfo()
+    public final void testSchemaOntologyWithoutVersionIRI() throws Exception
     {
         try
         {
-            this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
-            
-            this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-v1-noVersionSet.owl",
+            this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl",
                     RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
-            
-            // verify a version IRI has been correctly assigned
-            
+            Assert.fail("Did not receive expected exception");
         }
         catch(final Exception e)
         {
-            e.printStackTrace();
-            Assert.fail("Unexpected exception");
+            Assert.assertNotNull(e);
         }
+        
+        final OWLOntologyID modifiedId =
+                new OWLOntologyID(IRI.create("http://purl.obolibrary.org/obo/po.owl"),
+                        IRI.create("urn:test:plantontology:version:16.0"));
+        
+        final InferredOWLOntologyID inferredID =
+                this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl",
+                        RDFFormat.RDFXML.getDefaultMIMEType(), modifiedId, this.getTestRepositoryConnection());
+        
+        // verify a version IRI has been correctly assigned
+        Assert.assertNotNull(inferredID.getInferredOntologyIRI());
     }
     
     /**
@@ -641,89 +639,75 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
      * version information and add one if none exists, or change it if the existing one is not
      * unique
      * 
+     * @throws Exception
      */
     @Ignore
     @Test
-    public final void testScienceOntologyWithNonUniqueVersion()
+    public final void testScienceOntologyWithNonUniqueVersion() throws Exception
     {
-        try
-        {
-            this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
-            
-            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
-            
-            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
-            
-            // verify version IRIs have been correctly assigned
-            
-        }
-        catch(final Exception e)
-        {
-            e.printStackTrace();
-            Assert.fail("Unexpected exception");
-        }
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        final OWLOntologyID modifiedId =
+                new OWLOntologyID(IRI.create("http://purl.obolibrary.org/obo/po.owl"),
+                        IRI.create("urn:test:plantontology:version:16.0"));
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                modifiedId, this.getTestRepositoryConnection());
+        
+        // verify version IRIs have been correctly assigned
     }
     
     /**
      * Tests loading a new version of the Science schema ontology and loading a PODD artifact that
-     * is only valid against the on version.
+     * is only valid against the new version.
      */
     @Test
-    public final void testTwoScienceOntologyVersionsOneArtifact()
+    public final void testTwoScienceOntologyVersionsOneArtifact() throws Exception
     {
-        InferredOWLOntologyID poddArtifact1 = null;
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        // load artifact with 2 lead institutions - fails
         try
         {
-            this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
-            
-            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
-            
-            // loading artifact with 2 lead institutions - fails
-            try
-            {
-                poddArtifact1 =
-                        this.utils.loadPoddArtifact("/test/artifacts/error-twoLeadInstitutions-1.rdf",
-                                RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
-                Assert.fail("Did not receive expected exception");
-            }
-            catch(final PoddException e)
-            {
-                Assert.assertEquals(PoddException.ERR_INCONSISTENT_ONTOLOGY, e.getCode());
-            }
-            
-            // load poddScience-v2 which allows 2 lead institutions
-            this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-v2.owl",
-                    RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
-            
-            // load artifact with 2 lead institutions - successful
             this.utils.loadPoddArtifact("/test/artifacts/error-twoLeadInstitutions-1.rdf",
                     RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+            Assert.fail("Did not receive expected exception");
         }
-        catch(final Exception e)
+        catch(final PoddException e)
         {
-            Assert.fail("Unexpected exception");
+            Assert.assertEquals(PoddException.ERR_INCONSISTENT_ONTOLOGY, e.getCode());
         }
-        finally
-        {
-            if(poddArtifact1 != null)
-            {
-                this.utils.removePoddArtifactFromManager(poddArtifact1);
-            }
-        }
+        
+        // load new version of poddScience schema ontology which allows 2 lead institutions
+        this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-2LeadInstitutions.owl",
+                RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+        
+        // load artifact with 2 lead institutions - successful
+        final InferredOWLOntologyID poddArtifact1 =
+                this.utils.loadPoddArtifact("/test/artifacts/error-twoLeadInstitutions-1.rdf",
+                        RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+        
+        this.utils.removePoddArtifactFromManager(poddArtifact1);
     }
     
     /**
      * Loads two PODD artifacts that are validated against different versions of the Science schema
      * ontology. Test that the artifacts are modified to import the correct version of the schema
      * ontology.
+     * 
+     * @throws Exception
      */
+    @Ignore
     @Test
-    public final void testArtifactsImportCorrectSchemaOntologyVersion()
+    public final void testArtifactsImportCorrectSchemaOntologyVersion() throws Exception
     {
         InferredOWLOntologyID poddArtifact1 = null;
         InferredOWLOntologyID poddArtifact2 = null;
@@ -732,37 +716,35 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
             this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                     this.getTestRepositoryConnection());
             
-            // poddScience allows 1 lead institution
-            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
+            // load poddScience v1 which allows 1 lead institution
+            final InferredOWLOntologyID scienceV1 =
+                    this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath,
+                            RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
-            // artifact 1
+            // load artifact 1
             poddArtifact1 =
                     this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf",
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
-            // poddScience-v2 allows 2 lead institutions
-            this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-v2.owl",
-                    RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
-            
-            // artifact 2 has 2 lead institutions
-            poddArtifact2 =
-                    this.utils.loadPoddArtifact("/test/artifacts/basicProject-2.rdf",
+            // load poddScience v2 which allows 2 lead institutions
+            final InferredOWLOntologyID scienceV2 =
+                    this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-2LeadInstitutions.owl",
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
-            // TODO - verify that artifact 1 is consistent and validates against Science v1
-            // TODO - verify that artifact 2 is consistent and validates against Science v2
+            // load artifact 2 which has 2 lead institutions
+            poddArtifact2 =
+                    this.utils.loadPoddArtifact("/test/artifacts/error-twoLeadInstitutions-1.rdf",
+                            RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
-        }
-        catch(final PoddException e)
-        {
-            System.out.println("        Details " + e.getDetails());
-            Assert.fail("Unexpected PoddException");
-        }
-        catch(final Exception e)
-        {
-            e.printStackTrace();
-            Assert.fail("Unexpected exception");
+            // =========== verify that correct versions are imported =================
+            // TODO
+            // - verify that artifact 1 is consistent and validates against Science v1
+            // - verify that artifact 2 is consistent and validates against Science v2
+            
+            this.printGraph(this.schemaOntologyManagementGraph);
+            
+            this.printSummary(poddArtifact1);
+            this.printSummary(poddArtifact2);
         }
         finally
         {
@@ -779,6 +761,34 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     }
     
     // ///////////////////// some helper methods for debugging////////////////////////
+    
+    private void printSummary(final InferredOWLOntologyID ontoID) throws Exception
+    {
+        System.out.println("\r\n================");
+        System.out.println("  Base Ontology IRI        : "
+                + this.urldecode(ontoID.getBaseOWLOntologyID().getOntologyIRI()));
+        System.out.println("  Base Ontology Version IRI: "
+                + this.urldecode(ontoID.getBaseOWLOntologyID().getVersionIRI()));
+        System.out.println("  Inferred Ontology IRI    : " + this.urldecode(ontoID.getInferredOntologyIRI()));
+        System.out.println("  Imports:- ");
+        
+        final OWLOntology owlArtifact1 = this.manager.getOntology(ontoID.getBaseOWLOntologyID());
+        
+        final Set<OWLOntology> ontoSet = this.manager.getImports(owlArtifact1);
+        for(final Object element : ontoSet)
+        {
+            final OWLOntology importedOntology = (OWLOntology)element;
+            System.out.println("   " + this.urldecode(importedOntology.getOntologyID().getOntologyIRI()) + " "
+                    + this.urldecode(importedOntology.getOntologyID().getVersionIRI()));
+            
+        }
+        System.out.println("  axiom count = " + owlArtifact1.getAxiomCount());
+    }
+    
+    private String urldecode(final Object s) throws Exception
+    {
+        return java.net.URLDecoder.decode(s.toString(), "UTF-8");
+    }
     
     private void printGraph(final URI context)
     {
