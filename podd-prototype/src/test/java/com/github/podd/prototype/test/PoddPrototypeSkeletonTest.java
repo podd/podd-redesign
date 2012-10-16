@@ -406,13 +406,9 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                 this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf",
                         RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
         
-        // Final: Remove the PODD Artifact Ontology from the manager cache
+        // Final: Remove the PODD Artifacts from the manager cache
         this.utils.removePoddArtifactFromManager(poddArtifact1);
         this.utils.removePoddArtifactFromManager(poddArtifact2);
-        // TODO: May eventually need to create a super-class of OWLOntologyManagerImpl that knows
-        // how to fetch PODD Artifact ontologies from a repository if they are not currently in
-        // memory
-        // Cannot (easily?) use an IRI mapper for this process as far as I can tell
     }
     
     /**
@@ -705,7 +701,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
      * 
      * @throws Exception
      */
-    @Ignore
     @Test
     public final void testArtifactsImportCorrectSchemaOntologyVersion() throws Exception
     {
@@ -736,15 +731,25 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                     this.utils.loadPoddArtifact("/test/artifacts/error-twoLeadInstitutions-1.rdf",
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
-            // =========== verify that correct versions are imported =================
-            // TODO
-            // - verify that artifact 1 is consistent and validates against Science v1
-            // - verify that artifact 2 is consistent and validates against Science v2
+            // =========== verify correct schema versions are imported =================
+            OWLOntology owlScience1 = this.manager.getOntology(scienceV1.getBaseOWLOntologyID());
+            OWLOntology owlScience2 = this.manager.getOntology(scienceV2.getBaseOWLOntologyID());
             
-            this.printGraph(this.schemaOntologyManagementGraph);
+            Set<OWLOntology> importsClosure1 =
+                    this.manager.getOntology(poddArtifact1.getBaseOWLOntologyID()).getImportsClosure();
+            Assert.assertTrue("artifact1 did not import old schema version", importsClosure1.contains(owlScience1));
+            Assert.assertFalse("artifact1 should not import new schema version", importsClosure1.contains(owlScience2));
             
-            this.printSummary(poddArtifact1);
-            this.printSummary(poddArtifact2);
+            Set<OWLOntology> importsClosure2 =
+                    this.manager.getOntology(poddArtifact2.getBaseOWLOntologyID()).getImportsClosure();
+            Assert.assertFalse("artifact2 should not import old schema version", importsClosure2.contains(owlScience1));
+            Assert.assertTrue("artifact2 did not import new schema ontology", importsClosure2.contains(owlScience2));
+            
+            // check consistency once again
+            this.utils.checkConsistency(owlScience1);
+            this.utils.checkConsistency(owlScience2);
+            this.utils.checkConsistency(this.manager.getOntology(poddArtifact1.getBaseOWLOntologyID()));
+            this.utils.checkConsistency(this.manager.getOntology(poddArtifact2.getBaseOWLOntologyID()));
         }
         finally
         {
@@ -765,24 +770,26 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     private void printSummary(final InferredOWLOntologyID ontoID) throws Exception
     {
         System.out.println("\r\n================");
-        System.out.println("  Base Ontology IRI        : "
+        System.out.println("  Ontology IRI          : "
                 + this.urldecode(ontoID.getBaseOWLOntologyID().getOntologyIRI()));
-        System.out.println("  Base Ontology Version IRI: "
-                + this.urldecode(ontoID.getBaseOWLOntologyID().getVersionIRI()));
-        System.out.println("  Inferred Ontology IRI    : " + this.urldecode(ontoID.getInferredOntologyIRI()));
-        System.out.println("  Imports:- ");
+        System.out
+                .println("  Ontology Version IRI  : " + this.urldecode(ontoID.getBaseOWLOntologyID().getVersionIRI()));
+        System.out.println("  Inferred Ontology IRI : " + this.urldecode(ontoID.getInferredOntologyIRI()));
+        System.out.println("  Imports Closure:- ");
         
         final OWLOntology owlArtifact1 = this.manager.getOntology(ontoID.getBaseOWLOntologyID());
         
-        final Set<OWLOntology> ontoSet = this.manager.getImports(owlArtifact1);
+        final Set<OWLOntology> ontoSet = this.manager.getImportsClosure(owlArtifact1);
         for(final Object element : ontoSet)
         {
             final OWLOntology importedOntology = (OWLOntology)element;
-            System.out.println("   " + this.urldecode(importedOntology.getOntologyID().getOntologyIRI()) + " "
+            System.out.println("   " + this.urldecode(importedOntology.getOntologyID().getOntologyIRI()) + " V>> "
                     + this.urldecode(importedOntology.getOntologyID().getVersionIRI()));
             
         }
         System.out.println("  axiom count = " + owlArtifact1.getAxiomCount());
+        
+        
     }
     
     private String urldecode(final Object s) throws Exception
