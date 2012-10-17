@@ -21,6 +21,8 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfile;
+import org.semanticweb.owlapi.profiles.OWLProfileReport;
+import org.semanticweb.owlapi.profiles.OWLProfileViolation;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -53,6 +55,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     private URI schemaOntologyManagementGraph;
     private URI poddArtifactManagementGraph;
     private IRI pelletOwlProfile;
+    private IRI elkOwlProfile;
     
     private PoddPrototypeUtils utils;
     
@@ -77,6 +80,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(this.reasonerName);
         Assert.assertNotNull("Could not find reasoner", this.reasonerFactory);
         this.pelletOwlProfile = OWLProfile.OWL2_DL;
+        this.elkOwlProfile = OWLProfile.OWL2_EL;
         
         this.schemaOntologyManagementGraph =
                 this.getTestValueFactory().createURI("urn:test:schemaOntologiesManagementGraph");
@@ -732,15 +736,15 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
             // =========== verify correct schema versions are imported =================
-            OWLOntology owlScience1 = this.manager.getOntology(scienceV1.getBaseOWLOntologyID());
-            OWLOntology owlScience2 = this.manager.getOntology(scienceV2.getBaseOWLOntologyID());
+            final OWLOntology owlScience1 = this.manager.getOntology(scienceV1.getBaseOWLOntologyID());
+            final OWLOntology owlScience2 = this.manager.getOntology(scienceV2.getBaseOWLOntologyID());
             
-            Set<OWLOntology> importsClosure1 =
+            final Set<OWLOntology> importsClosure1 =
                     this.manager.getOntology(poddArtifact1.getBaseOWLOntologyID()).getImportsClosure();
             Assert.assertTrue("artifact1 did not import old schema version", importsClosure1.contains(owlScience1));
             Assert.assertFalse("artifact1 should not import new schema version", importsClosure1.contains(owlScience2));
             
-            Set<OWLOntology> importsClosure2 =
+            final Set<OWLOntology> importsClosure2 =
                     this.manager.getOntology(poddArtifact2.getBaseOWLOntologyID()).getImportsClosure();
             Assert.assertFalse("artifact2 should not import old schema version", importsClosure2.contains(owlScience1));
             Assert.assertTrue("artifact2 did not import new schema ontology", importsClosure2.contains(owlScience2));
@@ -763,6 +767,39 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
             }
         }
         
+    }
+    
+    /**
+     * Tests loading a PODD artifact with 40,000 objects
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testPlantArtifactWith40KObjects() throws Exception
+    {
+        final OWLOntologyID modifiedId =
+                new OWLOntologyID(IRI.create("http://purl.obolibrary.org/obo/po.owl"),
+                        IRI.create("urn:test:plantontology:version:16.0"));
+        
+        this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl",
+                RDFFormat.RDFXML.getDefaultMIMEType(), modifiedId, this.getTestRepositoryConnection());
+        
+        final long startingStmtCount = this.getTestRepositoryConnection().size();
+        
+        try
+        {
+            final long start = System.currentTimeMillis();
+            this.utils.loadPoddArtifact("/test/artifacts/plant-40k-objects.rdf", RDFFormat.RDFXML.getDefaultMIMEType(),
+                    this.getTestRepositoryConnection());
+            this.log.info("<<" + (this.getTestRepositoryConnection().size() - startingStmtCount)
+                    + " statements loaded in " + (System.currentTimeMillis() - start) + " ms>>");
+        }
+        catch(final PoddException e)
+        {
+            final OWLProfileReport report = (OWLProfileReport)e.getDetails();
+            this.printOWLProfileReport(report);
+            throw e;
+        }
     }
     
     // ///////////////////// some helper methods for debugging////////////////////////
@@ -789,7 +826,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         }
         System.out.println("  axiom count = " + owlArtifact1.getAxiomCount());
         
-        
     }
     
     private String urldecode(final Object s) throws Exception
@@ -813,6 +849,19 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         catch(final Exception e)
         {
             e.printStackTrace();
+        }
+    }
+    
+    private void printOWLProfileReport(final OWLProfileReport report)
+    {
+        System.out.println("==== Profile Report ======");
+        System.out.println(" Profile:" + report.getProfile());
+        System.out.println(" Is in Profile: " + report.isInProfile());
+        System.out.println(" No. of violations: " + report.getViolations().size());
+        
+        for(final OWLProfileViolation violation : report.getViolations())
+        {
+            System.out.println(violation);
         }
     }
     
