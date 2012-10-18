@@ -802,6 +802,52 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         }
     }
     
+    /**
+     * Test a very large artifact which uses poddScience. The artifact is "shallow" as all randomly
+     * generated PoddInternalObjects are "contained by" the top Project.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testLargeShallowScienceArtifact() throws Exception
+    {
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        final long startingStmtCount = this.getTestRepositoryConnection().size();
+        final long start = System.currentTimeMillis();
+        this.utils.loadPoddArtifact("/test/artifacts/largeProject-44k-shallow-objects.rdf",
+                RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+        this.log.info("<<" + (this.getTestRepositoryConnection().size() - startingStmtCount) + " statements loaded in "
+                + (System.currentTimeMillis() - start) + " ms>>");
+    }
+    
+    /**
+     * Test a very large artifact which uses poddScience. Each PoddInternalObject "contains" the
+     * next PoddInternalObject, leading to a "deep" artifact.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testLargeDeepScienceArtifact() throws Exception
+    {
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        final long startingStmtCount = this.getTestRepositoryConnection().size();
+        final long start = System.currentTimeMillis();
+        this.utils.loadPoddArtifact("/test/artifacts/largeProject-44k-deep-objects.rdf",
+                RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+        this.log.info("<<" + (this.getTestRepositoryConnection().size() - startingStmtCount) + " statements loaded in "
+                + (System.currentTimeMillis() - start) + " ms>>");
+    }
+    
     // ///////////////////// some helper methods for debugging////////////////////////
     
     private void printSummary(final InferredOWLOntologyID ontoID) throws Exception
