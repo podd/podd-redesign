@@ -78,6 +78,9 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         // TODO: Pellet should be configurable
         this.reasonerName = "Pellet";
         this.reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(this.reasonerName);
+        
+        // this.reasonerName = "Hermit";
+        // this.reasonerFactory = new org.semanticweb.HermiT.Reasoner.ReasonerFactory();
         Assert.assertNotNull("Could not find reasoner", this.reasonerFactory);
         this.pelletOwlProfile = OWLProfile.OWL2_DL;
         this.elkOwlProfile = OWLProfile.OWL2_EL;
@@ -766,16 +769,75 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                 this.utils.removePoddArtifactFromManager(poddArtifact2);
             }
         }
-        
+    }
+    
+    @Test
+    public void testPlantArtifact1kObjects() throws Exception
+    {
+        this.loadPlantArtifact("/test/artifacts/plant-1k-objects.rdf");
+    }
+    
+    @Test
+    public void testPlantArtifact3kObjects() throws Exception
+    {
+        this.loadPlantArtifact("/test/artifacts/plant-3k-objects.rdf");
+    }
+    
+    @Test
+    public void testPlantArtifact10kObjects() throws Exception
+    {
+        this.loadPlantArtifact("/test/artifacts/plant-10k-objects.rdf");
     }
     
     /**
-     * Tests loading a PODD artifact with 40,000 objects
+     * Test loading a large artifact which uses poddScience. The artifact is "shallow" as all its
+     * PoddInternalObjects are "contained by" the top Project.
      * 
      * @throws Exception
      */
     @Test
-    public void testPlantArtifactWith40KObjects() throws Exception
+    public void testScienceArtifact1kObjectsShallow() throws Exception
+    {
+        this.loadScienceArtifact("/test/artifacts/science-1k-objects-shallow.rdf");
+    }
+    
+    @Test
+    public void testScienceArtifact3kObjectsShallow() throws Exception
+    {
+        this.loadScienceArtifact("/test/artifacts/science-3k-objects-shallow.rdf");
+    }
+    
+    @Test
+    public void testScienceArtifact10kObjectsShallow() throws Exception
+    {
+        this.loadScienceArtifact("/test/artifacts/science-10k-objects-shallow.rdf");
+    }
+    
+    /**
+     * Test loading a large artifact which uses poddScience. The artifact is "deep" as each
+     * PoddInternalObject "contains" the next one.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testScienceArtifact1kObjectsDeep() throws Exception
+    {
+        this.loadScienceArtifact("/test/artifacts/science-1k-objects-deep.rdf");
+    }
+    
+    @Test
+    public void testScienceArtifact3kObjectsDeep() throws Exception
+    {
+        this.loadScienceArtifact("/test/artifacts/science-3k-objects-deep.rdf");
+    }
+    
+    @Test
+    public void testScienceArtifact10kObjectsDeep() throws Exception
+    {
+        this.loadScienceArtifact("/test/artifacts/science-10k-objects-deep.rdf");
+    }
+    
+    private void loadPlantArtifact(final String filename) throws Exception
     {
         final OWLOntologyID modifiedId =
                 new OWLOntologyID(IRI.create("http://purl.obolibrary.org/obo/po.owl"),
@@ -784,32 +846,16 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl",
                 RDFFormat.RDFXML.getDefaultMIMEType(), modifiedId, this.getTestRepositoryConnection());
         
-        final long startingStmtCount = this.getTestRepositoryConnection().size();
+        final long statementCount = this.getTestRepositoryConnection().size();
         
-        try
-        {
-            final long start = System.currentTimeMillis();
-            this.utils.loadPoddArtifact("/test/artifacts/plant-40k-objects.rdf", RDFFormat.RDFXML.getDefaultMIMEType(),
-                    this.getTestRepositoryConnection());
-            this.log.info("<<" + (this.getTestRepositoryConnection().size() - startingStmtCount)
-                    + " statements loaded in " + (System.currentTimeMillis() - start) + " ms>>");
-        }
-        catch(final PoddException e)
-        {
-            final OWLProfileReport report = (OWLProfileReport)e.getDetails();
-            this.printOWLProfileReport(report);
-            throw e;
-        }
+        final long startedAt = System.currentTimeMillis();
+        this.utils
+                .loadPoddArtifact(filename, RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
+                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
     }
     
-    /**
-     * Test a very large artifact which uses poddScience. The artifact is "shallow" as all randomly
-     * generated PoddInternalObjects are "contained by" the top Project.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testLargeShallowScienceArtifact() throws Exception
+    private void loadScienceArtifact(final String filename) throws Exception
     {
         this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 this.getTestRepositoryConnection());
@@ -817,35 +863,13 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 this.getTestRepositoryConnection());
         
-        final long startingStmtCount = this.getTestRepositoryConnection().size();
-        final long start = System.currentTimeMillis();
-        this.utils.loadPoddArtifact("/test/artifacts/largeProject-44k-shallow-objects.rdf",
-                RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
-        this.log.info("<<" + (this.getTestRepositoryConnection().size() - startingStmtCount) + " statements loaded in "
-                + (System.currentTimeMillis() - start) + " ms>>");
-    }
-    
-    /**
-     * Test a very large artifact which uses poddScience. Each PoddInternalObject "contains" the
-     * next PoddInternalObject, leading to a "deep" artifact.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testLargeDeepScienceArtifact() throws Exception
-    {
-        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                this.getTestRepositoryConnection());
+        final long statementCount = this.getTestRepositoryConnection().size();
+        final long startedAt = System.currentTimeMillis();
+        this.utils
+                .loadPoddArtifact(filename, RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
         
-        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                this.getTestRepositoryConnection());
-        
-        final long startingStmtCount = this.getTestRepositoryConnection().size();
-        final long start = System.currentTimeMillis();
-        this.utils.loadPoddArtifact("/test/artifacts/largeProject-44k-deep-objects.rdf",
-                RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
-        this.log.info("<<" + (this.getTestRepositoryConnection().size() - startingStmtCount) + " statements loaded in "
-                + (System.currentTimeMillis() - start) + " ms>>");
+        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
+                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
     }
     
     // ///////////////////// some helper methods for debugging////////////////////////

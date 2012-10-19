@@ -4,11 +4,13 @@
 package com.github.podd.prototype;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import net.fortytwo.sesametools.URITranslator;
 
-import org.junit.Assert;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -28,6 +30,7 @@ import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -46,7 +49,18 @@ import org.semanticweb.owlapi.reasoner.TimeOutException;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.semanticweb.owlapi.rio.RioParserImpl;
 import org.semanticweb.owlapi.rio.RioRenderer;
+import org.semanticweb.owlapi.util.InferredAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredClassAssertionAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredDataPropertyCharacteristicAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredEquivalentClassAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredEquivalentDataPropertiesAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredEquivalentObjectPropertyAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredInverseObjectPropertiesAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredObjectPropertyCharacteristicAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
+import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredSubDataPropertyAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredSubObjectPropertyAxiomGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -237,10 +251,35 @@ public class PoddPrototypeUtils
         throws ReasonerInterruptedException, TimeOutException, InconsistentOntologyException,
         OWLOntologyCreationException, OWLOntologyChangeException
     {
+        long startedAt = System.currentTimeMillis();
         nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-        final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner);
+        this.log.info("precomputeInferences() took " + (System.currentTimeMillis() - startedAt));
+        
+        final List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators =
+                new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
+        axiomGenerators.add(new InferredClassAssertionAxiomGenerator());
+        axiomGenerators.add(new InferredDataPropertyCharacteristicAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentDataPropertiesAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentObjectPropertyAxiomGenerator());
+        axiomGenerators.add(new InferredInverseObjectPropertiesAxiomGenerator());
+        axiomGenerators.add(new InferredObjectPropertyCharacteristicAxiomGenerator());
+        
+        // loading time for science-3k-objects reduced from 66s to 8.8s after commenting out
+        // the InferredPropertyAssertionGenerator below
+        // axiomGenerators.add(new InferredPropertyAssertionGenerator());
+        
+        axiomGenerators.add(new InferredSubClassAxiomGenerator());
+        axiomGenerators.add(new InferredSubDataPropertyAxiomGenerator());
+        axiomGenerators.add(new InferredSubObjectPropertyAxiomGenerator());
+        
+        final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
         final OWLOntology nextInferredAxiomsOntology = this.manager.createOntology(inferredOntologyID);
+        
+        startedAt = System.currentTimeMillis();
+        
         iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
+        this.log.info("fillOntology() took " + (System.currentTimeMillis() - startedAt));
         
         return nextInferredAxiomsOntology;
     }
@@ -432,7 +471,7 @@ public class PoddPrototypeUtils
             return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology
                     .getOntologyID().getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
         }
-        catch(Exception e)
+        catch(final Exception e)
         {
             if(nextOntology != null)
             {
@@ -488,10 +527,17 @@ public class PoddPrototypeUtils
      */
     public OWLOntology loadOntology(final String ontologyResource, final String mimeType) throws Exception
     {
+        final InputStream inputStream = this.getClass().getResourceAsStream(ontologyResource);
+        
+        if(inputStream == null)
+        {
+            this.log.error("Could not find resource: {}", ontologyResource);
+            throw new NullPointerException("Could not find resource: " + ontologyResource);
+        }
+        
         final OWLOntology nextOntology =
-                this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
-                        .getResourceAsStream(ontologyResource), OWLOntologyFormatFactoryRegistry.getInstance()
-                        .getByMIMEType(mimeType)));
+                this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(inputStream,
+                        OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(mimeType)));
         if(nextOntology.isEmpty())
         {
             throw new PoddException("Loaded ontology is empty", null, PoddException.ERR_EMPTY_ONTOLOGY);
@@ -530,8 +576,15 @@ public class PoddPrototypeUtils
             final URI randomURN =
                     tempRepositoryConnection.getValueFactory().createURI("urn:random:" + UUID.randomUUID().toString());
             
-            tempRepositoryConnection.add(this.getClass().getResourceAsStream(artifactResourcePath), "",
-                    Rio.getParserFormatForMIMEType(mimeType), randomURN);
+            final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);
+            
+            if(inputStream == null)
+            {
+                this.log.error("Could not find resource: {}", artifactResourcePath);
+                throw new NullPointerException("Could not find resource: " + artifactResourcePath);
+            }
+            
+            tempRepositoryConnection.add(inputStream, "", Rio.getParserFormatForMIMEType(mimeType), randomURN);
             tempRepositoryConnection.commit();
             
             // TODO: improve the permanent URI rather than using http://example.org
@@ -691,8 +744,8 @@ public class PoddPrototypeUtils
      */
     protected boolean removeOntologyFromManager(final OWLOntology nextOntology)
     {
-        OWLOntologyManager nextManager = nextOntology.getOWLOntologyManager();
-        OWLOntologyID ontologyID = nextOntology.getOntologyID();
+        final OWLOntologyManager nextManager = nextOntology.getOWLOntologyManager();
+        final OWLOntologyID ontologyID = nextOntology.getOntologyID();
         if(nextManager.contains(ontologyID))
         {
             nextManager.removeOntology(ontologyID);
