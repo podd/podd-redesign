@@ -1,0 +1,202 @@
+package com.github.podd.prototype.test;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.openrdf.model.URI;
+import org.openrdf.rio.RDFFormat;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.profiles.OWLProfile;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
+
+import com.github.podd.prototype.PoddPrototypeUtils;
+
+/**
+ * Parameterized class for testing the performance of loading PODD artifacts.
+ * 
+ * @author kutila
+ * @created 2012/10/23
+ */
+@RunWith(value = Parameterized.class)
+public class PoddPrototypePerformanceTest extends AbstractSesameTest
+{
+    
+    private OWLOntologyManager manager;
+    private OWLReasonerFactory reasonerFactory;
+    private String reasonerName;
+    private URI schemaOntologyManagementGraph;
+    private URI poddArtifactManagementGraph;
+    private IRI pelletOwlProfile;
+    
+    private PoddPrototypeUtils utils;
+    
+    private String poddBasePath;
+    private String poddSciencePath;
+    
+    @BeforeClass
+    public static void beforeClass() throws Exception
+    {
+        // Create new statistics file
+    }
+    
+    @AfterClass
+    public static void afterClass() throws Exception
+    {
+        // close statistics file
+    }
+    
+    @Override
+    @Before
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        
+        // create the manager to use for the test
+        this.manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        Assert.assertNotNull("Could not create a manager", this.manager);
+        
+        this.reasonerName = "Pellet";
+        this.reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(this.reasonerName);
+        
+        Assert.assertNotNull("Could not find reasoner", this.reasonerFactory);
+        this.pelletOwlProfile = OWLProfile.OWL2_DL;
+        
+        this.schemaOntologyManagementGraph =
+                this.getTestValueFactory().createURI("urn:test:schemaOntologiesManagementGraph");
+        this.poddArtifactManagementGraph = this.getTestValueFactory().createURI("urn:test:poddArtifactManagementGraph");
+        
+        this.utils =
+                new PoddPrototypeUtils(this.manager, this.pelletOwlProfile, this.reasonerFactory,
+                        this.schemaOntologyManagementGraph, this.poddArtifactManagementGraph);
+        
+        this.poddBasePath = "/ontologies/poddBase.owl";
+        this.poddSciencePath = "/ontologies/poddScience.owl";
+    }
+    
+    @Override
+    @After
+    public void tearDown() throws Exception
+    {
+        super.tearDown();
+        
+        this.manager = null;
+        this.reasonerFactory = null;
+        this.utils = null;
+    }
+    
+    // ----------- parameters for junit test----------------
+    private boolean isPlant;
+    private boolean isNTriples;
+    private String filename;
+    
+    /**
+     * Parameterized constructor
+     * 
+     * @param number
+     */
+    public PoddPrototypePerformanceTest(final String filename, final boolean isPlant, final boolean isNTriples)
+    {
+        this.filename = filename;
+        this.isPlant = isPlant;
+        this.isNTriples = isNTriples;
+    }
+    
+    @Parameters
+    public static Collection<Object[]> data()
+    {
+        final Object[][] data =
+                new Object[][] { 
+                        { "/test/artifacts/plant-1k-objects.rdf", true, false },
+                        { "/test/artifacts/plant-3k-objects.rdf", true, false },
+                        { "/test/artifacts/plant-10k-objects.rdf", true, false },
+                        { "/test/artifacts/science-1k-objects-deep.rdf", false, false },
+                        { "/test/artifacts/science-3k-objects-deep.rdf", false, false },
+                        { "/test/artifacts/science-10k-objects-deep.rdf", false, false },
+                        { "/test/artifacts/science-1k-objects-shallow.rdf", false, false },
+                        { "/test/artifacts/science-3k-objects-shallow.rdf", false, false },
+                        { "/test/artifacts/science-10k-objects-shallow.rdf", false, false },
+                        { "/test/artifacts/plant-1k-objects.nt", true, true },
+                        { "/test/artifacts/plant-3k-objects.nt", true, true },
+                        { "/test/artifacts/plant-10k-objects.nt", true, true },
+                        { "/test/artifacts/science-1k-objects.nt", false, true },
+                        { "/test/artifacts/science-3k-objects.nt", false, true },
+                        { "/test/artifacts/science-10k-objects.nt", false, true } 
+                };
+        return Arrays.asList(data);
+    }
+    
+    @Test
+    public void testLoadArtifactPerformance() throws Exception
+    {
+        if(this.isPlant)
+        {
+            this.loadPlantArtifact(this.filename);
+        }
+        else
+        {
+            this.loadScienceArtifact(this.filename);
+        }
+        
+    }
+    
+    private void loadPlantArtifact(final String filename) throws Exception
+    {
+        final OWLOntologyID modifiedId =
+                new OWLOntologyID(IRI.create("http://purl.obolibrary.org/obo/po.owl"),
+                        IRI.create("urn:test:plantontology:version:16.0"));
+        
+        this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl",
+                RDFFormat.RDFXML.getDefaultMIMEType(), modifiedId, this.getTestRepositoryConnection());
+        
+        final long statementCount = this.getTestRepositoryConnection().size();
+        
+        final long startedAt = System.currentTimeMillis();
+        
+        String mimeType = RDFFormat.RDFXML.getDefaultMIMEType();
+        if(this.isNTriples)
+        {
+            mimeType = RDFFormat.NTRIPLES.getDefaultMIMEType();
+        }
+        this.utils.loadPoddArtifact(filename, mimeType, this.getTestRepositoryConnection());
+        
+        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
+                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
+    }
+    
+    private void loadScienceArtifact(final String filename) throws Exception
+    {
+        this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                this.getTestRepositoryConnection());
+        
+        final long statementCount = this.getTestRepositoryConnection().size();
+        final long startedAt = System.currentTimeMillis();
+        
+        String mimeType = RDFFormat.RDFXML.getDefaultMIMEType();
+        if(this.isNTriples)
+        {
+            mimeType = RDFFormat.NTRIPLES.getDefaultMIMEType();
+        }
+        
+        this.utils.loadPoddArtifact(filename, mimeType, this.getTestRepositoryConnection());
+        
+        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
+                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
+    }
+    
+}

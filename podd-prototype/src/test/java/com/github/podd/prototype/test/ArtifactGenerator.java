@@ -19,6 +19,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
@@ -40,13 +41,17 @@ public class ArtifactGenerator
     private static final String poddSciencePath = "/ontologies/poddScience.owl";
     private static final String poddAnimalPath = "/ontologies/poddAnimal.owl";
     
-    private static final String filePath =
-            "/home/kutila/gitrepos/podd-redesign/podd-prototype/src/test/resources/test/artifacts/";
+    private static final String filePath = "src/test/resources/test/artifacts/";
     
     private static final URI contains = IRI.create(ArtifactGenerator.PODD_BASE, "contains").toOpenRDFURI();
     private static final URI containedBy = IRI.create(ArtifactGenerator.PODD_BASE, "containedBy").toOpenRDFURI();
     
     private static final URI adjacentTo = IRI.create(ArtifactGenerator.PLANT_PREFIX, "po#adjacent_to").toOpenRDFURI();
+    
+    private static enum FILE_TYPES
+    {
+        RDFXML, NTRIPLES
+    };
     
     private final RepositoryConnection repositoryConnection;
     private final ValueFactory valueFactory;
@@ -57,10 +62,11 @@ public class ArtifactGenerator
     public static void main(final String[] args) throws Exception
     {
         final String filePrefix = "science-";
-        final int maxResources = 3000;
-        final boolean isDeep = true; // only for Science
+        final int maxResources = 1000;
+        final boolean isDeep = false; // only for Science
         final boolean isPlant = false;
         final int i = 4;
+        final FILE_TYPES fileType = FILE_TYPES.NTRIPLES;
         
         // create repository
         final Repository inMemoryRepository = new SailRepository(new MemoryStore());
@@ -71,7 +77,7 @@ public class ArtifactGenerator
         
         // generate artifact and write to file
         final ArtifactGenerator generator = new ArtifactGenerator(nextRepositoryConnection, valueFac);
-        generator.createArtifact(isPlant, filePrefix, maxResources, i, isDeep);
+        generator.createArtifact(isPlant, filePrefix, maxResources, i, isDeep, fileType);
         
         // clean up
         nextRepositoryConnection.close();
@@ -85,7 +91,7 @@ public class ArtifactGenerator
     }
     
     public final void createArtifact(final boolean isPlant, final String filePrefix, final int maxResources,
-            final int index, final boolean isDeep) throws Exception
+            final int index, final boolean isDeep, final FILE_TYPES fileType) throws Exception
     {
         // set the namespaces
         this.repositoryConnection.setNamespace(OWL.PREFIX, OWL.NAMESPACE);
@@ -121,12 +127,29 @@ public class ArtifactGenerator
         }
         
         // dump the RDF to a file
-        final FileOutputStream fos = new FileOutputStream(ArtifactGenerator.filePath + filePrefix + index + ".rdf");
-        final RDFHandler rdfxmlWriter = new RDFXMLWriter(fos);
-        this.repositoryConnection.export(rdfxmlWriter);
+        String filename = null;
+        FileOutputStream fos = null;
+        RDFHandler rdfWriter = null;
+        if(fileType == FILE_TYPES.RDFXML)
+        {
+            filename = filePrefix + index + ".rdf";
+            fos = new FileOutputStream(ArtifactGenerator.filePath + filename);
+            rdfWriter = new RDFXMLWriter(fos);
+        }
+        else if(fileType == FILE_TYPES.NTRIPLES)
+        {
+            filename = filePrefix + index + ".nt";
+            fos = new FileOutputStream(ArtifactGenerator.filePath + filename);
+            rdfWriter = new NTriplesWriter(fos);
+        }
+        else
+        {
+            System.out.println("Unsupported file type: " + fileType);
+        }
+        this.repositoryConnection.export(rdfWriter);
         this.repositoryConnection.commit();
         
-        System.out.println("Created " + filePrefix + index + ".rdf");
+        System.out.println("Created " + filename);
         System.out.println("  No. of triples = " + this.repositoryConnection.size());
         System.out.println("  No. of objects = " + objectCount);
     }
