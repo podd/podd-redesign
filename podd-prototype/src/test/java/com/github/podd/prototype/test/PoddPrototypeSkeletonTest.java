@@ -734,10 +734,14 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                     this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf",
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
+            log.info("About to load second version of ontology");
+            
             // load poddScience v2 which allows 2 lead institutions
             final InferredOWLOntologyID scienceV2 =
                     this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-2LeadInstitutions.owl",
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+            
+            log.info("About to load second second artifact which would have been inconsistent without the second version");
             
             // load artifact 2 which has 2 lead institutions
             poddArtifact2 =
