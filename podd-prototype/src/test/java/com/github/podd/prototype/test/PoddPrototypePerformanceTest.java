@@ -21,6 +21,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.prototype.PoddPrototypeUtils;
 
@@ -45,6 +47,8 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
     
     private String poddBasePath;
     private String poddSciencePath;
+    
+    private final Logger statsLogger = LoggerFactory.getLogger("statsLogger");
     
     @BeforeClass
     public static void beforeClass() throws Exception
@@ -172,8 +176,16 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
         }
         this.utils.loadPoddArtifact(filename, mimeType, this.getTestRepositoryConnection());
         
-        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
-                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
+//        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
+//                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
+        StringBuilder statsMsg = new StringBuilder();
+        statsMsg.append(filename);
+        statsMsg.append(',');
+        statsMsg.append((System.currentTimeMillis() - startedAt));
+        statsMsg.append(',');
+        statsMsg.append((this.getTestRepositoryConnection().size() - statementCount));
+        
+        this.statsLogger.info(statsMsg.toString());
     }
     
     private void loadScienceArtifact(final String filename) throws Exception
@@ -195,8 +207,16 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
         
         this.utils.loadPoddArtifact(filename, mimeType, this.getTestRepositoryConnection());
         
-        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
-                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
+//        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
+//                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
+        StringBuilder statsMsg = new StringBuilder();
+        statsMsg.append(filename);
+        statsMsg.append(',');
+        statsMsg.append((System.currentTimeMillis() - startedAt));
+        statsMsg.append(',');
+        statsMsg.append((this.getTestRepositoryConnection().size() - statementCount));
+        
+        this.statsLogger.info(statsMsg.toString());
     }
     
 }

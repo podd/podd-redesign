@@ -112,6 +112,8 @@ public class PoddPrototypeUtils
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
+    private final Logger statsLogger = LoggerFactory.getLogger("statsLogger");
+    
     /**
      * The manager that will be used to manage the Schema Ontologies.
      * 
@@ -251,9 +253,10 @@ public class PoddPrototypeUtils
         throws ReasonerInterruptedException, TimeOutException, InconsistentOntologyException,
         OWLOntologyCreationException, OWLOntologyChangeException
     {
-        long startedAt = System.currentTimeMillis();
+        // long startedAt = System.currentTimeMillis();
         nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-        this.log.info("precomputeInferences() took " + (System.currentTimeMillis() - startedAt));
+        // this.statsLogger.info("precomputeInferences()," + (System.currentTimeMillis() -
+        // startedAt));
         
         final List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators =
                 new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
@@ -276,10 +279,10 @@ public class PoddPrototypeUtils
         final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
         final OWLOntology nextInferredAxiomsOntology = this.manager.createOntology(inferredOntologyID);
         
-        startedAt = System.currentTimeMillis();
+        // startedAt = System.currentTimeMillis();
         
         iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
-        this.log.info("fillOntology() took " + (System.currentTimeMillis() - startedAt));
+        // this.statsLogger.info("fillOntology()," + (System.currentTimeMillis() - startedAt));
         
         return nextInferredAxiomsOntology;
     }
@@ -623,16 +626,19 @@ public class PoddPrototypeUtils
             
             // 2. Validate the object in terms of the OWL profile
             // 3. Validate the object using a reasoner
-            this.log.info("Checking consistency of podd artifact");
+            long startedAt = System.currentTimeMillis();
             final OWLReasoner reasoner = this.checkConsistency(nextOntology);
+            this.statsLogger.info("checkConsistency()," + (System.currentTimeMillis() - startedAt));
             
             // 4. Store the object
             this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
             
             // 5. Infer extra statements about the object using a reasoner
             this.log.info("Computing inferences for podd artifact");
+            startedAt = System.currentTimeMillis();
             final OWLOntology nextInferredOntology =
                     this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
+            this.statsLogger.info("computeInferences()," + (System.currentTimeMillis() - startedAt));
             
             // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
             // Sesame Repository
