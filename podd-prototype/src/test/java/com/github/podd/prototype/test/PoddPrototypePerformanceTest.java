@@ -24,6 +24,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.prototype.InferredOWLOntologyID;
 import com.github.podd.prototype.PoddPrototypeUtils;
 
 /**
@@ -47,20 +48,11 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
     
     private String poddBasePath;
     private String poddSciencePath;
-    
+
+    /**
+     * log4j logger which writes to the statistics file.
+     */
     private final Logger statsLogger = LoggerFactory.getLogger("statsLogger");
-    
-    @BeforeClass
-    public static void beforeClass() throws Exception
-    {
-        // Create new statistics file
-    }
-    
-    @AfterClass
-    public static void afterClass() throws Exception
-    {
-        // close statistics file
-    }
     
     @Override
     @Before
@@ -122,7 +114,8 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
     public static Collection<Object[]> data()
     {
         final Object[][] data =
-                new Object[][] { 
+                new Object[][] {
+                        { "/test/artifacts/plant-1k-objects.rdf", true, false }, //take care of the cold start
                         { "/test/artifacts/plant-1k-objects.rdf", true, false },
                         { "/test/artifacts/plant-3k-objects.rdf", true, false },
                         { "/test/artifacts/plant-10k-objects.rdf", true, false },
@@ -137,8 +130,7 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
                         { "/test/artifacts/plant-10k-objects.nt", true, true },
                         { "/test/artifacts/science-1k-objects.nt", false, true },
                         { "/test/artifacts/science-3k-objects.nt", false, true },
-                        { "/test/artifacts/science-10k-objects.nt", false, true } 
-                };
+                        { "/test/artifacts/science-10k-objects.nt", false, true } };
         return Arrays.asList(data);
     }
     
@@ -147,16 +139,43 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
     {
         if(this.isPlant)
         {
-            this.loadPlantArtifact(this.filename);
+            this.loadPlantImports(this.filename);
         }
         else
         {
-            this.loadScienceArtifact(this.filename);
+            this.loadScienceImports(this.filename);
         }
         
+        String mimeType = RDFFormat.RDFXML.getDefaultMIMEType();
+        if(this.isNTriples)
+        {
+            mimeType = RDFFormat.NTRIPLES.getDefaultMIMEType();
+        }
+        
+        this.statsLogger.info(this.filename.substring(this.filename.lastIndexOf('/') + 1) + ",");
+        
+        final long startedAt = System.currentTimeMillis();
+        InferredOWLOntologyID inferred = this.utils.loadPoddArtifact(
+                filename, mimeType, this.getTestRepositoryConnection());
+        
+        // write statistics
+        StringBuilder statsMsg = new StringBuilder();
+        
+        // time to load (ms)
+        statsMsg.append((System.currentTimeMillis() - startedAt));
+        statsMsg.append(',');
+        
+        // ontology statement count
+        statsMsg.append(this.getTestRepositoryConnection().size(inferred.getVersionIRI().toOpenRDFURI())); 
+        statsMsg.append(',');
+        
+        // inferred statement count
+        statsMsg.append(this.getTestRepositoryConnection().size(inferred.getInferredOntologyIRI().toOpenRDFURI()));
+        statsMsg.append("\n");
+        this.statsLogger.info(statsMsg.toString());
     }
     
-    private void loadPlantArtifact(final String filename) throws Exception
+    private void loadPlantImports(final String filename) throws Exception
     {
         final OWLOntologyID modifiedId =
                 new OWLOntologyID(IRI.create("http://purl.obolibrary.org/obo/po.owl"),
@@ -164,59 +183,15 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
         
         this.utils.loadInferAndStoreSchemaOntology("/ontologies/plant_ontology-v16.owl",
                 RDFFormat.RDFXML.getDefaultMIMEType(), modifiedId, this.getTestRepositoryConnection());
-        
-        final long statementCount = this.getTestRepositoryConnection().size();
-        
-        final long startedAt = System.currentTimeMillis();
-        
-        String mimeType = RDFFormat.RDFXML.getDefaultMIMEType();
-        if(this.isNTriples)
-        {
-            mimeType = RDFFormat.NTRIPLES.getDefaultMIMEType();
-        }
-        this.utils.loadPoddArtifact(filename, mimeType, this.getTestRepositoryConnection());
-        
-//        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
-//                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
-        StringBuilder statsMsg = new StringBuilder();
-        statsMsg.append(filename);
-        statsMsg.append(',');
-        statsMsg.append((System.currentTimeMillis() - startedAt));
-        statsMsg.append(',');
-        statsMsg.append((this.getTestRepositoryConnection().size() - statementCount));
-        
-        this.statsLogger.info(statsMsg.toString());
     }
     
-    private void loadScienceArtifact(final String filename) throws Exception
+    private void loadScienceImports(final String filename) throws Exception
     {
         this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 this.getTestRepositoryConnection());
         
         this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 this.getTestRepositoryConnection());
-        
-        final long statementCount = this.getTestRepositoryConnection().size();
-        final long startedAt = System.currentTimeMillis();
-        
-        String mimeType = RDFFormat.RDFXML.getDefaultMIMEType();
-        if(this.isNTriples)
-        {
-            mimeType = RDFFormat.NTRIPLES.getDefaultMIMEType();
-        }
-        
-        this.utils.loadPoddArtifact(filename, mimeType, this.getTestRepositoryConnection());
-        
-//        this.log.info("\r\n    " + (System.currentTimeMillis() - startedAt) + " ms for " + filename + " ("
-//                + (this.getTestRepositoryConnection().size() - statementCount) + " statements with inferences)");
-        StringBuilder statsMsg = new StringBuilder();
-        statsMsg.append(filename);
-        statsMsg.append(',');
-        statsMsg.append((System.currentTimeMillis() - startedAt));
-        statsMsg.append(',');
-        statsMsg.append((this.getTestRepositoryConnection().size() - statementCount));
-        
-        this.statsLogger.info(statsMsg.toString());
     }
     
 }

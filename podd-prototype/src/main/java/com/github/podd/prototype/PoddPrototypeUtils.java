@@ -628,7 +628,7 @@ public class PoddPrototypeUtils
             // 3. Validate the object using a reasoner
             long startedAt = System.currentTimeMillis();
             final OWLReasoner reasoner = this.checkConsistency(nextOntology);
-            this.statsLogger.info("checkConsistency()," + (System.currentTimeMillis() - startedAt));
+            this.statsLogger.info("checkConsistency:," + (System.currentTimeMillis() - startedAt) + ",");
             
             // 4. Store the object
             this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
@@ -638,8 +638,9 @@ public class PoddPrototypeUtils
             startedAt = System.currentTimeMillis();
             final OWLOntology nextInferredOntology =
                     this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
-            this.statsLogger.info("computeInferences()," + (System.currentTimeMillis() - startedAt));
-            
+            this.statsLogger.info("computeInferences:,"
+                    + (System.currentTimeMillis() - startedAt) + ",");
+
             // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
             // Sesame Repository
             // 6. Store the inferred statements
