@@ -157,10 +157,12 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
             final OWLOntology o = this.utils.loadOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType());
             Assert.assertNotNull(o);
             this.utils.checkConsistency(o);
+            this.getTestRepositoryConnection().rollback();
             Assert.fail("Consistency check should have failed.");
         }
         catch(final PoddException e)
         {
+            this.getTestRepositoryConnection().rollback();
             return e;
         }
         return null; // won't get here really
@@ -178,12 +180,13 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         {
             final OWLOntology o =
                     this.utils.loadOntology("/test/ontologies/empty.owl", RDFFormat.RDFXML.getDefaultMIMEType());
+            this.getTestRepositoryConnection().rollback();
             Assert.fail("Should have failed to load empty ontology.");
         }
         catch(final PoddException e)
         {
+            this.getTestRepositoryConnection().rollback();
             Assert.assertEquals(PoddException.ERR_EMPTY_ONTOLOGY, e.getCode());
-            
         }
     }
     
@@ -199,6 +202,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     public final void testBaseOntologyContent() throws Exception
     {
         final OWLOntology o = this.utils.loadOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType());
+        this.getTestRepositoryConnection().commit();
         Assert.assertNotNull(o);
         final OWLReasoner reasoner = this.utils.checkConsistency(o);
         reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
@@ -245,6 +249,8 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLOntology nextInferredOntology =
                 this.utils.computeInferences(reasoner,
                         this.utils.generateInferredOntologyID(nextOntology.getOntologyID()));
+        
+        this.getTestRepositoryConnection().commit();
         
         Assert.assertEquals(3, nextInferredOntology.getAxiomCount(AxiomType.SUBCLASS_OF));
     }
@@ -728,10 +734,14 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                     this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf",
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
+            log.info("About to load second version of ontology");
+            
             // load poddScience v2 which allows 2 lead institutions
             final InferredOWLOntologyID scienceV2 =
                     this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-2LeadInstitutions.owl",
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
+            
+            log.info("About to load second second artifact which would have been inconsistent without the second version");
             
             // load artifact 2 which has 2 lead institutions
             poddArtifact2 =
