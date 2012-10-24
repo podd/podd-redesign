@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -14,6 +13,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.io.OWLParserFactoryRegistry;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -111,7 +111,6 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
     
     // ----------- parameters for junit test----------------
     private boolean isPlant;
-    private boolean isNTriples;
     private String filename;
     
     /**
@@ -119,11 +118,10 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
      * 
      * @param number
      */
-    public PoddPrototypePerformanceTest(final String filename, final boolean isPlant, final boolean isNTriples)
+    public PoddPrototypePerformanceTest(final String filename, final boolean isPlant)
     {
         this.filename = filename;
         this.isPlant = isPlant;
-        this.isNTriples = isNTriples;
     }
     
     @Parameters
@@ -131,22 +129,22 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
     {
         final Object[][] data =
                 new Object[][] {
-                        { "/test/artifacts/plant-1k-objects.rdf", true, false }, //take care of the cold start
-                        { "/test/artifacts/plant-1k-objects.rdf", true, false },
-                        { "/test/artifacts/plant-3k-objects.rdf", true, false },
-                        { "/test/artifacts/plant-10k-objects.rdf", true, false },
-                        { "/test/artifacts/science-1k-objects-deep.rdf", false, false },
-                        { "/test/artifacts/science-3k-objects-deep.rdf", false, false },
-                        { "/test/artifacts/science-10k-objects-deep.rdf", false, false },
-                        { "/test/artifacts/science-1k-objects-shallow.rdf", false, false },
-                        { "/test/artifacts/science-3k-objects-shallow.rdf", false, false },
-                        { "/test/artifacts/science-10k-objects-shallow.rdf", false, false },
-                        { "/test/artifacts/plant-1k-objects.nt", true, true },
-                        { "/test/artifacts/plant-3k-objects.nt", true, true },
-                        { "/test/artifacts/plant-10k-objects.nt", true, true },
-                        { "/test/artifacts/science-1k-objects.nt", false, true },
-                        { "/test/artifacts/science-3k-objects.nt", false, true },
-                        { "/test/artifacts/science-10k-objects.nt", false, true } };
+                        { "/test/artifacts/plant-1k-objects.rdf", true }, //take care of the cold start
+                        { "/test/artifacts/plant-1k-objects.rdf", true },
+                        { "/test/artifacts/plant-3k-objects.rdf", true },
+                        { "/test/artifacts/plant-10k-objects.rdf", true },
+                        { "/test/artifacts/science-1k-objects-deep.rdf", false },
+                        { "/test/artifacts/science-3k-objects-deep.rdf", false },
+                        { "/test/artifacts/science-10k-objects-deep.rdf", false },
+                        { "/test/artifacts/science-1k-objects-shallow.rdf", false },
+                        { "/test/artifacts/science-3k-objects-shallow.rdf", false },
+                        { "/test/artifacts/science-10k-objects-shallow.rdf", false },
+                        { "/test/artifacts/plant-1k-objects.nt", true },
+                        { "/test/artifacts/plant-3k-objects.nt", true },
+                        { "/test/artifacts/plant-10k-objects.nt", true },
+                        { "/test/artifacts/science-1k-objects.nt", false },
+                        { "/test/artifacts/science-3k-objects.nt", false },
+                        { "/test/artifacts/science-10k-objects.nt", false } };
         return Arrays.asList(data);
     }
     
@@ -162,17 +160,13 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
             this.loadScienceImports(this.filename);
         }
         
-        String mimeType = RDFFormat.RDFXML.getDefaultMIMEType();
-        if(this.isNTriples)
-        {
-            mimeType = RDFFormat.NTRIPLES.getDefaultMIMEType();
-        }
+        final String mimeType = Rio.getParserFormatForFileName(this.filename, RDFFormat.RDFXML).getDefaultMIMEType();
         
         this.statsLogger.info(this.filename.substring(this.filename.lastIndexOf('/') + 1) + ",");
         
         final long startedAt = System.currentTimeMillis();
         InferredOWLOntologyID inferred = this.utils.loadPoddArtifact(
-                filename, mimeType, this.getTestRepositoryConnection());
+                this.filename, mimeType, this.getTestRepositoryConnection());
         
         // write statistics
         StringBuilder statsMsg = new StringBuilder();
