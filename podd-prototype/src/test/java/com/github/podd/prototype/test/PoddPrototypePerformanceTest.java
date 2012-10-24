@@ -14,11 +14,14 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
+import org.semanticweb.owlapi.io.OWLParserFactoryRegistry;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.model.OWLOntologyStorerFactoryRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfile;
+import org.semanticweb.owlapi.profiles.OWLProfileRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import org.slf4j.Logger;
@@ -53,6 +56,19 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
      * log4j logger which writes to the statistics file.
      */
     private final Logger statsLogger = LoggerFactory.getLogger("statsLogger");
+    
+    @BeforeClass
+    public static void beforeClass() throws Exception
+    {
+        for(int i = 0; i < 15000; i++)
+        {
+            OWLOntologyManagerFactoryRegistry.getInstance().getAll();
+            OWLParserFactoryRegistry.getInstance().getAll();
+            OWLOntologyStorerFactoryRegistry.getInstance().getAll();
+            OWLProfileRegistry.getInstance().getAll();
+            OWLReasonerFactoryRegistry.getInstance().getAll();        
+        }
+    }
     
     @Override
     @Before
