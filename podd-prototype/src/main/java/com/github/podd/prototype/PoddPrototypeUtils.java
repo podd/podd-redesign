@@ -708,19 +708,16 @@ public class PoddPrototypeUtils
     public boolean removePoddArtifactFromManager(final OWLOntologyID baseOntologyID,
             final OWLOntologyID inferredOntologyID)
     {
-        if(this.manager.contains(baseOntologyID) && this.manager.contains(inferredOntologyID))
+        this.manager.removeOntology(baseOntologyID);
+        this.manager.removeOntology(inferredOntologyID);
+        if(this.manager.contains(baseOntologyID) || this.manager.contains(inferredOntologyID))
         {
-            this.manager.removeOntology(baseOntologyID);
-            if(!this.manager.contains(baseOntologyID))
-            {
-                this.manager.removeOntology(inferredOntologyID);
-                if(!this.manager.contains(inferredOntologyID))
-                {
-                    return true;
-                }
-            }
+            return false;
         }
-        return false;
+        else
+        {
+            return true;
+        }
     }
     
     /**
