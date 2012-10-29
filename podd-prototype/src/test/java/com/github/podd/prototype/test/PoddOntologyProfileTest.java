@@ -189,14 +189,17 @@ public class PoddOntologyProfileTest
     
     private void printOWLProfileReport(final OWLProfileReport report)
     {
-        this.log.info("==== Profile Report ======");
-        this.log.info(" Profile:" + report.getProfile());
-        this.log.info(" Is in Profile: " + report.isInProfile());
-        this.log.info(" No. of violations: " + report.getViolations().size());
+        this.log.debug("==== Profile Report ======");
+        this.log.debug(" Profile:" + report.getProfile());
+        this.log.debug(" Is in Profile: " + report.isInProfile());
+        this.log.debug(" No. of violations: " + report.getViolations().size());
         
-        for(final OWLProfileViolation violation : report.getViolations())
+        if(this.log.isTraceEnabled())
         {
-            this.log.info(violation.toString());
+            for(final OWLProfileViolation violation : report.getViolations())
+            {
+                this.log.trace(violation.toString());
+            }
         }
     }
     
