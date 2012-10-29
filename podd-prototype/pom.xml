@@ -35,17 +35,19 @@
             <groupId>com.github.ansell.owlapi</groupId>
             <artifactId>owlapi-rio</artifactId>
         </dependency>
-        <!-- NOTE: The prototype is test driven, but some classes are on 
-            the compile classpath and they need JUnit to run assertions. Do not put JUnit 
-            on the compile classpath after the prototype is complete. -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.ansell.pellet</groupId>
             <artifactId>pellet-owlapiv3</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
