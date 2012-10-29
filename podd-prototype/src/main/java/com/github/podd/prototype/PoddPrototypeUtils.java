@@ -911,4 +911,10 @@ public class PoddPrototypeUtils
         
     }
     
+    public URI getSchemaGraph()
+    {
+        return this.schemaGraph;
+    }
+    
+    
 }
