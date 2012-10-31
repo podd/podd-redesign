@@ -244,6 +244,8 @@ public class PoddServletHelper
             this.utils.updateCurrentManagedPoddArtifactOntologyVersion(repositoryConnection,
                     nextOntology.getOntologyID(), nextInferredOntology.getOntologyID());
             
+            repositoryConnection.commit();
+            
             return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology
                     .getOntologyID().getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
         }
@@ -279,25 +281,29 @@ public class PoddServletHelper
         final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
         try
         {
-            final String versionIRIString =
-                    this.getArtifactVersionIRI(artifactUri, includeInferredStatements, repositoryConnection);
-            final URI versionedArtifactIRI = IRI.create(versionIRIString).toOpenRDFURI();
+            final InferredOWLOntologyID ontologyID = this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
             
-            if(repositoryConnection.size(versionedArtifactIRI) < 1)
+            if(ontologyID.getVersionIRI() == null || 
+                    repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
             {
                 throw new Exception("Artifact <" + artifactUri + "> not found.");
             }
             
-            // get InferredOwlOntologyID for this artifact
-            // export 1. asserted 2. inferred statements through RDF Handler
-            final URI inferredArtifactIRI = null;
-            // IN PROGRESS HERE!
-            
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final RDFHandler rdfWriter =
                     Rio.createWriter(Rio.getWriterFormatForMIMEType(mimeType, RDFFormat.RDFXML), out);
-            
-            repositoryConnection.export(rdfWriter, versionedArtifactIRI);
+
+            if (includeInferredStatements)
+            {
+                repositoryConnection.export(rdfWriter, 
+                        ontologyID.getVersionIRI().toOpenRDFURI(),
+                        ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+            }
+            else
+            {
+                repositoryConnection.export(rdfWriter, ontologyID.getVersionIRI().toOpenRDFURI());
+            }
+            repositoryConnection.rollback();
             
             return out.toString();
         }
@@ -407,24 +413,6 @@ public class PoddServletHelper
         }
         
         return new InferredOWLOntologyID(ontologyIRI, ontologyVersionIRI, ontologyInferredIRI);
-    }
-    
-    private String getArtifactVersionIRI(final String artifactUri, final boolean includeInferredStatements,
-            final RepositoryConnection repositoryConnection) throws RepositoryException
-    {
-        final URI context = IRI.create(artifactUri).toOpenRDFURI();
-        final RepositoryResult<Statement> repoResult =
-                repositoryConnection.getStatements(context, this.owlVersionIRI, null, includeInferredStatements,
-                        this.poddArtifactManagementGraph);
-        
-        if(repoResult.hasNext())
-        {
-            return repoResult.next().getObject().stringValue();
-        }
-        else
-        {
-            return artifactUri;
-        }
     }
     
     /**

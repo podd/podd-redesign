@@ -137,13 +137,13 @@ public class PoddServletHelperTest
         // now retrieve it via the Helper
         final String resultRDF = this.helper.getArtifact(artifactUniqueIRI.toString(), mimeType, true);
         
-        // TODO - validate inferred statements. e.g. statement count should be higher than 29
+        // validate inferred statements 
         Assert.assertNotNull(resultRDF);
         Assert.assertFalse(resultRDF.contains("urn:temp:"));
         Assert.assertTrue(resultRDF.contains(artifactUniqueIRI.toString()));
         final URI context = IRI.create("urn:context").toOpenRDFURI();
         final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
-        Assert.assertEquals(29, repoConn.size(context));
+        Assert.assertTrue(repoConn.size(context) > 29);
     }
     
     @Test
