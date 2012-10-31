@@ -319,11 +319,9 @@ public class PoddServletHelper
         final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
         try
         {
-            final URI artifactNormalURI = IRI.create(artifactUri).toOpenRDFURI();
-            final String versionIRIString = this.getArtifactVersionIRI(artifactUri, true, repositoryConnection);
-            final URI versionedArtifactIRI = IRI.create(versionIRIString).toOpenRDFURI();
-            
-            if(repositoryConnection.size(versionedArtifactIRI) < 1)
+            InferredOWLOntologyID ontologyID = this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
+            if (ontologyID.getVersionIRI() == null ||
+                    repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
             {
                 throw new Exception("Artifact <" + artifactUri + "> not found.");
             }
@@ -333,12 +331,12 @@ public class PoddServletHelper
                     Rio.createWriter(Rio.getWriterFormatForMIMEType(PoddServlet.MIME_TYPE_RDF_XML, RDFFormat.RDFXML),
                             out);
             
-            repositoryConnection.export(rdfWriter, versionedArtifactIRI);
-            repositoryConnection.clear(versionedArtifactIRI);
+            repositoryConnection.export(rdfWriter, ontologyID.getVersionIRI().toOpenRDFURI());
+            repositoryConnection.clear(ontologyID.getVersionIRI().toOpenRDFURI());
             
             // remove references in the artifact management graph
             final RepositoryResult<Statement> repoResult =
-                    repositoryConnection.getStatements(artifactNormalURI,
+                    repositoryConnection.getStatements(ontologyID.getOntologyIRI().toOpenRDFURI(),
                             PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION, null, false,
                             this.poddArtifactManagementGraph);
             while(repoResult.hasNext())
@@ -347,8 +345,10 @@ public class PoddServletHelper
                 repositoryConnection.remove(IRI.create(inferredOnto).toOpenRDFURI(), null, null,
                         this.poddArtifactManagementGraph);
             }
-            repositoryConnection.remove(artifactNormalURI, null, null, this.poddArtifactManagementGraph);
-            repositoryConnection.remove(versionedArtifactIRI, null, null, this.poddArtifactManagementGraph);
+            repositoryConnection.remove(ontologyID.getOntologyIRI().toOpenRDFURI(), 
+                    null, null, this.poddArtifactManagementGraph);
+            repositoryConnection.remove(ontologyID.getVersionIRI().toOpenRDFURI(),
+                    null, null, this.poddArtifactManagementGraph);
             
             repositoryConnection.commit();
             return out.toString();
@@ -375,22 +375,38 @@ public class PoddServletHelper
         return artifactURI;
     }
     
-    public InferredOWLOntologyID getInferredOntologyID(final String artifactUri,
-            final RepositoryConnection repositoryConnection) throws Exception
+    /**
+     * Given an Ontology URI (in String format), generates an InferredOWLOntologyID.
+     * 
+     * @param artifactUri
+     * @param repositoryConnection
+     * @return
+     * @throws RepositoryException
+     */
+    public InferredOWLOntologyID getInferredOWLOntologyIDForArtifact(final String artifactUri,
+            final RepositoryConnection repositoryConnection) throws RepositoryException
     {
-        final URI ontologyURI = IRI.create(artifactUri).toOpenRDFURI();
+        final IRI ontologyIRI = IRI.create(artifactUri);
         final RepositoryResult<Statement> repoResult =
-                repositoryConnection.getStatements(ontologyURI, null, null, true, this.poddArtifactManagementGraph);
-        
+                repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(), null, null, true, 
+                        this.poddArtifactManagementGraph);
+
+        IRI ontologyVersionIRI = null;
+        IRI ontologyInferredIRI = null;
         while(repoResult.hasNext())
         {
-            System.out.println("xxx " + repoResult.next());
-            // IN PROGRESS HERE!
-            
-            // if (this.owlInferredVersionIRI.equals(repoResult.next().getPredicate())
+            Statement statement = repoResult.next();
+            if (PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION.equals(statement.getPredicate()))
+            {
+                ontologyInferredIRI = IRI.create(statement.getObject().stringValue());
+            }
+            else if (PoddPrototypeUtils.OWL_VERSION_IRI.equals(statement.getPredicate()))
+            {
+                ontologyVersionIRI = IRI.create(statement.getObject().stringValue());
+            }
         }
         
-        return null;
+        return new InferredOWLOntologyID(ontologyIRI, ontologyVersionIRI, ontologyInferredIRI);
     }
     
     private String getArtifactVersionIRI(final String artifactUri, final boolean includeInferredStatements,

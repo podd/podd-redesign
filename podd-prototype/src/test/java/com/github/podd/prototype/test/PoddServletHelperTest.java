@@ -216,7 +216,7 @@ public class PoddServletHelperTest extends TestCase
     }
     
     @Test
-    public void testGetInferredOntologyID() throws Exception
+    public void testGetInferredOWLOntologyIDForArtifact() throws Exception
     {
         // first, load an artifact using the inner-load method
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
@@ -225,7 +225,16 @@ public class PoddServletHelperTest extends TestCase
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         final RepositoryConnection conn = this.helper.getRepositoryConnection();
-        this.helper.getInferredOntologyID(artifactUniqueIRI.stringValue(), conn);
+
+        // test with a non-existent artifact
+        InferredOWLOntologyID id = this.helper.getInferredOWLOntologyIDForArtifact("http://nosuch:ontology:1", conn);
+        Assert.assertNull(id.getInferredOntologyIRI());
+        Assert.assertNull(id.getVersionIRI());
+
+        // test with the added artifact
+        id = this.helper.getInferredOWLOntologyIDForArtifact(artifactUniqueIRI.stringValue(), conn);
+
+        conn.rollback();
         this.helper.returnRepositoryConnection(conn);
     }
     
