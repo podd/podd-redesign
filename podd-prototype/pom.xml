@@ -93,6 +93,29 @@
                     <password>poddredesign</password>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <destfile>${basedir}/target/coverage-reports/jacoco-unit.exec</destfile>
+                    <datafile>${basedir}/target/coverage-reports/jacoco-unit.exec</datafile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialise</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
