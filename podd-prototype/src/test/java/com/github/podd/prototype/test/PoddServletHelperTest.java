@@ -30,7 +30,7 @@ public class PoddServletHelperTest
     PoddServletHelper helper = null;
     
     @Before
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         try
         {
@@ -46,7 +46,7 @@ public class PoddServletHelperTest
     }
     
     @After
-    protected void tearDown() throws Exception
+    public void tearDown() throws Exception
     {
         this.helper.tearDown();
     }
