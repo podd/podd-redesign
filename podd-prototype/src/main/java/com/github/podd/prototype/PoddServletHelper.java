@@ -1,6 +1,7 @@
 package com.github.podd.prototype;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 import net.fortytwo.sesametools.URITranslator;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -20,9 +22,12 @@ import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
@@ -68,7 +73,7 @@ public class PoddServletHelper
     
     // private String poddPlantPath;
     
-    public void setUp() throws Exception
+    public void setUp() throws RepositoryException
     {
         // TODO: use an on disk store
         this.nextRepository = new SailRepository(new MemoryStore());
@@ -107,9 +112,13 @@ public class PoddServletHelper
      * The prototype does not yet support uploading of new Schema Ontologies. Therefore, this method
      * should be called at initialization to load the schemas.
      * 
-     * @throws Exception
+     * @throws PoddException
+     * @throws IOException
+     * @throws OpenRDFException
+     * @throws OWLException
+     * 
      */
-    public void loadSchemaOntologies() throws Exception
+    public void loadSchemaOntologies() throws OWLException, OpenRDFException, IOException, PoddException
     {
         final RepositoryConnection nextRepositoryConnection = this.getRepositoryConnection();
         this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
@@ -134,9 +143,13 @@ public class PoddServletHelper
      * @param inputStream
      * @param contentType
      * @return
-     * @throws Exception
+     * @throws PoddException
+     * @throws OWLException
+     * @throws IOException
+     * @throws OpenRDFException
      */
-    public String loadPoddArtifact(final InputStream inputStream, final String contentType) throws Exception
+    public String loadPoddArtifact(final InputStream inputStream, final String contentType) throws OpenRDFException,
+        IOException, OWLException, PoddException
     {
         final InferredOWLOntologyID nextOntology = this.loadPoddArtifactInternal(inputStream, contentType);
         
@@ -154,10 +167,12 @@ public class PoddServletHelper
      * @param inputStream
      * @param mimeType
      * @return
-     * @throws Exception
+     * @throws IOException
+     * @throws RepositoryException
+     * @throws RDFParseException
      */
     public InferredOWLOntologyID loadPoddArtifactInternal(final InputStream inputStream, final String mimeType)
-        throws Exception
+        throws OpenRDFException, IOException, OWLException, PoddException
     {
         this.log.info("ADD artifact: " + mimeType);
         
@@ -249,6 +264,11 @@ public class PoddServletHelper
             return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology
                     .getOntologyID().getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
         }
+        catch(OpenRDFException | OWLException | IOException | PoddException e)
+        {
+            repositoryConnection.rollback();
+            throw e;
+        }
         finally
         {
             this.returnRepositoryConnection(repositoryConnection);
@@ -271,33 +291,33 @@ public class PoddServletHelper
      * 
      * @param artifactUri
      * @return
-     * @throws Exception
      */
     public String getArtifact(final String artifactUri, final String mimeType, final boolean includeInferredStatements)
-        throws Exception
+        throws RepositoryException, RDFHandlerException
     {
         this.log.info("GET artifact: " + artifactUri);
         
         final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
         try
         {
-            final InferredOWLOntologyID ontologyID = this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
+            final InferredOWLOntologyID ontologyID =
+                    this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
             
-            if(ontologyID.getVersionIRI() == null || 
-                    repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
+            if(ontologyID.getVersionIRI() == null
+                    || repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
             {
-                throw new Exception("Artifact <" + artifactUri + "> not found.");
+                repositoryConnection.rollback();
+                throw new RuntimeException("Artifact <" + artifactUri + "> not found.");
             }
             
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final RDFHandler rdfWriter =
                     Rio.createWriter(Rio.getWriterFormatForMIMEType(mimeType, RDFFormat.RDFXML), out);
-
-            if (includeInferredStatements)
+            
+            if(includeInferredStatements)
             {
-                repositoryConnection.export(rdfWriter, 
-                        ontologyID.getVersionIRI().toOpenRDFURI(),
-                        ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+                repositoryConnection.export(rdfWriter, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
+                        .getInferredOntologyIRI().toOpenRDFURI());
             }
             else
             {
@@ -306,6 +326,11 @@ public class PoddServletHelper
             repositoryConnection.rollback();
             
             return out.toString();
+        }
+        catch(RepositoryException | RDFHandlerException e)
+        {
+            repositoryConnection.rollback();
+            throw e;
         }
         finally
         {
@@ -317,19 +342,23 @@ public class PoddServletHelper
      * Delete the specified artifact and all references to it.
      * 
      * @param artifactURI
+     * @throws RepositoryException
+     *             , RDFHandlerException
      */
-    public String deleteArtifact(final String artifactUri) throws Exception
+    public String deleteArtifact(final String artifactUri) throws RepositoryException, RDFHandlerException
     {
         this.log.info("DELETE artifact: " + artifactUri);
         
         final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
         try
         {
-            InferredOWLOntologyID ontologyID = this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
-            if (ontologyID.getVersionIRI() == null ||
-                    repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
+            InferredOWLOntologyID ontologyID =
+                    this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
+            if(ontologyID.getVersionIRI() == null
+                    || repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
             {
-                throw new Exception("Artifact <" + artifactUri + "> not found.");
+                repositoryConnection.rollback();
+                throw new RuntimeException("Artifact <" + artifactUri + "> not found.");
             }
             
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -351,13 +380,18 @@ public class PoddServletHelper
                 repositoryConnection.remove(IRI.create(inferredOnto).toOpenRDFURI(), null, null,
                         this.poddArtifactManagementGraph);
             }
-            repositoryConnection.remove(ontologyID.getOntologyIRI().toOpenRDFURI(), 
-                    null, null, this.poddArtifactManagementGraph);
-            repositoryConnection.remove(ontologyID.getVersionIRI().toOpenRDFURI(),
-                    null, null, this.poddArtifactManagementGraph);
+            repositoryConnection.remove(ontologyID.getOntologyIRI().toOpenRDFURI(), null, null,
+                    this.poddArtifactManagementGraph);
+            repositoryConnection.remove(ontologyID.getVersionIRI().toOpenRDFURI(), null, null,
+                    this.poddArtifactManagementGraph);
             
             repositoryConnection.commit();
             return out.toString();
+        }
+        catch(RepositoryException | RDFHandlerException e)
+        {
+            repositoryConnection.rollback();
+            throw e;
         }
         finally
         {
@@ -394,19 +428,19 @@ public class PoddServletHelper
     {
         final IRI ontologyIRI = IRI.create(artifactUri);
         final RepositoryResult<Statement> repoResult =
-                repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(), null, null, true, 
+                repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(), null, null, true,
                         this.poddArtifactManagementGraph);
-
+        
         IRI ontologyVersionIRI = null;
         IRI ontologyInferredIRI = null;
         while(repoResult.hasNext())
         {
             Statement statement = repoResult.next();
-            if (PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION.equals(statement.getPredicate()))
+            if(PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION.equals(statement.getPredicate()))
             {
                 ontologyInferredIRI = IRI.create(statement.getObject().stringValue());
             }
-            else if (PoddPrototypeUtils.OWL_VERSION_IRI.equals(statement.getPredicate()))
+            else if(PoddPrototypeUtils.OWL_VERSION_IRI.equals(statement.getPredicate()))
             {
                 ontologyVersionIRI = IRI.create(statement.getObject().stringValue());
             }
@@ -476,7 +510,7 @@ public class PoddServletHelper
         return uriPath;
     }
     
-    public void tearDown() throws Exception
+    public void tearDown() throws RepositoryException
     {
         this.nextValueFactory = null;
         
@@ -488,7 +522,8 @@ public class PoddServletHelper
             }
             catch(final RepositoryException e)
             {
-                this.log.info("Test repository could not be shutdown" + e);
+                this.log.error("Test repository could not be shutdown", e);
+                throw e;
             }
         }
         
@@ -524,7 +559,7 @@ public class PoddServletHelper
             }
             catch(final RepositoryException e)
             {
-                // ignore
+                this.log.error("Test repository connection could not be closed", e);
             }
         }
     }

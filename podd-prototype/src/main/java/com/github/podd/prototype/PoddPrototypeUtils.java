@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import net.fortytwo.sesametools.URITranslator;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -28,9 +29,11 @@ import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
+import org.semanticweb.owlapi.io.OWLParserException;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -193,7 +196,7 @@ public class PoddPrototypeUtils
      * @param nextOntology
      *            The ontology to check for consistency.
      * @return An instance of OWLreasoner that was used to check the consistency.
-     * @throws Exception
+     * @throws PoddException
      */
     public OWLReasoner checkConsistency(final OWLOntology nextOntology) throws PoddException
     {
@@ -364,7 +367,6 @@ public class PoddPrototypeUtils
      * @param nextRepositoryConnection
      *            The repository connection to use for storing the ontology and the inferred
      *            statements.
-     * @throws Exception
      * @throws IOException
      * @throws RepositoryException
      * @throws ReasonerInterruptedException
@@ -375,9 +377,8 @@ public class PoddPrototypeUtils
      */
     public InferredOWLOntologyID loadInferAndStoreSchemaOntology(final String ontologyResourcePath,
             final String mimeType, final OWLOntologyID newOWLOntologyID,
-            final RepositoryConnection nextRepositoryConnection) throws Exception, IOException, RepositoryException,
-        ReasonerInterruptedException, TimeOutException, InconsistentOntologyException, OWLOntologyCreationException,
-        OWLOntologyChangeException
+            final RepositoryConnection nextRepositoryConnection) throws OWLException, OpenRDFException, IOException,
+        PoddException
     {
         
         // TODO: Create a version of this method that utilises the
@@ -433,19 +434,10 @@ public class PoddPrototypeUtils
      * @param nextRepositoryConnection
      *            The repository connection to use for storing the ontology and the inferred
      *            statements.
-     * @throws Exception
-     * @throws IOException
-     * @throws RepositoryException
-     * @throws ReasonerInterruptedException
-     * @throws TimeOutException
-     * @throws InconsistentOntologyException
-     * @throws OWLOntologyCreationException
-     * @throws OWLOntologyChangeException
      */
     public InferredOWLOntologyID loadInferAndStoreSchemaOntology(final String ontologyResourcePath,
-            final String mimeType, final RepositoryConnection nextRepositoryConnection) throws Exception, IOException,
-        RepositoryException, ReasonerInterruptedException, TimeOutException, InconsistentOntologyException,
-        OWLOntologyCreationException, OWLOntologyChangeException
+            final String mimeType, final RepositoryConnection nextRepositoryConnection) throws OWLException,
+        OpenRDFException, IOException, PoddException
     {
         OWLOntology nextOntology = null;
         try
@@ -495,10 +487,10 @@ public class PoddPrototypeUtils
      *            An optional varargs array of contexts specifying the contexts to use when loading
      *            the ontology. If this is missing the entire repository will be used.
      * @return An OWLOntology instance populated with the triples from the repository.
-     * @throws Exception
      */
     public OWLOntology loadOntology(final RepositoryConnection conn, final String mimeType, final Resource... contexts)
-        throws Exception
+        throws OpenRDFException, OWLException, IOException, PoddException
+    
     {
         final RioMemoryTripleSource owlSource =
                 new RioMemoryTripleSource(conn.getStatements(null, null, null, true, contexts));
@@ -528,7 +520,8 @@ public class PoddPrototypeUtils
      * @return An OWLOntology instance populated with the triples from the classpath resource.
      * @throws Exception
      */
-    public OWLOntology loadOntology(final String ontologyResource, final String mimeType) throws Exception
+    public OWLOntology loadOntology(final String ontologyResource, final String mimeType)
+        throws OWLOntologyCreationException, PoddException
     {
         final InputStream inputStream = this.getClass().getResourceAsStream(ontologyResource);
         
@@ -562,7 +555,8 @@ public class PoddPrototypeUtils
      * @throws Exception
      */
     public InferredOWLOntologyID loadPoddArtifact(final String artifactResourcePath, final String mimeType,
-            final RepositoryConnection nextRepositoryConnection) throws Exception
+            final RepositoryConnection nextRepositoryConnection) throws OpenRDFException, OWLException, IOException,
+        PoddException
     {
         // load into temporary in memory repository to create persistent URLs
         Repository tempRepository = null;
@@ -638,9 +632,8 @@ public class PoddPrototypeUtils
             startedAt = System.currentTimeMillis();
             final OWLOntology nextInferredOntology =
                     this.computeInferences(reasoner, this.generateInferredOntologyID(nextOntology.getOntologyID()));
-            this.statsLogger.info("computeInferences:,"
-                    + (System.currentTimeMillis() - startedAt) + ",");
-
+            this.statsLogger.info("computeInferences:," + (System.currentTimeMillis() - startedAt) + ",");
+            
             // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
             // Sesame Repository
             // 6. Store the inferred statements
@@ -653,6 +646,10 @@ public class PoddPrototypeUtils
             
             return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology
                     .getOntologyID().getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
+        }
+        catch(OpenRDFException | OWLException | IOException | PoddException e)
+        {
+            throw e;
         }
         finally
         {
@@ -915,6 +912,5 @@ public class PoddPrototypeUtils
     {
         return this.schemaGraph;
     }
-    
     
 }

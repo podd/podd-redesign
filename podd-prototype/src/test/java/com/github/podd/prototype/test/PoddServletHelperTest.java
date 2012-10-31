@@ -214,6 +214,7 @@ public class PoddServletHelperTest
     {
         // first, load an artifact using the inner-load method
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Resource was not found", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
