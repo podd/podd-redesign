@@ -4,10 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.URI;
@@ -25,17 +23,15 @@ import com.github.podd.prototype.InferredOWLOntologyID;
 import com.github.podd.prototype.PoddServlet;
 import com.github.podd.prototype.PoddServletHelper;
 
-public class PoddServletHelperTest extends TestCase
+public class PoddServletHelperTest
 {
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     PoddServletHelper helper = null;
     
-    @Override
     @Before
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
-        super.setUp();
         try
         {
             this.helper = new PoddServletHelper();
@@ -49,11 +45,9 @@ public class PoddServletHelperTest extends TestCase
         }
     }
     
-    @Override
     @After
-    protected void tearDown() throws Exception
+    public void tearDown() throws Exception
     {
-        super.tearDown();
         this.helper.tearDown();
     }
     
