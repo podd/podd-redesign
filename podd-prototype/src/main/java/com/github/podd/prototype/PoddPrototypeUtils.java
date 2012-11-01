@@ -29,7 +29,6 @@ import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
-import org.semanticweb.owlapi.io.OWLParserException;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -224,6 +223,7 @@ public class PoddPrototypeUtils
         
         // Test that the ontology was consistent with this reasoner
         // This ensures in the case of Pellet that it is in the OWL2-DL profile
+        // if(!nextReasoner.isConsistent() || nextReasoner.getUnsatisfiableClasses().getSize() > 0)
         if(!nextReasoner.isConsistent())
         {
             this.removeOntologyFromManager(nextOntology.getOntologyID());
@@ -649,6 +649,7 @@ public class PoddPrototypeUtils
         }
         catch(OpenRDFException | OWLException | IOException | PoddException e)
         {
+            
             throw e;
         }
         finally
@@ -759,8 +760,8 @@ public class PoddPrototypeUtils
     }
     
     /**
-     * This method adds information to the Schema Ontology management graph, and updates the links
-     * for the current version for both the ontology and the inferred ontology.
+     * This method adds information to the PODD artifact management graph, and updates the links for
+     * the current version for both the ontology and the inferred ontology.
      * 
      * @param nextRepositoryConnection
      *            The repository connection to use for updating the code. The schema graph/context
@@ -789,7 +790,10 @@ public class PoddPrototypeUtils
             // 4th (the artifactGraph) is the "context" in which the triple is stored
             nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
             
-            // TODO: remove previous versionIRI statements
+            // remove previous versionIRI statements
+            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, null,
+                    this.artifactGraph);
+            
             // TODO: remove the content of any contexts that are the object of versionIRI statements
             
             // setup a version number link for this version
@@ -815,15 +819,20 @@ public class PoddPrototypeUtils
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
                     nextInferredOntologyUri, this.artifactGraph);
             
-            // TODO: Implement this code to get the statements and then remove the statements
-            // Remove the content for all previous inferred versions
+            // remove the content for all previous inferred versions
             // NOTE: This list should not ever be very large, as we perform this step every time
             // this method is called to update the version
-            // nextRepositoryConnection.getStatements(nextOntologyUri, PODD_BASE_INFERRED_VERSION,
-            // null, false, this.artifactGraph);
+            final RepositoryResult<Statement> repoResults =
+                    nextRepositoryConnection.getStatements(nextOntologyUri,
+                            PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION, null, false, this.artifactGraph);
+            while(repoResults.hasNext())
+            {
+                final URI inferredVersionUri = IRI.create(repoResults.next().getObject().stringValue()).toOpenRDFURI();
+                nextRepositoryConnection.remove(inferredVersionUri, null, null, this.artifactGraph);
+            }
             
-            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    null, this.artifactGraph);
+            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION, null,
+                    this.artifactGraph);
             
             // link from the ontology version IRI to the matching inferred axioms ontology version
             nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,

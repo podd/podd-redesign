@@ -137,7 +137,7 @@ public class PoddServletHelperTest
         // now retrieve it via the Helper
         final String resultRDF = this.helper.getArtifact(artifactUniqueIRI.toString(), mimeType, true);
         
-        // validate inferred statements 
+        // validate inferred statements
         Assert.assertNotNull(resultRDF);
         Assert.assertFalse(resultRDF.contains("urn:temp:"));
         Assert.assertTrue(resultRDF.contains(artifactUniqueIRI.toString()));
@@ -192,21 +192,88 @@ public class PoddServletHelperTest
         }
     }
     
-    private RepositoryConnection loadDataToNewRepository(final String data, final String mimeType, final URI context)
-        throws Exception
+    @Test
+    public void testEditArtifactWithMerge() throws Exception
     {
-        // create a temporary Repository
-        final Repository tempRepository = new SailRepository(new MemoryStore());
-        tempRepository.initialize();
-        final RepositoryConnection tempRepositoryConnection = tempRepository.getConnection();
-        tempRepositoryConnection.setAutoCommit(false);
+        final boolean isReplace = false;
+        // first, load an artifact using the inner-load method
+        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
-        // add data to Repository
-        tempRepositoryConnection.add(new ByteArrayInputStream(data.getBytes()), "",
-                Rio.getParserFormatForMIMEType(mimeType), context);
-        tempRepositoryConnection.commit();
+        // edit it
+        in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1-part.rdf");
+        Assert.assertNotNull("Resource was not found", in);
         
-        return tempRepositoryConnection;
+        final String editedArtifactURI =
+                this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace);
+        
+        // check the modifications were persisted
+        final String resultRDF = this.helper.getArtifact(editedArtifactURI, mimeType, false);
+        // System.out.println(resultRDF);
+        
+        Assert.assertNotNull(resultRDF);
+        Assert.assertFalse(resultRDF.contains("urn:temp:"));
+        Assert.assertTrue(resultRDF.contains(artifactUniqueIRI.toString()));
+        Assert.assertTrue(resultRDF.contains("John.Doe@csiro.au"));
+        final URI context = IRI.create("urn:context").toOpenRDFURI();
+        final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
+        
+        // with merge, the "OWL Comment" from the ontology is retained
+        Assert.assertEquals(33, repoConn.size(context));
+    }
+    
+    @Test
+    public void testEditArtifactWithReplace() throws Exception
+    {
+        final boolean isReplace = true;
+        // first, load an artifact using the inner-load method
+        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
+        
+        // edit it
+        in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1-part.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        
+        final String editedArtifactURI =
+                this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace);
+        
+        // check the modifications were persisted
+        final String resultRDF = this.helper.getArtifact(editedArtifactURI, mimeType, false);
+        // System.out.println(resultRDF);
+        
+        Assert.assertNotNull(resultRDF);
+        Assert.assertFalse(resultRDF.contains("urn:temp:"));
+        Assert.assertTrue(resultRDF.contains(artifactUniqueIRI.toString()));
+        Assert.assertTrue(resultRDF.contains("John.Doe@csiro.au"));
+        final URI context = IRI.create("urn:context").toOpenRDFURI();
+        final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
+        
+        // with replace, the "OWL Comment" from the ontology is removed
+        Assert.assertEquals(32, repoConn.size(context));
+    }
+    
+    @Test
+    public void testIncrementVersion() throws Exception
+    {
+        final String[] in =
+                { "", "abc", "alpha:1", "http://example.org/ac-d/art%3A55", "http://example.org/ac-d/art%3A99999",
+                        "http://example.org/permanenturl/431fd79a-7c8d-487c-9df5-09f4cd386249/artifact%3Aversion%3A1" };
+        final String[] expected =
+                { "1", "abc1", "alpha:11", "http://example.org/ac-d/art%3A56", "http://example.org/ac-d/art%3A100000",
+                        "http://example.org/permanenturl/431fd79a-7c8d-487c-9df5-09f4cd386249/artifact%3Aversion%3A2" };
+        
+        for(int i = 0; i < in.length; i++)
+        {
+            final String extracted = PoddServletHelper.incrementVersion(in[i]);
+            Assert.assertEquals(expected[i], extracted);
+        }
+        
     }
     
     @Test
@@ -220,15 +287,15 @@ public class PoddServletHelperTest
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         final RepositoryConnection conn = this.helper.getRepositoryConnection();
-
+        
         // test with a non-existent artifact
         InferredOWLOntologyID id = this.helper.getInferredOWLOntologyIDForArtifact("http://nosuch:ontology:1", conn);
         Assert.assertNull(id.getInferredOntologyIRI());
         Assert.assertNull(id.getVersionIRI());
-
+        
         // test with the added artifact
         id = this.helper.getInferredOWLOntologyIDForArtifact(artifactUniqueIRI.stringValue(), conn);
-
+        
         conn.rollback();
         this.helper.returnRepositoryConnection(conn);
     }
@@ -263,6 +330,25 @@ public class PoddServletHelperTest
         {
             Assert.assertNotNull(e);
         }
+    }
+    
+    // ----- helper methods -----
+    
+    private RepositoryConnection loadDataToNewRepository(final String data, final String mimeType, final URI context)
+        throws Exception
+    {
+        // create a temporary Repository
+        final Repository tempRepository = new SailRepository(new MemoryStore());
+        tempRepository.initialize();
+        final RepositoryConnection tempRepositoryConnection = tempRepository.getConnection();
+        tempRepositoryConnection.setAutoCommit(false);
+        
+        // add data to Repository
+        tempRepositoryConnection.add(new ByteArrayInputStream(data.getBytes()), "",
+                Rio.getParserFormatForMIMEType(mimeType), context);
+        tempRepositoryConnection.commit();
+        
+        return tempRepositoryConnection;
     }
     
 }

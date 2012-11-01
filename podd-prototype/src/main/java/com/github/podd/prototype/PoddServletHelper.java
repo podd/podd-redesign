@@ -1,20 +1,24 @@
 package com.github.podd.prototype;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import net.fortytwo.sesametools.URITranslator;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -65,8 +69,6 @@ public class PoddServletHelper
     private URI schemaOntologyManagementGraph;
     private URI poddArtifactManagementGraph;
     private IRI pelletOwlProfile;
-    private URI owlVersionIRI;
-    private URI owlInferredVersionIRI;
     
     private String poddBasePath;
     private String poddSciencePath;
@@ -102,10 +104,6 @@ public class PoddServletHelper
         this.poddSciencePath = "/ontologies/poddScience.owl";
         // this.poddPlantPath = "/ontologies/poddPlant.owl";
         
-        this.owlVersionIRI = this.nextValueFactory.createURI(OWL.NAMESPACE, "versionIRI");
-        this.owlInferredVersionIRI =
-                this.nextValueFactory.createURI("http://purl.org/podd/ns/poddBase#inferredVersion");
-        
     }
     
     /**
@@ -127,12 +125,6 @@ public class PoddServletHelper
         this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 nextRepositoryConnection);
         
-        // XXXX: adding a test artifact to debug the GET process
-        // final InferredOWLOntologyID poddArtifact =
-        // this.utils.loadPoddArtifact("/artifacts/basicProject-1.rdf",
-        // RDFFormat.RDFXML.getDefaultMIMEType(), this.getNextRepositoryConnection());
-        //
-        // this.log.info("Loaded a single artifact: " + poddArtifact.toString());
         this.returnRepositoryConnection(nextRepositoryConnection);
     }
     
@@ -159,10 +151,17 @@ public class PoddServletHelper
     /**
      * TODO: Copied from PoddPrototypeUtils. Needs to be checked and modified for the web service
      * 
-     * Loading an artifact consists of several steps. - Assign permanent URIs to any that have
-     * temporary values - Fix imported ontologies to import their current versions - Check
-     * consistency of ontology - Compute inferences - Store asserted and inferred ontologies in
-     * Repository
+     * Loading an artifact consists of several steps.
+     * 
+     * - Assign permanent URIs to any that have temporary values
+     * 
+     * - Fix imported ontologies to import their current versions
+     * 
+     * - Check consistency of ontology
+     * 
+     * - Compute inferences
+     * 
+     * - Store asserted and inferred ontologies in Repository
      * 
      * @param inputStream
      * @param mimeType
@@ -287,10 +286,16 @@ public class PoddServletHelper
     /**
      * Get the specified artifact if it exists inside PODD.
      * 
-     * TODO: include inferred statements if requested
-     * 
      * @param artifactUri
-     * @return
+     *            Identifies the requested artifact.
+     * @param mimeType
+     *            The MIME-type in which the artifact should be returned in.
+     * @param includeInferredStatements
+     *            If true, inferred statements for this artifact should also be returned.
+     * @return The artifact serialized in the requested mime type.
+     * 
+     * @throws RepositoryException
+     * @throws RDFHandlerException
      */
     public String getArtifact(final String artifactUri, final String mimeType, final boolean includeInferredStatements)
         throws RepositoryException, RDFHandlerException
@@ -352,7 +357,7 @@ public class PoddServletHelper
         final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
         try
         {
-            InferredOWLOntologyID ontologyID =
+            final InferredOWLOntologyID ontologyID =
                     this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
             if(ontologyID.getVersionIRI() == null
                     || repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
@@ -403,16 +408,181 @@ public class PoddServletHelper
     /**
      * Allows a part of the artifact to be modified
      * 
-     * @param artifactURI
+     * @param artifactUri
      * @param in
      * @param contentType
+     * @param isReplace
+     * @return
+     * @throws IOException
+     * @throws PoddException
+     * @throws OWLException
+     * @throws OpenRDFException
+     */
+    public String editArtifact(final String artifactUri, final InputStream in, final String contentType,
+            final boolean isReplace) throws IOException, OpenRDFException, OWLException, PoddException
+    {
+        this.log.info("EDIT artifact: " + artifactUri);
+        
+        final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        Repository tempRepository = null;
+        RepositoryConnection tempRepositoryConnection = null;
+        
+        try
+        {
+            // get the artifact's IDs
+            final InferredOWLOntologyID ontologyID =
+                    this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
+            if(ontologyID.getVersionIRI() == null
+                    || repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
+            {
+                repositoryConnection.rollback();
+                throw new RuntimeException("Artifact <" + artifactUri + "> not found.");
+            }
+            
+            final URI context = ontologyID.getVersionIRI().toOpenRDFURI();
+            final URI inferredContext = ontologyID.getInferredOntologyIRI().toOpenRDFURI();
+            
+            // create a temporary in-memory repository
+            tempRepository = new SailRepository(new MemoryStore());
+            tempRepository.initialize();
+            tempRepositoryConnection = tempRepository.getConnection();
+            tempRepositoryConnection.setAutoCommit(false);
+            
+            // load and copy the artifact's asserted statements to the temporary store
+            final RepositoryResult<Statement> repoResult =
+                    repositoryConnection.getStatements(null, null, null, false, context);
+            tempRepositoryConnection.add(repoResult, context);
+            
+            if(isReplace)
+            {
+                // create an intermediate context and add "edit" statements to it
+                final URI intContext = IRI.create("urn:intermediate:").toOpenRDFURI();
+                tempRepositoryConnection.add(in, "", Rio.getParserFormatForMIMEType(contentType), intContext);
+                
+                // get all Subjects in "edit" statements
+                final RepositoryResult<Statement> statements =
+                        tempRepositoryConnection.getStatements(null, null, null, false, intContext);
+                final List<Statement> allEditStatements = Iterations.addAll(statements, new ArrayList<Statement>());
+                
+                // remove all references to these Subjects in "main" context
+                for(final Statement statement : allEditStatements)
+                {
+                    tempRepositoryConnection.remove(statement.getSubject(), null, null, context);
+                }
+                
+                // copy the "edit" statements from intermediate context into our "main" context
+                tempRepositoryConnection.add(
+                        tempRepositoryConnection.getStatements(null, null, null, false, intContext), context);
+            }
+            else
+            {
+                tempRepositoryConnection.add(in, "", Rio.getParserFormatForMIMEType(contentType), context);
+            }
+            
+            final String uniqueUriString = artifactUri.substring(0, artifactUri.lastIndexOf("/"));
+            
+            URITranslator.doTranslation(tempRepositoryConnection, "urn:temp:", uniqueUriString + "/", context);
+            
+            tempRepositoryConnection.commit();
+            
+            // increment the version
+            final URI newVersionURI =
+                    IRI.create(PoddServletHelper.incrementVersion(context.stringValue())).toOpenRDFURI();
+            
+            URITranslator.doTranslation(tempRepositoryConnection, context.stringValue(), newVersionURI.stringValue(),
+                    context);
+            
+            // load into OWLAPI
+            this.log.info("Loading podd artifact from temp repository: {}", context);
+            final OWLOntology nextOntology =
+                    this.utils.loadOntology(tempRepositoryConnection, RDFFormat.RDFXML.getDefaultMIMEType(), context);
+            
+            // regain memory after loading the ontology into OWLAPI
+            tempRepositoryConnection.clear();
+            
+            // 2. Validate the object in terms of the OWL profile
+            // 3. Validate the object using a reasoner
+            final OWLReasoner reasoner = this.utils.checkConsistency(nextOntology);
+            
+            // 4. Store the object
+            this.utils.dumpOntologyToRepository(nextOntology, repositoryConnection);
+            
+            // 5. Infer extra statements about the object using a reasoner
+            this.log.info("Computing inferences for podd artifact");
+            final OWLOntology nextInferredOntology =
+                    this.utils.computeInferences(reasoner,
+                            this.utils.generateInferredOntologyID(nextOntology.getOntologyID()));
+            
+            // Dump the triples from the inferred axioms into a separate SPARQL Graph/Context in the
+            // Sesame Repository
+            // 6. Store the inferred statements
+            this.utils.dumpOntologyToRepository(nextInferredOntology, repositoryConnection);
+            
+            // update the PODD artifact management graph with links to the new version of the
+            // artifact
+            this.utils.updateCurrentManagedPoddArtifactOntologyVersion(repositoryConnection,
+                    nextOntology.getOntologyID(), nextInferredOntology.getOntologyID());
+            
+            repositoryConnection.commit();
+            
+            // delete the earlier version from the store
+            // NOTE: deleting and computing inferences should be scheduled on a separate thread
+            repositoryConnection.clear(context);
+            repositoryConnection.clear(inferredContext);
+            repositoryConnection.commit();
+            
+        }
+        finally
+        {
+            repositoryConnection.rollback(); // OR commit
+            this.returnRepositoryConnection(repositoryConnection);
+            
+            this.returnRepositoryConnection(repositoryConnection);
+            if(tempRepositoryConnection != null)
+            {
+                tempRepositoryConnection.rollback();
+                tempRepositoryConnection.close();
+            }
+            if(tempRepository != null)
+            {
+                tempRepository.shutDown();
+            }
+        }
+        
+        return artifactUri;
+    }
+    
+    /**
+     * This method takes a URL encoded String terminating with a colon (encoded as %3A) followed by
+     * an integer and increments this integer by one. If the input String is not of the expected
+     * format, incrementing is carried out by simply appending "1" to the end of the String.
+     * 
+     * E.g.: "http://purl.org/abcd/artifact%3A25" is converted to
+     * "http://purl.org/abcd/artifact%3A26"
+     * 
+     * @param oldVersion
      * @return
      */
-    public String editArtifact(final String artifactURI, final InputStream in, final String contentType)
+    public static String incrementVersion(final String oldVersion)
     {
-        // TODO
-        this.log.info("EDIT artifact: " + artifactURI);
-        return artifactURI;
+        final int positionVersionSeparator = oldVersion.lastIndexOf("%3A");
+        if(positionVersionSeparator < 1)
+        {
+            return oldVersion.concat("1");
+        }
+        final String prefix = oldVersion.substring(0, positionVersionSeparator);
+        final String version = oldVersion.substring(positionVersionSeparator + 3);
+        
+        try
+        {
+            int versionInt = Integer.parseInt(version);
+            versionInt++;
+            return prefix + "%3A" + versionInt;
+        }
+        catch(final NumberFormatException e)
+        {
+            return oldVersion.concat("1");
+        }
     }
     
     /**
@@ -435,7 +605,7 @@ public class PoddServletHelper
         IRI ontologyInferredIRI = null;
         while(repoResult.hasNext())
         {
-            Statement statement = repoResult.next();
+            final Statement statement = repoResult.next();
             if(PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION.equals(statement.getPredicate()))
             {
                 ontologyInferredIRI = IRI.create(statement.getObject().stringValue());
@@ -562,6 +732,22 @@ public class PoddServletHelper
                 this.log.error("Test repository connection could not be closed", e);
             }
         }
+    }
+    
+    public RepositoryConnection loadDataToNewRepository(final InputStream in, final String mimeType,
+            final Resource... context) throws Exception
+    {
+        // create a temporary Repository
+        final Repository tempRepository = new SailRepository(new MemoryStore());
+        tempRepository.initialize();
+        final RepositoryConnection tempRepositoryConnection = tempRepository.getConnection();
+        tempRepositoryConnection.setAutoCommit(false);
+        
+        // add data to Repository
+        tempRepositoryConnection.add(in, "", Rio.getParserFormatForMIMEType(mimeType), context);
+        tempRepositoryConnection.commit();
+        
+        return tempRepositoryConnection;
     }
     
     private void printGraph(final URI context, final RepositoryConnection con)

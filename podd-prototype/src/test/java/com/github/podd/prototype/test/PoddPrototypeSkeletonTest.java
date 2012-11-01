@@ -12,6 +12,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
@@ -734,14 +735,14 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
                     this.utils.loadPoddArtifact("/test/artifacts/basicProject-1.rdf",
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
-            log.info("About to load second version of ontology");
+            this.log.info("About to load second version of ontology");
             
             // load poddScience v2 which allows 2 lead institutions
             final InferredOWLOntologyID scienceV2 =
                     this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-2LeadInstitutions.owl",
                             RDFFormat.RDFXML.getDefaultMIMEType(), this.getTestRepositoryConnection());
             
-            log.info("About to load second second artifact which would have been inconsistent without the second version");
+            this.log.info("About to load second second artifact which would have been inconsistent without the second version");
             
             // load artifact 2 which has 2 lead institutions
             poddArtifact2 =
@@ -781,6 +782,75 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         }
     }
     
+    @Test
+    public void testUpdateCurrentManagedPoddArtifactOntologyVersion() throws Exception
+    {
+        final IRI artifact1 = IRI.create("http://purl.org/abc-def/artifact:1");
+        final IRI artifactVersion1 = IRI.create("http://purl.org/abc-def/artifact:1:version:1");
+        final IRI inferredArtifactVersion1 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:1");
+        
+        // first version
+        OWLOntologyID nextOntologyID = new OWLOntologyID(artifact1, artifactVersion1);
+        OWLOntologyID nextInferredOntologyID =
+                new OWLOntologyID(inferredArtifactVersion1,
+                        IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:1"));
+        this.utils.updateCurrentManagedPoddArtifactOntologyVersion(this.getTestRepositoryConnection(), nextOntologyID,
+                nextInferredOntologyID);
+        
+        // verify version statement exists
+        RepositoryResult<Statement> results =
+                this.getTestRepositoryConnection().getStatements(artifact1.toOpenRDFURI(),
+                        PoddPrototypeUtils.OMV_CURRENT_VERSION, null, false, this.poddArtifactManagementGraph);
+        while(results.hasNext())
+        {
+            Assert.assertEquals(artifactVersion1.toString(), results.next().getObject().toString());
+        }
+        
+        // update to second version
+        final IRI artifactVersion2 = IRI.create("http://purl.org/abc-def/artifact:1:version:2");
+        nextOntologyID = new OWLOntologyID(IRI.create("http://purl.org/abc-def/artifact:1"), artifactVersion2);
+        nextInferredOntologyID =
+                new OWLOntologyID(IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:2"),
+                        IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:2"));
+        
+        this.utils.updateCurrentManagedPoddArtifactOntologyVersion(this.getTestRepositoryConnection(), nextOntologyID,
+                nextInferredOntologyID);
+        
+        // verify version statement now refers to new version
+        results =
+                this.getTestRepositoryConnection().getStatements(artifact1.toOpenRDFURI(),
+                        PoddPrototypeUtils.OMV_CURRENT_VERSION, null, false, this.poddArtifactManagementGraph);
+        while(results.hasNext())
+        {
+            Assert.assertEquals(artifactVersion2.toString(), results.next().getObject().toString());
+        }
+        
+        // verify that version1 is no longer referenced
+        results =
+                this.getTestRepositoryConnection().getStatements(artifactVersion1.toOpenRDFURI(), null, null, false,
+                        this.poddArtifactManagementGraph);
+        if(results.hasNext())
+        {
+            Assert.fail("References to old version still exist in Artifact Graph");
+        }
+        results =
+                this.getTestRepositoryConnection().getStatements(inferredArtifactVersion1.toOpenRDFURI(), null, null,
+                        false, this.poddArtifactManagementGraph);
+        if(results.hasNext())
+        {
+            Assert.fail("References to old version still exist in Artifact Graph");
+        }
+        
+        results =
+                this.getTestRepositoryConnection().getStatements(inferredArtifactVersion1.toOpenRDFURI(), null, null,
+                        false, this.poddArtifactManagementGraph);
+        if(results.hasNext())
+        {
+            Assert.fail("References to old version still exist in Artifact Graph");
+        }
+        
+    }
+    
     // ///////////////////// some helper methods for debugging////////////////////////
     
     private void printSummary(final InferredOWLOntologyID ontoID) throws Exception
@@ -814,6 +884,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     
     private void printGraph(final URI context)
     {
+        System.out.println("===== Print Graph :" + context + "=====");
         org.openrdf.repository.RepositoryResult<Statement> results;
         try
         {

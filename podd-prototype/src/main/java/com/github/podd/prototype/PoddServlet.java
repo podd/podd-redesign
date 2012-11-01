@@ -75,10 +75,17 @@ public class PoddServlet extends PoddBaseServlet
             this.log.info("EDIT artifact");
             try
             {
-                final String artifactURI = PoddServletHelper.extractUri(pathInfo.substring(14));
+                boolean isReplace = false;
+                if(pathInfo.substring(15, 16).equals("r"))
+                {
+                    isReplace = true;
+                }
+
+                
+                final String artifactURI = PoddServletHelper.extractUri(pathInfo.substring(17));
                 final InputStream in = request.getInputStream();
                 final String contentType = PoddServlet.MIME_TYPE_RDF_XML; // request.getContentType();
-                final String editedURI = PoddBaseServlet.helper.editArtifact(artifactURI, in, contentType);
+                final String editedURI = PoddBaseServlet.helper.editArtifact(artifactURI, in, contentType, isReplace);
                 response.setContentType(PoddServlet.MIME_TYPE_JSON);
                 out.write(editedURI); // should be in JSON
             }
