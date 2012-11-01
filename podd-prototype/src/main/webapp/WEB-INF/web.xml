@@ -4,6 +4,9 @@
 
 <web-app>
     <display-name>Archetype Created Web Application</display-name>
+    <listener>
+        <listener-class>com.github.podd.prototype.PoddServletContextListener</listener-class>
+    </listener>
     <context-param>
         <param-name>passwdfile</param-name>
         <param-value>/var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/passwd</param-value>

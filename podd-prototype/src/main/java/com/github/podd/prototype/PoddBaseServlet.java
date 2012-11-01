@@ -27,43 +27,9 @@ public abstract class PoddBaseServlet extends HttpServlet
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
-    protected static PoddServletHelper helper = null;
-    
     public PoddBaseServlet()
     {
         super();
-    }
-    
-    @Override
-    public void init()
-    {
-        this.log.info("------------ Initializing PODD Prototype Web Service -------------");
-        PoddBaseServlet.helper = new PoddServletHelper();
-        try
-        {
-            PoddBaseServlet.helper.setUp();
-            PoddBaseServlet.helper.loadSchemaOntologies();
-        }
-        catch(final Exception e)
-        {
-            this.log.error("Failed to setup Servlet Helper", e);
-            e.printStackTrace();
-        }
-    }
-    
-    @Override
-    public void destroy()
-    {
-        this.log.info("====== TERMINATING PODD .....");
-        try
-        {
-            PoddBaseServlet.helper.tearDown();
-        }
-        catch(final Exception e)
-        {
-            this.log.error("Failed to clean up Servlet Helper", e);
-            e.printStackTrace();
-        }
     }
     
     /**

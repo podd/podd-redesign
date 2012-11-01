@@ -43,6 +43,11 @@ public class PoddServlet extends PoddBaseServlet
         {
             return;
         }
+        
+        final PoddServletHelper helper =
+                (PoddServletHelper)request.getServletContext().getAttribute(
+                        PoddServletContextListener.PODD_SERVLET_HELPER);
+        
         final PrintWriter out = response.getWriter();
         
         final String pathInfo = request.getPathInfo();
@@ -57,7 +62,7 @@ public class PoddServlet extends PoddBaseServlet
             final String contentType = PoddServlet.MIME_TYPE_RDF_XML;// request.getContentType();
             try
             {
-                final String loadedArtifactContent = PoddBaseServlet.helper.loadPoddArtifact(in, contentType);
+                final String loadedArtifactContent = helper.loadPoddArtifact(in, contentType);
                 response.setContentType(PoddServlet.MIME_TYPE_RDF_XML);
                 out.write(loadedArtifactContent);
             }
@@ -80,12 +85,11 @@ public class PoddServlet extends PoddBaseServlet
                 {
                     isReplace = true;
                 }
-
                 
                 final String artifactURI = PoddServletHelper.extractUri(pathInfo.substring(17));
                 final InputStream in = request.getInputStream();
                 final String contentType = PoddServlet.MIME_TYPE_RDF_XML; // request.getContentType();
-                final String editedURI = PoddBaseServlet.helper.editArtifact(artifactURI, in, contentType, isReplace);
+                final String editedURI = helper.editArtifact(artifactURI, in, contentType, isReplace);
                 response.setContentType(PoddServlet.MIME_TYPE_JSON);
                 out.write(editedURI); // should be in JSON
             }
@@ -112,7 +116,7 @@ public class PoddServlet extends PoddBaseServlet
                 final String artifactURI = PoddServletHelper.extractUri(pathInfo.substring(12));
                 response.setContentType(PoddServlet.MIME_TYPE_RDF_XML);
                 final String rdfContent =
-                        PoddBaseServlet.helper.getArtifact(artifactURI, PoddServlet.MIME_TYPE_RDF_XML, includeInferred);
+                        helper.getArtifact(artifactURI, PoddServlet.MIME_TYPE_RDF_XML, includeInferred);
                 out.write(rdfContent);
             }
             catch(final Exception e)
@@ -129,7 +133,7 @@ public class PoddServlet extends PoddBaseServlet
             try
             {
                 final String artifactURI = PoddServletHelper.extractUri(pathInfo.substring(10));
-                PoddBaseServlet.helper.deleteArtifact(artifactURI);
+                helper.deleteArtifact(artifactURI);
                 out.write("Successfully deleted " + artifactURI);
             }
             catch(final Exception e)
