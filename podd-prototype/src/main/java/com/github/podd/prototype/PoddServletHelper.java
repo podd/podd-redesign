@@ -116,13 +116,16 @@ public class PoddServletHelper
      */
     public void loadSchemaOntologies() throws OWLException, OpenRDFException, IOException, PoddException
     {
+        
         final RepositoryConnection nextRepositoryConnection = this.getRepositoryConnection();
+        this.log.info("loading schema ontology: PODD-BASE");
         this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 nextRepositoryConnection);
         
+        this.log.info("loading schema ontology: PODD-SCIENCE");
         this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 nextRepositoryConnection);
-        
+        this.log.info("schema ontology loading complete");
         this.returnRepositoryConnection(nextRepositoryConnection);
     }
     
