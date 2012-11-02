@@ -24,7 +24,6 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
@@ -76,29 +75,29 @@ public class PoddServletHelper
     
     // private String poddPlantPath;
     
-    public void setUp(Repository repository) throws RepositoryException
+    public void setUp(final Repository repository) throws RepositoryException
     {
-        this.log.info("... setUp ... valueFactory");
+        this.log.info("setUp ... valueFactory");
         this.nextRepository = repository;
         this.nextValueFactory = this.nextRepository.getValueFactory();
         
         // create the manager to use for the test
-        this.log.info("... setUp ... OWLOntologyManager");
+        this.log.info("setUp ... OWLOntologyManager");
         this.manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         
         // We're only supporting OWL2_DL and Pellet in this prototype
-        this.log.info("... setUp ... ReasonerFactory");
+        this.log.info("setUp ... ReasonerFactory");
         this.reasonerName = "Pellet";
         this.reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(this.reasonerName);
         
         this.pelletOwlProfile = OWLProfile.OWL2_DL;
         
-        this.log.info("... setUp ... graphs");
+        this.log.info("setUp ... graphs");
         this.schemaOntologyManagementGraph =
                 this.nextValueFactory.createURI("urn:test:schemaOntologiesManagementGraph");
         this.poddArtifactManagementGraph = this.nextValueFactory.createURI("urn:test:poddArtifactManagementGraph");
         
-        this.log.info("... setUp PoddPrototypeUtils");
+        this.log.info("setUp ... PoddPrototypeUtils");
         this.utils =
                 new PoddPrototypeUtils(this.manager, this.pelletOwlProfile, this.reasonerFactory,
                         this.schemaOntologyManagementGraph, this.poddArtifactManagementGraph);
@@ -107,7 +106,7 @@ public class PoddServletHelper
         this.poddSciencePath = "/ontologies/poddScience.owl";
         // this.poddPlantPath = "/ontologies/poddPlant.owl";
         
-        this.log.info("... setUp completed");
+        this.log.info("setUp ... completed");
     }
     
     /**
@@ -124,14 +123,14 @@ public class PoddServletHelper
     {
         
         final RepositoryConnection nextRepositoryConnection = this.getRepositoryConnection();
-        this.log.info("loading schema ontology: PODD-BASE");
+        this.log.info("loadSchemaOntology ... PODD-BASE");
         this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 nextRepositoryConnection);
         
-        this.log.info("loading schema ontology: PODD-SCIENCE");
+        this.log.info("loadSchemaOntology ... PODD-SCIENCE");
         this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 nextRepositoryConnection);
-        this.log.info("schema ontology loading complete");
+        this.log.info("loadSchemaOntology ... completed");
         this.returnRepositoryConnection(nextRepositoryConnection);
     }
     

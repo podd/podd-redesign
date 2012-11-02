@@ -75,18 +75,25 @@ public class PoddServlet extends PoddBaseServlet
             }
         }
         
-        else if(PoddBaseServlet.HTTP_POST.equals(httpMethod) && pathInfo.startsWith("/artifact/edit/"))
+        else if(PoddBaseServlet.HTTP_POST.equals(httpMethod) && (pathInfo.startsWith("/artifact/edit/replace/") ||
+                pathInfo.startsWith("/artifact/edit/merge/")))
         {
             this.log.info("EDIT artifact");
             try
             {
+                String artifactURI = null;
                 boolean isReplace = false;
-                if(pathInfo.substring(15, 16).equals("r"))
+                if(pathInfo.startsWith("/artifact/edit/merge/"))
+                {
+                    isReplace = false;
+                    artifactURI = PoddServletHelper.extractUri(pathInfo.substring(21));
+                }
+                else
                 {
                     isReplace = true;
+                    artifactURI = PoddServletHelper.extractUri(pathInfo.substring(23));
                 }
                 
-                final String artifactURI = PoddServletHelper.extractUri(pathInfo.substring(17));
                 final InputStream in = request.getInputStream();
                 final String contentType = PoddServlet.MIME_TYPE_RDF_XML; // request.getContentType();
                 final String editedURI = helper.editArtifact(artifactURI, in, contentType, isReplace);
@@ -102,18 +109,24 @@ public class PoddServlet extends PoddBaseServlet
         }
         
         else if(PoddBaseServlet.HTTP_GET.equals(httpMethod)
-                && (pathInfo.startsWith("/artifact/t/") || pathInfo.startsWith("/artifact/f/")))
+                && (pathInfo.startsWith("/artifact/base/") || pathInfo.startsWith("/artifact/inferred/")))
         {
             this.log.info("GET artifact");
             try
             {
                 boolean includeInferred = false;
-                if(pathInfo.substring(10, 11).equals("t"))
+                String artifactURI = null;
+                if(pathInfo.startsWith("/artifact/base/"))
+                {
+                    includeInferred = false;
+                    artifactURI = PoddServletHelper.extractUri(pathInfo.substring(15));
+                }
+                else
                 {
                     includeInferred = true;
+                    artifactURI = PoddServletHelper.extractUri(pathInfo.substring(19));
                 }
                 
-                final String artifactURI = PoddServletHelper.extractUri(pathInfo.substring(12));
                 response.setContentType(PoddServlet.MIME_TYPE_RDF_XML);
                 final String rdfContent =
                         helper.getArtifact(artifactURI, PoddServlet.MIME_TYPE_RDF_XML, includeInferred);

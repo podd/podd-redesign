@@ -7,7 +7,8 @@
 	<META NAME="AUTHOR" CONTENT="Kutila ">
 	<META NAME="CREATED" CONTENT="20121102;9090300">
 	<META NAME="CHANGEDBY" CONTENT="Kutila ">
-	<META NAME="CHANGED" CONTENT="20121102;11183900">
+	<META NAME="CHANGED" CONTENT="20121102;14324600">
+	<META NAME="CHANGEDBY" CONTENT="Kutila ">
 </HEAD>
 <BODY LANG="en-AU" DIR="LTR">
 <H1>PODD Prototype Web Service</H1>
@@ -15,220 +16,211 @@
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><B>Login Service</B></P>
-<DIV ALIGN=LEFT>
-	<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
-		<COL WIDTH=110>
-		<COL WIDTH=241>
-		<COL WIDTH=321>
-		<COL WIDTH=243>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>HTTP Method</B></P>
-			</TD>
-			<TD WIDTH=241 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>URL</B></P>
-			</TD>
-			<TD WIDTH=321 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>Parameters</B></P>
-			</TD>
-			<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
-				<P ALIGN=CENTER><B>Response</B></P>
-			</TD>
-		</TR>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>POST</P>
-			</TD>
-			<TD WIDTH=241 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>http://&lt;server&gt;/artifact/login</P>
-			</TD>
-			<TD WIDTH=321 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>username, password 
-				</P>
-			</TD>
-			<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-				<P>HTTP status code 200 with session information as a cookie</P>
-			</TD>
-		</TR>
-	</TABLE>
-</DIV>
+<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
+	<COL WIDTH=110>
+	<COL WIDTH=241>
+	<COL WIDTH=321>
+	<COL WIDTH=243>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>HTTP Method</B></P>
+		</TD>
+		<TD WIDTH=241 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>URL</B></P>
+		</TD>
+		<TD WIDTH=321 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>Parameters</B></P>
+		</TD>
+		<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
+			<P ALIGN=CENTER><B>Response</B></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>POST</P>
+		</TD>
+		<TD WIDTH=241 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>http://&lt;server&gt;/artifact/login</P>
+		</TD>
+		<TD WIDTH=321 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>username, password 
+			</P>
+		</TD>
+		<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
+			<P>HTTP status code 200 with session information as a cookie</P>
+		</TD>
+	</TR>
+</TABLE>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><B>Add Artifact Service</B></P>
-<DIV ALIGN=LEFT>
-	<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
-		<COL WIDTH=110>
-		<COL WIDTH=241>
-		<COL WIDTH=321>
-		<COL WIDTH=243>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>HTTP Method</B></P>
-			</TD>
-			<TD WIDTH=241 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>URL</B></P>
-			</TD>
-			<TD WIDTH=321 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>Parameters</B></P>
-			</TD>
-			<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
-				<P ALIGN=CENTER><B>Response</B></P>
-			</TD>
-		</TR>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>POST</P>
-			</TD>
-			<TD WIDTH=241 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>http://&lt;server&gt;/artifact/new</P>
-			</TD>
-			<TD WIDTH=321 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>Artifact content in request body. Currently supports RDF/XML
-				only.</P>
-			</TD>
-			<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-				<P>The artifact as stored in PODD is returned.</P>
-			</TD>
-		</TR>
-	</TABLE>
-</DIV>
+<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
+	<COL WIDTH=110>
+	<COL WIDTH=241>
+	<COL WIDTH=321>
+	<COL WIDTH=243>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>HTTP Method</B></P>
+		</TD>
+		<TD WIDTH=241 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>URL</B></P>
+		</TD>
+		<TD WIDTH=321 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>Parameters</B></P>
+		</TD>
+		<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
+			<P ALIGN=CENTER><B>Response</B></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>POST</P>
+		</TD>
+		<TD WIDTH=241 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>http://&lt;server&gt;/artifact/new</P>
+		</TD>
+		<TD WIDTH=321 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>Artifact content in request body. Currently supports RDF/XML
+			only.</P>
+		</TD>
+		<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
+			<P>The artifact as stored in PODD is returned.</P>
+		</TD>
+	</TR>
+</TABLE>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><B>Get Artifact Service</B></P>
-<DIV ALIGN=LEFT>
-	<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
-		<COL WIDTH=110>
-		<COL WIDTH=240>
-		<COL WIDTH=322>
-		<COL WIDTH=243>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>HTTP Method</B></P>
-			</TD>
-			<TD WIDTH=240 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>URL</B></P>
-			</TD>
-			<TD WIDTH=322 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>Parameters</B></P>
-			</TD>
-			<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
-				<P ALIGN=CENTER><B>Response</B></P>
-			</TD>
-		</TR>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>GET</P>
-			</TD>
-			<TD WIDTH=240 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>http://&lt;server&gt;/artifact/<FONT COLOR="#000080">[t|f]/URI</FONT></P>
-			</TD>
-			<TD WIDTH=322 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P STYLE="margin-bottom: 0cm">[t/f] – indicates whether
-				inferred statements should be returned.</P>
-				<P>URI – identifies the requested artifact</P>
-			</TD>
-			<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-				<P>The artifact as stored in PODD is returned.</P>
-			</TD>
-		</TR>
-	</TABLE>
-</DIV>
+<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
+	<COL WIDTH=110>
+	<COL WIDTH=240>
+	<COL WIDTH=322>
+	<COL WIDTH=243>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>HTTP Method</B></P>
+		</TD>
+		<TD WIDTH=240 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>URL</B></P>
+		</TD>
+		<TD WIDTH=322 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>Parameters</B></P>
+		</TD>
+		<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
+			<P ALIGN=CENTER><B>Response</B></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>GET</P>
+		</TD>
+		<TD WIDTH=240 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>http://&lt;server&gt;/artifact/<FONT COLOR="#000080">[base|inferred]/URI</FONT></P>
+		</TD>
+		<TD WIDTH=322 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P STYLE="margin-bottom: 0cm">[base/inferred] – indicates
+			whether the asserted statements or inferred statements should be
+			returned.</P>
+			<P>URI – identifies the requested artifact</P>
+		</TD>
+		<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
+			<P>The artifact as stored in PODD is returned.</P>
+		</TD>
+	</TR>
+</TABLE>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><B>Edit Artifact Service</B></P>
-<DIV ALIGN=LEFT>
-	<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
-		<COL WIDTH=110>
-		<COL WIDTH=239>
-		<COL WIDTH=323>
-		<COL WIDTH=243>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>HTTP Method</B></P>
-			</TD>
-			<TD WIDTH=239 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>URL</B></P>
-			</TD>
-			<TD WIDTH=323 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>Parameters</B></P>
-			</TD>
-			<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
-				<P ALIGN=CENTER><B>Response</B></P>
-			</TD>
-		</TR>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>POST</P>
-			</TD>
-			<TD WIDTH=239 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>http://&lt;server&gt;/artifact/edit/<FONT COLOR="#000080">[m|r]/URI</FONT></P>
-			</TD>
-			<TD WIDTH=323 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P STYLE="margin-bottom: 0cm">RDF statements to be edited are
-				sent in the body of the POST request.</P>
-				<P STYLE="margin-bottom: 0cm">URI – identifies the artifact
-				being modified.</P>
-				<P STYLE="margin-bottom: 0cm">[m/r] – indicates whether
-				incoming statements should be merged or they should replace
-				existing statements.</P>
-				<P><BR>
-				</P>
-			</TD>
-			<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-				<P>The URI of the modified artifact.</P>
-				<P><BR>
-				</P>
-			</TD>
-		</TR>
-	</TABLE>
-</DIV>
+<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
+	<COL WIDTH=110>
+	<COL WIDTH=239>
+	<COL WIDTH=323>
+	<COL WIDTH=243>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>HTTP Method</B></P>
+		</TD>
+		<TD WIDTH=239 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>URL</B></P>
+		</TD>
+		<TD WIDTH=323 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>Parameters</B></P>
+		</TD>
+		<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
+			<P ALIGN=CENTER><B>Response</B></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>POST</P>
+		</TD>
+		<TD WIDTH=239 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>http://&lt;server&gt;/artifact/edit/<FONT COLOR="#000080">[merge|replace]/URI</FONT></P>
+		</TD>
+		<TD WIDTH=323 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P STYLE="margin-bottom: 0cm">RDF statements to be edited are sent
+			in the body of the POST request.</P>
+			<P STYLE="margin-bottom: 0cm">URI – identifies the artifact
+			being modified.</P>
+			<P STYLE="margin-bottom: 0cm">[merge/replace] – indicates
+			whether incoming statements should be merged or they should
+			replace existing statements.</P>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
+			<P>The URI of the modified artifact.</P>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><B>Delete Artifact Service</B></P>
-<DIV ALIGN=LEFT>
-	<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
-		<COL WIDTH=110>
-		<COL WIDTH=240>
-		<COL WIDTH=322>
-		<COL WIDTH=243>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>HTTP Method</B></P>
-			</TD>
-			<TD WIDTH=240 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>URL</B></P>
-			</TD>
-			<TD WIDTH=322 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P ALIGN=CENTER><B>Parameters</B></P>
-			</TD>
-			<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
-				<P ALIGN=CENTER><B>Response</B></P>
-			</TD>
-		</TR>
-		<TR VALIGN=TOP>
-			<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>DELETE</P>
-			</TD>
-			<TD WIDTH=240 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>http://&lt;server&gt;/artifact/<FONT COLOR="#000080">URI</FONT></P>
-			</TD>
-			<TD WIDTH=322 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-				<P>The URI of the artifact to be deleted</P>
-			</TD>
-			<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-				<P>HTTP status code 200</P>
-			</TD>
-		</TR>
-	</TABLE>
-</DIV>
+<TABLE WIDTH=954 CELLPADDING=4 CELLSPACING=1>
+	<COL WIDTH=110>
+	<COL WIDTH=240>
+	<COL WIDTH=322>
+	<COL WIDTH=243>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>HTTP Method</B></P>
+		</TD>
+		<TD WIDTH=240 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>URL</B></P>
+		</TD>
+		<TD WIDTH=322 STYLE="border-top: 1px double #808080; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P ALIGN=CENTER><B>Parameters</B></P>
+		</TD>
+		<TD WIDTH=243 STYLE="border: 1px double #808080; padding: 0.1cm">
+			<P ALIGN=CENTER><B>Response</B></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=110 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>DELETE</P>
+		</TD>
+		<TD WIDTH=240 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>http://&lt;server&gt;/artifact/<FONT COLOR="#000080">URI</FONT></P>
+		</TD>
+		<TD WIDTH=322 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
+			<P>The URI of the artifact to be deleted</P>
+		</TD>
+		<TD WIDTH=243 STYLE="border-top: none; border-bottom: 1px double #808080; border-left: 1px double #808080; border-right: 1px double #808080; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
+			<P>HTTP status code 200</P>
+		</TD>
+	</TR>
+</TABLE>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
