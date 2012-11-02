@@ -9,7 +9,7 @@
     </listener>
     <context-param>
         <param-name>passwdfile</param-name>
-        <param-value>/var/lib/tomcat7/webapps/ROOT/WEB-INF/classes/passwd</param-value>
+        <param-value>passwd</param-value>
     </context-param>
     <servlet>
         <servlet-name>PoddServlet</servlet-name>

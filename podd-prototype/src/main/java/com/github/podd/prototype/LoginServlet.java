@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -17,39 +16,41 @@ import javax.servlet.http.HttpSession;
  * @author kutila
  * @created 2012/10/26
  */
-public class LoginServlet extends PoddBaseServlet {
-
-	// Check whether this behaves as expected
+public class LoginServlet extends PoddBaseServlet
+{
+    
+    // Check whether this behaves as expected
     private static Properties passwords;
     private static long passwordsLoadedAt = -1;
-       
+    
     /**
      */
-    public LoginServlet() {
+    public LoginServlet()
+    {
         super();
     }
-
+    
     @Override
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-        IOException
+    protected void processRequest(final HttpServletRequest request, final HttpServletResponse response)
+        throws ServletException, IOException
     {
-        PrintWriter out = response.getWriter();
+        final PrintWriter out = response.getWriter();
         
-        String httpMethod = request.getMethod();
+        final String httpMethod = request.getMethod();
         String username = null;
         
-        if(HTTP_POST.equals(httpMethod))
+        if(PoddBaseServlet.HTTP_POST.equals(httpMethod))
         {
             username = request.getParameter("username");
-            String password = request.getParameter("password");
-            if(!checkCredentials(username, password))
+            final String password = request.getParameter("password");
+            if(!this.checkCredentials(username, password))
             {
-                log.info("Failed login attempt for " + username + "/" + password);
+                this.log.info("Failed login attempt for " + username + "/" + password);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login failed");
                 return;
             }
             // create session and send SUCCESS response
-            HttpSession session = request.getSession(true);
+            final HttpSession session = request.getSession(true);
             session.setMaxInactiveInterval(180); // invalidate session after 3 minutes
             session.setAttribute("user", username);
             out.write(username + " login successful\r\n");
@@ -59,7 +60,7 @@ public class LoginServlet extends PoddBaseServlet {
         }
         
     }
-
+    
     /**
      * The prototype will use a file based authentication mechanism. All userid/password pairs are
      * periodically read from a Properties file.
@@ -68,16 +69,16 @@ public class LoginServlet extends PoddBaseServlet {
      * @param password
      * @return
      */
-    private boolean checkCredentials(String userid, String password)
+    private boolean checkCredentials(final String userid, final String password)
     {
         if(userid == null || password == null || userid.trim().length() < 1 || password.trim().length() < 1)
         {
             return false;
         }
-        loadPasswordFile();
-        if(passwords.containsKey(userid))
+        this.loadPasswordFile();
+        if(LoginServlet.passwords.containsKey(userid))
         {
-            String expectedPassword = passwords.getProperty(userid);
+            final String expectedPassword = LoginServlet.passwords.getProperty(userid);
             if(expectedPassword.equals(password))
             {
                 return true;
@@ -89,23 +90,24 @@ public class LoginServlet extends PoddBaseServlet {
     
     private void loadPasswordFile()
     {
-        if((System.currentTimeMillis() - passwordsLoadedAt) < 60000)
+        if((System.currentTimeMillis() - LoginServlet.passwordsLoadedAt) < 60000)
         {
             return;
         }
-        String passwordFile = getServletContext().getInitParameter("passwdfile");
-        log.debug("The password file is located at : " + passwordFile);
-        passwords = new Properties();
+        
+        final String passwordFile =
+                (String)this.getServletContext().getAttribute(PoddServletContextListener.PODD_PASSWORD_FILE);
+        
+        LoginServlet.passwords = new Properties();
         try
         {
-            passwords.load(new FileInputStream(passwordFile));
+            LoginServlet.passwords.load(new FileInputStream(passwordFile));
         }
-        catch(Exception e)
+        catch(final Exception e)
         {
-            log.error("Failed to load password file", e);
+            this.log.error("Failed to load passwords", e);
         }
-        passwordsLoadedAt = System.currentTimeMillis();
+        LoginServlet.passwordsLoadedAt = System.currentTimeMillis();
     }
-    
     
 }
