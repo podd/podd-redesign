@@ -35,7 +35,7 @@ public class PoddServletHelperTest
         try
         {
             this.helper = new PoddServletHelper();
-            this.helper.setUp();
+            this.helper.setUp(false, null, null);
             this.helper.loadSchemaOntologies();
         }
         catch(final Exception e)

@@ -24,6 +24,7 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
@@ -75,12 +76,18 @@ public class PoddServletHelper
     
     // private String poddPlantPath;
     
-    public void setUp() throws RepositoryException
+    public void setUp(boolean useRemoteRepository, String server, String repositoryID) throws RepositoryException
     {
-        // TODO: use an on disk store
-        this.nextRepository = new SailRepository(new MemoryStore());
-        this.nextRepository.initialize();
-        
+        if(useRemoteRepository)
+        {
+            this.nextRepository = new HTTPRepository(server, repositoryID);
+            this.nextRepository.initialize();
+        }
+        else
+        {
+            this.nextRepository = new SailRepository(new MemoryStore());
+            this.nextRepository.initialize();
+        }
         this.nextValueFactory = this.nextRepository.getValueFactory();
         
         // create the manager to use for the test

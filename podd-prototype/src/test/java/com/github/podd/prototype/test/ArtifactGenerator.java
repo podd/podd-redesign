@@ -94,8 +94,11 @@ public class ArtifactGenerator
             final int index, final boolean isDeep, final FILE_TYPES fileType) throws Exception
     {
         // set the namespaces
-        this.repositoryConnection.setNamespace(OWL.PREFIX, OWL.NAMESPACE);
-        this.repositoryConnection.setNamespace(RDFS.PREFIX, RDFS.NAMESPACE);
+//        this.repositoryConnection.setNamespace(OWL.PREFIX, OWL.NAMESPACE);
+//        this.repositoryConnection.setNamespace(RDFS.PREFIX, RDFS.NAMESPACE);
+        this.repositoryConnection.setNamespace("rdf", RDF.NAMESPACE);
+        this.repositoryConnection.setNamespace("rdfs", RDFS.NAMESPACE);
+        this.repositoryConnection.setNamespace("owl", OWL.NAMESPACE);
         
         // create ontology (i.e. artifact)
         final URI artifactURI = this.valueFactory.createURI("urn:temp:artifact:" + index);

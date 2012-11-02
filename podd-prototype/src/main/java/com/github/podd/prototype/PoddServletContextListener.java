@@ -17,6 +17,11 @@ public class PoddServletContextListener implements ServletContextListener
     public static final String PODD_HOME = "podd.home";
     public static final String PODD_PASSWORD_FILE = "PODD_PASSWDS";
     
+    private static final String INIT_PASSWORD_FILE = "passwdfile";
+    private static final String INIT_SESAME_SERVER = "sesame-server";
+    private static final String INIT_SESAME_REPOSITORY = "sesame-repository-id";
+    
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     @Override
@@ -30,7 +35,10 @@ public class PoddServletContextListener implements ServletContextListener
         {
             this.initializeAuthenticationService(sce);
             
-            helper.setUp();
+            String sesameServer = sce.getServletContext().getInitParameter(INIT_SESAME_SERVER);
+            String repositoryID =sce.getServletContext().getInitParameter(INIT_SESAME_REPOSITORY); 
+
+            helper.setUp(true, sesameServer, repositoryID);
             helper.loadSchemaOntologies();
             
             sce.getServletContext().setAttribute(PoddServletContextListener.PODD_SERVLET_HELPER, helper);
@@ -75,7 +83,7 @@ public class PoddServletContextListener implements ServletContextListener
      */
     private void initializeAuthenticationService(final ServletContextEvent sce) throws PoddException
     {
-        String passwordFile = sce.getServletContext().getInitParameter("passwdfile");
+        String passwordFile = sce.getServletContext().getInitParameter(INIT_PASSWORD_FILE);
         if(passwordFile == null || passwordFile.trim().length() < 1)
         {
             throw new PoddException("Password file not specified.", null, -1);

@@ -11,6 +11,14 @@
         <param-name>passwdfile</param-name>
         <param-value>passwd</param-value>
     </context-param>
+    <context-param>
+        <param-name>sesame-server</param-name>
+        <param-value>http://localhost:8080/openrdf-sesame</param-value>
+    </context-param>
+    <context-param>
+        <param-name>sesame-repository-id</param-name>
+        <param-value>PODDrepo</param-value>
+    </context-param>
     <servlet>
         <servlet-name>PoddServlet</servlet-name>
         <servlet-class>com.github.podd.prototype.PoddServlet</servlet-class>
