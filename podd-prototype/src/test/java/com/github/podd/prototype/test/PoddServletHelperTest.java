@@ -34,8 +34,11 @@ public class PoddServletHelperTest
     {
         try
         {
+            Repository repository = new SailRepository(new MemoryStore());
+            repository.initialize();
+
             this.helper = new PoddServletHelper();
-            this.helper.setUp(false, null, null);
+            this.helper.setUp(repository);
             this.helper.loadSchemaOntologies();
         }
         catch(final Exception e)

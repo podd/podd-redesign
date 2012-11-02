@@ -1,12 +1,18 @@
 package com.github.podd.prototype;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.http.HTTPRepository;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.memory.MemoryStore;
+import org.openrdf.sail.nativerdf.NativeStore;
 import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +44,10 @@ public class PoddServletContextListener implements ServletContextListener
             String sesameServer = sce.getServletContext().getInitParameter(INIT_SESAME_SERVER);
             String repositoryID =sce.getServletContext().getInitParameter(INIT_SESAME_REPOSITORY); 
 
-            helper.setUp(true, sesameServer, repositoryID);
+            Repository nextRepository = new SailRepository(new NativeStore(new File(System.getProperty(PODD_HOME), "spoc,cspo,cpso,psoc,ospc,opsc,cops")));
+            nextRepository.initialize();
+            
+            helper.setUp(nextRepository);
             helper.loadSchemaOntologies();
             
             sce.getServletContext().setAttribute(PoddServletContextListener.PODD_SERVLET_HELPER, helper);

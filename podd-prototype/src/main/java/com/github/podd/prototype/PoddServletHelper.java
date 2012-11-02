@@ -76,18 +76,9 @@ public class PoddServletHelper
     
     // private String poddPlantPath;
     
-    public void setUp(boolean useRemoteRepository, String server, String repositoryID) throws RepositoryException
+    public void setUp(Repository repository) throws RepositoryException
     {
-        if(useRemoteRepository)
-        {
-            this.nextRepository = new HTTPRepository(server, repositoryID);
-            this.nextRepository.initialize();
-        }
-        else
-        {
-            this.nextRepository = new SailRepository(new MemoryStore());
-            this.nextRepository.initialize();
-        }
+        this.nextRepository = repository;
         this.nextValueFactory = this.nextRepository.getValueFactory();
         
         // create the manager to use for the test
