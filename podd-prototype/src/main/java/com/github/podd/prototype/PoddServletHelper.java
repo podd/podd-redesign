@@ -78,22 +78,27 @@ public class PoddServletHelper
     
     public void setUp(Repository repository) throws RepositoryException
     {
+        this.log.info("... setUp ... valueFactory");
         this.nextRepository = repository;
         this.nextValueFactory = this.nextRepository.getValueFactory();
         
         // create the manager to use for the test
+        this.log.info("... setUp ... OWLOntologyManager");
         this.manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         
         // We're only supporting OWL2_DL and Pellet in this prototype
+        this.log.info("... setUp ... ReasonerFactory");
         this.reasonerName = "Pellet";
         this.reasonerFactory = OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(this.reasonerName);
         
         this.pelletOwlProfile = OWLProfile.OWL2_DL;
         
+        this.log.info("... setUp ... graphs");
         this.schemaOntologyManagementGraph =
                 this.nextValueFactory.createURI("urn:test:schemaOntologiesManagementGraph");
         this.poddArtifactManagementGraph = this.nextValueFactory.createURI("urn:test:poddArtifactManagementGraph");
         
+        this.log.info("... setUp PoddPrototypeUtils");
         this.utils =
                 new PoddPrototypeUtils(this.manager, this.pelletOwlProfile, this.reasonerFactory,
                         this.schemaOntologyManagementGraph, this.poddArtifactManagementGraph);
@@ -102,6 +107,7 @@ public class PoddServletHelper
         this.poddSciencePath = "/ontologies/poddScience.owl";
         // this.poddPlantPath = "/ontologies/poddPlant.owl";
         
+        this.log.info("... setUp completed");
     }
     
     /**
