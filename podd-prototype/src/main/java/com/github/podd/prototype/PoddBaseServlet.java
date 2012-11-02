@@ -25,6 +25,10 @@ public abstract class PoddBaseServlet extends HttpServlet
     public static final String HTTP_GET = "GET";
     public static final String HTTP_DELETE = "DELETE";
     
+    public static final String HEADER_APPLICATION_VERSION = "X-Application-Version";
+    
+    private static final String PODD_VERSION = "PODD/0.0.1_12.10.02";
+
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     public PoddBaseServlet()
@@ -47,6 +51,7 @@ public abstract class PoddBaseServlet extends HttpServlet
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
         IOException
     {
+        response.setHeader(HEADER_APPLICATION_VERSION, PODD_VERSION);
         this.processRequest(request, response);
     }
     
@@ -54,6 +59,7 @@ public abstract class PoddBaseServlet extends HttpServlet
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException
     {
+        response.setHeader(HEADER_APPLICATION_VERSION, PODD_VERSION);
         this.processRequest(request, response);
     }
     
@@ -61,6 +67,7 @@ public abstract class PoddBaseServlet extends HttpServlet
     protected void doDelete(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException
     {
+        response.setHeader(HEADER_APPLICATION_VERSION, PODD_VERSION);
         this.processRequest(request, response);
     }
     
