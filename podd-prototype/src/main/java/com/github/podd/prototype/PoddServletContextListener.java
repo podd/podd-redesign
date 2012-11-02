@@ -27,7 +27,6 @@ public class PoddServletContextListener implements ServletContextListener
     private static final String INIT_SESAME_SERVER = "sesame-server";
     private static final String INIT_SESAME_REPOSITORY = "sesame-repository-id";
     
-    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     @Override
@@ -42,15 +41,18 @@ public class PoddServletContextListener implements ServletContextListener
             this.initializeAuthenticationService(sce);
             
             String sesameServer = sce.getServletContext().getInitParameter(INIT_SESAME_SERVER);
-            String repositoryID =sce.getServletContext().getInitParameter(INIT_SESAME_REPOSITORY); 
-
-            Repository nextRepository = new SailRepository(new NativeStore(new File(System.getProperty(PODD_HOME), "spoc,cspo,cpso,psoc,ospc,opsc,cops")));
+            String repositoryID = sce.getServletContext().getInitParameter(INIT_SESAME_REPOSITORY);
+            
+            Repository nextRepository =
+                    new SailRepository(new NativeStore(new File(System.getProperty(PODD_HOME),
+                            "spoc,cspo,cpso,psoc,ospc,opsc,cops")));
             nextRepository.initialize();
             
             helper.setUp(nextRepository);
             helper.loadSchemaOntologies();
             
             sce.getServletContext().setAttribute(PoddServletContextListener.PODD_SERVLET_HELPER, helper);
+            this.log.info("\r\n ... initialization complete.");
         }
         catch(OWLException | OpenRDFException | IOException | PoddException e)
         {
@@ -70,7 +72,10 @@ public class PoddServletContextListener implements ServletContextListener
             final PoddServletHelper helper =
                     (PoddServletHelper)sce.getServletContext().getAttribute(
                             PoddServletContextListener.PODD_SERVLET_HELPER);
-            helper.tearDown();
+            if(helper != null)
+            {
+                helper.tearDown();
+            }
         }
         catch(final RepositoryException e)
         {
@@ -82,6 +87,7 @@ public class PoddServletContextListener implements ServletContextListener
             sce.getServletContext().removeAttribute(PoddServletContextListener.PODD_SERVLET_HELPER);
             sce.getServletContext().removeAttribute(PoddServletContextListener.PODD_PASSWORD_FILE);
         }
+        this.log.info("\r\n ... termination complete.");
     }
     
     /**
