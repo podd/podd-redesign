@@ -75,8 +75,8 @@ public class PoddServlet extends PoddBaseServlet
             }
         }
         
-        else if(PoddBaseServlet.HTTP_POST.equals(httpMethod) && (pathInfo.startsWith("/artifact/edit/replace/") ||
-                pathInfo.startsWith("/artifact/edit/merge/")))
+        else if(PoddBaseServlet.HTTP_POST.equals(httpMethod)
+                && (pathInfo.startsWith("/artifact/edit/replace/") || pathInfo.startsWith("/artifact/edit/merge/")))
         {
             this.log.info("EDIT artifact");
             try

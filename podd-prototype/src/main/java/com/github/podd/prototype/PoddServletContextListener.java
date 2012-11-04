@@ -9,14 +9,18 @@ import javax.servlet.ServletContextListener;
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 import org.openrdf.sail.nativerdf.NativeStore;
 import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Initializes PODD at web-app startup and destroys when the web-app is shutting down.
+ * 
+ * @author kutila
+ * @created 2012/11/02
+ */
 public class PoddServletContextListener implements ServletContextListener
 {
     public static final String PODD_SERVLET_HELPER = "PODD_SERVLET_HELPER";
@@ -40,11 +44,14 @@ public class PoddServletContextListener implements ServletContextListener
         {
             this.initializeAuthenticationService(sce);
             
-            String sesameServer = sce.getServletContext().getInitParameter(INIT_SESAME_SERVER);
-            String repositoryID = sce.getServletContext().getInitParameter(INIT_SESAME_REPOSITORY);
+            final String sesameServer =
+                    sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_SERVER);
+            final String repositoryID =
+                    sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_REPOSITORY);
             
-            Repository nextRepository =
-                    new SailRepository(new NativeStore(new File(System.getProperty(PODD_HOME),
+            final Repository nextRepository =
+                    new SailRepository(new NativeStore(new File(
+                            System.getProperty(PoddServletContextListener.PODD_HOME),
                             "spoc,cspo,cpso,psoc,ospc,opsc,cops")));
             nextRepository.initialize();
             
@@ -98,7 +105,7 @@ public class PoddServletContextListener implements ServletContextListener
      */
     private void initializeAuthenticationService(final ServletContextEvent sce) throws PoddException
     {
-        String passwordFile = sce.getServletContext().getInitParameter(INIT_PASSWORD_FILE);
+        String passwordFile = sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_PASSWORD_FILE);
         if(passwordFile == null || passwordFile.trim().length() < 1)
         {
             throw new PoddException("Password file not specified.", null, -1);
