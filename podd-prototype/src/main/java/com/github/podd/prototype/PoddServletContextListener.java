@@ -26,8 +26,10 @@ public class PoddServletContextListener implements ServletContextListener
     public static final String PODD_SERVLET_HELPER = "PODD_SERVLET_HELPER";
     public static final String PODD_HOME = "podd.home";
     public static final String PODD_PASSWORD_FILE = "PODD_PASSWDS";
+    public static final String PODD_ALIAS_FILE = "PODD_ALIASES";
     
     private static final String INIT_PASSWORD_FILE = "passwdfile";
+    private static final String INIT_ALIAS_FILE = "aliasfile";
     private static final String INIT_SESAME_SERVER = "sesame-server";
     private static final String INIT_SESAME_REPOSITORY = "sesame-repository-id";
     
@@ -43,6 +45,7 @@ public class PoddServletContextListener implements ServletContextListener
         try
         {
             this.initializeAuthenticationService(sce);
+            this.initializeFileRepositoryRegistry(sce);
             
             final String sesameServer =
                     sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_SERVER);
@@ -123,6 +126,36 @@ public class PoddServletContextListener implements ServletContextListener
         }
         sce.getServletContext().setAttribute(PoddServletContextListener.PODD_PASSWORD_FILE, passwordFile);
         this.log.info("The PODD password file is located at : " + passwordFile);
+    }
+    
+    /**
+     * Sets up the FileReferenceValidator by initializing it with the location of the alias file.
+     * 
+     * @param sce
+     * @throws PoddException
+     */
+    private void initializeFileRepositoryRegistry(final ServletContextEvent sce) throws PoddException
+    {
+        String aliasFile = sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_ALIAS_FILE);
+        if(aliasFile == null || aliasFile.trim().length() < 1)
+        {
+            throw new PoddException("Alias file location not specified.", null, -1);
+        }
+        
+        if(!aliasFile.startsWith("/"))
+        {
+            final String poddHomeDir = System.getProperty(PoddServletContextListener.PODD_HOME);
+            if(poddHomeDir == null || poddHomeDir.trim().length() < 1)
+            {
+                throw new PoddException("PODD Home Directory not set.", null, -1);
+            }
+            aliasFile = poddHomeDir + "/" + aliasFile;
+        }
+        this.log.info("The PODD alias file is located at : " + aliasFile);
+        
+        final FileReferenceValidator validator = FileReferenceValidator.getInstance();
+        validator.initialize(aliasFile);
+        
     }
     
 }

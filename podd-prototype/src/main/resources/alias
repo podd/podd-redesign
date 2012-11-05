@@ -1,0 +1,9 @@
+#Properties file containing aliases for use with file references
+arrow.protocol=http
+arrow.host=arrow.monash.edu.au
+arrow.username=
+arrow.password=
+salesforce.protocol=https
+salesforce.host=na1.salesforce.com
+salesforce.username=
+salesforce.password=

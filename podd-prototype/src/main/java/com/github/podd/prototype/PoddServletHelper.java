@@ -559,6 +559,67 @@ public class PoddServletHelper
     }
     
     /**
+     * If the specified artifact exists inside PODD, add the given file reference attachments to it.
+     * 
+     * @param artifactUri
+     * @return
+     * @throws RepositoryException
+     */
+    public String attachReference(String artifactUri, String objectUri, String serverAlias,
+            String path, String filename, String description) throws RepositoryException 
+    {
+        this.log.info("REFERENCE attach: " + artifactUri);
+        
+        final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        try
+        {
+            // check that the artifact exists
+            final InferredOWLOntologyID ontologyID =
+                    this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
+            if(ontologyID.getVersionIRI() == null
+                    || repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
+            {
+                repositoryConnection.rollback();
+                throw new RuntimeException("Artifact <" + artifactUri + "> not found.");
+            }
+            
+            // check the object exists in this artifact
+            final URI context = ontologyID.getVersionIRI().toOpenRDFURI();            
+            final URI objectToAttachTo = IRI.create(objectUri).toOpenRDFURI();
+            RepositoryResult<Statement> statements = repositoryConnection.getStatements(objectToAttachTo, null, null, false, context);
+            if (statements.hasNext())
+            {
+                //FIXME: in progress here
+//                URI fileRef = IRI.create("http://todo", filename).toOpenRDFURI();
+//                URI hasFile = IRI.create("http://purl.org/podd/ns/poddBase#hasFile").toOpenRDFURI(); 
+//                repositoryConnection.add(objectToAttachTo, hasFile, fileRef, context);
+                
+                repositoryConnection.commit();
+                // attach file reference to object
+                // compute inferences again
+                // generate result
+            }
+            else
+            {
+                repositoryConnection.rollback();
+                throw new RuntimeException("Object <" + objectUri + "> not found.");
+            }
+            
+            return "Successfully attached references to " + artifactUri;
+        }
+        catch (RepositoryException e)
+        {
+            repositoryConnection.rollback();
+            throw e;
+        }
+        finally
+        {
+            this.returnRepositoryConnection(repositoryConnection);
+        }
+    }
+    
+    
+    /**
      * This method takes a URL encoded String terminating with a colon (encoded as %3A) followed by
      * an integer and increments this integer by one. If the input String is not of the expected
      * format, incrementing is carried out by simply appending "1" to the end of the String.
