@@ -2,6 +2,7 @@ package com.github.podd.prototype;
 
 import info.aduna.iteration.Iterations;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,11 +15,13 @@ import java.util.UUID;
 import net.fortytwo.sesametools.URITranslator;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -53,6 +56,8 @@ import org.slf4j.LoggerFactory;
  */
 public class PoddServletHelper
 {
+    public static String PODD_BASE_NAMESPACE = "http://purl.org/podd/ns/poddBase#";
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private Repository nextRepository;
@@ -297,7 +302,7 @@ public class PoddServletHelper
      * @param mimeType
      *            The MIME-type in which the artifact should be returned in.
      * @param includeInferredStatements
-     *            If true, inferred statements for this artifact should also be returned.
+     *            If true, the inferred statements for this artifact are returned.
      * @return The artifact serialized in the requested mime type.
      * 
      * @throws RepositoryException
@@ -559,18 +564,30 @@ public class PoddServletHelper
     }
     
     /**
-     * If the specified artifact exists inside PODD, add the given file reference attachments to it.
+     * If the specified artifact and object exist inside PODD, attach the given file reference 
+     * to the object.
      * 
      * @param artifactUri
+     * @param objectUri
+     * @param serverAlias
+     * @param path
+     * @param filename
+     * @param description
      * @return
-     * @throws RepositoryException
+     * @throws PoddException
+     * @throws OpenRDFException
+     * @throws IOException
+     * @throws OWLException
      */
     public String attachReference(String artifactUri, String objectUri, String serverAlias,
-            String path, String filename, String description) throws RepositoryException 
+            String path, String filename, String description) throws PoddException, OpenRDFException,
+            IOException, OWLException 
     {
         this.log.info("REFERENCE attach: " + artifactUri);
         
         final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        Repository tempRepository = null;
+        RepositoryConnection tempRepositoryConnection = null;
         try
         {
             // check that the artifact exists
@@ -587,32 +604,62 @@ public class PoddServletHelper
             final URI context = ontologyID.getVersionIRI().toOpenRDFURI();            
             final URI objectToAttachTo = IRI.create(objectUri).toOpenRDFURI();
             RepositoryResult<Statement> statements = repositoryConnection.getStatements(objectToAttachTo, null, null, false, context);
-            if (statements.hasNext())
-            {
-                //FIXME: in progress here
-//                URI fileRef = IRI.create("http://todo", filename).toOpenRDFURI();
-//                URI hasFile = IRI.create("http://purl.org/podd/ns/poddBase#hasFile").toOpenRDFURI(); 
-//                repositoryConnection.add(objectToAttachTo, hasFile, fileRef, context);
-                
-                repositoryConnection.commit();
-                // attach file reference to object
-                // compute inferences again
-                // generate result
-            }
-            else
+            if (!statements.hasNext())
             {
                 repositoryConnection.rollback();
                 throw new RuntimeException("Object <" + objectUri + "> not found.");
             }
+            repositoryConnection.rollback();
             
-            return "Successfully attached references to " + artifactUri;
+            // create a temporary in-memory repository
+            tempRepository = new SailRepository(new MemoryStore());
+            tempRepository.initialize();
+            tempRepositoryConnection = tempRepository.getConnection();
+            tempRepositoryConnection.setAutoCommit(false);
+            
+            // create triples for File Reference in the temporary repository
+            URI fileRefObject = IRI.create(objectToAttachTo.getNamespace(), filename).toOpenRDFURI();
+            URI fileReference = IRI.create(PODD_BASE_NAMESPACE, "FileReference").toOpenRDFURI(); 
+            URI propertyHasFileReference = IRI.create(PODD_BASE_NAMESPACE, "hasFileReference").toOpenRDFURI(); 
+            URI propertyHasFileName = IRI.create(PODD_BASE_NAMESPACE, "hasFileName").toOpenRDFURI(); 
+            URI propertyHasAlias = IRI.create(PODD_BASE_NAMESPACE, "hasAlias").toOpenRDFURI(); 
+            URI propertyHasPath = IRI.create(PODD_BASE_NAMESPACE, "hasPath").toOpenRDFURI(); 
+            URI propertyHasDescription = IRI.create(PODD_BASE_NAMESPACE, "hasDescription").toOpenRDFURI(); 
+
+            Literal fileNameLiteral = nextValueFactory.createLiteral(filename);
+            Literal filePathLiteral = nextValueFactory.createLiteral(path);
+            Literal fileAliasLiteral = nextValueFactory.createLiteral(serverAlias);
+            Literal fileDescLiteral = nextValueFactory.createLiteral(description);
+            
+            tempRepositoryConnection.add(fileRefObject, RDF.TYPE, fileReference, context);
+            tempRepositoryConnection.add(fileRefObject, propertyHasFileName, fileNameLiteral, context);
+            tempRepositoryConnection.add(fileRefObject, propertyHasAlias, fileAliasLiteral, context);
+            tempRepositoryConnection.add(fileRefObject, propertyHasPath, filePathLiteral, context);
+            tempRepositoryConnection.add(fileRefObject, propertyHasDescription, fileDescLiteral, context);
+            
+            tempRepositoryConnection.add(objectToAttachTo, propertyHasFileReference, fileRefObject, context);
+            tempRepositoryConnection.commit();
+
+            // get these statements as an InputStream
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final RDFHandler rdfWriter =
+                    Rio.createWriter(Rio.getWriterFormatForMIMEType(PoddServlet.MIME_TYPE_RDF_XML, RDFFormat.RDFXML),
+                            out);
+            
+            tempRepositoryConnection.export(rdfWriter);
+            tempRepositoryConnection.clear();
+            tempRepositoryConnection.rollback();
+
+            return this.editArtifact(artifactUri, new ByteArrayInputStream(out.toByteArray()), 
+                    PoddServlet.MIME_TYPE_RDF_XML, false);
         }
-        catch (RepositoryException e)
+        catch (PoddException | OWLException |OpenRDFException | IOException e)
         {
             repositoryConnection.rollback();
+            tempRepositoryConnection.rollback();
             throw e;
         }
-        finally
+        finally 
         {
             this.returnRepositoryConnection(repositoryConnection);
         }

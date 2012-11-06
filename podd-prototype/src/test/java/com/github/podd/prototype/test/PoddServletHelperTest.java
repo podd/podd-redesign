@@ -1,16 +1,22 @@
 package com.github.podd.prototype.test;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
@@ -196,6 +202,27 @@ public class PoddServletHelperTest
     }
     
     @Test
+    public void testEditNonExistentArtifact() throws Exception
+    {
+        final String artifactUniqueIRI = "http://purl.org/nosuch/artifact:1";
+        
+        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        
+        try
+        {
+            this.helper.editArtifact(artifactUniqueIRI, in, PoddServlet.MIME_TYPE_RDF_XML, false);
+            Assert.fail("Should have thrown an exception");
+        }
+        catch(final Exception e)
+        {
+            Assert.assertNotNull(e);
+            Assert.assertTrue(e.getMessage().contains("not found"));
+        }
+    }
+
+    
+    @Test
     public void testEditArtifactWithMerge() throws Exception
     {
         final boolean isReplace = false;
@@ -207,7 +234,7 @@ public class PoddServletHelperTest
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // edit it
-        in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1-part.rdf");
+        in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
         Assert.assertNotNull("Resource was not found", in);
         
         final String editedArtifactURI =
@@ -229,7 +256,7 @@ public class PoddServletHelperTest
     }
     
     @Test
-    public void testEditArtifactWithReplace() throws Exception
+    public void testEditArtifactWithReplace() throws Exception 
     {
         final boolean isReplace = true;
         // first, load an artifact using the inner-load method
@@ -239,8 +266,8 @@ public class PoddServletHelperTest
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
-        // edit it
-        in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1-part.rdf");
+        // edit it 
+        in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
         Assert.assertNotNull("Resource was not found", in);
         
         final String editedArtifactURI =
@@ -248,7 +275,7 @@ public class PoddServletHelperTest
         
         // check the modifications were persisted
         final String resultRDF = this.helper.getArtifact(editedArtifactURI, mimeType, false);
-        // System.out.println(resultRDF);
+         System.out.println(resultRDF);
         
         Assert.assertNotNull(resultRDF);
         Assert.assertFalse(resultRDF.contains("urn:temp:"));
@@ -259,6 +286,109 @@ public class PoddServletHelperTest
         
         // with replace, the "OWL Comment" from the ontology is removed
         Assert.assertEquals(32, repoConn.size(context));
+    }
+
+    @Test
+    public void testEditArtifactWithNewFileReferenceAttachment() throws Exception
+    {
+        final boolean isReplace = true;
+        // first, load an artifact using the inner-load method
+        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
+        
+        // edit it 
+        in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        
+        final String editedArtifactURI =
+                this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace);
+        
+    }
+    
+    
+    @Test
+    public void testAttachReferenceToInvalidObject() throws Exception
+    {
+        // 1. try attaching to a non-existent artifact
+        String artifactToAttachTo = "http://no.such.artifact";
+        String objectToAttachTo = "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0"; 
+        
+        final String serverAlias = "salesforce";
+        final String path = "/help/doc/en/";
+        final String filename = "salesforce_git_developer_cheatsheet.pdf";
+        final String description = "GIT developer cheatsheet from salesforce";
+        
+        try
+        {
+            this.helper.attachReference(artifactToAttachTo, objectToAttachTo, serverAlias, path, filename, description);
+            Assert.fail("Should have thrown an exception");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertNotNull(e);
+        }
+
+        // 2. try attaching to a non-existent object (inside an artifact)
+        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+
+        artifactToAttachTo = addedRDF.getOntologyIRI().toOpenRDFURI().stringValue();
+        objectToAttachTo = "urn:poddinternal:no-such-object:0"; 
+        
+        try
+        {
+            this.helper.attachReference(artifactToAttachTo, objectToAttachTo, serverAlias, path, filename, description);
+            Assert.fail("Should have thrown an exception");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertNotNull(e);
+        }
+        
+    }
+    
+    @Test
+    public void testAttachReference() throws Exception
+    {
+        // first, load an artifact using the inner-load method
+        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+
+        // where to attach the file reference to
+        final String artifactToAttachTo = addedRDF.getOntologyIRI().toOpenRDFURI().stringValue();
+        final String objectToAttachTo = "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0"; 
+        
+        // file reference attributes
+        final String serverAlias = "salesforce";
+        final String path = "/help/doc/en/";
+        final String filename = "salesforce_git_developer_cheatsheet.pdf";
+        final String description = "GIT developer cheatsheet from salesforce";
+        
+        this.helper.attachReference(artifactToAttachTo, objectToAttachTo, serverAlias, path, filename, description);
+
+        // retrieve artifact and verify whether file reference was correctly attached
+        final String resultRDF = this.helper.getArtifact(artifactToAttachTo, mimeType, false);
+        System.out.println(resultRDF);
+
+        Assert.assertNotNull(resultRDF);
+        Assert.assertFalse(resultRDF.contains("urn:temp:"));
+        Assert.assertTrue(resultRDF.contains(filename));
+        Assert.assertTrue(resultRDF.contains(serverAlias));
+
+        final URI context = IRI.create("urn:context").toOpenRDFURI();
+        final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
+        URI propertyHasFileReference = IRI.create("http://purl.org/podd/ns/poddBase#hasFileReference").toOpenRDFURI();
+        RepositoryResult<Statement> statements = repoConn.getStatements(null, propertyHasFileReference, null, false);
+        final List<Statement> fileRefStatements = Iterations.addAll(statements, new ArrayList<Statement>());
+        Assert.assertEquals("There should be exactly 1 hasFileReference property", 1, fileRefStatements.size());
+        Assert.assertEquals(objectToAttachTo, fileRefStatements.get(0).getSubject().stringValue());
     }
     
     @Test

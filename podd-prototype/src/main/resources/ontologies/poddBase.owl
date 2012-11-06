@@ -186,6 +186,17 @@
     
 
 
+    <!-- http://purl.org/podd/ns/poddBase#hasFileReference -->
+
+    <owl:ObjectProperty rdf:about="&poddBase;hasFileReference">
+        <rdfs:label>has File Reference</rdfs:label>
+        <rdfs:range rdf:resource="&poddBase;FileReference"/>
+        <rdfs:domain rdf:resource="&poddBase;PoddObject"/>
+        <rdfs:subPropertyOf rdf:resource="&poddBase;poddObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -366,6 +377,33 @@
     </owl:DatatypeProperty>
     
 
+    <!-- http://purl.org/podd/ns/poddBase#hasAlias -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasAlias">
+        <rdfs:label>has Alias</rdfs:label>
+        <rdfs:domain rdf:resource="&poddBase;FileReference"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+    <!-- http://purl.org/podd/ns/poddBase#hasFileName -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasFileName">
+        <rdfs:label>has File Name</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+
+    <!-- http://purl.org/podd/ns/poddBase#hasPath -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasPath">
+        <rdfs:label>has Path</rdfs:label>
+        <rdfs:domain rdf:resource="&poddBase;FileReference"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
 
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -522,6 +560,15 @@
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
     </owl:Class>
     
+
+
+    <!-- http://purl.org/podd/ns/poddBase#FileReference -->
+
+    <owl:Class rdf:about="&poddBase;FileReference">
+        <rdfs:label>File Reference</rdfs:label>
+    </owl:Class>
+    
+
 
 
     <!-- http://www.w3.org/2002/07/owl#Thing -->

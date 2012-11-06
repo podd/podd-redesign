@@ -8,7 +8,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryException;
+import org.semanticweb.owlapi.model.OWLException;
 
 /**
  * Servlet implementation class FileReferenceAttachServlet
@@ -68,14 +70,38 @@ public class FileReferenceAttachServlet extends PoddBaseServlet implements Servl
                 (PoddServletHelper)request.getServletContext().getAttribute(
                         PoddServletContextListener.PODD_SERVLET_HELPER);
         
-        final String resultJson = "You're okay in the servlet.";
+        String resultJson = null;
         try
         {
-            helper.attachReference(artifactUri, objectUri, serverAlias, path, filename, description);
+            resultJson = helper.attachReference(artifactUri, objectUri, serverAlias, path, filename, description);
         }
         catch(final RepositoryException e)
         {
             // TODO: handle different failure cases
+            this.log.error("REFERENCE attach failed. Generic");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "REFERENCE attach failed: " + e.getMessage());
+            return;
+        }
+        catch(PoddException e)
+        {
+            // TODO Auto-generated catch block
+            this.log.error("REFERENCE attach failed. Generic");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "REFERENCE attach failed: " + e.getMessage());
+            return;
+        }
+        catch(OpenRDFException e)
+        {
+            // TODO Auto-generated catch block
+            this.log.error("REFERENCE attach failed. Generic");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "REFERENCE attach failed: " + e.getMessage());
+            return;
+        }
+        catch(OWLException e)
+        {
+            // TODO Auto-generated catch block
             this.log.error("REFERENCE attach failed. Generic");
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "REFERENCE attach failed: " + e.getMessage());
