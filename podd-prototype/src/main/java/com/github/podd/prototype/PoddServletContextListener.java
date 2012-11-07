@@ -153,7 +153,7 @@ public class PoddServletContextListener implements ServletContextListener
         }
         this.log.info("The PODD alias file is located at : " + aliasFile);
         
-        final FileReferenceValidator validator = FileReferenceValidator.getInstance();
+        final FileReferenceUtils validator = FileReferenceUtils.getInstance();
         validator.initialize(aliasFile);
         
     }

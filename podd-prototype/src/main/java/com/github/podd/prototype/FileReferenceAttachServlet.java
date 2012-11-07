@@ -1,7 +1,6 @@
 package com.github.podd.prototype;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -9,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.model.OWLException;
 
 /**
@@ -39,81 +37,54 @@ public class FileReferenceAttachServlet extends PoddBaseServlet implements Servl
         }
         
         this.log.info("REFERENCE attach");
+        final FileReferenceUtils utils = FileReferenceUtils.getInstance();
+
+        FileReference fileReference = utils.constructFileReferenceFromMap(request.getParameterMap());
         
-        final String artifactUri = request.getParameter("artifact_uri");
-        final String objectUri = request.getParameter("object_uri");
-        final String serverAlias = request.getParameter("file_server_alias");
-        final String path = request.getParameter("file_path");
-        final String filename = request.getParameter("file_name");
-        final String description = request.getParameter("file_description");
-        
-        if(artifactUri == null || objectUri == null || serverAlias == null | path == null || filename == null)
+        if(fileReference == null)
         {
-            this.log.error("REFERENCE attach failed. Insufficient information");
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing information");
+            final String message = "Not enough information to create file reference";
+            this.log.error(message);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         
-        final FileReferenceValidator validator = FileReferenceValidator.getInstance();
         try
         {
-            validator.validate(serverAlias, path, filename);
+            utils.checkFileExists(fileReference);
         }
-        catch(IOException | NullPointerException e)
+        catch(IOException | PoddException e)
         {
-            this.log.error("REFERENCE attach failed. File reference invalid");
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Referenced file is not valid: " + e.getMessage());
+            final String message = "Referenced file is not valid. ";
+            this.log.error(message, e);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message + e.getMessage());
             return;
         }
         
         final PoddServletHelper helper =
                 (PoddServletHelper)request.getServletContext().getAttribute(
                         PoddServletContextListener.PODD_SERVLET_HELPER);
-        
-        String resultJson = null;
         try
         {
-            resultJson = helper.attachReference(artifactUri, objectUri, serverAlias, path, filename, description);
+            helper.attachReference(fileReference);
         }
-        catch(final RepositoryException e)
+        catch(final RuntimeException e)
+        {
+            final String message = "REFERENCE attach failed. " + e.getMessage();
+            this.log.error(message);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message); //client error
+            return;
+        }
+        catch(final PoddException | OWLException | OpenRDFException e)
         {
             // TODO: handle different failure cases
-            this.log.error("REFERENCE attach failed. Generic");
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "REFERENCE attach failed: " + e.getMessage());
-            return;
-        }
-        catch(PoddException e)
-        {
-            // TODO Auto-generated catch block
-            this.log.error("REFERENCE attach failed. Generic");
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "REFERENCE attach failed: " + e.getMessage());
-            return;
-        }
-        catch(OpenRDFException e)
-        {
-            // TODO Auto-generated catch block
-            this.log.error("REFERENCE attach failed. Generic");
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "REFERENCE attach failed: " + e.getMessage());
-            return;
-        }
-        catch(OWLException e)
-        {
-            // TODO Auto-generated catch block
-            this.log.error("REFERENCE attach failed. Generic");
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "REFERENCE attach failed: " + e.getMessage());
+            final String message = "REFERENCE attach failed: " + e.getMessage();
+            this.log.error(message);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
             return;
         }
         
-        response.setContentType(PoddServlet.MIME_TYPE_JSON);
-        final PrintWriter out = response.getWriter();
-        out.write(resultJson); // should be in JSON
-        out.write("\r\n");
-        out.flush();
-        out.close();
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
-    
+
 }

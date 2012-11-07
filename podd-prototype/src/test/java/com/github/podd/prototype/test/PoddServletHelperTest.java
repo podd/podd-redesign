@@ -25,6 +25,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.prototype.HttpFileReference;
 import com.github.podd.prototype.InferredOWLOntologyID;
 import com.github.podd.prototype.PoddServlet;
 import com.github.podd.prototype.PoddServletHelper;
@@ -211,7 +212,7 @@ public class PoddServletHelperTest
         
         try
         {
-            this.helper.editArtifact(artifactUniqueIRI, in, PoddServlet.MIME_TYPE_RDF_XML, false);
+            this.helper.editArtifact(artifactUniqueIRI, in, PoddServlet.MIME_TYPE_RDF_XML, false, false);
             Assert.fail("Should have thrown an exception");
         }
         catch(final Exception e)
@@ -238,7 +239,7 @@ public class PoddServletHelperTest
         Assert.assertNotNull("Resource was not found", in);
         
         final String editedArtifactURI =
-                this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace);
+                this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace, false);
         
         // check the modifications were persisted
         final String resultRDF = this.helper.getArtifact(editedArtifactURI, mimeType, false);
@@ -308,7 +309,6 @@ public class PoddServletHelperTest
         
     }
     
-    
     @Test
     public void testAttachReferenceToInvalidObject() throws Exception
     {
@@ -319,11 +319,18 @@ public class PoddServletHelperTest
         final String serverAlias = "salesforce";
         final String path = "/help/doc/en/";
         final String filename = "salesforce_git_developer_cheatsheet.pdf";
-        final String description = "GIT developer cheatsheet from salesforce";
+
+        HttpFileReference invalidRef = new HttpFileReference();
+        invalidRef.setArtifactUri(artifactToAttachTo);
+        invalidRef.setObjectUri(objectToAttachTo);
+        invalidRef.setServerAlias(serverAlias);
+        invalidRef.setPath(path);
+        invalidRef.setFilename(filename);
+        invalidRef.setDescription(null);
         
         try
         {
-            this.helper.attachReference(artifactToAttachTo, objectToAttachTo, serverAlias, path, filename, description);
+            this.helper.attachReference(invalidRef);
             Assert.fail("Should have thrown an exception");
         }
         catch (RuntimeException e)
@@ -337,19 +344,18 @@ public class PoddServletHelperTest
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
 
-        artifactToAttachTo = addedRDF.getOntologyIRI().toOpenRDFURI().stringValue();
-        objectToAttachTo = "urn:poddinternal:no-such-object:0"; 
+        invalidRef.setArtifactUri(addedRDF.getOntologyIRI().toOpenRDFURI().stringValue());
+        invalidRef.setObjectUri("urn:poddinternal:no-such-object:0");
         
         try
         {
-            this.helper.attachReference(artifactToAttachTo, objectToAttachTo, serverAlias, path, filename, description);
+            this.helper.attachReference(invalidRef);
             Assert.fail("Should have thrown an exception");
         }
         catch (RuntimeException e)
         {
             Assert.assertNotNull(e);
         }
-        
     }
     
     @Test
@@ -370,8 +376,16 @@ public class PoddServletHelperTest
         final String path = "/help/doc/en/";
         final String filename = "salesforce_git_developer_cheatsheet.pdf";
         final String description = "GIT developer cheatsheet from salesforce";
+       
+        HttpFileReference fileRef = new HttpFileReference();
+        fileRef.setArtifactUri(artifactToAttachTo);
+        fileRef.setObjectUri(objectToAttachTo);
+        fileRef.setServerAlias(serverAlias);
+        fileRef.setPath(path);
+        fileRef.setFilename(filename);
+        fileRef.setDescription(description);
         
-        this.helper.attachReference(artifactToAttachTo, objectToAttachTo, serverAlias, path, filename, description);
+        this.helper.attachReference(fileRef);
 
         // retrieve artifact and verify whether file reference was correctly attached
         final String resultRDF = this.helper.getArtifact(artifactToAttachTo, mimeType, false);
@@ -390,6 +404,7 @@ public class PoddServletHelperTest
         Assert.assertEquals("There should be exactly 1 hasFileReference property", 1, fileRefStatements.size());
         Assert.assertEquals(objectToAttachTo, fileRefStatements.get(0).getSubject().stringValue());
     }
+    
     
     @Test
     public void testIncrementVersion() throws Exception
@@ -441,13 +456,15 @@ public class PoddServletHelperTest
                         "https/thebank.org/myaccount%2355",
                         "http/example.org/permanenturl/34cc1c8e-0ece-49f4-ac51/artifact:1",
                         "http/example.org/permanenturl/34cc1c8e-0ece-49f4-ac51-e17aa34648e4/artifact%3A1",
-                        "http/example.org/alpha/artifact:1:0:5:22" };
+                        "http/example.org/alpha/artifact:1:0:5:22",
+                        "http://www.podd.org/abc:3" };
         final String[] expected =
                 { "http://www.google.com", "http://130.198.34.55:9090/permanenturl",
                         "https://thebank.org/myaccount%2355", "https://thebank.org/myaccount%2355",
                         "http://example.org/permanenturl/34cc1c8e-0ece-49f4-ac51/artifact%3A1",
                         "http://example.org/permanenturl/34cc1c8e-0ece-49f4-ac51-e17aa34648e4/artifact%3A1",
-                        "http://example.org/alpha/artifact%3A1%3A0%3A5%3A22" };
+                        "http://example.org/alpha/artifact%3A1%3A0%3A5%3A22",
+                        "http://www.podd.org/abc%3A3" };
         
         for(int i = 0; i < in.length; i++)
         {

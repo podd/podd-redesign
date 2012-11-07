@@ -1,0 +1,9 @@
+#Properties file containing aliases for use with file references
+localhost.protocol=http
+localhost.host=localhost
+localhost.username=
+localhost.password=
+w3.protocol=http
+w3.host=www.w3.org
+w3.username=
+w3.password=
