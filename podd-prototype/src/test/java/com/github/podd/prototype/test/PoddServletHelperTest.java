@@ -441,6 +441,35 @@ public class PoddServletHelperTest
     }
     
     @Test
+    public void testResetPodd() throws Exception
+    {
+        // first, load an artifact using the inner-load method
+        final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
+        
+        // now retrieve it via the Helper
+        final String resultRDF = this.helper.getArtifact(artifactUniqueIRI.toString(), mimeType, false);
+        Assert.assertNotNull(resultRDF);
+        Assert.assertFalse(resultRDF.contains("urn:temp:"));
+        Assert.assertTrue(resultRDF.contains(artifactUniqueIRI.toString()));
+        
+        this.helper.resetPodd();
+        
+        try
+        {
+            this.helper.getArtifact(artifactUniqueIRI.toString(), mimeType, false);
+            Assert.fail("Should have thrown an exception trying to retrieve non-existent artifact");
+        }
+        catch(final RuntimeException e)
+        {
+            Assert.assertNotNull(e);
+            Assert.assertTrue(e.getMessage().contains("not found"));
+        }
+    }
+    
+    @Test
     public void testIncrementVersion() throws Exception
     {
         final String[] in =

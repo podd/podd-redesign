@@ -630,6 +630,25 @@ public class PoddServletHelper
     }
     
     /**
+     * This method clears the content of the RDF store.
+     * 
+     * @throws RepositoryException
+     */
+    public void resetPodd() throws RepositoryException
+    {
+        final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        try
+        {
+            repositoryConnection.clear();
+            repositoryConnection.commit();
+        }
+        finally
+        {
+            this.returnRepositoryConnection(repositoryConnection);
+        }
+    }
+    
+    /**
      * Checks whether the specified artifact exists within the given RepositoryConnection. A
      * RuntimeException is thrown if the artifact could not be found.
      * 

@@ -45,8 +45,8 @@ public class PoddServlet extends PoddBaseServlet
         }
         
         final PoddServletHelper helper =
-                (PoddServletHelper)request.getServletContext().getAttribute(
-                        PoddServletContextListener.PODD_SERVLET_HELPER);
+                (PoddServletHelper)this.getServletContext()
+                        .getAttribute(PoddServletContextListener.PODD_SERVLET_HELPER);
         
         final PrintWriter out = response.getWriter();
         
@@ -94,12 +94,12 @@ public class PoddServlet extends PoddBaseServlet
                     artifactURI = PoddServletHelper.extractUri(pathInfo.substring(23));
                 }
                 
-                final boolean checkFileReference = true; //this could be a user or system parameter
+                final boolean checkFileReference = true; // this could be a user or system parameter
                 
                 final InputStream in = request.getInputStream();
                 final String contentType = PoddServlet.MIME_TYPE_RDF_XML; // request.getContentType();
-                final String editedURI = helper.editArtifact(artifactURI, in, contentType, isReplace,
-                        checkFileReference);
+                final String editedURI =
+                        helper.editArtifact(artifactURI, in, contentType, isReplace, checkFileReference);
                 response.setContentType(PoddServlet.MIME_TYPE_JSON);
                 out.write(editedURI); // should be in JSON
             }
@@ -160,6 +160,21 @@ public class PoddServlet extends PoddBaseServlet
             }
         }
         
+        else if(PoddBaseServlet.HTTP_POST.equals(httpMethod) && pathInfo.startsWith("/reset"))
+        {
+            this.log.info("RESET PODD");
+            try
+            {
+                helper.resetPodd();
+                out.write("Successfully reset PODD");
+            }
+            catch(final Exception e)
+            {
+                this.log.error("RESET PODD failed with: " + e.toString());
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Failed to RESET PODD due to: " + e.getMessage());
+            }
+        }
         else
         {
             this.log.info("Unsupported service request: " + httpMethod + ":" + pathInfo);
