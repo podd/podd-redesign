@@ -58,6 +58,11 @@ public class LoginServlet extends PoddBaseServlet
             out.close();
             return;
         }
+        else if(PoddBaseServlet.HTTP_GET.equals(httpMethod) && request.getParameter("logout") != null)
+        {
+            this.log.info("Logout requested");
+            request.getSession().invalidate();
+        }
         
     }
     
