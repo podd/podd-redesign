@@ -3,8 +3,10 @@
  */
 package com.github.podd.prototype.test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.After;
@@ -122,7 +124,7 @@ public class PoddOntologyProfileTest
                 parsedOntology =
                         this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
                                 .getResourceAsStream(this.ontologyResourcePath), new RDFXMLOntologyFormatFactory()));
-                Assert.assertTrue(this.runConsistencyCheck(nextInProfile, parsedOntology));
+                Assert.assertTrue("Profile that failed: "+nextInProfile.toQuotedString(), this.runConsistencyCheck(nextInProfile, parsedOntology));
             }
             finally
             {
@@ -196,9 +198,18 @@ public class PoddOntologyProfileTest
         
         if(this.log.isTraceEnabled())
         {
+            ArrayList<String> violations = new ArrayList<String>();
+            
             for(final OWLProfileViolation violation : report.getViolations())
             {
-                this.log.trace(violation.toString());
+                violations.add(violation.toString());
+            }
+            
+            Collections.sort(violations);
+            
+            for(String nextViolation : violations)
+            {
+                this.log.trace(nextViolation);
             }
         }
     }
