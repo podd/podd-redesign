@@ -422,7 +422,6 @@ public class PoddServletHelperTest
         
         // retrieve artifact and verify whether file reference was correctly attached
         final String resultRDF = this.helper.getArtifact(artifactToAttachTo, mimeType, false);
-        System.out.println(resultRDF);
         
         Assert.assertNotNull(resultRDF);
         Assert.assertFalse(resultRDF.contains("urn:temp:"));
