@@ -15,13 +15,11 @@ import java.util.UUID;
 import net.fortytwo.sesametools.URITranslator;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -319,7 +317,7 @@ public class PoddServletHelper
             final InferredOWLOntologyID ontologyID =
                     this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
             
-            checkArtifactExists(repositoryConnection, ontologyID);
+            this.checkArtifactExists(repositoryConnection, ontologyID);
             
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final RDFHandler rdfWriter =
@@ -365,7 +363,7 @@ public class PoddServletHelper
         {
             final InferredOWLOntologyID ontologyID =
                     this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
-            checkArtifactExists(repositoryConnection, ontologyID);
+            this.checkArtifactExists(repositoryConnection, ontologyID);
             
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final RDFHandler rdfWriter =
@@ -407,16 +405,6 @@ public class PoddServletHelper
     }
     
     /**
-     * Use the method with an extra parameter to "checkFileReferences"  
-     */
-    @Deprecated
-    public String editArtifact(final String artifactUri, final InputStream in, final String contentType,
-            final boolean isReplace) throws IOException, OpenRDFException, OWLException, PoddException
-    {    
-        boolean checkFileReferences = false;
-        return editArtifact(artifactUri, in, contentType, isReplace, checkFileReferences);
-    }
-    /**
      * Allows a part of the artifact to be modified
      * 
      * @param artifactUri
@@ -430,8 +418,8 @@ public class PoddServletHelper
      * @throws OpenRDFException
      */
     public String editArtifact(final String artifactUri, final InputStream in, final String contentType,
-            final boolean isReplace, final boolean checkFileReferences)
-                    throws IOException, OpenRDFException, OWLException, PoddException
+            final boolean isReplace, final boolean checkFileReferences) throws IOException, OpenRDFException,
+        OWLException, PoddException
     {
         this.log.info("EDIT artifact: " + artifactUri);
         
@@ -444,7 +432,7 @@ public class PoddServletHelper
             // get the artifact's IDs
             final InferredOWLOntologyID ontologyID =
                     this.getInferredOWLOntologyIDForArtifact(artifactUri, repositoryConnection);
-            checkArtifactExists(repositoryConnection, ontologyID);
+            this.checkArtifactExists(repositoryConnection, ontologyID);
             
             final URI context = ontologyID.getVersionIRI().toOpenRDFURI();
             final URI inferredContext = ontologyID.getInferredOntologyIRI().toOpenRDFURI();
@@ -459,12 +447,7 @@ public class PoddServletHelper
             final RepositoryResult<Statement> repoResult =
                     repositoryConnection.getStatements(null, null, null, false, context);
             tempRepositoryConnection.add(repoResult, context);
-            
-            if (checkFileReferences)
-            {
-                FileReferenceUtils fileRefUtils = FileReferenceUtils.getInstance();
-                fileRefUtils.checkFileReferencesInRDF(tempRepositoryConnection, context);
-            }
+            tempRepositoryConnection.commit();
             
             if(isReplace)
             {
@@ -490,6 +473,13 @@ public class PoddServletHelper
             else
             {
                 tempRepositoryConnection.add(in, "", Rio.getParserFormatForMIMEType(contentType), context);
+            }
+            tempRepositoryConnection.commit();
+            
+            if(checkFileReferences)
+            {
+                final FileReferenceUtils fileRefUtils = FileReferenceUtils.getInstance();
+                fileRefUtils.checkFileReferencesInRDF(tempRepositoryConnection, context);
             }
             
             final String uniqueUriString = artifactUri.substring(0, artifactUri.lastIndexOf("/"));
@@ -564,44 +554,46 @@ public class PoddServletHelper
         
         return artifactUri;
     }
-
+    
     /**
-     * If the specified artifact and object exist inside PODD, attach the given file reference 
-     * to the object.
-
+     * If the specified artifact and object exist inside PODD, attach the given file reference to
+     * the object.
+     * 
      * @param fileReference
      * @throws PoddException
      * @throws OpenRDFException
      * @throws IOException
      * @throws OWLException
      */
-    public void attachReference(FileReference fileReference) throws PoddException, OpenRDFException,
-    IOException, OWLException
+    public void attachReference(final FileReference fileReference, final boolean checkFileReferences)
+        throws PoddException, OpenRDFException, IOException, OWLException
     {
         this.log.info("REFERENCE attach: " + fileReference.toString());
         
         final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
         Repository tempRepository = null;
         RepositoryConnection tempRepositoryConnection = null;
-
+        
         try
         {
             final InferredOWLOntologyID ontologyID =
                     this.getInferredOWLOntologyIDForArtifact(fileReference.getArtifactUri(), repositoryConnection);
             
+            System.out.println("Checking artifact: " + ontologyID.toString());// DEBUG
+            
             this.checkArtifactExists(repositoryConnection, ontologyID);
             
             // check the object exists in this artifact
-            final URI context = ontologyID.getVersionIRI().toOpenRDFURI();            
+            final URI context = ontologyID.getVersionIRI().toOpenRDFURI();
             final URI objectToAttachTo = IRI.create(fileReference.getObjectUri()).toOpenRDFURI();
-            RepositoryResult<Statement> statements = repositoryConnection.getStatements(objectToAttachTo, null, null, false, context);
-            if (!statements.hasNext())
+            final RepositoryResult<Statement> statements =
+                    repositoryConnection.getStatements(objectToAttachTo, null, null, false, context);
+            if(!statements.hasNext())
             {
                 repositoryConnection.rollback();
                 throw new RuntimeException("Object <" + fileReference.getObjectUri() + "> not found.");
             }
             repositoryConnection.rollback();
-            
             
             // populate a temporary in-memory repository with File Reference statements
             tempRepository = new SailRepository(new MemoryStore());
@@ -620,29 +612,27 @@ public class PoddServletHelper
             tempRepositoryConnection.export(rdfWriter);
             tempRepositoryConnection.clear();
             tempRepositoryConnection.rollback();
-
             
             // merge the File Referencing statements with the artifact in the repository
-            this.editArtifact(fileReference.getArtifactUri(), new ByteArrayInputStream(out.toByteArray()), 
-                    PoddServlet.MIME_TYPE_RDF_XML, false);
+            this.editArtifact(fileReference.getArtifactUri(), new ByteArrayInputStream(out.toByteArray()),
+                    PoddServlet.MIME_TYPE_RDF_XML, false, checkFileReferences);
         }
-        catch (PoddException | OWLException |OpenRDFException | IOException e)
+        catch(PoddException | OWLException | OpenRDFException | IOException e)
         {
             repositoryConnection.rollback();
             tempRepositoryConnection.rollback();
             throw e;
         }
-        finally 
+        finally
         {
             this.returnRepositoryConnection(repositoryConnection);
         }
     }
     
-    
     /**
-     * Checks whether the specified artifact exists within the given RepositoryConnection.
-     * A RuntimeException is thrown if the artifact could not be found.
-     *  
+     * Checks whether the specified artifact exists within the given RepositoryConnection. A
+     * RuntimeException is thrown if the artifact could not be found.
+     * 
      * @param artifactUri
      * @param repositoryConnection
      * @param ontologyID
@@ -658,7 +648,6 @@ public class PoddServletHelper
             throw new RuntimeException("Artifact <" + ontologyID.getOntologyIRI() + "> not found.");
         }
     }
-    
     
     /**
      * This method takes a URL encoded String terminating with a colon (encoded as %3A) followed by

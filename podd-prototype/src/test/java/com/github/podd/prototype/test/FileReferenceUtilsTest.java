@@ -27,7 +27,6 @@ import com.github.podd.prototype.PoddException;
 
 public class FileReferenceUtilsTest
 {
-    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     protected FileReferenceUtils utils = FileReferenceUtils.getInstance();
@@ -35,39 +34,38 @@ public class FileReferenceUtilsTest
     @Before
     public void setUp() throws Exception
     {
-        String aliasFilePath = "/test/alias.txt";
-        utils.initialize(aliasFilePath);
+        this.utils.initialize("src/test/resources/test/alias.txt");
     }
     
     @After
     public void tearDown() throws Exception
     {
-        utils.clean();
+        this.utils.clean();
     }
     
     @Test
     public void testCheckFileExists_simpleFailures() throws Exception
     {
         // test with an unsupported FileReference format
-        FileReference emptyRef = new FileReference();
+        final FileReference emptyRef = new FileReference();
         try
         {
-            utils.checkFileExists(emptyRef);
+            this.utils.checkFileExists(emptyRef);
             Assert.fail("Should have thrown an exception during validate");
         }
-        catch(PoddException e)
+        catch(final PoddException e)
         {
             Assert.assertNotNull(e);
         }
         
         // test with an empty FileReference
-        FileReference httpRef = new HttpFileReference();
+        final FileReference httpRef = new HttpFileReference();
         try
         {
-            utils.checkFileExists(httpRef);
+            this.utils.checkFileExists(httpRef);
             Assert.fail("Should have thrown an exception during validate");
         }
-        catch(Exception e)
+        catch(final Exception e)
         {
             Assert.assertNotNull(e);
         }
@@ -76,10 +74,10 @@ public class FileReferenceUtilsTest
         httpRef.setServerAlias("noSuchAlias");
         try
         {
-            utils.checkFileExists(httpRef);
+            this.utils.checkFileExists(httpRef);
             Assert.fail("Should have thrown an exception during validate");
         }
-        catch(Exception e)
+        catch(final Exception e)
         {
             Assert.assertNotNull(e);
         }
@@ -93,10 +91,10 @@ public class FileReferenceUtilsTest
         
         try
         {
-            utils.checkFileExists(httpRef);
+            this.utils.checkFileExists(httpRef);
             Assert.fail("Should have thrown an exception during validate");
         }
-        catch(Exception e)
+        catch(final Exception e)
         {
             Assert.assertNotNull(e);
         }
@@ -106,7 +104,7 @@ public class FileReferenceUtilsTest
     public void testCheckFileExists_httpFileRef() throws Exception
     {
         // validating "http://www.w3.org/Protocols/rfc2616/rfc2616.html" exists
-        HttpFileReference httpRef = new HttpFileReference();
+        final HttpFileReference httpRef = new HttpFileReference();
         httpRef.setServerAlias("w3");
         httpRef.setArtifactUri(null);
         httpRef.setObjectUri(null);
@@ -114,72 +112,34 @@ public class FileReferenceUtilsTest
         httpRef.setPath("Protocols/rfc2616");
         httpRef.setDescription("HTTP RFC");
         
-        utils.checkFileExists(httpRef);
+        this.utils.checkFileExists(httpRef);
     }
     
     @Test
     public void testConstructFileReferenceFromMap() throws Exception
     {
-        Map<String, String[]> map = new HashMap<String, String[]>();
-        Assert.assertNull(utils.constructFileReferenceFromMap(map));
+        final Map<String, String[]> map = new HashMap<String, String[]>();
+        Assert.assertNull(this.utils.constructFileReferenceFromMap(map));
         
         map.put(FileReferenceUtils.KEY_ARTIFACT_URI, new String[] { "http://example.org/podd/artifact:12" });
-        Assert.assertNull(utils.constructFileReferenceFromMap(map));
+        Assert.assertNull(this.utils.constructFileReferenceFromMap(map));
         map.put(FileReferenceUtils.KEY_OBJECT_URI, new String[] { "urn:poddinternal:permanent:object34" });
-        Assert.assertNull(utils.constructFileReferenceFromMap(map));
+        Assert.assertNull(this.utils.constructFileReferenceFromMap(map));
         
         map.put(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, new String[] { "some_alias" });
-        Assert.assertNull(utils.constructFileReferenceFromMap(map));
+        Assert.assertNull(this.utils.constructFileReferenceFromMap(map));
         map.put(FileReferenceUtils.KEY_FILE_PATH, new String[] { "some_file_path" });
-        Assert.assertNull(utils.constructFileReferenceFromMap(map));
+        Assert.assertNull(this.utils.constructFileReferenceFromMap(map));
         map.put(FileReferenceUtils.KEY_FILE_NAME, new String[] { "some_file_name" });
         // description is optional
-        Assert.assertNotNull(utils.constructFileReferenceFromMap(map));
+        Assert.assertNotNull(this.utils.constructFileReferenceFromMap(map));
         
     }
     
     @Test
     public void testCheckFileReferenceInRDFWithNone() throws Exception
     {
-      InputStream in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
-      Assert.assertNotNull("Resource was not found", in);
-      
-      Repository tempRepository = null;
-      RepositoryConnection tempRepositoryConnection = null;
-      
-      // create a temporary in-memory repository
-      tempRepository = new SailRepository(new MemoryStore());
-      tempRepository.initialize();
-      tempRepositoryConnection = tempRepository.getConnection();
-      tempRepositoryConnection.setAutoCommit(false);
-      
-      try
-      {
-          // populate repository with incoming RDF statements
-          final URI intContext = IRI.create("urn:intermediate:").toOpenRDFURI();
-          tempRepositoryConnection.add(in, "", RDFFormat.RDFXML, intContext);
-          
-          utils.checkFileReferencesInRDF(tempRepositoryConnection, intContext);
-      }
-      finally
-      {
-          
-          if(tempRepositoryConnection != null)
-          {
-              tempRepositoryConnection.rollback();
-              tempRepositoryConnection.close();
-          }
-          if(tempRepository != null)
-          {
-              tempRepository.shutDown();
-          }
-      }
-    }
-    
-    @Test
-    public void testCheckFileReferenceInRDF() throws Exception 
-    {
-        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/fragmentWithFileReference.rdf");
+        final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
         Assert.assertNotNull("Resource was not found", in);
         
         Repository tempRepository = null;
@@ -197,14 +157,54 @@ public class FileReferenceUtilsTest
             final URI intContext = IRI.create("urn:intermediate:").toOpenRDFURI();
             tempRepositoryConnection.add(in, "", RDFFormat.RDFXML, intContext);
             
-            utils.checkFileReferencesInRDF(tempRepositoryConnection, intContext);
+            this.utils.checkFileReferencesInRDF(tempRepositoryConnection, intContext);
+        }
+        finally
+        {
+            
+            if(tempRepositoryConnection != null)
+            {
+                tempRepositoryConnection.rollback();
+                tempRepositoryConnection.close();
+            }
+            if(tempRepository != null)
+            {
+                tempRepository.shutDown();
+            }
+        }
+    }
+    
+    @Test
+    public void testCheckFileReferenceInRDF() throws Exception
+    {
+        final InputStream in =
+                this.getClass().getResourceAsStream("/test/artifacts/fragmentWithInvalidFileReference.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        
+        Repository tempRepository = null;
+        RepositoryConnection tempRepositoryConnection = null;
+        
+        // create a temporary in-memory repository
+        tempRepository = new SailRepository(new MemoryStore());
+        tempRepository.initialize();
+        tempRepositoryConnection = tempRepository.getConnection();
+        tempRepositoryConnection.setAutoCommit(false);
+        
+        try
+        {
+            // populate repository with incoming RDF statements
+            final URI intContext = IRI.create("urn:intermediate:").toOpenRDFURI();
+            tempRepositoryConnection.add(in, "", RDFFormat.RDFXML, intContext);
+            tempRepositoryConnection.commit();
+            
+            this.utils.checkFileReferencesInRDF(tempRepositoryConnection, intContext);
             Assert.fail("Should have thrown exception from checkFileReferencesInRDF()");
         }
-        catch (PoddException e)
+        catch(final PoddException e)
         {
             Assert.assertNotNull(e.getDetails());
             Assert.assertTrue(e.getDetails() instanceof List);
-            List errors = (List) e.getDetails();
+            final List errors = (List)e.getDetails();
             Assert.assertEquals(1, errors.size());
         }
         finally

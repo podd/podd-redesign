@@ -5,9 +5,9 @@ package com.github.podd.prototype;
 
 import info.aduna.iteration.Iterations;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -22,13 +22,9 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,14 +82,14 @@ public class FileReferenceUtils
      * @return a populated FileReference object or NULL if an object could not be constructed with
      *         the provided information.
      */
-    public FileReference constructFileReferenceFromMap(Map<String, String[]> requestMap)
+    public FileReference constructFileReferenceFromMap(final Map<String, String[]> requestMap)
     {
-        HttpFileReference fileRef = new HttpFileReference();
+        final HttpFileReference fileRef = new HttpFileReference();
         
         try
         {
-            String artifactUri = requestMap.get(KEY_ARTIFACT_URI)[0];
-            String objectUri = requestMap.get(KEY_OBJECT_URI)[0];
+            String artifactUri = requestMap.get(FileReferenceUtils.KEY_ARTIFACT_URI)[0];
+            String objectUri = requestMap.get(FileReferenceUtils.KEY_OBJECT_URI)[0];
             try
             {
                 artifactUri = PoddServletHelper.extractUri(artifactUri);
@@ -107,12 +103,12 @@ public class FileReferenceUtils
             
             fileRef.setArtifactUri(artifactUri);
             fileRef.setObjectUri(objectUri);
-            fileRef.setServerAlias(requestMap.get(KEY_FILE_SERVER_ALIAS)[0]);
+            fileRef.setServerAlias(requestMap.get(FileReferenceUtils.KEY_FILE_SERVER_ALIAS)[0]);
             
             // these will vary depending on file reference type (e.g. SSH, HTTP)
-            fileRef.setPath(requestMap.get(KEY_FILE_PATH)[0]);
-            fileRef.setFilename(requestMap.get(KEY_FILE_NAME)[0]);
-            String[] descriptions = requestMap.get(KEY_FILE_DESCRIPTION);
+            fileRef.setPath(requestMap.get(FileReferenceUtils.KEY_FILE_PATH)[0]);
+            fileRef.setFilename(requestMap.get(FileReferenceUtils.KEY_FILE_NAME)[0]);
+            final String[] descriptions = requestMap.get(FileReferenceUtils.KEY_FILE_DESCRIPTION);
             if(descriptions != null && descriptions.length > 0)
             {
                 fileRef.setDescription(descriptions[0]);
@@ -139,13 +135,13 @@ public class FileReferenceUtils
      * @throws IOException
      * @throws PoddException
      */
-    public void checkFileExists(FileReference fileReference) throws IOException, PoddException
+    public void checkFileExists(final FileReference fileReference) throws IOException, PoddException
     {
         if(!(fileReference instanceof HttpFileReference))
         {
             throw new PoddException("Unsupported File Reference format", null, -1);
         }
-        HttpFileReference httpFileRef = (HttpFileReference)fileReference;
+        final HttpFileReference httpFileRef = (HttpFileReference)fileReference;
         this.loadAliases();
         
         final String host = this.aliases.getProperty(httpFileRef.getServerAlias() + ".host");
@@ -178,31 +174,32 @@ public class FileReferenceUtils
         }
     }
     
-    public static void addFileReferenceAsTriplesToRepository(RepositoryConnection tempRepositoryConnection,
-            FileReference fileReference, URI context) throws RepositoryException
+    public static void addFileReferenceAsTriplesToRepository(final RepositoryConnection tempRepositoryConnection,
+            final FileReference fileReference, final URI context) throws RepositoryException
     {
         // handles HTTP file reference
-        HttpFileReference httpRef = (HttpFileReference)fileReference;
+        final HttpFileReference httpRef = (HttpFileReference)fileReference;
         
         final URI objectToAttachTo = IRI.create(fileReference.getObjectUri()).toOpenRDFURI();
         
         // generate unique URI for file reference object
-        URI fileRefObject =
+        final URI fileRefObject =
                 IRI.create("http://example.org/permanenturl/fileref:" + UUID.randomUUID().toString()).toOpenRDFURI();
         
-        URI fileRefURI = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "FileReference").toOpenRDFURI();
-        URI propertyHasFileReference =
+        final URI fileRefURI = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "FileReference").toOpenRDFURI();
+        final URI propertyHasFileReference =
                 IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileReference").toOpenRDFURI();
-        URI propertyHasFileName = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileName").toOpenRDFURI();
-        URI propertyHasAlias = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasAlias").toOpenRDFURI();
-        URI propertyHasPath = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasPath").toOpenRDFURI();
-        URI propertyHasDescription = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasDescription").toOpenRDFURI();
+        final URI propertyHasFileName = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileName").toOpenRDFURI();
+        final URI propertyHasAlias = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasAlias").toOpenRDFURI();
+        final URI propertyHasPath = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasPath").toOpenRDFURI();
+        final URI propertyHasDescription =
+                IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasDescription").toOpenRDFURI();
         
-        ValueFactory f = tempRepositoryConnection.getValueFactory();
-        Literal fileNameLiteral = f.createLiteral(httpRef.getFilename());
-        Literal filePathLiteral = f.createLiteral(httpRef.getPath());
-        Literal fileAliasLiteral = f.createLiteral(fileRefURI.stringValue());
-        Literal fileDescLiteral = f.createLiteral(httpRef.getDescription());
+        final ValueFactory f = tempRepositoryConnection.getValueFactory();
+        final Literal fileNameLiteral = f.createLiteral(httpRef.getFilename());
+        final Literal filePathLiteral = f.createLiteral(httpRef.getPath());
+        final Literal fileAliasLiteral = f.createLiteral(httpRef.getServerAlias());
+        final Literal fileDescLiteral = f.createLiteral(httpRef.getDescription());
         
         tempRepositoryConnection.add(fileRefObject, RDF.TYPE, fileRefURI, context);
         tempRepositoryConnection.add(fileRefObject, propertyHasFileName, fileNameLiteral, context);
@@ -214,54 +211,60 @@ public class FileReferenceUtils
     }
     
     /**
-     * Check RDF statements in the provided RepositoryConnection for File References and validate if any exist.
+     * Check RDF statements in the provided RepositoryConnection for File References and validate if
+     * any exist. While this method does not make any changes to the content of the Repository, any
+     * uncommitted operations are committed.
      * 
      * @param repositoryConnection
      * @param context
      * @throws RepositoryException
      * @throws IOException
-     * @throws PoddException If invalid File References were found
+     * @throws PoddException
+     *             If invalid File References were found
      */
-    public void checkFileReferencesInRDF(RepositoryConnection repositoryConnection, URI context) throws RepositoryException, IOException, PoddException
+    public void checkFileReferencesInRDF(final RepositoryConnection repositoryConnection, final URI context)
+        throws RepositoryException, IOException, PoddException
     {
-        List<String> errors = new ArrayList<String>();
+        repositoryConnection.commit();
+        final List<String> errors = new ArrayList<String>();
         try
         {
             // how about making these constants?
-            URI fileRefURI = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "FileReference").toOpenRDFURI();
-            URI propertyHasFileName = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileName").toOpenRDFURI();
-            URI propertyHasAlias = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasAlias").toOpenRDFURI();
-            URI propertyHasPath = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasPath").toOpenRDFURI();
+            final URI fileRefURI = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "FileReference").toOpenRDFURI();
+            final URI propertyHasFileName =
+                    IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileName").toOpenRDFURI();
+            final URI propertyHasAlias = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasAlias").toOpenRDFURI();
+            final URI propertyHasPath = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasPath").toOpenRDFURI();
             
             // search statements identifying any resource as a File Reference
-            RepositoryResult<Statement> statements =
+            final RepositoryResult<Statement> statements =
                     repositoryConnection.getStatements(null, RDF.TYPE, fileRefURI, false, context);
             final List<Statement> statementList = Iterations.addAll(statements, new ArrayList<Statement>());
             for(final Statement statement : statementList)
             {
-                String fileRefObj = statement.getSubject().stringValue();
+                final String fileRefObj = statement.getSubject().stringValue();
                 System.out.println("found file reference: " + fileRefObj);
-                HttpFileReference httpFileRef = new HttpFileReference();
+                final HttpFileReference httpFileRef = new HttpFileReference();
                 
-                RepositoryResult<Statement> st =
-                        repositoryConnection.getStatements(IRI.create(fileRefObj).toOpenRDFURI(), null, null,
-                                false, context);
+                final RepositoryResult<Statement> st =
+                        repositoryConnection.getStatements(IRI.create(fileRefObj).toOpenRDFURI(), null, null, false,
+                                context);
                 while(st.hasNext())
                 {
-                    Statement nextStatement = st.next();
-                    if (propertyHasFileName.equals(nextStatement.getPredicate()))
+                    final Statement nextStatement = st.next();
+                    if(propertyHasFileName.equals(nextStatement.getPredicate()))
                     {
-                        String filename = nextStatement.getObject().stringValue();
+                        final String filename = nextStatement.getObject().stringValue();
                         httpFileRef.setFilename(filename);
                     }
-                    else if (propertyHasAlias.equals(nextStatement.getPredicate()))
+                    else if(propertyHasAlias.equals(nextStatement.getPredicate()))
                     {
-                        String alias = nextStatement.getObject().stringValue();
+                        final String alias = nextStatement.getObject().stringValue();
                         httpFileRef.setServerAlias(alias);
                     }
-                    else if (propertyHasPath.equals(nextStatement.getPredicate()))
+                    else if(propertyHasPath.equals(nextStatement.getPredicate()))
                     {
-                        String path = nextStatement.getObject().stringValue();
+                        final String path = nextStatement.getObject().stringValue();
                         httpFileRef.setPath(path);
                     }
                     
@@ -271,12 +274,12 @@ public class FileReferenceUtils
                 {
                     this.checkFileExists(httpFileRef);
                 }
-                catch (IOException | PoddException e)
+                catch(IOException | PoddException e)
                 {
                     errors.add(e.getMessage());
                 }
             }
-            if (errors.size() > 0)
+            if(errors.size() > 0)
             {
                 throw new PoddException("Invalid File Reference(s) found.", errors, -1);
             }
@@ -297,12 +300,14 @@ public class FileReferenceUtils
         
         try
         {
-            this.aliases.load(this.getClass().getResourceAsStream(this.aliasFilePath));
+            // this.aliases.load(this.getClass().getResourceAsStream(this.aliasFilePath));
+            this.aliases.load(new FileInputStream(this.aliasFilePath));
         }
-        catch(final IOException e)
+        catch(final IOException | NullPointerException e)
         {
-            this.log.error("Failed to load aliases", e);
-            throw new IOException("Failed to load aliases", e);
+            final String message = "Failed to load aliases from " + this.aliasFilePath;
+            this.log.error(message, e);
+            throw new IOException(message, e);
         }
         this.aliasesLoadedAt = System.currentTimeMillis();
     }

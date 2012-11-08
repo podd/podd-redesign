@@ -38,8 +38,8 @@ public class FileReferenceAttachServlet extends PoddBaseServlet implements Servl
         
         this.log.info("REFERENCE attach");
         final FileReferenceUtils utils = FileReferenceUtils.getInstance();
-
-        FileReference fileReference = utils.constructFileReferenceFromMap(request.getParameterMap());
+        
+        final FileReference fileReference = utils.constructFileReferenceFromMap(request.getParameterMap());
         
         if(fileReference == null)
         {
@@ -66,13 +66,13 @@ public class FileReferenceAttachServlet extends PoddBaseServlet implements Servl
                         PoddServletContextListener.PODD_SERVLET_HELPER);
         try
         {
-            helper.attachReference(fileReference);
+            helper.attachReference(fileReference, false);
         }
         catch(final RuntimeException e)
         {
             final String message = "REFERENCE attach failed. " + e.getMessage();
             this.log.error(message);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message); //client error
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message); // client error
             return;
         }
         catch(final PoddException | OWLException | OpenRDFException e)
@@ -86,5 +86,5 @@ public class FileReferenceAttachServlet extends PoddBaseServlet implements Servl
         
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
-
+    
 }

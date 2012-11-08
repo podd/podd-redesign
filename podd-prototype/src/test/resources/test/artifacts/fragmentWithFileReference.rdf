@@ -9,17 +9,6 @@
 	xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
 
 <!-- a file reference resource -->
-<rdf:Description rdf:about="http://podd.org/filereference#unique_random_id:1">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
-	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">SalesForce GIT CheatSheet</rdfs:label>
-	<poddBase:hasFileName>salesforce_git_developer_cheatsheet.pdf</poddBase:hasFileName>
-	<poddBase:hasDescription>GIT developer cheatsheet from salesforce</poddBase:hasDescription>
-	<poddBase:hasPath>this/is/path</poddBase:hasPath>
-	<poddBase:hasAlias>no_such_alias</poddBase:hasAlias>
-</rdf:Description>
-
-<!-- a file reference resource -->
 <rdf:Description rdf:about="http://podd.org/filereference#unique_random_id:2">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
@@ -38,7 +27,7 @@
 <!-- owner of file reference -->
 <rdf:Description rdf:about="http://www.podd.org/user#John.Doe@csiro.au">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-	<poddBase:hasFileReference rdf:resource="http://podd.org/filereference#unique_random_id:1"/>
+	<poddBase:hasFileReference rdf:resource="http://podd.org/filereference#unique_random_id:2"/>
 </rdf:Description>
 
 </rdf:RDF>

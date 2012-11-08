@@ -94,9 +94,12 @@ public class PoddServlet extends PoddBaseServlet
                     artifactURI = PoddServletHelper.extractUri(pathInfo.substring(23));
                 }
                 
+                final boolean checkFileReference = true; //this could be a user or system parameter
+                
                 final InputStream in = request.getInputStream();
                 final String contentType = PoddServlet.MIME_TYPE_RDF_XML; // request.getContentType();
-                final String editedURI = helper.editArtifact(artifactURI, in, contentType, isReplace);
+                final String editedURI = helper.editArtifact(artifactURI, in, contentType, isReplace,
+                        checkFileReference);
                 response.setContentType(PoddServlet.MIME_TYPE_JSON);
                 out.write(editedURI); // should be in JSON
             }
