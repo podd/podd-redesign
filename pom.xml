@@ -61,6 +61,19 @@
         <maven>2.2.1</maven>
     </prerequisites>
 
+    <profiles>
+        <profile>
+            <id>test</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <default-podd-home>${basedir}/target/.podd</default-podd-home>
+            </properties>
+        </profile>
+    
+    </profiles>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
