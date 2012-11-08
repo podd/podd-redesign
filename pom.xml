@@ -338,9 +338,17 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.12.3</version>
-                    <!-- <configuration>
-                        <argLine>-Xmx4096m</argLine>
-                    </configuration> -->
+                    <!-- <configuration> <argLine>-Xmx4096m</argLine> </configuration> -->
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.12.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>jetty-maven-plugin</artifactId>
+                    <version>8.1.8.v20121106</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
