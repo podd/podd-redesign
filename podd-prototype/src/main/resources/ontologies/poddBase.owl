@@ -34,10 +34,6 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <owl:AnnotationProperty rdf:about="&poddBase;hasUser">
-        <rdfs:label>has User</rdfs:label>
-        <rdfs:domain rdf:resource="&poddBase;PoddTopObject"/>
-    </owl:AnnotationProperty>
     <owl:AnnotationProperty rdf:about="&poddBase;weight">
         <rdfs:label>has Weight</rdfs:label>
     </owl:AnnotationProperty>
