@@ -62,8 +62,8 @@ public class FileReferenceAttachServlet extends PoddBaseServlet implements Servl
         }
         
         final PoddServletHelper helper =
-                (PoddServletHelper)request.getServletContext().getAttribute(
-                        PoddServletContextListener.PODD_SERVLET_HELPER);
+                (PoddServletHelper)this.getServletContext()
+                        .getAttribute(PoddServletContextListener.PODD_SERVLET_HELPER);
         try
         {
             helper.attachReference(fileReference, false);
