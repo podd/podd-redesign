@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class AbstractSesameTest
+public abstract class AbstractSesameTest
 {
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
