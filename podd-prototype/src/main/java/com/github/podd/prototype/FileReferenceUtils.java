@@ -243,7 +243,6 @@ public class FileReferenceUtils
             for(final Statement statement : statementList)
             {
                 final String fileRefObj = statement.getSubject().stringValue();
-                System.out.println("found file reference: " + fileRefObj);
                 final HttpFileReference httpFileRef = new HttpFileReference();
                 
                 final RepositoryResult<Statement> st =
