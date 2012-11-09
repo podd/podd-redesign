@@ -45,7 +45,7 @@ public class LoginServlet extends PoddBaseServlet
             final String password = request.getParameter("password");
             if(!this.checkCredentials(username, password))
             {
-                this.log.info("Failed login attempt for " + username + "/" + password);
+                this.log.info("Failed login attempt for " + username);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login failed");
                 return;
             }
