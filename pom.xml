@@ -241,14 +241,6 @@
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
                     </exclusion>
-                    <exclusion>
-                        <artifactId>httpcore</artifactId>
-                        <groupId>org.apache.httpcomponents</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>httpclient</artifactId>
-                        <groupId>org.apache.httpcomponents</groupId>
-                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -465,5 +457,28 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>maven-restlet</id>
+            <name>Public online Restlet repository</name>
+            <url>http://maven.restlet.org</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>net.sourceforge.jwebunit</groupId>
+            <artifactId>jwebunit-htmlunit-plugin</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
 </project>
