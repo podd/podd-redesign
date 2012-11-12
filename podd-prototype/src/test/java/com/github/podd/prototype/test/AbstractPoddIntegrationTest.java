@@ -15,6 +15,9 @@ import com.github.podd.prototype.PoddServletContextListener;
 public abstract class AbstractPoddIntegrationTest
 {
     
+    protected static final String TEST_USERNAME = "john";
+    protected static final String TEST_PASSWORD = "wayne";
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     protected String BASE_URL = null;
@@ -47,13 +50,13 @@ public abstract class AbstractPoddIntegrationTest
     public void setUp() throws Exception
     {
         this.BASE_URL = "http://localhost:9090/podd-test";
-
-        String poddHome = System.getProperty(PoddServletContextListener.PODD_HOME);
-        Properties passwords = new Properties();
-        passwords.setProperty("john", "wayne");
+        
+        final String poddHome = System.getProperty(PoddServletContextListener.PODD_HOME);
+        final Properties passwords = new Properties();
+        passwords.setProperty(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         this.writeFile(passwords, poddHome + "/passwd");
         
-        Properties aliases = new Properties();
+        final Properties aliases = new Properties();
         aliases.setProperty("localhost.protocol", "http");
         aliases.setProperty("localhost.host", "localhost");
         this.writeFile(aliases, poddHome + "/alias");
@@ -77,7 +80,7 @@ public abstract class AbstractPoddIntegrationTest
         
         try
         {
-            String poddHome = System.getProperty(PoddServletContextListener.PODD_HOME);
+            final String poddHome = System.getProperty(PoddServletContextListener.PODD_HOME);
             this.deleteFile(poddHome + "/passwd");
             this.deleteFile(poddHome + "/alias");
         }
@@ -87,35 +90,35 @@ public abstract class AbstractPoddIntegrationTest
         }
         
     }
-
-    private void writeFile(Properties props, String filename)
+    
+    private void writeFile(final Properties props, final String filename)
     {
         try
         {
             props.store(new FileOutputStream(filename), "");
-            this.log.info("Created file: " + filename);
+            this.log.debug("Created file: " + filename);
         }
-        catch(IOException e)
+        catch(final IOException e)
         {
             this.log.error("Failed to create file: " + filename, e);
         }
     }
-
-    private void deleteFile(String filename)
+    
+    private void deleteFile(final String filename)
     {
         boolean deleted = false;
-        File f = new File(filename);
-        if (f.exists() && !f.isDirectory())
+        final File f = new File(filename);
+        if(f.exists() && !f.isDirectory())
         {
             deleted = f.delete();
         }
-        if (deleted)
+        if(deleted)
         {
-            this.log.info("Deleted file: " + filename);
+            this.log.debug("Deleted file: " + filename);
         }
         else
         {
-            this.log.info("Could not delete file: " + filename);
+            this.log.debug("Could not delete file: " + filename);
         }
     }
     
