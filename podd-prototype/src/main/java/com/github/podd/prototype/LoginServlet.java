@@ -40,7 +40,6 @@ public class LoginServlet extends PoddBaseServlet
         
         if(PoddBaseServlet.HTTP_POST.equals(httpMethod))
         {
-            this.log.debug("request parameters", request.getParameterMap());
             final String username = request.getParameter("username");
             
             if(username == null)
@@ -76,10 +75,17 @@ public class LoginServlet extends PoddBaseServlet
         }
         else if(PoddBaseServlet.HTTP_GET.equals(httpMethod) && request.getParameter("logout") != null)
         {
-            this.log.info("Logout requested");
-            request.getSession().invalidate();
+            this.log.debug("Logout requested");
+            if(this.isValidSession(request, response))
+            {
+                request.getSession().invalidate();
+            }
         }
-        
+        else
+        {
+            this.log.info("Unsupported service request: " + httpMethod);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Request not supported");
+        }
     }
     
     /**
