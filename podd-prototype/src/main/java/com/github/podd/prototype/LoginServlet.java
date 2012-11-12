@@ -37,16 +37,32 @@ public class LoginServlet extends PoddBaseServlet
         final PrintWriter out = response.getWriter();
         
         final String httpMethod = request.getMethod();
-        String username = null;
         
         if(PoddBaseServlet.HTTP_POST.equals(httpMethod))
         {
-            username = request.getParameter("username");
+            this.log.debug("request parameters", request.getParameterMap());
+            final String username = request.getParameter("username");
+            
+            if(username == null)
+            {
+                this.log.info("Did not receive a username parameter {}", request.getParameterMap());
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            
             final String password = request.getParameter("password");
+            
+            if(password == null)
+            {
+                this.log.info("Did not receive a password parameter {}", request.getParameterMap());
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            
             if(!this.checkCredentials(username, password))
             {
                 this.log.info("Failed login attempt for " + username);
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login failed");
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Login failed");
                 return;
             }
             // create session and send SUCCESS response
