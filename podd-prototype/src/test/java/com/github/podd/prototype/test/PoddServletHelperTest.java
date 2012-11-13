@@ -16,6 +16,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFParseException;
@@ -498,8 +499,10 @@ public class PoddServletHelperTest
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
+        final RepositoryConnection nextRepositoryConnection = this.helper.nextRepository.getConnection();
+        nextRepositoryConnection.setAutoCommit(false);
         
-        final RepositoryConnection conn = this.helper.getRepositoryConnection();
+        final RepositoryConnection conn = nextRepositoryConnection;
         
         // test with a non-existent artifact
         InferredOWLOntologyID id = this.helper.getInferredOWLOntologyIDForArtifact("http://nosuch:ontology:1", conn);
@@ -510,7 +513,17 @@ public class PoddServletHelperTest
         id = this.helper.getInferredOWLOntologyIDForArtifact(artifactUniqueIRI.stringValue(), conn);
         
         conn.rollback();
-        this.helper.returnRepositoryConnection(conn);
+        if(conn != null)
+        {
+            try
+            {
+                conn.close();
+            }
+            catch(final RepositoryException e)
+            {
+                this.helper.log.error("Test repository connection could not be closed", e);
+            }
+        }
     }
     
     @Test

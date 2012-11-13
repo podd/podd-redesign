@@ -124,7 +124,9 @@ public class PoddServletHelper
     public void loadSchemaOntologies() throws OWLException, OpenRDFException, IOException, PoddException
     {
         
-        final RepositoryConnection nextRepositoryConnection = this.getRepositoryConnection();
+        final RepositoryConnection nextRepositoryConnection1 = this.nextRepository.getConnection();
+        nextRepositoryConnection1.setAutoCommit(false);
+        final RepositoryConnection nextRepositoryConnection = nextRepositoryConnection1;
         this.log.info("loadSchemaOntology ... PODD-BASE");
         this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 nextRepositoryConnection);
@@ -133,7 +135,17 @@ public class PoddServletHelper
         this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                 nextRepositoryConnection);
         this.log.info("loadSchemaOntology ... completed");
-        this.returnRepositoryConnection(nextRepositoryConnection);
+        if(nextRepositoryConnection != null)
+        {
+            try
+            {
+                nextRepositoryConnection.close();
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Test repository connection could not be closed", e);
+            }
+        }
     }
     
     /**
@@ -193,7 +205,9 @@ public class PoddServletHelper
         // load on to a temporary in-memory repository to create persistent URLs
         Repository tempRepository = null;
         RepositoryConnection tempRepositoryConnection = null;
-        final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        final RepositoryConnection nextRepositoryConnection = this.nextRepository.getConnection();
+        nextRepositoryConnection.setAutoCommit(false);
+        final RepositoryConnection repositoryConnection = nextRepositoryConnection;
         
         try
         {
@@ -278,7 +292,17 @@ public class PoddServletHelper
         }
         finally
         {
-            this.returnRepositoryConnection(repositoryConnection);
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be closed", e);
+                }
+            }
             if(tempRepositoryConnection != null)
             {
                 tempRepositoryConnection.rollback();
@@ -309,8 +333,10 @@ public class PoddServletHelper
         throws RepositoryException, RDFHandlerException
     {
         this.log.info("GET artifact: " + artifactUri);
+        final RepositoryConnection nextRepositoryConnection = this.nextRepository.getConnection();
+        nextRepositoryConnection.setAutoCommit(false);
         
-        final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        final RepositoryConnection repositoryConnection = nextRepositoryConnection;
         try
         {
             final InferredOWLOntologyID ontologyID =
@@ -342,7 +368,17 @@ public class PoddServletHelper
         }
         finally
         {
-            this.returnRepositoryConnection(repositoryConnection);
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be closed", e);
+                }
+            }
         }
     }
     
@@ -356,8 +392,10 @@ public class PoddServletHelper
     public String deleteArtifact(final String artifactUri) throws RepositoryException, RDFHandlerException
     {
         this.log.info("DELETE artifact: " + artifactUri);
+        final RepositoryConnection nextRepositoryConnection = this.nextRepository.getConnection();
+        nextRepositoryConnection.setAutoCommit(false);
         
-        final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        final RepositoryConnection repositoryConnection = nextRepositoryConnection;
         try
         {
             final InferredOWLOntologyID ontologyID =
@@ -398,7 +436,17 @@ public class PoddServletHelper
         }
         finally
         {
-            this.returnRepositoryConnection(repositoryConnection);
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be closed", e);
+                }
+            }
         }
         
     }
@@ -421,8 +469,10 @@ public class PoddServletHelper
         OWLException, PoddException
     {
         this.log.info("EDIT artifact: " + artifactUri);
+        final RepositoryConnection nextRepositoryConnection = this.nextRepository.getConnection();
+        nextRepositoryConnection.setAutoCommit(false);
         
-        final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        final RepositoryConnection repositoryConnection = nextRepositoryConnection;
         Repository tempRepository = null;
         RepositoryConnection tempRepositoryConnection = null;
         
@@ -537,9 +587,29 @@ public class PoddServletHelper
         finally
         {
             repositoryConnection.rollback(); // OR commit
-            this.returnRepositoryConnection(repositoryConnection);
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be closed", e);
+                }
+            }
             
-            this.returnRepositoryConnection(repositoryConnection);
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be closed", e);
+                }
+            }
             if(tempRepositoryConnection != null)
             {
                 tempRepositoryConnection.rollback();
@@ -568,8 +638,10 @@ public class PoddServletHelper
         throws PoddException, OpenRDFException, IOException, OWLException
     {
         this.log.info("REFERENCE attach: " + fileReference.toString());
+        final RepositoryConnection nextRepositoryConnection = this.nextRepository.getConnection();
+        nextRepositoryConnection.setAutoCommit(false);
         
-        final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        final RepositoryConnection repositoryConnection = nextRepositoryConnection;
         Repository tempRepository = null;
         RepositoryConnection tempRepositoryConnection = null;
         
@@ -622,7 +694,17 @@ public class PoddServletHelper
         }
         finally
         {
-            this.returnRepositoryConnection(repositoryConnection);
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be closed", e);
+                }
+            }
         }
     }
     
@@ -633,7 +715,9 @@ public class PoddServletHelper
      */
     public void resetPodd() throws RepositoryException
     {
-        final RepositoryConnection repositoryConnection = this.getRepositoryConnection();
+        final RepositoryConnection nextRepositoryConnection = this.nextRepository.getConnection();
+        nextRepositoryConnection.setAutoCommit(false);
+        final RepositoryConnection repositoryConnection = nextRepositoryConnection;
         try
         {
             repositoryConnection.clear();
@@ -641,7 +725,17 @@ public class PoddServletHelper
         }
         finally
         {
-            this.returnRepositoryConnection(repositoryConnection);
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be closed", e);
+                }
+            }
         }
     }
     
@@ -769,6 +863,7 @@ public class PoddServletHelper
             // URL decode it first to make sure we don't double encode
             uriPath = java.net.URLDecoder.decode(uriPath, "UTF-8");
             
+            // FIXME: The following is broken if the slash is inside the query or fragment portions
             // URL encode the part after the last '/'
             final String hostPath = uriPath.substring(0, uriPath.lastIndexOf("/") + 1);
             final String toEncode = uriPath.substring(uriPath.lastIndexOf("/") + 1);
@@ -811,40 +906,6 @@ public class PoddServletHelper
         }
         
         this.nextRepository = null;
-    }
-    
-    /**
-     * Get a new RepositoryConnection object. Remember to "return" it after you're done using it.
-     * 
-     * @return
-     * @throws RepositoryException
-     */
-    public RepositoryConnection getRepositoryConnection() throws RepositoryException
-    {
-        final RepositoryConnection nextRepositoryConnection = this.nextRepository.getConnection();
-        nextRepositoryConnection.setAutoCommit(false);
-        return nextRepositoryConnection;
-    }
-    
-    /**
-     * A used RepositoryConnection should be "returned" using this method so that the system can
-     * discard/reuse it as appropriate.
-     * 
-     * @param repositoryConnection
-     */
-    public void returnRepositoryConnection(final RepositoryConnection repositoryConnection)
-    {
-        if(repositoryConnection != null)
-        {
-            try
-            {
-                repositoryConnection.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Test repository connection could not be closed", e);
-            }
-        }
     }
     
     public RepositoryConnection loadDataToNewRepository(final InputStream in, final String mimeType,

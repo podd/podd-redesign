@@ -9,6 +9,9 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 /**
  * Encapsulates File References that are tracked inside of PODD Artifacts.
  * 
+ * More specific interfaces should be used to represent particular types of file references. For
+ * example, SSH file reference objects may be distinctly different to DOI file reference objects.
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
@@ -18,27 +21,27 @@ public interface FileReference
      * 
      * @return The {@link OWLOntologyID} for the Artifact that includes this file reference.
      */
-    public OWLOntologyID getArtifactID();
+    OWLOntologyID getArtifactID();
     
     /**
      * 
      * @return The {@link IRI} of the object inside of the Artifact that this file reference is
      *         linked to.
      */
-    public IRI getObjectIri();
+    IRI getObjectIri();
     
     /**
      * 
      * @return The alias for the repository that is managing this file reference.
      */
-    public String getRepositoryAlias();
+    String getRepositoryAlias();
     
     /**
      * 
      * @param artifactUri
      *            The {@link OWLOntologyID} for the Artifact that includes this file reference.
      */
-    public void setArtifactID(OWLOntologyID artifactUri);
+    void setArtifactID(OWLOntologyID artifactUri);
     
     /**
      * 
@@ -46,7 +49,7 @@ public interface FileReference
      *            The {@link IRI} of the object inside of the Artifact that this file reference is
      *            linked to.
      */
-    public void setObjectIri(IRI objectUri);
+    void setObjectIri(IRI objectUri);
     
     /**
      * Sets the alias used to name the repository configuration used to access this file reference.
@@ -54,5 +57,5 @@ public interface FileReference
      * @param repositoryAlias
      *            Alias for the repository that is managing this file reference.
      */
-    public void setRepositoryAlias(String repositoryAlias);
+    void setRepositoryAlias(String repositoryAlias);
 }
