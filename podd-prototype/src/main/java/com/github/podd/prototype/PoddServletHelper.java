@@ -137,12 +137,13 @@ public class PoddServletHelper
     }
     
     /**
-     * Add a new artifact to PODD TODO: support different mime types
+     * Add a new artifact to PODD 
      * 
+     * TODO: support different mime types
      * 
      * @param inputStream
      * @param contentType
-     * @return
+     * @return The newly allocated URI that is used by PODD to identify this artifact
      * @throws PoddException
      * @throws OWLException
      * @throws IOException
@@ -152,8 +153,7 @@ public class PoddServletHelper
         IOException, OWLException, PoddException
     {
         final InferredOWLOntologyID nextOntology = this.loadPoddArtifactInternal(inputStream, contentType);
-        
-        return this.getArtifact(nextOntology.getOntologyIRI().toString(), contentType, false);
+        return nextOntology.getOntologyIRI().toString();
     }
     
     /**

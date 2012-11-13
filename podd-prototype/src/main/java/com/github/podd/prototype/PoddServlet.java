@@ -62,9 +62,9 @@ public class PoddServlet extends PoddBaseServlet
             final String contentType = PoddServlet.MIME_TYPE_RDF_XML;// request.getContentType();
             try
             {
-                final String loadedArtifactContent = helper.loadPoddArtifact(in, contentType);
-                response.setContentType(PoddServlet.MIME_TYPE_RDF_XML);
-                out.write(loadedArtifactContent);
+                final String loadedArtifactUri = helper.loadPoddArtifact(in, contentType);
+                response.setContentType(PoddServlet.MIME_TYPE_JSON);
+                out.write(loadedArtifactUri); //should be encapsulated in JSON format
             }
             catch(final Exception e)
             {
@@ -186,7 +186,6 @@ public class PoddServlet extends PoddBaseServlet
             this.log.info("Unsupported service request: " + httpMethod + ":" + pathInfo);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Request not supported");
         }
-        out.write("\r\n");
         out.flush();
         out.close();
     }

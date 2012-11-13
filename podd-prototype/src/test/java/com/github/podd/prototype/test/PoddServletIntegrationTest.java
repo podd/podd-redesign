@@ -5,10 +5,7 @@ import java.io.ByteArrayInputStream;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -146,8 +143,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
         final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
-        final String artifactUri =
-                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+        final String artifactUri = this.formatUri(addResponse.getEntityAsText());
         
         // -- GET the "base" artifact from the web service and verify results
         final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
@@ -189,8 +185,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
         final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
-        final String artifactUri =
-                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+        final String artifactUri = this.formatUri(addResponse.getEntityAsText());
         
         // -- DELETE the artifact using the web service and verify results
         final Request deleteRequest = new Request(Method.DELETE, this.BASE_URL + "/podd/artifact/" + artifactUri);
@@ -219,8 +214,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
         final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
-        final String artifactUri =
-                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+        final String artifactUri = this.formatUri(addResponse.getEntityAsText());
         
         // -- send RESET request
         final Request resetRequest = new Request(Method.POST, this.BASE_URL + "/podd/reset");
@@ -266,8 +260,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         final String path = this.getClass().getResource("/test/artifacts/editableProject-1.rdf").getFile();
         final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
-        final String artifactUri =
-                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+        final String artifactUri = this.formatUri(addResponse.getEntityAsText());
         
         // -- generate and send an edit request
         final String fragmentPath = this.getClass().getResource("/test/artifacts/fragment.rdf").getFile();
@@ -322,44 +315,18 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     }
     
     /**
-     * Helper method to extract an artifact's URI from a String representation of the whole
-     * artifact.
+     * Helper method to convert an artifact URI to a format that can be sent to the web service.
      * 
      * The URI is returned with the protocol part separated using a single '/' such that it can be
      * directly used with web service requests. (E.g. "http/purl.og...")
      * 
      * @param rdfString
-     * @param rdfFormat
      * @return
      * @throws Exception
      */
-    protected String getArtifactUriFromStringRepresentation(final String rdfString, final RDFFormat rdfFormat)
-        throws Exception
+    protected String formatUri(final String rdfString) throws Exception
     {
-        try
-        {
-            final URI initialContext = IRI.create("urn:initial-context:").toOpenRDFURI();
-            this.getTestRepositoryConnection().add(new ByteArrayInputStream(rdfString.getBytes()), "", rdfFormat,
-                    initialContext);
-            final URI hasTopObject = IRI.create("http://purl.org/podd/ns/poddBase#artifactHasTopObject").toOpenRDFURI();
-            
-            final RepositoryResult<Statement> results =
-                    this.getTestRepositoryConnection().getStatements(null, hasTopObject, null, true, initialContext);
-            if(results.hasNext())
-            {
-                final Resource artifactResource = results.next().getSubject();
-                return artifactResource.stringValue().replace("://", "/");
-            }
-            else
-            {
-                Assert.fail("Could not find URI of added artifact");
-                return null; // unreachable line, added to make the compiler happy
-            }
-        }
-        finally
-        {
-            this.getTestRepositoryConnection().rollback();
-        }
+        return rdfString.replace("://", "/");
     }
     
 }
