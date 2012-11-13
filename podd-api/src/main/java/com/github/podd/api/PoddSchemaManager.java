@@ -58,6 +58,23 @@ public interface PoddSchemaManager
             RDFFormat format) throws UnmanagedSchemaException;
     
     /**
+     * Get the most current version of a managed Schema Ontology that contains the given
+     * schemaOntologyIRI as either the ontology IRI or the version IRI.
+     * 
+     * NOTE: This method must be able to take an ontology version IRI, and return the most current
+     * version of that ontology, if the IRI does not match a schema ontology IRI.
+     * 
+     * @param schemaOntologyIRI
+     *            The Ontology IRI, or if no ontology IRIs match, the version IRI of a Schema
+     *            Ontology.
+     * @return The current managed Schema Ontology with either the given IRI as the schema ontology
+     *         IRI, or the given IRI as the schema ontology version IRI.
+     * @throws UnmanagedSchemaIRIException
+     *             If the given schemaOntologyIRI is not recognised or managed.
+     */
+    OWLOntologyID getCurrentSchemaOntologyVersion(IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException;
+    
+    /**
      * Gets a PODD Schema Ontology based on the given IRI. If the IRI matches a managed Schema
      * Ontology IRI then the current version of that Schema Ontology is returned. If the IRI does
      * not match a Schema Ontology IRI, then it is checked against all of the version IRIs for the
