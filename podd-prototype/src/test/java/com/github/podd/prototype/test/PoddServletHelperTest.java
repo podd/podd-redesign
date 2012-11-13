@@ -5,6 +5,7 @@ import info.aduna.iteration.Iterations;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -496,31 +497,15 @@ public class PoddServletHelperTest
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
-        final RepositoryConnection nextRepositoryConnection = this.helper.nextRepository.getConnection();
-        nextRepositoryConnection.setAutoCommit(false);
-        
-        final RepositoryConnection conn = nextRepositoryConnection;
-        
         // test with a non-existent artifact
-        InferredOWLOntologyID id = this.helper.getInferredOWLOntologyIDForArtifact("http://nosuch:ontology:1", conn);
+        InferredOWLOntologyID id = this.helper.getInferredOWLOntologyIDForArtifact("http://nosuch:ontology:1");
         Assert.assertNull(id.getInferredOntologyIRI());
         Assert.assertNull(id.getVersionIRI());
         
         // test with the added artifact
-        id = this.helper.getInferredOWLOntologyIDForArtifact(artifactUniqueIRI.stringValue(), conn);
+        InferredOWLOntologyID nextId = this.helper.getInferredOWLOntologyIDForArtifact(artifactUniqueIRI.stringValue());
         
-        conn.rollback();
-        if(conn != null)
-        {
-            try
-            {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.helper.log.error("Test repository connection could not be closed", e);
-            }
-        }
+        // FIXME: Test nextId
     }
     
     @Test
@@ -567,7 +552,7 @@ public class PoddServletHelperTest
         tempRepositoryConnection.setAutoCommit(false);
         
         // add data to Repository
-        tempRepositoryConnection.add(new ByteArrayInputStream(data.getBytes()), "",
+        tempRepositoryConnection.add(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)), "",
                 Rio.getParserFormatForMIMEType(mimeType), context);
         tempRepositoryConnection.commit();
         

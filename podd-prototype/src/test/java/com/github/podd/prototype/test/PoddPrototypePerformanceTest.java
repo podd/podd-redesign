@@ -168,6 +168,8 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
         InferredOWLOntologyID inferred = this.utils.loadPoddArtifact(
                 this.filename, mimeType, this.getTestRepositoryConnection());
         
+        this.getTestRepositoryConnection().commit();
+        
         // write statistics
         StringBuilder statsMsg = new StringBuilder();
         

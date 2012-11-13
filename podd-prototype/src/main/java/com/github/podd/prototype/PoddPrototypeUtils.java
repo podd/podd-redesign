@@ -303,28 +303,21 @@ public class PoddPrototypeUtils
     public void dumpOntologyToRepository(final OWLOntology nextOntology,
             final RepositoryConnection nextRepositoryConnection) throws IOException, RepositoryException
     {
-        try
+        if(nextOntology.getOntologyID().getVersionIRI() == null)
         {
-            // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
-            // into a single context in the Sesame Repository
-            final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
-            repositoryHandler.enforceContext(nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
-            
-            // Render the triples out from OWLAPI into a Sesame Repository
-            final RioRenderer renderer =
-                    new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
-                            nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
-            renderer.render();
-            
-            // Commit the current repository connection
-            nextRepositoryConnection.commit();
+            throw new IllegalArgumentException("Cannot dump and ontology to repository if it does not have a version IRI");
         }
-        catch(final RepositoryException e)
-        {
-            // if anything failed, rollback the connection before rethrowing the exception
-            nextRepositoryConnection.rollback();
-            throw e;
-        }
+        
+        // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
+        // into a single context in the Sesame Repository
+        final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
+        repositoryHandler.enforceContext(nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
+        
+        // Render the triples out from OWLAPI into a Sesame Repository
+        final RioRenderer renderer =
+                new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
+                        nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
+        renderer.render();
     }
     
     /**
@@ -446,6 +439,16 @@ public class PoddPrototypeUtils
             // loadOntology(RepositoryConnection...) method
             nextOntology = this.loadOntology(ontologyResourcePath, mimeType);
             
+            if(nextOntology == null)
+            {
+                throw new PoddException("Could not load ontology for some reason", null, -1);
+            }
+            
+            if(nextOntology.getOntologyID().getVersionIRI() == null)
+            {
+                throw new PoddException("Cannot load a schema ontology that does not have a version IRI", null, -1);
+            }
+            
             final OWLReasoner reasoner = this.checkConsistency(nextOntology);
             this.dumpOntologyToRepository(nextOntology, nextRepositoryConnection);
             final OWLOntology nextInferredOntology =
@@ -466,7 +469,7 @@ public class PoddPrototypeUtils
             return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology
                     .getOntologyID().getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
         }
-        catch(final Exception e)
+        catch(OWLException | OpenRDFException | IOException | PoddException e)
         {
             if(nextOntology != null)
             {
@@ -647,11 +650,6 @@ public class PoddPrototypeUtils
             return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology
                     .getOntologyID().getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
         }
-        catch(OpenRDFException | OWLException | IOException | PoddException e)
-        {
-            
-            throw e;
-        }
         finally
         {
             if(tempRepositoryConnection != null)
@@ -783,70 +781,57 @@ public class PoddPrototypeUtils
         // for the corresponding code.
         final URI nextInferredOntologyUri = nextInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         
-        try
+        // type the ontology
+        // 1st 3 parameters represent the triple.
+        // 4th (the artifactGraph) is the "context" in which the triple is stored
+        nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
+        
+        // remove previous versionIRI statements
+        nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, null, this.artifactGraph);
+        
+        // TODO: remove the content of any contexts that are the object of versionIRI statements
+        
+        // setup a version number link for this version
+        nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, nextVersionUri,
+                this.artifactGraph);
+        
+        // remove whatever was previously there for the current version marker
+        nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, null,
+                this.artifactGraph);
+        
+        // then insert the new current version marker
+        nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, nextVersionUri,
+                this.artifactGraph);
+        
+        // then do a similar process with the inferred axioms ontology
+        nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
+        
+        // remove whatever was previously there for the current inferred version marker
+        nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION, null,
+                this.artifactGraph);
+        
+        // link from the ontology IRI to the current inferred axioms ontology version
+        nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
+                nextInferredOntologyUri, this.artifactGraph);
+        
+        // remove the content for all previous inferred versions
+        // NOTE: This list should not ever be very large, as we perform this step every time
+        // this method is called to update the version
+        final RepositoryResult<Statement> repoResults =
+                nextRepositoryConnection.getStatements(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
+                        null, false, this.artifactGraph);
+        while(repoResults.hasNext())
         {
-            // type the ontology
-            // 1st 3 parameters represent the triple.
-            // 4th (the artifactGraph) is the "context" in which the triple is stored
-            nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
-            
-            // remove previous versionIRI statements
-            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, null,
-                    this.artifactGraph);
-            
-            // TODO: remove the content of any contexts that are the object of versionIRI statements
-            
-            // setup a version number link for this version
-            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, nextVersionUri,
-                    this.artifactGraph);
-            
-            // remove whatever was previously there for the current version marker
-            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, null,
-                    this.artifactGraph);
-            
-            // then insert the new current version marker
-            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, nextVersionUri,
-                    this.artifactGraph);
-            
-            // then do a similar process with the inferred axioms ontology
-            nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
-            
-            // remove whatever was previously there for the current inferred version marker
-            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    null, this.artifactGraph);
-            
-            // link from the ontology IRI to the current inferred axioms ontology version
-            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    nextInferredOntologyUri, this.artifactGraph);
-            
-            // remove the content for all previous inferred versions
-            // NOTE: This list should not ever be very large, as we perform this step every time
-            // this method is called to update the version
-            final RepositoryResult<Statement> repoResults =
-                    nextRepositoryConnection.getStatements(nextOntologyUri,
-                            PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION, null, false, this.artifactGraph);
-            while(repoResults.hasNext())
-            {
-                final URI inferredVersionUri = IRI.create(repoResults.next().getObject().stringValue()).toOpenRDFURI();
-                nextRepositoryConnection.remove(inferredVersionUri, null, null, this.artifactGraph);
-            }
-            
-            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION, null,
-                    this.artifactGraph);
-            
-            // link from the ontology version IRI to the matching inferred axioms ontology version
-            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
-                    nextInferredOntologyUri, this.artifactGraph);
-            
-            // if everything went well commit the connection
-            nextRepositoryConnection.commit();
+            final URI inferredVersionUri = IRI.create(repoResults.next().getObject().stringValue()).toOpenRDFURI();
+            nextRepositoryConnection.remove(inferredVersionUri, null, null, this.artifactGraph);
         }
-        catch(final RepositoryException e)
-        {
-            // if anything failed, rollback the connection before rethrowing the exception
-            nextRepositoryConnection.rollback();
-            throw e;
-        }
+        
+        nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION, null,
+                this.artifactGraph);
+        
+        // link from the ontology version IRI to the matching inferred axioms ontology version
+        nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
+                nextInferredOntologyUri, this.artifactGraph);
         
     }
     
@@ -874,46 +859,34 @@ public class PoddPrototypeUtils
         // for the corresponding code.
         final URI nextInferredOntologyUri = nextInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         
-        try
-        {
-            // type the ontology
-            nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-            // setup a version number link for this version
-            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, nextVersionUri,
-                    this.schemaGraph);
-            
-            // remove whatever was previously there for the current version marker
-            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, null,
-                    this.schemaGraph);
-            
-            // then insert the new current version marker
-            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, nextVersionUri,
-                    this.schemaGraph);
-            
-            // then do a similar process with the inferred axioms ontology
-            nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-            
-            // remove whatever was previously there for the current inferred version marker
-            nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    null, this.schemaGraph);
-            
-            // link from the ontology IRI to the current inferred axioms ontology version
-            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    nextInferredOntologyUri, this.schemaGraph);
-            
-            // link from the ontology version IRI to the matching inferred axioms ontology version
-            nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
-                    nextInferredOntologyUri, this.schemaGraph);
-            
-            // if everything went well commit the connection
-            nextRepositoryConnection.commit();
-        }
-        catch(final RepositoryException e)
-        {
-            // if anything failed, rollback the connection before rethrowing the exception
-            nextRepositoryConnection.rollback();
-            throw e;
-        }
+        // type the ontology
+        nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
+        // setup a version number link for this version
+        nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OWL_VERSION_IRI, nextVersionUri,
+                this.schemaGraph);
+        
+        // remove whatever was previously there for the current version marker
+        nextRepositoryConnection
+                .remove(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, null, this.schemaGraph);
+        
+        // then insert the new current version marker
+        nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.OMV_CURRENT_VERSION, nextVersionUri,
+                this.schemaGraph);
+        
+        // then do a similar process with the inferred axioms ontology
+        nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
+        
+        // remove whatever was previously there for the current inferred version marker
+        nextRepositoryConnection.remove(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION, null,
+                this.schemaGraph);
+        
+        // link from the ontology IRI to the current inferred axioms ontology version
+        nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_CURRENT_INFERRED_VERSION,
+                nextInferredOntologyUri, this.schemaGraph);
+        
+        // link from the ontology version IRI to the matching inferred axioms ontology version
+        nextRepositoryConnection.add(nextOntologyUri, PoddPrototypeUtils.PODD_BASE_INFERRED_VERSION,
+                nextInferredOntologyUri, this.schemaGraph);
         
     }
     
