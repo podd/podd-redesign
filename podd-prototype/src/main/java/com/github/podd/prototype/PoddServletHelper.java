@@ -863,6 +863,7 @@ public class PoddServletHelper
             // URL decode it first to make sure we don't double encode
             uriPath = java.net.URLDecoder.decode(uriPath, "UTF-8");
             
+            // FIXME: The following is broken if the slash is inside the query or fragment portions
             // URL encode the part after the last '/'
             final String hostPath = uriPath.substring(0, uriPath.lastIndexOf("/") + 1);
             final String toEncode = uriPath.substring(uriPath.lastIndexOf("/") + 1);
