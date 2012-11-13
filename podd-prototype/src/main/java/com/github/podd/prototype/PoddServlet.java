@@ -138,8 +138,14 @@ public class PoddServlet extends PoddBaseServlet
             catch(final Exception e)
             {
                 this.log.error("GET Artifact failed with: " + e.toString());
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        "Failed to GET artifact due to: " + e.getMessage());
+                
+                // FIXME: Status code should be decided based on the type of PODD Exception
+                int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                if(e instanceof RuntimeException && e.getMessage().contains("not found"))
+                {
+                    statusCode = HttpServletResponse.SC_NOT_FOUND;
+                }
+                response.sendError(statusCode, "Failed to GET artifact due to: " + e.getMessage());
             }
         }
         
