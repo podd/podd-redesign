@@ -12,6 +12,8 @@
 
     <modules>
         <module>podd-prototype</module>
+        <module>podd-api</module>
+        <module>podd-webapp-lib</module>
     </modules>
 
     <scm>
@@ -26,7 +28,17 @@
             <email>p_ansell@yahoo.com</email>
             <name>Peter Ansell</name>
         </developer>
+        <developer>
+            <id>kutila</id>
+            <email>kutila@gmail.com</email>
+            <name>Kutila Gunasekera</name>
+        </developer>
     </developers>
+
+    <organization>
+        <name>University of Queensland</name>
+        <url>http://itee.uq.edu.au/~eresearch/</url>
+    </organization>
 
     <licenses>
         <license>
@@ -52,6 +64,7 @@
         <pellet.version>2.3.1-SNAPSHOT</pellet.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <restlet.version>2.1.0</restlet.version>
         <sesame.version>2.6.10</sesame.version>
         <sesametools.version>1.7-SNAPSHOT</sesametools.version>
         <slf4j.version>1.7.2</slf4j.version>
@@ -255,6 +268,50 @@
                     <exclusion>
                         <artifactId>servlet-api</artifactId>
                         <groupId>javax.servlet</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jee</groupId>
+                <artifactId>org.restlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jee</groupId>
+                <artifactId>org.restlet.ext.freemarker</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jee</groupId>
+                <artifactId>org.restlet.ext.servlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jee</groupId>
+                <artifactId>org.restlet.ext.crypto</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jee</groupId>
+                <artifactId>org.restlet.ext.html</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jee</groupId>
+                <artifactId>org.restlet.ext.httpclient</artifactId>
+                <version>${restlet.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>httpcore</artifactId>
+                        <groupId>org.apache.httpcomponents</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>httpclient</artifactId>
+                        <groupId>org.apache.httpcomponents</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>commons-logging</artifactId>
+                        <groupId>commons-logging</groupId>
                     </exclusion>
                 </exclusions>
             </dependency>
