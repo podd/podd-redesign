@@ -7,28 +7,20 @@ import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.restlet.Client;
+import org.restlet.data.Protocol;
 
 import com.github.podd.prototype.PoddServletContextListener;
 
-public abstract class AbstractPoddIntegrationTest
+public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
 {
     
     protected static final String TEST_USERNAME = "john";
     protected static final String TEST_PASSWORD = "wayne";
     
-    protected Logger log = LoggerFactory.getLogger(this.getClass());
-    
     protected String BASE_URL = null;
     
-    /**
-     * Override this to return the http accept header for this test class.
-     * 
-     * @return The test HTTP Accept header to use for all requests through this class, or null to
-     *         use the default Content Negotiation mechanism, which may produce random results.
-     */
-    protected abstract String getTestAcceptHeader();
+    protected Client client = null;
     
     /**
      * Logs in the user with the given username and password using whatever method matches the
@@ -46,16 +38,26 @@ public abstract class AbstractPoddIntegrationTest
      */
     protected abstract void logout();
     
+    /**
+     * Resets the web service so that the RDF store is wiped clean.
+     */
+    protected abstract void resetWebService();
+    
+    @Override
     @Before
     public void setUp() throws Exception
     {
+        super.setUp();
         this.BASE_URL = "http://localhost:9090/podd-test";
+        this.client = new Client(Protocol.HTTP);
         
+        // -- generate password file
         final String poddHome = System.getProperty(PoddServletContextListener.PODD_HOME);
         final Properties passwords = new Properties();
         passwords.setProperty(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         this.writeFile(passwords, poddHome + "/passwd");
         
+        // -- generate alias file
         final Properties aliases = new Properties();
         aliases.setProperty("localhost.protocol", "http");
         aliases.setProperty("localhost.host", "localhost");
@@ -65,13 +67,16 @@ public abstract class AbstractPoddIntegrationTest
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @After
     public void tearDown() throws Exception
     {
+        super.tearDown();
         try
         {
-            // TODO: Reset the data store
+            this.resetWebService();
             this.logout();
+            this.client.stop();
         }
         catch(final Exception ex)
         {
@@ -88,9 +93,18 @@ public abstract class AbstractPoddIntegrationTest
         {
             this.log.error("Found exception resetting application after test", ex);
         }
-        
     }
     
+    /**
+     * Get a Restlet Client instance with which web service requests can be made.
+     * 
+     * @return
+     */
+    protected Client getClient()
+    {
+        return this.client;
+    }
+
     private void writeFile(final Properties props, final String filename)
     {
         try
@@ -121,5 +135,4 @@ public abstract class AbstractPoddIntegrationTest
             this.log.debug("Could not delete file: " + filename);
         }
     }
-    
 }

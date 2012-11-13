@@ -4,14 +4,12 @@ import java.io.ByteArrayInputStream;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.sail.memory.MemoryStore;
-import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.CharacterSet;
@@ -20,36 +18,22 @@ import org.restlet.data.CookieSetting;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Protocol;
 import org.restlet.data.Status;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.util.Series;
-
-import com.github.podd.prototype.PoddServletContextListener;
+import org.semanticweb.owlapi.model.IRI;
 
 /**
- * Integration test for PODD Servlet.
+ * This integration test class validates the PODD-prototype web service operations.
  * 
  * @author kutila
  * 
  */
 public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
 {
-    // set of cookies containing session information
+    
+    /** set of cookies containing session information */
     private Series<Cookie> cookies = null;
-    
-    // Restlet Client to access the PODD web service
-    private Client client = null;
-    
-    /**
-     * Mimic a typical browser accept header, which will have * / * and we need to be able to cope
-     * with that.
-     */
-    @Override
-    protected String getTestAcceptHeader()
-    {
-        return "text/html, text/javascript, application/javascript, text/css, */*";
-    }
     
     @Override
     protected void login(final String username, final String password)
@@ -70,7 +54,6 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         {
             this.cookies.add(cookieSetting);
         }
-        this.stopClient();
     }
     
     @Override
@@ -83,8 +66,19 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         // Note: not asserting response code which depends on whether there was an active session
     }
     
+    @Override
+    protected void resetWebService()
+    {
+        final Request resetRequest = new Request(Method.POST, this.BASE_URL + "/podd/reset");
+        resetRequest.setCookies(this.cookies);
+        this.getClient().handle(resetRequest);
+        // Note: not asserting response code which depends on whether there was an active session
+    }
+    
     /**
-     * Test the home page exists to ensure the web-app is deployed
+     * Test that the home page exists to ensure the PODD web-app is deployed.
+     * 
+     * @throws Exception
      */
     @Test
     public void testHomePage() throws Exception
@@ -96,100 +90,214 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         Assert.assertTrue(response.getEntityAsText().contains("PODD Prototype Web Service"));
     }
     
+    /**
+     * Tests the ability to login and logout of the web service.
+     * 
+     * @throws Exception
+     */
     @Test
     public void testLogin() throws Exception
     {
         this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         
-        // -- logout without sending cookie: fails with Status 401 (UNAUTHORIZED)
+        // -- logout without sending cookie: should fail with Status 401 (UNAUTHORIZED)
         final Request incorrectLogoutRequest = new Request(Method.GET, this.BASE_URL + "/login");
         incorrectLogoutRequest.getResourceRef().addQueryParameter("logout", "true");
         final Response incorrectLogoutResponse = this.getClient().handle(incorrectLogoutRequest);
         Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED.getCode(), incorrectLogoutResponse.getStatus().getCode());
         
-        // -- logout: succeeds
+        // -- logout: should succeed
         final Request logoutRequest = new Request(Method.GET, this.BASE_URL + "/login");
         logoutRequest.setCookies(this.cookies);
         logoutRequest.getResourceRef().addQueryParameter("logout", "true");
         final Response logoutResponse = this.getClient().handle(logoutRequest);
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), logoutResponse.getStatus().getCode());
+        
+        // -- try to logout again: should fail with Status 401 (UNAUTHORIZED)
+        final Request secondLogoutRequest = new Request(Method.GET, this.BASE_URL + "/login");
+        secondLogoutRequest.setCookies(this.cookies);
+        secondLogoutRequest.getResourceRef().addQueryParameter("logout", "true");
+        final Response secondLogoutResponse = this.getClient().handle(secondLogoutRequest);
+        Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED.getCode(), secondLogoutResponse.getStatus().getCode());
     }
     
+    /**
+     * Tests that a new artifact can be added through the web service.
+     * 
+     * @throws Exception
+     */
     @Test
-    public void testSimpleAddArtifact() throws Exception
+    public void testAddArtifact() throws Exception
     {
         this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
-        final String path =
-                System.getProperty(PoddServletContextListener.PODD_HOME)
-                        + "/../test-classes/test/artifacts/basicProject-1.rdf";
-        
+        final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
         this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
     }
     
+    /**
+     * Tests that it is possible to retrieve an artifact from the web service.
+     * 
+     * @throws Exception
+     */
     @Test
     public void testGetArtifact() throws Exception
     {
+        // -- login and add an artifact
         this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
-        final String path =
-                System.getProperty(PoddServletContextListener.PODD_HOME)
-                        + "/../test-classes/test/artifacts/basicProject-1.rdf";
+        final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
+        final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+        final String artifactUri =
+                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
         
-        final Response response = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+        // -- GET the "base" artifact from the web service and verify results
+        final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+        getBaseRequest.setCookies(this.cookies);
+        final Response getBaseResponse = this.getClient().handle(getBaseRequest);
         
-        final RepositoryConnection testRepoConnection = this.getMemoryRepositoryConnection();
-        testRepoConnection.add(new ByteArrayInputStream(response.getEntityAsText().getBytes()), "", RDFFormat.RDFXML);
-        Assert.assertEquals(29, testRepoConnection.size());
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
+        final String getResult = getBaseResponse.getEntityAsText();
+        final URI baseContext = IRI.create("urn:get-base:").toOpenRDFURI();
+        this.getTestRepositoryConnection().add(new ByteArrayInputStream(getResult.getBytes()), "", RDFFormat.RDFXML,
+                baseContext);
+        Assert.assertEquals(29, this.getTestRepositoryConnection().size(baseContext));
         
-        // INCOMPLETE HERE. IN PROGRESS
+        // -- GET the "inferred" artifact from the web service and verify results
+        final Request getInferredRequest =
+                new Request(Method.GET, this.BASE_URL + "/podd/artifact/inferred/" + artifactUri);
+        getInferredRequest.setCookies(this.cookies);
+        final Response getInferredResponse = this.getClient().handle(getInferredRequest);
         
-        final String artifactUri = "http/purl.org/example/artifact:11";
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getInferredResponse.getStatus().getCode());
+        final String getInferredResult = getInferredResponse.getEntityAsText();
+        final URI inferredContext = IRI.create("urn:get-inferred:").toOpenRDFURI();
+        this.getTestRepositoryConnection().add(new ByteArrayInputStream(getInferredResult.getBytes()), "",
+                RDFFormat.RDFXML, inferredContext);
+        Assert.assertTrue(this.getTestRepositoryConnection().size(inferredContext) > 29);
         
-        final Request getRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
-        getRequest.setCookies(this.cookies);
-        final Response getResponse = this.getClient().handle(getRequest);
-        System.out.println(getResponse.getStatus().getCode());
-        
+        this.getTestRepositoryConnection().rollback();
     }
     
-    @Ignore
-    @Test
-    public void testEditArtifact() throws Exception
-    {
-        // TODO
-    }
-    
-    @Ignore
+    /**
+     * Tests that it is possible to delete an artifact through the web service.
+     * 
+     * @throws Exception
+     */
     @Test
     public void testDeleteArtifact() throws Exception
     {
-        // TODO
+        // -- login and add an artifact
+        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
+        final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
+        final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+        final String artifactUri =
+                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+        
+        // -- DELETE the artifact using the web service and verify results
+        final Request deleteRequest = new Request(Method.DELETE, this.BASE_URL + "/podd/artifact/" + artifactUri);
+        deleteRequest.setCookies(this.cookies);
+        final Response deleteResponse = this.getClient().handle(deleteRequest);
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), deleteResponse.getStatus().getCode());
+        Assert.assertTrue(deleteResponse.getEntityAsText().contains(artifactUri.substring(6)));
+        
+        // -- try to retrieve the artifact from the web service and verify that it no longer exists
+        final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+        getBaseRequest.setCookies(this.cookies);
+        final Response getBaseResponse = this.getClient().handle(getBaseRequest);
+        
+        Assert.assertEquals(Status.CLIENT_ERROR_NOT_FOUND.getCode(), getBaseResponse.getStatus().getCode());
     }
     
+    /**
+     * Tests that resetting the web service results in the repository contents being wiped.
+     * 
+     * @throws Exception
+     */
     @Test
     public void testReset() throws Exception
     {
+        // -- login and add an artifact
         this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
+        final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
+        final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+        final String artifactUri =
+                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
         
         // -- send RESET request
-        final Request logoutRequest = new Request(Method.POST, this.BASE_URL + "/podd/reset");
-        logoutRequest.setCookies(this.cookies);
-        final Response logoutResponse = this.getClient().handle(logoutRequest);
-        Assert.assertEquals(Status.SUCCESS_OK.getCode(), logoutResponse.getStatus().getCode());
+        final Request resetRequest = new Request(Method.POST, this.BASE_URL + "/podd/reset");
+        resetRequest.setCookies(this.cookies);
+        final Response resetResponse = this.getClient().handle(resetRequest);
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), resetResponse.getStatus().getCode());
         
-        // -- TODO: verify RDF store is empty
+        // -- try to retrieve the artifact from the web service and verify that it no longer exists
+        final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+        getBaseRequest.setCookies(this.cookies);
+        final Response getBaseResponse = this.getClient().handle(getBaseRequest);
+        
+        Assert.assertEquals(Status.CLIENT_ERROR_NOT_FOUND.getCode(), getBaseResponse.getStatus().getCode());
+    }
+    
+    /**
+     * Tests that an artifact can be edited through the web service.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testEditArtifactWithMerge() throws Exception
+    {
+        final long noOfStatements = this.genericTestEditArtifact("merge");
+        Assert.assertEquals(33, noOfStatements);
+    }
+    
+    /**
+     * Tests that an artifact can be edited through the web service.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testEditArtifactWithReplace() throws Exception
+    {
+        final long noOfStatements = this.genericTestEditArtifact("replace");
+        Assert.assertEquals(32, noOfStatements);
+    }
+    
+    public long genericTestEditArtifact(final String editType) throws Exception
+    {
+        // -- login and add an artifact
+        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
+        final String path = this.getClass().getResource("/test/artifacts/editableProject-1.rdf").getFile();
+        final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+        final String artifactUri =
+                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+        
+        // -- generate and send an edit request
+        final String fragmentPath = this.getClass().getResource("/test/artifacts/fragment.rdf").getFile();
+        final Request editRequest =
+                new Request(Method.POST, this.BASE_URL + "/podd/artifact/edit/" + editType + "/" + artifactUri);
+        editRequest.setCookies(this.cookies);
+        final FileRepresentation artifactToAdd = new FileRepresentation(fragmentPath, MediaType.APPLICATION_RDF_XML);
+        editRequest.setEntity(artifactToAdd);
+        final Response editResponse = this.getClient().handle(editRequest);
+        
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), editResponse.getStatus().getCode());
+        
+        // -- retrieve edited artifact and verify the modifications are present
+        final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+        getBaseRequest.setCookies(this.cookies);
+        final Response getBaseResponse = this.getClient().handle(getBaseRequest);
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
+        final String modifiedRDFString = getBaseResponse.getEntityAsText();
+        
+        Assert.assertTrue(modifiedRDFString.contains("John.Doe@csiro.au"));
+        final URI baseContext = IRI.create("urn:get-base:").toOpenRDFURI();
+        this.getTestRepositoryConnection().add(new ByteArrayInputStream(modifiedRDFString.getBytes()), "",
+                RDFFormat.RDFXML, baseContext);
+        final long noOfStatements = this.getTestRepositoryConnection().size(baseContext);
+        this.getTestRepositoryConnection().rollback();
+        return noOfStatements;
+        
     }
     
     // ----- helper methods -----
-    
-    protected RepositoryConnection getMemoryRepositoryConnection() throws Exception
-    {
-        final Repository repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-        
-        final RepositoryConnection repositoryConnection = repository.getConnection();
-        repositoryConnection.setAutoCommit(false);
-        return repositoryConnection;
-    }
     
     /**
      * Helper method to add an artifact. This method expects that a valid session exists.
@@ -213,26 +321,45 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         return addResponse;
     }
     
-    protected Client getClient()
-    {
-        if(this.client == null)
-        {
-            this.client = new Client(Protocol.HTTP);
-        }
-        return this.client;
-    }
-    
-    protected void stopClient()
+    /**
+     * Helper method to extract an artifact's URI from a String representation of the whole
+     * artifact.
+     * 
+     * The URI is returned with the protocol part separated using a single '/' such that it can be
+     * directly used with web service requests. (E.g. "http/purl.og...")
+     * 
+     * @param rdfString
+     * @param rdfFormat
+     * @return
+     * @throws Exception
+     */
+    protected String getArtifactUriFromStringRepresentation(final String rdfString, final RDFFormat rdfFormat)
+        throws Exception
     {
         try
         {
-            this.client.stop();
+            final URI initialContext = IRI.create("urn:initial-context:").toOpenRDFURI();
+            this.getTestRepositoryConnection().add(new ByteArrayInputStream(rdfString.getBytes()), "", rdfFormat,
+                    initialContext);
+            final URI hasTopObject = IRI.create("http://purl.org/podd/ns/poddBase#artifactHasTopObject").toOpenRDFURI();
+            
+            final RepositoryResult<Statement> results =
+                    this.getTestRepositoryConnection().getStatements(null, hasTopObject, null, true, initialContext);
+            if(results.hasNext())
+            {
+                final Resource artifactResource = results.next().getSubject();
+                return artifactResource.stringValue().replace("://", "/");
+            }
+            else
+            {
+                Assert.fail("Could not find URI of added artifact");
+                return null; // unreachable line, added to make the compiler happy
+            }
         }
-        catch(final Exception e)
+        finally
         {
-            e.printStackTrace();
+            this.getTestRepositoryConnection().rollback();
         }
-        
     }
     
 }
