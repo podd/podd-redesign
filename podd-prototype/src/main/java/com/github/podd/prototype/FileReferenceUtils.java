@@ -225,67 +225,60 @@ public class FileReferenceUtils
     public void checkFileReferencesInRDF(final RepositoryConnection repositoryConnection, final URI context)
         throws RepositoryException, IOException, PoddException
     {
-        repositoryConnection.commit();
         final List<String> errors = new ArrayList<String>();
-        try
+        // how about making these constants?
+        final URI fileRefURI = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "FileReference").toOpenRDFURI();
+        final URI propertyHasFileName =
+                IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileName").toOpenRDFURI();
+        final URI propertyHasAlias = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasAlias").toOpenRDFURI();
+        final URI propertyHasPath = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasPath").toOpenRDFURI();
+        
+        // search statements identifying any resource as a File Reference
+        final RepositoryResult<Statement> statements =
+                repositoryConnection.getStatements(null, RDF.TYPE, fileRefURI, false, context);
+        final List<Statement> statementList = Iterations.addAll(statements, new ArrayList<Statement>());
+        for(final Statement statement : statementList)
         {
-            // how about making these constants?
-            final URI fileRefURI = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "FileReference").toOpenRDFURI();
-            final URI propertyHasFileName =
-                    IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileName").toOpenRDFURI();
-            final URI propertyHasAlias = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasAlias").toOpenRDFURI();
-            final URI propertyHasPath = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasPath").toOpenRDFURI();
+            final String fileRefObj = statement.getSubject().stringValue();
+            final HttpFileReference httpFileRef = new HttpFileReference();
             
-            // search statements identifying any resource as a File Reference
-            final RepositoryResult<Statement> statements =
-                    repositoryConnection.getStatements(null, RDF.TYPE, fileRefURI, false, context);
-            final List<Statement> statementList = Iterations.addAll(statements, new ArrayList<Statement>());
-            for(final Statement statement : statementList)
+            final RepositoryResult<Statement> st =
+                    repositoryConnection.getStatements(IRI.create(fileRefObj).toOpenRDFURI(), null, null, false,
+                            context);
+            while(st.hasNext())
             {
-                final String fileRefObj = statement.getSubject().stringValue();
-                final HttpFileReference httpFileRef = new HttpFileReference();
+                final Statement nextStatement = st.next();
+                if(propertyHasFileName.equals(nextStatement.getPredicate()))
+                {
+                    final String filename = nextStatement.getObject().stringValue();
+                    httpFileRef.setFilename(filename);
+                }
+                else if(propertyHasAlias.equals(nextStatement.getPredicate()))
+                {
+                    final String alias = nextStatement.getObject().stringValue();
+                    httpFileRef.setServerAlias(alias);
+                }
+                else if(propertyHasPath.equals(nextStatement.getPredicate()))
+                {
+                    final String path = nextStatement.getObject().stringValue();
+                    httpFileRef.setPath(path);
+                }
                 
-                final RepositoryResult<Statement> st =
-                        repositoryConnection.getStatements(IRI.create(fileRefObj).toOpenRDFURI(), null, null, false,
-                                context);
-                while(st.hasNext())
-                {
-                    final Statement nextStatement = st.next();
-                    if(propertyHasFileName.equals(nextStatement.getPredicate()))
-                    {
-                        final String filename = nextStatement.getObject().stringValue();
-                        httpFileRef.setFilename(filename);
-                    }
-                    else if(propertyHasAlias.equals(nextStatement.getPredicate()))
-                    {
-                        final String alias = nextStatement.getObject().stringValue();
-                        httpFileRef.setServerAlias(alias);
-                    }
-                    else if(propertyHasPath.equals(nextStatement.getPredicate()))
-                    {
-                        final String path = nextStatement.getObject().stringValue();
-                        httpFileRef.setPath(path);
-                    }
-                    
-                }
-                st.close();
-                try
-                {
-                    this.checkFileExists(httpFileRef);
-                }
-                catch(IOException | PoddException e)
-                {
-                    errors.add(e.getMessage());
-                }
             }
-            if(errors.size() > 0)
+            st.close();
+            try
             {
-                throw new PoddException("Invalid File Reference(s) found.", errors, -1);
+                this.checkFileExists(httpFileRef);
+            }
+            catch(IOException | PoddException e)
+            {
+                errors.add(e.getMessage());
             }
         }
-        finally
+        if(errors.size() > 0)
         {
-            repositoryConnection.rollback();
+            // FIXME: Create a subclass of PoddException for these errors
+            throw new PoddException("Invalid File Reference(s) found.", errors, -1);
         }
         
     }
