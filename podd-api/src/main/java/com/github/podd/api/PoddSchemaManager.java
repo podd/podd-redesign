@@ -130,6 +130,9 @@ public interface PoddSchemaManager
      * ontology, and stores the original schema ontology and the inferences in separate RDF Graphs
      * inside of the internal repository.
      * 
+     * If there is no version IRI in the incoming schema ontology, PODD assigns a new version.
+     * However, if the incoming content has a version, and it is unique, it is preserved.
+     * 
      * @param inputStream
      * @param fileFormat
      * @return An InferredOWLOntologyID containing the ontology IRI, version IRI, along with the
@@ -146,5 +149,31 @@ public interface PoddSchemaManager
      */
     InferredOWLOntologyID uploadSchemaOntology(InputStream inputStream, RDFFormat fileFormat) throws OpenRDFException,
         IOException, OWLException, PoddException;
+    
+    /**
+     * Loads a Schema Ontology into the internal repository, computes inferences on the schema
+     * ontology, and stores the original schema ontology and the inferences in separate RDF Graphs
+     * inside of the internal repository.
+     * 
+     * The version information in the passed in OWLOntologyID will override any version or ontology
+     * IRI information contained in the inputstream.
+     * 
+     * @param schemaOntologyID
+     * @param inputStream
+     * @param fileFormat
+     * @return An InferredOWLOntologyID containing the ontology IRI, version IRI, along with the
+     *         ontology IRI that was used for the inferences.
+     * @throws OpenRDFException
+     *             If an RDF parsing or RDF repository error occurs.
+     * @throws IOException
+     *             If the file cannot be processed due to an Input/Output error.
+     * @throws OWLException
+     *             If the file cannot be interpreted as an OWL Ontology or is inconsistent in some
+     *             way.
+     * @throws PoddException
+     *             If an error occurs due to a violation of the PODD constraints.
+     */
+    InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
+            RDFFormat fileFormat) throws OpenRDFException, IOException, OWLException, PoddException;
     
 }
