@@ -1,14 +1,12 @@
 package com.github.podd.prototype.test;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -76,6 +74,30 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     }
     
     /**
+     * Helper method that logs in to the web service and adds an artifact.
+     * 
+     * @param path
+     *            Location of the artifact file
+     * @param mediaType
+     * @param expectedStatusCode
+     * @return A string representation of the added artifact's URI
+     * @throws Exception
+     */
+    protected String loginAndAddArtifact(final String path, final MediaType mediaType, final int expectedStatusCode)
+        throws Exception
+    {
+        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
+        
+        final Request addRequest = new Request(Method.POST, this.BASE_URL + "/podd/artifact/new");
+        addRequest.setCookies(this.cookies);
+        final FileRepresentation artifactToAdd = new FileRepresentation(path, mediaType);
+        addRequest.setEntity(artifactToAdd);
+        final Response addResponse = this.getClient().handle(addRequest);
+        Assert.assertEquals(expectedStatusCode, addResponse.getStatus().getCode());
+        return addResponse.getEntityAsText().replace("://", "/");
+    }
+    
+    /**
      * Test that the home page exists to ensure the PODD web-app is deployed.
      * 
      * @throws Exception
@@ -129,9 +151,10 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     @Test
     public void testAddArtifact() throws Exception
     {
-        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
-        this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+        final String artifactUri =
+                this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+        Assert.assertNotNull(artifactUri);
     }
     
     /**
@@ -143,11 +166,9 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     public void testGetArtifact() throws Exception
     {
         // -- login and add an artifact
-        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
-        final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
         final String artifactUri =
-                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+                this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
         
         // -- GET the "base" artifact from the web service and verify results
         final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
@@ -157,8 +178,8 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
         final String getResult = getBaseResponse.getEntityAsText();
         final URI baseContext = IRI.create("urn:get-base:").toOpenRDFURI();
-        this.getTestRepositoryConnection().add(new ByteArrayInputStream(getResult.getBytes()), "", RDFFormat.RDFXML,
-                baseContext);
+        this.getTestRepositoryConnection().add(new ByteArrayInputStream(getResult.getBytes(StandardCharsets.UTF_8)),
+                "", RDFFormat.RDFXML, baseContext);
         Assert.assertEquals(29, this.getTestRepositoryConnection().size(baseContext));
         
         // -- GET the "inferred" artifact from the web service and verify results
@@ -170,8 +191,9 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getInferredResponse.getStatus().getCode());
         final String getInferredResult = getInferredResponse.getEntityAsText();
         final URI inferredContext = IRI.create("urn:get-inferred:").toOpenRDFURI();
-        this.getTestRepositoryConnection().add(new ByteArrayInputStream(getInferredResult.getBytes()), "",
-                RDFFormat.RDFXML, inferredContext);
+        this.getTestRepositoryConnection().add(
+                new ByteArrayInputStream(getInferredResult.getBytes(StandardCharsets.UTF_8)), "", RDFFormat.RDFXML,
+                inferredContext);
         Assert.assertTrue(this.getTestRepositoryConnection().size(inferredContext) > 29);
         
         this.getTestRepositoryConnection().rollback();
@@ -186,11 +208,9 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     public void testDeleteArtifact() throws Exception
     {
         // -- login and add an artifact
-        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
-        final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
         final String artifactUri =
-                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+                this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
         
         // -- DELETE the artifact using the web service and verify results
         final Request deleteRequest = new Request(Method.DELETE, this.BASE_URL + "/podd/artifact/" + artifactUri);
@@ -216,11 +236,9 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     public void testReset() throws Exception
     {
         // -- login and add an artifact
-        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         final String path = this.getClass().getResource("/test/artifacts/basicProject-1.rdf").getFile();
-        final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
         final String artifactUri =
-                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+                this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
         
         // -- send RESET request
         final Request resetRequest = new Request(Method.POST, this.BASE_URL + "/podd/reset");
@@ -263,18 +281,16 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     public long genericTestEditArtifact(final String editType) throws Exception
     {
         // -- login and add an artifact
-        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         final String path = this.getClass().getResource("/test/artifacts/editableProject-1.rdf").getFile();
-        final Response addResponse = this.addArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
         final String artifactUri =
-                this.getArtifactUriFromStringRepresentation(addResponse.getEntityAsText(), RDFFormat.RDFXML);
+                this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
         
         // -- generate and send an edit request
         final String fragmentPath = this.getClass().getResource("/test/artifacts/fragment.rdf").getFile();
+        final FileRepresentation artifactToAdd = new FileRepresentation(fragmentPath, MediaType.APPLICATION_RDF_XML);
         final Request editRequest =
                 new Request(Method.POST, this.BASE_URL + "/podd/artifact/edit/" + editType + "/" + artifactUri);
         editRequest.setCookies(this.cookies);
-        final FileRepresentation artifactToAdd = new FileRepresentation(fragmentPath, MediaType.APPLICATION_RDF_XML);
         editRequest.setEntity(artifactToAdd);
         final Response editResponse = this.getClient().handle(editRequest);
         
@@ -289,77 +305,12 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         Assert.assertTrue(modifiedRDFString.contains("John.Doe@csiro.au"));
         final URI baseContext = IRI.create("urn:get-base:").toOpenRDFURI();
-        this.getTestRepositoryConnection().add(new ByteArrayInputStream(modifiedRDFString.getBytes()), "",
-                RDFFormat.RDFXML, baseContext);
+        this.getTestRepositoryConnection().add(
+                new ByteArrayInputStream(modifiedRDFString.getBytes(StandardCharsets.UTF_8)), "", RDFFormat.RDFXML,
+                baseContext);
         final long noOfStatements = this.getTestRepositoryConnection().size(baseContext);
         this.getTestRepositoryConnection().rollback();
         return noOfStatements;
-        
-    }
-    
-    // ----- helper methods -----
-    
-    /**
-     * Helper method to add an artifact. This method expects that a valid session exists.
-     * 
-     * @param path
-     *            Location of the artifact file
-     * @param mediaType
-     * @param expectedStatusCode
-     * @return
-     * @throws Exception
-     */
-    protected Response addArtifact(final String path, final MediaType mediaType, final int expectedStatusCode)
-        throws Exception
-    {
-        final Request addRequest = new Request(Method.POST, this.BASE_URL + "/podd/artifact/new");
-        addRequest.setCookies(this.cookies);
-        final FileRepresentation artifactToAdd = new FileRepresentation(path, mediaType);
-        addRequest.setEntity(artifactToAdd);
-        final Response addResponse = this.getClient().handle(addRequest);
-        Assert.assertEquals(expectedStatusCode, addResponse.getStatus().getCode());
-        return addResponse;
-    }
-    
-    /**
-     * Helper method to extract an artifact's URI from a String representation of the whole
-     * artifact.
-     * 
-     * The URI is returned with the protocol part separated using a single '/' such that it can be
-     * directly used with web service requests. (E.g. "http/purl.og...")
-     * 
-     * @param rdfString
-     * @param rdfFormat
-     * @return
-     * @throws Exception
-     */
-    protected String getArtifactUriFromStringRepresentation(final String rdfString, final RDFFormat rdfFormat)
-        throws Exception
-    {
-        try
-        {
-            final URI initialContext = IRI.create("urn:initial-context:").toOpenRDFURI();
-            this.getTestRepositoryConnection().add(new ByteArrayInputStream(rdfString.getBytes()), "", rdfFormat,
-                    initialContext);
-            final URI hasTopObject = IRI.create("http://purl.org/podd/ns/poddBase#artifactHasTopObject").toOpenRDFURI();
-            
-            final RepositoryResult<Statement> results =
-                    this.getTestRepositoryConnection().getStatements(null, hasTopObject, null, true, initialContext);
-            if(results.hasNext())
-            {
-                final Resource artifactResource = results.next().getSubject();
-                return artifactResource.stringValue().replace("://", "/");
-            }
-            else
-            {
-                Assert.fail("Could not find URI of added artifact");
-                return null; // unreachable line, added to make the compiler happy
-            }
-        }
-        finally
-        {
-            this.getTestRepositoryConnection().rollback();
-        }
     }
     
 }

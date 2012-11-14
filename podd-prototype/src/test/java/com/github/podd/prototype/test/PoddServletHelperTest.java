@@ -84,7 +84,7 @@ public class PoddServletHelperTest
     }
     
     /**
-     * Tests loading a simple PODD artifact. Response is validated based on statement count and no
+     * Tests loading a simple PODD artifact. Response is validated based on returned artifact URI no
      * longer having "urn:temp:".
      * 
      * @throws Exception
@@ -95,13 +95,16 @@ public class PoddServletHelperTest
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         
-        final String addedRdf = this.helper.loadPoddArtifact(in, mimeType);
+        final String artifactUriString = this.helper.loadPoddArtifact(in, mimeType);
+        Assert.assertNotNull(artifactUriString);
+
+        final String resultRDF = this.helper.getArtifact(artifactUriString, mimeType, false);
         
-        Assert.assertNotNull(addedRdf);
-        Assert.assertFalse(addedRdf.contains("urn:temp:"));
-        
+        Assert.assertNotNull(resultRDF);
+        Assert.assertFalse(resultRDF.contains("urn:temp:"));
+        Assert.assertTrue(resultRDF.contains(artifactUriString));
         final URI context = IRI.create("urn:context").toOpenRDFURI();
-        final RepositoryConnection repoConn = this.loadDataToNewRepository(addedRdf, mimeType, context);
+        final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
         Assert.assertEquals(29, repoConn.size(context));
     }
     
