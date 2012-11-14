@@ -2,7 +2,6 @@ package com.github.podd.prototype;
 
 import java.io.IOException;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +15,7 @@ import org.semanticweb.owlapi.model.OWLException;
  * @author kutila
  */
 @SuppressWarnings("serial")
-public class FileReferenceAttachServlet extends PoddBaseServlet implements Servlet
+public class FileReferenceAttachServlet extends PoddBaseServlet
 {
     
     @Override
