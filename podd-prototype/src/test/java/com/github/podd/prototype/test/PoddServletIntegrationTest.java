@@ -22,7 +22,6 @@ import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.prototype.FileReferenceUtils;
-import com.github.podd.prototype.HttpFileReference;
 
 /**
  * This integration test class validates the PODD-prototype web service operations.
@@ -301,29 +300,107 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         final long noOfStatements = this.getStatementCount(modifiedRDFString);
         return noOfStatements;
     }
-
+    
     /**
-     * Tests that a file reference can be attached to an object via the web service.
+     * Tests adding a file reference without providing sufficient information to generate a file
+     * reference
      * 
      * @throws Exception
      */
     @Test
-    public void testAttachReference() throws Exception
+    public void testAttachReferenceInsufficientInformation4FileReference() throws Exception
     {
         // -- login and add an artifact
         final String path = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf").getFile();
         final String artifactUri =
                 this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
-
+        
         // -- retrieve the artifact and check that file ref. does not exist
         final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
         getBaseRequest.setCookies(this.cookies);
         final Response getBaseResponse = this.getClient().handle(getBaseRequest);
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
         final String originalRdfString = getBaseResponse.getEntityAsText();
-        Assert.assertFalse(originalRdfString.contains("rfc2616.html")); //artifact is not aware of this file
         Assert.assertEquals(33, this.getStatementCount(originalRdfString));
-
+        
+        // -- generate and send an attach request
+        final Form form = new Form();
+        form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
+        // object URI is missing here
+        form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "w3");
+        form.add(FileReferenceUtils.KEY_FILE_PATH, "Protocols/rfc2616");
+        form.add(FileReferenceUtils.KEY_FILE_NAME, "rfc2616.html");
+        form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION, "http RFC");
+        
+        final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
+        editRequest.setCookies(this.cookies);
+        editRequest.setEntity(form.getWebRepresentation(CharacterSet.UTF_8));
+        final Response editResponse = this.getClient().handle(editRequest);
+        
+        Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST.getCode(), editResponse.getStatus().getCode());
+    }
+    
+    /**
+     * Tests adding a file reference where the referred file's existence is not verifiable.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testAttachReferenceNonExistentFileReferred() throws Exception
+    {
+        // -- login and add an artifact
+        final String path = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf").getFile();
+        final String artifactUri =
+                this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+        
+        // -- retrieve the artifact and check that file ref. does not exist
+        final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+        getBaseRequest.setCookies(this.cookies);
+        final Response getBaseResponse = this.getClient().handle(getBaseRequest);
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
+        final String originalRdfString = getBaseResponse.getEntityAsText();
+        Assert.assertEquals(33, this.getStatementCount(originalRdfString));
+        
+        // -- generate and send an attach request
+        final Form form = new Form();
+        form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
+        form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
+        form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "w3");
+        form.add(FileReferenceUtils.KEY_FILE_PATH, "Protocols/rfc2616thisiswrong");
+        form.add(FileReferenceUtils.KEY_FILE_NAME, "rfc2616.html");
+        form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION, "http RFC");
+        
+        final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
+        editRequest.setCookies(this.cookies);
+        editRequest.setEntity(form.getWebRepresentation(CharacterSet.UTF_8));
+        final Response editResponse = this.getClient().handle(editRequest);
+        
+        Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST.getCode(), editResponse.getStatus().getCode());
+    }
+    
+    /**
+     * Tests that a file reference can be attached to an object via the web service.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testAttachReferenceCorrect() throws Exception
+    {
+        // -- login and add an artifact
+        final String path = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf").getFile();
+        final String artifactUri =
+                this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+        
+        // -- retrieve the artifact and check that file ref. does not exist
+        final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+        getBaseRequest.setCookies(this.cookies);
+        final Response getBaseResponse = this.getClient().handle(getBaseRequest);
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
+        final String originalRdfString = getBaseResponse.getEntityAsText();
+        Assert.assertFalse(originalRdfString.contains("rfc2616.html")); // artifact is not aware of
+                                                                        // this file
+        Assert.assertEquals(33, this.getStatementCount(originalRdfString));
+        
         // -- generate and send an attach request
         final Form form = new Form();
         form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
@@ -332,9 +409,8 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         form.add(FileReferenceUtils.KEY_FILE_PATH, "Protocols/rfc2616");
         form.add(FileReferenceUtils.KEY_FILE_NAME, "rfc2616.html");
         form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION, "http RFC");
-
-        final Request editRequest =
-                new Request(Method.POST, this.BASE_URL + "/attachref");
+        
+        final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
         editRequest.setCookies(this.cookies);
         editRequest.setEntity(form.getWebRepresentation(CharacterSet.UTF_8));
         final Response editResponse = this.getClient().handle(editRequest);
@@ -342,7 +418,8 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         Assert.assertEquals(Status.SUCCESS_NO_CONTENT.getCode(), editResponse.getStatus().getCode());
         
         // -- retrieve edited artifact and verify the attached file reference is present
-        final Request getBaseAfterAttachRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+        final Request getBaseAfterAttachRequest =
+                new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
         getBaseAfterAttachRequest.setCookies(this.cookies);
         final Response getBaseAfterAttachResponse = this.getClient().handle(getBaseAfterAttachRequest);
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseAfterAttachResponse.getStatus().getCode());
@@ -351,17 +428,15 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         Assert.assertTrue(modifiedRdfString.contains("rfc2616.html"));
         Assert.assertEquals(40, this.getStatementCount(modifiedRdfString));
     }
-
-    protected long getStatementCount(String rdf) throws Exception
+    
+    protected long getStatementCount(final String rdf) throws Exception
     {
         final URI baseContext = IRI.create("urn:get-attached-base:").toOpenRDFURI();
-        this.getTestRepositoryConnection().add(
-                new ByteArrayInputStream(rdf.getBytes(StandardCharsets.UTF_8)), "", RDFFormat.RDFXML,
-                baseContext);
+        this.getTestRepositoryConnection().add(new ByteArrayInputStream(rdf.getBytes(StandardCharsets.UTF_8)), "",
+                RDFFormat.RDFXML, baseContext);
         final long statementCount = this.getTestRepositoryConnection().size(baseContext);
         this.getTestRepositoryConnection().rollback();
         return statementCount;
     }
-    
     
 }
