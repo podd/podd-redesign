@@ -365,6 +365,105 @@ public abstract class AbstractPoddSchemaManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testUploadSchemaOntologyIDOverrideEmpty() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testUploadSchemaOntologyIDOverrideInvalidRdfXml() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testUploadSchemaOntologyIDOverrideInvalidTurtle() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testUploadSchemaOntologyIDOverrideNoOntologyIRI() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testUploadSchemaOntologyIDOverrideNotConsistent() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testUploadSchemaOntologyIDOverrideNotInProfile() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testUploadSchemaOntologyIDOverrideNullInput() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testUploadSchemaOntologyIDOverrideOnlyOntologyIRI() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testUploadSchemaOntologyIDOverrideWithOntologyIRIAndVersionIRI() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
