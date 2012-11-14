@@ -190,7 +190,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getInferredResponse.getStatus().getCode());
         final String getInferredResult = getInferredResponse.getEntityAsText();
-        Assert.assertTrue(this.getStatementCount(getInferredResult) > 29);
+        Assert.assertEquals(394, this.getStatementCount(getInferredResult));
     }
     
     /**
@@ -322,6 +322,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
         final String originalRdfString = getBaseResponse.getEntityAsText();
         Assert.assertFalse(originalRdfString.contains("rfc2616.html")); //artifact is not aware of this file
+        Assert.assertEquals(33, this.getStatementCount(originalRdfString));
 
         // -- generate and send an attach request
         final Form form = new Form();
@@ -345,13 +346,10 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         getBaseAfterAttachRequest.setCookies(this.cookies);
         final Response getBaseAfterAttachResponse = this.getClient().handle(getBaseAfterAttachRequest);
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseAfterAttachResponse.getStatus().getCode());
-        final String modifiedRDFString = getBaseAfterAttachResponse.getEntityAsText();
+        final String modifiedRdfString = getBaseAfterAttachResponse.getEntityAsText();
         
-        Assert.assertTrue(modifiedRDFString.contains("rfc2616.html"));
-
-        final long originalStatementCount = this.getStatementCount(originalRdfString);
-        final long updatedStatementCount = this.getStatementCount(modifiedRDFString); 
-        Assert.assertTrue(originalStatementCount < updatedStatementCount);
+        Assert.assertTrue(modifiedRdfString.contains("rfc2616.html"));
+        Assert.assertEquals(40, this.getStatementCount(modifiedRdfString));
     }
 
     protected long getStatementCount(String rdf) throws Exception
