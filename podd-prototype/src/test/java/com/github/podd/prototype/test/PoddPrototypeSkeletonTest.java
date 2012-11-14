@@ -3,6 +3,7 @@
  */
 package com.github.podd.prototype.test;
 
+import java.util.HashMap;
 import java.util.Set;
 
 import org.junit.After;
@@ -10,8 +11,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -179,8 +182,7 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     {
         try
         {
-            final OWLOntology o =
-                    this.utils.loadOntology("/test/ontologies/empty.owl", RDFFormat.RDFXML.getDefaultMIMEType());
+            this.utils.loadOntology("/test/ontologies/empty.owl", RDFFormat.RDFXML.getDefaultMIMEType());
             this.getTestRepositoryConnection().rollback();
             Assert.fail("Should have failed to load empty ontology.");
         }
@@ -203,7 +205,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
     public final void testBaseOntologyContent() throws Exception
     {
         final OWLOntology o = this.utils.loadOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType());
-        this.getTestRepositoryConnection().commit();
         Assert.assertNotNull(o);
         final OWLReasoner reasoner = this.utils.checkConsistency(o);
         reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
@@ -250,8 +251,6 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         final OWLOntology nextInferredOntology =
                 this.utils.computeInferences(reasoner,
                         this.utils.generateInferredOntologyID(nextOntology.getOntologyID()));
-        
-        this.getTestRepositoryConnection().commit();
         
         Assert.assertEquals(3, nextInferredOntology.getAxiomCount(AxiomType.SUBCLASS_OF));
     }
@@ -752,6 +751,9 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         this.getTestRepositoryConnection().commit();
         
+        // note down details of graph sizes
+        final HashMap<String, Long> initialGraphSizes = this.calculateRepositoryGraphSizes();
+        
         // load artifact with 2 lead institutions - fails
         try
         {
@@ -764,9 +766,11 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         {
             this.getTestRepositoryConnection().rollback();
             Assert.assertEquals(PoddException.ERR_INCONSISTENT_ONTOLOGY, e.getCode());
+            
+            // verify Repository is unchanged by checking that graph sizes remain the same
+            final HashMap<String, Long> graphSizesAfterFailedAdd = this.calculateRepositoryGraphSizes();
+            Assert.assertEquals(initialGraphSizes, graphSizesAfterFailedAdd);
         }
-        
-        // FIXME: The following should be in a new test
         
         // load new version of poddScience schema ontology which allows 2 lead institutions
         this.utils.loadInferAndStoreSchemaOntology("/test/ontologies/poddScience-2LeadInstitutions.owl",
@@ -781,7 +785,17 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         this.getTestRepositoryConnection().commit();
         
-        this.utils.removePoddArtifactFromManager(poddArtifact1);
+        // assert artifact exists by independently checking it has a graph with statements
+        final RepositoryConnection alternateRepoConnection = this.getNewRepositoryConnection();
+        Assert.assertTrue(alternateRepoConnection.size(poddArtifact1.getVersionIRI().toOpenRDFURI()) > 0);
+        alternateRepoConnection.rollback();
+        alternateRepoConnection.close();
+        
+        // remove artifact from the Manager should return true
+        Assert.assertTrue(this.utils.removePoddArtifactFromManager(poddArtifact1));
+        
+        // a second call to remove artifact from the Manager should return false
+        Assert.assertFalse(this.utils.removePoddArtifactFromManager(poddArtifact1));
     }
     
     /**
@@ -886,12 +900,12 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         this.getTestRepositoryConnection().commit();
         
         // verify version statement exists
-        RepositoryResult<Statement> results =
+        final RepositoryResult<Statement> results4InitialVersion =
                 this.getTestRepositoryConnection().getStatements(artifact1.toOpenRDFURI(),
                         PoddPrototypeUtils.OMV_CURRENT_VERSION, null, false, this.poddArtifactManagementGraph);
-        while(results.hasNext())
+        while(results4InitialVersion.hasNext())
         {
-            Assert.assertEquals(artifactVersion1.toString(), results.next().getObject().toString());
+            Assert.assertEquals(artifactVersion1.toString(), results4InitialVersion.next().getObject().toString());
         }
         
         // update to second version
@@ -906,44 +920,73 @@ public class PoddPrototypeSkeletonTest extends AbstractSesameTest
         
         this.getTestRepositoryConnection().commit();
         
-        // FIXME: Create a new variable instead of assigning to a preexisting variable
         // verify version statement now refers to new version
-        results =
+        final RepositoryResult<Statement> results4UpdatedVersion =
                 this.getTestRepositoryConnection().getStatements(artifact1.toOpenRDFURI(),
                         PoddPrototypeUtils.OMV_CURRENT_VERSION, null, false, this.poddArtifactManagementGraph);
-        while(results.hasNext())
+        while(results4UpdatedVersion.hasNext())
         {
-            Assert.assertEquals(artifactVersion2.toString(), results.next().getObject().toString());
+            Assert.assertEquals(artifactVersion2.toString(), results4UpdatedVersion.next().getObject().toString());
         }
         
-        // FIXME: Create a new variable instead of assigning to a preexisting variable
         // verify that version1 is no longer referenced
-        results =
+        final RepositoryResult<Statement> results4OldVersionA =
                 this.getTestRepositoryConnection().getStatements(artifactVersion1.toOpenRDFURI(), null, null, false,
                         this.poddArtifactManagementGraph);
-        if(results.hasNext())
+        if(results4OldVersionA.hasNext())
         {
             Assert.fail("References to old version still exist in Artifact Graph");
         }
         
-        // FIXME: Create a new variable instead of assigning to a preexisting variable
-        results =
+        final RepositoryResult<Statement> results4OldVersionB =
                 this.getTestRepositoryConnection().getStatements(inferredArtifactVersion1.toOpenRDFURI(), null, null,
                         false, this.poddArtifactManagementGraph);
-        if(results.hasNext())
+        if(results4OldVersionB.hasNext())
         {
             Assert.fail("References to old version still exist in Artifact Graph");
         }
         
-        // FIXME: Create a new variable instead of assigning to a preexisting variable
-        results =
+        final RepositoryResult<Statement> results4OldVersionC =
                 this.getTestRepositoryConnection().getStatements(inferredArtifactVersion1.toOpenRDFURI(), null, null,
                         false, this.poddArtifactManagementGraph);
-        if(results.hasNext())
+        if(results4OldVersionC.hasNext())
         {
             Assert.fail("References to old version still exist in Artifact Graph");
         }
         
+    }
+    
+    public final RepositoryConnection getNewRepositoryConnection() throws Exception
+    {
+        final RepositoryConnection secondRepositoryConnection = this.getTestRepository().getConnection();
+        secondRepositoryConnection.setAutoCommit(false);
+        return secondRepositoryConnection;
+    }
+    
+    /**
+     * Utility method to calculate sizes of all graphs in Repository
+     * 
+     * @throws Exception
+     */
+    protected final HashMap<String, Long> calculateRepositoryGraphSizes() throws Exception
+    {
+        final HashMap<String, Long> graphInfoMap = new HashMap<String, Long>();
+        final RepositoryConnection myRepositoryConnection = this.getTestRepository().getConnection();
+        myRepositoryConnection.setAutoCommit(false);
+        final RepositoryResult<Resource> contextIDs = myRepositoryConnection.getContextIDs();
+        while(contextIDs.hasNext())
+        {
+            final Resource resource = contextIDs.next();
+            final long graphSize = myRepositoryConnection.size(resource);
+            graphInfoMap.put(resource.stringValue(), graphSize);
+        }
+        final long graphSize = myRepositoryConnection.size();
+        graphInfoMap.put("Total", graphSize);
+        
+        myRepositoryConnection.rollback();
+        myRepositoryConnection.close();
+        
+        return graphInfoMap;
     }
     
     // ///////////////////// some helper methods for debugging////////////////////////
