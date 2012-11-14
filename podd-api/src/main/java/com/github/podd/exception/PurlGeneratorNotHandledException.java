@@ -30,7 +30,7 @@ public class PurlGeneratorNotHandledException extends PoddException
      * @param msg
      *            The message for this exception.
      */
-    public PurlGeneratorNotHandledException(PoddPurlGenerator generator, URI inputUri, String msg)
+    public PurlGeneratorNotHandledException(final PoddPurlGenerator generator, final URI inputUri, final String msg)
     {
         super(msg);
         this.generator = generator;
@@ -47,7 +47,8 @@ public class PurlGeneratorNotHandledException extends PoddException
      * @param throwable
      *            The cause for this exception.
      */
-    public PurlGeneratorNotHandledException(PoddPurlGenerator generator, URI inputUri, String msg, Throwable throwable)
+    public PurlGeneratorNotHandledException(final PoddPurlGenerator generator, final URI inputUri, final String msg,
+            final Throwable throwable)
     {
         super(msg, throwable);
         this.generator = generator;
@@ -62,7 +63,8 @@ public class PurlGeneratorNotHandledException extends PoddException
      * @param throwable
      *            The cause for this exception.
      */
-    public PurlGeneratorNotHandledException(PoddPurlGenerator generator, URI inputUri, Throwable throwable)
+    public PurlGeneratorNotHandledException(final PoddPurlGenerator generator, final URI inputUri,
+            final Throwable throwable)
     {
         super(throwable);
         this.generator = generator;
@@ -70,19 +72,19 @@ public class PurlGeneratorNotHandledException extends PoddException
     }
     
     /**
-     * @return The input URI that failed to be handled by the given PURL Generator.
-     */
-    public URI getInputUri()
-    {
-        return inputUri;
-    }
-    
-    /**
      * @return The PURL Generator that was not able to handle the given input URI.
      */
     public PoddPurlGenerator getGenerator()
     {
-        return generator;
+        return this.generator;
+    }
+    
+    /**
+     * @return The input URI that failed to be handled by the given PURL Generator.
+     */
+    public URI getInputUri()
+    {
+        return this.inputUri;
     }
     
 }

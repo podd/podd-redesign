@@ -3,7 +3,11 @@
  */
 package com.github.podd.api;
 
+import java.util.List;
+
 import org.semanticweb.owlapi.model.OWLOntologyID;
+
+import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
  * Manages PODD Artifacts, including loading and retrieving the ontologies representing the
@@ -13,6 +17,40 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
  */
 public interface PoddArtifactManager
 {
+    /**
+     * 
+     * @param purlGenerator
+     *            A PURL Generator that no longer needs to be associated with this
+     *            PoddArtifactManager.
+     */
+    void deregisterPurlGenerator(PoddPurlGenerator purlGenerator);
+    
+    /**
+     * 
+     * @return The current List of PoddPurlGenerator's that are registered with this
+     *         PoddArtifactManager to provide PURL Generation services for loading and publishing
+     *         objects.
+     */
+    List<PoddPurlGenerator> getPurlGenerators();
+    
+    /**
+     * 
+     * NOTE: After publication PODD Artifacts cannot be modified. New versions must be created as
+     * new PODD Artifacts, which may then be published when they are ready.
+     * 
+     * @param ontologyId
+     *            The OWL Ontology ID of the PODD Artifact that needs to be published.
+     * @return The full inferred OWL Ontology ID of the published Artifact.
+     */
+    InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId);
+    
+    /**
+     * 
+     * @param purlGenerator
+     *            A PURL Generator that needs to be associated with this PoddArtifactManager.
+     */
+    void registerPurlGenerator(PoddPurlGenerator purlGenerator);
+    
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
      * 
@@ -32,5 +70,4 @@ public interface PoddArtifactManager
      *            imports for the PODD Artifact.
      */
     void updateSchemaImport(OWLOntologyID artifactId, OWLOntologyID schemaOntologyId);
-    
 }

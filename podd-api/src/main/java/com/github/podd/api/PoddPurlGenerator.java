@@ -26,16 +26,6 @@ public interface PoddPurlGenerator
     void addTemporaryUriHandler(String temporaryUriPrefix);
     
     /**
-     * Signals to this Purl Generator that it should no longer handle permanent URL generation for
-     * URIs that start with the given prefix.
-     * 
-     * @param temporaryUriPrefix
-     *            A string that matches against the start of a temporary URI to identify it as being
-     *            relevant to this Purl Generator.
-     */
-    void removeTemporaryUriHandler(String temporaryUriPrefix);
-    
-    /**
      * Decides whether the given input URI is compatible with this Purl Generator.
      * 
      * @param inputUri
@@ -57,4 +47,14 @@ public interface PoddPurlGenerator
      *             avoid this exception in normal circumstances, check first using canHandle(URI).
      */
     URI handleTranslation(URI inputUri) throws PurlGeneratorNotHandledException;
+    
+    /**
+     * Signals to this Purl Generator that it should no longer handle permanent URL generation for
+     * URIs that start with the given prefix.
+     * 
+     * @param temporaryUriPrefix
+     *            A string that matches against the start of a temporary URI to identify it as being
+     *            relevant to this Purl Generator.
+     */
+    void removeTemporaryUriHandler(String temporaryUriPrefix);
 }
