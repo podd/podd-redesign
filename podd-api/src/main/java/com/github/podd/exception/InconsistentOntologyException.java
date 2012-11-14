@@ -6,6 +6,8 @@ package com.github.podd.exception;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 /**
+ * An exception indicating that the given ontology was inconsistent.
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
