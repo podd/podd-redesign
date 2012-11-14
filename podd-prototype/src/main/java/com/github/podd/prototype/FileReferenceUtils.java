@@ -93,7 +93,6 @@ public class FileReferenceUtils
             try
             {
                 artifactUri = PoddServletHelper.extractUri(artifactUri);
-                objectUri = PoddServletHelper.extractUri(objectUri);
             }
             catch(URISyntaxException | UnsupportedEncodingException e)
             {

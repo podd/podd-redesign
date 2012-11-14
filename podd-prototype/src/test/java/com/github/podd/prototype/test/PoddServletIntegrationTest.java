@@ -21,6 +21,9 @@ import org.restlet.representation.FileRepresentation;
 import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
 
+import com.github.podd.prototype.FileReferenceUtils;
+import com.github.podd.prototype.HttpFileReference;
+
 /**
  * This integration test class validates the PODD-prototype web service operations.
  * 
@@ -177,10 +180,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
         final String getResult = getBaseResponse.getEntityAsText();
-        final URI baseContext = IRI.create("urn:get-base:").toOpenRDFURI();
-        this.getTestRepositoryConnection().add(new ByteArrayInputStream(getResult.getBytes(StandardCharsets.UTF_8)),
-                "", RDFFormat.RDFXML, baseContext);
-        Assert.assertEquals(29, this.getTestRepositoryConnection().size(baseContext));
+        Assert.assertEquals(29, this.getStatementCount(getResult));
         
         // -- GET the "inferred" artifact from the web service and verify results
         final Request getInferredRequest =
@@ -190,13 +190,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getInferredResponse.getStatus().getCode());
         final String getInferredResult = getInferredResponse.getEntityAsText();
-        final URI inferredContext = IRI.create("urn:get-inferred:").toOpenRDFURI();
-        this.getTestRepositoryConnection().add(
-                new ByteArrayInputStream(getInferredResult.getBytes(StandardCharsets.UTF_8)), "", RDFFormat.RDFXML,
-                inferredContext);
-        Assert.assertTrue(this.getTestRepositoryConnection().size(inferredContext) > 29);
-        
-        this.getTestRepositoryConnection().rollback();
+        Assert.assertTrue(this.getStatementCount(getInferredResult) > 29);
     }
     
     /**
@@ -304,13 +298,72 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         final String modifiedRDFString = getBaseResponse.getEntityAsText();
         
         Assert.assertTrue(modifiedRDFString.contains("John.Doe@csiro.au"));
-        final URI baseContext = IRI.create("urn:get-base:").toOpenRDFURI();
-        this.getTestRepositoryConnection().add(
-                new ByteArrayInputStream(modifiedRDFString.getBytes(StandardCharsets.UTF_8)), "", RDFFormat.RDFXML,
-                baseContext);
-        final long noOfStatements = this.getTestRepositoryConnection().size(baseContext);
-        this.getTestRepositoryConnection().rollback();
+        final long noOfStatements = this.getStatementCount(modifiedRDFString);
         return noOfStatements;
     }
+
+    /**
+     * Tests that a file reference can be attached to an object via the web service.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testAttachReference() throws Exception
+    {
+        // -- login and add an artifact
+        final String path = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf").getFile();
+        final String artifactUri =
+                this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+
+        // -- retrieve the artifact and check that file ref. does not exist
+        final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+        getBaseRequest.setCookies(this.cookies);
+        final Response getBaseResponse = this.getClient().handle(getBaseRequest);
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
+        final String originalRdfString = getBaseResponse.getEntityAsText();
+        Assert.assertFalse(originalRdfString.contains("rfc2616.html")); //artifact is not aware of this file
+
+        // -- generate and send an attach request
+        final Form form = new Form();
+        form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
+        form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
+        form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "w3");
+        form.add(FileReferenceUtils.KEY_FILE_PATH, "Protocols/rfc2616");
+        form.add(FileReferenceUtils.KEY_FILE_NAME, "rfc2616.html");
+        form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION, "http RFC");
+
+        final Request editRequest =
+                new Request(Method.POST, this.BASE_URL + "/attachref");
+        editRequest.setCookies(this.cookies);
+        editRequest.setEntity(form.getWebRepresentation(CharacterSet.UTF_8));
+        final Response editResponse = this.getClient().handle(editRequest);
+        
+        Assert.assertEquals(Status.SUCCESS_NO_CONTENT.getCode(), editResponse.getStatus().getCode());
+        
+        // -- retrieve edited artifact and verify the attached file reference is present
+        final Request getBaseAfterAttachRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+        getBaseAfterAttachRequest.setCookies(this.cookies);
+        final Response getBaseAfterAttachResponse = this.getClient().handle(getBaseAfterAttachRequest);
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseAfterAttachResponse.getStatus().getCode());
+        final String modifiedRDFString = getBaseAfterAttachResponse.getEntityAsText();
+        
+        Assert.assertTrue(modifiedRDFString.contains("rfc2616.html"));
+
+        final long originalStatementCount = this.getStatementCount(originalRdfString);
+        final long updatedStatementCount = this.getStatementCount(modifiedRDFString); 
+        Assert.assertTrue(originalStatementCount < updatedStatementCount);
+    }
+
+    protected long getStatementCount(String rdf) throws Exception
+    {
+        final URI baseContext = IRI.create("urn:get-attached-base:").toOpenRDFURI();
+        this.getTestRepositoryConnection().add(
+                new ByteArrayInputStream(rdf.getBytes(StandardCharsets.UTF_8)), "", RDFFormat.RDFXML,
+                baseContext);
+        final long statementCount = this.getTestRepositoryConnection().size(baseContext);
+        this.getTestRepositoryConnection().rollback();
+        return statementCount;
+    }
+    
     
 }

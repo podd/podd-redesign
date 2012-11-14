@@ -61,6 +61,8 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
         final Properties aliases = new Properties();
         aliases.setProperty("localhost.protocol", "http");
         aliases.setProperty("localhost.host", "localhost");
+        aliases.setProperty("w3.protocol", "http");
+        aliases.setProperty("w3.host", "www.w3.org");
         this.writeFile(aliases, poddHome + "/alias");
     }
     
