@@ -17,7 +17,6 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFParseException;
@@ -97,7 +96,7 @@ public class PoddServletHelperTest
         
         final String artifactUriString = this.helper.loadPoddArtifact(in, mimeType);
         Assert.assertNotNull(artifactUriString);
-
+        
         final String resultRDF = this.helper.getArtifact(artifactUriString, mimeType, false);
         
         Assert.assertNotNull(resultRDF);
@@ -423,8 +422,8 @@ public class PoddServletHelperTest
         fileRef.setFilename(filename);
         fileRef.setDescription(description);
         
-        this.helper.attachReference(fileRef, true);
-        
+        final URI fileReferenceUri = this.helper.attachReference(fileRef, true);
+        Assert.assertNotNull(fileReferenceUri);
         // retrieve artifact and verify whether file reference was correctly attached
         final String resultRDF = this.helper.getArtifact(artifactToAttachTo, mimeType, false);
         
@@ -501,12 +500,13 @@ public class PoddServletHelperTest
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         // test with a non-existent artifact
-        InferredOWLOntologyID id = this.helper.getInferredOWLOntologyIDForArtifact("http://nosuch:ontology:1");
+        final InferredOWLOntologyID id = this.helper.getInferredOWLOntologyIDForArtifact("http://nosuch:ontology:1");
         Assert.assertNull(id.getInferredOntologyIRI());
         Assert.assertNull(id.getVersionIRI());
         
         // test with the added artifact
-        InferredOWLOntologyID nextId = this.helper.getInferredOWLOntologyIDForArtifact(artifactUniqueIRI.stringValue());
+        final InferredOWLOntologyID nextId =
+                this.helper.getInferredOWLOntologyIDForArtifact(artifactUniqueIRI.stringValue());
         
         // FIXME: Test nextId
     }

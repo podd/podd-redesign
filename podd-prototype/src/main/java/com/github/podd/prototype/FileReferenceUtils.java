@@ -89,7 +89,7 @@ public class FileReferenceUtils
         try
         {
             String artifactUri = requestMap.get(FileReferenceUtils.KEY_ARTIFACT_URI)[0];
-            String objectUri = requestMap.get(FileReferenceUtils.KEY_OBJECT_URI)[0];
+            final String objectUri = requestMap.get(FileReferenceUtils.KEY_OBJECT_URI)[0];
             try
             {
                 artifactUri = PoddServletHelper.extractUri(artifactUri);
@@ -173,7 +173,7 @@ public class FileReferenceUtils
         }
     }
     
-    public static void addFileReferenceAsTriplesToRepository(final RepositoryConnection tempRepositoryConnection,
+    public static URI addFileReferenceAsTriplesToRepository(final RepositoryConnection tempRepositoryConnection,
             final FileReference fileReference, final URI context) throws RepositoryException
     {
         // handles HTTP file reference
@@ -207,6 +207,7 @@ public class FileReferenceUtils
         tempRepositoryConnection.add(fileRefObject, propertyHasDescription, fileDescLiteral, context);
         
         tempRepositoryConnection.add(objectToAttachTo, propertyHasFileReference, fileRefObject, context);
+        return fileRefObject;
     }
     
     /**
@@ -227,8 +228,7 @@ public class FileReferenceUtils
         final List<String> errors = new ArrayList<String>();
         // how about making these constants?
         final URI fileRefURI = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "FileReference").toOpenRDFURI();
-        final URI propertyHasFileName =
-                IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileName").toOpenRDFURI();
+        final URI propertyHasFileName = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileName").toOpenRDFURI();
         final URI propertyHasAlias = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasAlias").toOpenRDFURI();
         final URI propertyHasPath = IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasPath").toOpenRDFURI();
         

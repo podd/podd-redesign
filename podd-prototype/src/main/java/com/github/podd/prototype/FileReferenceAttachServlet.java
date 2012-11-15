@@ -1,12 +1,14 @@
 package com.github.podd.prototype;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.URI;
 import org.semanticweb.owlapi.model.OWLException;
 
 /**
@@ -54,8 +56,8 @@ public class FileReferenceAttachServlet extends PoddBaseServlet
         }
         catch(IOException | PoddException e)
         {
-            final String message = "Referenced file is not valid. ";
-            this.log.error(message, e);
+            final String message = "Referenced file is not valid. " + e.getMessage();
+            this.log.error(message);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, message + e.getMessage());
             return;
         }
@@ -65,7 +67,13 @@ public class FileReferenceAttachServlet extends PoddBaseServlet
                         .getAttribute(PoddServletContextListener.PODD_SERVLET_HELPER);
         try
         {
-            helper.attachReference(fileReference, false);
+            final URI fileReferenceUri = helper.attachReference(fileReference, false);
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType(PoddServlet.MIME_TYPE_JSON);
+            final PrintWriter out = response.getWriter();
+            out.write(fileReferenceUri.stringValue()); // should be encapsulated in JSON format
+            out.flush();
+            out.close();
         }
         catch(final RuntimeException e)
         {
@@ -83,7 +91,6 @@ public class FileReferenceAttachServlet extends PoddBaseServlet
             return;
         }
         
-        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
     
 }

@@ -415,7 +415,8 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         editRequest.setEntity(form.getWebRepresentation(CharacterSet.UTF_8));
         final Response editResponse = this.getClient().handle(editRequest);
         
-        Assert.assertEquals(Status.SUCCESS_NO_CONTENT.getCode(), editResponse.getStatus().getCode());
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), editResponse.getStatus().getCode());
+        Assert.assertNotNull(editResponse.getEntityAsText());
         
         // -- retrieve edited artifact and verify the attached file reference is present
         final Request getBaseAfterAttachRequest =
