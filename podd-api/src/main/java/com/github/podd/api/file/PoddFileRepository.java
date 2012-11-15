@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.podd.api;
+package com.github.podd.api.file;
 
 /**
  * This interface represents the basic type for all file repositories. PODD uses File Repositories

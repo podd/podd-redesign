@@ -1,4 +1,4 @@
-package com.github.podd.api;
+package com.github.podd.api.file;
 
 import java.util.List;
 

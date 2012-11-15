@@ -5,7 +5,7 @@ package com.github.podd.exception;
 
 import org.openrdf.model.URI;
 
-import com.github.podd.api.PoddPurlGenerator;
+import com.github.podd.api.purl.PoddPurlProcessor;
 
 /**
  * This exception indicates that a Purl Generator was not able to handle the generation of a
@@ -18,7 +18,7 @@ public class PurlGeneratorNotHandledException extends PoddException
 {
     private static final long serialVersionUID = -8569720976338731517L;
     
-    private final PoddPurlGenerator generator;
+    private final PoddPurlProcessor generator;
     private final URI inputUri;
     
     /**
@@ -30,7 +30,7 @@ public class PurlGeneratorNotHandledException extends PoddException
      * @param msg
      *            The message for this exception.
      */
-    public PurlGeneratorNotHandledException(final PoddPurlGenerator generator, final URI inputUri, final String msg)
+    public PurlGeneratorNotHandledException(final PoddPurlProcessor generator, final URI inputUri, final String msg)
     {
         super(msg);
         this.generator = generator;
@@ -47,7 +47,7 @@ public class PurlGeneratorNotHandledException extends PoddException
      * @param throwable
      *            The cause for this exception.
      */
-    public PurlGeneratorNotHandledException(final PoddPurlGenerator generator, final URI inputUri, final String msg,
+    public PurlGeneratorNotHandledException(final PoddPurlProcessor generator, final URI inputUri, final String msg,
             final Throwable throwable)
     {
         super(msg, throwable);
@@ -63,7 +63,7 @@ public class PurlGeneratorNotHandledException extends PoddException
      * @param throwable
      *            The cause for this exception.
      */
-    public PurlGeneratorNotHandledException(final PoddPurlGenerator generator, final URI inputUri,
+    public PurlGeneratorNotHandledException(final PoddPurlProcessor generator, final URI inputUri,
             final Throwable throwable)
     {
         super(throwable);
@@ -74,7 +74,7 @@ public class PurlGeneratorNotHandledException extends PoddException
     /**
      * @return The PURL Generator that was not able to handle the given input URI.
      */
-    public PoddPurlGenerator getGenerator()
+    public PoddPurlProcessor getGenerator()
     {
         return this.generator;
     }

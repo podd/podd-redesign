@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.podd.api;
+package com.github.podd.api.file;
 
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;

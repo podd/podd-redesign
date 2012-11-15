@@ -3,8 +3,10 @@
  */
 package com.github.podd.api;
 
+import java.io.InputStream;
 import java.util.List;
 
+import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -19,19 +21,19 @@ public interface PoddArtifactManager
 {
     /**
      * 
-     * @param purlGenerator
-     *            A PURL Generator that no longer needs to be associated with this
-     *            PoddArtifactManager.
+     * @param processor
+     *            A Processor that is registered with this Artifact manager for the given stage.
+     * @param stage
+     *            A stage that the processor is registered with.
      */
-    void deregisterPurlGenerator(PoddPurlGenerator purlGenerator);
+    void deregisterProcessor(PoddProcessorFactory<?,?,?,?> processor, PoddProcessorStage stage);
     
     /**
      * 
-     * @return The current List of PoddPurlGenerator's that are registered with this
-     *         PoddArtifactManager to provide PURL Generation services for loading and publishing
-     *         objects.
+     * @return The current List of {@link PoddProcessorFactory} instances that are registered with
+     *         this PoddArtifactManager to provide processing services.
      */
-    List<PoddPurlGenerator> getPurlGenerators();
+    List<PoddProcessorFactory<?,?,?,?>> getProcessors(PoddProcessorStage stage);
     
     /**
      * 
@@ -46,10 +48,13 @@ public interface PoddArtifactManager
     
     /**
      * 
-     * @param purlGenerator
-     *            A PURL Generator that needs to be associated with this PoddArtifactManager.
+     * @param processor
+     *            A {@link PoddProcessorFactory} that will be registered with this Artifact manager for the given
+     *            stage.
+     * @param stage
+     *            A stage that the processor will be registered with.
      */
-    void registerPurlGenerator(PoddPurlGenerator purlGenerator);
+    void registerProcessor(PoddProcessorFactory<?,?,?,?> processor, PoddProcessorStage stage);
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
@@ -70,4 +75,16 @@ public interface PoddArtifactManager
      *            imports for the PODD Artifact.
      */
     void updateSchemaImport(OWLOntologyID artifactId, OWLOntologyID schemaOntologyId);
+    
+    /**
+     * Loads an artifact into the manager.
+     * 
+     * @param inputStream
+     *            The input stream containing the RDF document for the updated artifact.
+     * @param format
+     *            The format for the input RDF document.
+     * @return An InferredOWLOntologyID object containing the details of the artifact. If the
+     *         inferencing is delayed, the object may not contain the inferred ontology IRI.
+     */
+    InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format);
 }

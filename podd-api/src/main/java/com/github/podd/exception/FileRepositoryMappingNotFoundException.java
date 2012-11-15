@@ -3,7 +3,7 @@
  */
 package com.github.podd.exception;
 
-import com.github.podd.api.PoddFileRepositoryManager;
+import com.github.podd.api.file.PoddFileRepositoryManager;
 
 /**
  * An exception that is thrown to indicate that there was no file repository mapping found for the
