@@ -26,14 +26,29 @@ public interface PoddArtifactManager
      * @param stage
      *            A stage that the processor is registered with.
      */
-    void deregisterProcessor(PoddProcessorFactory<?,?,?,?> processor, PoddProcessorStage stage);
+    void deregisterProcessor(PoddProcessorFactory<?, ?, ?> processor, PoddProcessorStage stage);
     
     /**
      * 
+     * @param stage
+     *            A varargs list of PoddProcessorStage enumerations that signify the stages to
+     *            fetch. If there are no stages given then all processors are returned.
      * @return The current List of {@link PoddProcessorFactory} instances that are registered with
      *         this PoddArtifactManager to provide processing services.
      */
-    List<PoddProcessorFactory<?,?,?,?>> getProcessors(PoddProcessorStage stage);
+    List<PoddProcessorFactory<?, ?, ?>> getProcessors(PoddProcessorStage... stage);
+    
+    /**
+     * Loads an artifact into the manager.
+     * 
+     * @param inputStream
+     *            The input stream containing the RDF document for the updated artifact.
+     * @param format
+     *            The format for the input RDF document.
+     * @return An InferredOWLOntologyID object containing the details of the artifact. If the
+     *         inferencing is delayed, the object may not contain the inferred ontology IRI.
+     */
+    InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format);
     
     /**
      * 
@@ -49,12 +64,12 @@ public interface PoddArtifactManager
     /**
      * 
      * @param processor
-     *            A {@link PoddProcessorFactory} that will be registered with this Artifact manager for the given
-     *            stage.
+     *            A {@link PoddProcessorFactory} that will be registered with this Artifact manager
+     *            for the given stage.
      * @param stage
      *            A stage that the processor will be registered with.
      */
-    void registerProcessor(PoddProcessorFactory<?,?,?,?> processor, PoddProcessorStage stage);
+    void registerProcessor(PoddProcessorFactory<?, ?, ?> processor, PoddProcessorStage stage);
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
@@ -75,16 +90,4 @@ public interface PoddArtifactManager
      *            imports for the PODD Artifact.
      */
     void updateSchemaImport(OWLOntologyID artifactId, OWLOntologyID schemaOntologyId);
-    
-    /**
-     * Loads an artifact into the manager.
-     * 
-     * @param inputStream
-     *            The input stream containing the RDF document for the updated artifact.
-     * @param format
-     *            The format for the input RDF document.
-     * @return An InferredOWLOntologyID object containing the details of the artifact. If the
-     *         inferencing is delayed, the object may not contain the inferred ontology IRI.
-     */
-    InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format);
 }

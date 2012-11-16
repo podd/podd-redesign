@@ -6,7 +6,7 @@ package com.github.podd.utils;
  * @author kutila
  *
  */
-enum USER_STATUS
+enum PoddUserStatus
 {
     /**
      * An ACTIVE user has the ability to access the PODD system.

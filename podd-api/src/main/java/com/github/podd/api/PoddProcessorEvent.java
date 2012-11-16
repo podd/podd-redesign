@@ -12,20 +12,19 @@ package com.github.podd.api;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
- * @param <I> The input for this PoddProcessorEvent.
- * @param <O> The output for this PoddProcessorEvent.
+ * @param <I>
+ *            The input for this PoddProcessorEvent.
+ * @param <O>
+ *            The output for this PoddProcessorEvent.
  */
-public interface PoddProcessorEvent<I, O>
+public interface PoddProcessorEvent<I>
 {
-    PoddArtifactManager getArtifactManager();
+    I getInput();
     
     PoddProcessorStage getStage();
     
-    boolean isBeforeStage();
-    
     boolean isAfterStage();
     
-    I getInput();
+    boolean isBeforeStage();
     
-    void setOutput(O output);
 }
