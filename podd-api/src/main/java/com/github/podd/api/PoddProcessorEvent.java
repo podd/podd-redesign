@@ -23,8 +23,4 @@ public interface PoddProcessorEvent<I>
     
     PoddProcessorStage getStage();
     
-    boolean isAfterStage();
-    
-    boolean isBeforeStage();
-    
 }

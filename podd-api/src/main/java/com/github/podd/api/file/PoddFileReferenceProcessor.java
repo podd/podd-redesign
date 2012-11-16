@@ -3,6 +3,7 @@
  */
 package com.github.podd.api.file;
 
+import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRdfProcessor;
 
 /**
@@ -14,6 +15,8 @@ import com.github.podd.api.PoddRdfProcessor;
  */
 public interface PoddFileReferenceProcessor extends PoddRdfProcessor
 {
+    void setArtifactManager(PoddArtifactManager testArtifactManager);
+    
     /**
      * 
      * @param manager

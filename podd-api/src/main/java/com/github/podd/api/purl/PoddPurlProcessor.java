@@ -3,6 +3,8 @@
  */
 package com.github.podd.api.purl;
 
+import java.util.List;
+
 import org.openrdf.model.URI;
 
 import com.github.podd.api.PoddRdfProcessor;
@@ -35,6 +37,13 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      *         URI to a Purl, and false if it is not known whether this will be possible.
      */
     boolean canHandle(URI inputUri);
+    
+    /**
+     * 
+     * @return A list of temporary URI handler prefixes that have been registered for this
+     *         PoddPurlProcessor.
+     */
+    List<String> getTemporaryUriHandlers();
     
     /**
      * Handles the translation of URIs using this Purl Processor

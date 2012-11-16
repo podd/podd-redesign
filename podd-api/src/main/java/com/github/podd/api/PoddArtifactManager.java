@@ -4,7 +4,6 @@
 package com.github.podd.api;
 
 import java.io.InputStream;
-import java.util.List;
 
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -19,25 +18,6 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public interface PoddArtifactManager
 {
-    /**
-     * 
-     * @param processor
-     *            A Processor that is registered with this Artifact manager for the given stage.
-     * @param stage
-     *            A stage that the processor is registered with.
-     */
-    void deregisterProcessor(PoddProcessorFactory<?, ?, ?> processor, PoddProcessorStage stage);
-    
-    /**
-     * 
-     * @param stage
-     *            A varargs list of PoddProcessorStage enumerations that signify the stages to
-     *            fetch. If there are no stages given then all processors are returned.
-     * @return The current List of {@link PoddProcessorFactory} instances that are registered with
-     *         this PoddArtifactManager to provide processing services.
-     */
-    List<PoddProcessorFactory<?, ?, ?>> getProcessors(PoddProcessorStage... stage);
-    
     /**
      * Loads an artifact into the manager.
      * 
@@ -60,16 +40,6 @@ public interface PoddArtifactManager
      * @return The full inferred OWL Ontology ID of the published Artifact.
      */
     InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId);
-    
-    /**
-     * 
-     * @param processor
-     *            A {@link PoddProcessorFactory} that will be registered with this Artifact manager
-     *            for the given stage.
-     * @param stage
-     *            A stage that the processor will be registered with.
-     */
-    void registerProcessor(PoddProcessorFactory<?, ?, ?> processor, PoddProcessorStage stage);
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
