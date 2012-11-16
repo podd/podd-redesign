@@ -14,7 +14,7 @@ import com.github.podd.exception.PurlGeneratorNotHandledException;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public interface PoddPurlProcessor extends PoddRdfProcessor<URI>
+public interface PoddPurlProcessor extends PoddRdfProcessor
 {
     /**
      * Signals to this Purl Processor that it should handle permanent URL generation for URIs that

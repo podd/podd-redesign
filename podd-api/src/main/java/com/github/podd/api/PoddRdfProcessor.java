@@ -8,10 +8,11 @@ import org.openrdf.model.Graph;
 /**
  * 
  * @author Peter Ansell p_ansell@yahoo.com
- *
- * @param <T> The types of objects that this PoddRdfProcessor creates.
+ * 
+ * @param <T>
+ *            The types of objects that this PoddRdfProcessor creates.
  */
-public interface PoddRdfProcessor<T> extends PoddProcessor<Graph, T>
+public interface PoddRdfProcessor extends PoddProcessor<Graph>
 {
     /**
      * Defines the SPARQL Construct Basic Graph Pattern (BGP) that will be used to create sets of
@@ -25,5 +26,5 @@ public interface PoddRdfProcessor<T> extends PoddProcessor<Graph, T>
     
     String getSPARQLConstructWhere();
     
-    T processRdfGraph(Graph graph);
+    void processRdfGraph(Graph graph);
 }
