@@ -10,7 +10,6 @@ import org.openrdf.model.URI;
 import com.github.podd.exception.InvalidUserDetailsException;
 import com.github.podd.exception.UserAlreadyExistsException;
 import com.github.podd.exception.UserNotFoundException;
-import com.github.podd.utils.AbstractPoddUser;
 import com.github.podd.utils.PoddUser;
 
 /**
@@ -55,7 +54,7 @@ public interface PoddUserManager
      * @return A <code>List</code> of the current set of PODD users or an empty list if no users
      *         exist.
      */
-    List<AbstractPoddUser> listAllPoddUsers();
+    List<PoddUser> listAllPoddUsers();
     
     /**
      * Updates details of an existing <code>PoddUser</code>.
