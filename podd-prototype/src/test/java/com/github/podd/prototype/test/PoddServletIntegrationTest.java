@@ -59,9 +59,8 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     @Override
     protected void logout()
     {
-        final Request logoutRequest = new Request(Method.GET, this.BASE_URL + "/login");
+        final Request logoutRequest = new Request(Method.GET, this.BASE_URL + "/logout");
         logoutRequest.setCookies(this.cookies);
-        logoutRequest.getResourceRef().addQueryParameter("logout", "true");
         this.getClient().handle(logoutRequest);
         // Note: not asserting response code which depends on whether there was an active session
     }
@@ -125,22 +124,19 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
         
         // -- logout without sending cookie: should fail with Status 401 (UNAUTHORIZED)
-        final Request incorrectLogoutRequest = new Request(Method.GET, this.BASE_URL + "/login");
-        incorrectLogoutRequest.getResourceRef().addQueryParameter("logout", "true");
+        final Request incorrectLogoutRequest = new Request(Method.GET, this.BASE_URL + "/logout");
         final Response incorrectLogoutResponse = this.getClient().handle(incorrectLogoutRequest);
         Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED.getCode(), incorrectLogoutResponse.getStatus().getCode());
         
         // -- logout: should succeed
-        final Request logoutRequest = new Request(Method.GET, this.BASE_URL + "/login");
+        final Request logoutRequest = new Request(Method.GET, this.BASE_URL + "/logout");
         logoutRequest.setCookies(this.cookies);
-        logoutRequest.getResourceRef().addQueryParameter("logout", "true");
         final Response logoutResponse = this.getClient().handle(logoutRequest);
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), logoutResponse.getStatus().getCode());
         
         // -- try to logout again: should fail with Status 401 (UNAUTHORIZED)
-        final Request secondLogoutRequest = new Request(Method.GET, this.BASE_URL + "/login");
+        final Request secondLogoutRequest = new Request(Method.GET, this.BASE_URL + "/logout");
         secondLogoutRequest.setCookies(this.cookies);
-        secondLogoutRequest.getResourceRef().addQueryParameter("logout", "true");
         final Response secondLogoutResponse = this.getClient().handle(secondLogoutRequest);
         Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED.getCode(), secondLogoutResponse.getStatus().getCode());
     }

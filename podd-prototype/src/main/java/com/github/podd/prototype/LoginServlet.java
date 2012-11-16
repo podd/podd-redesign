@@ -37,8 +37,9 @@ public class LoginServlet extends PoddBaseServlet
         final PrintWriter out = response.getWriter();
         
         final String httpMethod = request.getMethod();
+        final String servletPath = request.getServletPath();
         
-        if(PoddBaseServlet.HTTP_POST.equals(httpMethod))
+        if(PoddBaseServlet.HTTP_POST.equals(httpMethod) && servletPath.contains("login"))
         {
             final String username = request.getParameter("username");
             
@@ -73,7 +74,7 @@ public class LoginServlet extends PoddBaseServlet
             out.close();
             return;
         }
-        else if(PoddBaseServlet.HTTP_GET.equals(httpMethod) && request.getParameter("logout") != null)
+        else if(PoddBaseServlet.HTTP_GET.equals(httpMethod) && servletPath.contains("logout"))
         {
             this.log.debug("Logout requested");
             if(this.isValidSession(request, response))

@@ -45,6 +45,10 @@
     	<url-pattern>/login</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
     	<servlet-name>FileReferenceAttachServlet</servlet-name>
     	<url-pattern>/attachref</url-pattern>
     </servlet-mapping>
