@@ -45,8 +45,8 @@ public interface PoddUser
     
     public abstract void setOrganization(String organization);
     
-    public abstract USER_STATUS getStatus();
+    public abstract PoddUserStatus getStatus();
     
-    public abstract void setStatus(USER_STATUS status);
+    public abstract void setStatus(PoddUserStatus status);
     
 }
