@@ -89,10 +89,11 @@ public class FileReferenceUtils
         try
         {
             String artifactUri = requestMap.get(FileReferenceUtils.KEY_ARTIFACT_URI)[0];
-            final String objectUri = requestMap.get(FileReferenceUtils.KEY_OBJECT_URI)[0];
+            String objectUri = requestMap.get(FileReferenceUtils.KEY_OBJECT_URI)[0];
             try
             {
                 artifactUri = PoddServletHelper.extractUri(artifactUri);
+                objectUri = PoddServletHelper.extractUri(objectUri);
             }
             catch(URISyntaxException | UnsupportedEncodingException e)
             {

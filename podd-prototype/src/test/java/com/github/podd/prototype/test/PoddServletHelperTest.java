@@ -515,17 +515,78 @@ public class PoddServletHelperTest
     public void testExtractUri() throws Exception
     {
         final String[] in =
-                { "http/www.google.com", "http/130.198.34.55:9090/permanenturl", "https/thebank.org/myaccount#55",
+                {
+                        "http/www.google.com",
+                        "http/130.198.34.55:9090/permanenturl",
+                        
+                        // fragment separation # is not encoded
+                        "https/thebank.org/myaccount#55",
+                        
+                        // the fragment should be encoded
+                        "https/thebank.org/myaccount#55abc:alpha",
+                        
+                        // the query should be encoded
+                        "https/purl.org/myaccount?phrase=abc:z",
+                        "https/purl.org/myaccount?phrase/z",
+                        
+                        // the encoded '#' inside fragment should be kept as is
+                        "https/thebank.org/myaccount#55abc%23-alpha",
+                        
+                        // the path has an encoded '#' that should be kept encoded
                         "https/thebank.org/myaccount%2355",
-                        "http/example.org/permanenturl/34cc1c8e-0ece-49f4-ac51/artifact:1",
+                        
+                        // the ":" in the path should be encoded
+                        "http/example.org/permanenturl/colon-in-path/artifact:1", "http/purl.org/artifact:4:3abc:99",
+                        "http/example.org/alpha/artifact:1:0:5:22",
+                        "http/www.podd.org/abc:3",
+                        
+                        // keep the encoded parts of the path unchanged
+                        "http://purl.org/artifact%3A4%3A3abc%3A99",
                         "http/example.org/permanenturl/34cc1c8e-0ece-49f4-ac51-e17aa34648e4/artifact%3A1",
-                        "http/example.org/alpha/artifact:1:0:5:22", "http://www.podd.org/abc:3" };
+                        
+                        // following are kept as they are
+                        "urn:alphabeta:34:d", "urn:temp:tree:54#abc", "urn:temp:tree:54%23abc",
+                        "ftp://somehost/somepath/somefile:zip", "mailto:folder@machine.csiro.au",
+                        
+                        // harmless element to terminate the test array
+                        "http/purl.org" };
         final String[] expected =
-                { "http://www.google.com", "http://130.198.34.55:9090/permanenturl",
-                        "https://thebank.org/myaccount%2355", "https://thebank.org/myaccount%2355",
-                        "http://example.org/permanenturl/34cc1c8e-0ece-49f4-ac51/artifact%3A1",
+                {
+                        "http://www.google.com",
+                        "http://130.198.34.55:9090/permanenturl",
+                        
+                        // fragment separation # is not encoded
+                        "https://thebank.org/myaccount#55",
+                        
+                        // the fragment should be encoded
+                        "https://thebank.org/myaccount#55abc%3Aalpha",
+                        
+                        // the query should be encoded
+                        "https://purl.org/myaccount?phrase%3Dabc%3Az",
+                        "https://purl.org/myaccount?phrase%2Fz",
+                        
+                        // the encoded '#' inside fragment should be kept as is
+                        "https://thebank.org/myaccount#55abc%23-alpha",
+                        
+                        // the path has an encoded '#' that should be kept encoded
+                        "https://thebank.org/myaccount%2355",
+                        
+                        // the ":" in the path should be encoded
+                        "http://example.org/permanenturl/colon-in-path/artifact%3A1",
+                        "http://purl.org/artifact%3A4%3A3abc%3A99",
+                        "http://example.org/alpha/artifact%3A1%3A0%3A5%3A22",
+                        "http://www.podd.org/abc%3A3",
+                        
+                        // keep the encoded parts of the path unchanged
+                        "http://purl.org/artifact%3A4%3A3abc%3A99",
                         "http://example.org/permanenturl/34cc1c8e-0ece-49f4-ac51-e17aa34648e4/artifact%3A1",
-                        "http://example.org/alpha/artifact%3A1%3A0%3A5%3A22", "http://www.podd.org/abc%3A3" };
+                        
+                        // following are kept as they are
+                        "urn:alphabeta:34:d", "urn:temp:tree:54#abc", "urn:temp:tree:54%23abc",
+                        "ftp://somehost/somepath/somefile:zip", "mailto:folder@machine.csiro.au",
+                        
+                        // terminating element of the array
+                        "http://purl.org" };
         
         for(int i = 0; i < in.length; i++)
         {

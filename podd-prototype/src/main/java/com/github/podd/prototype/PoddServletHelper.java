@@ -904,64 +904,87 @@ public class PoddServletHelper
     
     /**
      * Converts incoming (URL-encoded) URI strings to a format compliant with the one used by PODD.
+     * Only URI strings starting with 'http' and 'https' are processed. All others pass through this
+     * method unchanged.
      * 
-     * 1. The scheme is separated by a '/' only. Replace it with '://' 2. URL encode the path and
-     * any fragments.
+     * - If the scheme in the incoming URI String is separated by a '/' only, this is replaced with
+     * '://'.
      * 
-     * Examples:
+     * - The final part of the <i>path</i>, <i>query</i> and <i>fragment</i> are URL encoded
      * 
-     * "https/thebank.org/myaccount#55" --> "https://thebank.org/myaccount%2355".
+     * For examples see PoddServletHelperTest.testExtractUri() For URI Encoding/decoding concerns
+     * see https://tools.ietf.org/html/rfc3986#section-2.1
      * 
-     * "http/example.org/alpha/artifact:1:0:5:22" -->
-     * "http://example.org/alpha/artifact%3A1%3A0%3A5%3A22"
+     * NOTE: This method is fairly weak in that anything beyond what has been tested could fail.
      * 
-     * "https/thebank.org/myaccount%2355" --> "https://thebank.org/myaccount%2355"
-     * 
-     * Note: Currently supports http and https protocols/schemes only.
-     * 
-     * @param uriPath
+     * @param uriString
      *            URL encoded string of the form "http/host.com/..."
-     * @return The converted URI
+     * @return
      * @throws URISyntaxException
+     *             If the URI is too short (i.e. less than 6 characters)
      * @throws UnsupportedEncodingException
      */
-    public static String extractUri(String uriPath) throws URISyntaxException, UnsupportedEncodingException
+    public static String extractUri(String uriString) throws URISyntaxException, UnsupportedEncodingException
     {
-        if(uriPath == null || uriPath.length() < 6)
+        // -- check length (can we have valid URIs less than 6 characters in PODD?)
+        if(uriString == null || uriString.length() < 6)
         {
-            throw new URISyntaxException(uriPath, "Too short to be a URI in the expected format");
+            throw new URISyntaxException(uriString, "Too short to be a URI in the expected format");
         }
         
-        // URL encode the fragment part as SesameTools URITranslator URL encodes them when putting
-        // into Sesame
-        try
+        // -- add proper scheme separation characters
+        if(uriString.startsWith("http/"))
         {
-            // URL decode it first to make sure we don't double encode
-            uriPath = java.net.URLDecoder.decode(uriPath, "UTF-8");
-            
-            // FIXME: The following is broken if the slash is inside the query or fragment portions
-            // URL encode the part after the last '/'
-            final String hostPath = uriPath.substring(0, uriPath.lastIndexOf("/") + 1);
-            final String toEncode = uriPath.substring(uriPath.lastIndexOf("/") + 1);
+            uriString = uriString.replaceFirst("http/", "http://");
+        }
+        else if(uriString.startsWith("https/"))
+        {
+            uriString = uriString.replaceFirst("https/", "https://");
+        }
+        else if(uriString.startsWith("ftp") || uriString.startsWith("mailto") || uriString.startsWith("ssh"))
+        {
+            return uriString;
+        }
+        
+        final java.net.URI uri = new java.net.URI(uriString);
+        if(uri.isOpaque())
+        {
+            return uriString;
+        }
+        
+        final StringBuilder b = new StringBuilder();
+        b.append(uri.getScheme());
+        b.append(":");
+        b.append("//"); // works for http, which is all we support now
+        b.append(uri.getAuthority());
+        
+        // final part of the Path may have characters that need to be encoded (e.g. .../artifact:1)
+        final String path = uri.getPath();
+        if(path != null)
+        {
+            final String keepAs = path.substring(0, path.lastIndexOf("/") + 1);
+            final String toEncode = path.substring(path.lastIndexOf("/") + 1);
             
             final String encoded = java.net.URLEncoder.encode(toEncode, "UTF-8");
-            uriPath = hostPath.concat(encoded);
-        }
-        catch(final UnsupportedEncodingException e)
-        {
-            throw e;
+            b.append(keepAs);
+            b.append(encoded);
         }
         
-        if(uriPath.startsWith("http/"))
+        // encode query part
+        if(uri.getQuery() != null && !uri.getQuery().isEmpty())
         {
-            uriPath = uriPath.replaceFirst("http/", "http://");
-        }
-        else if(uriPath.startsWith("https/"))
-        {
-            uriPath = uriPath.replaceFirst("https/", "https://");
+            b.append("?");
+            b.append(java.net.URLEncoder.encode(uri.getQuery(), "UTF-8"));
         }
         
-        return uriPath;
+        // encode fragment part
+        if(uri.getFragment() != null && !uri.getFragment().isEmpty())
+        {
+            b.append("#");
+            b.append(java.net.URLEncoder.encode(uri.getFragment(), "UTF-8"));
+        }
+        
+        return b.toString();
     }
     
     public void tearDown() throws RepositoryException
