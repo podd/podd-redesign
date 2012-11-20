@@ -63,6 +63,11 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
         aliases.setProperty("localhost.host", "localhost");
         aliases.setProperty("w3.protocol", "http");
         aliases.setProperty("w3.host", "www.w3.org");
+        aliases.setProperty("localssh.host", "localhost");
+        aliases.setProperty("localssh.port", "9856");
+        aliases.setProperty("localssh.username", "salt");
+        aliases.setProperty("localssh.secret", "salt");
+        aliases.setProperty("localssh.fingerprint", "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db");
         this.writeFile(aliases, poddHome + "/alias");
     }
     
