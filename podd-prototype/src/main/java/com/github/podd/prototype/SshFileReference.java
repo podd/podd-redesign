@@ -1,12 +1,15 @@
+/**
+ * 
+ */
 package com.github.podd.prototype;
 
 /**
- * Represents a reference to a file accessible as a web resource over HTTP
+ * This class represents a PODD File Reference to a resource accessible via SSH.
  * 
  * @author kutila
- * @created 2012/11/07
+ * @created 19/11/2012
  */
-public class HttpFileReference extends FileReference
+public class SshFileReference extends FileReference
 {
     
     private String filename;
@@ -15,30 +18,25 @@ public class HttpFileReference extends FileReference
     
     public String getFilename()
     {
-        return this.filename;
+        return filename;
     }
-    
-    public void setFilename(final String filename)
+    public void setFilename(String filename)
     {
         this.filename = filename;
     }
-    
     public String getPath()
     {
-        return this.path;
+        return path;
     }
-    
-    public void setPath(final String path)
+    public void setPath(String path)
     {
         this.path = path;
     }
-    
     public String getDescription()
     {
-        return this.description;
+        return description;
     }
-    
-    public void setDescription(final String description)
+    public void setDescription(String description)
     {
         this.description = description;
     }
@@ -57,12 +55,12 @@ public class HttpFileReference extends FileReference
     @Override
     public String toString()
     {
-        final StringBuilder b = new StringBuilder();
+        StringBuilder b = new StringBuilder();
         b.append(super.toString());
         b.append(" path=");
-        b.append(this.path);
+        b.append(path);
         b.append(" filename=");
-        b.append(this.filename);
+        b.append(filename);
         return b.toString();
     }
     

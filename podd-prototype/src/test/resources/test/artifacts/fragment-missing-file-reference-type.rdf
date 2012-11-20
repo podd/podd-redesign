@@ -12,6 +12,8 @@
 <rdf:Description rdf:about="http://podd.org/filereference#unique_random_id:2">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
+	<!-- file reference type is missing -->
+	<!-- poddBase:hasFileReferenceType>HTTP</poddBase:hasFileReferenceType-->
 	<poddBase:hasFileName>rfc2616.html</poddBase:hasFileName>
 	<poddBase:hasDescription>The http RFC</poddBase:hasDescription>
 	<poddBase:hasPath>Protocols/rfc2616</poddBase:hasPath>

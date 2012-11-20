@@ -10,9 +10,11 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
@@ -24,6 +26,8 @@ import com.github.podd.prototype.FileReference;
 import com.github.podd.prototype.FileReferenceUtils;
 import com.github.podd.prototype.HttpFileReference;
 import com.github.podd.prototype.PoddException;
+import com.github.podd.prototype.PoddServletHelper;
+import com.github.podd.prototype.SshFileReference;
 
 public class FileReferenceUtilsTest
 {
@@ -47,7 +51,14 @@ public class FileReferenceUtilsTest
     public void testCheckFileExists_simpleFailures() throws Exception
     {
         // test with an unsupported FileReference format
-        final FileReference emptyRef = new FileReference();
+        final FileReference emptyRef = new FileReference()
+            {
+                @Override
+                public boolean isFilled()
+                {
+                    return true;
+                }
+            };
         try
         {
             this.utils.checkFileExists(emptyRef);
@@ -115,12 +126,38 @@ public class FileReferenceUtilsTest
         this.utils.checkFileExists(httpRef);
     }
     
+    /**
+     * This test starts up an internal SSH server and therefore is somewhat an integration test. If
+     * the specified port is unavailable, the test will fail.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testCheckFileExists_sshFileRef() throws Exception
+    {
+        final SSHService sshd = new SSHService();
+        sshd.startTestSSHServer(9856);
+        
+        final SshFileReference sshFileRef = new SshFileReference();
+        sshFileRef.setArtifactUri(null);
+        sshFileRef.setObjectUri(null);
+        sshFileRef.setServerAlias("localssh");
+        sshFileRef.setFilename("basicProject-1.rdf");
+        sshFileRef.setPath("src/test/resources/test/artifacts");
+        sshFileRef.setDescription("Refers to one of the test artifacts, to be accessed through an ssh server");
+        
+        this.utils.checkFileExists(sshFileRef);
+        
+        sshd.stopTestSSHServer();
+    }
+    
     @Test
     public void testConstructFileReferenceFromMap() throws Exception
     {
         final Map<String, String[]> map = new HashMap<String, String[]>();
         Assert.assertNull(this.utils.constructFileReferenceFromMap(map));
         
+        map.put(FileReferenceUtils.KEY_FILE_REF_TYPE, new String[] { "http" });
         map.put(FileReferenceUtils.KEY_ARTIFACT_URI, new String[] { "http://example.org/podd/artifact:12" });
         Assert.assertNull(this.utils.constructFileReferenceFromMap(map));
         map.put(FileReferenceUtils.KEY_OBJECT_URI, new String[] { "urn:poddinternal:permanent:object34" });
@@ -137,31 +174,62 @@ public class FileReferenceUtilsTest
     }
     
     @Test
-    public void testCheckFileReferenceInRDFWithNone() throws Exception
+    public void testAddFileReferenceAsTriplesToRepository_HTTP() throws Exception
     {
-        final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        final HttpFileReference httpRef = new HttpFileReference();
+        httpRef.setServerAlias("w3");
+        httpRef.setArtifactUri("urn:artifact:01:ac");
+        httpRef.setObjectUri("urn:someobject");
+        httpRef.setFilename("rfc2616.html");
+        httpRef.setPath("Protocols/rfc2616");
+        httpRef.setDescription("HTTP RFC");
         
-        Repository tempRepository = null;
-        RepositoryConnection tempRepositoryConnection = null;
+        this.internalTestAddFileReferenceAsTriplesToRepository(httpRef, "HTTP");
+    }
+    
+    @Test
+    public void testAddFileReferenceAsTriplesToRepository_SSH() throws Exception
+    {
+        final SshFileReference sshRef = new SshFileReference();
+        sshRef.setServerAlias("w3");
+        sshRef.setArtifactUri("urn:artifact:01:ac");
+        sshRef.setObjectUri("urn:someobject");
+        sshRef.setFilename("rfc2616.html");
+        sshRef.setPath("Protocols/rfc2616");
+        sshRef.setDescription("HTTP RFC");
         
+        this.internalTestAddFileReferenceAsTriplesToRepository(sshRef, "SSH");
+    }
+    
+    protected void internalTestAddFileReferenceAsTriplesToRepository(final FileReference fileRef,
+            final String fileReferenceType) throws Exception
+    {
         // create a temporary in-memory repository
-        tempRepository = new SailRepository(new MemoryStore());
+        final Repository tempRepository = new SailRepository(new MemoryStore());
         tempRepository.initialize();
-        tempRepositoryConnection = tempRepository.getConnection();
+        final RepositoryConnection tempRepositoryConnection = tempRepository.getConnection();
         tempRepositoryConnection.setAutoCommit(false);
         
         try
         {
-            // populate repository with incoming RDF statements
             final URI intContext = IRI.create("urn:intermediate:").toOpenRDFURI();
-            tempRepositoryConnection.add(in, "", RDFFormat.RDFXML, intContext);
             
-            this.utils.checkFileReferencesInRDF(tempRepositoryConnection, intContext);
+            FileReferenceUtils.addFileReferenceAsTriplesToRepository(tempRepositoryConnection, fileRef, intContext);
+            
+            // verify the added statements
+            Assert.assertEquals(7, tempRepositoryConnection.size(intContext));
+            
+            final URI hasFileReferenceType =
+                    IRI.create(PoddServletHelper.PODD_BASE_NAMESPACE, "hasFileReferenceType").toOpenRDFURI();
+            final RepositoryResult<Statement> results =
+                    tempRepositoryConnection.getStatements(null, hasFileReferenceType, null, false, intContext);
+            Assert.assertNotNull(results);
+            final List<Statement> list = results.asList();
+            Assert.assertEquals(1, list.size());
+            Assert.assertEquals(fileReferenceType, list.get(0).getObject().stringValue());
         }
         finally
         {
-            
             if(tempRepositoryConnection != null)
             {
                 tempRepositoryConnection.rollback();
@@ -175,19 +243,55 @@ public class FileReferenceUtilsTest
     }
     
     @Test
-    public void testCheckFileReferenceInRDF() throws Exception
+    public void testCheckFileReferencesInRDF_None() throws Exception
     {
-        final InputStream in =
-                this.getClass().getResourceAsStream("/test/artifacts/fragmentWithInvalidFileReference.rdf");
+        this.internalTestCheckFileReferencesInRDF("/test/artifacts/fragment.rdf", false);
+    }
+    
+    @Test
+    public void testCheckFileReferencesInRDF_Correct() throws Exception
+    {
+        this.internalTestCheckFileReferencesInRDF("/test/artifacts/fragment-1-file-reference.rdf", false);
+    }
+    
+    @Test
+    public void testCheckFileReferencesInRDF_2With1Invalid() throws Exception
+    {
+        final List<String> errors =
+                this.internalTestCheckFileReferencesInRDF("/test/artifacts/fragment-invalid-file-reference.rdf", true);
+        Assert.assertEquals(1, errors.size());
+    }
+    
+    @Test
+    public void testCheckFileReferencesInRDF_MissingFileReferenceType() throws Exception
+    {
+        final List<String> errors =
+                this.internalTestCheckFileReferencesInRDF("/test/artifacts/fragment-missing-file-reference-type.rdf",
+                        true);
+        Assert.assertEquals(1, errors.size());
+        Assert.assertTrue(errors.get(0).contains("Missing File Reference Type"));
+    }
+    
+    @Test
+    public void testCheckFileReferencesInRDF_UnknownFileReferenceType() throws Exception
+    {
+        final List<String> errors =
+                this.internalTestCheckFileReferencesInRDF("/test/artifacts/fragment-unknown-file-reference-type.rdf",
+                        true);
+        Assert.assertEquals(1, errors.size());
+        Assert.assertTrue(errors.get(0).contains("Unknown File Reference Type"));
+    }
+    
+    protected List<String> internalTestCheckFileReferencesInRDF(final String rdfPath, final boolean expectErrors)
+        throws Exception
+    {
+        final InputStream in = this.getClass().getResourceAsStream(rdfPath);
         Assert.assertNotNull("Resource was not found", in);
         
-        Repository tempRepository = null;
-        RepositoryConnection tempRepositoryConnection = null;
-        
         // create a temporary in-memory repository
-        tempRepository = new SailRepository(new MemoryStore());
+        final Repository tempRepository = new SailRepository(new MemoryStore());
         tempRepository.initialize();
-        tempRepositoryConnection = tempRepository.getConnection();
+        final RepositoryConnection tempRepositoryConnection = tempRepository.getConnection();
         tempRepositoryConnection.setAutoCommit(false);
         
         try
@@ -198,18 +302,23 @@ public class FileReferenceUtilsTest
             tempRepositoryConnection.commit();
             
             this.utils.checkFileReferencesInRDF(tempRepositoryConnection, intContext);
-            Assert.fail("Should have thrown exception from checkFileReferencesInRDF()");
+            if(expectErrors)
+            {
+                Assert.fail("Should have thrown exception from checkFileReferencesInRDF()");
+            }
         }
         catch(final PoddException e)
         {
+            if(!expectErrors)
+            {
+                Assert.fail("Unexpected Exception thrown" + e.getMessage());
+            }
             Assert.assertNotNull(e.getDetails());
-            Assert.assertTrue(e.getDetails() instanceof List);
-            final List errors = (List)e.getDetails();
-            Assert.assertEquals(1, errors.size());
+            Assert.assertTrue(e.getDetails() instanceof List<?>);
+            return (List<String>)e.getDetails();
         }
         finally
         {
-            
             if(tempRepositoryConnection != null)
             {
                 tempRepositoryConnection.rollback();
@@ -220,6 +329,7 @@ public class FileReferenceUtilsTest
                 tempRepository.shutDown();
             }
         }
+        return null; // to make the Compiler happy!
     }
     
 }

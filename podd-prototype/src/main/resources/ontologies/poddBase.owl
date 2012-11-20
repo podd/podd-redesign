@@ -399,6 +399,14 @@
     </owl:DatatypeProperty>
     
 
+    <!-- http://purl.org/podd/ns/poddBase#hasFileReferenceType -->
+
+    <owl:DatatypeProperty rdf:about="&poddBase;hasFileReferenceType">
+        <rdfs:label>has File Reference Type</rdfs:label>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+
 
 
     <!-- 

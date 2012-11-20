@@ -185,7 +185,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), getInferredResponse.getStatus().getCode());
         final String getInferredResult = getInferredResponse.getEntityAsText();
-        Assert.assertEquals(394, this.getStatementCount(getInferredResult));
+        Assert.assertEquals(396, this.getStatementCount(getInferredResult));
     }
     
     /**
@@ -321,6 +321,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         // -- generate and send an attach request
         final Form form = new Form();
+        form.add(FileReferenceUtils.KEY_FILE_REF_TYPE, "HTTP");
         form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
         // object URI is missing here
         form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "w3");
@@ -359,6 +360,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         // -- generate and send an attach request
         final Form form = new Form();
+        form.add(FileReferenceUtils.KEY_FILE_REF_TYPE, "HTTP");
         form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
         form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
         form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "w3");
@@ -399,6 +401,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         // -- generate and send an attach request
         final Form form = new Form();
+        form.add(FileReferenceUtils.KEY_FILE_REF_TYPE, "HTTP");
         form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
         form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
         form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "w3");
@@ -423,7 +426,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         final String modifiedRdfString = getBaseAfterAttachResponse.getEntityAsText();
         
         Assert.assertTrue(modifiedRdfString.contains("rfc2616.html"));
-        Assert.assertEquals(40, this.getStatementCount(modifiedRdfString));
+        Assert.assertEquals(41, this.getStatementCount(modifiedRdfString));
     }
     
     protected long getStatementCount(final String rdf) throws Exception

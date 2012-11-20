@@ -32,6 +32,7 @@ import com.github.podd.prototype.InferredOWLOntologyID;
 import com.github.podd.prototype.PoddException;
 import com.github.podd.prototype.PoddServlet;
 import com.github.podd.prototype.PoddServletHelper;
+import com.github.podd.prototype.SshFileReference;
 
 public class PoddServletHelperTest
 {
@@ -313,7 +314,7 @@ public class PoddServletHelperTest
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // edit it with a fragment that contains "invalid" file references
-        in = this.getClass().getResourceAsStream("/test/artifacts/fragmentWithInvalidFileReference.rdf");
+        in = this.getClass().getResourceAsStream("/test/artifacts/fragment-invalid-file-reference.rdf");
         Assert.assertNotNull("Resource was not found", in);
         
         try
@@ -326,7 +327,7 @@ public class PoddServletHelperTest
         }
         
         // edit it with a fragment that is correct
-        in = this.getClass().getResourceAsStream("/test/artifacts/fragmentWithFileReference.rdf");
+        in = this.getClass().getResourceAsStream("/test/artifacts/fragment-1-file-reference.rdf");
         Assert.assertNotNull("Resource was not found", in);
         final String editedArtifactURI =
                 this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace, true);
@@ -345,7 +346,7 @@ public class PoddServletHelperTest
     }
     
     @Test
-    public void testAttachReferenceToInvalidObject() throws Exception
+    public void testAttachReferenceToInvalidHttpObject() throws Exception
     {
         // 1. try attaching to a non-existent artifact
         final String artifactToAttachTo = "http://no.such.artifact";
@@ -395,7 +396,7 @@ public class PoddServletHelperTest
     }
     
     @Test
-    public void testAttachReference() throws Exception
+    public void testAttachReferenceHttp() throws Exception
     {
         // first, load an artifact using the inner-load method
         final InputStream in =
@@ -441,6 +442,60 @@ public class PoddServletHelperTest
         final List<Statement> fileRefStatements = Iterations.addAll(statements, new ArrayList<Statement>());
         Assert.assertEquals("There should be exactly 1 hasFileReference property", 1, fileRefStatements.size());
         Assert.assertEquals(objectToAttachTo, fileRefStatements.get(0).getSubject().stringValue());
+    }
+    
+    @Test
+    public void testAttachReferenceSSH() throws Exception
+    {
+        final SSHService sshd = new SSHService();
+        sshd.startTestSSHServer(9856);
+        
+        // first, load an artifact using the inner-load method
+        final InputStream in =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        Assert.assertNotNull("Resource was not found", in);
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        
+        // where to attach the file reference to
+        final String artifactToAttachTo = addedRDF.getOntologyIRI().toOpenRDFURI().stringValue();
+        final String objectToAttachTo = "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0";
+        
+        // file reference attributes
+        final String serverAlias = "localssh";
+        final String path = "src/test/resources/test/artifacts";
+        final String filename = "basicProject-1.rdf";
+        final String description = "Refers to one of the test artifacts, to be accessed through an ssh server";
+        
+        final SshFileReference fileRef = new SshFileReference();
+        fileRef.setArtifactUri(artifactToAttachTo);
+        fileRef.setObjectUri(objectToAttachTo);
+        fileRef.setServerAlias(serverAlias);
+        fileRef.setPath(path);
+        fileRef.setFilename(filename);
+        fileRef.setDescription(description);
+        
+        final URI fileReferenceUri = this.helper.attachReference(fileRef, true);
+        Assert.assertNotNull(fileReferenceUri);
+        // retrieve artifact and verify whether file reference was correctly attached
+        final String resultRDF = this.helper.getArtifact(artifactToAttachTo, mimeType, false);
+        
+        Assert.assertNotNull(resultRDF);
+        Assert.assertFalse(resultRDF.contains("urn:temp:"));
+        Assert.assertTrue(resultRDF.contains(filename));
+        Assert.assertTrue(resultRDF.contains(serverAlias));
+        
+        final URI context = IRI.create("urn:context").toOpenRDFURI();
+        final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
+        final URI propertyHasFileReference =
+                IRI.create("http://purl.org/podd/ns/poddBase#hasFileReference").toOpenRDFURI();
+        final RepositoryResult<Statement> statements =
+                repoConn.getStatements(null, propertyHasFileReference, null, false);
+        final List<Statement> fileRefStatements = Iterations.addAll(statements, new ArrayList<Statement>());
+        Assert.assertEquals("There should be exactly 1 hasFileReference property", 1, fileRefStatements.size());
+        Assert.assertEquals(objectToAttachTo, fileRefStatements.get(0).getSubject().stringValue());
+        
+        sshd.stopTestSSHServer();
     }
     
     @Test
