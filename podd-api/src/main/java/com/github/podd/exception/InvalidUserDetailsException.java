@@ -69,20 +69,20 @@ public class InvalidUserDetailsException extends PoddException
     }
     
     /**
+     * @return The user fields that had errors
+     */
+    public String[] getErrorFields()
+    {
+        return this.errorFields;
+    }
+    
+    /**
      * 
      * @return The <code>PoddUser</code> object that had errors
      */
     public PoddUser getUser()
     {
         return this.user;
-    }
-    
-    /**
-     * @return The user fields that had errors
-     */
-    public String[] getErrorFields()
-    {
-        return this.errorFields;
     }
     
 }
