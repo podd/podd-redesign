@@ -8,6 +8,7 @@ import java.io.InputStream;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
+import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -60,4 +61,6 @@ public interface PoddArtifactManager
      *            imports for the PODD Artifact.
      */
     void updateSchemaImport(OWLOntologyID artifactId, OWLOntologyID schemaOntologyId);
+    
+    void setFileReferenceManager(PoddFileReferenceManager fileManager);
 }

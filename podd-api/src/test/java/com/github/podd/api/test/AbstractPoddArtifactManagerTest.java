@@ -38,7 +38,7 @@ import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
  */
 public abstract class AbstractPoddArtifactManagerTest
 {
-    protected abstract PoddArtifactManager getNewArtifactManager(PoddFileReferenceManager testFileReferenceManager);
+    protected abstract PoddArtifactManager getNewArtifactManager();
     
     protected abstract PoddRdfProcessorEvent getNewFileReferenceEvent(Graph graph, OWLOntologyID artifactId);
     
@@ -54,7 +54,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final PoddFileReferenceProcessorFactoryRegistry testRegistry = new PoddFileReferenceProcessorFactoryRegistry();
         
         final PoddFileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
-        final PoddArtifactManager testArtifactManager = this.getNewArtifactManager(testFileReferenceManager);
+        final PoddArtifactManager testArtifactManager = this.getNewArtifactManager();
+        testArtifactManager.setFileReferenceManager(testFileReferenceManager);
         
         final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
         final RDFFormat format = RDFFormat.RDFXML;
