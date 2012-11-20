@@ -68,6 +68,7 @@
         <sesame.version>2.6.10</sesame.version>
         <sesametools.version>1.7-SNAPSHOT</sesametools.version>
         <slf4j.version>1.7.2</slf4j.version>
+        <sshj.version>0.9.0-SNAPSHOT</sshj.version>
     </properties>
 
     <prerequisites>
@@ -314,6 +315,21 @@
                         <groupId>commons-logging</groupId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                    <groupId>net.schmizz</groupId>
+                    <artifactId>sshj</artifactId>
+                    <version>${sshj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-core</artifactId>
+                <version>0.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk16</artifactId>
+                <version>1.46</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
