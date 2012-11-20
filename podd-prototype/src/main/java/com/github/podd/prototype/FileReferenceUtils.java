@@ -255,9 +255,8 @@ public class FileReferenceUtils
             
             // check details of a remote file
             final FileAttributes attribs = sftp.lstat(fileName);
-            if(attribs == null || attribs.getSize() < 1)
+            if(attribs == null || attribs.getSize() <= 0)
             {
-                System.out.println("Result size= " + attribs.getSize() + " type=" + attribs.getType());
                 throw new FileNotFoundException("Referenced file not found. " + fileName);
             }
         }
