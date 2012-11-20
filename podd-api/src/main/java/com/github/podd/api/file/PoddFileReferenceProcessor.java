@@ -3,7 +3,8 @@
  */
 package com.github.podd.api.file;
 
-import com.github.podd.api.PoddArtifactManager;
+import org.openrdf.model.Graph;
+
 import com.github.podd.api.PoddRdfProcessor;
 
 /**
@@ -15,14 +16,5 @@ import com.github.podd.api.PoddRdfProcessor;
  */
 public interface PoddFileReferenceProcessor extends PoddRdfProcessor
 {
-    void setArtifactManager(PoddArtifactManager testArtifactManager);
-    
-    /**
-     * 
-     * @param manager
-     *            The PoddFileReferenceManager that can be used to track and update file references
-     *            for objects.
-     */
-    void setFileReferenceManager(PoddFileReferenceManager manager);
-    
+    PoddFileReference createReference(Graph rdfStatements);
 }

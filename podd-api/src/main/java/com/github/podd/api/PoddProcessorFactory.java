@@ -19,7 +19,7 @@ import java.util.Set;
  * @param <I>
  *            The type of the Input for this type of PoddProcessorFactory.
  */
-public interface PoddProcessorFactory<T extends PoddProcessor<I>, E extends PoddProcessorEvent<I>, I>
+public interface PoddProcessorFactory<T extends PoddProcessor<I>, I>
 {
     /**
      * Tests whether this processor factory can create objects that are able to handle the given
@@ -42,11 +42,9 @@ public interface PoddProcessorFactory<T extends PoddProcessor<I>, E extends Podd
      * NOTE: If instances of the processor are not threadsafe, then new instances must be returned
      * by this method for each call.
      * 
-     * @param event
-     *            An instance of PoddProcessorEvent that contains the input for this event.
-     * @return An instance of PoddProcessor that can process the given event.
+     * @return An instance of PoddProcessor.
      */
-    T getProcessor(E event);
+    T getProcessor();
     
     /**
      * 

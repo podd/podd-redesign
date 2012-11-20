@@ -19,6 +19,8 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public interface PoddArtifactManager
 {
+    PoddFileReferenceManager getFileReferenceManager();
+    
     /**
      * Loads an artifact into the manager.
      * 
@@ -42,6 +44,8 @@ public interface PoddArtifactManager
      */
     InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId);
     
+    void setFileReferenceManager(PoddFileReferenceManager fileManager);
+    
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
      * 
@@ -61,6 +65,4 @@ public interface PoddArtifactManager
      *            imports for the PODD Artifact.
      */
     void updateSchemaImport(OWLOntologyID artifactId, OWLOntologyID schemaOntologyId);
-    
-    void setFileReferenceManager(PoddFileReferenceManager fileManager);
 }

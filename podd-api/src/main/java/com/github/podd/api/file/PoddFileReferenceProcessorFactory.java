@@ -11,4 +11,5 @@ import com.github.podd.api.PoddRdfProcessorFactory;
  */
 public interface PoddFileReferenceProcessorFactory extends PoddRdfProcessorFactory<PoddFileReferenceProcessor>
 {
+    
 }

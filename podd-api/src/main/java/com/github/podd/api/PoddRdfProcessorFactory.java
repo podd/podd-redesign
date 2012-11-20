@@ -4,6 +4,7 @@
 package com.github.podd.api;
 
 import org.openrdf.model.Graph;
+import org.openrdf.model.URI;
 
 /**
  * 
@@ -12,8 +13,7 @@ import org.openrdf.model.Graph;
  * @param <T>
  *            The type of objects that this RDF Processor creates.
  */
-public interface PoddRdfProcessorFactory<T extends PoddRdfProcessor> extends
-        PoddProcessorFactory<T, PoddRdfProcessorEvent, Graph>
+public interface PoddRdfProcessorFactory<T extends PoddRdfProcessor> extends PoddProcessorFactory<T, Graph>
 {
     /**
      * Defines the SPARQL Construct Basic Graph Pattern (BGP) that will be used to create sets of
@@ -26,6 +26,8 @@ public interface PoddRdfProcessorFactory<T extends PoddRdfProcessor> extends
     String getSPARQLConstructBGP();
     
     String getSPARQLConstructWhere();
+    
+    String getSPARQLConstructWhere(URI subject);
     
     String getSPARQLGroupBy();
     
