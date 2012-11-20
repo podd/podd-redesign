@@ -12,7 +12,9 @@ import org.openrdf.model.URI;
 import org.semanticweb.owlapi.model.OWLException;
 
 /**
- * Servlet implementation class FileReferenceAttachServlet
+ * This servlet implements the File Reference attachment service in the PODD prototype. It delegates
+ * all File Reference specific tasks to an instance of the FileReferenceUtils class.
+ * 
  * 
  * @author kutila
  */
