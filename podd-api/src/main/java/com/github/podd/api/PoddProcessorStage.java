@@ -4,12 +4,11 @@
 package com.github.podd.api;
 
 /**
- * An enumeration of the processing stages inside of the PODD system. Events are generated
- * immediately before and after each stage to allow processors to modify the input or results of
- * each stage.
+ * An enumeration of the processing stages inside of the PODD system.
  * 
  * The core functionality for each stage is fixed in the PODD system, so without any processors, the
- * system will still function.
+ * system will still function, but objects for file references, purls, etc., will not be created or
+ * validated.
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 

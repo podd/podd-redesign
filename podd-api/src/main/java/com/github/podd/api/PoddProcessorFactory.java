@@ -8,14 +8,12 @@ import java.util.Set;
 /**
  * Creates PoddProcessor instances to handle events in the PODD Artifact handling lifecycle.
  * 
- * The same processor object may be returned for multiple events if it is threadsafe.
+ * The same processor object may be returned for multiple calls if it is threadsafe.
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  * @param <T>
  *            The types of Processor that this PoddProcessorFactory creates.
- * @param <E>
- *            The types of Events that this PoddProcessorFactory is designed to receive.
  * @param <I>
  *            The type of the Input for this type of PoddProcessorFactory.
  */

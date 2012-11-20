@@ -11,6 +11,8 @@ import org.semanticweb.owlapi.util.AbstractServiceLoader;
 import com.github.podd.api.PoddProcessorStage;
 
 /**
+ * A registry for implementations of the PoddPurlProcessorFactory interface.
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */

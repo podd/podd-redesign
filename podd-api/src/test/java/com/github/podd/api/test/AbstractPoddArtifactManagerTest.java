@@ -29,7 +29,6 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddProcessorStage;
-import com.github.podd.api.PoddRdfProcessorEvent;
 import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.file.PoddFileReferenceProcessor;
@@ -44,8 +43,6 @@ import com.github.podd.utils.InferredOWLOntologyID;
 public abstract class AbstractPoddArtifactManagerTest
 {
     protected abstract PoddArtifactManager getNewArtifactManager();
-    
-    protected abstract PoddRdfProcessorEvent getNewFileReferenceEvent(Graph graph, OWLOntologyID artifactId);
     
     protected abstract PoddFileReferenceManager getNewFileReferenceManager();
     
