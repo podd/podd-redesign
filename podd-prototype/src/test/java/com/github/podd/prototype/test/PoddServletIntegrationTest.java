@@ -441,50 +441,55 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         SSHService sshd = new SSHService();
         sshd.startTestSSHServer(9856);
         
-        // -- login and add an artifact
-        final String path = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf").getFile();
-        final String artifactUri =
-                this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
-        
-        // -- retrieve the artifact and check that file ref. does not exist
-        final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
-        getBaseRequest.setCookies(this.cookies);
-        final Response getBaseResponse = this.getClient().handle(getBaseRequest);
-        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
-        final String originalRdfString = getBaseResponse.getEntityAsText();
-        Assert.assertFalse(originalRdfString.contains("basicProject-1.rdf"));
-        Assert.assertEquals(33, this.getStatementCount(originalRdfString));
-        
-        // -- generate and send an attach request
-        final Form form = new Form();
-        form.add(FileReferenceUtils.KEY_FILE_REF_TYPE, "SSH");
-        form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
-        form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
-        form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "localssh");
-        form.add(FileReferenceUtils.KEY_FILE_PATH, "src/test/resources/test/artifacts");
-        form.add(FileReferenceUtils.KEY_FILE_NAME, "basicProject-1.rdf");
-        form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION, "Refers to one of the test artifacts, to be accessed through an ssh server");
-        
-        final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
-        editRequest.setCookies(this.cookies);
-        editRequest.setEntity(form.getWebRepresentation(CharacterSet.UTF_8));
-        final Response editResponse = this.getClient().handle(editRequest);
-        
-        Assert.assertEquals(Status.SUCCESS_OK.getCode(), editResponse.getStatus().getCode());
-        Assert.assertNotNull(editResponse.getEntityAsText());
-        
-        // -- retrieve edited artifact and verify the attached file reference is present
-        final Request getBaseAfterAttachRequest =
-                new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
-        getBaseAfterAttachRequest.setCookies(this.cookies);
-        final Response getBaseAfterAttachResponse = this.getClient().handle(getBaseAfterAttachRequest);
-        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseAfterAttachResponse.getStatus().getCode());
-        final String modifiedRdfString = getBaseAfterAttachResponse.getEntityAsText();
-        
-        Assert.assertTrue(modifiedRdfString.contains("basicProject-1.rdf"));
-        Assert.assertEquals(41, this.getStatementCount(modifiedRdfString));
-        
-        sshd.stopTestSSHServer();
+        try
+        {
+            // -- login and add an artifact
+            final String path = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf").getFile();
+            final String artifactUri =
+                    this.loginAndAddArtifact(path, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK.getCode());
+            
+            // -- retrieve the artifact and check that file ref. does not exist
+            final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+            getBaseRequest.setCookies(this.cookies);
+            final Response getBaseResponse = this.getClient().handle(getBaseRequest);
+            Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
+            final String originalRdfString = getBaseResponse.getEntityAsText();
+            Assert.assertFalse(originalRdfString.contains("basicProject-1.rdf"));
+            Assert.assertEquals(33, this.getStatementCount(originalRdfString));
+            
+            // -- generate and send an attach request
+            final Form form = new Form();
+            form.add(FileReferenceUtils.KEY_FILE_REF_TYPE, "SSH");
+            form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
+            form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
+            form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "localssh");
+            form.add(FileReferenceUtils.KEY_FILE_PATH, "src/test/resources/test/artifacts");
+            form.add(FileReferenceUtils.KEY_FILE_NAME, "basicProject-1.rdf");
+            form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION, "Refers to one of the test artifacts, to be accessed through an ssh server");
+            
+            final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
+            editRequest.setCookies(this.cookies);
+            editRequest.setEntity(form.getWebRepresentation(CharacterSet.UTF_8));
+            final Response editResponse = this.getClient().handle(editRequest);
+            
+            Assert.assertEquals(Status.SUCCESS_OK.getCode(), editResponse.getStatus().getCode());
+            Assert.assertNotNull(editResponse.getEntityAsText());
+            
+            // -- retrieve edited artifact and verify the attached file reference is present
+            final Request getBaseAfterAttachRequest =
+                    new Request(Method.GET, this.BASE_URL + "/podd/artifact/base/" + artifactUri);
+            getBaseAfterAttachRequest.setCookies(this.cookies);
+            final Response getBaseAfterAttachResponse = this.getClient().handle(getBaseAfterAttachRequest);
+            Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseAfterAttachResponse.getStatus().getCode());
+            final String modifiedRdfString = getBaseAfterAttachResponse.getEntityAsText();
+            
+            Assert.assertTrue(modifiedRdfString.contains("basicProject-1.rdf"));
+            Assert.assertEquals(41, this.getStatementCount(modifiedRdfString));
+        }
+        finally
+        {
+            sshd.stopTestSSHServer();
+        }
     }
     
     
