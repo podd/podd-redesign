@@ -9,6 +9,7 @@ import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.file.PoddFileReferenceManager;
+import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -20,6 +21,8 @@ import com.github.podd.utils.InferredOWLOntologyID;
 public interface PoddArtifactManager
 {
     PoddFileReferenceManager getFileReferenceManager();
+    
+    PoddPurlManager getPurlManager();
     
     /**
      * Loads an artifact into the manager.
@@ -45,6 +48,8 @@ public interface PoddArtifactManager
     InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId);
     
     void setFileReferenceManager(PoddFileReferenceManager fileManager);
+    
+    void setPurlManager(PoddPurlManager testPurlManager);
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.

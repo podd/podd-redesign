@@ -34,6 +34,11 @@ import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.file.PoddFileReferenceProcessor;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.purl.PoddPurlManager;
+import com.github.podd.api.purl.PoddPurlProcessor;
+import com.github.podd.api.purl.PoddPurlProcessorFactory;
+import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
+import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -44,11 +49,19 @@ public abstract class AbstractPoddArtifactManagerTest
 {
     protected abstract PoddArtifactManager getNewArtifactManager();
     
+    protected abstract PoddPurlProcessorFactory getNewDoiPurlProcessorFactory();
+    
     protected abstract PoddFileReferenceManager getNewFileReferenceManager();
+    
+    protected abstract PoddPurlProcessorFactory getNewHandlePurlProcessorFactory();
     
     protected abstract PoddFileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory();
     
+    protected abstract PoddPurlManager getNewPurlManager();
+    
     protected abstract PoddFileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
+    
+    protected abstract PoddPurlProcessorFactory getNewUUIDPurlProcessorFactory();
     
     /**
      * @throws java.lang.Exception
@@ -57,26 +70,38 @@ public abstract class AbstractPoddArtifactManagerTest
     @Before
     public void setUp() throws Exception
     {
-        final PoddFileReferenceProcessorFactoryRegistry testRegistry = new PoddFileReferenceProcessorFactoryRegistry();
+        final PoddFileReferenceProcessorFactoryRegistry testFileRegistry =
+                new PoddFileReferenceProcessorFactoryRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
         // classpath
-        testRegistry.clear();
+        testFileRegistry.clear();
         // In practice, the following factories would be automatically added to the registry,
         // however for testing we want to explicitly add the ones we want to support for each test
-        testRegistry.add(this.getNewSSHFileReferenceProcessorFactory());
-        testRegistry.add(this.getNewHttpFileReferenceProcessorFactory());
+        testFileRegistry.add(this.getNewSSHFileReferenceProcessorFactory());
+        testFileRegistry.add(this.getNewHttpFileReferenceProcessorFactory());
+        
+        final PoddPurlProcessorFactoryRegistry testPurlRegistry = new PoddPurlProcessorFactoryRegistry();
+        testPurlRegistry.clear();
+        testPurlRegistry.add(this.getNewDoiPurlProcessorFactory());
+        testPurlRegistry.add(this.getNewHandlePurlProcessorFactory());
+        testPurlRegistry.add(this.getNewUUIDPurlProcessorFactory());
         
         final PoddFileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
-        testFileReferenceManager.setProcessorFactoryRegistry(testRegistry);
+        testFileReferenceManager.setProcessorFactoryRegistry(testFileRegistry);
+        
+        final PoddPurlManager testPurlManager = this.getNewPurlManager();
+        testPurlManager.setPurlFactoryRegistry(testPurlRegistry);
         
         final PoddArtifactManager testArtifactManager = this.getNewArtifactManager();
         testArtifactManager.setFileReferenceManager(testFileReferenceManager);
+        testArtifactManager.setPurlManager(testPurlManager);
         
         final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
         final InferredOWLOntologyID resultArtifactId = testArtifactManager.loadArtifact(inputStream, format);
         
         // INSIDE the loadArtifact method...
@@ -85,12 +110,17 @@ public abstract class AbstractPoddArtifactManagerTest
         // references
         final OWLOntologyID tempArtifactId = null;
         
-        // connection to the repository that the file reference is being stored in
-        final RepositoryConnection conn = null;
+        // connection to the repository that the artifact RDF triples will be stored in
+        final RepositoryConnection tempConn = null;
+        
+        // TODO: Load the artifact RDF triples into a specific context in the temp repository
+        tempConn.add(inputStream, "", format);
+        
+        // TODO: Identify the Artifact IRI and Artifact Version IRI
         
         // calls, to setup the results collection
         final Set<PoddFileReference> results =
-                testArtifactManager.getFileReferenceManager().extractFileReferences(conn,
+                testArtifactManager.getFileReferenceManager().extractFileReferences(tempConn,
                         tempArtifactId.getVersionIRI().toOpenRDFURI());
         
         // INSIDE the extractFileReferences method....
@@ -99,7 +129,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // TODO: This needs to be a constant
         final URI poddFileReferenceType =
-                conn.getValueFactory().createURI("http://purl.org/podd/ns/poddBase#PoddFileReference");
+                tempConn.getValueFactory().createURI("http://purl.org/podd/ns/poddBase#PoddFileReference");
         
         for(final PoddFileReferenceProcessorFactory nextProcessorFactory : testArtifactManager
                 .getFileReferenceManager().getProcessorFactoryRegistry().getByStage(PoddProcessorStage.RDF_PARSING))
@@ -116,7 +146,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 sparqlQuery.append(nextProcessorFactory.getSPARQLGroupBy());
             }
             
-            final GraphQuery graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
+            final GraphQuery graphQuery = tempConn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
             
             // Create a new dataset to specify the contexts that the query will be allowed to access
             final DatasetImpl dataset = new DatasetImpl();
@@ -183,6 +213,73 @@ public abstract class AbstractPoddArtifactManagerTest
         // return the results, setting the results variable to be the same as the internalResults
         // variable from inside of extractFileReferences
         // Ie, return internalResults; results = internalResults;
+        
+        final Set<PoddPurlReference> purlResults =
+                testArtifactManager.getPurlManager().extractPurlReferences(tempConn,
+                        tempArtifactId.getVersionIRI().toOpenRDFURI());
+        
+        // INSIDE extractPurlReferences
+        
+        for(final PoddPurlProcessorFactory nextProcessorFactory : testArtifactManager.getPurlManager()
+                .getProcessorFactoryRegistry().getByStage(PoddProcessorStage.RDF_PARSING))
+        {
+            final StringBuilder sparqlQuery = new StringBuilder();
+            sparqlQuery.append("CONSTRUCT { ");
+            sparqlQuery.append(nextProcessorFactory.getSPARQLConstructBGP());
+            sparqlQuery.append(" } WHERE { ");
+            sparqlQuery.append(nextProcessorFactory.getSPARQLConstructWhere());
+            sparqlQuery.append(" } ");
+            if(!nextProcessorFactory.getSPARQLGroupBy().isEmpty())
+            {
+                sparqlQuery.append(" GROUP BY ");
+                sparqlQuery.append(nextProcessorFactory.getSPARQLGroupBy());
+            }
+            
+            final GraphQuery graphQuery = tempConn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
+            
+            // Create a new dataset to specify the contexts that the query will be allowed to access
+            final DatasetImpl dataset = new DatasetImpl();
+            // The following URIs are passed in as the context to the
+            // extractFileReferences(RepositoryConnection,URI...) method
+            final URI artifactGraphUri = null;
+            
+            // for(URI artifactGraphUri : contexts)
+            dataset.addDefaultGraph(artifactGraphUri);
+            dataset.addNamedGraph(artifactGraphUri);
+            // end for loop
+            
+            // if the stage is after inferencing, the inferred graph URI would be one of the
+            // contexts as well
+            final URI artifactInferredGraphUri = null;
+            dataset.addDefaultGraph(artifactInferredGraphUri);
+            dataset.addNamedGraph(artifactInferredGraphUri);
+            
+            // set the dataset for the query to be our artificially constructed dataset
+            graphQuery.setDataset(dataset);
+            
+            final GraphQueryResult queryResult = graphQuery.evaluate();
+            
+            // If the query matched anything, then for each of the file references in the resulting
+            // construct statements, we create a file reference and add it to the results
+            if(!queryResult.hasNext())
+            {
+                final Graph graph = new GraphImpl();
+                while(queryResult.hasNext())
+                {
+                    graph.add(queryResult.next());
+                }
+                
+                // This processor factory matches the graph that we wish to use, so we create a
+                // processor instance now to create the file reference
+                // NOTE: This object cannot be shared as we do not specify that it needs to be
+                // threadsafe
+                final PoddPurlProcessor processor = nextProcessorFactory.getProcessor();
+                
+                // TODO: create a reference out of the resulting graph
+                processor.handleTranslation(null);
+            }
+        }
+        
     }
     
     /**
