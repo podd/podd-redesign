@@ -33,4 +33,6 @@ public interface PoddFileReferenceManager
     PoddFileReferenceProcessorFactoryRegistry getProcessorFactoryRegistry();
     
     void setProcessorFactoryRegistry(PoddFileReferenceProcessorFactoryRegistry testRegistry);
+    
+    void verifyFileReferences(Set<PoddFileReference> fileReferenceResults, RepositoryConnection tempConn, URI openRDFURI);
 }

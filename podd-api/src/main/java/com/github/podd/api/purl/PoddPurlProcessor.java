@@ -56,7 +56,7 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      *             If the URI was not able to be handled by this Purl Processor for any reason. To
      *             avoid this exception in normal circumstances, check first using canHandle(URI).
      */
-    URI handleTranslation(URI inputUri) throws PurlGeneratorNotHandledException;
+    PoddPurlReference handleTranslation(URI inputUri) throws PurlGeneratorNotHandledException;
     
     /**
      * Signals to this Purl Processor that it should no longer handle permanent URL generation for

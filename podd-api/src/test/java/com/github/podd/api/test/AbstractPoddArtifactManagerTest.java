@@ -127,6 +127,8 @@ public abstract class AbstractPoddArtifactManagerTest
                         tempArtifactId.getVersionIRI().toOpenRDFURI());
         
         // INSIDE extractPurlReferences
+        final Set<PoddPurlReference> internalPurlResults =
+                Collections.newSetFromMap(new ConcurrentHashMap<PoddPurlReference, Boolean>());
         
         for(final PoddPurlProcessorFactory nextProcessorFactory : testArtifactManager.getPurlManager()
                 .getProcessorFactoryRegistry().getByStage(PoddProcessorStage.RDF_PARSING))
@@ -171,30 +173,37 @@ public abstract class AbstractPoddArtifactManagerTest
             // construct statements, we create a file reference and add it to the results
             if(!queryResult.hasNext())
             {
-                final Graph graph = new GraphImpl();
                 while(queryResult.hasNext())
                 {
-                    graph.add(queryResult.next());
+                    final Statement next = queryResult.next();
+                    // This processor factory matches the graph that we wish to use, so we create a
+                    // processor instance now to create the file reference
+                    // NOTE: This object cannot be shared as we do not specify that it needs to be
+                    // threadsafe
+                    final PoddPurlProcessor processor = nextProcessorFactory.getProcessor();
+                    
+                    if(next.getSubject() instanceof URI && processor.canHandle((URI)next.getSubject()))
+                    {
+                        internalPurlResults.add(processor.handleTranslation((URI)next.getSubject()));
+                    }
                 }
-                
-                // This processor factory matches the graph that we wish to use, so we create a
-                // processor instance now to create the file reference
-                // NOTE: This object cannot be shared as we do not specify that it needs to be
-                // threadsafe
-                final PoddPurlProcessor processor = nextProcessorFactory.getProcessor();
-                
-                // TODO: create a reference out of the resulting graph
-                processor.handleTranslation(null);
             }
         }
         
+        // perform the conversion of the URIs, possibly in bulk, as they are all given to this
+        // method together
+        testArtifactManager.getPurlManager().convertTemporaryUris(purlResults, tempConn,
+                tempArtifactId.getVersionIRI().toOpenRDFURI());
+        
+        // Then work on the file references
+        
         // calls, to setup the results collection
-        final Set<PoddFileReference> results =
+        final Set<PoddFileReference> fileReferenceResults =
                 testArtifactManager.getFileReferenceManager().extractFileReferences(tempConn,
                         tempArtifactId.getVersionIRI().toOpenRDFURI());
         
         // INSIDE the extractFileReferences method....
-        final Set<PoddFileReference> internalResults =
+        final Set<PoddFileReference> internalFileReferenceResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<PoddFileReference, Boolean>());
         
         // TODO: This needs to be a constant
@@ -275,14 +284,14 @@ public abstract class AbstractPoddArtifactManagerTest
                     final PoddFileReferenceProcessor processor = nextProcessorFactory.getProcessor();
                     
                     // create a reference out of the resulting graph
-                    internalResults.add(processor.createReference(fileReferenceGraph));
+                    internalFileReferenceResults.add(processor.createReference(fileReferenceGraph));
                 }
             }
         }
         
-        // TODO: optionally verify the file references
-        
-        
+        // optionally verify the file references
+        testArtifactManager.getFileReferenceManager().verifyFileReferences(fileReferenceResults, tempConn,
+                tempArtifactId.getVersionIRI().toOpenRDFURI());
     }
     
     /**

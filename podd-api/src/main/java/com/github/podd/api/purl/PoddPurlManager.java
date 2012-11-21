@@ -15,10 +15,11 @@ import org.openrdf.repository.RepositoryConnection;
 public interface PoddPurlManager
 {
     
+    void convertTemporaryUris(Set<PoddPurlReference> purlResults, RepositoryConnection conn, URI... contexts);
+    
     Set<PoddPurlReference> extractPurlReferences(RepositoryConnection tempConn, URI... contexts);
     
     PoddPurlProcessorFactoryRegistry getProcessorFactoryRegistry();
     
     void setPurlFactoryRegistry(PoddPurlProcessorFactoryRegistry testPurlRegistry);
-    
 }
