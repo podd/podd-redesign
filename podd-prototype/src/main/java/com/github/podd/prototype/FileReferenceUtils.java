@@ -57,7 +57,7 @@ public class FileReferenceUtils
     private long aliasesLoadedAt;
     private String aliasFilePath;
     
-    private FileReferenceUtils()
+    public FileReferenceUtils()
     {
     }
     
@@ -244,12 +244,15 @@ public class FileReferenceUtils
         
         this.log.info("Validating file reference: " + host + ":" + port + " " + fileName);
         
-        final SSHClient sshClient = new SSHClient();
-        sshClient.addHostKeyVerifier(fingerprint);
-        sshClient.connect(host, portNo);
+        SSHClient sshClient = null;
         
         try
         {
+            sshClient = new SSHClient();
+            
+            sshClient.addHostKeyVerifier(fingerprint);
+            sshClient.connect(host, portNo);
+            
             sshClient.authPassword(username, secret);
             final SFTPClient sftp = sshClient.newSFTPClient();
             
@@ -262,8 +265,11 @@ public class FileReferenceUtils
         }
         finally
         {
-            // close the SSH client without closing the SFTPClient
-            sshClient.close();
+            if(sshClient != null && sshClient.isConnected())
+            {
+                // close the SSH client without closing the SFTPClient
+                sshClient.close();
+            }
         }
         
     }

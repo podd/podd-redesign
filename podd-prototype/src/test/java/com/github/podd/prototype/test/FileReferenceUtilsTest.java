@@ -33,11 +33,13 @@ public class FileReferenceUtilsTest
 {
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
-    protected FileReferenceUtils utils = FileReferenceUtils.getInstance();
+    protected FileReferenceUtils utils;
     
     @Before
     public void setUp() throws Exception
     {
+        this.utils = new FileReferenceUtils();
+        
         this.utils.initialize("src/test/resources/test/alias.txt");
     }
     
