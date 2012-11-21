@@ -23,6 +23,8 @@ import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.sftp.SftpSubsystem;
 import org.apache.sshd.server.shell.ProcessShellFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple SSH Service for testing. This is based on the unit tests in the sshj project.
@@ -32,6 +34,7 @@ import org.apache.sshd.server.shell.ProcessShellFactory;
  */
 public class SSHService
 {
+    protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private SshServer server;
     private boolean serverRunning = false;
@@ -83,7 +86,7 @@ public class SSHService
         
         this.server.start();
         this.serverRunning = true;
-        System.out.println("started the SSHD server on port: " + port);
+        this.log.info("started the SSHD server on port: " + port);
         return port;
     }
     
@@ -94,12 +97,14 @@ public class SSHService
      */
     public void stopTestSSHServer() throws Exception
     {
+        this.log.info("Entering stopTestSSHServer()");
         if(this.server != null && this.serverRunning)
         {
+            this.log.info("Stop SSHD server");
             this.server.stop();
             this.serverRunning = false;
         }
-        System.out.println("Stopped the SSHD server");
+        this.log.info("Exiting stopTestSSHServer()");
     }
     
     /**

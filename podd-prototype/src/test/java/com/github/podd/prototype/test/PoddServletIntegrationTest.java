@@ -438,7 +438,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     public void testAttachReference_SSH() throws Exception
     {
         // -- start the test SSH Service here since other tests don't need it
-        SSHService sshd = new SSHService();
+        SSHService sshd = new SSHService(); 
         sshd.startTestSSHServer(9856);
         
         try

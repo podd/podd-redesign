@@ -449,7 +449,8 @@ public class PoddServletHelperTest
     {
         final SSHService sshd = new SSHService();
         sshd.startTestSSHServer(9856);
-        
+        try
+        {
         // first, load an artifact using the inner-load method
         final InputStream in =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
@@ -495,7 +496,11 @@ public class PoddServletHelperTest
         Assert.assertEquals("There should be exactly 1 hasFileReference property", 1, fileRefStatements.size());
         Assert.assertEquals(objectToAttachTo, fileRefStatements.get(0).getSubject().stringValue());
         
-        sshd.stopTestSSHServer();
+        }
+        finally
+        {
+            sshd.stopTestSSHServer();
+        }
     }
     
     @Test

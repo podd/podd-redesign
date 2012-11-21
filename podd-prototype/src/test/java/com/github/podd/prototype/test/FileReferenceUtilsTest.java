@@ -137,18 +137,22 @@ public class FileReferenceUtilsTest
     {
         final SSHService sshd = new SSHService();
         sshd.startTestSSHServer(9856);
-        
-        final SshFileReference sshFileRef = new SshFileReference();
-        sshFileRef.setArtifactUri(null);
-        sshFileRef.setObjectUri(null);
-        sshFileRef.setServerAlias("localssh");
-        sshFileRef.setFilename("basicProject-1.rdf");
-        sshFileRef.setPath("src/test/resources/test/artifacts");
-        sshFileRef.setDescription("Refers to one of the test artifacts, to be accessed through an ssh server");
-        
-        this.utils.checkFileExists(sshFileRef);
-        
-        sshd.stopTestSSHServer();
+        try
+        {
+            final SshFileReference sshFileRef = new SshFileReference();
+            sshFileRef.setArtifactUri(null);
+            sshFileRef.setObjectUri(null);
+            sshFileRef.setServerAlias("localssh");
+            sshFileRef.setFilename("basicProject-1.rdf");
+            sshFileRef.setPath("src/test/resources/test/artifacts");
+            sshFileRef.setDescription("Refers to one of the test artifacts, to be accessed through an ssh server");
+            
+            this.utils.checkFileExists(sshFileRef);
+        }
+        finally
+        {
+            sshd.stopTestSSHServer();
+        }
     }
     
     @Test
