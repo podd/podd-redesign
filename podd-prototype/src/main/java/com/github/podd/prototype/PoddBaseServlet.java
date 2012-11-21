@@ -27,7 +27,7 @@ public abstract class PoddBaseServlet extends HttpServlet
     
     public static final String HEADER_APPLICATION_VERSION = "X-Application-Version";
     
-    private static final String PODD_VERSION = "PODD/0.0.1_14.10.02";
+    private static final String PODD_VERSION = "PODD/0.0.1_21.11.12";
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
