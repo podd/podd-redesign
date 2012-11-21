@@ -118,6 +118,76 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // TODO: Identify the Artifact IRI and Artifact Version IRI
         
+        // return the results, setting the results variable to be the same as the internalResults
+        // variable from inside of extractFileReferences
+        // Ie, return internalResults; results = internalResults;
+        
+        final Set<PoddPurlReference> purlResults =
+                testArtifactManager.getPurlManager().extractPurlReferences(tempConn,
+                        tempArtifactId.getVersionIRI().toOpenRDFURI());
+        
+        // INSIDE extractPurlReferences
+        
+        for(final PoddPurlProcessorFactory nextProcessorFactory : testArtifactManager.getPurlManager()
+                .getProcessorFactoryRegistry().getByStage(PoddProcessorStage.RDF_PARSING))
+        {
+            final StringBuilder sparqlQuery = new StringBuilder();
+            sparqlQuery.append("CONSTRUCT { ");
+            sparqlQuery.append(nextProcessorFactory.getSPARQLConstructBGP());
+            sparqlQuery.append(" } WHERE { ");
+            sparqlQuery.append(nextProcessorFactory.getSPARQLConstructWhere());
+            sparqlQuery.append(" } ");
+            if(!nextProcessorFactory.getSPARQLGroupBy().isEmpty())
+            {
+                sparqlQuery.append(" GROUP BY ");
+                sparqlQuery.append(nextProcessorFactory.getSPARQLGroupBy());
+            }
+            
+            final GraphQuery graphQuery = tempConn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
+            
+            // Create a new dataset to specify the contexts that the query will be allowed to access
+            final DatasetImpl dataset = new DatasetImpl();
+            // The following URIs are passed in as the context to the
+            // extractFileReferences(RepositoryConnection,URI...) method
+            final URI artifactGraphUri = null;
+            
+            // for(URI artifactGraphUri : contexts)
+            dataset.addDefaultGraph(artifactGraphUri);
+            dataset.addNamedGraph(artifactGraphUri);
+            // end for loop
+            
+            // if the stage is after inferencing, the inferred graph URI would be one of the
+            // contexts as well
+            final URI artifactInferredGraphUri = null;
+            dataset.addDefaultGraph(artifactInferredGraphUri);
+            dataset.addNamedGraph(artifactInferredGraphUri);
+            
+            // set the dataset for the query to be our artificially constructed dataset
+            graphQuery.setDataset(dataset);
+            
+            final GraphQueryResult queryResult = graphQuery.evaluate();
+            
+            // If the query matched anything, then for each of the file references in the resulting
+            // construct statements, we create a file reference and add it to the results
+            if(!queryResult.hasNext())
+            {
+                final Graph graph = new GraphImpl();
+                while(queryResult.hasNext())
+                {
+                    graph.add(queryResult.next());
+                }
+                
+                // This processor factory matches the graph that we wish to use, so we create a
+                // processor instance now to create the file reference
+                // NOTE: This object cannot be shared as we do not specify that it needs to be
+                // threadsafe
+                final PoddPurlProcessor processor = nextProcessorFactory.getProcessor();
+                
+                // TODO: create a reference out of the resulting graph
+                processor.handleTranslation(null);
+            }
+        }
+        
         // calls, to setup the results collection
         final Set<PoddFileReference> results =
                 testArtifactManager.getFileReferenceManager().extractFileReferences(tempConn,
@@ -210,75 +280,8 @@ public abstract class AbstractPoddArtifactManagerTest
             }
         }
         
-        // return the results, setting the results variable to be the same as the internalResults
-        // variable from inside of extractFileReferences
-        // Ie, return internalResults; results = internalResults;
+        // TODO: optionally verify the file references
         
-        final Set<PoddPurlReference> purlResults =
-                testArtifactManager.getPurlManager().extractPurlReferences(tempConn,
-                        tempArtifactId.getVersionIRI().toOpenRDFURI());
-        
-        // INSIDE extractPurlReferences
-        
-        for(final PoddPurlProcessorFactory nextProcessorFactory : testArtifactManager.getPurlManager()
-                .getProcessorFactoryRegistry().getByStage(PoddProcessorStage.RDF_PARSING))
-        {
-            final StringBuilder sparqlQuery = new StringBuilder();
-            sparqlQuery.append("CONSTRUCT { ");
-            sparqlQuery.append(nextProcessorFactory.getSPARQLConstructBGP());
-            sparqlQuery.append(" } WHERE { ");
-            sparqlQuery.append(nextProcessorFactory.getSPARQLConstructWhere());
-            sparqlQuery.append(" } ");
-            if(!nextProcessorFactory.getSPARQLGroupBy().isEmpty())
-            {
-                sparqlQuery.append(" GROUP BY ");
-                sparqlQuery.append(nextProcessorFactory.getSPARQLGroupBy());
-            }
-            
-            final GraphQuery graphQuery = tempConn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
-            
-            // Create a new dataset to specify the contexts that the query will be allowed to access
-            final DatasetImpl dataset = new DatasetImpl();
-            // The following URIs are passed in as the context to the
-            // extractFileReferences(RepositoryConnection,URI...) method
-            final URI artifactGraphUri = null;
-            
-            // for(URI artifactGraphUri : contexts)
-            dataset.addDefaultGraph(artifactGraphUri);
-            dataset.addNamedGraph(artifactGraphUri);
-            // end for loop
-            
-            // if the stage is after inferencing, the inferred graph URI would be one of the
-            // contexts as well
-            final URI artifactInferredGraphUri = null;
-            dataset.addDefaultGraph(artifactInferredGraphUri);
-            dataset.addNamedGraph(artifactInferredGraphUri);
-            
-            // set the dataset for the query to be our artificially constructed dataset
-            graphQuery.setDataset(dataset);
-            
-            final GraphQueryResult queryResult = graphQuery.evaluate();
-            
-            // If the query matched anything, then for each of the file references in the resulting
-            // construct statements, we create a file reference and add it to the results
-            if(!queryResult.hasNext())
-            {
-                final Graph graph = new GraphImpl();
-                while(queryResult.hasNext())
-                {
-                    graph.add(queryResult.next());
-                }
-                
-                // This processor factory matches the graph that we wish to use, so we create a
-                // processor instance now to create the file reference
-                // NOTE: This object cannot be shared as we do not specify that it needs to be
-                // threadsafe
-                final PoddPurlProcessor processor = nextProcessorFactory.getProcessor();
-                
-                // TODO: create a reference out of the resulting graph
-                processor.handleTranslation(null);
-            }
-        }
         
     }
     
