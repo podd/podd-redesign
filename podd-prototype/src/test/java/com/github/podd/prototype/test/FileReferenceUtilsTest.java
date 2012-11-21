@@ -138,9 +138,10 @@ public class FileReferenceUtilsTest
     public void testCheckFileExists_sshFileRef() throws Exception
     {
         final SSHService sshd = new SSHService();
-        sshd.startTestSSHServer(9856);
         try
         {
+            sshd.startTestSSHServer(9856);
+            
             final SshFileReference sshFileRef = new SshFileReference();
             sshFileRef.setArtifactUri(null);
             sshFileRef.setObjectUri(null);
