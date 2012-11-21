@@ -306,6 +306,19 @@ public abstract class AbstractPoddArtifactManagerTest
         // optionally verify the file references
         testArtifactManager.getFileReferenceManager().verifyFileReferences(fileReferenceResults, tempConn,
                 tempArtifactId.getVersionIRI().toOpenRDFURI());
+        
+        // TODO: Load the statements into an OWLAPI OWLOntology
+        
+        // TODO: Check the OWLAPI OWLOntology against an OWLProfile to make sure it is in profile
+        
+        // TODO: Check the OWLAPI OWLOntology using a reasoner for .isConsistent
+        
+        // TODO: Use an OWLAPI InferredAxiomGenerator together with the reasoner to create inferred
+        // axioms to store in the database
+        
+        // TODO: Serialise the inferred statements back to a different context in the database
+        
+        // return InferredOWLOntologyID() with the context of the inferred statements
     }
     
     /**
