@@ -161,7 +161,6 @@ public class FileReferenceUtils
      * @param fileReference
      * @throws IOException
      * @throws PoddException
-
      */
     public void checkFileExists(final FileReference fileReference) throws IOException, PoddException
     {
@@ -245,19 +244,21 @@ public class FileReferenceUtils
         
         this.log.info("Validating file reference: " + host + ":" + port + " " + fileName);
         
-        try(SSHClient sshClient = new SSHClient())
+        try (SSHClient sshClient = new SSHClient();)
         {
             sshClient.addHostKeyVerifier(fingerprint);
             sshClient.connect(host, portNo);
             
             sshClient.authPassword(username, secret);
-            final SFTPClient sftp = sshClient.newSFTPClient();
             
-            // check details of a remote file
-            final FileAttributes attribs = sftp.lstat(fileName);
-            if(attribs == null || attribs.getSize() <= 0)
+            try (SFTPClient sftp = sshClient.newSFTPClient();)
             {
-                throw new FileNotFoundException("Referenced file not found. " + fileName);
+                // check details of a remote file
+                final FileAttributes attribs = sftp.lstat(fileName);
+                if(attribs == null || attribs.getSize() <= 0)
+                {
+                    throw new FileNotFoundException("Referenced file not found. " + fileName);
+                }
             }
         }
     }
