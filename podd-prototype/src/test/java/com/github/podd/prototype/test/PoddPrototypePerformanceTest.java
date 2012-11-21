@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -148,6 +149,7 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
         return Arrays.asList(data);
     }
     
+    @Ignore
     @Test
     public void testLoadArtifactPerformance() throws Exception
     {
