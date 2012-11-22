@@ -439,10 +439,11 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     {
         // -- start the test SSH Service here since other tests don't need it
         SSHService sshd = new SSHService(); 
-        sshd.startTestSSHServer(9856);
         
         try
         {
+            sshd.startTestSSHServer(9856);
+            
             // -- login and add an artifact
             final String path = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf").getFile();
             final String artifactUri =
