@@ -11,6 +11,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
 import com.github.podd.utils.InferredOWLOntologyID;
 
@@ -21,6 +22,14 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public interface PoddOWLManager
 {
+    /**
+     * Loads and caches the given schema ontology in memory from a Repository.
+     * 
+     * @param ontology
+     * @param conn
+     */
+    void cacheSchemaOntology(InferredOWLOntologyID ontology, RepositoryConnection conn);
+    
     OWLReasoner createReasoner(OWLOntology nextOntology);
     
     /**
@@ -49,6 +58,14 @@ public interface PoddOWLManager
     OWLProfile getReasonerProfile();
     
     void inferStatements(InferredOWLOntologyID inferredOWLOntologyID, RepositoryConnection permanentRepositoryConnection);
+    
+    /**
+     * Loads an ontology into memory from a RioMemoryTripleSource.
+     * 
+     * @param owlSource
+     * @return
+     */
+    OWLOntology loadOntology(RioMemoryTripleSource owlSource);
     
     /**
      * Parses RDF statements into an ontology, and returns the OWLOntologyID for the resulting

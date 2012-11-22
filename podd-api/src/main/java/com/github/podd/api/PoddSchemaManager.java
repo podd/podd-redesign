@@ -72,7 +72,7 @@ public interface PoddSchemaManager
      * @throws UnmanagedSchemaIRIException
      *             If the given schemaOntologyIRI is not recognised or managed.
      */
-    OWLOntologyID getCurrentSchemaOntologyVersion(IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException;
+    InferredOWLOntologyID getCurrentSchemaOntologyVersion(IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException;
     
     /**
      * Gets a PODD Schema Ontology based on the given IRI. If the IRI matches a managed Schema

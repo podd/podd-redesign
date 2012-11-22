@@ -29,6 +29,7 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
@@ -40,6 +41,7 @@ import org.semanticweb.owlapi.rio.RioParserImpl;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddProcessorStage;
+import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.file.PoddFileReferenceProcessor;
@@ -58,6 +60,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public abstract class AbstractPoddArtifactManagerTest
 {
+    
     protected abstract PoddArtifactManager getNewArtifactManager();
     
     protected abstract PoddPurlProcessorFactory getNewDoiPurlProcessorFactory();
@@ -71,6 +74,8 @@ public abstract class AbstractPoddArtifactManagerTest
     protected abstract PoddOWLManager getNewOWLManager();
     
     protected abstract PoddPurlManager getNewPurlManager();
+    
+    protected abstract PoddSchemaManager getNewSchemaManager();
     
     protected abstract PoddFileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
     
@@ -115,6 +120,8 @@ public abstract class AbstractPoddArtifactManagerTest
         testArtifactManager.setFileReferenceManager(testFileReferenceManager);
         testArtifactManager.setPurlManager(testPurlManager);
         testArtifactManager.setOwlManager(testOWLManager);
+        
+        final PoddSchemaManager testSchemaManager = this.getNewSchemaManager();
         
         final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
         // MIME type should be either given by the user, detected from the content type on the
@@ -335,17 +342,30 @@ public abstract class AbstractPoddArtifactManagerTest
         // TODO: Optionally remove invalid file references or mark them as invalid using RDF
         // statements/OWL Classes
         
-        // TODO: Load the statements into an OWLAPI OWLOntology
+        // Before loading the statements into OWLAPI, ensure that the schema ontologies are cached
+        // in memory
         
+        // TODO: For each OWL:IMPORTS statement, call the following
+        final IRI schemaOntologyIRI = null;
+        // Get the current version
+        final InferredOWLOntologyID ontologyVersion =
+                testSchemaManager.getCurrentSchemaOntologyVersion(schemaOntologyIRI);
+        // Make sure it is cached in memory. This will not attempt to load the ontology again if it
+        // is already cached or already being loaded
+        testArtifactManager.getOWLManager().cacheSchemaOntology(ontologyVersion, temporaryRepositoryConnection);
+        
+        // Load the statements into an OWLAPI OWLOntology
         final RioMemoryTripleSource owlSource =
                 new RioMemoryTripleSource(temporaryRepositoryConnection.getStatements(null, null, null, true,
                         tempArtifactId.getVersionIRI().toOpenRDFURI()));
         owlSource.setNamespaces(temporaryRepositoryConnection.getNamespaces());
         
+        final OWLOntology nextOntology = testArtifactManager.getOWLManager().loadOntology(owlSource);
+        
+        // Inside of PoddOWLManager.loadOntology().....
         final RioParser owlParser =
                 new RioParserImpl((RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance()
                         .getByMIMEType(mimeType));
-        final OWLOntology nextOntology = null;
         // nextOntology = this.manager.createOntology();
         owlParser.parse(owlSource, nextOntology);
         
