@@ -34,6 +34,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.semanticweb.owlapi.rio.RioParser;
 import org.semanticweb.owlapi.rio.RioParserImpl;
@@ -75,6 +76,8 @@ public abstract class AbstractPoddArtifactManagerTest
     
     protected abstract PoddPurlManager getNewPurlManager();
     
+    protected abstract OWLReasonerFactory getNewReasonerFactory();
+
     protected abstract PoddSchemaManager getNewSchemaManager();
     
     protected abstract PoddFileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
@@ -115,6 +118,7 @@ public abstract class AbstractPoddArtifactManagerTest
         testPurlManager.setPurlFactoryRegistry(testPurlRegistry);
         
         final PoddOWLManager testOWLManager = this.getNewOWLManager();
+        testOWLManager.setReasonerFactory(this.getNewReasonerFactory());
         
         final PoddArtifactManager testArtifactManager = this.getNewArtifactManager();
         testArtifactManager.setFileReferenceManager(testFileReferenceManager);
@@ -122,6 +126,7 @@ public abstract class AbstractPoddArtifactManagerTest
         testArtifactManager.setOwlManager(testOWLManager);
         
         final PoddSchemaManager testSchemaManager = this.getNewSchemaManager();
+        testSchemaManager.setOwlManager(testOWLManager);
         
         final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
         // MIME type should be either given by the user, detected from the content type on the

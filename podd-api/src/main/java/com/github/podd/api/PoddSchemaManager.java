@@ -176,4 +176,6 @@ public interface PoddSchemaManager
     InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
             RDFFormat fileFormat) throws OpenRDFException, IOException, OWLException, PoddException;
     
+    void setOwlManager(PoddOWLManager testOWLManager);
+    
 }

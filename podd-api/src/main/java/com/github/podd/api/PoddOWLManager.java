@@ -11,6 +11,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -106,4 +107,6 @@ public interface PoddOWLManager
      * @param manager
      */
     void setOWLOntologyManager(OWLOntologyManager manager);
+
+    void setReasonerFactory(OWLReasonerFactory newReasonerFactory);
 }
