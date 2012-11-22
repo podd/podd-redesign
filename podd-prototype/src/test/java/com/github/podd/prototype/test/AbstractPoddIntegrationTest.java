@@ -1,22 +1,21 @@
 package com.github.podd.prototype.test;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.Properties;
+
+import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
 import org.restlet.Client;
 import org.restlet.data.Protocol;
 
-import com.github.podd.prototype.PoddServletContextListener;
-
 public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
 {
     
-    protected static final String TEST_USERNAME = "john";
-    protected static final String TEST_PASSWORD = "wayne";
+    protected static String TEST_USERNAME = null;
+    protected static String TEST_PASSWORD = null;
     
     protected String BASE_URL = null;
     
@@ -51,24 +50,22 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
         this.BASE_URL = "http://localhost:9090/podd-test";
         this.client = new Client(Protocol.HTTP);
         
-        // -- generate password file
-        final String poddHome = System.getProperty(PoddServletContextListener.PODD_HOME);
+        final InputStream passwdStream = this.getClass().getResourceAsStream("/integration/passwd");
+        Assert.assertNotNull("test properties file was not found", passwdStream);
         final Properties passwords = new Properties();
-        passwords.setProperty(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
-        this.writeFile(passwords, poddHome + "/passwd");
+        passwords.load(passwdStream);
+        Assert.assertTrue("Could not read test user details", passwords.size() > 0);
+        final Enumeration<Object> keys = passwords.keys();
+        if(keys.hasMoreElements())
+        {
+            AbstractPoddIntegrationTest.TEST_USERNAME = (String)keys.nextElement();
+            AbstractPoddIntegrationTest.TEST_PASSWORD =
+                    passwords.getProperty(AbstractPoddIntegrationTest.TEST_USERNAME);
+        }
         
-        // -- generate alias file
-        final Properties aliases = new Properties();
-        aliases.setProperty("localhost.protocol", "http");
-        aliases.setProperty("localhost.host", "localhost");
-        aliases.setProperty("w3.protocol", "http");
-        aliases.setProperty("w3.host", "www.w3.org");
-        aliases.setProperty("localssh.host", "localhost");
-        aliases.setProperty("localssh.port", "9856");
-        aliases.setProperty("localssh.username", "salt");
-        aliases.setProperty("localssh.secret", "salt");
-        aliases.setProperty("localssh.fingerprint", "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db");
-        this.writeFile(aliases, poddHome + "/alias");
+        // Assert alias file exists
+        final InputStream aliasStream = this.getClass().getResourceAsStream("/integration/alias");
+        Assert.assertNotNull("test alias file was not found", aliasStream);
     }
     
     /**
@@ -89,17 +86,6 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
         {
             this.log.error("Found exception in tearDown after test", ex);
         }
-        
-        try
-        {
-            final String poddHome = System.getProperty(PoddServletContextListener.PODD_HOME);
-            this.deleteFile(poddHome + "/passwd");
-            this.deleteFile(poddHome + "/alias");
-        }
-        catch(final Exception ex)
-        {
-            this.log.error("Found exception resetting application after test", ex);
-        }
     }
     
     /**
@@ -110,36 +96,5 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
     protected Client getClient()
     {
         return this.client;
-    }
-
-    private void writeFile(final Properties props, final String filename)
-    {
-        try
-        {
-            props.store(new FileOutputStream(filename), "");
-            this.log.debug("Created file: " + filename);
-        }
-        catch(final IOException e)
-        {
-            this.log.error("Failed to create file: " + filename, e);
-        }
-    }
-    
-    private void deleteFile(final String filename)
-    {
-        boolean deleted = false;
-        final File f = new File(filename);
-        if(f.exists() && !f.isDirectory())
-        {
-            deleted = f.delete();
-        }
-        if(deleted)
-        {
-            this.log.debug("Deleted file: " + filename);
-        }
-        else
-        {
-            this.log.debug("Could not delete file: " + filename);
-        }
     }
 }

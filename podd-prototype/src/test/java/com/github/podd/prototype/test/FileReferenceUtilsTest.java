@@ -1,9 +1,11 @@
 package com.github.podd.prototype.test;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import junit.framework.Assert;
 
@@ -38,15 +40,17 @@ public class FileReferenceUtilsTest
     @Before
     public void setUp() throws Exception
     {
-        this.utils = new FileReferenceUtils();
+        final Properties testAliases = new Properties();
+        testAliases.load(new FileInputStream("src/test/resources/test/alias.txt"));
         
-        this.utils.initialize("src/test/resources/test/alias.txt");
+        this.utils = new FileReferenceUtils();
+        this.utils.setAliases(testAliases);
     }
     
     @After
     public void tearDown() throws Exception
     {
-        this.utils.clean();
+        this.utils = null;
     }
     
     @Test

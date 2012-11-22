@@ -1,7 +1,9 @@
 package com.github.podd.prototype;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -24,16 +26,19 @@ import org.slf4j.LoggerFactory;
 public class PoddServletContextListener implements ServletContextListener
 {
     public static final String PODD_SERVLET_HELPER = "PODD_SERVLET_HELPER";
-    public static final String PODD_HOME = "podd.home";
-    public static final String PODD_PASSWORD_FILE = "PODD_PASSWDS";
-    public static final String PODD_ALIAS_FILE = "PODD_ALIASES";
     
+    public static final String PODD_PASSWORDS = "PODD_PASSWDS";
+    public static final String PODD_ALIASES = "PODD_ALIASES";
+    
+    private static final String INIT_PODD_CONFIG_DIR = "podd_config_dir";
     private static final String INIT_PASSWORD_FILE = "passwdfile";
     private static final String INIT_ALIAS_FILE = "aliasfile";
-    private static final String INIT_SESAME_SERVER = "sesame-server";
-    private static final String INIT_SESAME_REPOSITORY = "sesame-repository-id";
+    // private static final String INIT_SESAME_SERVER = "sesame-server";
+    // private static final String INIT_SESAME_REPOSITORY = "sesame-repository-id";
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
+
+    private String poddHomeDir;
     
     @Override
     public void contextInitialized(final ServletContextEvent sce)
@@ -44,22 +49,41 @@ public class PoddServletContextListener implements ServletContextListener
         final PoddServletHelper helper = new PoddServletHelper();
         try
         {
+//            poddHomeDir = System.getProperty("podd.home");
+            poddHomeDir = sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_PODD_CONFIG_DIR);
+            if(poddHomeDir == null || poddHomeDir.trim().length() <= 0)
+            {
+                throw new PoddException("PODD Home Directory not set.", null, -1);
+            }
+            System.out.println("********************************* podd.home is" + poddHomeDir);
             this.initializeAuthenticationService(sce);
             this.initializeFileRepositoryRegistry(sce);
             
-            final String sesameServer =
-                    sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_SERVER);
-            final String repositoryID =
-                    sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_REPOSITORY);
+            // final String sesameServer =
+            // sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_SERVER);
+            // final String repositoryID =
+            // sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_REPOSITORY);
+            
             
             final Repository nextRepository =
-                    new SailRepository(new NativeStore(new File(
-                            System.getProperty(PoddServletContextListener.PODD_HOME),
-                            "spoc,cspo,cpso,psoc,ospc,opsc,cops")));
+                    new SailRepository(
+                            new NativeStore(new File(poddHomeDir + File.separatorChar + "native"),
+                                    "spoc,posc,cspo,cpso,psoc,ospc,opsc,cops"));
             nextRepository.initialize();
+            
+            // FIXME: This is not very clean.
+            // We're creating an instance of FileReferenceUtils and setting the aliases (which were
+            // read above)
+            // Then the FileReferenceUtils is being passed into the PoddServletHelper, which in turn
+            // is kept in the servletContext for use by Servlets
+            final FileReferenceUtils fileReferenceUtils = new FileReferenceUtils();
+            final Properties aliases =
+                    (Properties)sce.getServletContext().getAttribute(PoddServletContextListener.PODD_ALIASES);
+            fileReferenceUtils.setAliases(aliases);
             
             helper.setUp(nextRepository);
             helper.loadSchemaOntologies();
+            helper.setFileReferenceUtils(fileReferenceUtils);
             
             sce.getServletContext().setAttribute(PoddServletContextListener.PODD_SERVLET_HELPER, helper);
             this.log.info("\r\n ... initialization complete.");
@@ -95,13 +119,13 @@ public class PoddServletContextListener implements ServletContextListener
         finally
         {
             sce.getServletContext().removeAttribute(PoddServletContextListener.PODD_SERVLET_HELPER);
-            sce.getServletContext().removeAttribute(PoddServletContextListener.PODD_PASSWORD_FILE);
+            sce.getServletContext().removeAttribute(PoddServletContextListener.PODD_PASSWORDS);
         }
         this.log.info("\r\n ... termination complete.");
     }
     
     /**
-     * Figures out the password file location and adds it as an attribute to the ServletContext.
+     * Loads the passwords from a file and adds them to the ServletContext in a Properties object.
      * 
      * @param sce
      * @throws PoddException
@@ -117,19 +141,25 @@ public class PoddServletContextListener implements ServletContextListener
         // TODO: add support for Windows OS paths
         if(!passwordFile.startsWith("/"))
         {
-            final String poddHomeDir = System.getProperty(PoddServletContextListener.PODD_HOME);
-            if(poddHomeDir == null || poddHomeDir.trim().length() < 1)
-            {
-                throw new PoddException("PODD Home Directory not set.", null, -1);
-            }
-            passwordFile = poddHomeDir + "/" + passwordFile;
+            passwordFile = poddHomeDir + File.separatorChar + passwordFile;
         }
-        sce.getServletContext().setAttribute(PoddServletContextListener.PODD_PASSWORD_FILE, passwordFile);
-        this.log.info("The PODD password file is located at : " + passwordFile);
+        final Properties passwords = new Properties();
+        try
+        {
+            passwords.load(new FileInputStream(passwordFile));
+        }
+        catch(final IOException e)
+        {
+            throw new PoddException("Could not load passwords", e, -1);
+        }
+        sce.getServletContext().setAttribute(PoddServletContextListener.PODD_PASSWORDS, passwords);
+        this.log.info("Loaded passwords from : " + passwordFile);
     }
     
     /**
-     * Sets up the FileReferenceValidator by initializing it with the location of the alias file.
+     * Loads aliases containing information about external file repositories from a local file and
+     * adds these details to the ServletContext in a Properties object.
+     * <p/>
      * 
      * @param sce
      * @throws PoddException
@@ -139,23 +169,25 @@ public class PoddServletContextListener implements ServletContextListener
         String aliasFile = sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_ALIAS_FILE);
         if(aliasFile == null || aliasFile.trim().length() < 1)
         {
-            throw new PoddException("Alias file location not specified.", null, -1);
+            throw new PoddException("Alias file not specified.", null, -1);
         }
         
+        // TODO: add support for Windows OS paths
         if(!aliasFile.startsWith("/"))
         {
-            final String poddHomeDir = System.getProperty(PoddServletContextListener.PODD_HOME);
-            if(poddHomeDir == null || poddHomeDir.trim().length() < 1)
-            {
-                throw new PoddException("PODD Home Directory not set.", null, -1);
-            }
-            aliasFile = poddHomeDir + "/" + aliasFile;
+            aliasFile = poddHomeDir + File.separatorChar + aliasFile;
         }
-        this.log.info("The PODD alias file is located at : " + aliasFile);
-        
-        final FileReferenceUtils validator = FileReferenceUtils.getInstance();
-        validator.initialize(aliasFile);
-        
+        final Properties aliasProps = new Properties();
+        try
+        {
+            aliasProps.load(new FileInputStream(aliasFile));
+        }
+        catch(final IOException e)
+        {
+            throw new PoddException("Could not load aliases", e, -1);
+        }
+        sce.getServletContext().setAttribute(PoddServletContextListener.PODD_ALIASES, aliasProps);
+        this.log.info("Loaded aliases from : " + aliasFile);
     }
     
 }

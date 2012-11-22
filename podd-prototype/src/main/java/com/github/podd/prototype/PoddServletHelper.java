@@ -65,6 +65,7 @@ public class PoddServletHelper
     private ValueFactory nextValueFactory;
     
     private PoddPrototypeUtils utils;
+    private FileReferenceUtils fileReferenceUtils;
     
     private OWLOntologyManager manager;
     private OWLReasonerFactory reasonerFactory;
@@ -109,6 +110,16 @@ public class PoddServletHelper
         // this.poddPlantPath = "/ontologies/poddPlant.owl";
         
         this.log.debug("setUp ... completed");
+    }
+    
+    /**
+     * Use this setter to pass in an initialized FileReferenceUtils for use by this class.
+     * 
+     * @param fileReferenceUtils
+     */
+    public void setFileReferenceUtils(final FileReferenceUtils fileReferenceUtils)
+    {
+        this.fileReferenceUtils = fileReferenceUtils;
     }
     
     /**
@@ -559,8 +570,8 @@ public class PoddServletHelper
             
             if(checkFileReferences)
             {
-                final FileReferenceUtils fileRefUtils = FileReferenceUtils.getInstance();
-                fileRefUtils.checkFileReferencesInRDF(tempRepositoryConnection, context);
+                // final FileReferenceUtils fileRefUtils = FileReferenceUtils.getInstance();
+                this.fileReferenceUtils.checkFileReferencesInRDF(tempRepositoryConnection, context);
             }
             
             final String uniqueUriString = artifactUri.substring(0, artifactUri.lastIndexOf("/"));

@@ -2,6 +2,7 @@ package com.github.podd.prototype;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,10 @@ public class FileReferenceAttachServlet extends PoddBaseServlet
         }
         
         this.log.info("REFERENCE attach");
-        final FileReferenceUtils utils = FileReferenceUtils.getInstance();
+        final FileReferenceUtils utils = new FileReferenceUtils();
+        final Properties aliases =
+                (Properties)this.getServletContext().getAttribute(PoddServletContextListener.PODD_ALIASES);
+        utils.setAliases(aliases);
         
         final FileReference fileReference = utils.constructFileReferenceFromMap(request.getParameterMap());
         

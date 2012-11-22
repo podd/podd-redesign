@@ -3,11 +3,13 @@ package com.github.podd.prototype.test;
 import info.aduna.iteration.Iterations;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -52,7 +54,12 @@ public class PoddServletHelperTest
             this.helper.setUp(repository);
             this.helper.loadSchemaOntologies();
             
-            FileReferenceUtils.getInstance().initialize("src/test/resources/test/alias.txt");
+            final Properties testAliases = new Properties();
+            testAliases.load(new FileInputStream("src/test/resources/test/alias.txt"));
+            
+            final FileReferenceUtils utils = new FileReferenceUtils();
+            utils.setAliases(testAliases);
+            this.helper.setFileReferenceUtils(utils);
         }
         catch(final Exception e)
         {
@@ -65,7 +72,7 @@ public class PoddServletHelperTest
     public void tearDown() throws Exception
     {
         this.helper.tearDown();
-        FileReferenceUtils.getInstance().clean();
+        // FileReferenceUtils.getInstance().clean();
     }
     
     @Test

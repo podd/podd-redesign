@@ -1,6 +1,5 @@
 package com.github.podd.prototype;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
@@ -18,10 +17,6 @@ import javax.servlet.http.HttpSession;
  */
 public class LoginServlet extends PoddBaseServlet
 {
-    
-    // Check whether this behaves as expected
-    private static Properties passwords;
-    private static long passwordsLoadedAt = -1;
     
     /**
      */
@@ -103,10 +98,12 @@ public class LoginServlet extends PoddBaseServlet
         {
             return false;
         }
-        this.loadPasswordFile();
-        if(LoginServlet.passwords.containsKey(userid))
+        final Properties passwords =
+                (Properties)this.getServletContext().getAttribute(PoddServletContextListener.PODD_PASSWORDS);
+        
+        if(passwords.containsKey(userid))
         {
-            final String expectedPassword = LoginServlet.passwords.getProperty(userid);
+            final String expectedPassword = passwords.getProperty(userid);
             if(expectedPassword.equals(password))
             {
                 return true;
@@ -114,28 +111,6 @@ public class LoginServlet extends PoddBaseServlet
         }
         
         return false;
-    }
-    
-    private void loadPasswordFile()
-    {
-        if((System.currentTimeMillis() - LoginServlet.passwordsLoadedAt) < 60000)
-        {
-            return;
-        }
-        
-        final String passwordFile =
-                (String)this.getServletContext().getAttribute(PoddServletContextListener.PODD_PASSWORD_FILE);
-        
-        LoginServlet.passwords = new Properties();
-        try
-        {
-            LoginServlet.passwords.load(new FileInputStream(passwordFile));
-        }
-        catch(final Exception e)
-        {
-            this.log.error("Failed to load passwords", e);
-        }
-        LoginServlet.passwordsLoadedAt = System.currentTimeMillis();
     }
     
 }

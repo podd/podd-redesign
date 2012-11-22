@@ -8,6 +8,10 @@
         <listener-class>com.github.podd.prototype.PoddServletContextListener</listener-class>
     </listener>
     <context-param>
+        <param-name>podd_config_dir</param-name>
+        <param-value>/home/kutila/gitrepos/podd-redesign/podd-prototype/src/test/resources/integration</param-value>
+    </context-param>
+    <context-param>
         <param-name>passwdfile</param-name>
         <param-value>passwd</param-value>
     </context-param>

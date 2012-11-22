@@ -5,7 +5,6 @@ package com.github.podd.prototype;
 
 import info.aduna.iteration.Iterations;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -49,33 +48,23 @@ public class FileReferenceUtils
     public static final String KEY_FILE_PATH = "file_path";
     public static final String KEY_FILE_SERVER_ALIAS = "file_server_alias";
     
+    public static final String SEPARATOR = ".";
+    public static final String ALIAS_HTTP_PROTOCOL = "protocol";
+    public static final String ALIAS_HTTP_HOST = "host";
+    
+    public static final String ALIAS_SSH_HOST = "host";
+    public static final String ALIAS_SSH_PORT = "port";
+    public static final String ALIAS_SSH_FINGERPRINT = "fingerprint";
+    public static final String ALIAS_SSH_USERNAME = "username";
+    public static final String ALIAS_SSH_SECRET = "secret";
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private static FileReferenceUtils instance = new FileReferenceUtils();
-    
     private Properties aliases = new Properties();
-    private long aliasesLoadedAt;
-    private String aliasFilePath;
     
-    public FileReferenceUtils()
+    public void setAliases(final Properties aliases)
     {
-    }
-    
-    public static FileReferenceUtils getInstance()
-    {
-        return FileReferenceUtils.instance;
-    }
-    
-    public void initialize(final String aliasFilePath)
-    {
-        this.aliasFilePath = aliasFilePath;
-    }
-    
-    public void clean()
-    {
-        this.aliasFilePath = null;
-        this.aliases = new Properties();
-        this.aliasesLoadedAt = -1;
+        this.aliases = aliases;
     }
     
     /**
@@ -164,6 +153,11 @@ public class FileReferenceUtils
      */
     public void checkFileExists(final FileReference fileReference) throws IOException, PoddException
     {
+        if(this.aliases == null || this.aliases.size() <= 0)
+        {
+            throw new PoddException("Aliases not found", this.aliases, -1);
+        }
+        
         if(fileReference instanceof SshFileReference)
         {
             this.checkFileExists((SshFileReference)fileReference);
@@ -180,10 +174,12 @@ public class FileReferenceUtils
     
     private void checkFileExists(final HttpFileReference httpFileRef) throws IOException, PoddException
     {
-        this.loadAliases();
-        
-        final String host = this.aliases.getProperty(httpFileRef.getServerAlias() + ".host");
-        final String protocol = this.aliases.getProperty(httpFileRef.getServerAlias() + ".protocol");
+        final String host =
+                this.aliases.getProperty(httpFileRef.getServerAlias() + FileReferenceUtils.SEPARATOR
+                        + FileReferenceUtils.ALIAS_HTTP_HOST);
+        final String protocol =
+                this.aliases.getProperty(httpFileRef.getServerAlias() + FileReferenceUtils.SEPARATOR
+                        + FileReferenceUtils.ALIAS_HTTP_PROTOCOL);
         // String username = aliases.getProperty(serverAlias + ".username");
         // String password = aliases.getProperty(serverAlias + ".password");
         
@@ -214,12 +210,21 @@ public class FileReferenceUtils
     
     private void checkFileExists(final SshFileReference sshFileRef) throws IOException, PoddException
     {
-        this.loadAliases();
-        final String host = this.aliases.getProperty(sshFileRef.getServerAlias() + ".host");
-        final String port = this.aliases.getProperty(sshFileRef.getServerAlias() + ".port");
-        final String fingerprint = this.aliases.getProperty(sshFileRef.getServerAlias() + ".fingerprint");
-        final String username = this.aliases.getProperty(sshFileRef.getServerAlias() + ".username");
-        final String secret = this.aliases.getProperty(sshFileRef.getServerAlias() + ".secret");
+        final String host =
+                this.aliases.getProperty(sshFileRef.getServerAlias() + FileReferenceUtils.SEPARATOR
+                        + FileReferenceUtils.ALIAS_SSH_HOST);
+        final String port =
+                this.aliases.getProperty(sshFileRef.getServerAlias() + FileReferenceUtils.SEPARATOR
+                        + FileReferenceUtils.ALIAS_SSH_PORT);
+        final String fingerprint =
+                this.aliases.getProperty(sshFileRef.getServerAlias() + FileReferenceUtils.SEPARATOR
+                        + FileReferenceUtils.ALIAS_SSH_FINGERPRINT);
+        final String username =
+                this.aliases.getProperty(sshFileRef.getServerAlias() + FileReferenceUtils.SEPARATOR
+                        + FileReferenceUtils.ALIAS_SSH_USERNAME);
+        final String secret =
+                this.aliases.getProperty(sshFileRef.getServerAlias() + FileReferenceUtils.SEPARATOR
+                        + FileReferenceUtils.ALIAS_SSH_SECRET);
         
         if(host == null || port == null)
         {
@@ -483,26 +488,6 @@ public class FileReferenceUtils
             // FIXME: Create a subclass of PoddException for these errors
             throw new PoddException("Invalid File Reference(s) found.", errors, -1);
         }
-    }
-    
-    private void loadAliases() throws IOException
-    {
-        if((System.currentTimeMillis() - this.aliasesLoadedAt) < 60000)
-        {
-            return;
-        }
-        
-        try
-        {
-            this.aliases.load(new FileInputStream(this.aliasFilePath));
-        }
-        catch(final IOException | NullPointerException e)
-        {
-            final String message = "Failed to load aliases from " + this.aliasFilePath;
-            this.log.error(message, e);
-            throw new IOException(message, e);
-        }
-        this.aliasesLoadedAt = System.currentTimeMillis();
     }
     
 }
