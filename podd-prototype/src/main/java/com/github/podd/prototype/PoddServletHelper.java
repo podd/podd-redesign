@@ -122,6 +122,11 @@ public class PoddServletHelper
         this.fileReferenceUtils = fileReferenceUtils;
     }
     
+    public FileReferenceUtils getFileReferenceUtils()
+    {
+        return this.fileReferenceUtils;
+    }
+    
     /**
      * The prototype does not yet support uploading of new Schema Ontologies. Therefore, this method
      * should be called at initialization to load the schemas.

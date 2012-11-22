@@ -1,15 +1,12 @@
 package com.github.podd.prototype.test;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import junit.framework.Assert;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Statement;
@@ -33,18 +30,20 @@ import com.github.podd.prototype.SshFileReference;
 
 public class FileReferenceUtilsTest
 {
-    protected Logger log = LoggerFactory.getLogger(this.getClass());
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     protected FileReferenceUtils utils;
     
     @Before
     public void setUp() throws Exception
     {
-        final Properties testAliases = new Properties();
-        testAliases.load(new FileInputStream("src/test/resources/test/alias.txt"));
+        final InputStream inputStream = this.getClass().getResourceAsStream("/test/alias.ttl");
+        Assert.assertNotNull("Could not find alias file", inputStream);
         
         this.utils = new FileReferenceUtils();
-        this.utils.setAliases(testAliases);
+        this.log.info("About to set aliases");
+        this.utils.setAliases(inputStream, RDFFormat.TURTLE);
+        this.log.info("Finished setting aliases");
     }
     
     @After

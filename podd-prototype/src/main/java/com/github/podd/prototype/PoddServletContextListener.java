@@ -3,6 +3,7 @@ package com.github.podd.prototype;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import javax.servlet.ServletContextEvent;
@@ -12,6 +13,8 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.sail.nativerdf.NativeStore;
 import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
@@ -37,7 +40,7 @@ public class PoddServletContextListener implements ServletContextListener
     // private static final String INIT_SESAME_REPOSITORY = "sesame-repository-id";
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     private String poddHomeDir;
     
     @Override
@@ -49,41 +52,29 @@ public class PoddServletContextListener implements ServletContextListener
         final PoddServletHelper helper = new PoddServletHelper();
         try
         {
-//            poddHomeDir = System.getProperty("podd.home");
-            poddHomeDir = sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_PODD_CONFIG_DIR);
-            if(poddHomeDir == null || poddHomeDir.trim().length() <= 0)
+            // poddHomeDir = System.getProperty("podd.home");
+            this.poddHomeDir =
+                    sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_PODD_CONFIG_DIR);
+            if(this.poddHomeDir == null || this.poddHomeDir.trim().length() <= 0)
             {
                 throw new PoddException("PODD Home Directory not set.", null, -1);
             }
-            System.out.println("********************************* podd.home is" + poddHomeDir);
+            System.out.println("********************************* podd.home is" + this.poddHomeDir);
             this.initializeAuthenticationService(sce);
-            this.initializeFileRepositoryRegistry(sce);
             
             // final String sesameServer =
             // sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_SERVER);
             // final String repositoryID =
             // sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_REPOSITORY);
             
-            
             final Repository nextRepository =
-                    new SailRepository(
-                            new NativeStore(new File(poddHomeDir + File.separatorChar + "native"),
-                                    "spoc,posc,cspo,cpso,psoc,ospc,opsc,cops"));
+                    new SailRepository(new NativeStore(new File(this.poddHomeDir + File.separatorChar + "native"),
+                            "spoc,posc,cspo,cpso,psoc,ospc,opsc,cops"));
             nextRepository.initialize();
-            
-            // FIXME: This is not very clean.
-            // We're creating an instance of FileReferenceUtils and setting the aliases (which were
-            // read above)
-            // Then the FileReferenceUtils is being passed into the PoddServletHelper, which in turn
-            // is kept in the servletContext for use by Servlets
-            final FileReferenceUtils fileReferenceUtils = new FileReferenceUtils();
-            final Properties aliases =
-                    (Properties)sce.getServletContext().getAttribute(PoddServletContextListener.PODD_ALIASES);
-            fileReferenceUtils.setAliases(aliases);
             
             helper.setUp(nextRepository);
             helper.loadSchemaOntologies();
-            helper.setFileReferenceUtils(fileReferenceUtils);
+            helper.setFileReferenceUtils(this.setupFileRepositoryAliases(sce));
             
             sce.getServletContext().setAttribute(PoddServletContextListener.PODD_SERVLET_HELPER, helper);
             this.log.info("\r\n ... initialization complete.");
@@ -141,7 +132,7 @@ public class PoddServletContextListener implements ServletContextListener
         // TODO: add support for Windows OS paths
         if(!passwordFile.startsWith("/"))
         {
-            passwordFile = poddHomeDir + File.separatorChar + passwordFile;
+            passwordFile = this.poddHomeDir + File.separatorChar + passwordFile;
         }
         final Properties passwords = new Properties();
         try
@@ -164,30 +155,35 @@ public class PoddServletContextListener implements ServletContextListener
      * @param sce
      * @throws PoddException
      */
-    private void initializeFileRepositoryRegistry(final ServletContextEvent sce) throws PoddException
+    private FileReferenceUtils setupFileRepositoryAliases(final ServletContextEvent sce) throws PoddException
     {
-        String aliasFile = sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_ALIAS_FILE);
+        final String aliasFile = sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_ALIAS_FILE);
         if(aliasFile == null || aliasFile.trim().length() < 1)
         {
             throw new PoddException("Alias file not specified.", null, -1);
         }
         
-        // TODO: add support for Windows OS paths
-        if(!aliasFile.startsWith("/"))
+        final FileReferenceUtils fileReferenceUtils = new FileReferenceUtils();
+        final InputStream stream = this.getClass().getResourceAsStream(aliasFile);
+        
+        if(stream == null)
         {
-            aliasFile = poddHomeDir + File.separatorChar + aliasFile;
+            this.log.warn("File Repository Aliases were not found, File Reference Attachments will not be functional!");
         }
-        final Properties aliasProps = new Properties();
-        try
+        else
         {
-            aliasProps.load(new FileInputStream(aliasFile));
+            try
+            {
+                fileReferenceUtils.setAliases(stream, RDFFormat.TURTLE);
+                this.log.info("Loaded aliases from : {}", aliasFile);
+            }
+            catch(RepositoryException | RDFParseException | IOException e1)
+            {
+                this.log.error("Failed to load aliases from : {}", aliasFile);
+                throw new PoddException("Could not set File Repository Aliases due to an exception", e1, null, -1);
+            }
         }
-        catch(final IOException e)
-        {
-            throw new PoddException("Could not load aliases", e, -1);
-        }
-        sce.getServletContext().setAttribute(PoddServletContextListener.PODD_ALIASES, aliasProps);
-        this.log.info("Loaded aliases from : " + aliasFile);
+        
+        return fileReferenceUtils;
     }
-    
 }

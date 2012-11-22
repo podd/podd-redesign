@@ -8,11 +8,6 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.sftp.FileAttributes;
-import net.schmizz.sshj.sftp.SFTPClient;
-
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.keyprovider.FileKeyPairProvider;

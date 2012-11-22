@@ -305,7 +305,8 @@ public class PoddPrototypeUtils
     {
         if(nextOntology.getOntologyID().getVersionIRI() == null)
         {
-            throw new IllegalArgumentException("Cannot dump and ontology to repository if it does not have a version IRI");
+            throw new IllegalArgumentException(
+                    "Cannot dump and ontology to repository if it does not have a version IRI");
         }
         
         // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI

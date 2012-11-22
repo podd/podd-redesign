@@ -3,13 +3,11 @@ package com.github.podd.prototype.test;
 import info.aduna.iteration.Iterations;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -21,6 +19,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
@@ -45,27 +44,22 @@ public class PoddServletHelperTest
     @Before
     public void setUp() throws Exception
     {
-        try
-        {
-            final Repository repository = new SailRepository(new MemoryStore());
-            repository.initialize();
-            
-            this.helper = new PoddServletHelper();
-            this.helper.setUp(repository);
-            this.helper.loadSchemaOntologies();
-            
-            final Properties testAliases = new Properties();
-            testAliases.load(new FileInputStream("src/test/resources/test/alias.txt"));
-            
-            final FileReferenceUtils utils = new FileReferenceUtils();
-            utils.setAliases(testAliases);
-            this.helper.setFileReferenceUtils(utils);
-        }
-        catch(final Exception e)
-        {
-            e.printStackTrace();
-            throw e;
-        }
+        final Repository repository = new SailRepository(new MemoryStore());
+        repository.initialize();
+        
+        this.helper = new PoddServletHelper();
+        this.helper.setUp(repository);
+        this.helper.loadSchemaOntologies();
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream("/test/alias.ttl");
+        Assert.assertNotNull("Could not find alias file", inputStream);
+        
+        final FileReferenceUtils utils = new FileReferenceUtils();
+        this.log.info("About to set aliases");
+        utils.setAliases(inputStream, RDFFormat.TURTLE);
+        this.log.info("Finished setting aliases");
+        
+        this.helper.setFileReferenceUtils(utils);
     }
     
     @After
@@ -79,6 +73,7 @@ public class PoddServletHelperTest
     public void testLoadInvalidArtifact() throws Exception
     {
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/cookie.txt");
+        Assert.assertNotNull("Could not find test resource", in);
         try
         {
             this.helper.loadPoddArtifact(in, PoddServlet.MIME_TYPE_RDF_XML);
@@ -100,6 +95,7 @@ public class PoddServletHelperTest
     public void testLoadArtifact() throws Exception
     {
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         
         final String artifactUriString = this.helper.loadPoddArtifact(in, mimeType);
@@ -137,6 +133,7 @@ public class PoddServletHelperTest
     {
         // first, load an artifact using the inner-load method
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
@@ -157,6 +154,7 @@ public class PoddServletHelperTest
     {
         // first, load an artifact using the inner-load method
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
@@ -178,6 +176,7 @@ public class PoddServletHelperTest
     {
         // first, load an artifact using the inner-load method
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
@@ -225,7 +224,7 @@ public class PoddServletHelperTest
         final String artifactUniqueIRI = "http://purl.org/nosuch/artifact:1";
         
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        Assert.assertNotNull("Could not find test resource", in);
         
         try
         {
@@ -244,18 +243,18 @@ public class PoddServletHelperTest
     {
         final boolean isReplace = false;
         // first, load an artifact using the inner-load method
-        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1.rdf");
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // edit it
-        in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        final InputStream nextInputStream = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
+        Assert.assertNotNull("Could not find test resource", nextInputStream);
         
         final String editedArtifactURI =
-                this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace, false);
+                this.helper.editArtifact(artifactUniqueIRI.stringValue(), nextInputStream, mimeType, isReplace, false);
         
         // check the modifications were persisted
         final String resultRDF = this.helper.getArtifact(editedArtifactURI, mimeType, false);
@@ -277,18 +276,18 @@ public class PoddServletHelperTest
     {
         final boolean isReplace = true;
         // first, load an artifact using the inner-load method
-        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1.rdf");
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // edit it
-        in = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        final InputStream nextInputStream = this.getClass().getResourceAsStream("/test/artifacts/fragment.rdf");
+        Assert.assertNotNull("Could not find test resource", nextInputStream);
         
         final String editedArtifactURI =
-                this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace, false);
+                this.helper.editArtifact(artifactUniqueIRI.stringValue(), nextInputStream, mimeType, isReplace, false);
         
         // check the modifications were persisted
         final String resultRDF = this.helper.getArtifact(editedArtifactURI, mimeType, false);
@@ -314,19 +313,22 @@ public class PoddServletHelperTest
     {
         final boolean isReplace = true;
         // first, load an artifact using the inner-load method
-        InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        final InputStream in =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // edit it with a fragment that contains "invalid" file references
-        in = this.getClass().getResourceAsStream("/test/artifacts/fragment-invalid-file-reference.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        final InputStream nextInputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/fragment-invalid-file-reference.rdf");
+        Assert.assertNotNull("Could not find test resource", nextInputStream);
         
         try
         {
-            this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace, true);
+            this.helper.editArtifact(artifactUniqueIRI.stringValue(), nextInputStream, mimeType, isReplace, true);
+            Assert.fail("Did not find expected exception");
         }
         catch(final PoddException e)
         {
@@ -334,10 +336,11 @@ public class PoddServletHelperTest
         }
         
         // edit it with a fragment that is correct
-        in = this.getClass().getResourceAsStream("/test/artifacts/fragment-1-file-reference.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        final InputStream nextInputStream2 =
+                this.getClass().getResourceAsStream("/test/artifacts/fragment-1-file-reference.rdf");
+        Assert.assertNotNull("Could not find test resource", nextInputStream2);
         final String editedArtifactURI =
-                this.helper.editArtifact(artifactUniqueIRI.stringValue(), in, mimeType, isReplace, true);
+                this.helper.editArtifact(artifactUniqueIRI.stringValue(), nextInputStream2, mimeType, isReplace, true);
         
         // check the modifications were persisted
         final String resultRDF = this.helper.getArtifact(editedArtifactURI, mimeType, false);
@@ -374,7 +377,7 @@ public class PoddServletHelperTest
         try
         {
             this.helper.attachReference(invalidRef, false);
-            Assert.fail("Should have thrown an exception");
+            Assert.fail("Did not find expected exception");
         }
         catch(final RuntimeException e)
         {
@@ -384,7 +387,7 @@ public class PoddServletHelperTest
         // 2. try attaching to a non-existent object (inside an artifact)
         final InputStream in =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         
@@ -394,7 +397,7 @@ public class PoddServletHelperTest
         try
         {
             this.helper.attachReference(invalidRef, false);
-            Assert.fail("Should have thrown an exception");
+            Assert.fail("Did not find expected exception");
         }
         catch(final RuntimeException e)
         {
@@ -408,7 +411,7 @@ public class PoddServletHelperTest
         // first, load an artifact using the inner-load method
         final InputStream in =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         
@@ -461,7 +464,7 @@ public class PoddServletHelperTest
             // first, load an artifact using the inner-load method
             final InputStream in =
                     this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
-            Assert.assertNotNull("Resource was not found", in);
+            Assert.assertNotNull("Could not find test resource", in);
             final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
             final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
             
@@ -514,6 +517,7 @@ public class PoddServletHelperTest
     {
         // first, load an artifact using the inner-load method
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
@@ -561,7 +565,7 @@ public class PoddServletHelperTest
     {
         // first, load an artifact using the inner-load method
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
-        Assert.assertNotNull("Resource was not found", in);
+        Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
@@ -663,6 +667,7 @@ public class PoddServletHelperTest
         try
         {
             PoddServletHelper.extractUri("htp/a");
+            Assert.fail("Did not find expected exception");
         }
         catch(final URISyntaxException e)
         {
