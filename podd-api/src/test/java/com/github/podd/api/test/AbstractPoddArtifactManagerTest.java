@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.After;
@@ -17,6 +18,7 @@ import org.openrdf.model.Graph;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.GraphImpl;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
@@ -25,9 +27,18 @@ import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
+import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.profiles.OWLProfileReport;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
+import org.semanticweb.owlapi.rio.RioParser;
+import org.semanticweb.owlapi.rio.RioParserImpl;
 
 import com.github.podd.api.PoddArtifactManager;
+import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddFileReferenceManager;
@@ -57,6 +68,8 @@ public abstract class AbstractPoddArtifactManagerTest
     
     protected abstract PoddFileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory();
     
+    protected abstract PoddOWLManager getNewOWLManager();
+    
     protected abstract PoddPurlManager getNewPurlManager();
     
     protected abstract PoddFileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
@@ -70,6 +83,10 @@ public abstract class AbstractPoddArtifactManagerTest
     @Before
     public void setUp() throws Exception
     {
+        // FIXME: This needs to be a constant
+        final URI poddFileReferenceType =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#PoddFileReference");
+        
         final PoddFileReferenceProcessorFactoryRegistry testFileRegistry =
                 new PoddFileReferenceProcessorFactoryRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
@@ -92,9 +109,12 @@ public abstract class AbstractPoddArtifactManagerTest
         final PoddPurlManager testPurlManager = this.getNewPurlManager();
         testPurlManager.setPurlFactoryRegistry(testPurlRegistry);
         
+        final PoddOWLManager testOWLManager = this.getNewOWLManager();
+        
         final PoddArtifactManager testArtifactManager = this.getNewArtifactManager();
         testArtifactManager.setFileReferenceManager(testFileReferenceManager);
         testArtifactManager.setPurlManager(testPurlManager);
+        testArtifactManager.setOwlManager(testOWLManager);
         
         final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
         // MIME type should be either given by the user, detected from the content type on the
@@ -106,24 +126,31 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // INSIDE the loadArtifact method...
         
-        // testArtifactManager needs to create artifactId before attempting to extract file
-        // references
+        // connection to the temporary repository that the artifact RDF triples will be stored while
+        // they are initially parsed by OWLAPI.
+        final RepositoryConnection temporaryRepositoryConnection = null;
+        
+        final URI randomContext = ValueFactoryImpl.getInstance().createURI(UUID.randomUUID().toString());
+        
+        // Load the artifact RDF triples into a random context in the temp repository, which may be
+        // shared between different uploads
+        temporaryRepositoryConnection.add(inputStream, "", format, randomContext);
+        
+        // TODO: SPARQL query to extract the Ontology IRI and Version IRI from the
+        // temporaryRepositoryConnection
+        
+        // Create an initial OWLOntologyID for the uploaded ontology, after checking that the
+        // Version IRI is distinct for the given Ontology IRI
         final OWLOntologyID tempArtifactId = null;
         
-        // connection to the repository that the artifact RDF triples will be stored in
-        final RepositoryConnection tempConn = null;
-        
-        // TODO: Load the artifact RDF triples into a specific context in the temp repository
-        tempConn.add(inputStream, "", format);
-        
-        // TODO: Identify the Artifact IRI and Artifact Version IRI
+        // TODO If the OWLOntologyID is not distinct, then modify it to be distinct
         
         // return the results, setting the results variable to be the same as the internalResults
         // variable from inside of extractFileReferences
         // Ie, return internalResults; results = internalResults;
         
         final Set<PoddPurlReference> purlResults =
-                testArtifactManager.getPurlManager().extractPurlReferences(tempConn,
+                testArtifactManager.getPurlManager().extractPurlReferences(temporaryRepositoryConnection,
                         tempArtifactId.getVersionIRI().toOpenRDFURI());
         
         // INSIDE extractPurlReferences
@@ -145,7 +172,8 @@ public abstract class AbstractPoddArtifactManagerTest
                 sparqlQuery.append(nextProcessorFactory.getSPARQLGroupBy());
             }
             
-            final GraphQuery graphQuery = tempConn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
+            final GraphQuery graphQuery =
+                    temporaryRepositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
             
             // Create a new dataset to specify the contexts that the query will be allowed to access
             final DatasetImpl dataset = new DatasetImpl();
@@ -206,23 +234,19 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // perform the conversion of the URIs, possibly in bulk, as they are all given to this
         // method together
-        testArtifactManager.getPurlManager().convertTemporaryUris(purlResults, tempConn,
+        testArtifactManager.getPurlManager().convertTemporaryUris(purlResults, temporaryRepositoryConnection,
                 tempArtifactId.getVersionIRI().toOpenRDFURI());
         
         // Then work on the file references
         
         // calls, to setup the results collection
         final Set<PoddFileReference> fileReferenceResults =
-                testArtifactManager.getFileReferenceManager().extractFileReferences(tempConn,
+                testArtifactManager.getFileReferenceManager().extractFileReferences(temporaryRepositoryConnection,
                         tempArtifactId.getVersionIRI().toOpenRDFURI());
         
         // INSIDE the extractFileReferences method....
         final Set<PoddFileReference> internalFileReferenceResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<PoddFileReference, Boolean>());
-        
-        // TODO: This needs to be a constant
-        final URI poddFileReferenceType =
-                tempConn.getValueFactory().createURI("http://purl.org/podd/ns/poddBase#PoddFileReference");
         
         for(final PoddFileReferenceProcessorFactory nextProcessorFactory : testArtifactManager
                 .getFileReferenceManager().getProcessorFactoryRegistry().getByStage(PoddProcessorStage.RDF_PARSING))
@@ -239,7 +263,8 @@ public abstract class AbstractPoddArtifactManagerTest
                 sparqlQuery.append(nextProcessorFactory.getSPARQLGroupBy());
             }
             
-            final GraphQuery graphQuery = tempConn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
+            final GraphQuery graphQuery =
+                    temporaryRepositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
             
             // Create a new dataset to specify the contexts that the query will be allowed to access
             final DatasetImpl dataset = new DatasetImpl();
@@ -304,21 +329,73 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         
         // optionally verify the file references
-        testArtifactManager.getFileReferenceManager().verifyFileReferences(fileReferenceResults, tempConn,
-                tempArtifactId.getVersionIRI().toOpenRDFURI());
+        testArtifactManager.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
+                temporaryRepositoryConnection, tempArtifactId.getVersionIRI().toOpenRDFURI());
+        
+        // TODO: Optionally remove invalid file references or mark them as invalid using RDF
+        // statements/OWL Classes
         
         // TODO: Load the statements into an OWLAPI OWLOntology
         
-        // TODO: Check the OWLAPI OWLOntology against an OWLProfile to make sure it is in profile
+        final RioMemoryTripleSource owlSource =
+                new RioMemoryTripleSource(temporaryRepositoryConnection.getStatements(null, null, null, true,
+                        tempArtifactId.getVersionIRI().toOpenRDFURI()));
+        owlSource.setNamespaces(temporaryRepositoryConnection.getNamespaces());
         
-        // TODO: Check the OWLAPI OWLOntology using a reasoner for .isConsistent
+        final RioParser owlParser =
+                new RioParserImpl((RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance()
+                        .getByMIMEType(mimeType));
+        final OWLOntology nextOntology = null;
+        // nextOntology = this.manager.createOntology();
+        owlParser.parse(owlSource, nextOntology);
         
-        // TODO: Use an OWLAPI InferredAxiomGenerator together with the reasoner to create inferred
+        // Check the OWLAPI OWLOntology against an OWLProfile to make sure it is in profile
+        final OWLProfileReport profileReport =
+                testArtifactManager.getOWLManager().getReasonerProfile().checkOntology(nextOntology);
+        if(!profileReport.isInProfile())
+        {
+            testArtifactManager.getOWLManager().removeCache(nextOntology.getOntologyID());
+        }
+        
+        // create an OWL Reasoner using the Pellet library and ensure that the reasoner thinks the
+        // ontology is consistent so far
+        // Use the factory that we found to create a reasoner over the ontology
+        final OWLReasoner nextReasoner = testArtifactManager.getOWLManager().createReasoner(nextOntology);
+        
+        // Test that the ontology was consistent with this reasoner
+        // This ensures in the case of Pellet that it is in the OWL2-DL profile
+        // if(!nextReasoner.isConsistent() || nextReasoner.getUnsatisfiableClasses().getSize() > 0)
+        // Check the OWLAPI OWLOntology using a reasoner for .isConsistent
+        if(!nextReasoner.isConsistent())
+        {
+            testArtifactManager.getOWLManager().removeCache(nextOntology.getOntologyID());
+        }
+        
+        // Once the reasoner determines that the ontology is consistent, copy the statements to a
+        // permanent repository connection
+        final RepositoryConnection permanentRepositoryConnection = null;
+        
+        // TODO: Copy the statements to permanentRepositoryConnection
+        
+        // NOTE: At this stage, a client could be notified, and the artifact could be streamed back
+        // to them from permanentRepositoryConnection
+        
+        final InferredOWLOntologyID inferredOWLOntologyID =
+                testArtifactManager.getOWLManager().generateInferredOntologyID(nextOntology.getOntologyID());
+        
+        // Use an OWLAPI InferredAxiomGenerator together with the reasoner to create inferred
         // axioms to store in the database
+        // Serialise the inferred statements back to a different context in the permanent
+        // repository connection
+        // The contexts to use within the permanent repository connection are all encapsulated in
+        // the InferredOWLOntologyID object
+        testArtifactManager.getOWLManager().inferStatements(inferredOWLOntologyID, permanentRepositoryConnection);
         
-        // TODO: Serialise the inferred statements back to a different context in the database
+        // make sure in a finally block to remove the cache for the ontology
+        testArtifactManager.getOWLManager().removeCache(inferredOWLOntologyID);
         
         // return InferredOWLOntologyID() with the context of the inferred statements
+        
     }
     
     /**

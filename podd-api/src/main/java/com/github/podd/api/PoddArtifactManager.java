@@ -22,10 +22,15 @@ public interface PoddArtifactManager
 {
     PoddFileReferenceManager getFileReferenceManager();
     
+    PoddOWLManager getOWLManager();
+    
     PoddPurlManager getPurlManager();
     
     /**
      * Loads an artifact into the manager.
+     * 
+     * NOTE: After this method completes the Artifact may no longer be in memory in the
+     * PoddOWLManager, but will be stored in the underlying Sesame Repository.
      * 
      * @param inputStream
      *            The input stream containing the RDF document for the updated artifact.
@@ -48,6 +53,19 @@ public interface PoddArtifactManager
     InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId);
     
     void setFileReferenceManager(PoddFileReferenceManager fileManager);
+    
+    /**
+     * Sets the PoddOWLManager instance to use when loading and dealing with Artifacts in memory.
+     * This manager may not be used for some queries where SPARQL queries on the underlying
+     * Repository can more efficiently complete the operation.
+     * 
+     * NOTE: Artifacts are not necessarily cached in memory, so no manual cleanup is needed if
+     * calling methods from the PoddArtifactManager interface.
+     * 
+     * @param testOWLManager
+     *            The manager for interactions with OWLAPI.
+     */
+    void setOwlManager(PoddOWLManager testOWLManager);
     
     void setPurlManager(PoddPurlManager testPurlManager);
     
