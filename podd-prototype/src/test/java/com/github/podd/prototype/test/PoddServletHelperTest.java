@@ -12,7 +12,9 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
@@ -37,6 +39,9 @@ import com.github.podd.prototype.SshFileReference;
 
 public class PoddServletHelperTest
 {
+    @Rule
+    public TemporaryFolder tempDirectory = new TemporaryFolder();
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     PoddServletHelper helper = null;
@@ -460,7 +465,7 @@ public class PoddServletHelperTest
         final SSHService sshd = new SSHService();
         try
         {
-            sshd.startTestSSHServer(9856);
+            sshd.startTestSSHServer(9856, this.tempDirectory.newFolder());
             // first, load an artifact using the inner-load method
             final InputStream in =
                     this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");

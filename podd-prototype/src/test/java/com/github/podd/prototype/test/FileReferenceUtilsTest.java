@@ -8,7 +8,9 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
@@ -30,6 +32,9 @@ import com.github.podd.prototype.SshFileReference;
 
 public class FileReferenceUtilsTest
 {
+    @Rule
+    public TemporaryFolder tempDirectory = new TemporaryFolder();
+    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     protected FileReferenceUtils utils;
@@ -143,7 +148,7 @@ public class FileReferenceUtilsTest
         final SSHService sshd = new SSHService();
         try
         {
-            sshd.startTestSSHServer(9856);
+            sshd.startTestSSHServer(9856, this.tempDirectory.newFolder());
             
             final SshFileReference sshFileRef = new SshFileReference();
             sshFileRef.setArtifactUri(null);

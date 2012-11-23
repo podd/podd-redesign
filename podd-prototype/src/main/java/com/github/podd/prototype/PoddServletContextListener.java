@@ -1,7 +1,6 @@
 package com.github.podd.prototype;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -41,7 +40,7 @@ public class PoddServletContextListener implements ServletContextListener
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private String poddHomeDir;
+    // private String poddHomeDir;
     
     @Override
     public void contextInitialized(final ServletContextEvent sce)
@@ -53,13 +52,14 @@ public class PoddServletContextListener implements ServletContextListener
         try
         {
             // poddHomeDir = System.getProperty("podd.home");
-            this.poddHomeDir =
-                    sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_PODD_CONFIG_DIR);
-            if(this.poddHomeDir == null || this.poddHomeDir.trim().length() <= 0)
-            {
-                throw new PoddException("PODD Home Directory not set.", null, -1);
-            }
-            System.out.println("********************************* podd.home is" + this.poddHomeDir);
+            // this.poddHomeDir =
+            // sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_PODD_CONFIG_DIR);
+            // if(this.poddHomeDir == null || this.poddHomeDir.trim().length() <= 0)
+            // {
+            // throw new PoddException("PODD Home Directory not set.", null, -1);
+            // }
+            // System.out.println("********************************* podd.home is" +
+            // this.poddHomeDir);
             this.initializeAuthenticationService(sce);
             
             // final String sesameServer =
@@ -68,8 +68,9 @@ public class PoddServletContextListener implements ServletContextListener
             // sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_REPOSITORY);
             
             final Repository nextRepository =
-                    new SailRepository(new NativeStore(new File(this.poddHomeDir + File.separatorChar + "native"),
-                            "spoc,posc,cspo,cpso,psoc,ospc,opsc,cops"));
+                    new SailRepository(new NativeStore(new File(sce.getServletContext()
+                            .getAttribute("javax.servlet.context.tempdir").toString()
+                            + File.separatorChar + "native"), "spoc,posc,cspo,cpso,psoc,ospc,opsc,cops"));
             nextRepository.initialize();
             
             helper.setUp(nextRepository);
@@ -123,21 +124,17 @@ public class PoddServletContextListener implements ServletContextListener
      */
     private void initializeAuthenticationService(final ServletContextEvent sce) throws PoddException
     {
-        String passwordFile = sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_PASSWORD_FILE);
+        final String passwordFile =
+                sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_PASSWORD_FILE);
         if(passwordFile == null || passwordFile.trim().length() < 1)
         {
             throw new PoddException("Password file not specified.", null, -1);
         }
         
-        // TODO: add support for Windows OS paths
-        if(!passwordFile.startsWith("/"))
-        {
-            passwordFile = this.poddHomeDir + File.separatorChar + passwordFile;
-        }
         final Properties passwords = new Properties();
         try
         {
-            passwords.load(new FileInputStream(passwordFile));
+            passwords.load(this.getClass().getResourceAsStream(passwordFile));
         }
         catch(final IOException e)
         {

@@ -61,7 +61,7 @@ public class FileReferenceAttachServlet extends PoddBaseServlet
         catch(IOException | PoddException e)
         {
             final String message = "Referenced file is not valid. " + e.getMessage();
-            this.log.error(message);
+            this.log.error(message, e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, message + e.getMessage());
             return;
         }

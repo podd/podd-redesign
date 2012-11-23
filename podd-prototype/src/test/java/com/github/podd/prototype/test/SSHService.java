@@ -3,8 +3,13 @@
  */
 package com.github.podd.prototype.test;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +39,7 @@ public class SSHService
     private SshServer server;
     private boolean serverRunning = false;
     
-    private final String hostkey = "src/test/resources/test/hostkey.pem";
+    private final String hostkey = "/test/hostkey.pem";
     
     /**
      * Start an SSH service on the specified port. If the port is below 1024, a random available
@@ -44,7 +49,7 @@ public class SSHService
      * @return
      * @throws Exception
      */
-    public int startTestSSHServer(int port) throws Exception
+    public int startTestSSHServer(int port, final File tempDirectory) throws Exception
     {
         if(port < 1024)
         {
@@ -53,9 +58,20 @@ public class SSHService
         this.server = SshServer.setUpDefaultServer();
         this.server.setPort(port);
         
+        final InputStream input = this.getClass().getResourceAsStream(this.hostkey);
+        
+        if(input == null)
+        {
+            throw new IllegalArgumentException("Test SSH Server Host key was not found");
+        }
+        // Copy the host key file out to a temporary directory so that the server can lock it as
+        // required and cannot modify the test resource
+        final Path tempFile = Files.createTempFile(tempDirectory.toPath(), "podd-test-ssh-hostkey-", ".pem");
+        Files.copy(input, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        
         this.server.setCommandFactory(new ScpCommandFactory());
         this.server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("hostkey.ser"));
-        this.server.setKeyPairProvider(new FileKeyPairProvider(new String[] { this.hostkey }));
+        this.server.setKeyPairProvider(new FileKeyPairProvider(new String[] { tempFile.toString() }));
         this.server.setPasswordAuthenticator(new PasswordAuthenticator()
             {
                 @Override

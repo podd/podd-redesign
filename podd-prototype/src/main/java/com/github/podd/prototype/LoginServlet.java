@@ -36,11 +36,13 @@ public class LoginServlet extends PoddBaseServlet
         
         if(PoddBaseServlet.HTTP_POST.equals(httpMethod) && servletPath.startsWith("/login"))
         {
+            this.log.info("Login requested");
+            
             final String username = request.getParameter("username");
             
             if(username == null)
             {
-                this.log.info("Did not receive a username parameter {}", request.getParameterMap());
+                this.log.error("Did not receive a username parameter {}", request.getParameterMap());
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -49,14 +51,14 @@ public class LoginServlet extends PoddBaseServlet
             
             if(password == null)
             {
-                this.log.info("Did not receive a password parameter {}", request.getParameterMap());
+                this.log.error("Did not receive a password parameter {}", request.getParameterMap());
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
             
             if(!this.checkCredentials(username, password))
             {
-                this.log.info("Failed login attempt for " + username);
+                this.log.error("Failed login attempt for " + username);
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Login failed");
                 return;
             }
@@ -71,7 +73,7 @@ public class LoginServlet extends PoddBaseServlet
         }
         else if(PoddBaseServlet.HTTP_GET.equals(httpMethod) && servletPath.startsWith("/logout"))
         {
-            this.log.debug("Logout requested");
+            this.log.info("Logout requested");
             if(this.isValidSession(request, response))
             {
                 request.getSession().invalidate();

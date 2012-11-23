@@ -22,6 +22,16 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
     protected Client client = null;
     
     /**
+     * Get a Restlet Client instance with which web service requests can be made.
+     * 
+     * @return
+     */
+    protected Client getClient()
+    {
+        return this.client;
+    }
+    
+    /**
      * Logs in the user with the given username and password using whatever method matches the
      * integration test implementing this method.
      * 
@@ -50,8 +60,8 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
         this.BASE_URL = "http://localhost:9090/podd-test";
         this.client = new Client(Protocol.HTTP);
         
-        final InputStream passwdStream = this.getClass().getResourceAsStream("/integration/passwd");
-        Assert.assertNotNull("test properties file was not found", passwdStream);
+        final InputStream passwdStream = this.getClass().getResourceAsStream("/integrationtest/passwd");
+        Assert.assertNotNull("Test password file was not found", passwdStream);
         final Properties passwords = new Properties();
         passwords.load(passwdStream);
         Assert.assertTrue("Could not read test user details", passwords.size() > 0);
@@ -64,7 +74,7 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
         }
         
         // Assert alias file exists
-        final InputStream aliasStream = this.getClass().getResourceAsStream("/integration/alias");
+        final InputStream aliasStream = this.getClass().getResourceAsStream("/integrationtest/alias.ttl");
         Assert.assertNotNull("test alias file was not found", aliasStream);
     }
     
@@ -86,15 +96,5 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
         {
             this.log.error("Found exception in tearDown after test", ex);
         }
-    }
-    
-    /**
-     * Get a Restlet Client instance with which web service requests can be made.
-     * 
-     * @return
-     */
-    protected Client getClient()
-    {
-        return this.client;
     }
 }
