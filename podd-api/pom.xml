@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.podd</groupId>
         <artifactId>podd-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1</version>
     </parent>
     <artifactId>podd-api</artifactId>
     <name>PODD API</name>
