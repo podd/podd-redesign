@@ -1,8 +1,12 @@
 package com.github.podd.prototype.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import junit.framework.Assert;
 
@@ -230,7 +234,12 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         try
         {
-            sshd.startTestSSHServer(9856, this.tempDirectory.newFolder());
+            File tempFolder = this.tempDirectory.newFolder();
+            InputStream testUploadedFile = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+            final Path tempFile = Files.createTempFile(tempFolder.toPath(), "basicProject-1", ".rdf");
+            Files.copy(testUploadedFile, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            
+            sshd.startTestSSHServer(9856, tempFolder);
             
             // -- login and add an artifact
             final InputStream input =
@@ -255,8 +264,8 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
             form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
             form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
             form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "localssh");
-            form.add(FileReferenceUtils.KEY_FILE_PATH, "src/test/resources/test/artifacts");
-            form.add(FileReferenceUtils.KEY_FILE_NAME, "basicProject-1.rdf");
+            form.add(FileReferenceUtils.KEY_FILE_PATH, tempFolder.toPath().toAbsolutePath().toString());
+            form.add(FileReferenceUtils.KEY_FILE_NAME, tempFile.getFileName().toString());
             form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION,
                     "Refers to one of the test artifacts, to be accessed through an ssh server");
             
@@ -276,7 +285,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
             Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseAfterAttachResponse.getStatus().getCode());
             final String modifiedRdfString = getBaseAfterAttachResponse.getEntityAsText();
             
-            Assert.assertTrue(modifiedRdfString.contains("basicProject-1.rdf"));
+            Assert.assertTrue(modifiedRdfString.contains( tempFile.getFileName().toString()));
             Assert.assertEquals(41, this.getStatementCount(modifiedRdfString));
         }
         finally
