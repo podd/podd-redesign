@@ -76,7 +76,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <systemPropertiesFile>${basedir}/target/test-classes/test-podd.properties</systemPropertiesFile>
                     <includes>
                         <include>**/*IntegrationTest.java</include>
                     </includes>
@@ -102,7 +101,6 @@
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>
-                    <systemPropertiesFile>${basedir}/target/test-classes/test-podd.properties</systemPropertiesFile>
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                     <stopKey>foo</stopKey>
                     <stopPort>9999</stopPort>
