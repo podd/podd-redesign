@@ -3,17 +3,17 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-    <display-name>Archetype Created Web Application</display-name>
+    <display-name>PODD Prototype CSIRO HRPPC</display-name>
     <listener>
         <listener-class>com.github.podd.prototype.PoddServletContextListener</listener-class>
     </listener>
     <context-param>
         <param-name>passwdfile</param-name>
-        <param-value>passwd</param-value>
+        <param-value>/csiroconfig/passwd</param-value>
     </context-param>
     <context-param>
         <param-name>aliasfile</param-name>
-        <param-value>alias</param-value>
+        <param-value>/csiroconfig/alias.ttl</param-value>
     </context-param>
     <context-param>
         <param-name>sesame-server</param-name>

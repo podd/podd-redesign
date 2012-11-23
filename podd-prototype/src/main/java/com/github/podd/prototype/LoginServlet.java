@@ -1,6 +1,5 @@
 package com.github.podd.prototype;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
@@ -18,10 +17,6 @@ import javax.servlet.http.HttpSession;
  */
 public class LoginServlet extends PoddBaseServlet
 {
-    
-    // Check whether this behaves as expected
-    private static Properties passwords;
-    private static long passwordsLoadedAt = -1;
     
     /**
      */
@@ -41,11 +36,13 @@ public class LoginServlet extends PoddBaseServlet
         
         if(PoddBaseServlet.HTTP_POST.equals(httpMethod) && servletPath.startsWith("/login"))
         {
+            this.log.info("Login requested");
+            
             final String username = request.getParameter("username");
             
             if(username == null)
             {
-                this.log.info("Did not receive a username parameter {}", request.getParameterMap());
+                this.log.error("Did not receive a username parameter {}", request.getParameterMap());
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -54,14 +51,14 @@ public class LoginServlet extends PoddBaseServlet
             
             if(password == null)
             {
-                this.log.info("Did not receive a password parameter {}", request.getParameterMap());
+                this.log.error("Did not receive a password parameter {}", request.getParameterMap());
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
             
             if(!this.checkCredentials(username, password))
             {
-                this.log.info("Failed login attempt for " + username);
+                this.log.error("Failed login attempt for " + username);
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Login failed");
                 return;
             }
@@ -76,7 +73,7 @@ public class LoginServlet extends PoddBaseServlet
         }
         else if(PoddBaseServlet.HTTP_GET.equals(httpMethod) && servletPath.startsWith("/logout"))
         {
-            this.log.debug("Logout requested");
+            this.log.info("Logout requested");
             if(this.isValidSession(request, response))
             {
                 request.getSession().invalidate();
@@ -103,10 +100,12 @@ public class LoginServlet extends PoddBaseServlet
         {
             return false;
         }
-        this.loadPasswordFile();
-        if(LoginServlet.passwords.containsKey(userid))
+        final Properties passwords =
+                (Properties)this.getServletContext().getAttribute(PoddServletContextListener.PODD_PASSWORDS);
+        
+        if(passwords.containsKey(userid))
         {
-            final String expectedPassword = LoginServlet.passwords.getProperty(userid);
+            final String expectedPassword = passwords.getProperty(userid);
             if(expectedPassword.equals(password))
             {
                 return true;
@@ -114,28 +113,6 @@ public class LoginServlet extends PoddBaseServlet
         }
         
         return false;
-    }
-    
-    private void loadPasswordFile()
-    {
-        if((System.currentTimeMillis() - LoginServlet.passwordsLoadedAt) < 60000)
-        {
-            return;
-        }
-        
-        final String passwordFile =
-                (String)this.getServletContext().getAttribute(PoddServletContextListener.PODD_PASSWORD_FILE);
-        
-        LoginServlet.passwords = new Properties();
-        try
-        {
-            LoginServlet.passwords.load(new FileInputStream(passwordFile));
-        }
-        catch(final Exception e)
-        {
-            this.log.error("Failed to load passwords", e);
-        }
-        LoginServlet.passwordsLoadedAt = System.currentTimeMillis();
     }
     
 }

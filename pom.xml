@@ -12,6 +12,8 @@
 
     <modules>
         <module>podd-prototype</module>
+        <module>podd-integrationtest</module>
+        <module>podd-prototype-csiro</module>
         <module>podd-api</module>
         <module>podd-webapp-lib</module>
     </modules>
@@ -191,13 +193,11 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.17</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>

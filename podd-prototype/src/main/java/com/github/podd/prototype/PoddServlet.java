@@ -64,7 +64,7 @@ public class PoddServlet extends PoddBaseServlet
             {
                 final String loadedArtifactUri = helper.loadPoddArtifact(in, contentType);
                 response.setContentType(PoddServlet.MIME_TYPE_JSON);
-                out.write(loadedArtifactUri); //should be encapsulated in JSON format
+                out.write(loadedArtifactUri); // should be encapsulated in JSON format
             }
             catch(final Exception e)
             {

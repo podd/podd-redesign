@@ -23,8 +23,8 @@ public class PoddException extends Exception
     
     private static final long serialVersionUID = 804321L;
     
-    private Object details;
-    private int code;
+    private final Object details;
+    private final int code;
     
     /**
      * Create a new <code>PoddException</code> with details.
@@ -39,6 +39,23 @@ public class PoddException extends Exception
     public PoddException(final String msg, final Object details, final int code)
     {
         super(msg);
+        this.details = details;
+        this.code = code;
+    }
+    
+    /**
+     * Create a new <code>PoddException</code> with details.
+     * 
+     * @param msg
+     *            A message describing the Exception.
+     * @param details
+     *            An object containing details of the underlying cause.
+     * @param code
+     *            A numeric code describing the Exception.
+     */
+    public PoddException(final String msg, final Throwable cause, final Object details, final int code)
+    {
+        super(msg, cause);
         this.details = details;
         this.code = code;
     }

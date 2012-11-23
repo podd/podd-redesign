@@ -18,25 +18,30 @@ public class SshFileReference extends FileReference
     
     public String getFilename()
     {
-        return filename;
+        return this.filename;
     }
-    public void setFilename(String filename)
+    
+    public void setFilename(final String filename)
     {
         this.filename = filename;
     }
+    
     public String getPath()
     {
-        return path;
+        return this.path;
     }
-    public void setPath(String path)
+    
+    public void setPath(final String path)
     {
         this.path = path;
     }
+    
     public String getDescription()
     {
-        return description;
+        return this.description;
     }
-    public void setDescription(String description)
+    
+    public void setDescription(final String description)
     {
         this.description = description;
     }
@@ -55,12 +60,12 @@ public class SshFileReference extends FileReference
     @Override
     public String toString()
     {
-        StringBuilder b = new StringBuilder();
+        final StringBuilder b = new StringBuilder();
         b.append(super.toString());
         b.append(" path=");
-        b.append(path);
+        b.append(this.path);
         b.append(" filename=");
-        b.append(filename);
+        b.append(this.filename);
         return b.toString();
     }
     

@@ -124,7 +124,8 @@ public class PoddOntologyProfileTest
                 parsedOntology =
                         this.manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(this.getClass()
                                 .getResourceAsStream(this.ontologyResourcePath), new RDFXMLOntologyFormatFactory()));
-                Assert.assertTrue("Profile that failed: "+nextInProfile.toQuotedString(), this.runConsistencyCheck(nextInProfile, parsedOntology));
+                Assert.assertTrue("Profile that failed: " + nextInProfile.toQuotedString(),
+                        this.runConsistencyCheck(nextInProfile, parsedOntology));
             }
             finally
             {
@@ -198,7 +199,7 @@ public class PoddOntologyProfileTest
         
         if(this.log.isTraceEnabled())
         {
-            ArrayList<String> violations = new ArrayList<String>();
+            final ArrayList<String> violations = new ArrayList<String>();
             
             for(final OWLProfileViolation violation : report.getViolations())
             {
@@ -207,7 +208,7 @@ public class PoddOntologyProfileTest
             
             Collections.sort(violations);
             
-            for(String nextViolation : violations)
+            for(final String nextViolation : violations)
             {
                 this.log.trace(nextViolation);
             }

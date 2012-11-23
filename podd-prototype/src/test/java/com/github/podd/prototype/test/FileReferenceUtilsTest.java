@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
@@ -31,22 +32,29 @@ import com.github.podd.prototype.SshFileReference;
 
 public class FileReferenceUtilsTest
 {
-    protected Logger log = LoggerFactory.getLogger(this.getClass());
+    @Rule
+    public TemporaryFolder tempDirectory = new TemporaryFolder();
+    
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     protected FileReferenceUtils utils;
     
     @Before
     public void setUp() throws Exception
     {
-        this.utils = new FileReferenceUtils();
+        final InputStream inputStream = this.getClass().getResourceAsStream("/test/alias.ttl");
+        Assert.assertNotNull("Could not find alias file", inputStream);
         
-        this.utils.initialize("src/test/resources/test/alias.txt");
+        this.utils = new FileReferenceUtils();
+        this.log.info("About to set aliases");
+        this.utils.setAliases(inputStream, RDFFormat.TURTLE);
+        this.log.info("Finished setting aliases");
     }
     
     @After
     public void tearDown() throws Exception
     {
-        this.utils.clean();
+        this.utils = null;
     }
     
     @Test
@@ -140,7 +148,7 @@ public class FileReferenceUtilsTest
         final SSHService sshd = new SSHService();
         try
         {
-            sshd.startTestSSHServer(9856);
+            sshd.startTestSSHServer(9856, this.tempDirectory.newFolder());
             
             final SshFileReference sshFileRef = new SshFileReference();
             sshFileRef.setArtifactUri(null);

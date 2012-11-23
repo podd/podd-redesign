@@ -40,7 +40,9 @@ public class FileReferenceAttachServlet extends PoddBaseServlet
         }
         
         this.log.info("REFERENCE attach");
-        final FileReferenceUtils utils = FileReferenceUtils.getInstance();
+        final FileReferenceUtils utils =
+                ((PoddServletHelper)this.getServletContext().getAttribute(
+                        PoddServletContextListener.PODD_SERVLET_HELPER)).getFileReferenceUtils();
         
         final FileReference fileReference = utils.constructFileReferenceFromMap(request.getParameterMap());
         
@@ -59,7 +61,7 @@ public class FileReferenceAttachServlet extends PoddBaseServlet
         catch(IOException | PoddException e)
         {
             final String message = "Referenced file is not valid. " + e.getMessage();
-            this.log.error(message);
+            this.log.error(message, e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, message + e.getMessage());
             return;
         }

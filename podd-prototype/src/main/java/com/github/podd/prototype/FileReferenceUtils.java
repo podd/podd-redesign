@@ -5,30 +5,40 @@ package com.github.podd.prototype;
 
 import info.aduna.iteration.Iterations;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.FileAttributes;
 import net.schmizz.sshj.sftp.SFTPClient;
 
+import org.openrdf.model.Graph;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.GraphImpl;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +51,28 @@ import org.slf4j.LoggerFactory;
  */
 public class FileReferenceUtils
 {
+    public static final URI PODD_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "FileRepository");
+    public static final URI PODD_HTTP_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "HttpFileRepository");
+    public static final URI PODD_SSH_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "SshFileRepository");
+    
+    public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryAlias");
+    public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryProtocol");
+    public static final URI PODD_FILE_REPOSITORY_HOST = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryHost");
+    public static final URI PODD_FILE_REPOSITORY_PORT = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryPort");
+    public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryFingerprint");
+    public static final URI PODD_FILE_REPOSITORY_USERNAME = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryUsername");
+    public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(
+            "http://purl.org/podd/ns/poddBase#", "hasFileRepositorySecret");
+    
     public static final String KEY_FILE_REF_TYPE = "file_reference_type";
     public static final String KEY_OBJECT_URI = "object_uri";
     public static final String KEY_ARTIFACT_URI = "artifact_uri";
@@ -49,33 +81,148 @@ public class FileReferenceUtils
     public static final String KEY_FILE_PATH = "file_path";
     public static final String KEY_FILE_SERVER_ALIAS = "file_server_alias";
     
-    protected Logger log = LoggerFactory.getLogger(this.getClass());
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private static FileReferenceUtils instance = new FileReferenceUtils();
+    private final ConcurrentMap<String, PoddAlias> aliases = new ConcurrentHashMap<String, PoddAlias>();
     
-    private Properties aliases = new Properties();
-    private long aliasesLoadedAt;
-    private String aliasFilePath;
-    
-    public FileReferenceUtils()
+    public void setAliases(final InputStream inputStream, final RDFFormat format) throws RepositoryException,
+        RDFParseException, IOException
     {
-    }
-    
-    public static FileReferenceUtils getInstance()
-    {
-        return FileReferenceUtils.instance;
-    }
-    
-    public void initialize(final String aliasFilePath)
-    {
-        this.aliasFilePath = aliasFilePath;
-    }
-    
-    public void clean()
-    {
-        this.aliasFilePath = null;
-        this.aliases = new Properties();
-        this.aliasesLoadedAt = -1;
+        final Repository repository = new SailRepository(new MemoryStore());
+        repository.initialize();
+        
+        final RepositoryConnection connection = repository.getConnection();
+        connection.setAutoCommit(true);
+        
+        try
+        {
+            connection.add(inputStream, "", format);
+            
+            final RepositoryResult<Statement> statements =
+                    connection.getStatements(null, RDF.TYPE, FileReferenceUtils.PODD_FILE_REPOSITORY, true);
+            
+            while(statements.hasNext())
+            {
+                final Statement next = statements.next();
+                
+                this.log.info("Next alias: {}", next);
+                
+                final Graph newGraph =
+                        new GraphImpl(connection.getStatements(next.getSubject(), null, null, true).asList());
+                
+                String aliasString = null;
+                
+                final Iterator<Statement> aliasIterator =
+                        newGraph.match(next.getSubject(), FileReferenceUtils.PODD_FILE_REPOSITORY_ALIAS, null);
+                
+                if(!aliasIterator.hasNext())
+                {
+                    this.log.error("Could not find an alias for : {}", next.getSubject());
+                    continue;
+                }
+                else
+                {
+                    aliasString = aliasIterator.next().getObject().stringValue();
+                }
+                
+                if(newGraph.match(next.getSubject(), RDF.TYPE, FileReferenceUtils.PODD_HTTP_FILE_REPOSITORY).hasNext())
+                {
+                    final PoddHttpAlias nextAlias = new PoddHttpAlias(aliasString);
+                    
+                    for(final Statement nextStatement : newGraph)
+                    {
+                        if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_HOST))
+                        {
+                            nextAlias.setHost(nextStatement.getObject().stringValue());
+                        }
+                        else if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_PORT))
+                        {
+                            nextAlias.setPort(nextStatement.getObject().stringValue());
+                        }
+                        else if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_PROTOCOL))
+                        {
+                            nextAlias.setProtocol(nextStatement.getObject().stringValue());
+                        }
+                        else if(nextStatement.getPredicate().equals(RDF.TYPE))
+                        {
+                            // ignore the rdf.type at this stage
+                        }
+                        else if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_ALIAS))
+                        {
+                            // ignore the alias as we have already found it
+                        }
+                        else
+                        {
+                            this.log.warn("Did not recognise http repository predicate: {}", nextStatement);
+                        }
+                    }
+                    
+                    final PoddAlias putIfAbsent = this.aliases.putIfAbsent(aliasString, nextAlias);
+                    
+                    if(putIfAbsent != null)
+                    {
+                        this.log.error("Found duplicate alias: {} existing={}", next, putIfAbsent);
+                    }
+                }
+                else if(newGraph.match(next.getSubject(), RDF.TYPE, FileReferenceUtils.PODD_SSH_FILE_REPOSITORY)
+                        .hasNext())
+                {
+                    final PoddSshAlias nextAlias = new PoddSshAlias(aliasString);
+                    
+                    for(final Statement nextStatement : newGraph)
+                    {
+                        if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_HOST))
+                        {
+                            nextAlias.setHost(nextStatement.getObject().stringValue());
+                        }
+                        else if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_PORT))
+                        {
+                            nextAlias.setPort(nextStatement.getObject().stringValue());
+                        }
+                        else if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_PROTOCOL))
+                        {
+                            nextAlias.setProtocol(nextStatement.getObject().stringValue());
+                        }
+                        else if(nextStatement.getPredicate()
+                                .equals(FileReferenceUtils.PODD_FILE_REPOSITORY_FINGERPRINT))
+                        {
+                            nextAlias.setFingerprint(nextStatement.getObject().stringValue());
+                        }
+                        else if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_SECRET))
+                        {
+                            nextAlias.setSecret(nextStatement.getObject().stringValue());
+                        }
+                        else if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_USERNAME))
+                        {
+                            nextAlias.setUsername(nextStatement.getObject().stringValue());
+                        }
+                        else if(nextStatement.getPredicate().equals(RDF.TYPE))
+                        {
+                            // ignore the rdf.type at this stage
+                        }
+                        else if(nextStatement.getPredicate().equals(FileReferenceUtils.PODD_FILE_REPOSITORY_ALIAS))
+                        {
+                            // ignore the alias as we have already found it
+                        }
+                        else
+                        {
+                            this.log.warn("Did not recognise ssh repository predicate: {}", nextStatement);
+                        }
+                    }
+                    
+                    final PoddAlias putIfAbsent = this.aliases.putIfAbsent(aliasString, nextAlias);
+                    
+                    if(putIfAbsent != null)
+                    {
+                        this.log.error("Found duplicate alias: {} existing={}", next, putIfAbsent);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            connection.close();
+        }
     }
     
     /**
@@ -164,6 +311,11 @@ public class FileReferenceUtils
      */
     public void checkFileExists(final FileReference fileReference) throws IOException, PoddException
     {
+        if(this.aliases == null || this.aliases.isEmpty())
+        {
+            throw new PoddException("Aliases not found", this.aliases, -1);
+        }
+        
         if(fileReference instanceof SshFileReference)
         {
             this.checkFileExists((SshFileReference)fileReference);
@@ -180,18 +332,34 @@ public class FileReferenceUtils
     
     private void checkFileExists(final HttpFileReference httpFileRef) throws IOException, PoddException
     {
-        this.loadAliases();
+        if(httpFileRef.getServerAlias() == null)
+        {
+            throw new IllegalArgumentException("Cannot check for a file reference without a server alias");
+        }
         
-        final String host = this.aliases.getProperty(httpFileRef.getServerAlias() + ".host");
-        final String protocol = this.aliases.getProperty(httpFileRef.getServerAlias() + ".protocol");
-        // String username = aliases.getProperty(serverAlias + ".username");
-        // String password = aliases.getProperty(serverAlias + ".password");
+        final PoddAlias nextAlias = this.aliases.get(httpFileRef.getServerAlias());
+        
+        if(nextAlias == null)
+        {
+            throw new PoddException("No entry for the alias: " + httpFileRef.getServerAlias(), null, -1);
+        }
+        
+        if(!(nextAlias instanceof PoddHttpAlias))
+        {
+            throw new PoddException("Server Alias was not an HTTP Repository: " + httpFileRef.getServerAlias(), null,
+                    -1);
+        }
+        
+        final PoddHttpAlias nextHttpAlias = (PoddHttpAlias)nextAlias;
+        final String host = nextHttpAlias.getHost();
+        final String protocol = nextHttpAlias.getProtocol();
         
         if(host == null || protocol == null)
         {
             throw new PoddException("No entry for the alias: " + httpFileRef.getServerAlias(), null, -1);
         }
         
+        // TODO: Make this into a method in PoddAlias
         final String urlString =
                 protocol + "://" + host + "/" + httpFileRef.getPath() + "/" + httpFileRef.getFilename();
         
@@ -214,12 +382,29 @@ public class FileReferenceUtils
     
     private void checkFileExists(final SshFileReference sshFileRef) throws IOException, PoddException
     {
-        this.loadAliases();
-        final String host = this.aliases.getProperty(sshFileRef.getServerAlias() + ".host");
-        final String port = this.aliases.getProperty(sshFileRef.getServerAlias() + ".port");
-        final String fingerprint = this.aliases.getProperty(sshFileRef.getServerAlias() + ".fingerprint");
-        final String username = this.aliases.getProperty(sshFileRef.getServerAlias() + ".username");
-        final String secret = this.aliases.getProperty(sshFileRef.getServerAlias() + ".secret");
+        if(sshFileRef.getServerAlias() == null)
+        {
+            throw new IllegalArgumentException("Cannot check for a file reference without a server alias");
+        }
+        
+        final PoddAlias nextAlias = this.aliases.get(sshFileRef.getServerAlias());
+        
+        if(nextAlias == null)
+        {
+            throw new PoddException("No entry for the alias: " + sshFileRef.getServerAlias(), null, -1);
+        }
+        
+        if(!(nextAlias instanceof PoddSshAlias))
+        {
+            throw new PoddException("Server Alias was not an SSH Repository: " + sshFileRef.getServerAlias(), null, -1);
+        }
+        
+        final PoddSshAlias nextSshAlias = (PoddSshAlias)nextAlias;
+        final String host = nextSshAlias.getHost();
+        final String port = nextSshAlias.getPort();
+        final String fingerprint = nextSshAlias.getFingerprint();
+        final String username = nextSshAlias.getUsername();
+        final String secret = nextSshAlias.getSecret();
         
         if(host == null || port == null)
         {
@@ -483,26 +668,6 @@ public class FileReferenceUtils
             // FIXME: Create a subclass of PoddException for these errors
             throw new PoddException("Invalid File Reference(s) found.", errors, -1);
         }
-    }
-    
-    private void loadAliases() throws IOException
-    {
-        if((System.currentTimeMillis() - this.aliasesLoadedAt) < 60000)
-        {
-            return;
-        }
-        
-        try
-        {
-            this.aliases.load(new FileInputStream(this.aliasFilePath));
-        }
-        catch(final IOException | NullPointerException e)
-        {
-            final String message = "Failed to load aliases from " + this.aliasFilePath;
-            this.log.error(message, e);
-            throw new IOException(message, e);
-        }
-        this.aliasesLoadedAt = System.currentTimeMillis();
     }
     
 }

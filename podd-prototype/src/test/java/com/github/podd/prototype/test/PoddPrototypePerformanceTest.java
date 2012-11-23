@@ -52,7 +52,7 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
     
     private String poddBasePath;
     private String poddSciencePath;
-
+    
     /**
      * log4j logger which writes to the statistics file.
      */
@@ -67,7 +67,7 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
             OWLParserFactoryRegistry.getInstance().getAll();
             OWLOntologyStorerFactoryRegistry.getInstance().getAll();
             OWLProfileRegistry.getInstance().getAll();
-            OWLReasonerFactoryRegistry.getInstance().getAll();        
+            OWLReasonerFactoryRegistry.getInstance().getAll();
         }
     }
     
@@ -130,7 +130,8 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
     {
         final Object[][] data =
                 new Object[][] {
-                        { "/test/artifacts/plant-1k-objects.rdf", true }, //take care of the cold start
+                        { "/test/artifacts/plant-1k-objects.rdf", true }, // take care of the cold
+                                                                          // start
                         { "/test/artifacts/plant-1k-objects.rdf", true },
                         { "/test/artifacts/plant-3k-objects.rdf", true },
                         { "/test/artifacts/plant-10k-objects.rdf", true },
@@ -167,20 +168,20 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
         this.statsLogger.info(this.filename.substring(this.filename.lastIndexOf('/') + 1) + ",");
         
         final long startedAt = System.currentTimeMillis();
-        InferredOWLOntologyID inferred = this.utils.loadPoddArtifact(
-                this.filename, mimeType, this.getTestRepositoryConnection());
+        final InferredOWLOntologyID inferred =
+                this.utils.loadPoddArtifact(this.filename, mimeType, this.getTestRepositoryConnection());
         
         this.getTestRepositoryConnection().commit();
         
         // write statistics
-        StringBuilder statsMsg = new StringBuilder();
+        final StringBuilder statsMsg = new StringBuilder();
         
         // time to load (ms)
         statsMsg.append((System.currentTimeMillis() - startedAt));
         statsMsg.append(',');
         
         // ontology statement count
-        statsMsg.append(this.getTestRepositoryConnection().size(inferred.getVersionIRI().toOpenRDFURI())); 
+        statsMsg.append(this.getTestRepositoryConnection().size(inferred.getVersionIRI().toOpenRDFURI()));
         statsMsg.append(',');
         
         // inferred statement count
