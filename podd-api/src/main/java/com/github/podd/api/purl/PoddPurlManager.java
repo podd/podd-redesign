@@ -9,17 +9,49 @@ import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 
 /**
+ * A manager object used to manage conversion of temporary URIs to Permanent URLs as required by PODD. 
+ *
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
 public interface PoddPurlManager
 {
+    /**
+     * Convert the temporary URIs from the RepositoryConnection in the given contexts to PURLs.
+     * 
+     * @param purlResults
+     *            Set of PurlReferences containing temporary URIs and their corresponding PURLs
+     * @param repositoryConnection
+     *            The RepositoryConnection in which temporary URIs need to be replaced
+     * @param contexts
+     *            The contexts in the Repository to be considered
+     */
+    void convertTemporaryUris(Set<PoddPurlReference> purlResults, RepositoryConnection repositoryConnection,
+            URI... contexts);
     
-    void convertTemporaryUris(Set<PoddPurlReference> purlResults, RepositoryConnection conn, URI... contexts);
+    /**
+     * Identify temporary URIs from the RepositoryConnection (in the given contexts) and generate
+     * PURLs for them.
+     * 
+     * @param repositoryConnection
+     * @param contexts
+     *            The contexts in the Repository to be considered
+     * @return A set of PoddPurlReferences containing the extracted temporary URIs and the PURLs
+     *         generated for them
+     */
+    Set<PoddPurlReference> extractPurlReferences(RepositoryConnection repositoryConnection, URI... contexts);
     
-    Set<PoddPurlReference> extractPurlReferences(RepositoryConnection tempConn, URI... contexts);
+    /**
+     * Retrieve the <code>PodPurlProcessorFactoryRegistry</code> assigned to this Manager.
+     * 
+     * @return
+     */
+    PoddPurlProcessorFactoryRegistry getPurlProcessorFactoryRegistry();
     
-    PoddPurlProcessorFactoryRegistry getProcessorFactoryRegistry();
-    
-    void setPurlFactoryRegistry(PoddPurlProcessorFactoryRegistry testPurlRegistry);
+    /**
+     * Set the  the <code>PodPurlProcessorFactoryRegistry</code> for this Manager.
+     * 
+     * @param purlProcessorFactoryRegistry
+     */
+    void setPurlProcessorFactoryRegistry(PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry);
 }
