@@ -11,6 +11,7 @@ import javax.servlet.ServletContextListener;
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
@@ -32,11 +33,10 @@ public class PoddServletContextListener implements ServletContextListener
     public static final String PODD_PASSWORDS = "PODD_PASSWDS";
     public static final String PODD_ALIASES = "PODD_ALIASES";
     
-    private static final String INIT_PODD_CONFIG_DIR = "podd_config_dir";
     private static final String INIT_PASSWORD_FILE = "passwdfile";
     private static final String INIT_ALIAS_FILE = "aliasfile";
-    // private static final String INIT_SESAME_SERVER = "sesame-server";
-    // private static final String INIT_SESAME_REPOSITORY = "sesame-repository-id";
+    private static final String INIT_SESAME_SERVER = "sesame-server";
+    private static final String INIT_SESAME_REPOSITORY = "sesame-repository-id";
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -51,27 +51,29 @@ public class PoddServletContextListener implements ServletContextListener
         final PoddServletHelper helper = new PoddServletHelper();
         try
         {
-            // poddHomeDir = System.getProperty("podd.home");
-            // this.poddHomeDir =
-            // sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_PODD_CONFIG_DIR);
-            // if(this.poddHomeDir == null || this.poddHomeDir.trim().length() <= 0)
-            // {
-            // throw new PoddException("PODD Home Directory not set.", null, -1);
-            // }
-            // System.out.println("********************************* podd.home is" +
-            // this.poddHomeDir);
             this.initializeAuthenticationService(sce);
             
-            // final String sesameServer =
-            // sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_SERVER);
-            // final String repositoryID =
-            // sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_REPOSITORY);
-            
-            final Repository nextRepository =
-                    new SailRepository(new NativeStore(new File(sce.getServletContext()
-                            .getAttribute("javax.servlet.context.tempdir").toString()
-                            + File.separatorChar + "native"), "spoc,posc,cspo,cpso,psoc,ospc,opsc,cops"));
-            nextRepository.initialize();
+             final String sesameServer =
+             sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_SERVER);
+             final String repositoryID =
+             sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_REPOSITORY);
+
+             Repository nextRepository = null;
+             if (sesameServer != null && repositoryID != null && sesameServer.trim().length() > 0 
+                     && repositoryID.trim().length() > 0) 
+             {
+                 nextRepository = new HTTPRepository(sesameServer, repositoryID);
+                 this.log.info("Using remote RDF Repository: " + sesameServer + ", " + repositoryID);
+             }
+             else
+             {
+                 String nativeStoreDir = sce.getServletContext().getAttribute("javax.servlet.context.tempdir").toString()
+                         + File.separatorChar + "native";
+                 this.log.warn("No remote RDF Repository details. Setting up a native store in {}", nativeStoreDir);
+                 nextRepository =
+                         new SailRepository(new NativeStore(new File(nativeStoreDir), "spoc,posc,cspo,cpso,psoc,ospc,opsc,cops"));
+             }
+             nextRepository.initialize();
             
             helper.setUp(nextRepository);
             helper.loadSchemaOntologies();

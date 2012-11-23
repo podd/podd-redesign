@@ -21,7 +21,7 @@
     </context-param>
     <context-param>
         <param-name>sesame-repository-id</param-name>
-        <param-value>PODDrepo</param-value>
+        <param-value>PODD</param-value>
     </context-param>
     <servlet>
         <servlet-name>PoddServlet</servlet-name>
