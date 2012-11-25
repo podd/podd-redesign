@@ -3,8 +3,7 @@
  */
 package com.github.podd.utils.test;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.podd.utils.PoddUserStatus;
