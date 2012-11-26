@@ -48,7 +48,7 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
     protected abstract void logout();
     
     /**
-     * Resets the web service so that the RDF store is wiped clean.
+     * Resets the web service so that any artifacts in the RDF store are wiped out.
      */
     protected abstract void resetWebService();
     
