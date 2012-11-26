@@ -27,7 +27,7 @@ public abstract class PoddBaseServlet extends HttpServlet
     
     public static final String HEADER_APPLICATION_VERSION = "X-Application-Version";
     
-    private static final String PODD_VERSION = "PODD/0.0.1_21.11.12";
+    private static final String PODD_VERSION = "PODD/0.2_26.11.12";
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -85,6 +85,7 @@ public abstract class PoddBaseServlet extends HttpServlet
         final HttpSession session = request.getSession(false);
         if(session == null || (session.getAttribute("user") == null))
         {
+            this.log.info("No valid session for request {}", request.getRequestURI());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Please login");
             return false;
         }
