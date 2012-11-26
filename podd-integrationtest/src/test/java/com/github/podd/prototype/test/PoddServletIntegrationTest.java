@@ -463,6 +463,28 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     }
     
     /**
+     * Tests that it is possible to retrieve a schema ontology from the web service.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGetSchemaOntology() throws Exception
+    {
+        // -- there is no need to login (this means the web service will not be reset in the tearDown() 
+        
+        String schemaOntologyUri = "poddBase";
+        
+        // -- GET the PODD Base schema ontology from the web service and verify results
+        final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/ns/" + schemaOntologyUri);
+        final Response getBaseResponse = this.getClient().handle(getBaseRequest);
+        
+        Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseResponse.getStatus().getCode());
+        final String getResult = getBaseResponse.getEntityAsText();
+        Assert.assertEquals(282, this.getStatementCount(getResult));
+    }
+    
+    
+    /**
      * Test that the home page exists to ensure the PODD web-app is deployed.
      * 
      * @throws Exception

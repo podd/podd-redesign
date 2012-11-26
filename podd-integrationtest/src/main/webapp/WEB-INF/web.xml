@@ -26,6 +26,10 @@
     </context-param>
 -->
     <servlet>
+        <servlet-name>ResolverServlet</servlet-name>
+        <servlet-class>com.github.podd.prototype.ResolverServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>PoddServlet</servlet-name>
         <servlet-class>com.github.podd.prototype.PoddServlet</servlet-class>
     </servlet>
@@ -38,6 +42,10 @@
     	<description></description>
     	<servlet-class>com.github.podd.prototype.FileReferenceAttachServlet</servlet-class>
     </servlet>
+    <servlet-mapping>
+        <servlet-name>ResolverServlet</servlet-name>
+        <url-pattern>/ns/*</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>PoddServlet</servlet-name>
         <url-pattern>/podd/*</url-pattern>

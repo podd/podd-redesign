@@ -6,10 +6,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import net.fortytwo.sesametools.URITranslator;
@@ -147,14 +150,14 @@ public class PoddServletHelper
             repositoryConnection = this.nextRepository.getConnection();
             repositoryConnection.setAutoCommit(false);
             
-            this.log.info("loadSchemaOntology ... PODD-BASE");
+            this.log.info("loadSchemaOntology ... PODD-BASE ({})", repositoryConnection.size());
             this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                     repositoryConnection);
             
-            this.log.info("loadSchemaOntology ... PODD-SCIENCE");
+            this.log.info("loadSchemaOntology ... PODD-SCIENCE ({})", repositoryConnection.size());
             this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
                     repositoryConnection);
-            this.log.info("loadSchemaOntology ... completed");
+            this.log.info("loadSchemaOntology ... completed ({})", repositoryConnection.size());
             
             repositoryConnection.commit();
         }
@@ -408,6 +411,86 @@ public class PoddServletHelper
                 repositoryConnection.rollback();
             }
             
+            throw e;
+        }
+        finally
+        {
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be closed", e);
+                }
+            }
+        }
+    }
+    
+    /**
+     * If the specified String represents to a schema ontology managed by PODD, write the RDF
+     * statements belonging to this schema ontology to the given <code>OutputStream</code> using the
+     * specified MIME type.
+     * 
+     * @param uriString
+     *            String representation of the ontology requested
+     * @param mimeType
+     *            The format in which data should be sent back
+     * @param out
+     *            An output stream into which RDF data is to be written
+     * @throws RDFHandlerException
+     * @throws RepositoryException
+     */
+    public void getSchemaOntology(final String uriString, final String mimeType, final OutputStream out)
+        throws RDFHandlerException, RepositoryException
+    {
+        this.log.info("GET schema ontology: " + uriString);
+        RepositoryConnection repositoryConnection = null;
+        
+        try
+        {
+            repositoryConnection = this.nextRepository.getConnection();
+            repositoryConnection.setAutoCommit(false);
+            
+            // -- get the version IRI, which is the context under which the ontology is stored
+            final URI ontologyURI = repositoryConnection.getValueFactory().createURI(uriString);
+            URI ontologyVersionURI = null;
+            final RepositoryResult<Statement> repoResult =
+                    repositoryConnection.getStatements(ontologyURI, PoddPrototypeUtils.OMV_CURRENT_VERSION, null,
+                            false, this.schemaOntologyManagementGraph);
+            if(repoResult.hasNext())
+            {
+                final Statement statement = repoResult.next();
+                if(statement.getObject() instanceof URI)
+                {
+                    ontologyVersionURI = (URI)statement.getObject();
+                }
+                else
+                {
+                    this.log.error("Object {} was not a URI", statement);
+                    throw new RuntimeException("Current Version <" + uriString + "> not a URI");
+                }
+            }
+            
+            if(ontologyVersionURI == null)
+            {
+                throw new RuntimeException("Schema Ontology <" + uriString + "> not found.");
+            }
+            
+            // read all statements and write to the output stream
+            final RDFHandler rdfWriter =
+                    Rio.createWriter(Rio.getWriterFormatForMIMEType(mimeType, RDFFormat.RDFXML), out);
+            repositoryConnection.export(rdfWriter, ontologyVersionURI);
+            repositoryConnection.rollback();
+        }
+        catch(RepositoryException | RDFHandlerException e)
+        {
+            if(repositoryConnection != null)
+            {
+                repositoryConnection.rollback();
+            }
             throw e;
         }
         finally
@@ -759,7 +842,8 @@ public class PoddServletHelper
     }
     
     /**
-     * This method clears the content of the RDF store.
+     * This method clears the content of the RDF store and reloads the schema ontologies such that
+     * it resembles the store of a freshly installed and unused PODD.
      * 
      * @throws RepositoryException
      */
@@ -797,6 +881,24 @@ public class PoddServletHelper
                     this.log.error("Test repository connection could not be closed", e);
                 }
             }
+        }
+        
+        // -- remove all the ontologies from the manager
+        final Set<OWLOntology> setOfOwlOntologies = new HashSet<>(this.manager.getOntologies());
+        for(final OWLOntology ontology : setOfOwlOntologies)
+        {
+            this.manager.removeOntology(ontology);
+        }
+        
+        // -- reload the schema ontologies
+        try
+        {
+            this.log.info("Reloading schema ontologies after resetting the repository");
+            this.loadSchemaOntologies();
+        }
+        catch(OWLException | OpenRDFException | IOException | PoddException e)
+        {
+            this.log.error("Could not reload schema ontologies {}", e);
         }
     }
     

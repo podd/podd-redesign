@@ -3,6 +3,7 @@ package com.github.podd.prototype.test;
 import info.aduna.iteration.Iterations;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -174,6 +175,67 @@ public class PoddServletHelperTest
         final URI context = IRI.create("urn:context").toOpenRDFURI();
         final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
         Assert.assertTrue(repoConn.size(context) > 29);
+    }
+    
+    /**
+     * Tests trying to retrieve a schema ontology that is not managed by PODD
+     */
+    @Test
+    public void testGetSchemaOntologyNonExistent() throws Exception
+    {
+        final String ontologyUri = "http://purl.org/podd/ns/poddNoSuchSchemaOntology";
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        
+        try
+        {
+            this.helper.getSchemaOntology(ontologyUri, mimeType, new ByteArrayOutputStream());
+            Assert.fail("Should have thrown an exception");
+        }
+        catch(final RuntimeException e)
+        {
+            Assert.assertNotNull(e);
+            Assert.assertTrue(e.getMessage().contains("not found"));
+        }
+    }
+    
+    /**
+     * Tests trying to retrieve the PODD Base schema ontology
+     */
+    @Test
+    public void testGetSchemaOntologyPoddBase() throws Exception
+    {
+        final String ontologyUri = "http://purl.org/podd/ns/poddBase";
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        
+        this.helper.getSchemaOntology(ontologyUri, mimeType, out);
+        
+        // verify
+        Assert.assertTrue("Ontology not written to output stream", out.size() > 0);
+        
+        final URI context = IRI.create("urn:context").toOpenRDFURI();
+        final RepositoryConnection repoConn = this.loadDataToNewRepository(out.toString(), mimeType, context);
+        Assert.assertEquals(282, repoConn.size(context));
+    }
+    
+    /**
+     * Tests trying to retrieve the PODD Science schema ontology
+     */
+    @Test
+    public void testGetSchemaOntologyPoddScience() throws Exception
+    {
+        final String ontologyUri = "http://purl.org/podd/ns/poddScience";
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        
+        this.helper.getSchemaOntology(ontologyUri, mimeType, out);
+        
+        // verify
+        Assert.assertTrue("Ontology not written to output stream", out.size() > 0);
+        
+        final URI context = IRI.create("urn:context").toOpenRDFURI();
+        final RepositoryConnection repoConn = this.loadDataToNewRepository(out.toString(), mimeType, context);
+        Assert.assertEquals(1588, repoConn.size(context));
     }
     
     @Test
@@ -545,6 +607,11 @@ public class PoddServletHelperTest
             Assert.assertNotNull(e);
             Assert.assertTrue(e.getMessage().contains("not found"));
         }
+        
+        final ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        this.helper.getSchemaOntology("http://purl.org/podd/ns/poddBase", mimeType, bout);
+        Assert.assertNotNull(bout);
+        Assert.assertTrue(bout.size() > 0);
     }
     
     @Test
