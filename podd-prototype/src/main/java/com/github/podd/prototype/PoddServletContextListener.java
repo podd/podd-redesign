@@ -3,12 +3,17 @@ package com.github.podd.prototype;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.http.HTTPRepository;
@@ -28,6 +33,14 @@ import org.slf4j.LoggerFactory;
  */
 public class PoddServletContextListener implements ServletContextListener
 {
+    public static final String PATH_PODD_PLANT = "/ontologies/poddPlant.owl";
+    public static final String PATH_PODD_SCIENCE = "/ontologies/poddScience.owl";
+    public static final String PATH_PODD_BASE = "/ontologies/poddBase.owl";
+    
+    public static final String URI_PODD_PLANT = "http://purl.org/podd/ns/poddPlant";
+    public static final String URI_PODD_SCIENCE = "http://purl.org/podd/ns/poddScience";
+    public static final String URI_PODD_BASE = "http://purl.org/podd/ns/poddBase";
+    
     public static final String PODD_SERVLET_HELPER = "PODD_SERVLET_HELPER";
     
     public static final String PODD_PASSWORDS = "PODD_PASSWDS";
@@ -53,30 +66,42 @@ public class PoddServletContextListener implements ServletContextListener
         {
             this.initializeAuthenticationService(sce);
             
-             final String sesameServer =
-             sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_SERVER);
-             final String repositoryID =
-             sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_REPOSITORY);
-
-             Repository nextRepository = null;
-             if (sesameServer != null && repositoryID != null && sesameServer.trim().length() > 0 
-                     && repositoryID.trim().length() > 0) 
-             {
-                 nextRepository = new HTTPRepository(sesameServer, repositoryID);
-                 this.log.info("Using remote RDF Repository: " + sesameServer + ", " + repositoryID);
-             }
-             else
-             {
-                 String nativeStoreDir = sce.getServletContext().getAttribute("javax.servlet.context.tempdir").toString()
-                         + File.separatorChar + "native";
-                 this.log.warn("No remote RDF Repository details. Setting up a native store in {}", nativeStoreDir);
-                 nextRepository =
-                         new SailRepository(new NativeStore(new File(nativeStoreDir), "spoc,posc,cspo,cpso,psoc,ospc,opsc,cops"));
-             }
-             nextRepository.initialize();
+            final String sesameServer =
+                    sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_SERVER);
+            final String repositoryID =
+                    sce.getServletContext().getInitParameter(PoddServletContextListener.INIT_SESAME_REPOSITORY);
             
+            Repository nextRepository = null;
+            if(sesameServer != null && repositoryID != null && sesameServer.trim().length() > 0
+                    && repositoryID.trim().length() > 0)
+            {
+                nextRepository = new HTTPRepository(sesameServer, repositoryID);
+                this.log.info("Using remote RDF Repository: " + sesameServer + ", " + repositoryID);
+            }
+            else
+            {
+                final String nativeStoreDir =
+                        sce.getServletContext().getAttribute("javax.servlet.context.tempdir").toString()
+                                + File.separatorChar + "native";
+                this.log.warn("No remote RDF Repository details. Setting up a native store in {}", nativeStoreDir);
+                nextRepository =
+                        new SailRepository(new NativeStore(new File(nativeStoreDir),
+                                "spoc,posc,cspo,cpso,psoc,ospc,opsc,cops"));
+            }
+            nextRepository.initialize();
             helper.setUp(nextRepository);
+            
+            // populate Helper with a list of Schema Ontologies to manage
+            final List<Entry<URI, String>> schemaOntologyList = new ArrayList<>();
+            schemaOntologyList.add(new SimpleEntry<URI, String>(nextRepository.getValueFactory().createURI(
+                    PoddServletContextListener.URI_PODD_BASE), PoddServletContextListener.PATH_PODD_BASE));
+            schemaOntologyList.add(new SimpleEntry<URI, String>(nextRepository.getValueFactory().createURI(
+                    PoddServletContextListener.URI_PODD_SCIENCE), PoddServletContextListener.PATH_PODD_SCIENCE));
+            schemaOntologyList.add(new SimpleEntry<URI, String>(nextRepository.getValueFactory().createURI(
+                    PoddServletContextListener.URI_PODD_PLANT), PoddServletContextListener.PATH_PODD_PLANT));
+            helper.setSchemaOntologyList(schemaOntologyList);
             helper.loadSchemaOntologies();
+            
             helper.setFileReferenceUtils(this.setupFileRepositoryAliases(sce));
             
             sce.getServletContext().setAttribute(PoddServletContextListener.PODD_SERVLET_HELPER, helper);

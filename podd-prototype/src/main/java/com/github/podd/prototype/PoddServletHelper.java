@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
@@ -77,10 +78,8 @@ public class PoddServletHelper
     private URI poddArtifactManagementGraph;
     private IRI pelletOwlProfile;
     
-    private String poddBasePath;
-    private String poddSciencePath;
-    
-    // private String poddPlantPath;
+    /** The list of Schema Ontologies managed by PODD */
+    private List<Entry<URI, String>> schemaOntologyList;
     
     public void setUp(final Repository repository) throws RepositoryException
     {
@@ -108,10 +107,6 @@ public class PoddServletHelper
                 new PoddPrototypeUtils(this.manager, this.pelletOwlProfile, this.reasonerFactory,
                         this.schemaOntologyManagementGraph, this.poddArtifactManagementGraph);
         
-        this.poddBasePath = "/ontologies/poddBase.owl";
-        this.poddSciencePath = "/ontologies/poddScience.owl";
-        // this.poddPlantPath = "/ontologies/poddPlant.owl";
-        
         this.log.debug("setUp ... completed");
     }
     
@@ -131,6 +126,17 @@ public class PoddServletHelper
     }
     
     /**
+     * Use the setter to pass the Schema Ontology List for use by this class. This should be done
+     * before attempting to load schema ontologies.
+     * 
+     * @param schemaOntologyList
+     */
+    public void setSchemaOntologyList(final List<Entry<URI, String>> schemaOntologyList)
+    {
+        this.schemaOntologyList = schemaOntologyList;
+    }
+    
+    /**
      * The prototype does not yet support uploading of new Schema Ontologies. Therefore, this method
      * should be called at initialization to load the schemas.
      * 
@@ -142,46 +148,53 @@ public class PoddServletHelper
      */
     public void loadSchemaOntologies() throws OWLException, OpenRDFException, IOException, PoddException
     {
-        
+        this.log.info("loadSchemaOntology ... start");
         RepositoryConnection repositoryConnection = null;
+        
+        if(this.schemaOntologyList == null || this.schemaOntologyList.size() == 0)
+        {
+            throw new PoddException("No schema ontologies to load.", this.schemaOntologyList, -1);
+        }
+        
+        final List<URI> loadedSchemas = new ArrayList<>();
         
         try
         {
             repositoryConnection = this.nextRepository.getConnection();
             repositoryConnection.setAutoCommit(false);
             
-            final long schemaGraphSize = repositoryConnection.size(this.schemaOntologyManagementGraph);
-            if(schemaGraphSize > 0)
+            for(final Entry<URI, String> schemaOntology : this.schemaOntologyList)
             {
-                this.log.info("loadSchemaOntology ... from Repository ({})", schemaGraphSize);
-                
-                // -- get current versions of all schema ontologies and load them to the OWL
-                // Ontology Manager
                 final RepositoryResult<Statement> repoResult =
-                        repositoryConnection.getStatements(null, PoddPrototypeUtils.OMV_CURRENT_VERSION, null, false,
-                                this.schemaOntologyManagementGraph);
-                while(repoResult.hasNext())
+                        repositoryConnection
+                                .getStatements(schemaOntology.getKey(), PoddPrototypeUtils.OMV_CURRENT_VERSION, null,
+                                        false, this.schemaOntologyManagementGraph);
+                if(repoResult.hasNext())
                 {
                     final Value object = repoResult.next().getObject();
                     if(object instanceof Resource)
                     {
-                        this.log.info("loadSchemaOntology ... {}", object);
+                        this.log.info("loadSchemaOntology ... {} (from Repository)", object);
                         this.utils.loadOntology(repositoryConnection, RDFFormat.RDFXML.getDefaultMIMEType(),
                                 (Resource)object);
+                        loadedSchemas.add(schemaOntology.getKey());
                     }
                 }
             }
-            else
+            
+            // load remaining schema ontologies from classpath resources
+            for(final Entry<URI, String> schemaOntology : this.schemaOntologyList)
             {
-                this.log.info("loadSchemaOntology ... PODD-BASE ({})", repositoryConnection.size());
-                this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                        repositoryConnection);
-                
-                this.log.info("loadSchemaOntology ... PODD-SCIENCE ({})", repositoryConnection.size());
-                this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                        repositoryConnection);
-                this.log.info("loadSchemaOntology ... completed ({})", repositoryConnection.size());
+                if(!loadedSchemas.contains(schemaOntology.getKey()))
+                {
+                    this.log.info("loadSchemaOntology ... {} (from Classpath) ({})", schemaOntology.getKey(),
+                            repositoryConnection.size());
+                    this.utils.loadInferAndStoreSchemaOntology(schemaOntology.getValue(),
+                            RDFFormat.RDFXML.getDefaultMIMEType(), repositoryConnection);
+                }
             }
+            
+            this.log.info("loadSchemaOntology ... completed ({})", repositoryConnection.size());
             repositoryConnection.commit();
         }
         catch(OWLException | OpenRDFException | IOException | PoddException e)
