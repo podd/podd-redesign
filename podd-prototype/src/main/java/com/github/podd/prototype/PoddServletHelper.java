@@ -560,6 +560,7 @@ public class PoddServletHelper
             
             repositoryConnection.export(rdfWriter, ontologyID.getVersionIRI().toOpenRDFURI());
             repositoryConnection.clear(ontologyID.getVersionIRI().toOpenRDFURI());
+            repositoryConnection.clear(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
             
             // remove references in the artifact management graph
             final RepositoryResult<Statement> repoResult =
