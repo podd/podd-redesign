@@ -614,6 +614,58 @@ public class PoddServletHelperTest
         Assert.assertTrue(bout.size() > 0);
     }
     
+    /**
+     * Tests that schema ontologies are not reloaded if the repository has a non-empty schema
+     * ontology management graph.
+     * 
+     * Also verifies that the helper instance is consistent and can load artifacts after such a
+     * start up.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testLoadSchemaOntologies() throws Exception
+    {
+        this.helper.tearDown();
+        
+        // create a new Repository and configure the Helper
+        final Repository repository = new SailRepository(new MemoryStore());
+        repository.initialize();
+        
+        final RepositoryConnection testRepositoryConnection = repository.getConnection();
+        testRepositoryConnection.setAutoCommit(false);
+        
+        Assert.assertEquals("Repository should be empty at the beginning", 0, testRepositoryConnection.size());
+        testRepositoryConnection.rollback();
+        
+        // create another Helper instance and use it to populate the Repository
+        final PoddServletHelper anotherHelper = new PoddServletHelper();
+        anotherHelper.setUp(repository);
+        anotherHelper.loadSchemaOntologies();
+        
+        Assert.assertEquals(2359, testRepositoryConnection.size());
+        testRepositoryConnection.rollback();
+        
+        // setup the test Helper instance using the same repository (which already has schema
+        // ontologies)
+        this.helper = new PoddServletHelper();
+        this.helper.setUp(repository);
+        this.helper.loadSchemaOntologies();
+        
+        // assert that the Repository is unchanged by loadSchemaOntologies()
+        Assert.assertEquals("Repository size should not have changed", 2359, testRepositoryConnection.size());
+        testRepositoryConnection.rollback();
+        testRepositoryConnection.close();
+        
+        // check if it is possible to add an artifact to this helper/repository pair
+        final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Could not find test resource", in);
+        final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
+        
+        final String artifactUriString = this.helper.loadPoddArtifact(in, mimeType);
+        Assert.assertNotNull(artifactUriString);
+    }
+    
     @Test
     public void testIncrementVersion() throws Exception
     {

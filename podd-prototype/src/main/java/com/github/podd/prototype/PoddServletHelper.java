@@ -150,15 +150,38 @@ public class PoddServletHelper
             repositoryConnection = this.nextRepository.getConnection();
             repositoryConnection.setAutoCommit(false);
             
-            this.log.info("loadSchemaOntology ... PODD-BASE ({})", repositoryConnection.size());
-            this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                    repositoryConnection);
-            
-            this.log.info("loadSchemaOntology ... PODD-SCIENCE ({})", repositoryConnection.size());
-            this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
-                    repositoryConnection);
-            this.log.info("loadSchemaOntology ... completed ({})", repositoryConnection.size());
-            
+            final long schemaGraphSize = repositoryConnection.size(this.schemaOntologyManagementGraph);
+            if(schemaGraphSize > 0)
+            {
+                this.log.info("loadSchemaOntology ... from Repository ({})", schemaGraphSize);
+                
+                // -- get current versions of all schema ontologies and load them to the OWL
+                // Ontology Manager
+                final RepositoryResult<Statement> repoResult =
+                        repositoryConnection.getStatements(null, PoddPrototypeUtils.OMV_CURRENT_VERSION, null, false,
+                                this.schemaOntologyManagementGraph);
+                while(repoResult.hasNext())
+                {
+                    final Value object = repoResult.next().getObject();
+                    if(object instanceof Resource)
+                    {
+                        this.log.info("loadSchemaOntology ... {}", object);
+                        this.utils.loadOntology(repositoryConnection, RDFFormat.RDFXML.getDefaultMIMEType(),
+                                (Resource)object);
+                    }
+                }
+            }
+            else
+            {
+                this.log.info("loadSchemaOntology ... PODD-BASE ({})", repositoryConnection.size());
+                this.utils.loadInferAndStoreSchemaOntology(this.poddBasePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                        repositoryConnection);
+                
+                this.log.info("loadSchemaOntology ... PODD-SCIENCE ({})", repositoryConnection.size());
+                this.utils.loadInferAndStoreSchemaOntology(this.poddSciencePath, RDFFormat.RDFXML.getDefaultMIMEType(),
+                        repositoryConnection);
+                this.log.info("loadSchemaOntology ... completed ({})", repositoryConnection.size());
+            }
             repositoryConnection.commit();
         }
         catch(OWLException | OpenRDFException | IOException | PoddException e)
