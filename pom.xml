@@ -4,7 +4,7 @@
     <groupId>com.github.podd</groupId>
     <artifactId>podd-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2.0</version>
     <name>PODD :: Parent POM</name>
     <description>Parent pom for the PODD Redesign Project code. Manages the versions of dependencies and plugins for all child modules.</description>
     <url>https://github.com/podd</url>
