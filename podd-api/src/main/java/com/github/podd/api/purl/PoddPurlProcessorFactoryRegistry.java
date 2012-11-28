@@ -19,11 +19,28 @@ import com.github.podd.api.PoddProcessorStage;
 public class PoddPurlProcessorFactoryRegistry extends AbstractServiceLoader<String, PoddPurlProcessorFactory>
 {
     
+    private static final PoddPurlProcessorFactoryRegistry instance = new PoddPurlProcessorFactoryRegistry();
+    
     public PoddPurlProcessorFactoryRegistry()
     {
         super(PoddPurlProcessorFactory.class);
     }
     
+    /**
+     * @return A static instance of this registry.
+     */
+    public static PoddPurlProcessorFactoryRegistry getInstance()
+    {
+        return PoddPurlProcessorFactoryRegistry.instance;
+    }
+    
+    /**
+     * From amongst all the PODD PURL processor factories available with this registry, retrieve a
+     * list of the factories that support the given <code>PoddProcessorStage</code>.
+     * 
+     * @param nextStage
+     * @return
+     */
     public final List<PoddPurlProcessorFactory> getByStage(final PoddProcessorStage nextStage)
     {
         final List<PoddPurlProcessorFactory> result = new ArrayList<PoddPurlProcessorFactory>();
