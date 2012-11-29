@@ -52,7 +52,7 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      *            A temporary URI that needs to be translated into a Permanent URL.
      * @return A translated URI that was generated using a mechanism which attempts to guarantee
      *         both permanence and uniqueness of the resulting URI.
-     * @throws PurlProcessorNotHandledException
+     * @throws PurlGeneratorNotHandledException
      *             If the URI was not able to be handled by this Purl Processor for any reason. To
      *             avoid this exception in normal circumstances, check first using canHandle(URI).
      */
