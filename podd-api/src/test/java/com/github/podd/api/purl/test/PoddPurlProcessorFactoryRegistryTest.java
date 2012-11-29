@@ -18,13 +18,18 @@ import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 
 /**
- * Tests the functionality of the PoddPurlProcessorFactoryRegistry.
+ * Tests functionality of the PoddPurlProcessorFactoryRegistry.
  * 
  * @author kutila
  * 
  */
 public class PoddPurlProcessorFactoryRegistryTest
 {
+    
+    private PoddPurlProcessorFactory factory4rdfParsingStage;
+    private PoddPurlProcessorFactory secondFactory4RDFParsingStage;
+    private PoddPurlProcessorFactory factory4AllStages;
+    private PoddPurlProcessorFactory factory4InferenceStage;
     
     /**
      * 
@@ -33,26 +38,28 @@ public class PoddPurlProcessorFactoryRegistryTest
     @Before
     public void setUp() throws Exception
     {
-        // ensure the registry is clean of any factories that were loaded from the Environment
+        // ensure the registry is clean of any factories that were previously loaded
         PoddPurlProcessorFactoryRegistry.getInstance().clear();
+        Assert.assertEquals("Registry wasn't cleared", 0, PoddPurlProcessorFactoryRegistry.getInstance().getAll()
+                .size());
         
-        // create test Processor Factories
-        final PoddPurlProcessorFactory factory4AllStages = Mockito.mock(PoddPurlProcessorFactory.class);
-        Mockito.when(factory4AllStages.canHandleStage((PoddProcessorStage)Matchers.any())).thenReturn(true);
-        Mockito.when(factory4AllStages.getKey()).thenReturn("key_ALL");
+        // create mock factories for use in tests
+        this.factory4rdfParsingStage = Mockito.mock(PoddPurlProcessorFactory.class);
+        Mockito.when(this.factory4rdfParsingStage.canHandleStage(PoddProcessorStage.RDF_PARSING)).thenReturn(true);
+        Mockito.when(this.factory4rdfParsingStage.getKey()).thenReturn("key_RDF_PARSING");
         
-        final PoddPurlProcessorFactory factory4RDFParsingStage = Mockito.mock(PoddPurlProcessorFactory.class);
-        Mockito.when(factory4RDFParsingStage.canHandleStage(PoddProcessorStage.RDF_PARSING)).thenReturn(true);
-        Mockito.when(factory4RDFParsingStage.getKey()).thenReturn("key_RDF_PARSING");
+        this.secondFactory4RDFParsingStage = Mockito.mock(PoddPurlProcessorFactory.class);
+        Mockito.when(this.secondFactory4RDFParsingStage.canHandleStage(PoddProcessorStage.RDF_PARSING))
+                .thenReturn(true);
+        Mockito.when(this.secondFactory4RDFParsingStage.getKey()).thenReturn("key_RDF_PARSING");
         
-        final PoddPurlProcessorFactory secondFactory4RDFParsingStage = Mockito.mock(PoddPurlProcessorFactory.class);
-        Mockito.when(secondFactory4RDFParsingStage.canHandleStage(PoddProcessorStage.RDF_PARSING)).thenReturn(true);
-        Mockito.when(secondFactory4RDFParsingStage.getKey()).thenReturn("key_RDF_PARSING");
+        this.factory4InferenceStage = Mockito.mock(PoddPurlProcessorFactory.class);
+        Mockito.when(this.factory4InferenceStage.canHandleStage(PoddProcessorStage.INFERENCE)).thenReturn(true);
+        Mockito.when(this.factory4InferenceStage.getKey()).thenReturn("key_INFERENCE");
         
-        // add the mock Factories to the registry
-        PoddPurlProcessorFactoryRegistry.getInstance().add(factory4AllStages);
-        PoddPurlProcessorFactoryRegistry.getInstance().add(factory4RDFParsingStage);
-        PoddPurlProcessorFactoryRegistry.getInstance().add(secondFactory4RDFParsingStage);
+        this.factory4AllStages = Mockito.mock(PoddPurlProcessorFactory.class);
+        Mockito.when(this.factory4AllStages.canHandleStage((PoddProcessorStage)Matchers.any())).thenReturn(true);
+        Mockito.when(this.factory4AllStages.getKey()).thenReturn("key_ALL");
     }
     
     /**
@@ -66,14 +73,100 @@ public class PoddPurlProcessorFactoryRegistryTest
     }
     
     @Test
-    public void testGetOnePerStage() throws Exception
+    public void testGetByStageNullStage() throws Exception
     {
-        final PoddPurlProcessorFactoryRegistry purlFactoryRegistry = PoddPurlProcessorFactoryRegistry.getInstance();
-        final List<PoddPurlProcessorFactory> list = purlFactoryRegistry.getByStage(PoddProcessorStage.RDF_PARSING);
-        Assert.assertEquals(3, list.size());
-        Assert.assertEquals("key_RDF_PARSING", list.get(0).getKey());
-        
-        final List<PoddPurlProcessorFactory> list2 = purlFactoryRegistry.getByStage(PoddProcessorStage.PROFILE_CHECK);
-        Assert.assertEquals(1, list2.size());
+        final List<PoddPurlProcessorFactory> nullStageFactories =
+                PoddPurlProcessorFactoryRegistry.getInstance().getByStage(null);
+        Assert.assertNotNull(nullStageFactories);
+        Assert.assertEquals("Should return an empty List for NULL stage", 0, nullStageFactories.size());
     }
+    
+    @Test
+    public void testGetByStageOneFactoryMatchingOneStage() throws Exception
+    {
+        // add factories to Registry
+        PoddPurlProcessorFactoryRegistry.getInstance().add(this.factory4rdfParsingStage);
+        
+        final PoddPurlProcessorFactoryRegistry purlFactoryRegistry = PoddPurlProcessorFactoryRegistry.getInstance();
+        
+        // retrieve factories for RDF_PARSING stage
+        final List<PoddPurlProcessorFactory> parsingStageFactories =
+                purlFactoryRegistry.getByStage(PoddProcessorStage.RDF_PARSING);
+        
+        Assert.assertEquals(1, parsingStageFactories.size());
+        Assert.assertEquals("key_RDF_PARSING", parsingStageFactories.get(0).getKey());
+        
+        // retrieve factories for PROFILE_CHECK stage
+        final List<PoddPurlProcessorFactory> profileCheckingStageFactories =
+                purlFactoryRegistry.getByStage(PoddProcessorStage.PROFILE_CHECK);
+        Assert.assertEquals(0, profileCheckingStageFactories.size());
+    }
+    
+    @Test
+    public void testGetByStageTwoFactoriesMatchingOneStage() throws Exception
+    {
+        // add factories to Registry
+        PoddPurlProcessorFactoryRegistry.getInstance().add(this.factory4rdfParsingStage);
+        PoddPurlProcessorFactoryRegistry.getInstance().add(this.secondFactory4RDFParsingStage);
+        
+        final PoddPurlProcessorFactoryRegistry purlFactoryRegistry = PoddPurlProcessorFactoryRegistry.getInstance();
+        
+        // retrieve factories for RDF_PARSING stage
+        final List<PoddPurlProcessorFactory> parsingStageFactories =
+                purlFactoryRegistry.getByStage(PoddProcessorStage.RDF_PARSING);
+        
+        Assert.assertEquals(2, parsingStageFactories.size());
+        Assert.assertEquals("key_RDF_PARSING", parsingStageFactories.get(0).getKey());
+        
+        // retrieve factories for PROFILE_CHECK stage
+        final List<PoddPurlProcessorFactory> profileCheckingStageFactories =
+                purlFactoryRegistry.getByStage(PoddProcessorStage.PROFILE_CHECK);
+        Assert.assertEquals(0, profileCheckingStageFactories.size());
+    }
+    
+    @Test
+    public void testGetByStageOneFactoryMatchingAllStages() throws Exception
+    {
+        // add factories to Registry
+        PoddPurlProcessorFactoryRegistry.getInstance().add(this.factory4AllStages);
+        
+        // go through ALL stages and verify the factory is returned for each one
+        for(final PoddProcessorStage stage : PoddProcessorStage.values())
+        {
+            final List<PoddPurlProcessorFactory> factories =
+                    PoddPurlProcessorFactoryRegistry.getInstance().getByStage(stage);
+            Assert.assertEquals(1, factories.size());
+            Assert.assertEquals("key_ALL", factories.get(0).getKey());
+        }
+    }
+    
+    @Test
+    public void testGetByStageOneFactoryPerStage() throws Exception
+    {
+        // add factories to Registry
+        PoddPurlProcessorFactoryRegistry.getInstance().add(this.factory4rdfParsingStage);
+        PoddPurlProcessorFactoryRegistry.getInstance().add(this.factory4InferenceStage);
+        
+        final PoddPurlProcessorFactoryRegistry purlFactoryRegistry = PoddPurlProcessorFactoryRegistry.getInstance();
+        
+        // retrieve factories for RDF_PARSING stage
+        final List<PoddPurlProcessorFactory> parsingStageFactories =
+                purlFactoryRegistry.getByStage(PoddProcessorStage.RDF_PARSING);
+        
+        Assert.assertEquals(1, parsingStageFactories.size());
+        Assert.assertEquals("key_RDF_PARSING", parsingStageFactories.get(0).getKey());
+        
+        // retrieve factories for INFERENCE stage
+        final List<PoddPurlProcessorFactory> inferenceStageFactories =
+                purlFactoryRegistry.getByStage(PoddProcessorStage.INFERENCE);
+        
+        Assert.assertEquals(1, inferenceStageFactories.size());
+        Assert.assertEquals("key_INFERENCE", inferenceStageFactories.get(0).getKey());
+        
+        // retrieve factories for PROFILE_CHECK stage
+        final List<PoddPurlProcessorFactory> profileCheckingStageFactories =
+                purlFactoryRegistry.getByStage(PoddProcessorStage.PROFILE_CHECK);
+        Assert.assertEquals(0, profileCheckingStageFactories.size());
+    }
+    
 }
