@@ -174,7 +174,7 @@ public abstract class AbstractPoddPurlProcessorTest
     public void testHandleTranslationUnSupported() throws Exception
     {
         this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
-        final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixExampleUrl + ":artifact:8275");
+        final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixExampleUrl + "artifact:8275");
         
         try
         {
@@ -191,7 +191,7 @@ public abstract class AbstractPoddPurlProcessorTest
     public void testHandleTranslationSuccessful() throws Exception
     {
         this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
-        final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixUrnTemp + ":artifact:1482");
+        final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixUrnTemp + "artifact:1482");
         
         final PoddPurlReference purlReference = this.purlProcessor.handleTranslation(tempUriUrnTemp);
         
