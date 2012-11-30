@@ -44,11 +44,11 @@ public class PoddPurlProcessorFactoryRegistry extends AbstractServiceLoader<Stri
     public final List<PoddPurlProcessorFactory> getByStage(final PoddProcessorStage nextStage)
     {
         final List<PoddPurlProcessorFactory> result = new ArrayList<PoddPurlProcessorFactory>();
-        for(final PoddPurlProcessorFactory nextProcessor : this.getAll())
+        for(final PoddPurlProcessorFactory nextProcessorFactory : this.getAll())
         {
-            if(nextProcessor.canHandleStage(nextStage))
+            if(nextProcessorFactory.canHandleStage(nextStage))
             {
-                result.add(nextProcessor);
+                result.add(nextProcessorFactory);
             }
         }
         
