@@ -25,6 +25,8 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      * @param temporaryUriPrefix
      *            A string that matches against the start of a temporary URI to identify it as being
      *            relevant to this Purl Processor.
+     * @throws NullPointerException
+     *             If a null String is passed
      */
     void addTemporaryUriHandler(String temporaryUriPrefix);
     
