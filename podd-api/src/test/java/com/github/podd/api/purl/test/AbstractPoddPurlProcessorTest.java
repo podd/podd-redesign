@@ -25,11 +25,11 @@ import com.github.podd.exception.PurlGeneratorNotHandledException;
 public abstract class AbstractPoddPurlProcessorTest
 {
     
-    private PoddPurlProcessor purlProcessor;
+    protected PoddPurlProcessor purlProcessor;
     
-    private String prefixUrnTemp = null;
-    private String prefixExampleUrl = null;
-    private String prefixPurl = null;
+    protected String prefixUrnTemp = null;
+    protected String prefixExampleUrl = null;
+    protected String prefixPurl = null;
     
     /**
      * @return A new PoddPurlProcessor instance for use by the test
@@ -47,6 +47,15 @@ public abstract class AbstractPoddPurlProcessorTest
      * @return True if the Purl could have been generated from the tempUri. False otherwise
      */
     protected abstract boolean isPurlGeneratedFromTemp(URI purl, URI tempUri);
+    
+    /**
+     * Tests purlProcessor.addTemporaryUriHandler(null) Subclass implementations decide on the
+     * behaviour when adding null as a temporary URI Handler.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public abstract void testAddTemporaryUriHandlerWithNull() throws Exception;
     
     @Before
     public void setUp() throws Exception
@@ -68,17 +77,25 @@ public abstract class AbstractPoddPurlProcessorTest
         this.prefixPurl = null;
     }
     
+    /**
+     * Simple test to check that addTemporaryUriHandler() can be invoked
+     * 
+     * @throws Exception
+     */
     @Test
     public void testAddTemporaryUriHandler() throws Exception
     {
         this.purlProcessor.addTemporaryUriHandler(this.prefixPurl);
     }
     
+    /**
+     * Test a PoddPurlProcessor that has not been assigned any temporary URI prefixes
+     * 
+     * @throws Exception
+     */
     @Test
     public void testCanHandleWithNoPrefixes() throws Exception
     {
-        // we're not adding any temporary URI handlers.
-        
         final URI tempUriUnsupported = new ValueFactoryImpl().createURI("urn:unsupported:temporary/uri");
         Assert.assertFalse(this.purlProcessor.canHandle(tempUriUnsupported));
     }
@@ -89,7 +106,7 @@ public abstract class AbstractPoddPurlProcessorTest
         this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
         
         final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixUrnTemp + "some/path");
-        Assert.assertTrue(this.getNewPoddPurlProcessor().canHandle(tempUriUrnTemp));
+        Assert.assertTrue(this.purlProcessor.canHandle(tempUriUrnTemp));
     }
     
     @Test
@@ -99,10 +116,10 @@ public abstract class AbstractPoddPurlProcessorTest
         this.purlProcessor.addTemporaryUriHandler(this.prefixExampleUrl);
         
         final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixUrnTemp + "some/path");
-        Assert.assertTrue(this.getNewPoddPurlProcessor().canHandle(tempUriUrnTemp));
+        Assert.assertTrue(this.purlProcessor.canHandle(tempUriUrnTemp));
         
         final URI tempUriExampleOrg = new ValueFactoryImpl().createURI(this.prefixExampleUrl + "some/other/path");
-        Assert.assertTrue(this.getNewPoddPurlProcessor().canHandle(tempUriExampleOrg));
+        Assert.assertTrue(this.purlProcessor.canHandle(tempUriExampleOrg));
     }
     
     /**
@@ -141,16 +158,16 @@ public abstract class AbstractPoddPurlProcessorTest
         this.purlProcessor.addTemporaryUriHandler(this.prefixExampleUrl);
         
         final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixUrnTemp + "some/path");
-        Assert.assertTrue(this.getNewPoddPurlProcessor().canHandle(tempUriUrnTemp));
+        Assert.assertTrue(this.purlProcessor.canHandle(tempUriUrnTemp));
         
         this.purlProcessor.removeTemporaryUriHandler(this.prefixUrnTemp);
         
         // tempUriUrnTemp is no longer supported
-        Assert.assertFalse(this.getNewPoddPurlProcessor().canHandle(tempUriUrnTemp));
+        Assert.assertFalse(this.purlProcessor.canHandle(tempUriUrnTemp));
         
         // prefixExampleUrl is still supported
         final URI tempUriExampleOrg = new ValueFactoryImpl().createURI(this.prefixExampleUrl + "some/other/path");
-        Assert.assertTrue(this.getNewPoddPurlProcessor().canHandle(tempUriExampleOrg));
+        Assert.assertTrue(this.purlProcessor.canHandle(tempUriExampleOrg));
     }
     
     @Test
