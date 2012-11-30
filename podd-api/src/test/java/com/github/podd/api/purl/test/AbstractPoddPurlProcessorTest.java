@@ -14,7 +14,7 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 
 import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlReference;
-import com.github.podd.exception.PurlGeneratorNotHandledException;
+import com.github.podd.exception.PurlProcessorNotHandledException;
 
 /**
  * Abstract class to test PoddPurlProcessor.
@@ -48,19 +48,11 @@ public abstract class AbstractPoddPurlProcessorTest
      */
     protected abstract boolean isPurlGeneratedFromTemp(URI purl, URI tempUri);
     
-    /**
-     * Tests purlProcessor.addTemporaryUriHandler(null) Subclass implementations decide on the
-     * behaviour when adding null as a temporary URI Handler.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public abstract void testAddTemporaryUriHandlerWithNull() throws Exception;
-    
     @Before
     public void setUp() throws Exception
     {
         this.purlProcessor = this.getNewPoddPurlProcessor();
+        Assert.assertNotNull("Null implementation of test processor", this.purlProcessor);
         
         this.prefixUrnTemp = "urn:temp:";
         this.prefixExampleUrl = "http://example.org/";
@@ -89,6 +81,26 @@ public abstract class AbstractPoddPurlProcessorTest
     }
     
     /**
+     * Tests purlProcessor.addTemporaryUriHandler(null) Subclass implementations decide on the
+     * behaviour when adding null as a temporary URI Handler.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testAddTemporaryUriHandlerWithNull() throws Exception
+    {
+        try
+        {
+            this.purlProcessor.addTemporaryUriHandler(null);
+            Assert.fail("Adding a NULL temporary URI prefix should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertNotNull(e);
+        }
+    }
+    
+    /**
      * Test a PoddPurlProcessor that has not been assigned any temporary URI prefixes
      * 
      * @throws Exception
@@ -96,7 +108,7 @@ public abstract class AbstractPoddPurlProcessorTest
     @Test
     public void testCanHandleWithNoPrefixes() throws Exception
     {
-        final URI tempUriUnsupported = new ValueFactoryImpl().createURI("urn:unsupported:temporary/uri");
+        final URI tempUriUnsupported = ValueFactoryImpl.getInstance().createURI("urn:unsupported:temporary/uri");
         Assert.assertFalse(this.purlProcessor.canHandle(tempUriUnsupported));
     }
     
@@ -105,7 +117,7 @@ public abstract class AbstractPoddPurlProcessorTest
     {
         this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
         
-        final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixUrnTemp + "some/path");
+        final URI tempUriUrnTemp = ValueFactoryImpl.getInstance().createURI(this.prefixUrnTemp + "some/path");
         Assert.assertTrue(this.purlProcessor.canHandle(tempUriUrnTemp));
     }
     
@@ -115,10 +127,11 @@ public abstract class AbstractPoddPurlProcessorTest
         this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
         this.purlProcessor.addTemporaryUriHandler(this.prefixExampleUrl);
         
-        final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixUrnTemp + "some/path");
+        final URI tempUriUrnTemp = ValueFactoryImpl.getInstance().createURI(this.prefixUrnTemp + "some/path");
         Assert.assertTrue(this.purlProcessor.canHandle(tempUriUrnTemp));
         
-        final URI tempUriExampleOrg = new ValueFactoryImpl().createURI(this.prefixExampleUrl + "some/other/path");
+        final URI tempUriExampleOrg =
+                ValueFactoryImpl.getInstance().createURI(this.prefixExampleUrl + "some/other/path");
         Assert.assertTrue(this.purlProcessor.canHandle(tempUriExampleOrg));
     }
     
@@ -152,12 +165,42 @@ public abstract class AbstractPoddPurlProcessorTest
     }
     
     @Test
+    public void testHandleTranslationSuccessful() throws Exception
+    {
+        this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
+        final URI tempUriUrnTemp = ValueFactoryImpl.getInstance().createURI(this.prefixUrnTemp + "artifact:1482");
+        
+        final PoddPurlReference purlReference = this.purlProcessor.handleTranslation(tempUriUrnTemp);
+        
+        Assert.assertNotNull(purlReference);
+        Assert.assertEquals(tempUriUrnTemp, purlReference.getTemporaryURI());
+        Assert.assertTrue(this.isPurlGeneratedFromTemp(purlReference.getPurlURI(), tempUriUrnTemp));
+    }
+    
+    @Test
+    public void testHandleTranslationUnSupported() throws Exception
+    {
+        this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
+        final URI tempUriUrnTemp = ValueFactoryImpl.getInstance().createURI(this.prefixExampleUrl + "artifact:8275");
+        
+        try
+        {
+            this.purlProcessor.handleTranslation(tempUriUrnTemp);
+            Assert.fail("Expected PurlGeneratorNotHandledException was not thrown");
+        }
+        catch(final PurlProcessorNotHandledException e)
+        {
+            Assert.assertNotNull(e);
+        }
+    }
+    
+    @Test
     public void testRemoveTemporaryUriHandler() throws Exception
     {
         this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
         this.purlProcessor.addTemporaryUriHandler(this.prefixExampleUrl);
         
-        final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixUrnTemp + "some/path");
+        final URI tempUriUrnTemp = ValueFactoryImpl.getInstance().createURI(this.prefixUrnTemp + "some/path");
         Assert.assertTrue(this.purlProcessor.canHandle(tempUriUrnTemp));
         
         this.purlProcessor.removeTemporaryUriHandler(this.prefixUrnTemp);
@@ -166,38 +209,9 @@ public abstract class AbstractPoddPurlProcessorTest
         Assert.assertFalse(this.purlProcessor.canHandle(tempUriUrnTemp));
         
         // prefixExampleUrl is still supported
-        final URI tempUriExampleOrg = new ValueFactoryImpl().createURI(this.prefixExampleUrl + "some/other/path");
+        final URI tempUriExampleOrg =
+                ValueFactoryImpl.getInstance().createURI(this.prefixExampleUrl + "some/other/path");
         Assert.assertTrue(this.purlProcessor.canHandle(tempUriExampleOrg));
-    }
-    
-    @Test
-    public void testHandleTranslationUnSupported() throws Exception
-    {
-        this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
-        final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixExampleUrl + "artifact:8275");
-        
-        try
-        {
-            this.purlProcessor.handleTranslation(tempUriUrnTemp);
-            Assert.fail("Expected PurlGeneratorNotHandledException was not thrown");
-        }
-        catch(final PurlGeneratorNotHandledException e)
-        {
-            Assert.assertNotNull(e);
-        }
-    }
-    
-    @Test
-    public void testHandleTranslationSuccessful() throws Exception
-    {
-        this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
-        final URI tempUriUrnTemp = new ValueFactoryImpl().createURI(this.prefixUrnTemp + "artifact:1482");
-        
-        final PoddPurlReference purlReference = this.purlProcessor.handleTranslation(tempUriUrnTemp);
-        
-        Assert.assertNotNull(purlReference);
-        Assert.assertEquals(tempUriUrnTemp, purlReference.getTemporaryURI());
-        Assert.assertTrue(this.isPurlGeneratedFromTemp(purlReference.getPurlURI(), tempUriUrnTemp));
     }
     
 }

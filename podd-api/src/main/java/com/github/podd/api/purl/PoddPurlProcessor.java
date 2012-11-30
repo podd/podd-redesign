@@ -8,7 +8,7 @@ import java.util.List;
 import org.openrdf.model.URI;
 
 import com.github.podd.api.PoddRdfProcessor;
-import com.github.podd.exception.PurlGeneratorNotHandledException;
+import com.github.podd.exception.PurlProcessorNotHandledException;
 
 /**
  * An interface that can be subclassed to generate different types of Permanent URLs, or more
@@ -52,11 +52,11 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      *            A temporary URI that needs to be translated into a Permanent URL.
      * @return A translated URI that was generated using a mechanism which attempts to guarantee
      *         both permanence and uniqueness of the resulting URI.
-     * @throws PurlGeneratorNotHandledException
+     * @throws PurlProcessorNotHandledException
      *             If the URI was not able to be handled by this Purl Processor for any reason. To
      *             avoid this exception in normal circumstances, check first using canHandle(URI).
      */
-    PoddPurlReference handleTranslation(URI inputUri) throws PurlGeneratorNotHandledException;
+    PoddPurlReference handleTranslation(URI inputUri) throws PurlProcessorNotHandledException;
     
     /**
      * Signals to this Purl Processor that it should no longer handle permanent URL generation for

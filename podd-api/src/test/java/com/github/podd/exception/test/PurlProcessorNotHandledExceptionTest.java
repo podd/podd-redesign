@@ -10,14 +10,14 @@ import org.mockito.Mockito;
 import org.openrdf.model.URI;
 
 import com.github.podd.api.purl.PoddPurlProcessor;
-import com.github.podd.exception.PurlGeneratorNotHandledException;
+import com.github.podd.exception.PurlProcessorNotHandledException;
 
 /**
- * Tests that the PurlGeneratorNotHandledException correctly manages its internal content.
+ * Tests that the PurlProcessorNotHandledException correctly manages its internal content.
  * 
  * @author kutila
  */
-public class PurlGeneratorNotHandledExceptionTest
+public class PurlProcessorNotHandledExceptionTest
 {
     
     @Test
@@ -27,8 +27,8 @@ public class PurlGeneratorNotHandledExceptionTest
         final URI failedUri = Mockito.mock(URI.class);
         final String message = "Exception with mocked up internals";
         
-        final PurlGeneratorNotHandledException theException =
-                new PurlGeneratorNotHandledException(thePurlProcessor, failedUri, message);
+        final PurlProcessorNotHandledException theException =
+                new PurlProcessorNotHandledException(thePurlProcessor, failedUri, message);
         
         Assert.assertNotNull(theException.getGenerator());
         Assert.assertEquals(failedUri, theException.getInputUri());

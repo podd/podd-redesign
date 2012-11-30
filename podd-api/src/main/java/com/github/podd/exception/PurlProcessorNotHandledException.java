@@ -14,7 +14,7 @@ import com.github.podd.api.purl.PoddPurlProcessor;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class PurlGeneratorNotHandledException extends PoddException
+public class PurlProcessorNotHandledException extends PoddException
 {
     private static final long serialVersionUID = -8569720976338731517L;
     
@@ -30,7 +30,7 @@ public class PurlGeneratorNotHandledException extends PoddException
      * @param msg
      *            The message for this exception.
      */
-    public PurlGeneratorNotHandledException(final PoddPurlProcessor generator, final URI inputUri, final String msg)
+    public PurlProcessorNotHandledException(final PoddPurlProcessor generator, final URI inputUri, final String msg)
     {
         super(msg);
         this.generator = generator;
@@ -47,7 +47,7 @@ public class PurlGeneratorNotHandledException extends PoddException
      * @param throwable
      *            The cause for this exception.
      */
-    public PurlGeneratorNotHandledException(final PoddPurlProcessor generator, final URI inputUri, final String msg,
+    public PurlProcessorNotHandledException(final PoddPurlProcessor generator, final URI inputUri, final String msg,
             final Throwable throwable)
     {
         super(msg, throwable);
@@ -63,7 +63,7 @@ public class PurlGeneratorNotHandledException extends PoddException
      * @param throwable
      *            The cause for this exception.
      */
-    public PurlGeneratorNotHandledException(final PoddPurlProcessor generator, final URI inputUri,
+    public PurlProcessorNotHandledException(final PoddPurlProcessor generator, final URI inputUri,
             final Throwable throwable)
     {
         super(throwable);
