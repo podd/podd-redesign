@@ -81,8 +81,7 @@ public abstract class AbstractPoddPurlProcessorTest
     }
     
     /**
-     * Tests purlProcessor.addTemporaryUriHandler(null) Subclass implementations decide on the
-     * behaviour when adding null as a temporary URI Handler.
+     * Tests purlProcessor.addTemporaryUriHandler(null)
      * 
      * @throws Exception
      */
