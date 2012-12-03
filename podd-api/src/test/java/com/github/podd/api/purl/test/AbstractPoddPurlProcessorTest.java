@@ -48,6 +48,7 @@ public abstract class AbstractPoddPurlProcessorTest
      */
     protected abstract boolean isPurlGeneratedFromTemp(URI purl, URI tempUri);
     
+    
     @Before
     public void setUp() throws Exception
     {
@@ -97,6 +98,15 @@ public abstract class AbstractPoddPurlProcessorTest
         {
             Assert.assertNotNull(e);
         }
+    }
+    
+    /**
+     * Tests the behaviour when a null value is given to the canHandle() method
+     */
+    @Test
+    public void testCanHandleWithNull() throws Exception
+    {
+        Assert.assertFalse(this.purlProcessor.canHandle(null));
     }
     
     /**
@@ -162,6 +172,23 @@ public abstract class AbstractPoddPurlProcessorTest
         // this unregistered prefix is not in the list
         Assert.assertFalse(prefixList.contains(this.prefixPurl));
     }
+
+    /**
+     * Tests the behaviour when a null value is given to the handleTranslation() method
+     */
+    @Test
+    public void testHandleTranslationWithNull() throws Exception
+    {
+        try
+        {
+            this.purlProcessor.handleTranslation(null);
+            Assert.fail("Expected NullPointerException was not thrown");
+        }
+        catch(final NullPointerException e)
+        {
+            // fine as this is an expected exception 
+        }
+    }
     
     @Test
     public void testHandleTranslationSuccessful() throws Exception
@@ -212,5 +239,7 @@ public abstract class AbstractPoddPurlProcessorTest
                 ValueFactoryImpl.getInstance().createURI(this.prefixExampleUrl + "some/other/path");
         Assert.assertTrue(this.purlProcessor.canHandle(tempUriExampleOrg));
     }
+    
+    
     
 }

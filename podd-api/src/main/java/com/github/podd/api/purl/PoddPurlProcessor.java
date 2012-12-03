@@ -36,7 +36,8 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      * @param inputUri
      *            A temporary URI that needs to be translated into a Permanent URL.
      * @return True if this Purl Processor should be able to handle the conversion of this temporary
-     *         URI to a Purl, and false if it is not known whether this will be possible.
+     *         URI to a Purl, and false if it is not known whether this will be possible, or if a
+     *         NULL value is passed in.
      */
     boolean canHandle(URI inputUri);
     
@@ -57,6 +58,9 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      * @throws PurlProcessorNotHandledException
      *             If the URI was not able to be handled by this Purl Processor for any reason. To
      *             avoid this exception in normal circumstances, check first using canHandle(URI).
+     * @throws NullPointerException
+     *             If a null URI is passed
+     * 
      */
     PoddPurlReference handleTranslation(URI inputUri) throws PurlProcessorNotHandledException;
     

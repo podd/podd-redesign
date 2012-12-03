@@ -90,8 +90,7 @@ public class SimplePoddPurlProcessor implements PoddPurlProcessor
     {
         if(inputUri == null)
         {
-            throw new PurlProcessorNotHandledException(this, inputUri,
-                    "The input URI cannot be handled by this Purl Processor");
+            throw new NullPointerException("NULL URI cannot be handled by this Purl Processor");
         }
         
         String thePrefix = null;
