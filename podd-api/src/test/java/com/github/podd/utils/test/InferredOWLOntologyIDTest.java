@@ -14,8 +14,8 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
- * Tests the InferredOWLOntologyID class for its assignment of IRIs to various attributes
- * and the equality conditions.
+ * Tests the InferredOWLOntologyID class for its assignment of IRIs to various attributes and the
+ * equality conditions.
  * 
  * @author kutila
  * 
@@ -70,13 +70,14 @@ public class InferredOWLOntologyIDTest
         Assert.assertEquals(this.testBaseOntologyIRI, inferredOwlOntologyID.getBaseOWLOntologyID().getOntologyIRI());
         Assert.assertEquals(this.testOntologyVersionIRI, inferredOwlOntologyID.getBaseOWLOntologyID().getVersionIRI());
         
-        // test the OWLOntologyID representing the inferred portion (here ontologyIRI and versionIRI are the same)
+        // test the OWLOntologyID representing the inferred portion (here ontologyIRI and versionIRI
+        // are the same)
         Assert.assertEquals(this.testInferredOntologyIRI, inferredOwlOntologyID.getInferredOWLOntologyID()
                 .getOntologyIRI());
         Assert.assertEquals(this.testInferredOntologyIRI, inferredOwlOntologyID.getInferredOWLOntologyID()
                 .getVersionIRI());
     }
-
+    
     @Test
     public void testEqualAnonymous() throws Exception
     {
@@ -85,7 +86,7 @@ public class InferredOWLOntologyIDTest
         
         Assert.assertTrue(onto1.isAnonymous());
         Assert.assertTrue(onto2.isAnonymous());
-
+        
         Assert.assertFalse(onto1.equals(onto2));
     }
     
@@ -163,16 +164,16 @@ public class InferredOWLOntologyIDTest
         
         Assert.assertTrue(onto1.equals(onto2));
     }
-
+    
     /**
      * Compare two InferredOWLOntologyIDs that only have base ontology IRIs
+     * 
      * @throws Exception
      */
     @Test
     public void testEqualWithOWLOntologyIDNoVersionIRIAndInferredIRI() throws Exception
     {
-        final InferredOWLOntologyID onto1 =
-                new InferredOWLOntologyID(this.testBaseOntologyIRI, null, null);
+        final InferredOWLOntologyID onto1 = new InferredOWLOntologyID(this.testBaseOntologyIRI, null, null);
         final OWLOntologyID onto2 = new OWLOntologyID(this.testBaseOntologyIRI, null);
         
         Assert.assertTrue(onto1.equals(onto2));
@@ -180,6 +181,7 @@ public class InferredOWLOntologyIDTest
     
     /**
      * Compare two that have different version IRIs
+     * 
      * @throws Exception
      */
     @Test
@@ -199,6 +201,7 @@ public class InferredOWLOntologyIDTest
     
     /**
      * Compare two that have different version IRIs and Inferred IRIs
+     * 
      * @throws Exception
      */
     @Test
@@ -218,6 +221,40 @@ public class InferredOWLOntologyIDTest
         Assert.assertFalse(onto1.equals(onto2));
     }
     
-
+    @Test
+    public void testEqualInferredIRIAndNullInferredIRI() throws Exception
+    {
+        final InferredOWLOntologyID onto1 =
+                new InferredOWLOntologyID(this.testBaseOntologyIRI, this.testOntologyVersionIRI, null);
+        final InferredOWLOntologyID onto2 =
+                new InferredOWLOntologyID(this.testBaseOntologyIRI, this.testOntologyVersionIRI,
+                        this.testInferredOntologyIRI);
+        
+        Assert.assertFalse(onto1.equals(onto2));
+        Assert.assertFalse(onto2.equals(onto1));
+        
+    }
+    
+    @Test
+    public void testToString() throws Exception
+    {
+        final InferredOWLOntologyID onto1 =
+                new InferredOWLOntologyID(this.testBaseOntologyIRI, this.testOntologyVersionIRI,
+                        this.testInferredOntologyIRI);
+        final String onto1StringRepresentation = onto1.toString();
+        Assert.assertNotNull("toString() returned NULL", onto1StringRepresentation);
+        Assert.assertTrue(onto1StringRepresentation.contains(this.testBaseOntologyIRI.toString()));
+        Assert.assertTrue(onto1StringRepresentation.contains(this.testOntologyVersionIRI.toString()));
+        Assert.assertTrue(onto1StringRepresentation.contains(this.testInferredOntologyIRI.toString()));
+        
+        final InferredOWLOntologyID onto2 =
+                new InferredOWLOntologyID(this.testBaseOntologyIRI, this.testOntologyVersionIRI, null);
+        final String onto2StringRepresentation = onto2.toString();
+        Assert.assertNotNull("toString() returned NULL", onto2StringRepresentation);
+        Assert.assertTrue(onto2StringRepresentation.contains(this.testBaseOntologyIRI.toString()));
+        Assert.assertTrue(onto2StringRepresentation.contains(this.testOntologyVersionIRI.toString()));
+        Assert.assertFalse(onto2StringRepresentation.contains(this.testInferredOntologyIRI.toString()));
+        
+    }
     
 }
