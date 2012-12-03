@@ -29,25 +29,6 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
      */
     protected abstract PoddProcessorFactory<T, I> getNewPoddProcessorFactory();
     
-    /**
-     * Set the Stages that can be handled by this particular Processor Factory
-     * 
-     * @param factory
-     *            The PoddProcessorFactory whose handled stages are being updated
-     * @param stages
-     *            The PoddProcessorStages that are to be added to the "handled list of stages"
-     */
-    protected abstract void addProcessorFactoryStages(PoddProcessorFactory<T, I> factory, PoddProcessorStage... stages);
-    
-    /**
-     * Adds the specified number of Processors to the ProcessorFactory
-     * 
-     * @param factory
-     *            PODD Processors are to be added to this factory
-     * @param noOfProcessors
-     */
-    protected abstract void addProcessorsToFactory(PoddProcessorFactory<T, I> factory, int noOfProcessors);
-    
     @Before
     public void setUp() throws Exception
     {
@@ -75,63 +56,6 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
         }
     }
     
-    @Test
-    public void testCanHandleStageWithOneStage() throws Exception
-    {
-        final PoddProcessorStage[] supportedStages = { PoddProcessorStage.PROFILE_CHECK };
-        final PoddProcessorStage[] unsupportedStages =
-                { PoddProcessorStage.CONCRETE_AXIOM_STORAGE, PoddProcessorStage.RDF_PARSING,
-                        PoddProcessorStage.CONSISTENCY_CHECK, PoddProcessorStage.INFERENCE,
-                        PoddProcessorStage.INFERRED_AXIOM_STORAGE, PoddProcessorStage.OWL_AXIOM };
-        this.addProcessorFactoryStages(this.processorFactory, supportedStages);
-        
-        this.assertCanHandleStage(supportedStages, unsupportedStages);
-    }
-    
-    @Test
-    public void testCanHandleStageWithTwoStages() throws Exception
-    {
-        final PoddProcessorStage[] supportedStages =
-                { PoddProcessorStage.PROFILE_CHECK, PoddProcessorStage.RDF_PARSING };
-        final PoddProcessorStage[] unsupportedStages =
-                { PoddProcessorStage.CONCRETE_AXIOM_STORAGE, PoddProcessorStage.CONSISTENCY_CHECK,
-                        PoddProcessorStage.INFERENCE, PoddProcessorStage.INFERRED_AXIOM_STORAGE,
-                        PoddProcessorStage.OWL_AXIOM };
-        this.addProcessorFactoryStages(this.processorFactory, supportedStages);
-        
-        this.assertCanHandleStage(supportedStages, unsupportedStages);
-    }
-    
-    @Test
-    public void testCanHandleStageWithAllStages() throws Exception
-    {
-        final PoddProcessorStage[] supportedStages = PoddProcessorStage.values();
-        final PoddProcessorStage[] otherStages = {};
-        this.addProcessorFactoryStages(this.processorFactory, supportedStages);
-        
-        this.assertCanHandleStage(supportedStages, otherStages);
-    }
-    
-    protected void assertCanHandleStage(final PoddProcessorStage[] supported, final PoddProcessorStage[] unsupported)
-    {
-        for(final PoddProcessorStage thisStage : supported)
-        {
-            Assert.assertTrue(this.processorFactory.canHandleStage(thisStage));
-        }
-        for(final PoddProcessorStage otherStage : unsupported)
-        {
-            Assert.assertFalse(this.processorFactory.canHandleStage(otherStage));
-        }
-    }
-    
-    @Test
-    public void testGetStagesWithNoSupportedStages() throws Exception
-    {
-        final Set<PoddProcessorStage> stages = this.processorFactory.getStages();
-        Assert.assertNotNull("getStages() returned a NULL Set", stages);
-        Assert.assertEquals("Should have returned an empty Set", 0, stages.size());
-    }
-    
     /**
      * Tests that ProcessorFactory.getStages() returns an accurate representation of the stages
      * supported by a PoddProcessorFactory.
@@ -139,55 +63,39 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
      * @throws Exception
      */
     @Test
-    public void testGetStagesWithOneStage() throws Exception
+    public void testCanHandleStageWithAllStages() throws Exception
     {
-        final PoddProcessorStage[] supportedStages = { PoddProcessorStage.PROFILE_CHECK };
+        for(final PoddProcessorStage supportedStage : this.processorFactory.getStages())
+        {
+            Assert.assertTrue(this.processorFactory.canHandleStage(supportedStage));
+        }
         
-        this.addProcessorFactoryStages(this.processorFactory, supportedStages);
-        
-        final Set<PoddProcessorStage> stages = this.processorFactory.getStages();
-        
-        Assert.assertEquals(1, stages.size());
-        Assert.assertTrue(stages.contains(supportedStages[0]));
+        for(final PoddProcessorStage aStage : PoddProcessorStage.values())
+        {
+            if(!this.processorFactory.getStages().contains(aStage))
+            {
+                Assert.assertFalse(this.processorFactory.canHandleStage(aStage));
+            }
+        }
     }
     
     @Test
-    public void testGetStagesWithThreeStages() throws Exception
+    public void testGetStagesNotEmpty() throws Exception
     {
-        final PoddProcessorStage[] supportedStages =
-                { PoddProcessorStage.PROFILE_CHECK, PoddProcessorStage.OWL_AXIOM,
-                        PoddProcessorStage.INFERRED_AXIOM_STORAGE };
-        
-        this.addProcessorFactoryStages(this.processorFactory, supportedStages);
-        
         final Set<PoddProcessorStage> stages = this.processorFactory.getStages();
-        
-        Assert.assertEquals(3, stages.size());
-        Assert.assertTrue(stages.contains(supportedStages[0]));
-        Assert.assertTrue(stages.contains(supportedStages[1]));
-        Assert.assertTrue(stages.contains(supportedStages[2]));
+        Assert.assertNotNull("getStages() returned a NULL Set", stages);
+        Assert.assertFalse("Should have returned an empty Set", stages.isEmpty());
     }
     
     /**
-     * Simple test that getProcessor() can be invoked
+     * Test that no null processors are returned by processor factory.
      * 
      * @throws Exception
      */
     @Test
-    public void testGetProcessorSimple() throws Exception
+    public void testGetProcessorNotNull() throws Exception
     {
-        this.processorFactory.getProcessor();
-    }
-    
-    /**
-     * Test that when no processors are recorded with the factory, NULL is returned
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testGetProcessorFromEmptyFactory() throws Exception
-    {
-        final PoddProcessor poddProcessor = this.processorFactory.getProcessor();
+        final PoddProcessor<I> poddProcessor = this.processorFactory.getProcessor();
         Assert.assertNull("Was expecting null for the Podd Processor", poddProcessor);
     }
     
@@ -199,30 +107,15 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
     @Test
     public void testGetProcessorSingleFactory() throws Exception
     {
-        this.addProcessorsToFactory(this.processorFactory, 1);
+        final PoddProcessor<I> poddProcessor = this.processorFactory.getProcessor();
         
-        final PoddProcessor poddProcessor = this.processorFactory.getProcessor();
-        
-        Assert.assertNull("Was expecting null for the Podd Processor", poddProcessor);
+        Assert.assertNotNull("Podd Processor was null", poddProcessor);
     }
     
     @Test
     public void testGetKey() throws Exception
     {
-        this.processorFactory.getKey();
-    }
-    
-    @Test
-    public void testGetKeyDifferent() throws Exception
-    {
-        final String key1 = this.processorFactory.getKey();
-        Assert.assertNotNull("ProcessorFactory.getKey() returned a NULL", key1);
-        
-        final String key2 = this.getNewPoddProcessorFactory().getKey();
-        Assert.assertNotNull("ProcessorFactory.getKey() returned a NULL", key1);
-        
-        Assert.assertFalse(key1.equals(key2));
-        Assert.assertFalse(key2.equals(key1));
+        Assert.assertNotNull(this.processorFactory.getKey());
     }
     
 }
