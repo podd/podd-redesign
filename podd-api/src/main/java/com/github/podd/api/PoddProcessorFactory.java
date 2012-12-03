@@ -26,6 +26,8 @@ public interface PoddProcessorFactory<T extends PoddProcessor<I>, I>
      * @param stage
      *            The stage that is being queried.
      * @return True if the processors created by this factory can handle the given stage.
+     * @throws NullPointerException
+     *            If a NULL value is passed in as the stage.
      */
     boolean canHandleStage(PoddProcessorStage stage);
     
@@ -46,7 +48,8 @@ public interface PoddProcessorFactory<T extends PoddProcessor<I>, I>
     
     /**
      * 
-     * @return A set of stages that this processor factory is relevant to.
+     * @return A set of stages that this processor factory is relevant to. An empty set is returned
+     *          if, for some reason this factory does not support any stages.
      */
     Set<PoddProcessorStage> getStages();
 }
