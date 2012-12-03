@@ -96,19 +96,6 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
     public void testGetProcessorNotNull() throws Exception
     {
         final PoddProcessor<I> poddProcessor = this.processorFactory.getProcessor();
-        Assert.assertNull("Was expecting null for the Podd Processor", poddProcessor);
-    }
-    
-    /**
-     * Test that when no processors are recorded with the factory, NULL is returned
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testGetProcessorSingleFactory() throws Exception
-    {
-        final PoddProcessor<I> poddProcessor = this.processorFactory.getProcessor();
-        
         Assert.assertNotNull("Podd Processor was null", poddProcessor);
     }
     
