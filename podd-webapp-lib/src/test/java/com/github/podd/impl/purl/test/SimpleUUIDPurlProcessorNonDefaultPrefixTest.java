@@ -7,18 +7,21 @@ import org.openrdf.model.URI;
 
 import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.test.AbstractPoddPurlProcessorTest;
-import com.github.podd.impl.purl.SimplePoddPurlProcessor;
+import com.github.podd.impl.purl.SimpleUUIDPurlProcessor;
 
 /**
  * @author kutila
  * 
  */
-public class SimplePoddPurlProcessorDefaultPrefixTest extends AbstractPoddPurlProcessorTest
+public class SimpleUUIDPurlProcessorNonDefaultPrefixTest extends AbstractPoddPurlProcessorTest
 {
+    
+    private final String purlPrefix = "urn:example:purl";
+    
     @Override
     protected PoddPurlProcessor getNewPoddPurlProcessor()
     {
-        return new SimplePoddPurlProcessor();
+        return new SimpleUUIDPurlProcessor(this.purlPrefix);
     }
     
     @Override
@@ -26,6 +29,7 @@ public class SimplePoddPurlProcessorDefaultPrefixTest extends AbstractPoddPurlPr
     {
         // NOTE: This method will start giving incorrect results when
         // multiple PurlProcessors use the same prefix
-        return purl.stringValue().startsWith(SimplePoddPurlProcessor.DEFAULT_PREFIX);
+        return purl.stringValue().startsWith(this.purlPrefix);
     }
+    
 }
