@@ -112,9 +112,58 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
         }
         
         final Repository repository = new SailRepository(new MemoryStore());
-        final RepositoryConnection repositoryConnection = repository.getConnection();
+        try
+        {
+            repository.initialize();
+            final RepositoryConnection repositoryConnection = repository.getConnection();
+            
+            repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlBuilder.toString());
+            
+            repositoryConnection.close();
+        }
+        finally
+        {
+            repository.shutDown();
+        }
+    }
+    
+    /**
+     * Test that a valid SPARQL query can be constructed based on the parts returned by this
+     * factory.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testSPARQLQueryStringWithSubject() throws Exception
+    {
+        final URI subject = ValueFactoryImpl.getInstance().createURI("http://example.com/podd/user#Will");
         
-        repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlBuilder.toString());
+        final StringBuilder sparqlBuilder = new StringBuilder();
+        sparqlBuilder.append("CONSTRUCT { ");
+        sparqlBuilder.append(this.rdfProcessorFactory.getSPARQLConstructBGP());
+        sparqlBuilder.append(" } WHERE { ");
+        sparqlBuilder.append(this.rdfProcessorFactory.getSPARQLConstructWhere(subject));
+        sparqlBuilder.append(" } ");
+        if(!this.rdfProcessorFactory.getSPARQLGroupBy().isEmpty())
+        {
+            sparqlBuilder.append(" GROUP BY ");
+            sparqlBuilder.append(this.rdfProcessorFactory.getSPARQLGroupBy());
+        }
+        
+        final Repository repository = new SailRepository(new MemoryStore());
+        try
+        {
+            repository.initialize();
+            final RepositoryConnection repositoryConnection = repository.getConnection();
+            
+            repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlBuilder.toString());
+            
+            repositoryConnection.close();
+        }
+        finally
+        {
+            repository.shutDown();
+        }
     }
     
 }

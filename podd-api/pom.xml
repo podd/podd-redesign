@@ -31,6 +31,10 @@
             <artifactId>sesame-sail-memory</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryparser-sparql</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.ansell.owlapi</groupId>
             <artifactId>owlapi-api</artifactId>
         </dependency>
