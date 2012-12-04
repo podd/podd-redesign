@@ -22,7 +22,7 @@ import com.github.podd.api.PoddProcessorStage;
  */
 public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I>, I>
 {
-    protected PoddProcessorFactory<T, I> processorFactory;
+    private PoddProcessorFactory<T, I> processorFactory;
     
     /**
      * @return A new PoddProcessorFactory instance for use in the test
@@ -84,7 +84,7 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
     {
         final Set<PoddProcessorStage> stages = this.processorFactory.getStages();
         Assert.assertNotNull("getStages() returned a NULL Set", stages);
-        Assert.assertFalse("Should have returned an empty Set", stages.isEmpty());
+        Assert.assertFalse("Should not have returned an empty Set", stages.isEmpty());
     }
     
     /**
