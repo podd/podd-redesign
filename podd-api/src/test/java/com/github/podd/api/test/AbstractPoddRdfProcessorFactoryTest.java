@@ -19,6 +19,7 @@ import org.openrdf.sail.memory.MemoryStore;
 import com.github.podd.api.PoddProcessorFactory;
 import com.github.podd.api.PoddRdfProcessor;
 import com.github.podd.api.PoddRdfProcessorFactory;
+import com.github.podd.utils.PoddRdfUtils;
 
 /**
  * Abstract class to test PoddRdfProcessorFactory
@@ -99,17 +100,7 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
     @Test
     public void testSPARQLQueryString() throws Exception
     {
-        final StringBuilder sparqlBuilder = new StringBuilder();
-        sparqlBuilder.append("CONSTRUCT { ");
-        sparqlBuilder.append(this.rdfProcessorFactory.getSPARQLConstructBGP());
-        sparqlBuilder.append(" } WHERE { ");
-        sparqlBuilder.append(this.rdfProcessorFactory.getSPARQLConstructWhere());
-        sparqlBuilder.append(" } ");
-        if(!this.rdfProcessorFactory.getSPARQLGroupBy().isEmpty())
-        {
-            sparqlBuilder.append(" GROUP BY ");
-            sparqlBuilder.append(this.rdfProcessorFactory.getSPARQLGroupBy());
-        }
+        final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory);
         
         final Repository repository = new SailRepository(new MemoryStore());
         try
@@ -117,7 +108,7 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
             repository.initialize();
             final RepositoryConnection repositoryConnection = repository.getConnection();
             
-            repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlBuilder.toString());
+            repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
             
             repositoryConnection.close();
         }
@@ -138,17 +129,7 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
     {
         final URI subject = ValueFactoryImpl.getInstance().createURI("http://example.com/podd/user#Will");
         
-        final StringBuilder sparqlBuilder = new StringBuilder();
-        sparqlBuilder.append("CONSTRUCT { ");
-        sparqlBuilder.append(this.rdfProcessorFactory.getSPARQLConstructBGP());
-        sparqlBuilder.append(" } WHERE { ");
-        sparqlBuilder.append(this.rdfProcessorFactory.getSPARQLConstructWhere(subject));
-        sparqlBuilder.append(" } ");
-        if(!this.rdfProcessorFactory.getSPARQLGroupBy().isEmpty())
-        {
-            sparqlBuilder.append(" GROUP BY ");
-            sparqlBuilder.append(this.rdfProcessorFactory.getSPARQLGroupBy());
-        }
+        final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory, subject);
         
         final Repository repository = new SailRepository(new MemoryStore());
         try
@@ -156,7 +137,7 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
             repository.initialize();
             final RepositoryConnection repositoryConnection = repository.getConnection();
             
-            repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlBuilder.toString());
+            repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
             
             repositoryConnection.close();
         }
