@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.openrdf.model.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.purl.PoddPurlProcessor;
@@ -22,6 +24,8 @@ import com.github.podd.api.purl.PoddPurlProcessorFactory;
  */
 public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
 {
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    
     private String prefix;
     
     private String[] temporaryUriArray;
@@ -40,7 +44,7 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
     public String getSPARQLConstructWhere()
     {
         final StringBuilder builder = new StringBuilder();
-
+        
         // match all triples
         builder.append(" ?subject ?predicate ?object ");
         
@@ -48,23 +52,23 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
         if(this.temporaryUriArray != null && this.temporaryUriArray.length > 0)
         {
             builder.append("FILTER ( ");
-            int startLength = builder.length();
+            final int startLength = builder.length();
             
-            for (String tempUri : temporaryUriArray)
+            for(final String tempUri : this.temporaryUriArray)
             {
-                if (builder.length() > startLength)
+                if(builder.length() > startLength)
                 {
                     builder.append(" || ");
                 }
-                builder.append(" regex(?subject, ");
-                builder.append("\"^");
+                builder.append(" strstarts(STR(?subject), ");
+                builder.append("\"");
                 builder.append(tempUri);
-                builder.append("\")"); 
+                builder.append("\")");
                 builder.append(" || ");
-                builder.append(" regex(?predicate, ");
-                builder.append("\"^");
+                builder.append(" strstarts(STR(?object), ");
+                builder.append("\"");
                 builder.append(tempUri);
-                builder.append("\")"); 
+                builder.append("\")");
             }
             builder.append(" ) ");
             
