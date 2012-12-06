@@ -9,6 +9,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.QueryLanguage;
@@ -62,10 +64,11 @@ public class SimpleUUIDPurlProcessorFactoryTest extends AbstractPoddRdfProcessor
         this.log.info("Generated SPARQL <{}> ", sparql);
         
         final Repository repository = new SailRepository(new MemoryStore());
+        RepositoryConnection repositoryConnection = null;
         try
         {
             repository.initialize();
-            final RepositoryConnection repositoryConnection = repository.getConnection();
+            repositoryConnection = repository.getConnection();
             repositoryConnection.setAutoCommit(false);
             
             // load RDF graph into Repository
@@ -76,8 +79,7 @@ public class SimpleUUIDPurlProcessorFactoryTest extends AbstractPoddRdfProcessor
             repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
             repositoryConnection.commit();
             
-            final GraphQuery query =
-                    repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
+            final GraphQuery query = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
             
             // verify SPARQL generated a graph as expected
             final GraphQueryResult result = query.evaluate();
@@ -105,8 +107,69 @@ public class SimpleUUIDPurlProcessorFactoryTest extends AbstractPoddRdfProcessor
         }
         finally
         {
+            if(repositoryConnection != null)
+            {
+                repositoryConnection.close();
+            }
             repository.shutDown();
         }
     }
-
+    
+    @Test
+    public void testSPARQLQueryWithSubjectViaExecution() throws Exception
+    {
+        final PoddRdfProcessorFactory<PoddPurlProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
+        
+        // build SPARQL query
+        final URI subject = ValueFactoryImpl.getInstance().createURI("urn:temp:object:2966");
+        final String sparql = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory, subject);
+        this.log.info("Generated SPARQL <{}> ", sparql);
+        
+        // verify SPARQL generated a graph as expected
+        final Repository repository = new SailRepository(new MemoryStore());
+        RepositoryConnection repositoryConnection = null;
+        try
+        {
+            repository.initialize();
+            repositoryConnection = repository.getConnection();
+            repositoryConnection.setAutoCommit(false);
+            
+            // load RDF graph into Repository
+            final String artifactResourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+            final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);
+            Assert.assertNotNull("Could not find resource", inputStream);
+            
+            repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
+            repositoryConnection.commit();
+            
+            final GraphQuery query = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
+            
+            // verify SPARQL generated a graph as expected
+            final GraphQueryResult result = query.evaluate();
+            int count = 0;
+            while(result.hasNext())
+            {
+                final Statement statement = result.next();
+                Assert.assertEquals("Subject was not what was requested", subject, statement.getSubject());
+                count++;
+            }
+            Assert.assertEquals("SPARQL query did not match expected number of statements", 13, count);
+            result.close();
+            repositoryConnection.rollback();
+            repositoryConnection.close();
+        }
+        finally
+        {
+            if(repositoryConnection != null)
+            {
+                repositoryConnection.close();
+            }
+            repository.shutDown();
+        }
+    }
+    
+    private void checkQueryWithRepository() throws Exception
+    {
+        // TODO: extract common content from above two test methods to here
+    }
 }
