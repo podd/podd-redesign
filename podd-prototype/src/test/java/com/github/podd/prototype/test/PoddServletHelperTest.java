@@ -59,7 +59,7 @@ public class PoddServletHelperTest
         
         this.helper = new PoddServletHelper();
         this.helper.setUp(repository);
-
+        
         schemaOntologyList.add(new SimpleEntry<URI, String>(repository.getValueFactory().createURI(
                 PoddServletContextListener.URI_PODD_BASE), PoddServletContextListener.PATH_PODD_BASE));
         schemaOntologyList.add(new SimpleEntry<URI, String>(repository.getValueFactory().createURI(
@@ -117,14 +117,15 @@ public class PoddServletHelperTest
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         
-        final String artifactUriString = this.helper.loadPoddArtifact(in, mimeType);
+        final InferredOWLOntologyID artifactUriString = this.helper.loadPoddArtifact(in, mimeType);
         Assert.assertNotNull(artifactUriString);
         
-        final String resultRDF = this.helper.getArtifact(artifactUriString, mimeType, false);
+        final String resultRDF =
+                this.helper.getArtifact(artifactUriString.getOntologyIRI().toString(), mimeType, false);
         
         Assert.assertNotNull(resultRDF);
         Assert.assertFalse(resultRDF.contains("urn:temp:"));
-        Assert.assertTrue(resultRDF.contains(artifactUriString));
+        Assert.assertTrue(resultRDF.contains(artifactUriString.getOntologyIRI().toString()));
         final URI context = IRI.create("urn:context").toOpenRDFURI();
         final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
         Assert.assertEquals(29, repoConn.size(context));
@@ -154,7 +155,7 @@ public class PoddServletHelperTest
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // now retrieve it via the Helper
@@ -175,7 +176,7 @@ public class PoddServletHelperTest
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // now retrieve it via the Helper
@@ -258,7 +259,7 @@ public class PoddServletHelperTest
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // get artifact to verify it exists
@@ -326,7 +327,7 @@ public class PoddServletHelperTest
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // edit it
@@ -359,7 +360,7 @@ public class PoddServletHelperTest
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/editableProject-1.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // edit it
@@ -397,7 +398,7 @@ public class PoddServletHelperTest
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // edit it with a fragment that contains "invalid" file references
@@ -459,9 +460,9 @@ public class PoddServletHelperTest
             this.helper.attachReference(invalidRef, false);
             Assert.fail("Did not find expected exception");
         }
-        catch(final RuntimeException e)
+        catch(final PoddException e)
         {
-            Assert.assertNotNull(e);
+            Assert.assertEquals("Artifact <http://no.such.artifact> not found.", e.getMessage());
         }
         
         // 2. try attaching to a non-existent object (inside an artifact)
@@ -469,7 +470,7 @@ public class PoddServletHelperTest
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         
         invalidRef.setArtifactUri(addedRDF.getOntologyIRI().toOpenRDFURI().stringValue());
         invalidRef.setObjectUri("urn:poddinternal:no-such-object:0");
@@ -479,9 +480,9 @@ public class PoddServletHelperTest
             this.helper.attachReference(invalidRef, false);
             Assert.fail("Did not find expected exception");
         }
-        catch(final RuntimeException e)
+        catch(final PoddException e)
         {
-            Assert.assertNotNull(e);
+            Assert.assertEquals("Object <urn:poddinternal:no-such-object:0> not found.", e.getMessage());
         }
     }
     
@@ -493,7 +494,7 @@ public class PoddServletHelperTest
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         
         // where to attach the file reference to
         final String artifactToAttachTo = addedRDF.getOntologyIRI().toOpenRDFURI().stringValue();
@@ -546,7 +547,7 @@ public class PoddServletHelperTest
                     this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
             Assert.assertNotNull("Could not find test resource", in);
             final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-            final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+            final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
             
             // where to attach the file reference to
             final String artifactToAttachTo = addedRDF.getOntologyIRI().toOpenRDFURI().stringValue();
@@ -599,7 +600,7 @@ public class PoddServletHelperTest
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         
         // now retrieve it via the Helper
@@ -615,10 +616,10 @@ public class PoddServletHelperTest
             this.helper.getArtifact(artifactUniqueIRI.toString(), mimeType, false);
             Assert.fail("Should have thrown an exception trying to retrieve non-existent artifact");
         }
-        catch(final RuntimeException e)
+        catch(final PoddException e)
         {
-            Assert.assertNotNull(e);
-            Assert.assertTrue(e.getMessage().contains("not found"));
+            Assert.assertTrue(e.getMessage().startsWith("Artifact <"));
+            Assert.assertTrue(e.getMessage().endsWith("> not found."));
         }
         
         final ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -677,7 +678,7 @@ public class PoddServletHelperTest
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
         
-        final String artifactUriString = this.helper.loadPoddArtifact(in, mimeType);
+        final InferredOWLOntologyID artifactUriString = this.helper.loadPoddArtifact(in, mimeType);
         Assert.assertNotNull(artifactUriString);
     }
     
@@ -706,7 +707,7 @@ public class PoddServletHelperTest
         final InputStream in = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Could not find test resource", in);
         final String mimeType = PoddServlet.MIME_TYPE_RDF_XML;
-        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifactInternal(in, mimeType);
+        final InferredOWLOntologyID addedRDF = this.helper.loadPoddArtifact(in, mimeType);
         final URI artifactUniqueIRI = addedRDF.getOntologyIRI().toOpenRDFURI();
         // test with a non-existent artifact
         final InferredOWLOntologyID id = this.helper.getInferredOWLOntologyIDForArtifact("http://nosuch:ontology:1");
