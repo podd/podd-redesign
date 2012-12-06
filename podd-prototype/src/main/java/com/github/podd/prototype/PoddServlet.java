@@ -62,9 +62,10 @@ public class PoddServlet extends PoddBaseServlet
             final String contentType = PoddServlet.MIME_TYPE_RDF_XML;// request.getContentType();
             try
             {
-                final String loadedArtifactUri = helper.loadPoddArtifact(in, contentType);
+                final InferredOWLOntologyID loadedArtifactUri = helper.loadPoddArtifact(in, contentType);
                 response.setContentType(PoddServlet.MIME_TYPE_JSON);
-                out.write(loadedArtifactUri); // should be encapsulated in JSON format
+                // FIXME: should be encapsulated in JSON format
+                out.write(loadedArtifactUri.getOntologyIRI().toString()); 
             }
             catch(final Exception e)
             {

@@ -232,11 +232,45 @@ public class PoddServletHelper
      * @throws IOException
      * @throws OpenRDFException
      */
-    public String loadPoddArtifact(final InputStream inputStream, final String contentType) throws OpenRDFException,
-        IOException, OWLException, PoddException
+    public InferredOWLOntologyID loadPoddArtifact(final InputStream inputStream, final String contentType)
+        throws OpenRDFException, IOException, OWLException, PoddException
     {
-        final InferredOWLOntologyID nextOntology = this.loadPoddArtifactInternal(inputStream, contentType);
-        return nextOntology.getOntologyIRI().toString();
+        RepositoryConnection repositoryConnection = null;
+        
+        try
+        {
+            repositoryConnection = this.nextRepository.getConnection();
+            repositoryConnection.begin();
+            
+            final InferredOWLOntologyID nextOntology =
+                    this.loadPoddArtifactInternal(inputStream, contentType, repositoryConnection);
+            
+            repositoryConnection.commit();
+            
+            return nextOntology;
+        }
+        catch(OpenRDFException | OWLException | IOException | PoddException e)
+        {
+            if(repositoryConnection != null)
+            {
+                repositoryConnection.rollback();
+            }
+            throw e;
+        }
+        finally
+        {
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Test repository connection could not be closed", e);
+                }
+            }
+        }
     }
     
     /**
@@ -261,8 +295,9 @@ public class PoddServletHelper
      * @throws RepositoryException
      * @throws RDFParseException
      */
-    public InferredOWLOntologyID loadPoddArtifactInternal(final InputStream inputStream, final String mimeType)
-        throws OpenRDFException, IOException, OWLException, PoddException
+    public InferredOWLOntologyID loadPoddArtifactInternal(final InputStream inputStream, final String mimeType,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException, IOException, OWLException,
+        PoddException
     {
         this.log.info("ADD artifact: " + mimeType);
         
@@ -276,7 +311,6 @@ public class PoddServletHelper
         // load on to a temporary in-memory repository to create persistent URLs
         Repository tempRepository = null;
         RepositoryConnection tempRepositoryConnection = null;
-        RepositoryConnection repositoryConnection = null;
         
         try
         {
@@ -333,9 +367,6 @@ public class PoddServletHelper
             // 3. Validate the object using a reasoner
             final OWLReasoner reasoner = this.utils.checkConsistency(nextOntology);
             
-            repositoryConnection = this.nextRepository.getConnection();
-            repositoryConnection.begin();
-            
             // 4. Store the object
             this.utils.dumpOntologyToRepository(nextOntology, repositoryConnection);
             
@@ -355,40 +386,52 @@ public class PoddServletHelper
             this.utils.updateCurrentManagedPoddArtifactOntologyVersion(repositoryConnection,
                     nextOntology.getOntologyID(), nextInferredOntology.getOntologyID());
             
-            repositoryConnection.commit();
-            
             return new InferredOWLOntologyID(nextOntology.getOntologyID().getOntologyIRI(), nextOntology
                     .getOntologyID().getVersionIRI(), nextInferredOntology.getOntologyID().getOntologyIRI());
         }
         catch(OpenRDFException | OWLException | IOException | PoddException e)
         {
-            if(repositoryConnection != null)
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
             {
-                repositoryConnection.rollback();
+                tempRepositoryConnection.rollback();
             }
             throw e;
         }
         finally
         {
-            if(repositoryConnection != null)
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
             {
                 try
                 {
-                    repositoryConnection.close();
+                    tempRepositoryConnection.rollback();
                 }
                 catch(final RepositoryException e)
                 {
-                    this.log.error("Test repository connection could not be closed", e);
+                    this.log.warn("Test repository connection could not be rolled back", e);
                 }
             }
-            if(tempRepositoryConnection != null)
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isOpen())
             {
-                tempRepositoryConnection.rollback();
-                tempRepositoryConnection.close();
+                try
+                {
+                    tempRepositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.warn("Test repository connection could not be closed", e);
+                }
+                
             }
             if(tempRepository != null)
             {
-                tempRepository.shutDown();
+                try
+                {
+                    tempRepository.shutDown();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.warn("Test repository could not be shutdown", e);
+                }
             }
         }
     }
@@ -408,7 +451,7 @@ public class PoddServletHelper
      * @throws RDFHandlerException
      */
     public String getArtifact(final String artifactUri, final String mimeType, final boolean includeInferredStatements)
-        throws RepositoryException, RDFHandlerException
+        throws RepositoryException, RDFHandlerException, PoddException
     {
         this.log.info("GET artifact: " + artifactUri);
         RepositoryConnection repositoryConnection = null;
@@ -421,13 +464,7 @@ public class PoddServletHelper
             final InferredOWLOntologyID ontologyID =
                     this.getInferredOWLOntologyIDForArtifactInternal(artifactUri, repositoryConnection);
             
-            repositoryConnection.rollback();
-            repositoryConnection.begin();
-            
             this.checkArtifactExists(repositoryConnection, ontologyID);
-            
-            repositoryConnection.rollback();
-            repositoryConnection.begin();
             
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final RDFHandler rdfWriter =
@@ -442,24 +479,19 @@ public class PoddServletHelper
             {
                 repositoryConnection.export(rdfWriter, ontologyID.getVersionIRI().toOpenRDFURI());
             }
-            repositoryConnection.rollback();
             
             // FIXME: Not a good idea to create strings out of ontologies. Why not take in an
             // OutputStream and export to that??
             return out.toString();
         }
-        catch(RepositoryException | RDFHandlerException e)
+        finally
         {
             if(repositoryConnection != null && repositoryConnection.isActive())
             {
                 repositoryConnection.rollback();
             }
             
-            throw e;
-        }
-        finally
-        {
-            if(repositoryConnection != null)
+            if(repositoryConnection != null && repositoryConnection.isOpen())
             {
                 try
                 {
@@ -560,7 +592,7 @@ public class PoddServletHelper
      * @throws RepositoryException
      *             , RDFHandlerException
      */
-    public String deleteArtifact(final String artifactUri) throws RepositoryException, RDFHandlerException
+    public String deleteArtifact(final String artifactUri) throws RepositoryException, RDFHandlerException, PoddException
     {
         this.log.info("DELETE artifact: " + artifactUri);
         
@@ -603,9 +635,9 @@ public class PoddServletHelper
             repositoryConnection.commit();
             return out.toString();
         }
-        catch(RepositoryException | RDFHandlerException e)
+        catch(RepositoryException | RDFHandlerException | PoddException e )
         {
-            if(repositoryConnection != null)
+            if(repositoryConnection != null && repositoryConnection.isActive())
             {
                 repositoryConnection.rollback();
             }
@@ -613,7 +645,7 @@ public class PoddServletHelper
         }
         finally
         {
-            if(repositoryConnection != null)
+            if(repositoryConnection != null && repositoryConnection.isOpen())
             {
                 try
                 {
@@ -663,7 +695,7 @@ public class PoddServletHelper
         }
         catch(PoddException | OWLException | OpenRDFException | IOException e)
         {
-            if(repositoryConnection != null)
+            if(repositoryConnection != null && repositoryConnection.isActive())
             {
                 repositoryConnection.rollback();
             }
@@ -671,7 +703,7 @@ public class PoddServletHelper
         }
         finally
         {
-            if(repositoryConnection != null)
+            if(repositoryConnection != null && repositoryConnection.isOpen())
             {
                 try
                 {
@@ -837,7 +869,7 @@ public class PoddServletHelper
     public URI attachReference(final FileReference fileReference, final boolean checkFileReferences)
         throws PoddException, OpenRDFException, IOException, OWLException
     {
-        this.log.info("REFERENCE attach: " + fileReference.toString());
+        this.log.info("REFERENCE attach: {}", fileReference.toString());
         
         RepositoryConnection repositoryConnection = null;
         Repository tempRepository = null;
@@ -859,12 +891,11 @@ public class PoddServletHelper
             final URI objectToAttachTo = IRI.create(fileReference.getObjectUri()).toOpenRDFURI();
             final RepositoryResult<Statement> statements =
                     repositoryConnection.getStatements(objectToAttachTo, null, null, false, context);
+            repositoryConnection.rollback();
             if(!statements.hasNext())
             {
-                repositoryConnection.rollback();
-                throw new RuntimeException("Object <" + fileReference.getObjectUri() + "> not found.");
+                throw new PoddException("Object <" + fileReference.getObjectUri() + "> not found.", null, -1);
             }
-            repositoryConnection.rollback();
             
             // populate a temporary in-memory repository with File Reference statements
             tempRepository = new SailRepository(new MemoryStore());
@@ -895,17 +926,47 @@ public class PoddServletHelper
             
             repositoryConnection.commit();
             
+            this.log.info("REFERENCE attach: returning {}", fileReferenceURI);
             return fileReferenceURI;
         }
         catch(PoddException | OWLException | OpenRDFException | IOException e)
         {
-            repositoryConnection.rollback();
-            tempRepositoryConnection.rollback();
+            this.log.info("Found exception", e);
+            
+            if(repositoryConnection != null && repositoryConnection.isActive())
+            {
+                try
+                {
+                    repositoryConnection.rollback();
+                }
+                catch(final RepositoryException re)
+                {
+                    this.log.warn("Repository connection could not be rolled back", re);
+                }
+            }
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
+            {
+                try
+                {
+                    tempRepositoryConnection.rollback();
+                }
+                catch(final RepositoryException re)
+                {
+                    this.log.warn("Temp repository connection could not be rolled back", re);
+                }
+            }
+            
             throw e;
+        }
+        catch(Throwable t)
+        {
+            this.log.info("Found unexpected throwable", t);
+            
+            throw new RuntimeException("Exception while attaching file reference", t);
         }
         finally
         {
-            if(repositoryConnection != null)
+            if(repositoryConnection != null && repositoryConnection.isOpen())
             {
                 try
                 {
@@ -913,7 +974,18 @@ public class PoddServletHelper
                 }
                 catch(final RepositoryException e)
                 {
-                    this.log.error("Test repository connection could not be closed", e);
+                    this.log.error("Repository connection could not be closed", e);
+                }
+            }
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isOpen())
+            {
+                try
+                {
+                    tempRepositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Temp repository connection could not be closed", e);
                 }
             }
         }
@@ -990,13 +1062,12 @@ public class PoddServletHelper
      * @throws RepositoryException
      */
     private void checkArtifactExists(final RepositoryConnection repositoryConnection,
-            final InferredOWLOntologyID ontologyID) throws RepositoryException
+            final InferredOWLOntologyID ontologyID) throws RepositoryException, PoddException
     {
         if(ontologyID.getVersionIRI() == null
                 || repositoryConnection.size(ontologyID.getVersionIRI().toOpenRDFURI()) < 1)
         {
-            // FIXME: Create a subclass of PoddException for this type of exception
-            throw new RuntimeException("Artifact <" + ontologyID.getOntologyIRI() + "> not found.");
+            throw new PoddException("Artifact <" + ontologyID.getOntologyIRI() + "> not found.", null, -1);
         }
     }
     
