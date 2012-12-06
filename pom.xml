@@ -19,11 +19,11 @@
 
     <modules>
 <!--
-	no longer building prototype regularly
+	no longer building prototype regularly -->
         <module>podd-prototype</module>
         <module>podd-integrationtest</module>
         <module>podd-prototype-csiro</module>
---> 
+<!--  --> 
         <module>podd-api</module>
         <module>podd-webapp-lib</module>
     </modules>

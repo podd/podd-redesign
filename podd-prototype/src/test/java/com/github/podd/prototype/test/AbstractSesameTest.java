@@ -62,7 +62,7 @@ public abstract class AbstractSesameTest
         this.testValueFactory = this.testRepository.getValueFactory();
         
         this.testRepositoryConnection = this.testRepository.getConnection();
-        this.testRepositoryConnection.setAutoCommit(false);
+        this.testRepositoryConnection.begin();
     }
     
     /**
@@ -77,6 +77,7 @@ public abstract class AbstractSesameTest
         {
             try
             {
+                this.testRepositoryConnection.rollback();
                 this.testRepositoryConnection.close();
             }
             catch(final RepositoryException e)
