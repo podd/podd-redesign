@@ -520,7 +520,7 @@ public class PoddServletHelper
      * @throws RepositoryException
      */
     public void getSchemaOntology(final String uriString, final String mimeType, final OutputStream out)
-        throws RDFHandlerException, RepositoryException
+        throws RDFHandlerException, RepositoryException, PoddException
     {
         this.log.info("GET schema ontology: " + uriString);
         RepositoryConnection repositoryConnection = null;
@@ -546,13 +546,13 @@ public class PoddServletHelper
                 else
                 {
                     this.log.error("Object {} was not a URI", statement);
-                    throw new RuntimeException("Current Version <" + uriString + "> not a URI");
+                    throw new PoddException("Current Version <" + uriString + "> not a URI", null, -1);
                 }
             }
             
             if(ontologyVersionURI == null)
             {
-                throw new RuntimeException("Schema Ontology <" + uriString + "> not found.");
+                throw new PoddException("Schema Ontology <" + uriString + "> not found.", null, -1);
             }
             
             // read all statements and write to the output stream
@@ -561,9 +561,11 @@ public class PoddServletHelper
             repositoryConnection.export(rdfWriter, ontologyVersionURI);
             repositoryConnection.rollback();
         }
-        catch(RepositoryException | RDFHandlerException e)
+        catch(RepositoryException | RDFHandlerException | PoddException e)
         {
-            if(repositoryConnection != null)
+            this.log.info("Found exception", e);
+            
+            if(repositoryConnection != null && repositoryConnection.isActive())
             {
                 repositoryConnection.rollback();
             }
@@ -571,7 +573,7 @@ public class PoddServletHelper
         }
         finally
         {
-            if(repositoryConnection != null)
+            if(repositoryConnection != null && repositoryConnection.isOpen())
             {
                 try
                 {
@@ -957,12 +959,6 @@ public class PoddServletHelper
             }
             
             throw e;
-        }
-        catch(Throwable t)
-        {
-            this.log.info("Found unexpected throwable", t);
-            
-            throw new RuntimeException("Exception while attaching file reference", t);
         }
         finally
         {
