@@ -205,10 +205,10 @@ public class PoddServletHelperTest
             this.helper.getSchemaOntology(ontologyUri, mimeType, new ByteArrayOutputStream());
             Assert.fail("Should have thrown an exception");
         }
-        catch(final RuntimeException e)
+        catch(final PoddException e)
         {
-            Assert.assertNotNull(e);
-            Assert.assertTrue(e.getMessage().contains("not found"));
+            Assert.assertTrue(e.getMessage().startsWith("Schema Ontology"));
+            Assert.assertTrue(e.getMessage().endsWith("not found."));
         }
     }
     
