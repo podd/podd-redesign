@@ -402,7 +402,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         getBaseRequest.setCookies(this.cookies);
         final Response getBaseResponse = this.getClient().handle(getBaseRequest);
         
-        Assert.assertEquals(Status.CLIENT_ERROR_NOT_FOUND.getCode(), getBaseResponse.getStatus().getCode());
+        Assert.assertEquals(Status.SERVER_ERROR_INTERNAL.getCode(), getBaseResponse.getStatus().getCode());
     }
     
     /**
@@ -551,7 +551,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         getBaseRequest.setCookies(this.cookies);
         final Response getBaseResponse = this.getClient().handle(getBaseRequest);
         
-        Assert.assertEquals(Status.CLIENT_ERROR_NOT_FOUND.getCode(), getBaseResponse.getStatus().getCode());
+        Assert.assertEquals(Status.SERVER_ERROR_INTERNAL.getCode(), getBaseResponse.getStatus().getCode());
     }
     
 }

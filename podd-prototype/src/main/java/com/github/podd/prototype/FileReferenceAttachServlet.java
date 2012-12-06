@@ -79,19 +79,11 @@ public class FileReferenceAttachServlet extends PoddBaseServlet
             out.flush();
             out.close();
         }
-        catch(final RuntimeException e)
+        catch(final PoddException | OpenRDFException | OWLException e)
         {
             final String message = "REFERENCE attach failed. " + e.getMessage();
             this.log.error(message);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, message); // client error
-            return;
-        }
-        catch(final PoddException | OWLException | OpenRDFException e)
-        {
-            // TODO: handle different failure cases
-            final String message = "REFERENCE attach failed: " + e.getMessage();
-            this.log.error(message);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
             return;
         }
         
