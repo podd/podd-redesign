@@ -46,16 +46,20 @@ public class PoddRdfUtils
         sparqlBuilder.append("CONSTRUCT { ");
         sparqlBuilder.append(rdfProcessorFactory.getSPARQLConstructBGP());
         sparqlBuilder.append(" } WHERE { ");
+
+        sparqlBuilder.append(rdfProcessorFactory.getSPARQLConstructWhere());
         
-        if(subject == null)
-        {
-            sparqlBuilder.append(rdfProcessorFactory.getSPARQLConstructWhere());
-        }
-        else
-        {
-            sparqlBuilder.append(rdfProcessorFactory.getSPARQLConstructWhere(subject));
-        }
         sparqlBuilder.append(" }");
+
+        if(subject != null)
+        {
+            sparqlBuilder.append(" VALUES (?");
+            sparqlBuilder.append(rdfProcessorFactory.getSPARQLVariable());
+            sparqlBuilder.append(") { (<");
+            sparqlBuilder.append(subject.stringValue());
+            sparqlBuilder.append("> ) }");
+        }
+        
         if(!rdfProcessorFactory.getSPARQLGroupBy().isEmpty())
         {
             sparqlBuilder.append(" GROUP BY ");

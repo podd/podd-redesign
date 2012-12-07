@@ -79,10 +79,9 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
     }
     
     @Test
-    public void testGetSPARQLConstructWhereWithUri() throws Exception
+    public void testGetSPARQLVariable() throws Exception
     {
-        final URI uri = ValueFactoryImpl.getInstance().createURI("urn:temporary/uri");
-        Assert.assertNotNull("WHERE with Subject was null", this.rdfProcessorFactory.getSPARQLConstructWhere(uri));
+        Assert.assertNotNull("SPARQL variable was null", this.rdfProcessorFactory.getSPARQLVariable());
     }
     
     @Test

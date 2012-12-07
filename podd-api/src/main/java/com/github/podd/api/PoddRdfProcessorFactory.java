@@ -34,18 +34,10 @@ public interface PoddRdfProcessorFactory<T extends PoddRdfProcessor> extends Pod
     String getSPARQLConstructWhere();
     
     /**
-     * Creates a query that can be used to construct triples relevant to the object with the given
-     * subject URI, as long as it is relevant to this processor.
      * 
-     * NOTE: This method will likely be called for each of the results from a query using
-     * getSPARQLConstructWhere(), but that behaviour may not be always the case, so the type of the
-     * subject still needs to be validated inside of the query.
-     * 
-     * @param subject
-     *            The URI of a specific object to fetch results for.
-     * @return
+     * @return The name of the variable to be bound to
      */
-    String getSPARQLConstructWhere(URI subject);
+    String getSPARQLVariable();
     
     /**
      * 

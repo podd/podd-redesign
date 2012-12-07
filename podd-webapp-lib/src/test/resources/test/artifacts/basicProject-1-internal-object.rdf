@@ -8,10 +8,10 @@
 	xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
 	xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
 
-<rdf:Description rdf:about="urn:temp:artifact:1">
+<rdf:Description rdf:about="urn:temp:uuid:artifact:1">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
-	<owl:versionIRI rdf:resource="urn:temp:artifact:version:1" />
-	<poddBase:artifactHasTopObject rdf:resource="urn:temp:object:2966"/>
+	<owl:versionIRI rdf:resource="urn:temp:uuid:artifact:version:1" />
+	<poddBase:artifactHasTopObject rdf:resource="urn:temp:uuid:object:2966"/>
 	<owl:imports rdf:resource="http://purl.org/podd/ns/poddBase" />
 	<owl:imports rdf:resource="http://purl.org/podd/ns/poddScience" />
 </rdf:Description>
@@ -45,10 +45,10 @@
 <rdf:Description rdf:about="urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0">
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
 	<rdfs:label>poddScience#Analysis 0</rdfs:label>
-	<poddBase:containedBy rdf:resource="urn:temp:object:2966"/>
+	<poddBase:containedBy rdf:resource="urn:temp:uuid:object:2966"/>
 </rdf:Description>
 
-<rdf:Description rdf:about="urn:temp:object:2966">
+<rdf:Description rdf:about="urn:temp:uuid:object:2966">
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Project"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Project#2012-0006_ Cotton Leaf Morphology</rdfs:label>

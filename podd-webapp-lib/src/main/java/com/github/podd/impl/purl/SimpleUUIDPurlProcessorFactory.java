@@ -4,7 +4,9 @@
 package com.github.podd.impl.purl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.openrdf.model.URI;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
+import com.github.podd.api.purl.PoddPurlProcessorPrefixes;
 
 /**
  * A Simple Processor Factory that creates <code>SimpleUUIDPurlProcessor</code> instances.
@@ -28,7 +31,7 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
     
     private String prefix;
     
-    private String[] temporaryUriArray;
+    private final List<String> temporaryUriArray = Collections.unmodifiableList(Arrays.asList(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix()));
     
     /* The fixed set of stages supported by this Factory */
     private static final Set<PoddProcessorStage> stages = new HashSet<PoddProcessorStage>(
@@ -49,7 +52,7 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
         builder.append(" ?subject ?predicate ?object ");
         
         // get a focused SPARQL by checking for the temporary URI patterns
-        if(this.temporaryUriArray != null && this.temporaryUriArray.length > 0)
+        if(!this.temporaryUriArray.isEmpty())
         {
             builder.append("FILTER ( ");
             final int startLength = builder.length();
@@ -97,23 +100,9 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
      * @see com.github.podd.api.PoddRdfProcessorFactory#getSPARQLConstructWhere(URI)
      */
     @Override
-    public String getSPARQLConstructWhere(final URI subject)
+    public String getSPARQLVariable()
     {
-        if(subject == null)
-        {
-            return "?subject ?predicate ?object";
-        }
-        else
-        {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("?subject ?predicate ?object ");
-            builder.append("FILTER ( ");
-            builder.append(" ?subject = <");
-            builder.append(subject.stringValue());
-            builder.append("> ");
-            builder.append(")");
-            return builder.toString();
-        }
+        return "subject";
     }
     
     @Override
@@ -142,7 +131,7 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
     @Override
     public PoddPurlProcessor getProcessor()
     {
-        if(this.temporaryUriArray == null || this.temporaryUriArray.length == 0)
+        if(this.temporaryUriArray.isEmpty())
         {
             // NOTE: Could throw a custom exception, possibly extending a PoddRuntimeException ?
             throw new RuntimeException("Not enough data (temporary URIs) to create SimplePoddPurlProcessor");
@@ -180,16 +169,6 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
     public void setPrefix(final String prefix)
     {
         this.prefix = prefix;
-    }
-    
-    /**
-     * 
-     * @param temporaryUri
-     *            The temporary URIs that the PurlProcessor created by this factory can handle.
-     */
-    public void setTemporaryUriArray(final String[] temporaryUri)
-    {
-        this.temporaryUriArray = temporaryUri;
     }
     
 }

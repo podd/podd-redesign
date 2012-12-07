@@ -29,8 +29,6 @@ public class SimplePoddPurlManagerTest extends AbstractPoddPurlManagerTest
         registry.clear();
         
         SimpleUUIDPurlProcessorFactory uuidPurlProcessorFactory = new SimpleUUIDPurlProcessorFactory();
-        String[] temporaryUriArray = new String[] { AbstractPoddPurlManagerTest.TEMP_URI_PREFIX };
-        uuidPurlProcessorFactory.setTemporaryUriArray(temporaryUriArray);
         uuidPurlProcessorFactory.setPrefix("http://purl.org/podd/");
         registry.add(uuidPurlProcessorFactory);
         

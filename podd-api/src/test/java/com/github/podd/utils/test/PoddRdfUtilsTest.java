@@ -72,8 +72,8 @@ public class PoddRdfUtilsTest
         {
             final PoddRdfProcessorFactory<PoddRdfProcessor> mockFactory = Mockito.mock(PoddRdfProcessorFactory.class);
             Mockito.when(mockFactory.getSPARQLConstructBGP()).thenReturn(this.testBGPArray[i]);
-            Mockito.when(mockFactory.getSPARQLConstructWhere(subjects[i])).thenReturn(
-                    this.testWhereArray[i] + subjects[i]);
+            Mockito.when(mockFactory.getSPARQLConstructWhere()).thenReturn(this.testWhereArray[i]);
+            Mockito.when(mockFactory.getSPARQLVariable()).thenReturn("s");
             Mockito.when(mockFactory.getSPARQLGroupBy()).thenReturn(this.testGroupByArray[i]);
             
             final String sparql = PoddRdfUtils.buildSparqlConstructQuery(mockFactory, subjects[i]);
@@ -81,7 +81,9 @@ public class PoddRdfUtilsTest
             Assert.assertFalse(sparql.isEmpty());
             
             String expectedSparql =
-                    "CONSTRUCT { " + this.testBGPArray[i] + " } WHERE { " + this.testWhereArray[i] + subjects[i] + " }";
+                    "CONSTRUCT { " + this.testBGPArray[i] + " } WHERE { " + this.testWhereArray[i] +
+                    " } VALUES (?s) { (<" + 
+                    subjects[i] + "> ) }";
             if(!this.testGroupByArray[i].isEmpty())
             {
                 expectedSparql = expectedSparql + " GROUP BY " + this.testGroupByArray[i];
