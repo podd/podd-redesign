@@ -7,10 +7,14 @@ import java.util.Set;
 
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+
+import com.github.podd.exception.PurlProcessorNotHandledException;
 
 /**
- * A manager object used to manage conversion of temporary URIs to Permanent URLs as required by PODD. 
- *
+ * A manager object used to manage conversion of temporary URIs to Permanent URLs as required by
+ * PODD.
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
@@ -38,8 +42,11 @@ public interface PoddPurlManager
      *            The contexts in the Repository to be considered
      * @return A set of PoddPurlReferences containing the extracted temporary URIs and the PURLs
      *         generated for them
+     * @throws PurlProcessorNotHandledException
+     * @throws RepositoryException
      */
-    Set<PoddPurlReference> extractPurlReferences(RepositoryConnection repositoryConnection, URI... contexts);
+    Set<PoddPurlReference> extractPurlReferences(RepositoryConnection repositoryConnection, URI... contexts)
+        throws PurlProcessorNotHandledException, RepositoryException;
     
     /**
      * Retrieve the <code>PodPurlProcessorFactoryRegistry</code> assigned to this Manager.
@@ -49,7 +56,7 @@ public interface PoddPurlManager
     PoddPurlProcessorFactoryRegistry getPurlProcessorFactoryRegistry();
     
     /**
-     * Set the  the <code>PodPurlProcessorFactoryRegistry</code> for this Manager.
+     * Set the the <code>PodPurlProcessorFactoryRegistry</code> for this Manager.
      * 
      * @param purlProcessorFactoryRegistry
      */
