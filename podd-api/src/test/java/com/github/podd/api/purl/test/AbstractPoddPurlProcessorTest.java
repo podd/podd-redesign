@@ -220,6 +220,27 @@ public abstract class AbstractPoddPurlProcessorTest
         }
     }
     
+    /**
+     * Tests handleTranslation(inputUri, parentUri). Passing NULL to parentUri is equivalent to calling 
+     * handleTranslation(inputUri).
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testHandleTranslationParentNull() throws Exception
+    {
+        this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
+        final URI tempUriUrnTemp = ValueFactoryImpl.getInstance().createURI(this.prefixUrnTemp + "artifact:1482");
+        
+        final PoddPurlReference purlReference = this.purlProcessor.handleTranslation(tempUriUrnTemp, null);
+        
+        Assert.assertNotNull(purlReference);
+        Assert.assertEquals(tempUriUrnTemp, purlReference.getTemporaryURI());
+        Assert.assertTrue(this.isPurlGeneratedFromTemp(purlReference.getPurlURI(), tempUriUrnTemp));
+    }
+    
+
+    
     @Test
     public void testRemoveTemporaryUriHandler() throws Exception
     {

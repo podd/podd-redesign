@@ -92,6 +92,12 @@ public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
     @Override
     public PoddPurlReference handleTranslation(final URI inputUri) throws PurlProcessorNotHandledException
     {
+        return this.handleTranslation(inputUri, null);
+    }
+    
+    @Override
+    public PoddPurlReference handleTranslation(URI inputUri, URI parentUri) throws PurlProcessorNotHandledException
+    {
         if(inputUri == null)
         {
             throw new NullPointerException("NULL URI cannot be handled by this Purl Processor");
@@ -115,8 +121,22 @@ public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
         
         // generate the PURL
         final StringBuilder b = new StringBuilder();
-        b.append(this.prefix);
-        b.append(UUID.randomUUID().toString());
+        if(parentUri != null && parentUri.stringValue().startsWith(this.prefix))
+        {
+            b.append(this.prefix);
+            
+            // get the first slash after the prefix
+            int index = parentUri.stringValue().indexOf('/', this.prefix.length());
+            
+            // get the UUID from between the end of the prefix and the first slash
+            // TODO: Check for off-by-one errors here
+            b.append(parentUri.stringValue().substring(this.prefix.length(), index));
+        }
+        else
+        {
+            b.append(this.prefix);
+            b.append(UUID.randomUUID().toString());
+        }
         b.append("/");
         b.append(inputStr.substring(thePrefix.length()));
         
@@ -126,10 +146,11 @@ public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
         
         return new SimplePoddPurlReference(inputUri, purl);
     }
-    
+
     @Override
     public void removeTemporaryUriHandler(final String temporaryUriPrefix)
     {
         this.supportedTemporaryUriPrefixes.remove(temporaryUriPrefix);
     }
+
 }
