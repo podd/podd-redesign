@@ -16,5 +16,7 @@ import com.github.podd.api.PoddRdfProcessor;
  */
 public interface PoddFileReferenceProcessor extends PoddRdfProcessor
 {
+    boolean canHandle(Graph rdfStatements);
+    
     PoddFileReference createReference(Graph rdfStatements);
 }
