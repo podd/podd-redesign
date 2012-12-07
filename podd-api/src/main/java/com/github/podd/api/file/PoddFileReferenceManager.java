@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -18,11 +19,9 @@ public interface PoddFileReferenceManager
 {
     void addFileReference(PoddFileReference reference);
     
-    void addFileReferenceProcessorFactory(PoddFileReferenceProcessor processor);
-    
     void deleteFileReference(PoddFileReference reference);
     
-    Set<PoddFileReference> extractFileReferences(RepositoryConnection conn, URI... contexts);
+    Set<PoddFileReference> extractFileReferences(RepositoryConnection conn, URI... contexts) throws RepositoryException;
     
     Set<PoddFileReference> getFileReferences(OWLOntologyID artifactId);
     
@@ -30,9 +29,9 @@ public interface PoddFileReferenceManager
     
     Set<PoddFileReference> getFileReferences(OWLOntologyID artifactId, String alias);
     
-    PoddFileReferenceProcessorFactoryRegistry getProcessorFactoryRegistry();
+    PoddFileReferenceProcessorFactoryRegistry getFileProcessorFactoryRegistry();
     
-    void setProcessorFactoryRegistry(PoddFileReferenceProcessorFactoryRegistry testRegistry);
+    void setProcessorFactoryRegistry(PoddFileReferenceProcessorFactoryRegistry registry);
     
-    void verifyFileReferences(Set<PoddFileReference> fileReferenceResults, RepositoryConnection tempConn, URI openRDFURI);
+    void verifyFileReferences(Set<PoddFileReference> fileReferenceResults, RepositoryConnection tempConn, URI openRDFURI) throws RepositoryException;
 }
