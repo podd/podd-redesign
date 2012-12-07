@@ -69,20 +69,27 @@ public class SimplePoddPurlManager implements PoddPurlManager
     public Set<PoddPurlReference> extractPurlReferences(final RepositoryConnection repositoryConnection,
             final URI... contexts) throws PurlProcessorNotHandledException, RepositoryException
     {
-        // NOTE: We use a Set to avoid duplicate calls to any Purl processors for any
-        // temporary URI
+        return this.extractPurlReferences(null, repositoryConnection, contexts);
+    }
+    
+    @Override
+    public Set<PoddPurlReference> extractPurlReferences(final URI parentUri,
+            final RepositoryConnection repositoryConnection, final URI... contexts)
+        throws PurlProcessorNotHandledException, RepositoryException
+    {
         final Set<PoddPurlReference> internalPurlResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<PoddPurlReference, Boolean>());
+        // NOTE: We use a Set to avoid duplicate calls to any Purl processors for any
+        // temporary URI
         final Set<URI> temporaryURIs = Collections.newSetFromMap(new ConcurrentHashMap<URI, Boolean>());
         
-        try
+        // NOTE: a Factory may handle only a particular temporary URI format, necessitating to
+        // go through multiple factories to extract ALL temporary URIs in the Repository.
+        for(final PoddPurlProcessorFactory nextProcessorFactory : this.getPurlProcessorFactoryRegistry().getByStage(
+                this.processorStage))
         {
-            // NOTE: a Factory may handle only a particular temporary URI format, necessitating to
-            // go through multiple factories to extract ALL temporary URIs in the Repository.
-            for(final PoddPurlProcessorFactory nextProcessorFactory : this.getPurlProcessorFactoryRegistry()
-                    .getByStage(this.processorStage))
+            try
             {
-                
                 final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(nextProcessorFactory);
                 
                 final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
@@ -94,13 +101,6 @@ public class SimplePoddPurlManager implements PoddPurlManager
                     dataset.addDefaultGraph(artifactGraphUri);
                     dataset.addNamedGraph(artifactGraphUri);
                 }
-
-                // TODO
-                // if the stage is after inferencing, the inferred graph URI would be one of the
-                // contexts as well
-//                final URI artifactInferredGraphUri = null;
-//                dataset.addDefaultGraph(artifactInferredGraphUri);
-//                dataset.addNamedGraph(artifactInferredGraphUri);
                 
                 // set the dataset for the query to be our artificially constructed dataset
                 graphQuery.setDataset(dataset);
@@ -124,7 +124,7 @@ public class SimplePoddPurlManager implements PoddPurlManager
                             && processor.canHandle((URI)next.getSubject()))
                     {
                         temporaryURIs.add((URI)next.getSubject());
-                        internalPurlResults.add(processor.handleTranslation((URI)next.getSubject()));
+                        internalPurlResults.add(processor.handleTranslation((URI)next.getSubject(), parentUri));
                     }
                     
                     // Predicate rewriting is not supported. Predicates in OWL Documents must
@@ -135,17 +135,14 @@ public class SimplePoddPurlManager implements PoddPurlManager
                             && processor.canHandle((URI)next.getObject()))
                     {
                         temporaryURIs.add((URI)next.getObject());
-                        internalPurlResults.add(processor.handleTranslation((URI)next.getObject()));
+                        internalPurlResults.add(processor.handleTranslation((URI)next.getObject(), parentUri));
                     }
                 }
             }
-        }
-        catch(final PurlProcessorNotHandledException | RepositoryException | MalformedQueryException
-                | QueryEvaluationException e)
-        {
-            this.log.warn(" {}", e.getMessage());
-            
-            // ADD throws clause
+            catch(final MalformedQueryException | QueryEvaluationException e)
+            {
+                this.log.error("Unexpected query exception", e);
+            }
         }
         return internalPurlResults;
     }

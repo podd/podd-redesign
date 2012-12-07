@@ -49,6 +49,24 @@ public interface PoddPurlManager
         throws PurlProcessorNotHandledException, RepositoryException;
     
     /**
+     * Identify temporary URIs from the RepositoryConnection (in the given contexts) and generate
+     * PURLs for them.
+     * 
+     * @param repositoryConnection
+     * @param parentUri
+     *            An optional parent URI that the {@link PoddPurlProcessor} may use when creating
+     *            Purls using {@link PoddPurlProcessor#handleTranslation(URI, URI)}.
+     * @param contexts
+     *            The contexts in the Repository to be considered
+     * @return A set of PoddPurlReferences containing the extracted temporary URIs and the PURLs
+     *         generated for them
+     * @throws PurlProcessorNotHandledException
+     * @throws RepositoryException
+     */
+    Set<PoddPurlReference> extractPurlReferences(URI parentUri, RepositoryConnection repositoryConnection,
+            URI... contexts) throws PurlProcessorNotHandledException, RepositoryException;
+    
+    /**
      * Retrieve the <code>PodPurlProcessorFactoryRegistry</code> assigned to this Manager.
      * 
      * @return
@@ -61,4 +79,5 @@ public interface PoddPurlManager
      * @param purlProcessorFactoryRegistry
      */
     void setPurlProcessorFactoryRegistry(PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry);
+    
 }
