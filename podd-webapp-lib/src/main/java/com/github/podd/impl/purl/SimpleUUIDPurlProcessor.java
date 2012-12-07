@@ -22,13 +22,13 @@ import com.github.podd.exception.PurlProcessorNotHandledException;
  * A simple permanent URI generator using UUIDs.
  * <p/>
  * The conversion process replaces the temporary URI prefix with a prefix of the form
- * <code>{new_prefix}{unique-id}</code> where 
+ * <code>{new_prefix}{unique-id}</code> where
  * 
- *     {new_prefix} is a prefix assigned during Processor creation or the default prefix 
- *     <code>http://purl.org/podd/</code> 
- *     
- *     {unique-id} is a random universally unique ID internally generated based on
- *     {@link java.util.UUID#randomUUID()}.
+ * {new_prefix} is a prefix assigned during Processor creation or the default prefix
+ * <code>http://purl.org/podd/</code>
+ * 
+ * {unique-id} is a random universally unique ID internally generated based on
+ * {@link java.util.UUID#randomUUID()}.
  * 
  * @author kutila
  * 
@@ -36,19 +36,22 @@ import com.github.podd.exception.PurlProcessorNotHandledException;
 public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
 {
     public static final String DEFAULT_PREFIX = "http://example.org/purl/";
-
+    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private Set<String> supportedTemporaryUriPrefixes = new HashSet<String>();
     
+    /**
+     * Prefix to use with generated Purls
+     */
     private final String prefix;
     
     public SimpleUUIDPurlProcessor()
     {
-        this(DEFAULT_PREFIX); 
+        this(SimpleUUIDPurlProcessor.DEFAULT_PREFIX);
     }
     
-    public SimpleUUIDPurlProcessor(String prefix)
+    public SimpleUUIDPurlProcessor(final String prefix)
     {
         this.prefix = prefix;
     }
@@ -96,24 +99,26 @@ public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
     }
     
     @Override
-    public PoddPurlReference handleTranslation(URI inputUri, URI parentUri) throws PurlProcessorNotHandledException
+    public PoddPurlReference handleTranslation(final URI inputUri, final URI parentUri)
+        throws PurlProcessorNotHandledException
     {
         if(inputUri == null)
         {
             throw new NullPointerException("NULL URI cannot be handled by this Purl Processor");
         }
         
-        String thePrefix = null;
+        // find which of the supported temporary URI prefixes is used in this inputUri
+        String theTemporaryPrefix = null;
         final String inputStr = inputUri.stringValue();
-        for(final String tempPrefix : this.supportedTemporaryUriPrefixes)
+        for(final String aTemporaryPrefix : this.supportedTemporaryUriPrefixes)
         {
-            if(inputStr.startsWith(tempPrefix))
+            if(inputStr.startsWith(aTemporaryPrefix))
             {
-                thePrefix = tempPrefix;
+                theTemporaryPrefix = aTemporaryPrefix;
                 break;
             }
         }
-        if(thePrefix == null)
+        if(theTemporaryPrefix == null)
         {
             throw new PurlProcessorNotHandledException(this, inputUri,
                     "The input URI cannot be handled by this Purl Processor");
@@ -126,11 +131,16 @@ public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
             b.append(this.prefix);
             
             // get the first slash after the prefix
-            int index = parentUri.stringValue().indexOf('/', this.prefix.length());
-            
-            // get the UUID from between the end of the prefix and the first slash
-            // TODO: Check for off-by-one errors here
-            b.append(parentUri.stringValue().substring(this.prefix.length(), index));
+            final int index = parentUri.stringValue().indexOf('/', this.prefix.length());
+            // get the UUID from after the end of the prefix (until the next slash)
+            if(index != -1)
+            {
+                b.append(parentUri.stringValue().substring(this.prefix.length(), index));
+            }
+            else
+            {
+                b.append(parentUri.stringValue().substring(this.prefix.length()));
+            }
         }
         else
         {
@@ -138,7 +148,7 @@ public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
             b.append(UUID.randomUUID().toString());
         }
         b.append("/");
-        b.append(inputStr.substring(thePrefix.length()));
+        b.append(inputStr.substring(theTemporaryPrefix.length()));
         
         final URI purl = ValueFactoryImpl.getInstance().createURI(b.toString());
         
@@ -146,11 +156,11 @@ public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
         
         return new SimplePoddPurlReference(inputUri, purl);
     }
-
+    
     @Override
     public void removeTemporaryUriHandler(final String temporaryUriPrefix)
     {
         this.supportedTemporaryUriPrefixes.remove(temporaryUriPrefix);
     }
-
+    
 }

@@ -48,7 +48,6 @@ public abstract class AbstractPoddPurlProcessorTest
      */
     protected abstract boolean isPurlGeneratedFromTemp(URI purl, URI tempUri);
     
-    
     @Before
     public void setUp() throws Exception
     {
@@ -172,7 +171,7 @@ public abstract class AbstractPoddPurlProcessorTest
         // this unregistered prefix is not in the list
         Assert.assertFalse(prefixList.contains(this.prefixPurl));
     }
-
+    
     /**
      * Tests the behaviour when a null value is given to the handleTranslation() method
      */
@@ -186,7 +185,7 @@ public abstract class AbstractPoddPurlProcessorTest
         }
         catch(final NullPointerException e)
         {
-            // fine as this is an expected exception 
+            // fine as this is an expected exception
         }
     }
     
@@ -221,13 +220,13 @@ public abstract class AbstractPoddPurlProcessorTest
     }
     
     /**
-     * Tests handleTranslation(inputUri, parentUri). Passing NULL to parentUri is equivalent to calling 
-     * handleTranslation(inputUri).
+     * Tests handleTranslation(inputUri, parentUri). Passing NULL to parentUri is equivalent to
+     * calling handleTranslation(inputUri).
      * 
      * @throws Exception
      */
     @Test
-    public void testHandleTranslationParentNull() throws Exception
+    public void testHandleTranslationWithParentUriNull() throws Exception
     {
         this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
         final URI tempUriUrnTemp = ValueFactoryImpl.getInstance().createURI(this.prefixUrnTemp + "artifact:1482");
@@ -238,8 +237,6 @@ public abstract class AbstractPoddPurlProcessorTest
         Assert.assertEquals(tempUriUrnTemp, purlReference.getTemporaryURI());
         Assert.assertTrue(this.isPurlGeneratedFromTemp(purlReference.getPurlURI(), tempUriUrnTemp));
     }
-    
-
     
     @Test
     public void testRemoveTemporaryUriHandler() throws Exception
@@ -260,7 +257,5 @@ public abstract class AbstractPoddPurlProcessorTest
                 ValueFactoryImpl.getInstance().createURI(this.prefixExampleUrl + "some/other/path");
         Assert.assertTrue(this.purlProcessor.canHandle(tempUriExampleOrg));
     }
-    
-    
     
 }
