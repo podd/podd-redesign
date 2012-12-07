@@ -3,13 +3,17 @@
  */
 package com.github.podd.api;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.rio.RDFFormat;
+import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
+import com.github.podd.exception.PoddException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -26,6 +30,8 @@ public interface PoddArtifactManager
     
     PoddPurlManager getPurlManager();
     
+    PoddSchemaManager getSchemaManager();
+    
     /**
      * Loads an artifact into the manager.
      * 
@@ -38,8 +44,12 @@ public interface PoddArtifactManager
      *            The format for the input RDF document.
      * @return An InferredOWLOntologyID object containing the details of the artifact. If the
      *         inferencing is delayed, the object may not contain the inferred ontology IRI.
+     * @throws IOException 
+     * @throws PoddException 
+     * @throws OpenRDFException 
+     * @throws OWLException 
      */
-    InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format);
+    InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format) throws OpenRDFException, PoddException, IOException, OpenRDFException, PoddException, OWLException;
     
     /**
      * 
@@ -62,12 +72,14 @@ public interface PoddArtifactManager
      * NOTE: Artifacts are not necessarily cached in memory, so no manual cleanup is needed if
      * calling methods from the PoddArtifactManager interface.
      * 
-     * @param testOWLManager
+     * @param owlManager
      *            The manager for interactions with OWLAPI.
      */
-    void setOwlManager(PoddOWLManager testOWLManager);
+    void setOwlManager(PoddOWLManager owlManager);
     
-    void setPurlManager(PoddPurlManager testPurlManager);
+    void setPurlManager(PoddPurlManager purlManager);
+    
+    void setSchemaManager(PoddSchemaManager schemaManager);
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
