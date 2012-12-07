@@ -182,7 +182,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 Collections.newSetFromMap(new ConcurrentHashMap<PoddFileReference, Boolean>());
         
         for(final PoddFileReferenceProcessorFactory nextProcessorFactory : testArtifactManager
-                .getFileReferenceManager().getProcessorFactoryRegistry().getByStage(PoddProcessorStage.RDF_PARSING))
+                .getFileReferenceManager().getFileProcessorFactoryRegistry().getByStage(PoddProcessorStage.RDF_PARSING))
         {
             final StringBuilder sparqlQuery = new StringBuilder();
             sparqlQuery.append("CONSTRUCT { ");
