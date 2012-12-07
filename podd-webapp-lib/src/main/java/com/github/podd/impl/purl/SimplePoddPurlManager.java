@@ -1,0 +1,153 @@
+/**
+ * 
+ */
+package com.github.podd.impl.purl;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.GraphQueryResult;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.impl.DatasetImpl;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.podd.api.PoddProcessorStage;
+import com.github.podd.api.purl.PoddPurlManager;
+import com.github.podd.api.purl.PoddPurlProcessor;
+import com.github.podd.api.purl.PoddPurlProcessorFactory;
+import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
+import com.github.podd.api.purl.PoddPurlReference;
+import com.github.podd.exception.PurlProcessorNotHandledException;
+import com.github.podd.utils.PoddRdfUtils;
+
+/**
+ * 
+ * @author kutila
+ * 
+ */
+public class SimplePoddPurlManager implements PoddPurlManager
+{
+    
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    // TODO Decide if the processor STAGE should be a constant or be configurable?
+    private PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
+    
+    private PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry;
+    
+    @Override
+    public PoddPurlProcessorFactoryRegistry getPurlProcessorFactoryRegistry()
+    {
+        return this.purlProcessorFactoryRegistry;
+    }
+    
+    @Override
+    public void setPurlProcessorFactoryRegistry(final PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry)
+    {
+        this.purlProcessorFactoryRegistry = purlProcessorFactoryRegistry;
+        
+    }
+    
+    @Override
+    public void convertTemporaryUris(final Set<PoddPurlReference> purlResults,
+            final RepositoryConnection repositoryConnection, final URI... contexts)
+    {
+        // TODO Auto-generated method stub
+        throw new RuntimeException("TODO: Implement convertTemporaryUris()");
+    }
+    
+    @Override
+    public Set<PoddPurlReference> extractPurlReferences(final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws PurlProcessorNotHandledException, RepositoryException
+    {
+        // NOTE: We use a Set to avoid duplicate calls to any Purl processors for any
+        // temporary URI
+        final Set<PoddPurlReference> internalPurlResults =
+                Collections.newSetFromMap(new ConcurrentHashMap<PoddPurlReference, Boolean>());
+        final Set<URI> temporaryURIs = Collections.newSetFromMap(new ConcurrentHashMap<URI, Boolean>());
+        
+        try
+        {
+            // NOTE: a Factory may handle only a particular temporary URI format, necessitating to
+            // go through multiple factories to extract ALL temporary URIs in the Repository.
+            for(final PoddPurlProcessorFactory nextProcessorFactory : this.getPurlProcessorFactoryRegistry()
+                    .getByStage(this.processorStage))
+            {
+                
+                final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(nextProcessorFactory);
+                
+                final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
+                
+                // Create a new dataset to specify contexts that the query will be allowed to access
+                final DatasetImpl dataset = new DatasetImpl();
+                for(final URI artifactGraphUri : contexts)
+                {
+                    dataset.addDefaultGraph(artifactGraphUri);
+                    dataset.addNamedGraph(artifactGraphUri);
+                }
+
+                // TODO
+                // if the stage is after inferencing, the inferred graph URI would be one of the
+                // contexts as well
+//                final URI artifactInferredGraphUri = null;
+//                dataset.addDefaultGraph(artifactInferredGraphUri);
+//                dataset.addNamedGraph(artifactInferredGraphUri);
+                
+                // set the dataset for the query to be our artificially constructed dataset
+                graphQuery.setDataset(dataset);
+                
+                final GraphQueryResult queryResult = graphQuery.evaluate();
+                
+                // If the query matched anything, then for each of the temporary URIs in the
+                // resulting construct statements, we create a file reference and add it to the
+                // results
+                while(queryResult.hasNext())
+                {
+                    final Statement next = queryResult.next();
+                    // This processor factory matches the graph that we wish to use, so we create a
+                    // processor instance now to create the PURL
+                    // NOTE: This object cannot be shared as we do not specify that it needs to be
+                    // threadsafe
+                    final PoddPurlProcessor processor = nextProcessorFactory.getProcessor();
+                    
+                    // Subject rewriting
+                    if(next.getSubject() instanceof URI && !temporaryURIs.contains(next.getSubject())
+                            && processor.canHandle((URI)next.getSubject()))
+                    {
+                        temporaryURIs.add((URI)next.getSubject());
+                        internalPurlResults.add(processor.handleTranslation((URI)next.getSubject()));
+                    }
+                    
+                    // Predicate rewriting is not supported. Predicates in OWL Documents must
+                    // be URIs from recognized vocabularies, so cannot be auto generated PURLs
+                    
+                    // Object rewriting
+                    if(next.getObject() instanceof URI && !temporaryURIs.contains(next.getObject())
+                            && processor.canHandle((URI)next.getObject()))
+                    {
+                        temporaryURIs.add((URI)next.getObject());
+                        internalPurlResults.add(processor.handleTranslation((URI)next.getObject()));
+                    }
+                }
+            }
+        }
+        catch(final PurlProcessorNotHandledException | RepositoryException | MalformedQueryException
+                | QueryEvaluationException e)
+        {
+            this.log.warn(" {}", e.getMessage());
+            
+            // ADD throws clause
+        }
+        return internalPurlResults;
+    }
+    
+}
