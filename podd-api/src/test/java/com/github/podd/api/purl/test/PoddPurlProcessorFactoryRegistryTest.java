@@ -76,17 +76,26 @@ public class PoddPurlProcessorFactoryRegistryTest
     }
     
     @Test
-    public void testGetInstance() throws Exception
-    {
-        Assert.assertNotNull("getInstance was null", PoddPurlProcessorFactoryRegistry.getInstance());
-    }
-    
-    @Test
     public void testGetByStageNullStage() throws Exception
     {
         final List<PoddPurlProcessorFactory> nullStageFactories = this.testRegistry.getByStage(null);
         Assert.assertNotNull(nullStageFactories);
         Assert.assertEquals("Should return an empty List for NULL stage", 0, nullStageFactories.size());
+    }
+    
+    @Test
+    public void testGetByStageOneFactoryMatchingAllStages() throws Exception
+    {
+        // add factories to Registry
+        this.testRegistry.add(this.factory4AllStages);
+        
+        // go through ALL stages and verify the factory is returned for each one
+        for(final PoddProcessorStage stage : PoddProcessorStage.values())
+        {
+            final List<PoddPurlProcessorFactory> factories = this.testRegistry.getByStage(stage);
+            Assert.assertEquals(1, factories.size());
+            Assert.assertEquals("key_ALL", factories.get(0).getKey());
+        }
     }
     
     @Test
@@ -101,6 +110,33 @@ public class PoddPurlProcessorFactoryRegistryTest
         
         Assert.assertEquals(1, parsingStageFactories.size());
         Assert.assertEquals("key_RDF_PARSING", parsingStageFactories.get(0).getKey());
+        
+        // retrieve factories for PROFILE_CHECK stage
+        final List<PoddPurlProcessorFactory> profileCheckingStageFactories =
+                this.testRegistry.getByStage(PoddProcessorStage.PROFILE_CHECK);
+        Assert.assertEquals(0, profileCheckingStageFactories.size());
+    }
+    
+    @Test
+    public void testGetByStageOneFactoryPerStage() throws Exception
+    {
+        // add factories to Registry
+        this.testRegistry.add(this.factory4rdfParsingStage);
+        this.testRegistry.add(this.factory4InferenceStage);
+        
+        // retrieve factories for RDF_PARSING stage
+        final List<PoddPurlProcessorFactory> parsingStageFactories =
+                this.testRegistry.getByStage(PoddProcessorStage.RDF_PARSING);
+        
+        Assert.assertEquals(1, parsingStageFactories.size());
+        Assert.assertEquals("key_RDF_PARSING", parsingStageFactories.get(0).getKey());
+        
+        // retrieve factories for INFERENCE stage
+        final List<PoddPurlProcessorFactory> inferenceStageFactories =
+                this.testRegistry.getByStage(PoddProcessorStage.INFERENCE);
+        
+        Assert.assertEquals(1, inferenceStageFactories.size());
+        Assert.assertEquals("key_INFERENCE", inferenceStageFactories.get(0).getKey());
         
         // retrieve factories for PROFILE_CHECK stage
         final List<PoddPurlProcessorFactory> profileCheckingStageFactories =
@@ -129,45 +165,9 @@ public class PoddPurlProcessorFactoryRegistryTest
     }
     
     @Test
-    public void testGetByStageOneFactoryMatchingAllStages() throws Exception
+    public void testGetInstance() throws Exception
     {
-        // add factories to Registry
-        this.testRegistry.add(this.factory4AllStages);
-        
-        // go through ALL stages and verify the factory is returned for each one
-        for(final PoddProcessorStage stage : PoddProcessorStage.values())
-        {
-            final List<PoddPurlProcessorFactory> factories = this.testRegistry.getByStage(stage);
-            Assert.assertEquals(1, factories.size());
-            Assert.assertEquals("key_ALL", factories.get(0).getKey());
-        }
-    }
-    
-    @Test
-    public void testGetByStageOneFactoryPerStage() throws Exception
-    {
-        // add factories to Registry
-        this.testRegistry.add(this.factory4rdfParsingStage);
-        this.testRegistry.add(this.factory4InferenceStage);
-        
-        // retrieve factories for RDF_PARSING stage
-        final List<PoddPurlProcessorFactory> parsingStageFactories =
-                this.testRegistry.getByStage(PoddProcessorStage.RDF_PARSING);
-        
-        Assert.assertEquals(1, parsingStageFactories.size());
-        Assert.assertEquals("key_RDF_PARSING", parsingStageFactories.get(0).getKey());
-        
-        // retrieve factories for INFERENCE stage
-        final List<PoddPurlProcessorFactory> inferenceStageFactories =
-                this.testRegistry.getByStage(PoddProcessorStage.INFERENCE);
-        
-        Assert.assertEquals(1, inferenceStageFactories.size());
-        Assert.assertEquals("key_INFERENCE", inferenceStageFactories.get(0).getKey());
-        
-        // retrieve factories for PROFILE_CHECK stage
-        final List<PoddPurlProcessorFactory> profileCheckingStageFactories =
-                this.testRegistry.getByStage(PoddProcessorStage.PROFILE_CHECK);
-        Assert.assertEquals(0, profileCheckingStageFactories.size());
+        Assert.assertNotNull("getInstance was null", PoddPurlProcessorFactoryRegistry.getInstance());
     }
     
 }

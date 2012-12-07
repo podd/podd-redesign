@@ -13,11 +13,11 @@ import com.github.podd.api.purl.PoddPurlReference;
  * Simple abstract test class for PoddPurlReference
  * 
  * @author kutila
- *
+ * 
  */
 public abstract class AbstractPoddPurlReferenceTest
 {
-  
+    
     protected PoddPurlReference purlReference;
     
     /**
@@ -25,7 +25,7 @@ public abstract class AbstractPoddPurlReferenceTest
      * @return A new PoddPurlReference instance for use by the test
      */
     protected abstract PoddPurlReference getNewPoddPurlReference();
-
+    
     @Before
     public void setUp() throws Exception
     {

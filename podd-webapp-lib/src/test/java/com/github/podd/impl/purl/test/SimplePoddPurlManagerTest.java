@@ -11,24 +11,24 @@ import com.github.podd.impl.purl.SimpleUUIDPurlProcessorFactory;
 
 /**
  * @author kutila
- *
+ * 
  */
 public class SimplePoddPurlManagerTest extends AbstractPoddPurlManagerTest
 {
-
+    
     @Override
     public PoddPurlManager getNewPoddPurlManager()
     {
         return new SimplePoddPurlManager();
     }
-
+    
     @Override
     public PoddPurlProcessorFactoryRegistry getNewPoddPurlProcessorFactoryRegistry()
     {
-        PoddPurlProcessorFactoryRegistry registry = PoddPurlProcessorFactoryRegistry.getInstance();
+        final PoddPurlProcessorFactoryRegistry registry = PoddPurlProcessorFactoryRegistry.getInstance();
         registry.clear();
         
-        SimpleUUIDPurlProcessorFactory uuidPurlProcessorFactory = new SimpleUUIDPurlProcessorFactory();
+        final SimpleUUIDPurlProcessorFactory uuidPurlProcessorFactory = new SimpleUUIDPurlProcessorFactory();
         uuidPurlProcessorFactory.setPrefix("http://purl.org/podd/");
         registry.add(uuidPurlProcessorFactory);
         

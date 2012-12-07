@@ -15,12 +15,12 @@ import com.github.podd.impl.purl.SimplePoddPurlReference;
  */
 public class SimplePoddPurlReferenceTest extends AbstractPoddPurlReferenceTest
 {
-
+    
     @Override
     protected PoddPurlReference getNewPoddPurlReference()
     {
-        URI tempUri = ValueFactoryImpl.getInstance().createURI("urn:temp:this/is/supposed/to/be/a:temporary:uri");
-        URI purl = ValueFactoryImpl.getInstance().createURI("http://purl.org/this/is/supposed/to/be/a:purl");
+        final URI tempUri = ValueFactoryImpl.getInstance().createURI("urn:temp:this/is/supposed/to/be/a:temporary:uri");
+        final URI purl = ValueFactoryImpl.getInstance().createURI("http://purl.org/this/is/supposed/to/be/a:purl");
         return new SimplePoddPurlReference(tempUri, purl);
     }
     

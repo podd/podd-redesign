@@ -4,7 +4,6 @@
 package com.github.podd.api;
 
 import org.openrdf.model.Graph;
-import org.openrdf.model.URI;
 
 /**
  * 
@@ -35,14 +34,14 @@ public interface PoddRdfProcessorFactory<T extends PoddRdfProcessor> extends Pod
     
     /**
      * 
-     * @return The name of the variable to be bound to
-     */
-    String getSPARQLVariable();
-    
-    /**
-     * 
      * @return Any SPARQL Group By statements needed to aggregate results inside of the query.
      */
     String getSPARQLGroupBy();
+    
+    /**
+     * 
+     * @return The name of the variable to be bound to
+     */
+    String getSPARQLVariable();
     
 }

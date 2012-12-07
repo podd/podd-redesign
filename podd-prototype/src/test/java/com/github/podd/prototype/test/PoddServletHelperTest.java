@@ -7,9 +7,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 import org.junit.After;
@@ -60,13 +60,13 @@ public class PoddServletHelperTest
         this.helper = new PoddServletHelper();
         this.helper.setUp(repository);
         
-        schemaOntologyList.add(new SimpleEntry<URI, String>(repository.getValueFactory().createURI(
+        this.schemaOntologyList.add(new SimpleEntry<URI, String>(repository.getValueFactory().createURI(
                 PoddServletContextListener.URI_PODD_BASE), PoddServletContextListener.PATH_PODD_BASE));
-        schemaOntologyList.add(new SimpleEntry<URI, String>(repository.getValueFactory().createURI(
+        this.schemaOntologyList.add(new SimpleEntry<URI, String>(repository.getValueFactory().createURI(
                 PoddServletContextListener.URI_PODD_SCIENCE), PoddServletContextListener.PATH_PODD_SCIENCE));
-        schemaOntologyList.add(new SimpleEntry<URI, String>(repository.getValueFactory().createURI(
+        this.schemaOntologyList.add(new SimpleEntry<URI, String>(repository.getValueFactory().createURI(
                 PoddServletContextListener.URI_PODD_PLANT), PoddServletContextListener.PATH_PODD_PLANT));
-        this.helper.setSchemaOntologyList(schemaOntologyList);
+        this.helper.setSchemaOntologyList(this.schemaOntologyList);
         
         this.helper.loadSchemaOntologies();
         
@@ -655,7 +655,7 @@ public class PoddServletHelperTest
         // create another Helper instance and use it to populate the Repository
         final PoddServletHelper anotherHelper = new PoddServletHelper();
         anotherHelper.setUp(repository);
-        anotherHelper.setSchemaOntologyList(schemaOntologyList);
+        anotherHelper.setSchemaOntologyList(this.schemaOntologyList);
         anotherHelper.loadSchemaOntologies();
         
         Assert.assertEquals(2860, testRepositoryConnection.size());
@@ -665,7 +665,7 @@ public class PoddServletHelperTest
         // ontologies)
         this.helper = new PoddServletHelper();
         this.helper.setUp(repository);
-        this.helper.setSchemaOntologyList(schemaOntologyList);
+        this.helper.setSchemaOntologyList(this.schemaOntologyList);
         this.helper.loadSchemaOntologies();
         
         // assert that the Repository is unchanged by loadSchemaOntologies()

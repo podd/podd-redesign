@@ -234,8 +234,9 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         try
         {
-            File tempFolder = this.tempDirectory.newFolder();
-            InputStream testUploadedFile = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+            final File tempFolder = this.tempDirectory.newFolder();
+            final InputStream testUploadedFile =
+                    this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
             final Path tempFile = Files.createTempFile(tempFolder.toPath(), "basicProject-1", ".rdf");
             Files.copy(testUploadedFile, tempFile, StandardCopyOption.REPLACE_EXISTING);
             
@@ -285,7 +286,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
             Assert.assertEquals(Status.SUCCESS_OK.getCode(), getBaseAfterAttachResponse.getStatus().getCode());
             final String modifiedRdfString = getBaseAfterAttachResponse.getEntityAsText();
             
-            Assert.assertTrue(modifiedRdfString.contains( tempFile.getFileName().toString()));
+            Assert.assertTrue(modifiedRdfString.contains(tempFile.getFileName().toString()));
             Assert.assertEquals(41, this.getStatementCount(modifiedRdfString));
         }
         finally
@@ -470,9 +471,10 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     @Test
     public void testGetSchemaOntology() throws Exception
     {
-        // -- there is no need to login (this means the web service will not be reset in the tearDown() 
+        // -- there is no need to login (this means the web service will not be reset in the
+        // tearDown()
         
-        String schemaOntologyUri = "poddBase";
+        final String schemaOntologyUri = "poddBase";
         
         // -- GET the PODD Base schema ontology from the web service and verify results
         final Request getBaseRequest = new Request(Method.GET, this.BASE_URL + "/ns/" + schemaOntologyUri);
@@ -482,7 +484,6 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         final String getResult = getBaseResponse.getEntityAsText();
         Assert.assertEquals(282, this.getStatementCount(getResult));
     }
-    
     
     /**
      * Test that the home page exists to ensure the PODD web-app is deployed.

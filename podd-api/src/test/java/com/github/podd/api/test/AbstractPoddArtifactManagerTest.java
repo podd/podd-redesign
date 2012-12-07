@@ -4,55 +4,26 @@
 package com.github.podd.api.test;
 
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.Graph;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.GraphImpl;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.impl.DatasetImpl;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
-import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
-import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyID;
-import org.semanticweb.owlapi.profiles.OWLProfileReport;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
-import org.semanticweb.owlapi.rio.RioParser;
-import org.semanticweb.owlapi.rio.RioParserImpl;
 
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
-import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.PoddSchemaManager;
-import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddFileReferenceManager;
-import com.github.podd.api.file.PoddFileReferenceProcessor;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlManager;
-import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
-import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -77,7 +48,7 @@ public abstract class AbstractPoddArtifactManagerTest
     protected abstract PoddPurlManager getNewPurlManager();
     
     protected abstract OWLReasonerFactory getNewReasonerFactory();
-
+    
     protected abstract PoddSchemaManager getNewSchemaManager();
     
     protected abstract PoddFileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
@@ -137,8 +108,6 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID resultArtifactId = testArtifactManager.loadArtifact(inputStream, format);
         
         // INSIDE the loadArtifact method...
-        
-
         
     }
     

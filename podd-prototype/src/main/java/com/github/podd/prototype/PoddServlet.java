@@ -65,7 +65,7 @@ public class PoddServlet extends PoddBaseServlet
                 final InferredOWLOntologyID loadedArtifactUri = helper.loadPoddArtifact(in, contentType);
                 response.setContentType(PoddServlet.MIME_TYPE_JSON);
                 // FIXME: should be encapsulated in JSON format
-                out.write(loadedArtifactUri.getOntologyIRI().toString()); 
+                out.write(loadedArtifactUri.getOntologyIRI().toString());
             }
             catch(final Exception e)
             {
@@ -140,7 +140,7 @@ public class PoddServlet extends PoddBaseServlet
             {
                 this.log.error("GET Artifact failed with: " + e.toString());
                 
-                int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                final int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
                 response.sendError(statusCode, "Failed to GET artifact due to: " + e.getMessage());
             }
         }

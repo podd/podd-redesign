@@ -594,7 +594,8 @@ public class PoddServletHelper
      * @throws RepositoryException
      *             , RDFHandlerException
      */
-    public String deleteArtifact(final String artifactUri) throws RepositoryException, RDFHandlerException, PoddException
+    public String deleteArtifact(final String artifactUri) throws RepositoryException, RDFHandlerException,
+        PoddException
     {
         this.log.info("DELETE artifact: " + artifactUri);
         
@@ -637,7 +638,7 @@ public class PoddServletHelper
             repositoryConnection.commit();
             return out.toString();
         }
-        catch(RepositoryException | RDFHandlerException | PoddException e )
+        catch(RepositoryException | RDFHandlerException | PoddException e)
         {
             if(repositoryConnection != null && repositoryConnection.isActive())
             {
@@ -687,8 +688,8 @@ public class PoddServletHelper
             repositoryConnection = this.nextRepository.getConnection();
             repositoryConnection.begin();
             
-            String result =
-                    editArtifactInternal(artifactUri, in, contentType, isReplace, checkFileReferences,
+            final String result =
+                    this.editArtifactInternal(artifactUri, in, contentType, isReplace, checkFileReferences,
                             repositoryConnection);
             
             repositoryConnection.commit();
@@ -1118,8 +1119,8 @@ public class PoddServletHelper
             repositoryConnection = this.nextRepository.getConnection();
             repositoryConnection.begin();
             
-            InferredOWLOntologyID result =
-                    getInferredOWLOntologyIDForArtifactInternal(artifactUri, repositoryConnection);
+            final InferredOWLOntologyID result =
+                    this.getInferredOWLOntologyIDForArtifactInternal(artifactUri, repositoryConnection);
             
             repositoryConnection.rollback();
             

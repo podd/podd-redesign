@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.model.Graph;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
@@ -58,7 +57,7 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * .PoddFileReference)
      */
     @Override
-    public void addFileReference(PoddFileReference reference)
+    public void addFileReference(final PoddFileReference reference)
     {
         throw new RuntimeException("TODO: Implement addFileReference");
     }
@@ -71,7 +70,7 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * .file.PoddFileReference)
      */
     @Override
-    public void deleteFileReference(PoddFileReference reference)
+    public void deleteFileReference(final PoddFileReference reference)
     {
         throw new RuntimeException("TODO: Implement deleteFileReference");
     }
@@ -84,8 +83,8 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * .RepositoryConnection, org.openrdf.model.URI[])
      */
     @Override
-    public Set<PoddFileReference> extractFileReferences(RepositoryConnection repositoryConnection, URI... contexts)
-        throws RepositoryException
+    public Set<PoddFileReference> extractFileReferences(final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws RepositoryException
     {
         final Set<PoddFileReference> internalPurlResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<PoddFileReference, Boolean>());
@@ -118,10 +117,12 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
                 final GraphQueryResult queryResult = graphQuery.evaluate();
                 
                 // FIXME: The following contains statements for the whole artifact
-                Graph results = queryResult.asGraph();
+                final Graph results = queryResult.asGraph();
                 
                 if(results != null)
+                {
                     throw new RuntimeException("TODO: Implement splitting graph into distinct file references");
+                }
                 
                 // This processor factory matches the graph that we wish to use, so we create a
                 // processor instance now to create the PURL
@@ -145,45 +146,6 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#getFileReferences(org.semanticweb.owlapi
-     * .model.OWLOntologyID)
-     */
-    @Override
-    public Set<PoddFileReference> getFileReferences(OWLOntologyID artifactId)
-    {
-        throw new RuntimeException("TODO: Implement getFileReferences");
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#getFileReferences(org.semanticweb.owlapi
-     * .model.OWLOntologyID, org.semanticweb.owlapi.model.IRI)
-     */
-    @Override
-    public Set<PoddFileReference> getFileReferences(OWLOntologyID artifactId, IRI objectIri)
-    {
-        throw new RuntimeException("TODO: Implement getFileReferences");
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#getFileReferences(org.semanticweb.owlapi
-     * .model.OWLOntologyID, java.lang.String)
-     */
-    @Override
-    public Set<PoddFileReference> getFileReferences(OWLOntologyID artifactId, String alias)
-    {
-        throw new RuntimeException("TODO: Implement getFileReferences");
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
      * @see com.github.podd.api.file.PoddFileReferenceManager#getProcessorFactoryRegistry()
      */
     @Override
@@ -196,11 +158,50 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * (non-Javadoc)
      * 
      * @see
+     * com.github.podd.api.file.PoddFileReferenceManager#getFileReferences(org.semanticweb.owlapi
+     * .model.OWLOntologyID)
+     */
+    @Override
+    public Set<PoddFileReference> getFileReferences(final OWLOntologyID artifactId)
+    {
+        throw new RuntimeException("TODO: Implement getFileReferences");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.github.podd.api.file.PoddFileReferenceManager#getFileReferences(org.semanticweb.owlapi
+     * .model.OWLOntologyID, org.semanticweb.owlapi.model.IRI)
+     */
+    @Override
+    public Set<PoddFileReference> getFileReferences(final OWLOntologyID artifactId, final IRI objectIri)
+    {
+        throw new RuntimeException("TODO: Implement getFileReferences");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.github.podd.api.file.PoddFileReferenceManager#getFileReferences(org.semanticweb.owlapi
+     * .model.OWLOntologyID, java.lang.String)
+     */
+    @Override
+    public Set<PoddFileReference> getFileReferences(final OWLOntologyID artifactId, final String alias)
+    {
+        throw new RuntimeException("TODO: Implement getFileReferences");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
      * com.github.podd.api.file.PoddFileReferenceManager#setProcessorFactoryRegistry(com.github.
      * podd.api.file.PoddFileReferenceProcessorFactoryRegistry)
      */
     @Override
-    public void setProcessorFactoryRegistry(PoddFileReferenceProcessorFactoryRegistry registry)
+    public void setProcessorFactoryRegistry(final PoddFileReferenceProcessorFactoryRegistry registry)
     {
         this.registry = registry;
     }
@@ -212,8 +213,8 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
      */
     @Override
-    public void verifyFileReferences(Set<PoddFileReference> fileReferenceResults, RepositoryConnection tempConn,
-            URI openRDFURI) throws RepositoryException
+    public void verifyFileReferences(final Set<PoddFileReference> fileReferenceResults,
+            final RepositoryConnection tempConn, final URI openRDFURI) throws RepositoryException
     {
         throw new RuntimeException("TODO: Implement verifyFileReferences");
     }

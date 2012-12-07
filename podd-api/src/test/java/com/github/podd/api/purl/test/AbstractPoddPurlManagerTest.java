@@ -47,7 +47,6 @@ public abstract class AbstractPoddPurlManagerTest
     private Repository testRepository;
     
     private RepositoryConnection testRepositoryConnection;
-
     
     /**
      * @return A new PoddPurlManager instance for use by this test
@@ -58,6 +57,45 @@ public abstract class AbstractPoddPurlManagerTest
      * @return A new PurlProcessorFactory Registry for use by this test
      */
     public abstract PoddPurlProcessorFactoryRegistry getNewPoddPurlProcessorFactoryRegistry();
+    
+    /**
+     * Helper method to read a classpath resource into a String.
+     * 
+     * @param resourcePath
+     * @return
+     * @throws IOException
+     */
+    private String getResourceAsString(final String resourcePath) throws IOException
+    {
+        final StringBuilder b = new StringBuilder();
+        final BufferedReader bReader =
+                new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(resourcePath),
+                        StandardCharsets.UTF_8));
+        for(int c = bReader.read(); c != -1; c = bReader.read())
+        {
+            b.append((char)c);
+        }
+        final String rdfResourceString = b.toString();
+        return rdfResourceString;
+    }
+    
+    /**
+     * Helper method to load RDF statements from the specified resource to the given context in the
+     * test Repository.
+     * 
+     * @param resourcePath
+     *            Path to resource from which statements are to be loaded
+     * @throws Exception
+     */
+    private void loadResourceToRepository(final String resourcePath, final URI context) throws Exception
+    {
+        if(resourcePath != null)
+        {
+            final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+            Assert.assertNotNull("Could not find resource", inputStream);
+            this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
+        }
+    }
     
     @Before
     public void setUp() throws Exception
@@ -86,25 +124,6 @@ public abstract class AbstractPoddPurlManagerTest
         this.testRepository.shutDown();
         
         this.testPurlManager = null;
-    }
-    
-    @Test
-    public void testGetPurlProcessorFactoryRegistry() throws Exception
-    {
-        Assert.assertNotNull("getRegistry() returned null", this.testPurlManager.getPurlProcessorFactoryRegistry());
-    }
-    
-    @Test
-    public void testSetPurlProcessorFactoryRegistry() throws Exception
-    {
-        // first set the Registry to Null and verify it
-        this.testPurlManager.setPurlProcessorFactoryRegistry(null);
-        Assert.assertNull("Registry was not set to null", this.testPurlManager.getPurlProcessorFactoryRegistry());
-        
-        // set the Registry
-        this.testPurlManager.setPurlProcessorFactoryRegistry(this.testRegistry);
-        
-        Assert.assertNotNull("getRegistry() returned null ", this.testPurlManager.getPurlProcessorFactoryRegistry());
     }
     
     /**
@@ -178,43 +197,23 @@ public abstract class AbstractPoddPurlManagerTest
         }
     }
     
-    /**
-     * Helper method to read a classpath resource into a String.
-     * 
-     * @param resourcePath
-     * @return
-     * @throws IOException
-     */
-    private String getResourceAsString(final String resourcePath) throws IOException
+    @Test
+    public void testGetPurlProcessorFactoryRegistry() throws Exception
     {
-        final StringBuilder b = new StringBuilder();
-        final BufferedReader bReader =
-                new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(resourcePath), 
-                        StandardCharsets.UTF_8));
-        for(int c = bReader.read(); c != -1; c = bReader.read())
-        {
-            b.append((char)c);
-        }
-        final String rdfResourceString = b.toString();
-        return rdfResourceString;
+        Assert.assertNotNull("getRegistry() returned null", this.testPurlManager.getPurlProcessorFactoryRegistry());
     }
     
-    /**
-     * Helper method to load RDF statements from the specified resource to the given context in the
-     * test Repository.
-     * 
-     * @param resourcePath
-     *            Path to resource from which statements are to be loaded
-     * @throws Exception
-     */
-    private void loadResourceToRepository(final String resourcePath, final URI context) throws Exception
+    @Test
+    public void testSetPurlProcessorFactoryRegistry() throws Exception
     {
-        if(resourcePath != null)
-        {
-            final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
-            Assert.assertNotNull("Could not find resource", inputStream);
-            this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-        }
+        // first set the Registry to Null and verify it
+        this.testPurlManager.setPurlProcessorFactoryRegistry(null);
+        Assert.assertNull("Registry was not set to null", this.testPurlManager.getPurlProcessorFactoryRegistry());
+        
+        // set the Registry
+        this.testPurlManager.setPurlProcessorFactoryRegistry(this.testRegistry);
+        
+        Assert.assertNotNull("getRegistry() returned null ", this.testPurlManager.getPurlProcessorFactoryRegistry());
     }
     
 }

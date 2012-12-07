@@ -21,6 +21,21 @@ public class PurlProcessorNotHandledExceptionTest
 {
     
     @Test
+    public void testConstructorWithProcessorUriMessage() throws Exception
+    {
+        final PoddPurlProcessor thePurlProcessor = Mockito.mock(PoddPurlProcessor.class);
+        final URI failedUri = Mockito.mock(URI.class);
+        final String message = "Exception with mocked up internals";
+        
+        final PurlProcessorNotHandledException theException =
+                new PurlProcessorNotHandledException(thePurlProcessor, failedUri, message);
+        
+        Assert.assertNotNull(theException.getGenerator());
+        Assert.assertEquals(failedUri, theException.getInputUri());
+        Assert.assertEquals(message, theException.getMessage());
+    }
+    
+    @Test
     public void testConstructorWithProcessorUriMessageThrowable() throws Exception
     {
         final PoddPurlProcessor thePurlProcessor = Mockito.mock(PoddPurlProcessor.class);
@@ -35,21 +50,6 @@ public class PurlProcessorNotHandledExceptionTest
         Assert.assertEquals(failedUri, theException.getInputUri());
         Assert.assertEquals(message, theException.getMessage());
         Assert.assertEquals(rootCause, theException.getCause());
-    }
-    
-    @Test
-    public void testConstructorWithProcessorUriMessage() throws Exception
-    {
-        final PoddPurlProcessor thePurlProcessor = Mockito.mock(PoddPurlProcessor.class);
-        final URI failedUri = Mockito.mock(URI.class);
-        final String message = "Exception with mocked up internals";
-        
-        final PurlProcessorNotHandledException theException =
-                new PurlProcessorNotHandledException(thePurlProcessor, failedUri, message);
-        
-        Assert.assertNotNull(theException.getGenerator());
-        Assert.assertEquals(failedUri, theException.getInputUri());
-        Assert.assertEquals(message, theException.getMessage());
     }
     
     @Test

@@ -81,9 +81,8 @@ public class PoddRdfUtilsTest
             Assert.assertFalse(sparql.isEmpty());
             
             String expectedSparql =
-                    "CONSTRUCT { " + this.testBGPArray[i] + " } WHERE { " + this.testWhereArray[i] +
-                    " } VALUES (?s) { (<" + 
-                    subjects[i] + "> ) }";
+                    "CONSTRUCT { " + this.testBGPArray[i] + " } WHERE { " + this.testWhereArray[i]
+                            + " } VALUES (?s) { (<" + subjects[i] + "> ) }";
             if(!this.testGroupByArray[i].isEmpty())
             {
                 expectedSparql = expectedSparql + " GROUP BY " + this.testGroupByArray[i];

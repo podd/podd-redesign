@@ -45,19 +45,6 @@ public class SimplePoddPurlManager implements PoddPurlManager
     private PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry;
     
     @Override
-    public PoddPurlProcessorFactoryRegistry getPurlProcessorFactoryRegistry()
-    {
-        return this.purlProcessorFactoryRegistry;
-    }
-    
-    @Override
-    public void setPurlProcessorFactoryRegistry(final PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry)
-    {
-        this.purlProcessorFactoryRegistry = purlProcessorFactoryRegistry;
-        
-    }
-    
-    @Override
     public void convertTemporaryUris(final Set<PoddPurlReference> purlResults,
             final RepositoryConnection repositoryConnection, final URI... contexts)
     {
@@ -145,6 +132,19 @@ public class SimplePoddPurlManager implements PoddPurlManager
             }
         }
         return internalPurlResults;
+    }
+    
+    @Override
+    public PoddPurlProcessorFactoryRegistry getPurlProcessorFactoryRegistry()
+    {
+        return this.purlProcessorFactoryRegistry;
+    }
+    
+    @Override
+    public void setPurlProcessorFactoryRegistry(final PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry)
+    {
+        this.purlProcessorFactoryRegistry = purlProcessorFactoryRegistry;
+        
     }
     
 }

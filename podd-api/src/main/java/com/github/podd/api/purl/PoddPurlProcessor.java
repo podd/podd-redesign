@@ -64,14 +64,13 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      */
     PoddPurlReference handleTranslation(URI inputUri) throws PurlProcessorNotHandledException;
     
-    
     /**
      * Handles the translation of URIs using this Purl Processor
      * 
      * @param inputUri
      *            A temporary URI that needs to be translated into a Permanent URL.
      * @param parentUri
-     *            A known URI for a parent of the temporary URI that may be used to create Purls.            
+     *            A known URI for a parent of the temporary URI that may be used to create Purls.
      * @return A translated URI that was generated using a mechanism which attempts to guarantee
      *         both permanence and uniqueness of the resulting URI.
      * @throws PurlProcessorNotHandledException
@@ -82,7 +81,7 @@ public interface PoddPurlProcessor extends PoddRdfProcessor
      * 
      */
     PoddPurlReference handleTranslation(URI inputUri, URI parentUri) throws PurlProcessorNotHandledException;
-
+    
     /**
      * Signals to this Purl Processor that it should no longer handle permanent URL generation for
      * URIs that start with the given prefix.

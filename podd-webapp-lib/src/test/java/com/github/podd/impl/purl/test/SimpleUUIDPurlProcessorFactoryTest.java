@@ -39,6 +39,11 @@ public class SimpleUUIDPurlProcessorFactoryTest extends AbstractPoddRdfProcessor
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
+    private void checkQueryWithRepository() throws Exception
+    {
+        // TODO: extract common content from above two test methods to here
+    }
+    
     @Override
     protected PoddRdfProcessorFactory<PoddPurlProcessor> getNewPoddRdfProcessorFactory()
     {
@@ -162,10 +167,5 @@ public class SimpleUUIDPurlProcessorFactoryTest extends AbstractPoddRdfProcessor
             }
             repository.shutDown();
         }
-    }
-    
-    private void checkQueryWithRepository() throws Exception
-    {
-        // TODO: extract common content from above two test methods to here
     }
 }

@@ -23,15 +23,16 @@ public interface PoddFileReferenceManager
     
     Set<PoddFileReference> extractFileReferences(RepositoryConnection conn, URI... contexts) throws RepositoryException;
     
+    PoddFileReferenceProcessorFactoryRegistry getFileProcessorFactoryRegistry();
+    
     Set<PoddFileReference> getFileReferences(OWLOntologyID artifactId);
     
     Set<PoddFileReference> getFileReferences(OWLOntologyID artifactId, IRI objectIri);
     
     Set<PoddFileReference> getFileReferences(OWLOntologyID artifactId, String alias);
     
-    PoddFileReferenceProcessorFactoryRegistry getFileProcessorFactoryRegistry();
-    
     void setProcessorFactoryRegistry(PoddFileReferenceProcessorFactoryRegistry registry);
     
-    void verifyFileReferences(Set<PoddFileReference> fileReferenceResults, RepositoryConnection tempConn, URI openRDFURI) throws RepositoryException;
+    void verifyFileReferences(Set<PoddFileReference> fileReferenceResults, RepositoryConnection tempConn, URI openRDFURI)
+        throws RepositoryException;
 }

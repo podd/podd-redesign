@@ -31,11 +31,55 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
     
     private String prefix;
     
-    private final List<String> temporaryUriArray = Collections.unmodifiableList(Arrays.asList(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix()));
+    private final List<String> temporaryUriArray = Collections.unmodifiableList(Arrays
+            .asList(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix()));
     
     /* The fixed set of stages supported by this Factory */
     private static final Set<PoddProcessorStage> stages = new HashSet<PoddProcessorStage>(
             Arrays.asList(new PoddProcessorStage[] { PoddProcessorStage.RDF_PARSING }));
+    
+    @Override
+    public boolean canHandleStage(final PoddProcessorStage stage)
+    {
+        if(stage == null)
+        {
+            throw new NullPointerException("Cannot handle NULL stage");
+        }
+        return SimpleUUIDPurlProcessorFactory.stages.contains(stage);
+    }
+    
+    @Override
+    public String getKey()
+    {
+        return this.getClass().getName();
+    }
+    
+    @Override
+    public PoddPurlProcessor getProcessor()
+    {
+        if(this.temporaryUriArray.isEmpty())
+        {
+            // NOTE: Could throw a custom exception, possibly extending a PoddRuntimeException ?
+            throw new RuntimeException("Not enough data (temporary URIs) to create SimplePoddPurlProcessor");
+        }
+        
+        SimpleUUIDPurlProcessor processor = null;
+        if(this.prefix != null)
+        {
+            processor = new SimpleUUIDPurlProcessor(this.prefix);
+        }
+        else
+        {
+            processor = new SimpleUUIDPurlProcessor();
+        }
+        
+        for(final String tempUri : this.temporaryUriArray)
+        {
+            processor.addTemporaryUriHandler(tempUri);
+        }
+        
+        return processor;
+    }
     
     @Override
     public String getSPARQLConstructBGP()
@@ -79,6 +123,13 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
         return builder.toString();
     }
     
+    @Override
+    public String getSPARQLGroupBy()
+    {
+        // an empty GROUP BY clause
+        return "";
+    }
+    
     /**
      * Only retrieves RDF triples containing the given Subject. Note that any occurrences of the
      * given URI as a predicate/object are ignored.
@@ -103,56 +154,6 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
     public String getSPARQLVariable()
     {
         return "subject";
-    }
-    
-    @Override
-    public String getSPARQLGroupBy()
-    {
-        // an empty GROUP BY clause
-        return "";
-    }
-    
-    @Override
-    public boolean canHandleStage(final PoddProcessorStage stage)
-    {
-        if(stage == null)
-        {
-            throw new NullPointerException("Cannot handle NULL stage");
-        }
-        return SimpleUUIDPurlProcessorFactory.stages.contains(stage);
-    }
-    
-    @Override
-    public String getKey()
-    {
-        return this.getClass().getName();
-    }
-    
-    @Override
-    public PoddPurlProcessor getProcessor()
-    {
-        if(this.temporaryUriArray.isEmpty())
-        {
-            // NOTE: Could throw a custom exception, possibly extending a PoddRuntimeException ?
-            throw new RuntimeException("Not enough data (temporary URIs) to create SimplePoddPurlProcessor");
-        }
-        
-        SimpleUUIDPurlProcessor processor = null;
-        if(this.prefix != null)
-        {
-            processor = new SimpleUUIDPurlProcessor(this.prefix);
-        }
-        else
-        {
-            processor = new SimpleUUIDPurlProcessor();
-        }
-        
-        for(final String tempUri : this.temporaryUriArray)
-        {
-            processor.addTemporaryUriHandler(tempUri);
-        }
-        
-        return processor;
     }
     
     @Override

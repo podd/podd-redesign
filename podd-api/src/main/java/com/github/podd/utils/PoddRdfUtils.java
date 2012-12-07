@@ -46,11 +46,11 @@ public class PoddRdfUtils
         sparqlBuilder.append("CONSTRUCT { ");
         sparqlBuilder.append(rdfProcessorFactory.getSPARQLConstructBGP());
         sparqlBuilder.append(" } WHERE { ");
-
+        
         sparqlBuilder.append(rdfProcessorFactory.getSPARQLConstructWhere());
         
         sparqlBuilder.append(" }");
-
+        
         if(subject != null)
         {
             sparqlBuilder.append(" VALUES (?");

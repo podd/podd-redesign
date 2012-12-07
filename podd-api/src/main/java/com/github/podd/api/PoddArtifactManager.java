@@ -44,12 +44,13 @@ public interface PoddArtifactManager
      *            The format for the input RDF document.
      * @return An InferredOWLOntologyID object containing the details of the artifact. If the
      *         inferencing is delayed, the object may not contain the inferred ontology IRI.
-     * @throws IOException 
-     * @throws PoddException 
-     * @throws OpenRDFException 
-     * @throws OWLException 
+     * @throws IOException
+     * @throws PoddException
+     * @throws OpenRDFException
+     * @throws OWLException
      */
-    InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format) throws OpenRDFException, PoddException, IOException, OpenRDFException, PoddException, OWLException;
+    InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format) throws OpenRDFException,
+        PoddException, IOException, OpenRDFException, PoddException, OWLException;
     
     /**
      * 

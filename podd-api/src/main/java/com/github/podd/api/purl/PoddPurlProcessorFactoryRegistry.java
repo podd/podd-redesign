@@ -21,17 +21,17 @@ public class PoddPurlProcessorFactoryRegistry extends AbstractServiceLoader<Stri
     
     private static final PoddPurlProcessorFactoryRegistry instance = new PoddPurlProcessorFactoryRegistry();
     
-    public PoddPurlProcessorFactoryRegistry()
-    {
-        super(PoddPurlProcessorFactory.class);
-    }
-    
     /**
      * @return A static instance of this registry.
      */
     public static PoddPurlProcessorFactoryRegistry getInstance()
     {
         return PoddPurlProcessorFactoryRegistry.instance;
+    }
+    
+    public PoddPurlProcessorFactoryRegistry()
+    {
+        super(PoddPurlProcessorFactory.class);
     }
     
     /**

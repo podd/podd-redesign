@@ -14,7 +14,6 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.Update;
 import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
@@ -53,14 +52,15 @@ public class URITranslator
      *             If the SPARQL Update queries used by this method were not able to be successfully
      *             executed on the given repository for some reason.
      */
-    public static void doTranslation(RepositoryConnection repositoryConnection, final String inputUriPrefix, final String outputUriPrefix,
-            Resource... contexts) throws RepositoryException, MalformedQueryException, UpdateExecutionException
+    public static void doTranslation(final RepositoryConnection repositoryConnection, final String inputUriPrefix,
+            final String outputUriPrefix, final Resource... contexts) throws RepositoryException,
+        MalformedQueryException, UpdateExecutionException
     {
-        Collection<URI> subjectMappingPredicates = Collections.emptyList();
-        Collection<URI> predicateMappingPredicates = Collections.emptyList();
-        Collection<URI> objectMappingPredicates = Collections.emptyList();
+        final Collection<URI> subjectMappingPredicates = Collections.emptyList();
+        final Collection<URI> predicateMappingPredicates = Collections.emptyList();
+        final Collection<URI> objectMappingPredicates = Collections.emptyList();
         
-        doTranslation(repositoryConnection, inputUriPrefix, outputUriPrefix, subjectMappingPredicates,
+        URITranslator.doTranslation(repositoryConnection, inputUriPrefix, outputUriPrefix, subjectMappingPredicates,
                 predicateMappingPredicates, objectMappingPredicates, true, contexts);
     }
     
@@ -98,14 +98,15 @@ public class URITranslator
      *             If the SPARQL Update queries used by this method were not able to be successfully
      *             executed on the given repository for some reason.
      */
-    public static void doTranslation(RepositoryConnection repositoryConnection, final String inputUriPrefix, final String outputUriPrefix,
-            final Collection<URI> nextSubjectMappingPredicates, final Collection<URI> nextPredicateMappingPredicates,
-            final Collection<URI> nextObjectMappingPredicates, boolean deleteTranslatedTriples, Resource... contexts)
-        throws RepositoryException, MalformedQueryException, UpdateExecutionException
+    public static void doTranslation(final RepositoryConnection repositoryConnection, final String inputUriPrefix,
+            final String outputUriPrefix, final Collection<URI> nextSubjectMappingPredicates,
+            final Collection<URI> nextPredicateMappingPredicates, final Collection<URI> nextObjectMappingPredicates,
+            final boolean deleteTranslatedTriples, final Resource... contexts) throws RepositoryException,
+        MalformedQueryException, UpdateExecutionException
     {
-        doTranslation(repositoryConnection, inputUriPrefix, outputUriPrefix, nextSubjectMappingPredicates, true, false,
-                nextPredicateMappingPredicates, true, false, nextObjectMappingPredicates, true, false, deleteTranslatedTriples,
-                contexts);
+        URITranslator.doTranslation(repositoryConnection, inputUriPrefix, outputUriPrefix,
+                nextSubjectMappingPredicates, true, false, nextPredicateMappingPredicates, true, false,
+                nextObjectMappingPredicates, true, false, deleteTranslatedTriples, contexts);
     }
     
     /**
@@ -146,12 +147,14 @@ public class URITranslator
      *             If the SPARQL Update queries used by this method were not able to be successfully
      *             executed on the given repository for some reason.
      */
-    public static void doTranslation(RepositoryConnection repositoryConnection, final String inputUriPrefix, final String outputUriPrefix,
-            final Collection<URI> nextSubjectMappingPredicates, boolean translateSubjectUris, boolean exactSubjectMatchRequired,
-            final Collection<URI> nextPredicateMappingPredicates, boolean translatePredicateUris, boolean exactPredicateMatchRequired,
-            final Collection<URI> nextObjectMappingPredicates, boolean translateObjectUris, boolean exactObjectMatchRequired,
-            boolean deleteTranslatedTriples, Resource... contexts) throws RepositoryException, MalformedQueryException,
-        UpdateExecutionException
+    public static void doTranslation(final RepositoryConnection repositoryConnection, final String inputUriPrefix,
+            final String outputUriPrefix, final Collection<URI> nextSubjectMappingPredicates,
+            final boolean translateSubjectUris, final boolean exactSubjectMatchRequired,
+            final Collection<URI> nextPredicateMappingPredicates, final boolean translatePredicateUris,
+            final boolean exactPredicateMatchRequired, final Collection<URI> nextObjectMappingPredicates,
+            final boolean translateObjectUris, final boolean exactObjectMatchRequired,
+            final boolean deleteTranslatedTriples, final Resource... contexts) throws RepositoryException,
+        MalformedQueryException, UpdateExecutionException
     {
         try
         {
@@ -160,7 +163,7 @@ public class URITranslator
             
             if(contexts != null)
             {
-                for(Resource nextResource : contexts)
+                for(final Resource nextResource : contexts)
                 {
                     if(nextResource != null && nextResource instanceof URI)
                     {
@@ -168,7 +171,7 @@ public class URITranslator
                     }
                     else
                     {
-                        LOGGER.error("Did not recognise (and ignoring) the context: " + nextResource);
+                        URITranslator.LOGGER.error("Did not recognise (and ignoring) the context: " + nextResource);
                     }
                 }
             }
@@ -182,7 +185,7 @@ public class URITranslator
             
             if(translateObjectUris)
             {
-                for(String nextWithClause : withClauses)
+                for(final String nextWithClause : withClauses)
                 {
                     final StringBuilder objectConstructBuilder =
                             new StringBuilder(nextObjectMappingPredicates.size() * 120);
@@ -199,7 +202,8 @@ public class URITranslator
                     
                     if(!exactObjectMatchRequired)
                     {
-                        objectTemplateWhereBuilder.append("filter(isIRI(?objectUri) && strStarts(str(?objectUri), \"" + inputUriPrefix + "\")");
+                        objectTemplateWhereBuilder.append("filter(isIRI(?objectUri) && strStarts(str(?objectUri), \""
+                                + inputUriPrefix + "\")");
                         objectTemplateWhereBuilder.append(") . ");
                         objectTemplateWhereBuilder.append("bind(iri(concat(\"");
                         objectTemplateWhereBuilder.append(outputUriPrefix);
@@ -209,9 +213,13 @@ public class URITranslator
                     }
                     else
                     {
-                        // the following should be more efficient on large queries for exact matching, as it contains constants that can be compiled down to IRIs
-                        // In addition, the branch above will work with exact matching, but is prone to collisions if the IRI is used as the base of a longer IRI
-                        objectTemplateWhereBuilder.append("filter(isIRI(?objectUri) && sameTerm(?objectUri, IRI(\""+inputUriPrefix+"\"))). bind(iri(\""+outputUriPrefix+"\") AS ?normalisedObjectUri) . ");
+                        // the following should be more efficient on large queries for exact
+                        // matching, as it contains constants that can be compiled down to IRIs
+                        // In addition, the branch above will work with exact matching, but is prone
+                        // to collisions if the IRI is used as the base of a longer IRI
+                        objectTemplateWhereBuilder.append("filter(isIRI(?objectUri) && sameTerm(?objectUri, IRI(\""
+                                + inputUriPrefix + "\"))). bind(iri(\"" + outputUriPrefix
+                                + "\") AS ?normalisedObjectUri) . ");
                     }
                     
                     String deleteObjectTemplate;
@@ -228,14 +236,14 @@ public class URITranslator
                     final String objectTemplate =
                             nextWithClause + " " + deleteObjectTemplate
                                     + " INSERT { ?subjectUri ?predicateUri ?normalisedObjectUri . "
-                                    + objectConstructBuilder.toString() + " } " + " WHERE { " + objectTemplateWhereBuilder.toString()
-                                    + " } ; ";
+                                    + objectConstructBuilder.toString() + " } " + " WHERE { "
+                                    + objectTemplateWhereBuilder.toString() + " } ; ";
                     
-                    LOGGER.debug("objectTemplate=" + objectTemplate);
+                    URITranslator.LOGGER.debug("objectTemplate=" + objectTemplate);
                     
                     // allQueries.add(objectTemplate);
                     
-                    executeSparqlUpdateQueries(repositoryConnection, objectTemplate);
+                    URITranslator.executeSparqlUpdateQueries(repositoryConnection, objectTemplate);
                 }
                 
                 // FIXME: Sesame seems to need this, or the following queries do not work correctly
@@ -245,7 +253,7 @@ public class URITranslator
             
             if(translateSubjectUris)
             {
-                for(String nextWithClause : withClauses)
+                for(final String nextWithClause : withClauses)
                 {
                     final StringBuilder subjectConstructBuilder =
                             new StringBuilder(nextSubjectMappingPredicates.size() * 120);
@@ -262,7 +270,9 @@ public class URITranslator
                     
                     if(!exactObjectMatchRequired)
                     {
-                        subjectTemplateWhereBuilder.append("filter(isIRI(?subjectUri) && strStarts(str(?subjectUri), \"" + inputUriPrefix + "\")");
+                        subjectTemplateWhereBuilder
+                                .append("filter(isIRI(?subjectUri) && strStarts(str(?subjectUri), \"" + inputUriPrefix
+                                        + "\")");
                         subjectTemplateWhereBuilder.append(") . ");
                         subjectTemplateWhereBuilder.append("bind(iri(concat(\"");
                         subjectTemplateWhereBuilder.append(outputUriPrefix);
@@ -272,9 +282,13 @@ public class URITranslator
                     }
                     else
                     {
-                        // the following should be more efficient on large queries for exact matching, as it contains constants that can be compiled down to IRIs
-                        // In addition, the branch above will work with exact matching, but is prone to collisions if the IRI is used as the base of a longer IRI
-                        subjectTemplateWhereBuilder.append("filter(isIRI(?subjectUri) && sameTerm(?subjectUri, IRI(\""+inputUriPrefix+"\"))). bind(iri(\""+outputUriPrefix+"\") AS ?normalisedSubjectUri) . ");
+                        // the following should be more efficient on large queries for exact
+                        // matching, as it contains constants that can be compiled down to IRIs
+                        // In addition, the branch above will work with exact matching, but is prone
+                        // to collisions if the IRI is used as the base of a longer IRI
+                        subjectTemplateWhereBuilder.append("filter(isIRI(?subjectUri) && sameTerm(?subjectUri, IRI(\""
+                                + inputUriPrefix + "\"))). bind(iri(\"" + outputUriPrefix
+                                + "\") AS ?normalisedSubjectUri) . ");
                     }
                     
                     String deleteSubjectTemplate;
@@ -291,12 +305,12 @@ public class URITranslator
                     final String subjectTemplate =
                             nextWithClause + " " + deleteSubjectTemplate
                                     + " INSERT { ?normalisedSubjectUri ?predicateUri ?objectUri . "
-                                    + subjectConstructBuilder.toString() + " } " + " WHERE { " + subjectTemplateWhereBuilder.toString()
-                                    + " } ; ";
+                                    + subjectConstructBuilder.toString() + " } " + " WHERE { "
+                                    + subjectTemplateWhereBuilder.toString() + " } ; ";
                     
                     // allQueries.add(subjectTemplate);
                     
-                    executeSparqlUpdateQueries(repositoryConnection, subjectTemplate);
+                    URITranslator.executeSparqlUpdateQueries(repositoryConnection, subjectTemplate);
                 }
                 
                 // FIXME: Sesame seems to need this, or the following queries do not work correctly
@@ -305,7 +319,7 @@ public class URITranslator
             
             if(translatePredicateUris)
             {
-                for(String nextWithClause : withClauses)
+                for(final String nextWithClause : withClauses)
                 {
                     final StringBuilder predicateConstructBuilder =
                             new StringBuilder(nextPredicateMappingPredicates.size() * 120);
@@ -322,7 +336,9 @@ public class URITranslator
                     
                     if(!exactObjectMatchRequired)
                     {
-                        predicateTemplateWhereBuilder.append("filter(isIRI(?predicateUri) && strStarts(str(?predicateUri), \"" + inputUriPrefix + "\")");
+                        predicateTemplateWhereBuilder
+                                .append("filter(isIRI(?predicateUri) && strStarts(str(?predicateUri), \""
+                                        + inputUriPrefix + "\")");
                         predicateTemplateWhereBuilder.append(") . ");
                         predicateTemplateWhereBuilder.append("bind(iri(concat(\"");
                         predicateTemplateWhereBuilder.append(outputUriPrefix);
@@ -332,9 +348,14 @@ public class URITranslator
                     }
                     else
                     {
-                        // the following should be more efficient on large queries for exact matching, as it contains constants that can be compiled down to IRIs
-                        // In addition, the branch above will work with exact matching, but is prone to collisions if the IRI is used as the base of a longer IRI
-                        predicateTemplateWhereBuilder.append("filter(isIRI(?predicateUri) && sameTerm(?predicateUri, IRI(\""+inputUriPrefix+"\"))). bind(iri(\""+outputUriPrefix+"\") AS ?normalisedPredicateUri) . ");
+                        // the following should be more efficient on large queries for exact
+                        // matching, as it contains constants that can be compiled down to IRIs
+                        // In addition, the branch above will work with exact matching, but is prone
+                        // to collisions if the IRI is used as the base of a longer IRI
+                        predicateTemplateWhereBuilder
+                                .append("filter(isIRI(?predicateUri) && sameTerm(?predicateUri, IRI(\""
+                                        + inputUriPrefix + "\"))). bind(iri(\"" + outputUriPrefix
+                                        + "\") AS ?normalisedPredicateUri) . ");
                     }
                     
                     String deletePredicateTemplate;
@@ -356,7 +377,7 @@ public class URITranslator
                     
                     // allQueries.add(predicateTemplate);
                     
-                    executeSparqlUpdateQueries(repositoryConnection, predicateTemplate);
+                    URITranslator.executeSparqlUpdateQueries(repositoryConnection, predicateTemplate);
                 }
                 
                 // executeSparqlUpdateQueries(repositoryConnection, allQueries);
@@ -364,7 +385,7 @@ public class URITranslator
                 repositoryConnection.commit();
             }
         }
-        catch(RepositoryException rex)
+        catch(final RepositoryException rex)
         {
             // rollback the connection and then throw the resulting exception
             // TODO: Will this get called before the repositoryConnection.close() in the finally
@@ -372,7 +393,7 @@ public class URITranslator
             repositoryConnection.rollback();
             throw rex;
         }
-        catch(MalformedQueryException mqe)
+        catch(final MalformedQueryException mqe)
         {
             // rollback the connection and then throw the resulting exception
             // TODO: Will this get called before the repositoryConnection.close() in the finally
@@ -380,7 +401,7 @@ public class URITranslator
             repositoryConnection.rollback();
             throw mqe;
         }
-        catch(UpdateExecutionException uee)
+        catch(final UpdateExecutionException uee)
         {
             // rollback the connection and then throw the resulting exception
             // TODO: Will this get called before the repositoryConnection.close() in the finally
@@ -399,10 +420,10 @@ public class URITranslator
      * @throws MalformedQueryException
      * @throws UpdateExecutionException
      */
-    private static void executeSparqlUpdateQueries(RepositoryConnection repositoryConnection, String nextQuery)
-        throws RepositoryException, MalformedQueryException, UpdateExecutionException
+    private static void executeSparqlUpdateQueries(final RepositoryConnection repositoryConnection,
+            final String nextQuery) throws RepositoryException, MalformedQueryException, UpdateExecutionException
     {
-        executeSparqlUpdateQueries(repositoryConnection, Collections.singletonList(nextQuery));
+        URITranslator.executeSparqlUpdateQueries(repositoryConnection, Collections.singletonList(nextQuery));
     }
     
     /**
@@ -414,17 +435,18 @@ public class URITranslator
      * @throws MalformedQueryException
      * @throws UpdateExecutionException
      */
-    private static void executeSparqlUpdateQueries(RepositoryConnection repositoryConnection, List<String> nextQueries)
-        throws RepositoryException, MalformedQueryException, UpdateExecutionException
+    private static void executeSparqlUpdateQueries(final RepositoryConnection repositoryConnection,
+            final List<String> nextQueries) throws RepositoryException, MalformedQueryException,
+        UpdateExecutionException
     {
-        for(String nextQuery : nextQueries)
+        for(final String nextQuery : nextQueries)
         {
-            LOGGER.info("nextQuery=" + nextQuery);
+            URITranslator.LOGGER.info("nextQuery=" + nextQuery);
             
-            Update preparedUpdate = repositoryConnection.prepareUpdate(QueryLanguage.SPARQL, nextQuery);
+            final Update preparedUpdate = repositoryConnection.prepareUpdate(QueryLanguage.SPARQL, nextQuery);
             
             preparedUpdate.execute();
         }
     }
-
+    
 }

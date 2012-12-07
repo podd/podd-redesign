@@ -100,15 +100,6 @@ public abstract class AbstractPoddPurlProcessorTest
     }
     
     /**
-     * Tests the behaviour when a null value is given to the canHandle() method
-     */
-    @Test
-    public void testCanHandleWithNull() throws Exception
-    {
-        Assert.assertFalse(this.purlProcessor.canHandle(null));
-    }
-    
-    /**
      * Test a PoddPurlProcessor that has not been assigned any temporary URI prefixes
      * 
      * @throws Exception
@@ -118,6 +109,15 @@ public abstract class AbstractPoddPurlProcessorTest
     {
         final URI tempUriUnsupported = ValueFactoryImpl.getInstance().createURI("urn:unsupported:temporary/uri");
         Assert.assertFalse(this.purlProcessor.canHandle(tempUriUnsupported));
+    }
+    
+    /**
+     * Tests the behaviour when a null value is given to the canHandle() method
+     */
+    @Test
+    public void testCanHandleWithNull() throws Exception
+    {
+        Assert.assertFalse(this.purlProcessor.canHandle(null));
     }
     
     @Test
@@ -172,23 +172,6 @@ public abstract class AbstractPoddPurlProcessorTest
         Assert.assertFalse(prefixList.contains(this.prefixPurl));
     }
     
-    /**
-     * Tests the behaviour when a null value is given to the handleTranslation() method
-     */
-    @Test
-    public void testHandleTranslationWithNull() throws Exception
-    {
-        try
-        {
-            this.purlProcessor.handleTranslation(null);
-            Assert.fail("Expected NullPointerException was not thrown");
-        }
-        catch(final NullPointerException e)
-        {
-            // fine as this is an expected exception
-        }
-    }
-    
     @Test
     public void testHandleTranslationSuccessful() throws Exception
     {
@@ -216,6 +199,23 @@ public abstract class AbstractPoddPurlProcessorTest
         catch(final PurlProcessorNotHandledException e)
         {
             Assert.assertNotNull(e);
+        }
+    }
+    
+    /**
+     * Tests the behaviour when a null value is given to the handleTranslation() method
+     */
+    @Test
+    public void testHandleTranslationWithNull() throws Exception
+    {
+        try
+        {
+            this.purlProcessor.handleTranslation(null);
+            Assert.fail("Expected NullPointerException was not thrown");
+        }
+        catch(final NullPointerException e)
+        {
+            // fine as this is an expected exception
         }
     }
     

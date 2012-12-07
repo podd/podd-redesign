@@ -42,20 +42,6 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
         this.processorFactory = null;
     }
     
-    @Test
-    public void testCanHandleStageWithNull() throws Exception
-    {
-        try
-        {
-            this.processorFactory.canHandleStage(null);
-            Assert.fail("Expected NullPointerException was not thrown");
-        }
-        catch(final NullPointerException e)
-        {
-            Assert.assertTrue(e.getMessage().toLowerCase().contains("null"));
-        }
-    }
-    
     /**
      * Tests that ProcessorFactory.getStages() returns an accurate representation of the stages
      * supported by a PoddProcessorFactory.
@@ -80,11 +66,23 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
     }
     
     @Test
-    public void testGetStagesNotEmpty() throws Exception
+    public void testCanHandleStageWithNull() throws Exception
     {
-        final Set<PoddProcessorStage> stages = this.processorFactory.getStages();
-        Assert.assertNotNull("getStages() returned a NULL Set", stages);
-        Assert.assertFalse("Should not have returned an empty Set", stages.isEmpty());
+        try
+        {
+            this.processorFactory.canHandleStage(null);
+            Assert.fail("Expected NullPointerException was not thrown");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertTrue(e.getMessage().toLowerCase().contains("null"));
+        }
+    }
+    
+    @Test
+    public void testGetKey() throws Exception
+    {
+        Assert.assertNotNull(this.processorFactory.getKey());
     }
     
     /**
@@ -100,9 +98,11 @@ public abstract class AbstractPoddProcessorFactoryTest<T extends PoddProcessor<I
     }
     
     @Test
-    public void testGetKey() throws Exception
+    public void testGetStagesNotEmpty() throws Exception
     {
-        Assert.assertNotNull(this.processorFactory.getKey());
+        final Set<PoddProcessorStage> stages = this.processorFactory.getStages();
+        Assert.assertNotNull("getStages() returned a NULL Set", stages);
+        Assert.assertFalse("Should not have returned an empty Set", stages.isEmpty());
     }
     
 }

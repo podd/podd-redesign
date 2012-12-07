@@ -125,6 +125,8 @@ public interface PoddSchemaManager
     void setCurrentSchemaOntologyVersion(OWLOntologyID schemaOntologyID) throws UnmanagedSchemaOntologyIDException,
         IllegalArgumentException;
     
+    void setOwlManager(PoddOWLManager testOWLManager);
+    
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
      * ontology, and stores the original schema ontology and the inferences in separate RDF Graphs
@@ -175,7 +177,5 @@ public interface PoddSchemaManager
      */
     InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
             RDFFormat fileFormat) throws OpenRDFException, IOException, OWLException, PoddException;
-    
-    void setOwlManager(PoddOWLManager testOWLManager);
     
 }

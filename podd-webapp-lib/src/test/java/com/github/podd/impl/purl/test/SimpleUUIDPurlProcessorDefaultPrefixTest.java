@@ -34,9 +34,8 @@ public class SimpleUUIDPurlProcessorDefaultPrefixTest extends AbstractPoddPurlPr
     }
     
     /**
-     * Tests handleTranslation(inputUri, parentUri) with a valid Parent URI.
-     * Translation consists of replacing the temporary URI prefix with the parent URI, which
-     * is a unique prefix.
+     * Tests handleTranslation(inputUri, parentUri) with a valid Parent URI. Translation consists of
+     * replacing the temporary URI prefix with the parent URI, which is a unique prefix.
      * 
      * @throws Exception
      */
@@ -54,9 +53,8 @@ public class SimpleUUIDPurlProcessorDefaultPrefixTest extends AbstractPoddPurlPr
         Assert.assertEquals(tempUriUrnTemp, purlReference.getTemporaryURI());
         Assert.assertTrue(this.isPurlGeneratedFromTemp(purlReference.getPurlURI(), tempUriUrnTemp));
         
-        Assert.assertEquals("Not the expected Purl", 
-                SimpleUUIDPurlProcessor.DEFAULT_PREFIX + "S0ME-UN1QUE-ID/artifact:1482", 
-                purlReference.getPurlURI().stringValue());
+        Assert.assertEquals("Not the expected Purl", SimpleUUIDPurlProcessor.DEFAULT_PREFIX
+                + "S0ME-UN1QUE-ID/artifact:1482", purlReference.getPurlURI().stringValue());
     }
     
 }

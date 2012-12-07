@@ -79,15 +79,15 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
     }
     
     @Test
-    public void testGetSPARQLVariable() throws Exception
-    {
-        Assert.assertNotNull("SPARQL variable was null", this.rdfProcessorFactory.getSPARQLVariable());
-    }
-    
-    @Test
     public void testGetSPARQLGroupBy() throws Exception
     {
         Assert.assertNotNull("GROUP BY was null", this.rdfProcessorFactory.getSPARQLGroupBy());
+    }
+    
+    @Test
+    public void testGetSPARQLVariable() throws Exception
+    {
+        Assert.assertNotNull("SPARQL variable was null", this.rdfProcessorFactory.getSPARQLVariable());
     }
     
     /**
@@ -99,7 +99,7 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
     @Test
     public void testSPARQLQueryString() throws Exception
     {
-        final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory);
+        final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(this.rdfProcessorFactory);
         
         final Repository repository = new SailRepository(new MemoryStore());
         try
@@ -128,7 +128,7 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
     {
         final URI subject = ValueFactoryImpl.getInstance().createURI("http://example.com/podd/user#Will");
         
-        final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory, subject);
+        final String sparqlQuery = PoddRdfUtils.buildSparqlConstructQuery(this.rdfProcessorFactory, subject);
         
         final Repository repository = new SailRepository(new MemoryStore());
         try
