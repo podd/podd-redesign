@@ -11,12 +11,24 @@ import org.semanticweb.owlapi.util.AbstractServiceLoader;
 import com.github.podd.api.PoddProcessorStage;
 
 /**
+ * A registry containing dynamically loaded instances of {@link PoddFileReferenceProcessorFactory}.
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
 public class PoddFileReferenceProcessorFactoryRegistry extends
         AbstractServiceLoader<String, PoddFileReferenceProcessorFactory>
 {
+    private static final PoddFileReferenceProcessorFactoryRegistry instance =
+            new PoddFileReferenceProcessorFactoryRegistry();
+    
+    /**
+     * @return A static instance of this registry.
+     */
+    public static PoddFileReferenceProcessorFactoryRegistry getInstance()
+    {
+        return PoddFileReferenceProcessorFactoryRegistry.instance;
+    }
     
     public PoddFileReferenceProcessorFactoryRegistry()
     {
