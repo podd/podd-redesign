@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.openrdf.model.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,24 +130,13 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
     }
     
     /**
-     * Only retrieves RDF triples containing the given Subject. Note that any occurrences of the
-     * given URI as a predicate/object are ignored.
+     * Returns the variable assigned to the "subject" of the SPARQL graph. This variable could then
+     * be used to retrieve RDF triples containing the given Subject. Note that any occurrences of
+     * the given URI as a predicate/object are ignored.
      * 
-     * <p>
-     * --------------------------------------------------------------------------------------
-     * <p>
-     * TODO: This method should simply throw an exception as calling it does not make sense in
-     * identifying temporary URIs for the purpose of generating PURLs. The current implementation
-     * should be moved to a FileReferenceProcessor class.
-     * <p>
-     * --------------------------------------------------------------------------------------
-     * <p>
+     * @return Variable name assigned to "subjects" in the SPARQL construct query
      * 
-     * @param subject
-     *            The URI of a specific object to fetch results for.
-     * @return A String which makes up the WHERE clause of a SPARQL construct query
-     * 
-     * @see com.github.podd.api.PoddRdfProcessorFactory#getSPARQLConstructWhere(URI)
+     * @see com.github.podd.api.PoddRdfProcessorFactory#getSPARQLVariable()
      */
     @Override
     public String getSPARQLVariable()
