@@ -26,23 +26,23 @@ import com.github.podd.api.PoddRdfProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlProcessorPrefixes;
 import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
-import com.github.podd.impl.purl.SimpleUUIDPurlProcessorFactory;
+import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.utils.PoddRdfUtils;
 
 /**
- * Concrete unit test for SimpleUUIDPurlProcessorFactory
+ * Concrete unit test for UUIDPurlProcessorFactoryImpl
  * 
  * @author kutila
  * 
  */
-public class SimpleUUIDPurlProcessorFactoryTest extends AbstractPoddRdfProcessorFactoryTest<PoddPurlProcessor>
+public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFactoryTest<PoddPurlProcessor>
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     @Override
     protected PoddRdfProcessorFactory<PoddPurlProcessor> getNewPoddRdfProcessorFactory()
     {
-        return new SimpleUUIDPurlProcessorFactory();
+        return new UUIDPurlProcessorFactoryImpl();
     }
     
     /**

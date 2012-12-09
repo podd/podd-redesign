@@ -11,18 +11,18 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.api.purl.test.AbstractPoddPurlProcessorTest;
-import com.github.podd.impl.purl.SimpleUUIDPurlProcessor;
+import com.github.podd.impl.purl.UUIDPurlProcessorImpl;
 
 /**
  * @author kutila
  * 
  */
-public class SimpleUUIDPurlProcessorDefaultPrefixTest extends AbstractPoddPurlProcessorTest
+public class UUIDPurlProcessorImplDefaultPrefixTest extends AbstractPoddPurlProcessorTest
 {
     @Override
     protected PoddPurlProcessor getNewPoddPurlProcessor()
     {
-        return new SimpleUUIDPurlProcessor();
+        return new UUIDPurlProcessorImpl();
     }
     
     @Override
@@ -30,7 +30,7 @@ public class SimpleUUIDPurlProcessorDefaultPrefixTest extends AbstractPoddPurlPr
     {
         // NOTE: This method will start giving incorrect results when
         // multiple PurlProcessors use the same prefix
-        return purl.stringValue().startsWith(SimpleUUIDPurlProcessor.DEFAULT_PREFIX);
+        return purl.stringValue().startsWith(UUIDPurlProcessorImpl.DEFAULT_PREFIX);
     }
     
     /**
@@ -45,7 +45,7 @@ public class SimpleUUIDPurlProcessorDefaultPrefixTest extends AbstractPoddPurlPr
         this.purlProcessor.addTemporaryUriHandler(this.prefixUrnTemp);
         final URI tempUriUrnTemp = ValueFactoryImpl.getInstance().createURI(this.prefixUrnTemp + "artifact:1482");
         final URI parentUri =
-                ValueFactoryImpl.getInstance().createURI(SimpleUUIDPurlProcessor.DEFAULT_PREFIX + "S0ME-UN1QUE-ID/");
+                ValueFactoryImpl.getInstance().createURI(UUIDPurlProcessorImpl.DEFAULT_PREFIX + "S0ME-UN1QUE-ID/");
         
         final PoddPurlReference purlReference = this.purlProcessor.handleTranslation(tempUriUrnTemp, parentUri);
         
@@ -53,7 +53,7 @@ public class SimpleUUIDPurlProcessorDefaultPrefixTest extends AbstractPoddPurlPr
         Assert.assertEquals(tempUriUrnTemp, purlReference.getTemporaryURI());
         Assert.assertTrue(this.isPurlGeneratedFromTemp(purlReference.getPurlURI(), tempUriUrnTemp));
         
-        Assert.assertEquals("Not the expected Purl", SimpleUUIDPurlProcessor.DEFAULT_PREFIX
+        Assert.assertEquals("Not the expected Purl", UUIDPurlProcessorImpl.DEFAULT_PREFIX
                 + "S0ME-UN1QUE-ID/artifact:1482", purlReference.getPurlURI().stringValue());
     }
     

@@ -18,13 +18,13 @@ import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorPrefixes;
 
 /**
- * A Simple Processor Factory that creates <code>SimpleUUIDPurlProcessor</code> instances.
+ * A Purl Processor Factory that creates <code>UUIDPurlProcessorImpl</code> instances.
  * 
  * 
  * @author kutila
  * 
  */
-public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
+public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -44,7 +44,7 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
         {
             throw new NullPointerException("Cannot handle NULL stage");
         }
-        return SimpleUUIDPurlProcessorFactory.stages.contains(stage);
+        return UUIDPurlProcessorFactoryImpl.stages.contains(stage);
     }
     
     @Override
@@ -62,14 +62,14 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
             throw new RuntimeException("Not enough data (temporary URIs) to create SimplePoddPurlProcessor");
         }
         
-        SimpleUUIDPurlProcessor processor = null;
+        UUIDPurlProcessorImpl processor = null;
         if(this.prefix != null)
         {
-            processor = new SimpleUUIDPurlProcessor(this.prefix);
+            processor = new UUIDPurlProcessorImpl(this.prefix);
         }
         else
         {
-            processor = new SimpleUUIDPurlProcessor();
+            processor = new UUIDPurlProcessorImpl();
         }
         
         for(final String tempUri : this.temporaryUriArray)
@@ -147,7 +147,7 @@ public class SimpleUUIDPurlProcessorFactory implements PoddPurlProcessorFactory
     @Override
     public Set<PoddProcessorStage> getStages()
     {
-        return SimpleUUIDPurlProcessorFactory.stages;
+        return UUIDPurlProcessorFactoryImpl.stages;
     }
     
     /**

@@ -33,7 +33,7 @@ import com.github.podd.exception.PurlProcessorNotHandledException;
  * @author kutila
  * 
  */
-public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
+public class UUIDPurlProcessorImpl implements PoddPurlProcessor
 {
     public static final String DEFAULT_PREFIX = "http://example.org/purl/";
     
@@ -46,12 +46,12 @@ public class SimpleUUIDPurlProcessor implements PoddPurlProcessor
      */
     private final String prefix;
     
-    public SimpleUUIDPurlProcessor()
+    public UUIDPurlProcessorImpl()
     {
-        this(SimpleUUIDPurlProcessor.DEFAULT_PREFIX);
+        this(UUIDPurlProcessorImpl.DEFAULT_PREFIX);
     }
     
-    public SimpleUUIDPurlProcessor(final String prefix)
+    public UUIDPurlProcessorImpl(final String prefix)
     {
         this.prefix = prefix;
     }

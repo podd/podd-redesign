@@ -11,13 +11,13 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.api.purl.test.AbstractPoddPurlProcessorTest;
-import com.github.podd.impl.purl.SimpleUUIDPurlProcessor;
+import com.github.podd.impl.purl.UUIDPurlProcessorImpl;
 
 /**
  * @author kutila
  * 
  */
-public class SimpleUUIDPurlProcessorNonDefaultPrefixTest extends AbstractPoddPurlProcessorTest
+public class UUIDPurlProcessorImplNonDefaultPrefixTest extends AbstractPoddPurlProcessorTest
 {
     
     private final String purlPrefix = "urn:example:purl:";
@@ -25,7 +25,7 @@ public class SimpleUUIDPurlProcessorNonDefaultPrefixTest extends AbstractPoddPur
     @Override
     protected PoddPurlProcessor getNewPoddPurlProcessor()
     {
-        return new SimpleUUIDPurlProcessor(this.purlPrefix);
+        return new UUIDPurlProcessorImpl(this.purlPrefix);
     }
     
     @Override
