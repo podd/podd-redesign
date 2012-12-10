@@ -16,6 +16,7 @@ import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorPrefixes;
+import com.github.podd.exception.PoddRuntimeException;
 
 /**
  * A Purl Processor Factory that creates <code>UUIDPurlProcessorImpl</code> instances.
@@ -58,8 +59,7 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
     {
         if(this.temporaryUris.isEmpty())
         {
-            // NOTE: Could throw a custom exception, possibly extending a PoddRuntimeException ?
-            throw new RuntimeException("Not enough data (temporary URIs) to create SimplePoddPurlProcessor");
+            throw new PoddRuntimeException("Not enough data (temporary URIs) to create SimplePoddPurlProcessor");
         }
         
         UUIDPurlProcessorImpl processor = null;
