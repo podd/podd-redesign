@@ -114,7 +114,7 @@ public class PoddPurlManagerImpl implements PoddPurlManager
                 final GraphQueryResult queryResult = graphQuery.evaluate();
                 
                 // If the query matched anything, then for each of the temporary URIs in the
-                // resulting construct statements, we create a file reference and add it to the
+                // resulting construct statements, we create a Purl reference and add it to the
                 // results
                 while(queryResult.hasNext())
                 {
@@ -122,7 +122,7 @@ public class PoddPurlManagerImpl implements PoddPurlManager
                     // This processor factory matches the graph that we wish to use, so we create a
                     // processor instance now to create the PURL
                     // NOTE: This object cannot be shared as we do not specify that it needs to be
-                    // threadsafe
+                    // thread safe
                     final PoddPurlProcessor processor = nextProcessorFactory.getProcessor();
                     
                     // Subject rewriting
