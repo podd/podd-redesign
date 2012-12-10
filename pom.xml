@@ -348,6 +348,11 @@
                 <artifactId>bcpkix-jdk15on</artifactId>
                 <version>1.47</version>
             </dependency>
+            <dependency>
+                <groupId>org.kohsuke.metainf-services</groupId>
+                <artifactId>metainf-services</artifactId>
+                <version>1.4</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>

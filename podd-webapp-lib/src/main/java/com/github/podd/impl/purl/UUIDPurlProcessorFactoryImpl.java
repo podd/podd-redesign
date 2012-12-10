@@ -5,10 +5,10 @@ package com.github.podd.impl.purl;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,18 +24,18 @@ import com.github.podd.api.purl.PoddPurlProcessorPrefixes;
  * @author kutila
  * 
  */
+@MetaInfServices(PoddPurlProcessorFactory.class)
 public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private String prefix;
     
-    private final List<String> temporaryUriArray = Collections.unmodifiableList(Arrays
+    private final List<String> temporaryUris = Collections.unmodifiableList(Arrays
             .asList(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix()));
     
     /* The fixed set of stages supported by this Factory */
-    private static final Set<PoddProcessorStage> stages = new HashSet<PoddProcessorStage>(
-            Arrays.asList(new PoddProcessorStage[] { PoddProcessorStage.RDF_PARSING }));
+    private static final Set<PoddProcessorStage> STAGES = Collections.singleton(PoddProcessorStage.RDF_PARSING);
     
     @Override
     public boolean canHandleStage(final PoddProcessorStage stage)
@@ -44,7 +44,7 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
         {
             throw new NullPointerException("Cannot handle NULL stage");
         }
-        return UUIDPurlProcessorFactoryImpl.stages.contains(stage);
+        return UUIDPurlProcessorFactoryImpl.STAGES.contains(stage);
     }
     
     @Override
@@ -56,7 +56,7 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
     @Override
     public PoddPurlProcessor getProcessor()
     {
-        if(this.temporaryUriArray.isEmpty())
+        if(this.temporaryUris.isEmpty())
         {
             // NOTE: Could throw a custom exception, possibly extending a PoddRuntimeException ?
             throw new RuntimeException("Not enough data (temporary URIs) to create SimplePoddPurlProcessor");
@@ -72,7 +72,7 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
             processor = new UUIDPurlProcessorImpl();
         }
         
-        for(final String tempUri : this.temporaryUriArray)
+        for(final String tempUri : this.temporaryUris)
         {
             processor.addTemporaryUriHandler(tempUri);
         }
@@ -95,12 +95,12 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
         builder.append(" ?subject ?predicate ?object ");
         
         // get a focused SPARQL by checking for the temporary URI patterns
-        if(!this.temporaryUriArray.isEmpty())
+        if(!this.temporaryUris.isEmpty())
         {
             builder.append("FILTER ( ");
             final int startLength = builder.length();
             
-            for(final String tempUri : this.temporaryUriArray)
+            for(final String tempUri : this.temporaryUris)
             {
                 if(builder.length() > startLength)
                 {
@@ -147,7 +147,7 @@ public class UUIDPurlProcessorFactoryImpl implements PoddPurlProcessorFactory
     @Override
     public Set<PoddProcessorStage> getStages()
     {
-        return UUIDPurlProcessorFactoryImpl.stages;
+        return UUIDPurlProcessorFactoryImpl.STAGES;
     }
     
     /**
