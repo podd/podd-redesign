@@ -10,7 +10,6 @@ import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -36,13 +35,13 @@ public abstract class AbstractPoddPurlManagerTest
     
     protected static final String TEMP_URI_PREFIX = "urn:temp";
     
-    private PoddPurlManager testPurlManager;
+    protected PoddPurlManager testPurlManager;
     
     private PoddPurlProcessorFactoryRegistry testRegistry;
     
     private Repository testRepository;
     
-    private RepositoryConnection testRepositoryConnection;
+    protected RepositoryConnection testRepositoryConnection;
     
     /**
      * @return A new PoddPurlManager instance for use by this test
@@ -55,21 +54,21 @@ public abstract class AbstractPoddPurlManagerTest
     public abstract PoddPurlProcessorFactoryRegistry getNewPoddPurlProcessorFactoryRegistry();
     
     /**
-     * Helper method to load RDF statements from the specified resource to the given context in the
-     * test Repository.
+     * Helper method loads RDF statements from a test resource into the test Repository.
      * 
-     * @param resourcePath
-     *            Path to resource from which statements are to be loaded
+     * @return The context into which the statements are loaded
      * @throws Exception
      */
-    private void loadResourceToRepository(final String resourcePath, final URI context) throws Exception
+    protected URI loadTestResources() throws Exception
     {
-        if(resourcePath != null)
-        {
-            final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
-            Assert.assertNotNull("Could not find resource", inputStream);
-            this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-        }
+        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
+        
+        return context;
     }
     
     @Before
@@ -112,11 +111,9 @@ public abstract class AbstractPoddPurlManagerTest
     @Test
     public void testConvertTemporaryUris() throws Exception
     {
-        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
-        this.loadResourceToRepository(resourcePath, context);
+        final URI context = this.loadTestResources();
         
-        final Set<PoddPurlReference> purlSet = // this.getArtificialPurls();
+        final Set<PoddPurlReference> purlSet =
                 this.testPurlManager.extractPurlReferences(this.testRepositoryConnection, context);
         
         this.testPurlManager.convertTemporaryUris(purlSet, this.testRepositoryConnection, context);
@@ -157,9 +154,7 @@ public abstract class AbstractPoddPurlManagerTest
     @Test
     public void testExtractPurlReferences() throws Exception
     {
-        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
-        this.loadResourceToRepository(resourcePath, context);
+        final URI context = this.loadTestResources();
         
         final Set<PoddPurlReference> purlSet =
                 this.testPurlManager.extractPurlReferences(this.testRepositoryConnection, context);
@@ -184,27 +179,6 @@ public abstract class AbstractPoddPurlManagerTest
                             .hasNext();
             Assert.assertTrue("Temporary URI not found in original RDF statements", tempUriExistsAsSubject
                     || tempUriExistsAsObject);
-        }
-    }
-    
-    @Ignore
-    @Test
-    public void testExtractPurlReferencesWithParentUri() throws Exception
-    {
-        // FIXME: incomplete and ignored
-        
-        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
-        this.loadResourceToRepository(resourcePath, context);
-        
-        final URI parentUri = ValueFactoryImpl.getInstance().createURI("http://purl.org/uuid/podd-abc-k/");
-        
-        final Set<PoddPurlReference> purlSet =
-                this.testPurlManager.extractPurlReferences(parentUri, this.testRepositoryConnection, context);
-        
-        for(final PoddPurlReference purl : purlSet)
-        {
-            System.out.println("    Converted " + purl.getTemporaryURI() + " to " + purl.getPurlURI());
         }
     }
     
