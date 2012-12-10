@@ -6,6 +6,7 @@ package com.github.podd.api.purl;
 import java.util.Set;
 
 import org.openrdf.model.URI;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
@@ -29,9 +30,11 @@ public interface PoddPurlManager
      *            The RepositoryConnection in which temporary URIs need to be replaced
      * @param contexts
      *            The contexts in the Repository to be considered
+     * @throws RepositoryException
+     * @throws UpdateExecutionException
      */
     void convertTemporaryUris(Set<PoddPurlReference> purlResults, RepositoryConnection repositoryConnection,
-            URI... contexts);
+            URI... contexts) throws RepositoryException, UpdateExecutionException;
     
     /**
      * Identify temporary URIs from the RepositoryConnection (in the given contexts) and generate

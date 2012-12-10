@@ -109,7 +109,6 @@ public abstract class AbstractPoddPurlManagerTest
      * 
      * @throws Exception
      */
-    @Ignore
     @Test
     public void testConvertTemporaryUris() throws Exception
     {
@@ -117,11 +116,12 @@ public abstract class AbstractPoddPurlManagerTest
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         this.loadResourceToRepository(resourcePath, context);
         
-        final Set<PoddPurlReference> purlSet =
+        final Set<PoddPurlReference> purlSet = // this.getArtificialPurls();
                 this.testPurlManager.extractPurlReferences(this.testRepositoryConnection, context);
         
         this.testPurlManager.convertTemporaryUris(purlSet, this.testRepositoryConnection, context);
         
+        // verify temporary URIs no longer exist in the Repository
         final RepositoryResult<Statement> repoContents =
                 this.testRepositoryConnection.getStatements(null, null, null, false, context);
         while(repoContents.hasNext())
@@ -131,6 +131,20 @@ public abstract class AbstractPoddPurlManagerTest
                     AbstractPoddPurlManagerTest.TEMP_URI_PREFIX.contains(statement.getSubject().stringValue()));
             Assert.assertFalse("Temporary URI exists in Object",
                     AbstractPoddPurlManagerTest.TEMP_URI_PREFIX.contains(statement.getObject().stringValue()));
+            // System.out.println(statement.toString());
+        }
+        
+        // verify generated Purls exist in the Repository
+        for(final PoddPurlReference purl : purlSet)
+        {
+            // check each Purl is present in the updated RDF statements as a subject or object
+            final boolean purlExistsAsSubject =
+                    this.testRepositoryConnection.getStatements(purl.getPurlURI(), null, null, false, context)
+                            .hasNext();
+            final boolean purlExistsAsObject =
+                    this.testRepositoryConnection.getStatements(null, null, purl.getPurlURI(), false, context)
+                            .hasNext();
+            Assert.assertTrue("Purl not found in updated RDF statements", purlExistsAsSubject || purlExistsAsObject);
         }
     }
     
@@ -140,7 +154,8 @@ public abstract class AbstractPoddPurlManagerTest
      * 
      * @throws Exception
      */
-    public void testExtractPurlReferencesCompareAsNTriples() throws Exception
+    @Test
+    public void testExtractPurlReferences() throws Exception
     {
         final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
@@ -169,8 +184,27 @@ public abstract class AbstractPoddPurlManagerTest
                             .hasNext();
             Assert.assertTrue("Temporary URI not found in original RDF statements", tempUriExistsAsSubject
                     || tempUriExistsAsObject);
-            
-            // further Purl verification requires implementation awareness
+        }
+    }
+    
+    @Ignore
+    @Test
+    public void testExtractPurlReferencesWithParentUri() throws Exception
+    {
+        // FIXME: incomplete and ignored
+        
+        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
+        this.loadResourceToRepository(resourcePath, context);
+        
+        final URI parentUri = ValueFactoryImpl.getInstance().createURI("http://purl.org/uuid/podd-abc-k/");
+        
+        final Set<PoddPurlReference> purlSet =
+                this.testPurlManager.extractPurlReferences(parentUri, this.testRepositoryConnection, context);
+        
+        for(final PoddPurlReference purl : purlSet)
+        {
+            System.out.println("    Converted " + purl.getTemporaryURI() + " to " + purl.getPurlURI());
         }
     }
     

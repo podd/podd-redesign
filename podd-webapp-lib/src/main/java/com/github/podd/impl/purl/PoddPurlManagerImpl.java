@@ -14,6 +14,7 @@ import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -26,11 +27,13 @@ import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlReference;
+import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.PurlProcessorNotHandledException;
 import com.github.podd.utils.PoddRdfUtils;
 
 /**
  * Basic PURL Manager implementation for use in PODD.
+ * 
  * 
  * @author kutila
  * 
@@ -40,17 +43,32 @@ public class PoddPurlManagerImpl implements PoddPurlManager
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    // TODO Decide if the processor STAGE should be a constant or be configurable?
-    private PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
+    // This manager functions only during the RDF_PARSING processor stage.
+    private final PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
     
     private PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry;
     
     @Override
     public void convertTemporaryUris(final Set<PoddPurlReference> purlResults,
-            final RepositoryConnection repositoryConnection, final URI... contexts)
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws RepositoryException,
+        UpdateExecutionException
     {
-        // TODO Auto-generated method stub
-        throw new RuntimeException("TODO: Implement convertTemporaryUris()");
+        for(final PoddPurlReference purl : purlResults)
+        {
+            final String inputUri = purl.getTemporaryURI().stringValue();
+            final String outputUri = purl.getPurlURI().stringValue();
+            this.log.debug("Converting: {} to {}", inputUri, outputUri);
+            try
+            {
+                URITranslator.doTranslation(repositoryConnection, inputUri, outputUri, contexts);
+            }
+            catch(final MalformedQueryException e)
+            {
+                final String message = "Error while translating temporary URIs to Purls";
+                this.log.error(message, e);
+                throw new PoddRuntimeException(message, e);
+            }
+        }
     }
     
     @Override
@@ -130,6 +148,8 @@ public class PoddPurlManagerImpl implements PoddPurlManager
             catch(final MalformedQueryException | QueryEvaluationException e)
             {
                 this.log.error("Unexpected query exception", e);
+                // continue after logging an error, as another ProcessorFactory may generate a Purl
+                // for this failed temporary URI
             }
         }
         return internalPurlResults;
