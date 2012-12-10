@@ -25,7 +25,7 @@ public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
     @Override
     public PoddPurlProcessorFactoryRegistry getNewPoddPurlProcessorFactoryRegistry()
     {
-        final PoddPurlProcessorFactoryRegistry registry = PoddPurlProcessorFactoryRegistry.getInstance();
+        final PoddPurlProcessorFactoryRegistry registry = new PoddPurlProcessorFactoryRegistry();
         registry.clear();
         
         final UUIDPurlProcessorFactoryImpl uuidPurlProcessorFactory = new UUIDPurlProcessorFactoryImpl();
