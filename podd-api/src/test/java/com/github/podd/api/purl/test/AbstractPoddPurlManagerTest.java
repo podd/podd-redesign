@@ -53,24 +53,6 @@ public abstract class AbstractPoddPurlManagerTest
      */
     public abstract PoddPurlProcessorFactoryRegistry getNewPoddPurlProcessorFactoryRegistry();
     
-    /**
-     * Helper method loads RDF statements from a test resource into the test Repository.
-     * 
-     * @return The context into which the statements are loaded
-     * @throws Exception
-     */
-    protected URI loadTestResources() throws Exception
-    {
-        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
-        
-        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-        
-        return context;
-    }
-    
     @Before
     public void setUp() throws Exception
     {
@@ -112,6 +94,7 @@ public abstract class AbstractPoddPurlManagerTest
     public void testConvertTemporaryUris() throws Exception
     {
         final URI context = this.loadTestResources();
+        final long repoSize = this.testRepositoryConnection.size();
         
         final Set<PoddPurlReference> purlSet =
                 this.testPurlManager.extractPurlReferences(this.testRepositoryConnection, context);
@@ -143,6 +126,49 @@ public abstract class AbstractPoddPurlManagerTest
                             .hasNext();
             Assert.assertTrue("Purl not found in updated RDF statements", purlExistsAsSubject || purlExistsAsObject);
         }
+        
+        Assert.assertEquals("Repository size should not have changed", repoSize, this.testRepositoryConnection.size());
+    }
+    
+    @Test
+    public void testConvertTemporaryUrisEmptyPurlSet() throws Exception
+    {
+        final URI context = this.loadTestResources();
+        final Set<PoddPurlReference> purlSet = new java.util.HashSet<PoddPurlReference>();
+        
+        this.testPurlManager.convertTemporaryUris(purlSet, this.testRepositoryConnection, context);
+        // no exceptions are expected, but Repository would remain unchanged
+    }
+    
+    @Test
+    public void testConvertTemporaryUrisNullPurlSet() throws Exception
+    {
+        final URI context = this.loadTestResources();
+        try
+        {
+            this.testPurlManager.convertTemporaryUris(null, this.testRepositoryConnection, context);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            // this is expected
+        }
+    }
+    
+    @Test
+    public void testConvertTemporaryUrisEmptyRepositoryConnection() throws Exception
+    {
+        final URI context = this.loadTestResources();
+        final Set<PoddPurlReference> purlSet =
+                this.testPurlManager.extractPurlReferences(this.testRepositoryConnection, context);
+        
+        this.testRepositoryConnection.rollback();
+        Assert.assertEquals("Repository should now be empty", 0, this.testRepositoryConnection.size());
+        
+        // this will have no effect as Repository is empty
+        this.testPurlManager.convertTemporaryUris(purlSet, this.testRepositoryConnection, context);
+        
+        Assert.assertEquals("Repository should still be empty", 0, this.testRepositoryConnection.size());
     }
     
     /**
@@ -182,6 +208,26 @@ public abstract class AbstractPoddPurlManagerTest
         }
     }
     
+    /**
+     * Tests extracting Purl references from an empty repository returns an empty PurlSet.
+     * Specifying an invalid context has the same effect.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExtractPurlReferencesFromEmptyRepository() throws Exception
+    {
+        final URI context = this.loadTestResources();
+        
+        this.testRepositoryConnection.rollback();
+        
+        final Set<PoddPurlReference> purlSet =
+                this.testPurlManager.extractPurlReferences(this.testRepositoryConnection, context);
+        
+        Assert.assertNotNull("Extracted Purl references were null", purlSet);
+        Assert.assertTrue("Extracted Purl references should be empty", purlSet.isEmpty());
+    }
+    
     @Test
     public void testGetPurlProcessorFactoryRegistry() throws Exception
     {
@@ -199,6 +245,24 @@ public abstract class AbstractPoddPurlManagerTest
         this.testPurlManager.setPurlProcessorFactoryRegistry(this.testRegistry);
         
         Assert.assertNotNull("getRegistry() returned null ", this.testPurlManager.getPurlProcessorFactoryRegistry());
+    }
+    
+    /**
+     * Helper method loads RDF statements from a test resource into the test Repository.
+     * 
+     * @return The context into which the statements are loaded
+     * @throws Exception
+     */
+    protected URI loadTestResources() throws Exception
+    {
+        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
+        
+        return context;
     }
     
 }
