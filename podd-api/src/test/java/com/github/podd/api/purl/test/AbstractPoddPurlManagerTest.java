@@ -3,11 +3,7 @@
  */
 package com.github.podd.api.purl.test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -57,27 +53,6 @@ public abstract class AbstractPoddPurlManagerTest
      * @return A new PurlProcessorFactory Registry for use by this test
      */
     public abstract PoddPurlProcessorFactoryRegistry getNewPoddPurlProcessorFactoryRegistry();
-    
-    /**
-     * Helper method to read a classpath resource into a String.
-     * 
-     * @param resourcePath
-     * @return
-     * @throws IOException
-     */
-    private String getResourceAsString(final String resourcePath) throws IOException
-    {
-        final StringBuilder b = new StringBuilder();
-        final BufferedReader bReader =
-                new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(resourcePath),
-                        StandardCharsets.UTF_8));
-        for(int c = bReader.read(); c != -1; c = bReader.read())
-        {
-            b.append((char)c);
-        }
-        final String rdfResourceString = b.toString();
-        return rdfResourceString;
-    }
     
     /**
      * Helper method to load RDF statements from the specified resource to the given context in the
@@ -165,8 +140,7 @@ public abstract class AbstractPoddPurlManagerTest
      * 
      * @throws Exception
      */
-    @Test
-    public void testExtractPurlReferences() throws Exception
+    public void testExtractPurlReferencesCompareAsNTriples() throws Exception
     {
         final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
@@ -179,9 +153,6 @@ public abstract class AbstractPoddPurlManagerTest
         Assert.assertFalse("Extracted Purl references were empty", purlSet.isEmpty());
         Assert.assertEquals("Incorrect number of Purl references extracted", 3, purlSet.size());
         
-        // get a String representation of the RDF resource for verification purposes
-        final String rdfResourceString = this.getResourceAsString(resourcePath);
-        
         for(final PoddPurlReference purl : purlSet)
         {
             Assert.assertNotNull("Purl has null temporary URI", purl.getTemporaryURI());
@@ -189,9 +160,15 @@ public abstract class AbstractPoddPurlManagerTest
             
             Assert.assertFalse("Purl and Temporary URI were same", purl.getPurlURI().equals(purl.getTemporaryURI()));
             
-            // comparing separately in case namespace prefix is used
-            Assert.assertTrue(rdfResourceString.contains(purl.getTemporaryURI().getNamespace()));
-            Assert.assertTrue(rdfResourceString.contains(purl.getTemporaryURI().getLocalName()));
+            // check that the temporary URI is present in the original RDF statements
+            final RepositoryResult<Statement> resultSubjects =
+                    this.testRepositoryConnection.getStatements(purl.getTemporaryURI(), null, null, false, context);
+            if(!resultSubjects.hasNext())
+            {
+                final RepositoryResult<Statement> resultObjects =
+                        this.testRepositoryConnection.getStatements(null, null, purl.getTemporaryURI(), false, context);
+                Assert.assertTrue("Temporary URI not found in original RDF statements", resultObjects.hasNext());
+            }
             
             // further Purl verification requires implementation awareness
         }
