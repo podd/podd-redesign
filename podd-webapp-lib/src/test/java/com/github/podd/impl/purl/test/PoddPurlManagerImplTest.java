@@ -6,20 +6,20 @@ package com.github.podd.impl.purl.test;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.api.purl.test.AbstractPoddPurlManagerTest;
-import com.github.podd.impl.purl.SimplePoddPurlManager;
+import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 
 /**
  * @author kutila
  * 
  */
-public class SimplePoddPurlManagerTest extends AbstractPoddPurlManagerTest
+public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
 {
     
     @Override
     public PoddPurlManager getNewPoddPurlManager()
     {
-        return new SimplePoddPurlManager();
+        return new PoddPurlManagerImpl();
     }
     
     @Override

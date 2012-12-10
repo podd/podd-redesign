@@ -30,11 +30,12 @@ import com.github.podd.exception.PurlProcessorNotHandledException;
 import com.github.podd.utils.PoddRdfUtils;
 
 /**
+ * Basic PURL Manager implementation for use in PODD.
  * 
  * @author kutila
  * 
  */
-public class SimplePoddPurlManager implements PoddPurlManager
+public class PoddPurlManagerImpl implements PoddPurlManager
 {
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
