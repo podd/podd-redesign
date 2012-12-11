@@ -108,5 +108,13 @@ public interface PoddOWLManager
      */
     void setOWLOntologyManager(OWLOntologyManager manager);
     
+    /**
+     * 
+     * @param newReasonerFactory
+     */
     void setReasonerFactory(OWLReasonerFactory newReasonerFactory);
+    
+    OWLOntologyManager getOWLOntologyManager();
+    
+    OWLReasonerFactory getReasonerFactory();
 }

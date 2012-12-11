@@ -11,12 +11,13 @@ import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
 import com.github.podd.api.PoddOWLManager;
 
 /**
  * Abstract test to verify that the PoddOWLManager API contract is followed by implementations.
+ * 
+ * TODO: add test cases for non-default cases (e.g. empty/null/invalid/non-matching values)
  * 
  * @author kutila
  * 
@@ -27,10 +28,14 @@ public abstract class AbstractPoddOWLManagerTest
     protected PoddOWLManager testOWLManager;
     
     /**
-     * 
      * @return A new instance of PoddOWLManager, for each call to this method
      */
     protected abstract PoddOWLManager getNewPoddOWLManagerInstance();
+    
+    /**
+     * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
+     */
+    protected abstract OWLReasonerFactory getNewOWLReasonerFactoryInstance();
     
     /**
      * @throws java.lang.Exception
@@ -167,7 +172,11 @@ public abstract class AbstractPoddOWLManagerTest
     public void testSetOWLOntologyManager() throws Exception
     {
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
+        
         this.testOWLManager.setOWLOntologyManager(manager);
+        
+        Assert.assertNotNull("OWLOntologyManager was not set", this.testOWLManager.getOWLOntologyManager());
     }
     
     /**
@@ -179,10 +188,12 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testSetReasonerFactory() throws Exception
     {
-        final String reasonerName = "Pellet";
-        final OWLReasonerFactory reasonerFactory =
-                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(reasonerName);
+        final OWLReasonerFactory reasonerFactory = this.getNewOWLReasonerFactoryInstance();
+        Assert.assertNotNull("Null implementation of reasoner factory", reasonerFactory);
+        
         this.testOWLManager.setReasonerFactory(reasonerFactory);
+        
+        Assert.assertNotNull("The reasoner factory was not set", this.testOWLManager.getReasonerFactory());
     }
     
 }
