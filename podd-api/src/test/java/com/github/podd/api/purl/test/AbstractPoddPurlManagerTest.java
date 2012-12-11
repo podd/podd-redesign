@@ -127,21 +127,27 @@ public abstract class AbstractPoddPurlManagerTest
             Assert.assertTrue("Purl not found in updated RDF statements", purlExistsAsSubject || purlExistsAsObject);
         }
         
+        // NOTE: It is possible that future Purl Generators may add new statements, thereby altering
+        // repository size.
+        // In such situations, this assertion would fail and have to be adjusted.
         Assert.assertEquals("Repository size should not have changed", repoSize, this.testRepositoryConnection.size());
     }
     
     @Test
-    public void testConvertTemporaryUrisEmptyPurlSet() throws Exception
+    public void testConvertTemporaryUrisWithEmptyPurlSet() throws Exception
     {
         final URI context = this.loadTestResources();
-        final Set<PoddPurlReference> purlSet = new java.util.HashSet<PoddPurlReference>();
+        final long repoSize = this.testRepositoryConnection.size();
+        final Set<PoddPurlReference> emptyPurlSet = new java.util.HashSet<PoddPurlReference>();
         
-        this.testPurlManager.convertTemporaryUris(purlSet, this.testRepositoryConnection, context);
+        this.testPurlManager.convertTemporaryUris(emptyPurlSet, this.testRepositoryConnection, context);
+        
         // no exceptions are expected, but Repository would remain unchanged
+        Assert.assertEquals("Repository Size should not have changed", repoSize, this.testRepositoryConnection.size());
     }
     
     @Test
-    public void testConvertTemporaryUrisNullPurlSet() throws Exception
+    public void testConvertTemporaryUrisWithNullPurlSet() throws Exception
     {
         final URI context = this.loadTestResources();
         try
@@ -151,24 +157,43 @@ public abstract class AbstractPoddPurlManagerTest
         }
         catch(final NullPointerException e)
         {
-            // this is expected
+            // this expected Exception is thrown without a message
+            Assert.assertEquals("A NULL message was expected", null, e.getMessage());
         }
     }
     
+    /**
+     * Tests calling convertTemporaryUris() with a non-empty PurlSet on an empty Repository.
+     * 
+     * NOTE: If this test fails at some stage due to a PurlManager implementation deciding to throw
+     * an Exception instead of silently failing, this would have to be moved into the concrete tests
+     * for PoddPurlManagerImpl.java.
+     * 
+     * @throws Exception
+     */
     @Test
-    public void testConvertTemporaryUrisEmptyRepositoryConnection() throws Exception
+    public void testConvertTemporaryUrisWithEmptyRepositoryConnection() throws Exception
     {
         final URI context = this.loadTestResources();
         final Set<PoddPurlReference> purlSet =
                 this.testPurlManager.extractPurlReferences(this.testRepositoryConnection, context);
         
-        this.testRepositoryConnection.rollback();
-        Assert.assertEquals("Repository should now be empty", 0, this.testRepositoryConnection.size());
+        // create an empty repository and to call convertTemporaryUris() on it
+        final Repository emptyRepository = new SailRepository(new MemoryStore());
+        emptyRepository.initialize();
+        final RepositoryConnection emptyRepositoryConnection = emptyRepository.getConnection();
+        emptyRepositoryConnection.begin();
         
-        // this will have no effect as Repository is empty
-        this.testPurlManager.convertTemporaryUris(purlSet, this.testRepositoryConnection, context);
+        Assert.assertEquals("New Repository should have been empty", 0, emptyRepositoryConnection.size());
         
-        Assert.assertEquals("Repository should still be empty", 0, this.testRepositoryConnection.size());
+        // convertTemporaryUris() will have no effect as our Repository is empty
+        this.testPurlManager.convertTemporaryUris(purlSet, emptyRepositoryConnection, context);
+        
+        Assert.assertEquals("Repository should still be empty", 0, emptyRepositoryConnection.size());
+        
+        emptyRepositoryConnection.rollback();
+        emptyRepositoryConnection.close();
+        emptyRepository.shutDown();
     }
     
     /**
@@ -210,19 +235,14 @@ public abstract class AbstractPoddPurlManagerTest
     
     /**
      * Tests extracting Purl references from an empty repository returns an empty PurlSet.
-     * Specifying an invalid context has the same effect.
      * 
      * @throws Exception
      */
     @Test
     public void testExtractPurlReferencesFromEmptyRepository() throws Exception
     {
-        final URI context = this.loadTestResources();
-        
-        this.testRepositoryConnection.rollback();
-        
         final Set<PoddPurlReference> purlSet =
-                this.testPurlManager.extractPurlReferences(this.testRepositoryConnection, context);
+                this.testPurlManager.extractPurlReferences(this.testRepositoryConnection);
         
         Assert.assertNotNull("Extracted Purl references were null", purlSet);
         Assert.assertTrue("Extracted Purl references should be empty", purlSet.isEmpty());
