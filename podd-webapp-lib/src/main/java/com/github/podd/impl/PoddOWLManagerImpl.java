@@ -129,7 +129,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             this.owlOntologyManager.removeOntology(ontologyID);
             
-            return this.owlOntologyManager.contains(ontologyID);
+            // return true if the ontology manager does not contain the ontology at this point
+            return !this.owlOntologyManager.contains(ontologyID);
         }
         else
         {
