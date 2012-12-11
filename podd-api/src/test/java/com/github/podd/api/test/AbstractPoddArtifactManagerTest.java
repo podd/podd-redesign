@@ -91,13 +91,14 @@ public abstract class AbstractPoddArtifactManagerTest
         final PoddOWLManager testOWLManager = this.getNewOWLManager();
         testOWLManager.setReasonerFactory(this.getNewReasonerFactory());
         
+        final PoddSchemaManager testSchemaManager = this.getNewSchemaManager();
+        testSchemaManager.setOwlManager(testOWLManager);
+        
         final PoddArtifactManager testArtifactManager = this.getNewArtifactManager();
         testArtifactManager.setFileReferenceManager(testFileReferenceManager);
         testArtifactManager.setPurlManager(testPurlManager);
         testArtifactManager.setOwlManager(testOWLManager);
-        
-        final PoddSchemaManager testSchemaManager = this.getNewSchemaManager();
-        testSchemaManager.setOwlManager(testOWLManager);
+        testArtifactManager.setSchemaManager(testSchemaManager);
         
         final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
         // MIME type should be either given by the user, detected from the content type on the
