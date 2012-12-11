@@ -5,6 +5,7 @@ package com.github.podd.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
@@ -55,6 +56,19 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public PoddArtifactManagerImpl()
     {
         // TODO Auto-generated constructor stub
+    }
+    
+    @Override
+    public void exportArtifact(final OWLOntologyID ontologyId, final OutputStream outputStream, final RDFFormat format,
+            final boolean includeInferred) throws OpenRDFException, PoddException, IOException
+    {
+        throw new RuntimeException("TODO: Implement exportArtifact");
+    }
+    
+    @Override
+    public InferredOWLOntologyID getArtifactByIRI(final IRI artifactIRI)
+    {
+        throw new RuntimeException("TODO: Implement getArtifactByIRI");
     }
     
     /*

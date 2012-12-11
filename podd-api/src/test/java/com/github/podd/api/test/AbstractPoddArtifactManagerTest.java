@@ -35,26 +35,96 @@ public abstract class AbstractPoddArtifactManagerTest
     
     private PoddArtifactManager testArtifactManager;
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of PoddArtifactManager
+     * for each invocation.
+     * 
+     * @return A new empty instance of an implementation of PoddArtifactManager.
+     */
     protected abstract PoddArtifactManager getNewArtifactManager();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * PoddPurlProcessorFactory that can process DOI references for each invocation.
+     * 
+     * @return A new empty instance of an implementation of PoddPurlProcessorFactory that can
+     *         process DOI references.
+     */
     protected abstract PoddPurlProcessorFactory getNewDoiPurlProcessorFactory();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * PoddFileReferenceManager.
+     * 
+     * @return A new empty instance of an implementation of PoddFileReferenceManager.
+     */
     protected abstract PoddFileReferenceManager getNewFileReferenceManager();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * PoddPurlProcessorFactory that can process Handle references for each invocation.
+     * 
+     * @return A new empty instance of an implementation of PoddPurlProcessorFactory that can
+     *         process Handle references.
+     */
     protected abstract PoddPurlProcessorFactory getNewHandlePurlProcessorFactory();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * PoddFileReferenceProcessorFactory that can process HTTP-based file references for each
+     * invocation.
+     * 
+     * @return A new empty instance of an implementation of PoddFileReferenceProcessorFactory that
+     *         can process HTTP-based file references.
+     */
     protected abstract PoddFileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of PoddOWLManager.
+     * 
+     * @return A new empty instance of an implementation of PoddOWLManager.
+     */
     protected abstract PoddOWLManager getNewOWLManager();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of PoddPurlManager.
+     * 
+     * @return A new empty instance of an implementation of PoddPurlManager.
+     */
     protected abstract PoddPurlManager getNewPurlManager();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of OWLReasonerFactory
+     * that can be used with the PoddOWLManager.
+     * 
+     * @return A new empty instance of an implementation of OWLReasonerFactory.
+     */
     protected abstract OWLReasonerFactory getNewReasonerFactory();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of PoddSchemaManager.
+     * 
+     * @return A new empty instance of an implementation of PoddSchemaManager.
+     */
     protected abstract PoddSchemaManager getNewSchemaManager();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * PoddFileReferenceProcessorFactory that can process SSH-based file references for each
+     * invocation.
+     * 
+     * @return A new empty instance of an implementation of PoddFileReferenceProcessorFactory that
+     *         can process SSH-based file references.
+     */
     protected abstract PoddFileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
     
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * PoddPurlProcessorFactory that can process UUID references for each invocation.
+     * 
+     * @return A new empty instance of an implementation of PoddPurlProcessorFactory that can
+     *         process UUID references.
+     */
     protected abstract PoddPurlProcessorFactory getNewUUIDPurlProcessorFactory();
     
     /**
@@ -95,11 +165,11 @@ public abstract class AbstractPoddArtifactManagerTest
         final PoddSchemaManager testSchemaManager = this.getNewSchemaManager();
         testSchemaManager.setOwlManager(testOWLManager);
         
-        testArtifactManager = this.getNewArtifactManager();
-        testArtifactManager.setFileReferenceManager(testFileReferenceManager);
-        testArtifactManager.setPurlManager(testPurlManager);
-        testArtifactManager.setOwlManager(testOWLManager);
-        testArtifactManager.setSchemaManager(testSchemaManager);
+        this.testArtifactManager = this.getNewArtifactManager();
+        this.testArtifactManager.setFileReferenceManager(testFileReferenceManager);
+        this.testArtifactManager.setPurlManager(testPurlManager);
+        this.testArtifactManager.setOwlManager(testOWLManager);
+        this.testArtifactManager.setSchemaManager(testSchemaManager);
     }
     
     /**
@@ -108,29 +178,31 @@ public abstract class AbstractPoddArtifactManagerTest
     @After
     public void tearDown() throws Exception
     {
-        testArtifactManager = null;
+        this.testArtifactManager = null;
     }
     
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#deregisterProcessor(com.github.podd.api.PoddProcessorFactory, com.github.podd.api.PoddProcessorStage)}
-     * .
-     */
     @Test
-    public final void testDeregisterProcessor() throws Exception
+    public final void testGetFileReferenceManager() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        Assert.assertNotNull("File Reference Manager was null", this.testArtifactManager.getFileReferenceManager());
     }
     
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#getProcessors(com.github.podd.api.PoddProcessorStage)}
-     * .
-     */
     @Test
-    public final void testGetProcessors() throws Exception
+    public final void testGetOWLManager() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        Assert.assertNotNull("OWL Manager was null", this.testArtifactManager.getOWLManager());
+    }
+    
+    @Test
+    public final void testGetPurlManager() throws Exception
+    {
+        Assert.assertNotNull("Purl Manager was null", this.testArtifactManager.getPurlManager());
+    }
+    
+    @Test
+    public final void testGetSchemaManager() throws Exception
+    {
+        Assert.assertNotNull("Schema Manager was null", this.testArtifactManager.getSchemaManager());
     }
     
     /**
@@ -147,7 +219,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final String mimeType = "application/rdf+xml";
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
-        final InferredOWLOntologyID resultArtifactId = testArtifactManager.loadArtifact(inputStream, format);
+        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
         Assert.assertNotNull("Load artifact returned a null artifact ID", resultArtifactId);
         Assert.assertNotNull("Load artifact returned a null ontology IRI", resultArtifactId.getOntologyIRI());
@@ -172,7 +244,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final String mimeType = "application/rdf+xml";
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
-        final InferredOWLOntologyID resultArtifactId = testArtifactManager.loadArtifact(inputStream, format);
+        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
         Assert.assertNotNull("Load artifact returned a null artifact ID", resultArtifactId);
         Assert.assertNotNull("Load artifact returned a null ontology IRI", resultArtifactId.getOntologyIRI());
@@ -180,21 +252,10 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
                 resultArtifactId.getInferredOntologyIRI());
         
-        testArtifactManager.publishArtifact(resultArtifactId);
+        this.testArtifactManager.publishArtifact(resultArtifactId);
         
         // FIXME: How do we get information about whether an artifact is published and other
         // metadata like who can access the artifact?
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#registerProcessor(com.github.podd.api.PoddProcessorFactory, com.github.podd.api.PoddProcessorStage)}
-     * .
-     */
-    @Test
-    public final void testRegisterProcessor() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
     }
     
     /**

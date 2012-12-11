@@ -5,9 +5,12 @@ package com.github.podd.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.repository.Repository;
 import org.openrdf.rio.RDFFormat;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -24,19 +27,73 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public interface PoddArtifactManager
 {
+    /**
+     * 
+     * @return The {@link PoddFileReferenceManager} used to manage file references for artifacts.
+     */
     PoddFileReferenceManager getFileReferenceManager();
     
+    /**
+     * 
+     * @return The {@link PoddOWLManager} used to manage OWL validation and inferencing for
+     *         artifacts.
+     */
     PoddOWLManager getOWLManager();
     
+    /**
+     * 
+     * @return The {@link PoddPurlManager} used to manage PURL creation and validation for URIs in
+     *         artifacts.
+     */
     PoddPurlManager getPurlManager();
     
+    /**
+     * 
+     * @return The {@link PoddSchemaManager} used to access and verify versions of Schema Ontologies
+     *         used in artifacts.
+     */
     PoddSchemaManager getSchemaManager();
+    
+    /**
+     * Exports the given artifact to the given output stream using an RDF format.
+     * 
+     * @param ontologyId
+     *            The {@link OWLOntologyID} of the artifact to export. This must contain both an
+     *            ontology IRI and a version IRI.
+     * @param outputStream
+     *            The {@link OutputStream} to export the RDF statements to.
+     * @param format
+     *            The {@link RDFFormat} for the exported RDF statements.
+     * @param includeInferred
+     *            If true, inferred statements will be included in the exported RDF statements,
+     *            otherwise if false, only the concrete RDF statements will be exported.
+     * @throws OpenRDFException
+     *             If there is an error communicating the RDF storage for the artifact.
+     * @throws PoddException
+     *             If there is an error in the PODD methods.
+     * @throws IOException
+     *             If there is an error accessing the RDF storage, or an error writing to the output
+     *             stream.
+     */
+    void exportArtifact(OWLOntologyID ontologyId, OutputStream outputStream, RDFFormat format, boolean includeInferred)
+        throws OpenRDFException, PoddException, IOException;
+    
+    /**
+     * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI.
+     * 
+     * If the IRI maps to more than one version of an artifact, the most current version of the
+     * artifact is returned.
+     * 
+     * @param artifactIRI
+     * @return
+     */
+    InferredOWLOntologyID getArtifactByIRI(IRI artifactIRI);
     
     /**
      * Loads an artifact into the manager.
      * 
      * NOTE: After this method completes the Artifact may no longer be in memory in the
-     * PoddOWLManager, but will be stored in the underlying Sesame Repository.
+     * {@link PoddOWLManager}, but will be stored in the underlying Sesame {@link Repository}.
      * 
      * @param inputStream
      *            The input stream containing the RDF document for the updated artifact.
@@ -50,7 +107,7 @@ public interface PoddArtifactManager
      * @throws OWLException
      */
     InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format) throws OpenRDFException,
-        PoddException, IOException, OpenRDFException, PoddException, OWLException;
+        PoddException, IOException, OWLException;
     
     /**
      * 
@@ -66,8 +123,8 @@ public interface PoddArtifactManager
     void setFileReferenceManager(PoddFileReferenceManager fileManager);
     
     /**
-     * Sets the PoddOWLManager instance to use when loading and dealing with Artifacts in memory.
-     * This manager may not be used for some queries where SPARQL queries on the underlying
+     * Sets the {@link PoddOWLManager} instance to use when loading and dealing with Artifacts in
+     * memory. This manager may not be used for some queries where SPARQL queries on the underlying
      * Repository can more efficiently complete the operation.
      * 
      * NOTE: Artifacts are not necessarily cached in memory, so no manual cleanup is needed if
