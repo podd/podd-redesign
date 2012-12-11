@@ -8,6 +8,7 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -196,4 +197,38 @@ public abstract class AbstractPoddOWLManagerTest
         Assert.assertNotNull("The reasoner factory was not set", this.testOWLManager.getReasonerFactory());
     }
     
+    /**
+     * Test method for {@link com.github.podd.api.PoddOWLManager#getOWLOntologyManager()} .
+     * 
+     */
+    @Test
+    public void testGetOWLOntologyManagerWithMockObject() throws Exception
+    {
+        Assert.assertNull("OWLOntologyManager should have been null", this.testOWLManager.getOWLOntologyManager());
+        
+        final OWLOntologyManager mockOWLOntologyManager = Mockito.mock(OWLOntologyManager.class);
+        this.testOWLManager.setOWLOntologyManager(mockOWLOntologyManager);
+        
+        Assert.assertNotNull("OWLOntologyManager was not set", this.testOWLManager.getOWLOntologyManager());
+        Assert.assertEquals("Not the expected mock OWLManager", mockOWLOntologyManager,
+                this.testOWLManager.getOWLOntologyManager());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddOWLManager#getReasonerFactory()} .
+     * 
+     */
+    @Test
+    public void testGetReasonerFactoryWithMockObject() throws Exception
+    {
+        Assert.assertNull("ReasonerFactory should have been null", this.testOWLManager.getReasonerFactory());
+        
+        final OWLReasonerFactory mockReasonerFactory = Mockito.mock(OWLReasonerFactory.class);
+        
+        this.testOWLManager.setReasonerFactory(mockReasonerFactory);
+        
+        Assert.assertNotNull("The reasoner factory was not set", this.testOWLManager.getReasonerFactory());
+        Assert.assertEquals("Not the expected mock ReasonerFactory", mockReasonerFactory,
+                this.testOWLManager.getReasonerFactory());
+    }
 }
