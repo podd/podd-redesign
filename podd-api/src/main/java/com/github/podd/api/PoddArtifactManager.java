@@ -29,33 +29,6 @@ import com.github.podd.utils.InferredOWLOntologyID;
 public interface PoddArtifactManager
 {
     /**
-     * 
-     * @return The {@link PoddFileReferenceManager} used to manage file references for artifacts.
-     */
-    PoddFileReferenceManager getFileReferenceManager();
-    
-    /**
-     * 
-     * @return The {@link PoddOWLManager} used to manage OWL validation and inferencing for
-     *         artifacts.
-     */
-    PoddOWLManager getOWLManager();
-    
-    /**
-     * 
-     * @return The {@link PoddPurlManager} used to manage PURL creation and validation for URIs in
-     *         artifacts.
-     */
-    PoddPurlManager getPurlManager();
-    
-    /**
-     * 
-     * @return The {@link PoddSchemaManager} used to access and verify versions of Schema Ontologies
-     *         used in artifacts.
-     */
-    PoddSchemaManager getSchemaManager();
-    
-    /**
      * Exports the given artifact to the given output stream using an RDF format.
      * 
      * @param ontologyId
@@ -89,6 +62,33 @@ public interface PoddArtifactManager
      * @return
      */
     InferredOWLOntologyID getArtifactByIRI(IRI artifactIRI);
+    
+    /**
+     * 
+     * @return The {@link PoddFileReferenceManager} used to manage file references for artifacts.
+     */
+    PoddFileReferenceManager getFileReferenceManager();
+    
+    /**
+     * 
+     * @return The {@link PoddOWLManager} used to manage OWL validation and inferencing for
+     *         artifacts.
+     */
+    PoddOWLManager getOWLManager();
+    
+    /**
+     * 
+     * @return The {@link PoddPurlManager} used to manage PURL creation and validation for URIs in
+     *         artifacts.
+     */
+    PoddPurlManager getPurlManager();
+    
+    /**
+     * 
+     * @return The {@link PoddSchemaManager} used to access and verify versions of Schema Ontologies
+     *         used in artifacts.
+     */
+    PoddSchemaManager getSchemaManager();
     
     /**
      * Loads an artifact into the manager.

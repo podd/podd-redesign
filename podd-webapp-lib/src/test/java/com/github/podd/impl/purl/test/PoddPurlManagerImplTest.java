@@ -45,38 +45,6 @@ public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
         return registry;
     }
     
-    /**
-     * Tests extractPurlReferences(URI, RepositoryConnection, URI) passing in a parent URI with the
-     * same prefix as that used in generated Purls.
-     * 
-     * This parent URI should then be used in all Purls instead of generating UUIDs.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testExtractPurlReferencesWithParentUri() throws Exception
-    {
-        final URI parentUri =
-                ValueFactoryImpl.getInstance().createURI(this.purlPrefix + "same-UUID-for-this-purl-set-11");
-        this.internalTestExtractPurlReferenceWithParentUri(parentUri, true);
-    }
-    
-    /**
-     * Tests extractPurlReferences(URI, RepositoryConnection, URI) passing in a parent URI different
-     * to the prefix used in generated Purls.
-     * 
-     * This parent URI should be ignored and Purls generated using internally generated UUIDs.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testExtractPurlReferencesWithNonMatchingParentUri() throws Exception
-    {
-        final URI parentUri =
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/nodd/same-UUID-for-this-purl-set-11");
-        this.internalTestExtractPurlReferenceWithParentUri(parentUri, false);
-    }
-    
     public void internalTestExtractPurlReferenceWithParentUri(final URI parentUri, final boolean useParentUri)
         throws Exception
     {
@@ -118,6 +86,38 @@ public class PoddPurlManagerImplTest extends AbstractPoddPurlManagerTest
                         purl.getPurlURI().stringValue().startsWith(parentUri.stringValue()));
             }
         }
+    }
+    
+    /**
+     * Tests extractPurlReferences(URI, RepositoryConnection, URI) passing in a parent URI different
+     * to the prefix used in generated Purls.
+     * 
+     * This parent URI should be ignored and Purls generated using internally generated UUIDs.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExtractPurlReferencesWithNonMatchingParentUri() throws Exception
+    {
+        final URI parentUri =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/nodd/same-UUID-for-this-purl-set-11");
+        this.internalTestExtractPurlReferenceWithParentUri(parentUri, false);
+    }
+    
+    /**
+     * Tests extractPurlReferences(URI, RepositoryConnection, URI) passing in a parent URI with the
+     * same prefix as that used in generated Purls.
+     * 
+     * This parent URI should then be used in all Purls instead of generating UUIDs.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExtractPurlReferencesWithParentUri() throws Exception
+    {
+        final URI parentUri =
+                ValueFactoryImpl.getInstance().createURI(this.purlPrefix + "same-UUID-for-this-purl-set-11");
+        this.internalTestExtractPurlReferenceWithParentUri(parentUri, true);
     }
     
 }

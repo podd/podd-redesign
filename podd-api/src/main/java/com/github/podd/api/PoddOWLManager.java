@@ -142,7 +142,7 @@ public interface PoddOWLManager
      * 
      * @param owlSource
      * @return
-     * @throws OWLException 
+     * @throws OWLException
      */
     OWLOntology loadOntology(RioMemoryTripleSource owlSource) throws OWLException;
     

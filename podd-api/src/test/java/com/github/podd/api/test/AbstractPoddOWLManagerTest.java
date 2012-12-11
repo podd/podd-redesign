@@ -29,14 +29,14 @@ public abstract class AbstractPoddOWLManagerTest
     protected PoddOWLManager testOWLManager;
     
     /**
-     * @return A new instance of PoddOWLManager, for each call to this method
-     */
-    protected abstract PoddOWLManager getNewPoddOWLManagerInstance();
-    
-    /**
      * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
      */
     protected abstract OWLReasonerFactory getNewOWLReasonerFactoryInstance();
+    
+    /**
+     * @return A new instance of PoddOWLManager, for each call to this method
+     */
+    protected abstract PoddOWLManager getNewPoddOWLManagerInstance();
     
     /**
      * @throws java.lang.Exception
@@ -103,6 +103,41 @@ public abstract class AbstractPoddOWLManagerTest
     public void testGetOntology() throws Exception
     {
         
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddOWLManager#getOWLOntologyManager()} .
+     * 
+     */
+    @Test
+    public void testGetOWLOntologyManagerWithMockObject() throws Exception
+    {
+        Assert.assertNull("OWLOntologyManager should have been null", this.testOWLManager.getOWLOntologyManager());
+        
+        final OWLOntologyManager mockOWLOntologyManager = Mockito.mock(OWLOntologyManager.class);
+        this.testOWLManager.setOWLOntologyManager(mockOWLOntologyManager);
+        
+        Assert.assertNotNull("OWLOntologyManager was not set", this.testOWLManager.getOWLOntologyManager());
+        Assert.assertEquals("Not the expected mock OWLManager", mockOWLOntologyManager,
+                this.testOWLManager.getOWLOntologyManager());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddOWLManager#getReasonerFactory()} .
+     * 
+     */
+    @Test
+    public void testGetReasonerFactoryWithMockObject() throws Exception
+    {
+        Assert.assertNull("ReasonerFactory should have been null", this.testOWLManager.getReasonerFactory());
+        
+        final OWLReasonerFactory mockReasonerFactory = Mockito.mock(OWLReasonerFactory.class);
+        
+        this.testOWLManager.setReasonerFactory(mockReasonerFactory);
+        
+        Assert.assertNotNull("The reasoner factory was not set", this.testOWLManager.getReasonerFactory());
+        Assert.assertEquals("Not the expected mock ReasonerFactory", mockReasonerFactory,
+                this.testOWLManager.getReasonerFactory());
     }
     
     /**
@@ -195,40 +230,5 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.setReasonerFactory(reasonerFactory);
         
         Assert.assertNotNull("The reasoner factory was not set", this.testOWLManager.getReasonerFactory());
-    }
-    
-    /**
-     * Test method for {@link com.github.podd.api.PoddOWLManager#getOWLOntologyManager()} .
-     * 
-     */
-    @Test
-    public void testGetOWLOntologyManagerWithMockObject() throws Exception
-    {
-        Assert.assertNull("OWLOntologyManager should have been null", this.testOWLManager.getOWLOntologyManager());
-        
-        final OWLOntologyManager mockOWLOntologyManager = Mockito.mock(OWLOntologyManager.class);
-        this.testOWLManager.setOWLOntologyManager(mockOWLOntologyManager);
-        
-        Assert.assertNotNull("OWLOntologyManager was not set", this.testOWLManager.getOWLOntologyManager());
-        Assert.assertEquals("Not the expected mock OWLManager", mockOWLOntologyManager,
-                this.testOWLManager.getOWLOntologyManager());
-    }
-    
-    /**
-     * Test method for {@link com.github.podd.api.PoddOWLManager#getReasonerFactory()} .
-     * 
-     */
-    @Test
-    public void testGetReasonerFactoryWithMockObject() throws Exception
-    {
-        Assert.assertNull("ReasonerFactory should have been null", this.testOWLManager.getReasonerFactory());
-        
-        final OWLReasonerFactory mockReasonerFactory = Mockito.mock(OWLReasonerFactory.class);
-        
-        this.testOWLManager.setReasonerFactory(mockReasonerFactory);
-        
-        Assert.assertNotNull("The reasoner factory was not set", this.testOWLManager.getReasonerFactory());
-        Assert.assertEquals("Not the expected mock ReasonerFactory", mockReasonerFactory,
-                this.testOWLManager.getReasonerFactory());
     }
 }

@@ -267,7 +267,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     ontologyId);
         }
         
-        OWLOntologyID currentVersion = this.getOWLManager().getCurrentVersion(ontologyId.getOntologyIRI());
+        final OWLOntologyID currentVersion = this.getOWLManager().getCurrentVersion(ontologyId.getOntologyIRI());
         
         if(!currentVersion.getVersionIRI().equals(ontologyId.getVersionIRI()))
         {
@@ -277,7 +277,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     ontologyId);
         }
         
-        InferredOWLOntologyID published = this.getOWLManager().setPublished(ontologyId);
+        final InferredOWLOntologyID published = this.getOWLManager().setPublished(ontologyId);
         
         return published;
     }

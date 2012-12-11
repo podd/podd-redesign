@@ -18,7 +18,7 @@ public class PublishArtifactException extends PoddException
     /**
      * @param msg
      */
-    public PublishArtifactException(String msg, OWLOntologyID artifactId)
+    public PublishArtifactException(final String msg, final OWLOntologyID artifactId)
     {
         super(msg);
         this.artifactId = artifactId;
@@ -28,7 +28,7 @@ public class PublishArtifactException extends PoddException
      * @param msg
      * @param throwable
      */
-    public PublishArtifactException(String msg, Throwable throwable, OWLOntologyID artifactId)
+    public PublishArtifactException(final String msg, final Throwable throwable, final OWLOntologyID artifactId)
     {
         super(msg, throwable);
         this.artifactId = artifactId;
@@ -37,7 +37,7 @@ public class PublishArtifactException extends PoddException
     /**
      * @param throwable
      */
-    public PublishArtifactException(Throwable throwable, OWLOntologyID artifactId)
+    public PublishArtifactException(final Throwable throwable, final OWLOntologyID artifactId)
     {
         super(throwable);
         this.artifactId = artifactId;

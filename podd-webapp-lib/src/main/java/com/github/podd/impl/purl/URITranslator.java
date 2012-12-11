@@ -33,86 +33,6 @@ public class URITranslator
      * Maps URIs for all triples in the given contexts in the given repository, between the input
      * URI prefix and the output URI prefix.
      * 
-     * @param repositoryConnection
-     *            The repository containing the input triples, and which will contain the output
-     *            triples
-     * @param inputUriPrefix
-     *            The string defining the start of any URIs to look for.
-     * @param outputUriPrefix
-     *            The string defining the start of the URIs which matched the inputUriPrefix, after
-     *            the translation is complete.
-     * @param contexts
-     *            The contexts in the repository that are relevant to the mapping
-     * @throws RepositoryException
-     *             If the repository threw an exception during the course of the method.
-     * @throws MalformedQueryException
-     *             If any of the translation queries could not be executed due to an error in the
-     *             queries or a lack of understanding of the query by the repository.
-     * @throws UpdateExecutionException
-     *             If the SPARQL Update queries used by this method were not able to be successfully
-     *             executed on the given repository for some reason.
-     */
-    public static void doTranslation(final RepositoryConnection repositoryConnection, final String inputUriPrefix,
-            final String outputUriPrefix, final Resource... contexts) throws RepositoryException,
-        MalformedQueryException, UpdateExecutionException
-    {
-        final Collection<URI> subjectMappingPredicates = Collections.emptyList();
-        final Collection<URI> predicateMappingPredicates = Collections.emptyList();
-        final Collection<URI> objectMappingPredicates = Collections.emptyList();
-        
-        URITranslator.doTranslation(repositoryConnection, inputUriPrefix, outputUriPrefix, subjectMappingPredicates,
-                predicateMappingPredicates, objectMappingPredicates, true, contexts);
-    }
-    
-    /**
-     * Maps URIs for all triples in the given contexts in the given repository, between the input
-     * URI prefix and the output URI prefix.
-     * 
-     * The mapping predicates are used to define extra triples to link the input and output URIs.
-     * 
-     * NOTE: The results for queries with deleteTranslatedTriples set to false may not be consistent
-     * with what you expect.
-     * 
-     * @param repositoryConnection
-     *            The repository containing the input triples, and which will contain the output
-     *            triples
-     * @param inputUriPrefix
-     *            The string defining the start of any URIs to look for.
-     * @param outputUriPrefix
-     *            The string defining the start of the URIs which matched the inputUriPrefix, after
-     *            the translation is complete.
-     * @param nextSubjectMappingPredicates
-     * @param nextPredicateMappingPredicates
-     * @param nextObjectMappingPredicates
-     * @param deleteTranslatedTriples
-     *            If this is true, then any triples which contained translated URIs will be deleted.
-     *            Mapping triples will still exist if any mapping predicates were utilised.
-     * @param contexts
-     *            The contexts in the repository that are relevant to the mapping
-     * @throws RepositoryException
-     *             If the repository threw an exception during the course of the method.
-     * @throws MalformedQueryException
-     *             If any of the translation queries could not be executed due to an error in the
-     *             queries or a lack of understanding of the query by the repository.
-     * @throws UpdateExecutionException
-     *             If the SPARQL Update queries used by this method were not able to be successfully
-     *             executed on the given repository for some reason.
-     */
-    public static void doTranslation(final RepositoryConnection repositoryConnection, final String inputUriPrefix,
-            final String outputUriPrefix, final Collection<URI> nextSubjectMappingPredicates,
-            final Collection<URI> nextPredicateMappingPredicates, final Collection<URI> nextObjectMappingPredicates,
-            final boolean deleteTranslatedTriples, final Resource... contexts) throws RepositoryException,
-        MalformedQueryException, UpdateExecutionException
-    {
-        URITranslator.doTranslation(repositoryConnection, inputUriPrefix, outputUriPrefix,
-                nextSubjectMappingPredicates, true, false, nextPredicateMappingPredicates, true, false,
-                nextObjectMappingPredicates, true, false, deleteTranslatedTriples, contexts);
-    }
-    
-    /**
-     * Maps URIs for all triples in the given contexts in the given repository, between the input
-     * URI prefix and the output URI prefix.
-     * 
      * The mapping predicates are used to define extra triples to link the input and output URIs.
      * 
      * NOTE: The results for queries with deleteTranslatedTriples set to false may not be consistent
@@ -412,18 +332,83 @@ public class URITranslator
     }
     
     /**
-     * Executes the given SPARQL Update query against the given repository.
+     * Maps URIs for all triples in the given contexts in the given repository, between the input
+     * URI prefix and the output URI prefix.
+     * 
+     * The mapping predicates are used to define extra triples to link the input and output URIs.
+     * 
+     * NOTE: The results for queries with deleteTranslatedTriples set to false may not be consistent
+     * with what you expect.
      * 
      * @param repositoryConnection
-     * @param nextQuery
+     *            The repository containing the input triples, and which will contain the output
+     *            triples
+     * @param inputUriPrefix
+     *            The string defining the start of any URIs to look for.
+     * @param outputUriPrefix
+     *            The string defining the start of the URIs which matched the inputUriPrefix, after
+     *            the translation is complete.
+     * @param nextSubjectMappingPredicates
+     * @param nextPredicateMappingPredicates
+     * @param nextObjectMappingPredicates
+     * @param deleteTranslatedTriples
+     *            If this is true, then any triples which contained translated URIs will be deleted.
+     *            Mapping triples will still exist if any mapping predicates were utilised.
+     * @param contexts
+     *            The contexts in the repository that are relevant to the mapping
      * @throws RepositoryException
+     *             If the repository threw an exception during the course of the method.
      * @throws MalformedQueryException
+     *             If any of the translation queries could not be executed due to an error in the
+     *             queries or a lack of understanding of the query by the repository.
      * @throws UpdateExecutionException
+     *             If the SPARQL Update queries used by this method were not able to be successfully
+     *             executed on the given repository for some reason.
      */
-    private static void executeSparqlUpdateQueries(final RepositoryConnection repositoryConnection,
-            final String nextQuery) throws RepositoryException, MalformedQueryException, UpdateExecutionException
+    public static void doTranslation(final RepositoryConnection repositoryConnection, final String inputUriPrefix,
+            final String outputUriPrefix, final Collection<URI> nextSubjectMappingPredicates,
+            final Collection<URI> nextPredicateMappingPredicates, final Collection<URI> nextObjectMappingPredicates,
+            final boolean deleteTranslatedTriples, final Resource... contexts) throws RepositoryException,
+        MalformedQueryException, UpdateExecutionException
     {
-        URITranslator.executeSparqlUpdateQueries(repositoryConnection, Collections.singletonList(nextQuery));
+        URITranslator.doTranslation(repositoryConnection, inputUriPrefix, outputUriPrefix,
+                nextSubjectMappingPredicates, true, false, nextPredicateMappingPredicates, true, false,
+                nextObjectMappingPredicates, true, false, deleteTranslatedTriples, contexts);
+    }
+    
+    /**
+     * Maps URIs for all triples in the given contexts in the given repository, between the input
+     * URI prefix and the output URI prefix.
+     * 
+     * @param repositoryConnection
+     *            The repository containing the input triples, and which will contain the output
+     *            triples
+     * @param inputUriPrefix
+     *            The string defining the start of any URIs to look for.
+     * @param outputUriPrefix
+     *            The string defining the start of the URIs which matched the inputUriPrefix, after
+     *            the translation is complete.
+     * @param contexts
+     *            The contexts in the repository that are relevant to the mapping
+     * @throws RepositoryException
+     *             If the repository threw an exception during the course of the method.
+     * @throws MalformedQueryException
+     *             If any of the translation queries could not be executed due to an error in the
+     *             queries or a lack of understanding of the query by the repository.
+     * @throws UpdateExecutionException
+     *             If the SPARQL Update queries used by this method were not able to be successfully
+     *             executed on the given repository for some reason.
+     */
+    public static void doTranslation(final RepositoryConnection repositoryConnection, final String inputUriPrefix,
+            final String outputUriPrefix, final Resource... contexts) throws RepositoryException,
+        MalformedQueryException, UpdateExecutionException
+    {
+        final Collection<URI> subjectMappingPredicates = Collections.emptyList();
+        final Collection<URI> predicateMappingPredicates = Collections.emptyList();
+        final Collection<URI> objectMappingPredicates = Collections.emptyList();
+        
+        URITranslator.doTranslation(repositoryConnection, inputUriPrefix, outputUriPrefix, subjectMappingPredicates,
+                predicateMappingPredicates, objectMappingPredicates, true, contexts);
     }
     
     /**
@@ -447,6 +432,21 @@ public class URITranslator
             
             preparedUpdate.execute();
         }
+    }
+    
+    /**
+     * Executes the given SPARQL Update query against the given repository.
+     * 
+     * @param repositoryConnection
+     * @param nextQuery
+     * @throws RepositoryException
+     * @throws MalformedQueryException
+     * @throws UpdateExecutionException
+     */
+    private static void executeSparqlUpdateQueries(final RepositoryConnection repositoryConnection,
+            final String nextQuery) throws RepositoryException, MalformedQueryException, UpdateExecutionException
+    {
+        URITranslator.executeSparqlUpdateQueries(repositoryConnection, Collections.singletonList(nextQuery));
     }
     
 }

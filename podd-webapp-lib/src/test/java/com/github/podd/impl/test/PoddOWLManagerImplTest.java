@@ -12,23 +12,22 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 
 /**
  * @author kutila
- *
+ * 
  */
 public class PoddOWLManagerImplTest extends AbstractPoddOWLManagerTest
 {
     private String reasonerName = "Pellet";
     
+    @Override
+    protected OWLReasonerFactory getNewOWLReasonerFactoryInstance()
+    {
+        return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(this.reasonerName);
+    }
     
     @Override
     protected PoddOWLManager getNewPoddOWLManagerInstance()
     {
         return new PoddOWLManagerImpl();
-    }
-
-    @Override
-    protected OWLReasonerFactory getNewOWLReasonerFactoryInstance()
-    {
-        return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(this.reasonerName);
     }
     
 }
