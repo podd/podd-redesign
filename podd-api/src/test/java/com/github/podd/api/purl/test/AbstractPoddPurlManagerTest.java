@@ -186,14 +186,19 @@ public abstract class AbstractPoddPurlManagerTest
         
         Assert.assertEquals("New Repository should have been empty", 0, emptyRepositoryConnection.size());
         
-        // convertTemporaryUris() will have no effect as our Repository is empty
-        this.testPurlManager.convertTemporaryUris(purlSet, emptyRepositoryConnection, context);
-        
-        Assert.assertEquals("Repository should still be empty", 0, emptyRepositoryConnection.size());
-        
-        emptyRepositoryConnection.rollback();
-        emptyRepositoryConnection.close();
-        emptyRepository.shutDown();
+        try
+        {
+            // convertTemporaryUris() will have no effect as our Repository is empty
+            this.testPurlManager.convertTemporaryUris(purlSet, emptyRepositoryConnection, context);
+            
+            Assert.assertEquals("Repository should still be empty", 0, emptyRepositoryConnection.size());
+        }
+        finally
+        {
+            emptyRepositoryConnection.rollback();
+            emptyRepositoryConnection.close();
+            emptyRepository.shutDown();
+        }
     }
     
     /**
