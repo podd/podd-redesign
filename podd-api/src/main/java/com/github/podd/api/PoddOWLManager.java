@@ -78,6 +78,16 @@ public interface PoddOWLManager
     OWLOntology getOntology(OWLOntologyID ontologyID) throws IllegalArgumentException, OWLException;
     
     /**
+     * @return The OWLOntologyManager mapped to this PoddOWLManager
+     */
+    OWLOntologyManager getOWLOntologyManager();
+    
+    /**
+     * @return The OWLReasonerFactory mapped to this PoddOWLManager
+     */
+    OWLReasonerFactory getReasonerFactory();
+    
+    /**
      * 
      * @return The {@link OWLProfile} used by the reasoner attached to this PoddOWLManager.
      */
@@ -187,15 +197,6 @@ public interface PoddOWLManager
     void setOWLOntologyManager(OWLOntologyManager manager);
     
     /**
-     * Sets the {@link OWLReasonerFactory} to use when creating instances of {@link OWLReasoner} to
-     * verify ontologies and infer statements based on ontologies.
-     * 
-     * @param reasonerFactory
-     *            The reasoner factory to use for all ontologies in this PoddOWLManager.
-     */
-    void setReasonerFactory(OWLReasonerFactory reasonerFactory);
-    
-    /**
      * Sets the given OWLOntologyID to be published, restricting the ability of the ontology to be
      * published again.
      * 
@@ -205,4 +206,13 @@ public interface PoddOWLManager
      *             If the ontologyId could not be published.
      */
     InferredOWLOntologyID setPublished(OWLOntologyID ontologyId) throws PublishArtifactException;
+    
+    /**
+     * Sets the {@link OWLReasonerFactory} to use when creating instances of {@link OWLReasoner} to
+     * verify ontologies and infer statements based on ontologies.
+     * 
+     * @param reasonerFactory
+     *            The reasoner factory to use for all ontologies in this PoddOWLManager.
+     */
+    void setReasonerFactory(OWLReasonerFactory reasonerFactory);
 }
