@@ -142,8 +142,9 @@ public interface PoddOWLManager
      * 
      * @param owlSource
      * @return
+     * @throws OWLException 
      */
-    OWLOntology loadOntology(RioMemoryTripleSource owlSource);
+    OWLOntology loadOntology(RioMemoryTripleSource owlSource) throws OWLException;
     
     /**
      * Parses RDF statements into an ontology, and returns the OWLOntologyID for the resulting
