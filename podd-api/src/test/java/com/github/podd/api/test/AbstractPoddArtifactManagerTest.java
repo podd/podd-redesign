@@ -33,6 +33,8 @@ import com.github.podd.utils.InferredOWLOntologyID;
 public abstract class AbstractPoddArtifactManagerTest
 {
     
+    private PoddArtifactManager testArtifactManager;
+    
     protected abstract PoddArtifactManager getNewArtifactManager();
     
     protected abstract PoddPurlProcessorFactory getNewDoiPurlProcessorFactory();
@@ -58,7 +60,6 @@ public abstract class AbstractPoddArtifactManagerTest
     /**
      * @throws java.lang.Exception
      */
-    @SuppressWarnings("null")
     @Before
     public void setUp() throws Exception
     {
@@ -94,22 +95,11 @@ public abstract class AbstractPoddArtifactManagerTest
         final PoddSchemaManager testSchemaManager = this.getNewSchemaManager();
         testSchemaManager.setOwlManager(testOWLManager);
         
-        final PoddArtifactManager testArtifactManager = this.getNewArtifactManager();
+        testArtifactManager = this.getNewArtifactManager();
         testArtifactManager.setFileReferenceManager(testFileReferenceManager);
         testArtifactManager.setPurlManager(testPurlManager);
         testArtifactManager.setOwlManager(testOWLManager);
         testArtifactManager.setSchemaManager(testSchemaManager);
-        
-        final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
-        // MIME type should be either given by the user, detected from the content type on the
-        // request, or autodetected using the Any23 Mime Detector
-        final String mimeType = "application/rdf+xml";
-        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
-        
-        final InferredOWLOntologyID resultArtifactId = testArtifactManager.loadArtifact(inputStream, format);
-        
-        // INSIDE the loadArtifact method...
-        
     }
     
     /**
@@ -118,6 +108,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @After
     public void tearDown() throws Exception
     {
+        testArtifactManager = null;
     }
     
     /**
@@ -126,7 +117,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testDeregisterProcessor()
+    public final void testDeregisterProcessor() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -137,7 +128,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testGetProcessors()
+    public final void testGetProcessors() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -148,10 +139,23 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testLoadArtifact()
+    public final void testLoadArtifactBasicSuccess() throws Exception
     {
+        final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
-        Assert.fail("Not yet implemented"); // TODO
+        final InferredOWLOntologyID resultArtifactId = testArtifactManager.loadArtifact(inputStream, format);
+        
+        Assert.assertNotNull("Load artifact returned a null artifact ID", resultArtifactId);
+        Assert.assertNotNull("Load artifact returned a null ontology IRI", resultArtifactId.getOntologyIRI());
+        Assert.assertNotNull("Load artifact returned a null ontology version IRI", resultArtifactId.getVersionIRI());
+        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
+                resultArtifactId.getInferredOntologyIRI());
+        
+        // FIXME: How do we verify that load artifact was successful on the underlying repository?
     }
     
     /**
@@ -160,9 +164,26 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testPublishArtifact()
+    public final void testPublishArtifact() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        final InferredOWLOntologyID resultArtifactId = testArtifactManager.loadArtifact(inputStream, format);
+        
+        Assert.assertNotNull("Load artifact returned a null artifact ID", resultArtifactId);
+        Assert.assertNotNull("Load artifact returned a null ontology IRI", resultArtifactId.getOntologyIRI());
+        Assert.assertNotNull("Load artifact returned a null ontology version IRI", resultArtifactId.getVersionIRI());
+        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
+                resultArtifactId.getInferredOntologyIRI());
+        
+        testArtifactManager.publishArtifact(resultArtifactId);
+        
+        // FIXME: How do we get information about whether an artifact is published and other
+        // metadata like who can access the artifact?
     }
     
     /**
@@ -171,7 +192,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testRegisterProcessor()
+    public final void testRegisterProcessor() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -182,7 +203,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testUpdateSchemaImport()
+    public final void testUpdateSchemaImport() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
