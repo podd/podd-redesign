@@ -3,8 +3,11 @@
  */
 package com.github.podd.api;
 
+import java.util.List;
+
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -14,6 +17,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
+import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -31,6 +35,12 @@ public interface PoddOWLManager
      */
     void cacheSchemaOntology(InferredOWLOntologyID ontology, RepositoryConnection conn);
     
+    /**
+     * Creates a reasoner over the given OWLOntology
+     * 
+     * @param nextOntology
+     * @return
+     */
     OWLReasoner createReasoner(OWLOntology nextOntology);
     
     /**
@@ -44,6 +54,17 @@ public interface PoddOWLManager
     
     /**
      * 
+     * @param ontologyIRI
+     *            The IRI of the ontology to get.
+     * @return The managed current version of the ontology with ontologyIRI as either the Ontology
+     *         IRI, or the Version IRI.
+     */
+    OWLOntologyID getCurrentVersion(IRI ontologyIRI);
+    
+    /**
+     * NOTE: Restrict usage of this method, as it will always fetch the entire OWLOntology into
+     * memory. Use getCurrentVersion or getVersions in most cases.
+     * 
      * @param ontologyID
      *            The full OWLOntologyID, containing both Ontology IRI and Version IRI for the
      *            ontology to fetch.
@@ -56,9 +77,55 @@ public interface PoddOWLManager
      */
     OWLOntology getOntology(OWLOntologyID ontologyID) throws IllegalArgumentException, OWLException;
     
+    /**
+     * 
+     * @return The {@link OWLProfile} used by the reasoner attached to this PoddOWLManager.
+     */
     OWLProfile getReasonerProfile();
     
-    void inferStatements(InferredOWLOntologyID inferredOWLOntologyID, RepositoryConnection permanentRepositoryConnection);
+    /**
+     * Returns a list of versions where one of the ontology IRI or version IRI match the ontology.
+     * 
+     * The most current version of the ontology is returned first in the list.
+     * 
+     * NOTE: The list of {@link OWLOntologyID} instances that are returned may not all contain the
+     * given IRI in cases where the given IRI is one of many different Version IRIs.
+     * 
+     * @param ontologyIRI
+     *            Either the Ontology IRI or the Version IRI of an ontology to match against.
+     * @return A list of versions for all ontologies, where the version either matches the Ontology
+     *         IRI or the Version IRI.
+     */
+    List<OWLOntologyID> getVersions(IRI ontologyIRI);
+    
+    /**
+     * Infer statements for the given {@link OWLOntologyID} into the given permanent repository
+     * connection.
+     * 
+     * @param ontologyId
+     * @param permanentRepositoryConnection
+     * @return The InferredOWLOntologyID representing the ontologyId, along with the IRI of the
+     *         Inferred Ontology.
+     */
+    InferredOWLOntologyID inferStatements(OWLOntologyID ontologyId, RepositoryConnection permanentRepositoryConnection);
+    
+    /**
+     * Returns true if the given ontologyIRI is either an Ontology IRI and it has a published
+     * version, or is a version IRI that was previously published.
+     * 
+     * @param ontologyIRI
+     * @return
+     */
+    boolean isPublished(IRI ontologyIRI);
+    
+    /**
+     * Returns true if the combination of the Ontology IRI and the Version IRI in the given
+     * ontologyId were previously published.
+     * 
+     * @param ontologyId
+     * @return
+     */
+    boolean isPublished(OWLOntologyID ontologyId);
     
     /**
      * Loads an ontology into memory from a RioMemoryTripleSource.
@@ -102,11 +169,40 @@ public interface PoddOWLManager
     boolean removeCache(OWLOntologyID ontologyID) throws OWLException;
     
     /**
+     * Sets the current version for the Ontology {@link IRI} in the given {@link OWLOntologyID} to
+     * be the given version.
+     * 
+     * @param ontologyId
+     * @throws IllegalArgumentException
+     *             If the ontologyId does not have a version.
+     */
+    void setCurrentVersion(OWLOntologyID ontologyId);
+    
+    /**
      * Map a single OWLOntologyManager into this PoddOWLManager.
      * 
      * @param manager
+     *            The manager for all PODD {@link OWLOntology} instances.
      */
     void setOWLOntologyManager(OWLOntologyManager manager);
     
-    void setReasonerFactory(OWLReasonerFactory newReasonerFactory);
+    /**
+     * Sets the {@link OWLReasonerFactory} to use when creating instances of {@link OWLReasoner} to
+     * verify ontologies and infer statements based on ontologies.
+     * 
+     * @param reasonerFactory
+     *            The reasoner factory to use for all ontologies in this PoddOWLManager.
+     */
+    void setReasonerFactory(OWLReasonerFactory reasonerFactory);
+    
+    /**
+     * Sets the given OWLOntologyID to be published, restricting the ability of the ontology to be
+     * published again.
+     * 
+     * @param ontologyId
+     *            The OWLOntologyID that needs to be published
+     * @throws PublishArtifactException
+     *             If the ontologyId could not be published.
+     */
+    InferredOWLOntologyID setPublished(OWLOntologyID ontologyId) throws PublishArtifactException;
 }

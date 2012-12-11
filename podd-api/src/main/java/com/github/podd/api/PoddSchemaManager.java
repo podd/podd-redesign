@@ -39,23 +39,12 @@ public interface PoddSchemaManager
      *            The stream that will be sent the schema ontology.
      * @param format
      *            The format for the downloaded Schema Ontology.
+     * @param includeInferences
+     *            If true, inferred statements are also returned. If false, only the concrete RDF
+     *            triples are returned.
      */
-    void downloadSchemaOntology(OWLOntologyID schemaOntologyID, OutputStream outputStream, RDFFormat format)
-        throws UnmanagedSchemaException;
-    
-    /**
-     * Downloads a PODD Schema Ontology to the given outputStream, in the given format, with
-     * inferences.
-     * 
-     * @param schemaOntologyID
-     *            The OWL Ontology ID for the schema ontology.
-     * @param outputStream
-     *            The stream that will be sent the schema ontology.
-     * @param format
-     *            The format for the downloaded Schema Ontology.
-     */
-    void downloadSchemaOntologyWithInferences(OWLOntologyID schemaOntologyID, OutputStream outputStream,
-            RDFFormat format) throws UnmanagedSchemaException;
+    void downloadSchemaOntology(OWLOntologyID schemaOntologyID, OutputStream outputStream, RDFFormat format,
+            boolean includeInferences) throws UnmanagedSchemaException;
     
     /**
      * Get the most current version of a managed Schema Ontology that contains the given
@@ -125,6 +114,11 @@ public interface PoddSchemaManager
     void setCurrentSchemaOntologyVersion(OWLOntologyID schemaOntologyID) throws UnmanagedSchemaOntologyIDException,
         IllegalArgumentException;
     
+    /**
+     * Sets the shared PoddOWLManager to use for Schema Ontologies and Artifact Ontologies.
+     * 
+     * @param testOWLManager
+     */
     void setOwlManager(PoddOWLManager testOWLManager);
     
     /**

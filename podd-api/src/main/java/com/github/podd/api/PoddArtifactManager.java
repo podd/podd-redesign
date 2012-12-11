@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -117,8 +118,10 @@ public interface PoddArtifactManager
      * @param ontologyId
      *            The OWL Ontology ID of the PODD Artifact that needs to be published.
      * @return The full inferred OWL Ontology ID of the published Artifact.
+     * @throws PublishArtifactException
+     *             If the artifact could not be published for any reason.
      */
-    InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId);
+    InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId) throws PublishArtifactException;
     
     void setFileReferenceManager(PoddFileReferenceManager fileManager);
     

@@ -25,6 +25,8 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.semanticweb.owlapi.rio.RioParser;
 import org.semanticweb.owlapi.rio.RioParserImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
@@ -34,6 +36,7 @@ import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -44,6 +47,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public class PoddArtifactManagerImpl implements PoddArtifactManager
 {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private PoddFileReferenceManager fileReferenceManager;
     private PoddOWLManager owlManager;
@@ -249,9 +253,33 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * OWLOntologyID)
      */
     @Override
-    public InferredOWLOntologyID publishArtifact(final OWLOntologyID ontologyId)
+    public InferredOWLOntologyID publishArtifact(final OWLOntologyID ontologyId) throws PublishArtifactException
     {
-        throw new RuntimeException("TODO: Implement publishArtifact");
+        if(ontologyId.getVersionIRI() == null)
+        {
+            throw new PublishArtifactException("Could not publish artifact as version was not specified.", ontologyId);
+        }
+        
+        if(this.getOWLManager().isPublished(ontologyId.getOntologyIRI()))
+        {
+            // Cannot publish multiple versions of a single artifact
+            throw new PublishArtifactException("Could not publish artifact as a version was already published",
+                    ontologyId);
+        }
+        
+        OWLOntologyID currentVersion = this.getOWLManager().getCurrentVersion(ontologyId.getOntologyIRI());
+        
+        if(!currentVersion.getVersionIRI().equals(ontologyId.getVersionIRI()))
+        {
+            // User must make the given artifact version the current version manually before
+            // publishing, to ensure that work from the current version is not lost accidentally
+            throw new PublishArtifactException("Could not publish artifact as it was not the most current version.",
+                    ontologyId);
+        }
+        
+        InferredOWLOntologyID published = this.getOWLManager().setPublished(ontologyId);
+        
+        return published;
     }
     
     /*
