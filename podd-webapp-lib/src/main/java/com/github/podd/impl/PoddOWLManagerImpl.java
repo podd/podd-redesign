@@ -3,19 +3,25 @@
  */
 package com.github.podd.impl;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
+import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
+import org.semanticweb.owlapi.rio.RioParserImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.PublishArtifactException;
@@ -29,6 +35,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public class PoddOWLManagerImpl implements PoddOWLManager
 {
+    protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private OWLOntologyManager owlOntologyManager;
     
@@ -108,9 +115,28 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public OWLOntology loadOntology(final RioMemoryTripleSource owlSource) throws OWLException
+    public OWLOntology loadOntology(final OWLOntologyDocumentSource owlSource) throws OWLException, IOException
     {
-        return this.owlOntologyManager.loadOntologyFromOntologyDocument(owlSource);
+        OWLOntology nextOntology;
+        if(owlSource instanceof RioMemoryTripleSource)
+        {
+            
+            final RioParserImpl owlParser = new RioParserImpl(null);
+            
+            nextOntology = this.owlOntologyManager.createOntology();
+            
+            owlParser.parse(owlSource, nextOntology);
+        }
+        else
+        {
+            nextOntology = this.owlOntologyManager.loadOntologyFromOntologyDocument(owlSource);
+        }
+        
+        if(nextOntology.isEmpty())
+        {
+            throw new OWLOntologyCreationException("Loaded ontology is empty");
+        }
+        return nextOntology;
     }
     
     @Override
