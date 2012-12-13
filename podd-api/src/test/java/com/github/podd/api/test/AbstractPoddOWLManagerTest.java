@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
@@ -27,12 +28,16 @@ import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.io.UnparsableOntologyException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
 import com.github.podd.api.PoddOWLManager;
+import com.github.podd.exception.EmptyOntologyException;
+import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
  * Abstract test to verify that the PoddOWLManager API contract is followed by implementations.
@@ -45,13 +50,13 @@ import com.github.podd.api.PoddOWLManager;
 public abstract class AbstractPoddOWLManagerTest
 {
     
+    private String poddBaseResourcePath = "/ontologies/poddBase.owl";
+    
     protected PoddOWLManager testOWLManager;
     
     private Repository testRepository;
     
     protected RepositoryConnection testRepositoryConnection;
-    
-    private String poddBaseResourcePath = "/ontologies/poddBase.owl";
     
     /**
      * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
@@ -76,6 +81,11 @@ public abstract class AbstractPoddOWLManagerTest
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
         this.testOWLManager.setOWLOntologyManager(manager);
+        
+        // set a ReasonerFactory for this PoddOWLManager
+        final OWLReasonerFactory reasonerFactory = this.getNewOWLReasonerFactoryInstance();
+        Assert.assertNotNull("Null implementation of reasoner factory", reasonerFactory);
+        this.testOWLManager.setReasonerFactory(reasonerFactory);
         
         // create a memory Repository for tests
         this.testRepository = new SailRepository(new MemoryStore());
@@ -107,6 +117,25 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testCacheSchemaOntology() throws Exception
     {
+        // prepare: load a schema ontology independently
+        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        final OWLOntology loadedOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
+        
+        final URI schemaOntologyGraph = loadedOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        final URI inferredOntologyGraph = null;
+        
+        // prepare: load poddBase schema ontology into the test repository
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, schemaOntologyGraph);
+        final List<Statement> statements =
+                this.testRepositoryConnection.getStatements(null, null, null, false, schemaOntologyGraph).asList();
+        Assert.assertEquals("Not the expected number of statements in Repository", 278, statements.size());
+        
+        final InferredOWLOntologyID inferredOntologyID = null;
+        
+        this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection);
+        
         Assert.fail("TODO: Implement me");
     }
     
@@ -116,11 +145,61 @@ public abstract class AbstractPoddOWLManagerTest
      * .
      * 
      */
-    @Ignore
     @Test
     public void testCreateReasoner() throws Exception
     {
-        Assert.fail("TODO: Implement me");
+        // prepare: load an Ontology independently
+        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        final OWLOntology loadedOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
+        
+        final OWLReasoner reasoner = this.testOWLManager.createReasoner(loadedOntology);
+        
+        // verify:
+        Assert.assertNotNull("Created reasoner was NULL", reasoner);
+        Assert.assertEquals(this.testOWLManager.getReasonerFactory().getReasonerName(), reasoner.getReasonerName());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#createReasoner(org.semanticweb.owlapi.model.OWLOntology)}
+     * .
+     * 
+     */
+    @Test
+    public void testCreateReasonerFromEmptyOntology() throws Exception
+    {
+        // prepare: load an Ontology independently
+        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        final OWLOntology emptyOntology = testOWLOntologyManager.createOntology();
+        
+        final OWLReasoner reasoner = this.testOWLManager.createReasoner(emptyOntology);
+        
+        // verify:
+        Assert.assertNotNull("Created reasoner was NULL", reasoner);
+        Assert.assertEquals(this.testOWLManager.getReasonerFactory().getReasonerName(), reasoner.getReasonerName());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#createReasoner(org.semanticweb.owlapi.model.OWLOntology)}
+     * .
+     * 
+     */
+    @Test
+    public void testCreateReasonerWithNull() throws Exception
+    {
+        try
+        {
+            this.testOWLManager.createReasoner(null);
+            Assert.fail("Should have thrown a Runtime Exception");
+        }
+        catch(final RuntimeException e)
+        {
+            Assert.assertTrue("Exception not expected type", e instanceof NullPointerException);
+            // this exception is thrown by the OWL API with a null message
+        }
     }
     
     /**
@@ -187,6 +266,7 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testGetReasonerFactoryWithMockObject() throws Exception
     {
+        this.testOWLManager.setReasonerFactory(null);
         Assert.assertNull("ReasonerFactory should have been null", this.testOWLManager.getReasonerFactory());
         
         final OWLReasonerFactory mockReasonerFactory = Mockito.mock(OWLReasonerFactory.class);
@@ -257,39 +337,36 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testIsPublishedOWLOntologyID() throws Exception
     {
+        // look for object property http://purl.org/podd/ns/poddBase#hasPublicationStatus
+        
         Assert.fail("TODO: Implement me");
     }
     
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#loadOntology(org.semanticweb.owlapi.rio.RioMemoryTripleSource)}
-     * .
-     * 
+     * . Attempts to load an RDF resource which does not contain an ontology.
      */
     @Test
-    public void testLoadOntologyFromRioMemoryTripleSource() throws Exception
+    public void testLoadOntologyFromEmptyOWLOntologyDocumentSource() throws Exception
     {
-        // prepare: load an ontology into a RioMemoryTripleSource via the test repository
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:context:test");
-        
-        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        // prepare: load an ontology into a StreamDocumentSource
+        final InputStream inputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
         Assert.assertNotNull("Could not find resource", inputStream);
         
-        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-        final List<Statement> statements =
-                this.testRepositoryConnection.getStatements(null, null, null, false, context).asList();
-        Assert.assertEquals("Not the expected number of statements in Repository", 278, statements.size());
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType()));
         
-        final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
-        
-        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
-        
-        // verify:
-        Assert.assertNotNull(loadedOntology);
-        Assert.assertEquals("<http://purl.org/podd/ns/poddBase>", loadedOntology.getOntologyID().getOntologyIRI()
-                .toQuotedString());
-        Assert.assertEquals("<http://purl.org/podd/ns/version/poddBase/1>", loadedOntology.getOntologyID()
-                .getVersionIRI().toQuotedString());
+        try
+        {
+            this.testOWLManager.loadOntology(owlSource);
+            Assert.fail("Should have thrown an OWLOntologyCreationException");
+        }
+        catch(final EmptyOntologyException e)
+        {
+            Assert.assertEquals("Unexpected message in expected Exception", "Loaded ontology is empty", e.getMessage());
+        }
     }
     
     /**
@@ -322,28 +399,33 @@ public abstract class AbstractPoddOWLManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#loadOntology(org.semanticweb.owlapi.rio.RioMemoryTripleSource)}
-     * . Attempts to load an RDF resource which does not contain an ontology.
+     * .
+     * 
      */
     @Test
-    public void testLoadOntologyFromEmptyOWLOntologyDocumentSource() throws Exception
+    public void testLoadOntologyFromRioMemoryTripleSource() throws Exception
     {
-        // prepare: load an ontology into a StreamDocumentSource
-        final InputStream inputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
+        // prepare: load an ontology into a RioMemoryTripleSource via the test repository
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:context:test");
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
         Assert.assertNotNull("Could not find resource", inputStream);
         
-        final OWLOntologyDocumentSource owlSource =
-                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
-                        RDFFormat.RDFXML.getDefaultMIMEType()));
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
+        final List<Statement> statements =
+                this.testRepositoryConnection.getStatements(null, null, null, false, context).asList();
+        Assert.assertEquals("Not the expected number of statements in Repository", 278, statements.size());
         
-        try
-        {
-            this.testOWLManager.loadOntology(owlSource);
-            Assert.fail("Should have thrown an OWLOntologyCreationException");
-        }
-        catch(final OWLOntologyCreationException e)
-        {
-            Assert.assertEquals("Unexpected message in expected Exception", "Loaded ontology is empty", e.getMessage());
-        }
+        final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
+        
+        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
+        
+        // verify:
+        Assert.assertNotNull(loadedOntology);
+        Assert.assertEquals("<http://purl.org/podd/ns/poddBase>", loadedOntology.getOntologyID().getOntologyIRI()
+                .toQuotedString());
+        Assert.assertEquals("<http://purl.org/podd/ns/version/poddBase/1>", loadedOntology.getOntologyID()
+                .getVersionIRI().toQuotedString());
     }
     
     /**
@@ -384,7 +466,7 @@ public abstract class AbstractPoddOWLManagerTest
         try
         {
             this.testOWLManager.loadOntology(null);
-            Assert.fail("Should have thrown a NullPointerException");
+            Assert.fail("Should have thrown a RuntimeException");
         }
         catch(final RuntimeException e)
         {
@@ -399,11 +481,80 @@ public abstract class AbstractPoddOWLManagerTest
      * .
      * 
      */
-    @Ignore
     @Test
     public void testParseRDFStatements() throws Exception
     {
-        Assert.fail("TODO: Implement me");
+        // prepare: load poddBase schema ontology into the test repository
+        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
+        final List<Statement> statements =
+                this.testRepositoryConnection.getStatements(null, null, null, false, context).asList();
+        Assert.assertEquals("Not the expected number of statements in Repository", 278, statements.size());
+        
+        final OWLOntologyID loadedOntologyID =
+                this.testOWLManager.parseRDFStatements(this.testRepositoryConnection, context);
+        
+        // verify:
+        Assert.assertNotNull("OntologyID was null", loadedOntologyID);
+        Assert.assertEquals("<http://purl.org/podd/ns/poddBase>", loadedOntologyID.getOntologyIRI().toQuotedString());
+        Assert.assertEquals("<http://purl.org/podd/ns/version/poddBase/1>", loadedOntologyID.getVersionIRI()
+                .toQuotedString());
+        
+        final OWLOntology loadedOntology = this.testOWLManager.getOntology(loadedOntologyID);
+        Assert.assertNotNull("Ontology not in memory", loadedOntology);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#parseRDFStatements(org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI...)}
+     * .
+     * 
+     */
+    @Test
+    public void testParseRDFStatementsWithEmptyRepository() throws Exception
+    {
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
+        try
+        {
+            this.testOWLManager.parseRDFStatements(this.testRepositoryConnection, context);
+        }
+        catch(final EmptyOntologyException e)
+        {
+            Assert.assertEquals("No statements to create an ontology", e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#parseRDFStatements(org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI...)}
+     * . This test asserts that when the RepositoryConnection has just one statement in it, a
+     * non-empty and anonymous Ontology is loaded to the memory.
+     */
+    @Test
+    public void testParseRDFStatementsWithOneStatementInRepository() throws Exception
+    {
+        // prepare: add a single statement to the Repository so that it is not empty
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
+        
+        this.testRepositoryConnection.add(ValueFactoryImpl.getInstance().createURI("urn:dummy:subject"), RDF.TYPE,
+                ValueFactoryImpl.getInstance().createURI("urn:dummy:object"), context);
+        
+        final OWLOntologyID loadedOntologyID =
+                this.testOWLManager.parseRDFStatements(this.testRepositoryConnection, context);
+        
+        // verify:
+        Assert.assertNotNull("OntologyID was null", loadedOntologyID);
+        
+        Assert.assertNull("Was not an anonymous ontology", loadedOntologyID.getOntologyIRI());
+        Assert.assertNull("Was not an anonymous ontology", loadedOntologyID.getVersionIRI());
+        
+        final OWLOntology loadedOntology = this.testOWLManager.getOntology(loadedOntologyID);
+        Assert.assertNotNull("Ontology not in memory", loadedOntology);
+        Assert.assertFalse("Ontology is empty", loadedOntology.isEmpty());
+        Assert.assertEquals("Not the expected number of axioms", 1, loadedOntology.getAxiomCount());
     }
     
     /**
@@ -429,20 +580,8 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testSetCurrentVersion() throws Exception
     {
+        // omv.ontoware/currentversion
         Assert.fail("TODO: Implement me");
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#setOWLOntologyManager(org.semanticweb.owlapi.model.OWLOntologyManager)}
-     * .
-     * 
-     */
-    @Test
-    public void testSetOWLOntologyManagerWithNull() throws Exception
-    {
-        this.testOWLManager.setOWLOntologyManager(null);
-        Assert.assertNull("OWLOntologyManager could not be set to NULL", this.testOWLManager.getOWLOntologyManager());
     }
     
     /**
@@ -468,6 +607,19 @@ public abstract class AbstractPoddOWLManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#setOWLOntologyManager(org.semanticweb.owlapi.model.OWLOntologyManager)}
+     * .
+     * 
+     */
+    @Test
+    public void testSetOWLOntologyManagerWithNull() throws Exception
+    {
+        this.testOWLManager.setOWLOntologyManager(null);
+        Assert.assertNull("OWLOntologyManager could not be set to NULL", this.testOWLManager.getOWLOntologyManager());
+    }
+    
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddOWLManager#setPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      * 
@@ -489,11 +641,28 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testSetReasonerFactory() throws Exception
     {
+        // set null to forget the reasoner factory being set in setUp()
+        this.testOWLManager.setReasonerFactory(null);
+        Assert.assertNull("The reasoner factory could not be set to NULL", this.testOWLManager.getReasonerFactory());
+        
         final OWLReasonerFactory reasonerFactory = this.getNewOWLReasonerFactoryInstance();
         Assert.assertNotNull("Null implementation of reasoner factory", reasonerFactory);
         
         this.testOWLManager.setReasonerFactory(reasonerFactory);
         
         Assert.assertNotNull("The reasoner factory was not set", this.testOWLManager.getReasonerFactory());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#setReasonerFactory(org.semanticweb.owlapi.reasoner.OWLReasonerFactory)}
+     * .
+     * 
+     */
+    @Test
+    public void testSetReasonerFactoryWithNull() throws Exception
+    {
+        this.testOWLManager.setReasonerFactory(null);
+        Assert.assertNull("The reasoner factory could not be set to NULL", this.testOWLManager.getReasonerFactory());
     }
 }

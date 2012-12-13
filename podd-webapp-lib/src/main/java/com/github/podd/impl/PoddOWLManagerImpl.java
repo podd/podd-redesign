@@ -6,13 +6,13 @@ package com.github.podd.impl;
 import java.io.IOException;
 import java.util.List;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.profiles.OWLProfile;
@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
+import com.github.podd.exception.EmptyOntologyException;
+import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
@@ -42,8 +44,20 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     private OWLReasonerFactory reasonerFactory;
     
     @Override
-    public void cacheSchemaOntology(final InferredOWLOntologyID ontology, final RepositoryConnection conn)
+    public void cacheSchemaOntology(final InferredOWLOntologyID ontologyID, final RepositoryConnection conn)
+        throws OpenRDFException
     {
+        // load ontology statements and inferred statements from the respective graphs into OWL
+        // Ontology Manager
+        
+        /*
+         * IRI schemaOntologyGraph = ontologyID.getVersionIRI(); IRI inferredSchemaOntologyGraph =
+         * ontologyID.getInferredOntologyIRI();
+         * 
+         * RepositoryResult<Statement> baseStatements = conn.getStatements(null, null, null, true,
+         * schemaOntologyGraph.toOpenRDFURI()); RepositoryResult<Statement> inferredStatements =
+         * conn.getStatements(null, null, null, true, inferredSchemaOntologyGraph.toOpenRDFURI());
+         */
         throw new RuntimeException("TODO: Implement cacheSchemaOntology");
     }
     
@@ -115,7 +129,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public OWLOntology loadOntology(final OWLOntologyDocumentSource owlSource) throws OWLException, IOException
+    public OWLOntology loadOntology(final OWLOntologyDocumentSource owlSource) throws OWLException, IOException,
+        PoddException
     {
         OWLOntology nextOntology;
         if(owlSource instanceof RioMemoryTripleSource)
@@ -134,15 +149,34 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         if(nextOntology.isEmpty())
         {
-            throw new OWLOntologyCreationException("Loaded ontology is empty");
+            throw new EmptyOntologyException(nextOntology, "Loaded ontology is empty");
         }
         return nextOntology;
     }
     
     @Override
     public OWLOntologyID parseRDFStatements(final RepositoryConnection conn, final URI... contexts)
+        throws OpenRDFException, OWLException, IOException, PoddException
     {
-        throw new RuntimeException("TODO: Implement parseRDFStatements");
+        final RioMemoryTripleSource owlSource =
+                new RioMemoryTripleSource(conn.getStatements(null, null, null, true, contexts));
+        
+        final RioParserImpl owlParser = new RioParserImpl(null);
+        
+        final OWLOntology nextOntology = this.owlOntologyManager.createOntology();
+        
+        if(conn.size(contexts) == 0)
+        {
+            throw new EmptyOntologyException(nextOntology, "No statements to create an ontology");
+        }
+        
+        owlParser.parse(owlSource, nextOntology);
+        if(nextOntology.isEmpty())
+        {
+            throw new EmptyOntologyException(nextOntology, "Loaded ontology is empty");
+        }
+        
+        return nextOntology.getOntologyID();
     }
     
     @Override

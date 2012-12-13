@@ -6,6 +6,7 @@ package com.github.podd.api;
 import java.io.IOException;
 import java.util.List;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -18,6 +19,7 @@ import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
+import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
@@ -31,10 +33,11 @@ public interface PoddOWLManager
     /**
      * Loads and caches the given schema ontology in memory from a Repository.
      * 
-     * @param ontology
+     * @param ontologyID
      * @param conn
+     * @throws OpenRDFException
      */
-    void cacheSchemaOntology(InferredOWLOntologyID ontology, RepositoryConnection conn);
+    void cacheSchemaOntology(InferredOWLOntologyID ontologyID, RepositoryConnection conn) throws OpenRDFException;
     
     /**
      * Creates a reasoner over the given OWLOntology
@@ -139,14 +142,15 @@ public interface PoddOWLManager
     boolean isPublished(OWLOntologyID ontologyId);
     
     /**
-     * Loads an ontology into memory from a RioMemoryTripleSource.
+     * Loads an ontology into memory from an OWLOntologyDocumentSource.
      * 
      * @param owlSource
-     * @return
+     * @return The OWLOntology that was loaded into memory
      * @throws OWLException
      * @throws IOException
+     * @throws PoddException
      */
-    OWLOntology loadOntology(OWLOntologyDocumentSource owlSource) throws OWLException, IOException;
+    OWLOntology loadOntology(OWLOntologyDocumentSource owlSource) throws OWLException, IOException, PoddException;
     
     /**
      * Parses RDF statements into an ontology, and returns the OWLOntologyID for the resulting
@@ -162,8 +166,13 @@ public interface PoddOWLManager
      *            statements.
      * @return The OWLOntologyID that was created by the internal OWLOntologyManager for the
      *         ontology that was parsed.
+     * @throws OWLException
+     * @throws IOException
+     * @throws PoddException
+     * @throws OpenRDFException
      */
-    OWLOntologyID parseRDFStatements(RepositoryConnection conn, URI... contexts);
+    OWLOntologyID parseRDFStatements(RepositoryConnection conn, URI... contexts) throws OWLException, IOException,
+        PoddException, OpenRDFException;
     
     /**
      * Attempts to regain memory in the underlying OWLOntologyManager by removing the ontology from
