@@ -9,14 +9,17 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.repository.Repository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
+import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
@@ -34,6 +37,8 @@ public abstract class AbstractPoddArtifactManagerTest
 {
     
     private PoddArtifactManager testArtifactManager;
+    private PoddRepositoryManager testRepositoryManager;
+    private PoddSchemaManager testSchemaManager;
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of PoddArtifactManager
@@ -80,29 +85,42 @@ public abstract class AbstractPoddArtifactManagerTest
     protected abstract PoddFileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory();
     
     /**
-     * Concrete tests must override this to provide a new, empty, instance of PoddOWLManager.
+     * Concrete tests must override this to provide a new, empty, instance of {@link PoddOWLManager}
+     * .
      * 
      * @return A new empty instance of an implementation of PoddOWLManager.
      */
     protected abstract PoddOWLManager getNewOWLManager();
     
     /**
-     * Concrete tests must override this to provide a new, empty, instance of PoddPurlManager.
+     * Concrete tests must override this to provide a new, empty, instance of
+     * {@link PoddPurlManager}.
      * 
      * @return A new empty instance of an implementation of PoddPurlManager.
      */
     protected abstract PoddPurlManager getNewPurlManager();
     
     /**
-     * Concrete tests must override this to provide a new, empty, instance of OWLReasonerFactory
-     * that can be used with the PoddOWLManager.
+     * Concrete tests must override this to provide a new, empty, instance of
+     * {@link OWLReasonerFactory} that can be used with the {@link PoddOWLManager}.
      * 
      * @return A new empty instance of an implementation of OWLReasonerFactory.
      */
     protected abstract OWLReasonerFactory getNewReasonerFactory();
     
     /**
-     * Concrete tests must override this to provide a new, empty, instance of PoddSchemaManager.
+     * Concrete tests must override this to provide a new, initialised, instance of
+     * {@link PoddRepositoryManager} with the desired {@link Repository} for this test.
+     * 
+     * @return A new, initialised. instance of {@link PoddRepositoryManager}
+     * @throws OpenRDFException
+     *             If there were problems creating or initialising the Repository.
+     */
+    protected abstract PoddRepositoryManager getNewRepositoryManager() throws OpenRDFException;
+    
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * {@link PoddSchemaManager}.
      * 
      * @return A new empty instance of an implementation of PoddSchemaManager.
      */
@@ -110,7 +128,7 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
-     * PoddFileReferenceProcessorFactory that can process SSH-based file references for each
+     * {@link PoddFileReferenceProcessorFactory} that can process SSH-based file references for each
      * invocation.
      * 
      * @return A new empty instance of an implementation of PoddFileReferenceProcessorFactory that
@@ -120,7 +138,7 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
-     * PoddPurlProcessorFactory that can process UUID references for each invocation.
+     * {@link PoddPurlProcessorFactory} that can process UUID references for each invocation.
      * 
      * @return A new empty instance of an implementation of PoddPurlProcessorFactory that can
      *         process UUID references.
@@ -142,19 +160,40 @@ public abstract class AbstractPoddArtifactManagerTest
         // clear any automatically added entries that may come from META-INF/services entries on the
         // classpath
         testFileRegistry.clear();
-        // In practice, the following factories would be automatically added to the registry,
-        // however for testing we want to explicitly add the ones we want to support for each test
-        testFileRegistry.add(this.getNewSSHFileReferenceProcessorFactory());
-        testFileRegistry.add(this.getNewHttpFileReferenceProcessorFactory());
         
         final PoddPurlProcessorFactoryRegistry testPurlRegistry = new PoddPurlProcessorFactoryRegistry();
         testPurlRegistry.clear();
-        testPurlRegistry.add(this.getNewDoiPurlProcessorFactory());
-        testPurlRegistry.add(this.getNewHandlePurlProcessorFactory());
-        testPurlRegistry.add(this.getNewUUIDPurlProcessorFactory());
+        final PoddPurlProcessorFactory uuidFactory = this.getNewUUIDPurlProcessorFactory();
+        Assert.assertNotNull("UUID factory was null", uuidFactory);
+        testPurlRegistry.add(uuidFactory);
         
-        final PoddFileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
-        testFileReferenceManager.setProcessorFactoryRegistry(testFileRegistry);
+        /**
+         * // In practice, the following factories would be automatically added to the registry, //
+         * however for testing we want to explicitly add the ones we want to support for each test
+         * PoddFileReferenceProcessorFactory sshFactory =
+         * this.getNewSSHFileReferenceProcessorFactory();
+         * Assert.assertNotNull("SSH factory was null", sshFactory);
+         * testFileRegistry.add(sshFactory);
+         * 
+         * PoddFileReferenceProcessorFactory httpFactory =
+         * this.getNewHttpFileReferenceProcessorFactory();
+         * Assert.assertNotNull("HTTP factory was null", httpFactory);
+         * testFileRegistry.add(httpFactory);
+         * 
+         * // TODO: Implement these file reference managers and factories final
+         * PoddFileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
+         * testFileReferenceManager.setProcessorFactoryRegistry(testFileRegistry);
+         */
+        
+        /**
+         * // TODO: Implement these purl processor factories PoddPurlProcessorFactory doiFactory =
+         * this.getNewDoiPurlProcessorFactory(); testPurlRegistry.add(doiFactory);
+         * Assert.assertNotNull("DOI factory was null", httpFactory);
+         * 
+         * PoddPurlProcessorFactory handleFactory = this.getNewHandlePurlProcessorFactory();
+         * testPurlRegistry.add(handleFactory); Assert.assertNotNull("Handle factory was null",
+         * handleFactory);
+         **/
         
         final PoddPurlManager testPurlManager = this.getNewPurlManager();
         testPurlManager.setPurlProcessorFactoryRegistry(testPurlRegistry);
@@ -162,14 +201,19 @@ public abstract class AbstractPoddArtifactManagerTest
         final PoddOWLManager testOWLManager = this.getNewOWLManager();
         testOWLManager.setReasonerFactory(this.getNewReasonerFactory());
         
-        final PoddSchemaManager testSchemaManager = this.getNewSchemaManager();
-        testSchemaManager.setOwlManager(testOWLManager);
+        this.testRepositoryManager = this.getNewRepositoryManager();
+        
+        this.testSchemaManager = this.getNewSchemaManager();
+        this.testSchemaManager.setOwlManager(testOWLManager);
+        this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
         
         this.testArtifactManager = this.getNewArtifactManager();
-        this.testArtifactManager.setFileReferenceManager(testFileReferenceManager);
+        this.testArtifactManager.setRepositoryManager(this.testRepositoryManager);
+        // TODO: Implement File Reference Manager
+        // this.testArtifactManager.setFileReferenceManager(testFileReferenceManager);
         this.testArtifactManager.setPurlManager(testPurlManager);
         this.testArtifactManager.setOwlManager(testOWLManager);
-        this.testArtifactManager.setSchemaManager(testSchemaManager);
+        this.testArtifactManager.setSchemaManager(this.testSchemaManager);
     }
     
     /**
@@ -200,6 +244,12 @@ public abstract class AbstractPoddArtifactManagerTest
     }
     
     @Test
+    public final void testGetRepositoryManager() throws Exception
+    {
+        Assert.assertNotNull("Repository Manager was null", this.testArtifactManager.getRepositoryManager());
+    }
+    
+    @Test
     public final void testGetSchemaManager() throws Exception
     {
         Assert.assertNotNull("Schema Manager was null", this.testArtifactManager.getSchemaManager());
@@ -213,7 +263,8 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactBasicSuccess() throws Exception
     {
-        final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";
@@ -238,7 +289,8 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testPublishArtifact() throws Exception
     {
-        final InputStream inputStream = this.getClass().getResourceAsStream("/testArtifact.rdf");
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";

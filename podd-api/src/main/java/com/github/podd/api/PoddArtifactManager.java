@@ -85,6 +85,12 @@ public interface PoddArtifactManager
     
     /**
      * 
+     * @return The {@link PoddRepositoryManager} used to manage access to the {@link Repository}.
+     */
+    PoddRepositoryManager getRepositoryManager();
+    
+    /**
+     * 
      * @return The {@link PoddSchemaManager} used to access and verify versions of Schema Ontologies
      *         used in artifacts.
      */
@@ -139,6 +145,8 @@ public interface PoddArtifactManager
     void setOwlManager(PoddOWLManager owlManager);
     
     void setPurlManager(PoddPurlManager purlManager);
+    
+    void setRepositoryManager(PoddRepositoryManager repositoryManager);
     
     void setSchemaManager(PoddSchemaManager schemaManager);
     

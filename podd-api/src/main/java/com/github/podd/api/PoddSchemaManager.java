@@ -117,9 +117,17 @@ public interface PoddSchemaManager
     /**
      * Sets the shared PoddOWLManager to use for Schema Ontologies and Artifact Ontologies.
      * 
-     * @param testOWLManager
+     * @param owlManager
+     *            The PoddOWLManager
      */
-    void setOwlManager(PoddOWLManager testOWLManager);
+    void setOwlManager(PoddOWLManager owlManager);
+    
+    /**
+     * 
+     * @param repositoryManager
+     *            The PoddRepositoryManager
+     */
+    void setRepositoryManager(PoddRepositoryManager repositoryManager);
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema

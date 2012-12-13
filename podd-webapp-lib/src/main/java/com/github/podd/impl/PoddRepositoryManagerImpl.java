@@ -30,7 +30,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         {
             this.repository.initialize();
         }
-        catch(RepositoryException e)
+        catch(final RepositoryException e)
         {
             throw new RuntimeException("Could not initialise PoddRepositoryManager with an in-memory repository");
         }
@@ -41,7 +41,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
      * @param repository
      *            An initialized implementation of Repository.
      */
-    public PoddRepositoryManagerImpl(Repository repository)
+    public PoddRepositoryManagerImpl(final Repository repository)
     {
         this.repository = repository;
     }
@@ -64,7 +64,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
      * com.github.podd.api.PoddRepositoryManager#setRepository(org.openrdf.repository.Repository)
      */
     @Override
-    public void setRepository(Repository repository) throws OpenRDFException
+    public void setRepository(final Repository repository) throws OpenRDFException
     {
         this.repository = repository;
     }

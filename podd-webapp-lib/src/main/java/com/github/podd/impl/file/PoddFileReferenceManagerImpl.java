@@ -37,7 +37,8 @@ import com.github.podd.utils.PoddRdfUtils;
 public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
 {
     // Initially setup the registry to the global instance
-    private PoddFileReferenceProcessorFactoryRegistry registry = PoddFileReferenceProcessorFactoryRegistry.getInstance();
+    private PoddFileReferenceProcessorFactoryRegistry registry = PoddFileReferenceProcessorFactoryRegistry
+            .getInstance();
     private PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
