@@ -49,7 +49,7 @@ public abstract class AbstractPoddOWLManagerTest
     
     protected RepositoryConnection testRepositoryConnection;
     
-    private String poddBaseResourcePath = "/test/ontologies/poddBase.owl";
+    private String poddBaseResourcePath = "/ontologies/poddBase.owl";
     
     /**
      * @return A new OWLReasonerFactory instance for use with the PoddOWLManager
