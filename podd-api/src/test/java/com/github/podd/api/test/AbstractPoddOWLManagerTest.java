@@ -24,7 +24,9 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
+import org.semanticweb.owlapi.io.UnparsableOntologyException;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -315,6 +317,80 @@ public abstract class AbstractPoddOWLManagerTest
                 .toQuotedString());
         Assert.assertEquals("<http://purl.org/podd/ns/version/poddBase/1>", loadedOntology.getOntologyID()
                 .getVersionIRI().toQuotedString());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#loadOntology(org.semanticweb.owlapi.rio.RioMemoryTripleSource)}
+     * . Attempts to load an RDF resource which does not contain an ontology.
+     */
+    @Test
+    public void testLoadOntologyFromEmptyOWLOntologyDocumentSource() throws Exception
+    {
+        // prepare: load an ontology into a StreamDocumentSource
+        final InputStream inputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
+        Assert.assertNotNull("Could not find resource", inputStream);
+        
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType()));
+        
+        try
+        {
+            this.testOWLManager.loadOntology(owlSource);
+            Assert.fail("Should have thrown an OWLOntologyCreationException");
+        }
+        catch(final OWLOntologyCreationException e)
+        {
+            Assert.assertEquals("Unexpected message in expected Exception", "Loaded ontology is empty", e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#loadOntology(org.semanticweb.owlapi.rio.RioMemoryTripleSource)}
+     * . Attempts to load a non-RDF resource.
+     */
+    @Test
+    public void testLoadOntologyFromTextDocumentSource() throws Exception
+    {
+        // prepare: load an ontology into a StreamDocumentSource
+        final InputStream inputStream = this.getClass().getResourceAsStream("/test/ontologies/justatextfile.owl");
+        Assert.assertNotNull("Could not find resource", inputStream);
+        
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType()));
+        
+        try
+        {
+            this.testOWLManager.loadOntology(owlSource);
+            Assert.fail("Should have thrown an OWLOntologyCreationException");
+        }
+        catch(final OWLOntologyCreationException e)
+        {
+            Assert.assertTrue("Exception not expected type", e instanceof UnparsableOntologyException);
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#loadOntology(org.semanticweb.owlapi.rio.RioMemoryTripleSource)}
+     * . Attempts to pass NULL value into loadOntlogy().
+     */
+    @Test
+    public void testLoadOntologyWithNull() throws Exception
+    {
+        try
+        {
+            this.testOWLManager.loadOntology(null);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final RuntimeException e)
+        {
+            Assert.assertTrue("Exception not expected type", e instanceof NullPointerException);
+            // this exception is thrown by the OWL API with a null message
+        }
     }
     
     /**
