@@ -6,8 +6,7 @@ package com.github.podd.api.purl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.owlapi.util.AbstractServiceLoader;
-
+import com.github.ansell.abstractserviceloader.AbstractServiceLoader;
 import com.github.podd.api.PoddProcessorStage;
 
 /**
