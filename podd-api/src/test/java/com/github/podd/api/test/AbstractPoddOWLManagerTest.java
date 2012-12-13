@@ -124,7 +124,7 @@ public abstract class AbstractPoddOWLManagerTest
         final OWLOntology loadedOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
         
         final URI schemaOntologyGraph = loadedOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        final URI inferredOntologyGraph = null;
+        // final URI inferredOntologyGraph = null;
         
         // prepare: load poddBase schema ontology into the test repository
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, schemaOntologyGraph);
@@ -337,8 +337,9 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testIsPublishedOWLOntologyID() throws Exception
     {
-        // look for object property http://purl.org/podd/ns/poddBase#hasPublicationStatus
+        final OWLOntologyID ontologyID = null;
         
+        this.testOWLManager.isPublished(ontologyID, this.testRepositoryConnection);
         Assert.fail("TODO: Implement me");
     }
     

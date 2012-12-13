@@ -116,12 +116,12 @@ public interface PoddOWLManager
      * Infer statements for the given {@link OWLOntologyID} into the given permanent repository
      * connection.
      * 
-     * @param ontologyId
+     * @param ontologyID
      * @param permanentRepositoryConnection
-     * @return The InferredOWLOntologyID representing the ontologyId, along with the IRI of the
+     * @return The InferredOWLOntologyID representing the ontologyID, along with the IRI of the
      *         Inferred Ontology.
      */
-    InferredOWLOntologyID inferStatements(OWLOntologyID ontologyId, RepositoryConnection permanentRepositoryConnection);
+    InferredOWLOntologyID inferStatements(OWLOntologyID ontologyID, RepositoryConnection permanentRepositoryConnection);
     
     /**
      * Returns true if the given ontologyIRI is either an Ontology IRI and it has a published
@@ -134,12 +134,14 @@ public interface PoddOWLManager
     
     /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
-     * ontologyId were previously published.
+     * ontologyID were previously published.
      * 
-     * @param ontologyId
+     * @param ontologyID
+     * @param repositoryConnection
      * @return
+     * @throws OpenRDFException
      */
-    boolean isPublished(OWLOntologyID ontologyId);
+    boolean isPublished(OWLOntologyID ontologyID, RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     /**
      * Loads an ontology into memory from an OWLOntologyDocumentSource.
@@ -194,11 +196,11 @@ public interface PoddOWLManager
      * Sets the current version for the Ontology {@link IRI} in the given {@link OWLOntologyID} to
      * be the given version.
      * 
-     * @param ontologyId
+     * @param ontologyID
      * @throws IllegalArgumentException
-     *             If the ontologyId does not have a version.
+     *             If the ontologyID does not have a version.
      */
-    void setCurrentVersion(OWLOntologyID ontologyId);
+    void setCurrentVersion(OWLOntologyID ontologyID);
     
     /**
      * Map a single OWLOntologyManager into this PoddOWLManager.
@@ -212,12 +214,12 @@ public interface PoddOWLManager
      * Sets the given OWLOntologyID to be published, restricting the ability of the ontology to be
      * published again.
      * 
-     * @param ontologyId
+     * @param ontologyID
      *            The OWLOntologyID that needs to be published
      * @throws PublishArtifactException
-     *             If the ontologyId could not be published.
+     *             If the ontologyID could not be published.
      */
-    InferredOWLOntologyID setPublished(OWLOntologyID ontologyId) throws PublishArtifactException;
+    InferredOWLOntologyID setPublished(OWLOntologyID ontologyID) throws PublishArtifactException;
     
     /**
      * Sets the {@link OWLReasonerFactory} to use when creating instances of {@link OWLReasoner} to

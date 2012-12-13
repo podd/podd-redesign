@@ -8,6 +8,9 @@ import java.util.List;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
+import org.openrdf.query.BooleanQuery;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -28,6 +31,7 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddBase;
 
 /**
  * Implementation of PoddOWLManager interface.
@@ -123,9 +127,35 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public boolean isPublished(final OWLOntologyID ontologyId)
+    public boolean isPublished(final OWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
+        throws OpenRDFException
     {
-        throw new RuntimeException("TODO: Implement isPublished(OWLOntologyID)");
+        
+        // FIXME: incomplete and untested
+        
+        // look for object property http://purl.org/podd/ns/poddBase#hasPublicationStatus
+        // <poddBase:hasPublicationStatus
+        // rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
+        
+        final OWLOntology ontology = this.owlOntologyManager.getOntology(ontologyID);
+        if(ontology == null || ontology.isEmpty())
+        {
+            return false;
+        }
+        
+        final String sparqlQuery =
+                "ASK { " + " ?subject <" + PoddBase.HAS_PUBLICATION_STATUS + "> <" + PoddBase.PUBLISHED + "> }";
+        
+        final BooleanQuery booleanQuery = repositoryConnection.prepareBooleanQuery(QueryLanguage.SPARQL, sparqlQuery);
+        
+        // Create a dataset to specify the contexts
+        final DatasetImpl dataset = new DatasetImpl();
+        final URI artifactGraphUri = ontologyID.getVersionIRI().toOpenRDFURI();
+        dataset.addDefaultGraph(artifactGraphUri);
+        dataset.addNamedGraph(artifactGraphUri);
+        booleanQuery.setDataset(dataset);
+        
+        return booleanQuery.evaluate();
     }
     
     @Override
@@ -199,7 +229,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public void setCurrentVersion(final OWLOntologyID ontologyId)
+    public void setCurrentVersion(final OWLOntologyID ontologyID)
     {
         throw new RuntimeException("TODO: Implement setCurrentVersion");
     }
@@ -212,7 +242,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public InferredOWLOntologyID setPublished(final OWLOntologyID ontologyId) throws PublishArtifactException
+    public InferredOWLOntologyID setPublished(final OWLOntologyID ontologyID) throws PublishArtifactException
     {
         throw new RuntimeException("TODO: Implement setPublished");
     }
