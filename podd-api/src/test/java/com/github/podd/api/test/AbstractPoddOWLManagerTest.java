@@ -514,7 +514,7 @@ public abstract class AbstractPoddOWLManagerTest
      * 
      */
     @Test
-    public void testParseRDFStatementsWithEmptyRepository() throws Exception
+    public void testParseRDFStatementsFromEmptyRepository() throws Exception
     {
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
         try
@@ -534,7 +534,7 @@ public abstract class AbstractPoddOWLManagerTest
      * non-empty and anonymous Ontology is loaded to the memory.
      */
     @Test
-    public void testParseRDFStatementsWithOneStatementInRepository() throws Exception
+    public void testParseRDFStatementsFromRepositoryWithOneStatement() throws Exception
     {
         // prepare: add a single statement to the Repository so that it is not empty
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
@@ -563,11 +563,94 @@ public abstract class AbstractPoddOWLManagerTest
      * .
      * 
      */
-    @Ignore
     @Test
     public void testRemoveCache() throws Exception
     {
-        Assert.fail("TODO: Implement me");
+        // prepare: load an ontology into the OWLManager
+        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType()));
+        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
+        
+        final OWLOntologyID ontologyID = loadedOntology.getOntologyID();
+        final OWLOntology ontologyLoadedFromMemory = this.testOWLManager.getOntology(ontologyID);
+        Assert.assertNotNull("Ontology should be in memory", ontologyLoadedFromMemory);
+        
+        final boolean removed = this.testOWLManager.removeCache(ontologyID);
+        
+        // verify:
+        Assert.assertTrue("Ontology could not be removed from cache", removed);
+        
+        final OWLOntology ontologyFromMemoryShouldBeNull = this.testOWLManager.getOntology(ontologyID);
+        Assert.assertNull("Ontology is still in cache", ontologyFromMemoryShouldBeNull);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#removeCache(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testRemoveCacheWithOntologyNotInMemory() throws Exception
+    {
+        // prepare: create an ontology externally
+        final OWLOntology ontologyLoadedFromMemory =
+                OWLOntologyManagerFactoryRegistry.createOWLOntologyManager().createOntology();
+        Assert.assertNotNull("Ontology should not be in memory", ontologyLoadedFromMemory);
+        
+        final OWLOntologyID ontologyID = ontologyLoadedFromMemory.getOntologyID();
+        final boolean removed = this.testOWLManager.removeCache(ontologyID);
+        
+        // verify:
+        Assert.assertFalse("Ontology should not have existed in memory/cache", removed);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#removeCache(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testRemoveCacheWithEmptyOntology() throws Exception
+    {
+        // prepare: create an empty ontology inside this OWLManager
+        final OWLOntologyID ontologyID = this.testOWLManager.getOWLOntologyManager().createOntology().getOntologyID();
+        final OWLOntology theOntologyFromMemory = this.testOWLManager.getOntology(ontologyID);
+        Assert.assertNotNull("The ontology was not in memory", theOntologyFromMemory);
+        Assert.assertTrue("Ontology was not empty", theOntologyFromMemory.isEmpty());
+        
+        final boolean removed = this.testOWLManager.removeCache(ontologyID);
+        
+        // verify:
+        Assert.assertTrue("Ontology could not be removed from cache", removed);
+        
+        final OWLOntology ontologyFromMemoryShouldBeNull = this.testOWLManager.getOntology(ontologyID);
+        Assert.assertNull("Ontology is still in cache", ontologyFromMemoryShouldBeNull);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#removeCache(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testRemoveCacheWithNullOntology() throws Exception
+    {
+        try
+        {
+            this.testOWLManager.removeCache(null);
+            Assert.fail("Should have thrown a RuntimeException");
+        }
+        catch(final RuntimeException e)
+        {
+            Assert.assertTrue("Not the expected type of Exception", e instanceof NullPointerException);
+            // this exception is thrown by the OWL API with a null message
+        }
     }
     
     /**
