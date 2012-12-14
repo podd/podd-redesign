@@ -121,8 +121,11 @@ public interface PoddOWLManager
      * @param permanentRepositoryConnection
      * @return The InferredOWLOntologyID representing the ontologyID, along with the IRI of the
      *         Inferred Ontology.
+     * @throws OWLException 
+     * @throws OpenRDFException
+     * @throws IOException 
      */
-    InferredOWLOntologyID inferStatements(OWLOntologyID ontologyID, RepositoryConnection permanentRepositoryConnection);
+    InferredOWLOntologyID inferStatements(OWLOntologyID ontologyID, RepositoryConnection permanentRepositoryConnection) throws OWLException, OpenRDFException, IOException;
     
     /**
      * Returns true if the given ontologyIRI is either an Ontology IRI and it has a published

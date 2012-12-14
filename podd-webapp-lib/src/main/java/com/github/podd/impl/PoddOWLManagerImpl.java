@@ -139,7 +139,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     
     @Override
     public InferredOWLOntologyID inferStatements(final OWLOntologyID inferredOWLOntologyID,
-            final RepositoryConnection permanentRepositoryConnection)
+            final RepositoryConnection permanentRepositoryConnection) throws OWLException, OpenRDFException,
+        IOException
     {
         throw new RuntimeException("TODO: Implement inferStatements");
     }
@@ -304,13 +305,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      */
     @Override
     public void dumpOntologyToRepository(final OWLOntology nextOntology,
-            final RepositoryConnection nextRepositoryConnection, URI... contexts) throws IOException,
+            final RepositoryConnection nextRepositoryConnection, final URI... contexts) throws IOException,
         RepositoryException
     {
         if(nextOntology.getOntologyID().getVersionIRI() == null)
         {
             throw new IllegalArgumentException(
-                    "Cannot dump and ontology to repository if it does not have a version IRI");
+                    "Cannot dump an ontology to repository if it does not have a version IRI");
         }
         
         // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
