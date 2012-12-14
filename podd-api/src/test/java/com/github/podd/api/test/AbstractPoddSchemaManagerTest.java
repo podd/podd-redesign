@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.rio.RDFFormat;
+import org.semanticweb.owlapi.io.UnparsableOntologyException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -478,11 +479,26 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideInvalidRdfXml() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+            IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
+            IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
+            OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
+            this.owlapiManager.createOntology(emptyOntologyID);
+            
+            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/justatextfile.owl");
+            
+            this.testSchemaManager.uploadSchemaOntology(emptyOntologyID, testInputStream, RDFFormat.RDFXML);
+            
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(UnparsableOntologyException e)
+        {
+            Assert.assertTrue("Message was not as expected", e.getMessage().startsWith("Problem parsing "));
+        }
     }
     
     /**
@@ -490,11 +506,26 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideInvalidTurtle() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+            IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
+            IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
+            OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
+            this.owlapiManager.createOntology(emptyOntologyID);
+            
+            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/invalidturtle.ttl");
+            
+            this.testSchemaManager.uploadSchemaOntology(emptyOntologyID, testInputStream, RDFFormat.TURTLE);
+            
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(UnparsableOntologyException e)
+        {
+            Assert.assertTrue("Message was not as expected", e.getMessage().startsWith("Problem parsing "));
+        }
     }
     
     /**
