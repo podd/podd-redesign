@@ -538,11 +538,24 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideNullInput() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+            IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
+            IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
+            OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
+            this.owlapiManager.createOntology(emptyOntologyID);
+            
+            this.testSchemaManager.uploadSchemaOntology(emptyOntologyID, null, RDFFormat.RDFXML);
+            
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(NullPointerException e)
+        {
+            Assert.assertEquals("Message was not as expected", "Schema Ontology input stream was null", e.getMessage());
+        }
     }
     
     /**
