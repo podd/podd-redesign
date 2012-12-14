@@ -3,11 +3,20 @@
  */
 package com.github.podd.api.test;
 
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
+import com.github.podd.api.PoddOWLManager;
+import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 
 /**
@@ -18,10 +27,32 @@ import com.github.podd.api.PoddSchemaManager;
  */
 public abstract class AbstractPoddSchemaManagerTest
 {
+    private PoddSchemaManager testSchemaManager;
+    private PoddOWLManager testOwlManager;
+    private PoddRepositoryManager testRepositoryManager;
+    private OWLOntologyManager owlapiManager;
+    
     /**
      * 
-     * @return A new instance of PoddSchemaManager, which operates on an empty repository, for each
-     *         call to this method.
+     * @return A new instance of PoddOWLManager, for each call to this method.
+     */
+    protected abstract PoddOWLManager getNewPoddOwlManagerInstance();
+    
+    /**
+     * 
+     * @return A new instance of OWLOntologyManager, for each call to this method.
+     */
+    protected abstract OWLOntologyManager getNewOwlOntologyManagerInstance();
+    
+    /**
+     * 
+     * @return A new instance of PoddRepositoryManager, for each call to this method.
+     */
+    protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance();
+    
+    /**
+     * 
+     * @return A new instance of PoddSchemaManager, for each call to this method.
      */
     protected abstract PoddSchemaManager getNewPoddSchemaManagerInstance();
     
@@ -31,6 +62,15 @@ public abstract class AbstractPoddSchemaManagerTest
     @Before
     public void setUp() throws Exception
     {
+        this.testSchemaManager = this.getNewPoddSchemaManagerInstance();
+        
+        this.testRepositoryManager = this.getNewPoddRepositoryManagerInstance();
+        this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
+        
+        this.testOwlManager = this.getNewPoddOwlManagerInstance();
+        this.owlapiManager = this.getNewOwlOntologyManagerInstance();
+        this.testOwlManager.setOWLOntologyManager(owlapiManager);
+        this.testSchemaManager.setOwlManager(this.testOwlManager);
     }
     
     /**
@@ -39,6 +79,7 @@ public abstract class AbstractPoddSchemaManagerTest
     @After
     public void tearDown() throws Exception
     {
+        this.testSchemaManager = null;
     }
     
     /**
@@ -46,6 +87,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyMatchingOntologyID() throws Exception
     {
@@ -57,6 +99,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyNotMatchingVersion() throws Exception
     {
@@ -68,6 +111,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyNullOntologyID() throws Exception
     {
@@ -79,6 +123,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyNullOutputStream() throws Exception
     {
@@ -90,6 +135,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyOnlyOntologyIRI() throws Exception
     {
@@ -101,6 +147,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntologyWithInferences(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyWithInferencesMatchingOntologyID() throws Exception
     {
@@ -112,6 +159,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntologyWithInferences(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyWithInferencesNoInferencesFound() throws Exception
     {
@@ -123,6 +171,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntologyWithInferences(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyWithInferencesNotMatchingVersion() throws Exception
     {
@@ -134,6 +183,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntologyWithInferences(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyWithInferencesNullOntologyID() throws Exception
     {
@@ -145,6 +195,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntologyWithInferences(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyWithInferencesNullOutputStream() throws Exception
     {
@@ -156,6 +207,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#downloadSchemaOntologyWithInferences(org.semanticweb.owlapi.model.OWLOntologyID, java.io.OutputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testDownloadSchemaOntologyWithInferencesOnlyOntologyIRI() throws Exception
     {
@@ -167,6 +219,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetCurrentSchemaOntologyVersionMatchesOntologyIRI() throws Exception
     {
@@ -178,6 +231,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetCurrentSchemaOntologyVersionMatchesOntologyVersionIRICurrent() throws Exception
     {
@@ -189,6 +243,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetCurrentSchemaOntologyVersionMatchesOntologyVersionIRINotCurrent() throws Exception
     {
@@ -200,6 +255,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetCurrentSchemaOntologyVersionNoMatches() throws Exception
     {
@@ -211,6 +267,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetCurrentSchemaOntologyVersionNull() throws Exception
     {
@@ -225,6 +282,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * Test that the designated current version is retrieved when an ontology IRI is given and there
      * are multiple versions available.
      */
+    @Ignore
     @Test
     public final void testGetSchemaOntologyIRIMatchesOntologyIRIMultipleVersions() throws Exception
     {
@@ -236,6 +294,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetSchemaOntologyIRIMatchesOntologyIRIOneVersion() throws Exception
     {
@@ -247,6 +306,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetSchemaOntologyIRIMatchesVersionIRI() throws Exception
     {
@@ -258,6 +318,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetSchemaOntologyIRINull() throws Exception
     {
@@ -269,6 +330,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetSchemaOntologyOWLOntologyIDNullOntologyID() throws Exception
     {
@@ -280,6 +342,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetSchemaOntologyOWLOntologyIDNullVersionIRI() throws Exception
     {
@@ -291,6 +354,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetSchemaOntologyOWLOntologyIDOntologyExists() throws Exception
     {
@@ -302,6 +366,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetSchemaOntologyOWLOntologyIDOntologyIRIDoesNotExist() throws Exception
     {
@@ -313,6 +378,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
+    @Ignore
     @Test
     public final void testGetSchemaOntologyOWLOntologyIDOntologyVersionDoesNotExist() throws Exception
     {
@@ -324,6 +390,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#setCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
+    @Ignore
     @Test
     public final void testSetCurrentSchemaOntologyVersionOneVersionOfOntology() throws Exception
     {
@@ -335,6 +402,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#setCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
+    @Ignore
     @Test
     public final void testSetCurrentSchemaOntologyVersionTwoVersionsOfOntologyChange() throws Exception
     {
@@ -346,6 +414,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#setCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
+    @Ignore
     @Test
     public final void testSetCurrentSchemaOntologyVersionTwoVersionsOfOntologyNoChange() throws Exception
     {
@@ -357,6 +426,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyEmpty() throws Exception
     {
@@ -367,12 +437,15 @@ public abstract class AbstractPoddSchemaManagerTest
      * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
-     * 
-     * ??
      */
     @Test
     public final void testUploadSchemaOntologyIDOverrideEmpty() throws Exception
     {
+        IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
+        IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
+        OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
+        this.owlapiManager.createOntology(emptyOntologyID);
+        
         Assert.fail("Not yet implemented"); // TODO
     }
     
@@ -381,6 +454,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideInvalidRdfXml() throws Exception
     {
@@ -392,6 +466,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideInvalidTurtle() throws Exception
     {
@@ -403,6 +478,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideNoOntologyIRI() throws Exception
     {
@@ -414,6 +490,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideNotConsistent() throws Exception
     {
@@ -425,6 +502,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideNotInProfile() throws Exception
     {
@@ -436,6 +514,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideNullInput() throws Exception
     {
@@ -447,6 +526,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideOnlyOntologyIRI() throws Exception
     {
@@ -458,6 +538,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(org.semanticweb.owlapi.model.OWLOntologyID, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyIDOverrideWithOntologyIRIAndVersionIRI() throws Exception
     {
@@ -469,6 +550,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyInvalidRdfXml() throws Exception
     {
@@ -480,6 +562,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyInvalidTurtle() throws Exception
     {
@@ -491,6 +574,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyNoOntologyIRI() throws Exception
     {
@@ -502,6 +586,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyNotConsistent() throws Exception
     {
@@ -513,6 +598,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyNotInProfile() throws Exception
     {
@@ -524,6 +610,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyNullInput() throws Exception
     {
@@ -535,6 +622,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyOnlyOntologyIRI() throws Exception
     {
@@ -546,6 +634,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologyWithOntologyIRIAndVersionIRI() throws Exception
     {
