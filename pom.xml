@@ -75,7 +75,7 @@
         <mockito.version>1.9.5</mockito.version>
         <podd-ontologies.version>1-SNAPSHOT</podd-ontologies.version>
         <owlapi.version>3.4.3.1-ansell-SNAPSHOT</owlapi.version>
-        <pellet.version>2.3.1-SNAPSHOT</pellet.version>
+        <pellet.version>2.3.2-SNAPSHOT</pellet.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <restlet.version>2.1.0</restlet.version>
