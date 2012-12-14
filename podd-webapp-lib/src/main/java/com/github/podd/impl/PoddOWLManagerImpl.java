@@ -75,7 +75,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     @Override
     public InferredOWLOntologyID generateInferredOntologyID(final OWLOntologyID ontologyID)
     {
-        throw new RuntimeException("TODO: Implement generateInferredOntologyID");
+        if(ontologyID == null || ontologyID.getOntologyIRI() == null || ontologyID.getVersionIRI() == null)
+        {
+            throw new NullPointerException("OWLOntology is incomplete");
+        }
+        
+        final IRI inferredOntologyIRI = IRI.create(PoddRdfConstants.INFERRED_PREFIX + ontologyID.getVersionIRI());
+        
+        return new InferredOWLOntologyID(ontologyID.getOntologyIRI(), ontologyID.getVersionIRI(), inferredOntologyIRI);
     }
     
     @Override
@@ -106,8 +113,19 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public OWLProfile getReasonerProfile()
     {
         final Set<OWLProfile> profiles = this.reasonerFactory.getSupportedProfiles();
-        
-        throw new RuntimeException("TODO: Implement getReasonerProfile");
+        if(!profiles.isEmpty())
+        {
+            if(profiles.size() > 1)
+            {
+                this.log.info("Reasoner factory supports {} profiles. Returning one of: {}", profiles.size(), profiles);
+            }
+            return profiles.iterator().next();
+        }
+        else
+        {
+            this.log.warn("Could not find any supported OWL Profiles");
+            return null;
+        }
     }
     
     @Override
@@ -159,9 +177,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final String sparqlQuery =
                 "ASK { " + "?artifact <" + PoddRdfConstants.OWL_VERSION_IRI.stringValue() + "> "
                         + ontologyID.getVersionIRI().toQuotedString() + " . " + "?artifact <"
-                        + PoddRdfConstants.HAS_TOP_OBJECT.stringValue() + "> ?top ." + " ?top <"
-                        + PoddRdfConstants.HAS_PUBLICATION_STATUS.stringValue() + "> <"
-                        + PoddRdfConstants.PUBLISHED.stringValue() + ">" + " }";
+                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT.stringValue() + "> ?top ." + " ?top <"
+                        + PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS.stringValue() + "> <"
+                        + PoddRdfConstants.PODDBASE_PUBLISHED.stringValue() + ">" + " }";
         
         this.log.info("Generated SPARQL {}", sparqlQuery);
         

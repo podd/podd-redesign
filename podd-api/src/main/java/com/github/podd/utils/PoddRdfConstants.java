@@ -16,18 +16,25 @@ import org.openrdf.model.vocabulary.OWL;
  */
 public interface PoddRdfConstants
 {
-    public static final ValueFactory VALUE_FACTORY = ValueFactoryImpl.getInstance();
+    /**
+     * An arbitrary prefix to use for automatically assigning ontology IRIs to inferred ontologies.
+     * There are no versions delegated to inferred ontologies, and the ontology IRI is generated
+     * using the version IRI of the original ontology, which must be unique.
+     */
+    public static final String INFERRED_PREFIX = "urn:podd:inferred:ontologyiriprefix:";
+    
+    public static final URI OWL_VERSION_IRI = PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "versionIRI");
     
     public static final String PODD_BASE = "http://purl.org/podd/ns/poddBase#";
     
-    public static final URI HAS_PUBLICATION_STATUS = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODDBASE_HAS_PUBLICATION_STATUS = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasPublicationStatus");
     
-    public static final URI PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "Published");
-    
-    public static final URI HAS_TOP_OBJECT = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+    public static final URI PODDBASE_HAS_TOP_OBJECT = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "artifactHasTopObject");
     
-    public static final URI OWL_VERSION_IRI = PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "versionIRI");
+    public static final URI PODDBASE_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "Published");
+    
+    public static final ValueFactory VALUE_FACTORY = ValueFactoryImpl.getInstance();
 }

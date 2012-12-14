@@ -30,20 +30,25 @@ import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.io.UnparsableOntologyException;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Abstract test to verify that the PoddOWLManager API contract is followed by implementations.
@@ -55,6 +60,8 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public abstract class AbstractPoddOWLManagerTest
 {
+    
+    protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private String poddBaseResourcePath = "/ontologies/poddBase.owl";
     
@@ -73,6 +80,27 @@ public abstract class AbstractPoddOWLManagerTest
      * @return A new instance of PoddOWLManager, for each call to this method
      */
     protected abstract PoddOWLManager getNewPoddOWLManagerInstance();
+    
+    private boolean internalTestIsPublishedOWLOntologyID(final String testResourcePath) throws OWLException,
+        IOException, PoddException, RDFParseException, RepositoryException, OpenRDFException
+    {
+        // prepare: load the ontology into the OWLManager
+        final InputStream artifact1InputStream = this.getClass().getResourceAsStream(testResourcePath);
+        Assert.assertNotNull("Could not find resource", artifact1InputStream);
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(artifact1InputStream, OWLOntologyFormatFactoryRegistry.getInstance()
+                        .getByMIMEType(RDFFormat.RDFXML.getDefaultMIMEType()));
+        final OWLOntologyID artifactOntologyID = this.testOWLManager.loadOntology(owlSource).getOntologyID();
+        final URI artifactGraph = artifactOntologyID.getVersionIRI().toOpenRDFURI();
+        
+        // prepare: load the ontology into the test repository
+        final InputStream artifact1InputStreamAgain = this.getClass().getResourceAsStream(testResourcePath);
+        this.testRepositoryConnection.add(artifact1InputStreamAgain, "", RDFFormat.RDFXML, artifactGraph);
+        Assert.assertEquals("Not the expected number of statements in Repository", 24,
+                this.testRepositoryConnection.size(artifactGraph));
+        
+        return this.testOWLManager.isPublished(artifactOntologyID, this.testRepositoryConnection);
+    }
     
     /**
      * @throws java.lang.Exception
@@ -213,11 +241,65 @@ public abstract class AbstractPoddOWLManagerTest
      * .
      * 
      */
-    @Ignore
     @Test
     public void testGenerateInferredOntologyID() throws Exception
     {
-        Assert.fail("TODO: Implement me");
+        // prepare: create an OntologyID
+        final OWLOntologyID ontologyID =
+                new OWLOntologyID(IRI.create("http://purl.org/podd/ns/poddBase"),
+                        IRI.create("http://purl.org/podd/ns/version/poddBase/1"));
+        
+        final InferredOWLOntologyID inferredOntologyID = this.testOWLManager.generateInferredOntologyID(ontologyID);
+        
+        // verify:
+        Assert.assertNotNull("InferredOntologyID was null", inferredOntologyID);
+        Assert.assertNotNull("Inferred Ontology IRI was null", inferredOntologyID.getInferredOntologyIRI());
+        Assert.assertEquals("Inferred IRI was not as expected",
+                IRI.create(PoddRdfConstants.INFERRED_PREFIX + "http://purl.org/podd/ns/version/poddBase/1"),
+                inferredOntologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#generateInferredOntologyID(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testGenerateInferredOntologyIDWithEmptyOntologyID() throws Exception
+    {
+        // prepare: create an OntologyID
+        final OWLOntologyID ontologyID = new OWLOntologyID();
+        
+        try
+        {
+            this.testOWLManager.generateInferredOntologyID(ontologyID);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#generateInferredOntologyID(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testGenerateInferredOntologyIDWithNullOntologyID() throws Exception
+    {
+        try
+        {
+            this.testOWLManager.generateInferredOntologyID(null);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
+        }
     }
     
     /**
@@ -287,11 +369,11 @@ public abstract class AbstractPoddOWLManagerTest
      * Test method for {@link com.github.podd.api.PoddOWLManager#getReasonerProfile()} .
      * 
      */
-    @Ignore
     @Test
     public void testGetReasonerProfile() throws Exception
     {
-        Assert.fail("TODO: Implement me");
+        final OWLProfile profile = this.testOWLManager.getReasonerProfile();
+        Assert.assertNotNull("OWLProfile was null", profile);
     }
     
     /**
@@ -339,55 +421,6 @@ public abstract class AbstractPoddOWLManagerTest
      * 
      */
     @Test
-    public void testIsPublishedOWLOntologyIDWithPublishedArtifact() throws Exception
-    {
-        final String testResourcePath = "/test/artifacts/basicProject-1-published.rdf";
-        final boolean isPublished = this.internalTestIsPublishedOWLOntologyID(testResourcePath);
-        Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     * 
-     */
-    @Test
-    public void testIsPublishedOWLOntologyIDWithUnPublishedArtifact() throws Exception
-    {
-        final String testResourcePath = "/test/artifacts/basicProject-1.rdf";
-        final boolean isPublished = this.internalTestIsPublishedOWLOntologyID(testResourcePath);
-        Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
-    }
-    
-    private boolean internalTestIsPublishedOWLOntologyID(final String testResourcePath) throws OWLException,
-        IOException, PoddException, RDFParseException, RepositoryException, OpenRDFException
-    {
-        // prepare: load the ontology into the OWLManager
-        final InputStream artifact1InputStream = this.getClass().getResourceAsStream(testResourcePath);
-        Assert.assertNotNull("Could not find resource", artifact1InputStream);
-        final OWLOntologyDocumentSource owlSource =
-                new StreamDocumentSource(artifact1InputStream, OWLOntologyFormatFactoryRegistry.getInstance()
-                        .getByMIMEType(RDFFormat.RDFXML.getDefaultMIMEType()));
-        final OWLOntologyID artifactOntologyID = this.testOWLManager.loadOntology(owlSource).getOntologyID();
-        final URI artifactGraph = artifactOntologyID.getVersionIRI().toOpenRDFURI();
-        
-        // prepare: load the ontology into the test repository
-        final InputStream artifact1InputStreamAgain = this.getClass().getResourceAsStream(testResourcePath);
-        this.testRepositoryConnection.add(artifact1InputStreamAgain, "", RDFFormat.RDFXML, artifactGraph);
-        Assert.assertEquals("Not the expected number of statements in Repository", 24,
-                this.testRepositoryConnection.size(artifactGraph));
-        
-        return this.testOWLManager.isPublished(artifactOntologyID, this.testRepositoryConnection);
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     * 
-     */
-    @Test
     public void testIsPublishedOWLOntologyIDWithEmptyOntology() throws Exception
     {
         final OWLOntologyID emptyOntologyID =
@@ -422,6 +455,34 @@ public abstract class AbstractPoddOWLManagerTest
         {
             Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
         }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testIsPublishedOWLOntologyIDWithPublishedArtifact() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/basicProject-1-published.rdf";
+        final boolean isPublished = this.internalTestIsPublishedOWLOntologyID(testResourcePath);
+        Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testIsPublishedOWLOntologyIDWithUnPublishedArtifact() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/basicProject-1.rdf";
+        final boolean isPublished = this.internalTestIsPublishedOWLOntologyID(testResourcePath);
+        Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
     }
     
     /**
@@ -675,27 +736,6 @@ public abstract class AbstractPoddOWLManagerTest
      * 
      */
     @Test
-    public void testRemoveCacheWithOntologyNotInMemory() throws Exception
-    {
-        // prepare: create an ontology externally
-        final OWLOntology ontologyLoadedFromMemory =
-                OWLOntologyManagerFactoryRegistry.createOWLOntologyManager().createOntology();
-        Assert.assertNotNull("Ontology should not be in memory", ontologyLoadedFromMemory);
-        
-        final OWLOntologyID ontologyID = ontologyLoadedFromMemory.getOntologyID();
-        final boolean removed = this.testOWLManager.removeCache(ontologyID);
-        
-        // verify:
-        Assert.assertFalse("Ontology should not have existed in memory/cache", removed);
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#removeCache(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     * 
-     */
-    @Test
     public void testRemoveCacheWithEmptyOntology() throws Exception
     {
         // prepare: create an empty ontology inside this OWLManager
@@ -732,6 +772,27 @@ public abstract class AbstractPoddOWLManagerTest
             Assert.assertTrue("Not the expected type of Exception", e instanceof NullPointerException);
             // this exception is thrown by the OWL API with a null message
         }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#removeCache(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testRemoveCacheWithOntologyNotInMemory() throws Exception
+    {
+        // prepare: create an ontology externally
+        final OWLOntology ontologyLoadedFromMemory =
+                OWLOntologyManagerFactoryRegistry.createOWLOntologyManager().createOntology();
+        Assert.assertNotNull("Ontology should not be in memory", ontologyLoadedFromMemory);
+        
+        final OWLOntologyID ontologyID = ontologyLoadedFromMemory.getOntologyID();
+        final boolean removed = this.testOWLManager.removeCache(ontologyID);
+        
+        // verify:
+        Assert.assertFalse("Ontology should not have existed in memory/cache", removed);
     }
     
     /**
