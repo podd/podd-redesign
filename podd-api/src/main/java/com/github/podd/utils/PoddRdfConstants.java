@@ -18,18 +18,25 @@ public interface PoddRdfConstants
 {
     public static final ValueFactory VALUE_FACTORY = ValueFactoryImpl.getInstance();
     
-    public static final String PODD_BASE = "http://purl.org/podd/ns/poddBase#";
-    
-    public static final URI HAS_PUBLICATION_STATUS = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "hasPublicationStatus");
-    
-    public static final URI PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "Published");
-    
-    public static final URI HAS_TOP_OBJECT = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "artifactHasTopObject");
+    /**
+     * An arbitrary prefix to use for automatically assigning ontology IRIs to inferred ontologies.
+     * There are no versions delegated to inferred ontologies, and the ontology IRI is generated
+     * using the version IRI of the original ontology, which must be unique.
+     */
+    public static final String INFERRED_PREFIX = "urn:podd:inferred:ontologyiriprefix:";
     
     public static final URI OWL_VERSION_IRI = PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "versionIRI");
+    
+    public static final String PODD_BASE = "http://purl.org/podd/ns/poddBase#";
+    
+    public static final URI PODDBASE_HAS_PUBLICATION_STATUS = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "hasPublicationStatus");
+    
+    public static final URI PODDBASE_HAS_TOP_OBJECT = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "artifactHasTopObject");
+    
+    public static final URI PODDBASE_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "Published");
     
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are
@@ -41,8 +48,6 @@ public interface PoddRdfConstants
     /**
      * Creating a property for PODD to track the currentInferredVersion for the inferred axioms
      * ontology when linking from the ontology IRI.
-     * 
-     * TODO: Put this in an external ontology somewhere so it isn't dependent on PODD.
      */
     public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "currentInferredVersion");
@@ -50,8 +55,6 @@ public interface PoddRdfConstants
     /**
      * Creating a property for PODD to track the inferredVersion for the inferred axioms ontology of
      * a particular versioned ontology.
-     * 
-     * TODO: Put this in an external ontology somewhere so it isn't dependent on PODD.
      */
     public static final URI PODD_BASE_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "inferredVersion");
