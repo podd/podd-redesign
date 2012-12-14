@@ -181,7 +181,7 @@ public abstract class AbstractPoddArtifactManagerTest
          * testFileRegistry.add(httpFactory);
          */
         
-        PoddFileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
+        final PoddFileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
         testFileReferenceManager.setProcessorFactoryRegistry(testFileRegistry);
         
         /**
