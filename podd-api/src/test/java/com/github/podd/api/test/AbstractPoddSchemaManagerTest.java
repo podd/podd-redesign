@@ -647,11 +647,19 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologyNullInput() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+            this.testSchemaManager.uploadSchemaOntology(null, RDFFormat.RDFXML);
+            
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(NullPointerException e)
+        {
+            Assert.assertEquals("Message was not as expected", "Schema Ontology input stream was null", e.getMessage());
+        }
     }
     
     /**
