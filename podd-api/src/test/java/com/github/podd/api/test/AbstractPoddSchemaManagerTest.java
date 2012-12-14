@@ -618,11 +618,21 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologyInvalidRdfXml() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/justatextfile.owl");
+            
+            this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
+            
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(UnparsableOntologyException e)
+        {
+            Assert.assertTrue("Message was not as expected", e.getMessage().startsWith("Problem parsing "));
+        }
     }
     
     /**
@@ -630,11 +640,21 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologyInvalidTurtle() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/invalidturtle.ttl");
+            
+            this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
+            
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(UnparsableOntologyException e)
+        {
+            Assert.assertTrue("Message was not as expected", e.getMessage().startsWith("Problem parsing "));
+        }
     }
     
     /**
