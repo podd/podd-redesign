@@ -31,7 +31,7 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddBase;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Implementation of PoddOWLManager interface.
@@ -130,27 +130,37 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public boolean isPublished(final OWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
         throws OpenRDFException
     {
-        
-        // FIXME: incomplete and untested
-        
-        // look for object property http://purl.org/podd/ns/poddBase#hasPublicationStatus
-        // <poddBase:hasPublicationStatus
-        // rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
-        
         final OWLOntology ontology = this.owlOntologyManager.getOntology(ontologyID);
         if(ontology == null || ontology.isEmpty())
         {
             return false;
         }
+        final URI artifactGraphUri = ontologyID.getVersionIRI().toOpenRDFURI();
         
+        /*
+         * ASK {
+         * 
+         * ?artifact owl:versionIRI ontology-version .
+         * 
+         * ?artifact poddBase:hasTopObject ?top .
+         * 
+         * ?top poddBase:hasPublicationStatus poddBase:Published .
+         * 
+         * }
+         */
         final String sparqlQuery =
-                "ASK { " + " ?subject <" + PoddBase.HAS_PUBLICATION_STATUS + "> <" + PoddBase.PUBLISHED + "> }";
+                "ASK { " + "?artifact <" + PoddRdfConstants.OWL_VERSION_IRI.stringValue() + "> "
+                        + ontologyID.getVersionIRI().toQuotedString() + " . " + "?artifact <"
+                        + PoddRdfConstants.HAS_TOP_OBJECT.stringValue() + "> ?top ." + " ?top <"
+                        + PoddRdfConstants.HAS_PUBLICATION_STATUS.stringValue() + "> <"
+                        + PoddRdfConstants.PUBLISHED.stringValue() + ">" + " }";
+        
+        this.log.info("Generated SPARQL {}", sparqlQuery);
         
         final BooleanQuery booleanQuery = repositoryConnection.prepareBooleanQuery(QueryLanguage.SPARQL, sparqlQuery);
         
         // Create a dataset to specify the contexts
         final DatasetImpl dataset = new DatasetImpl();
-        final URI artifactGraphUri = ontologyID.getVersionIRI().toOpenRDFURI();
         dataset.addDefaultGraph(artifactGraphUri);
         dataset.addNamedGraph(artifactGraphUri);
         booleanQuery.setDataset(dataset);

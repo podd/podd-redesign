@@ -3,6 +3,7 @@
  */
 package com.github.podd.api.test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -13,19 +14,23 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.io.UnparsableOntologyException;
+import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -37,6 +42,7 @@ import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.EmptyOntologyException;
+import com.github.podd.exception.PoddException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -128,9 +134,8 @@ public abstract class AbstractPoddOWLManagerTest
         
         // prepare: load poddBase schema ontology into the test repository
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, schemaOntologyGraph);
-        final List<Statement> statements =
-                this.testRepositoryConnection.getStatements(null, null, null, false, schemaOntologyGraph).asList();
-        Assert.assertEquals("Not the expected number of statements in Repository", 278, statements.size());
+        Assert.assertEquals("Not the expected number of statements in Repository", 24,
+                this.testRepositoryConnection.size(schemaOntologyGraph));
         
         final InferredOWLOntologyID inferredOntologyID = null;
         
@@ -333,14 +338,77 @@ public abstract class AbstractPoddOWLManagerTest
      * .
      * 
      */
-    @Ignore
     @Test
-    public void testIsPublishedOWLOntologyID() throws Exception
+    public void testIsPublishedOWLOntologyIDWithPublishedArtifact() throws Exception
     {
-        final OWLOntologyID ontologyID = null;
+        final String testResourcePath = "/test/artifacts/basicProject-1-published.rdf";
+        final boolean isPublished = this.internalTestIsPublishedOWLOntologyID(testResourcePath);
+        Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testIsPublishedOWLOntologyIDWithUnPublishedArtifact() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/basicProject-1.rdf";
+        final boolean isPublished = this.internalTestIsPublishedOWLOntologyID(testResourcePath);
+        Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
+    }
+    
+    private boolean internalTestIsPublishedOWLOntologyID(final String testResourcePath) throws OWLException,
+        IOException, PoddException, RDFParseException, RepositoryException, OpenRDFException
+    {
+        // prepare: load the ontology into the OWLManager
+        final InputStream artifact1InputStream = this.getClass().getResourceAsStream(testResourcePath);
+        Assert.assertNotNull("Could not find resource", artifact1InputStream);
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(artifact1InputStream, OWLOntologyFormatFactoryRegistry.getInstance()
+                        .getByMIMEType(RDFFormat.RDFXML.getDefaultMIMEType()));
+        final OWLOntologyID artifactOntologyID = this.testOWLManager.loadOntology(owlSource).getOntologyID();
+        final URI artifactGraph = artifactOntologyID.getVersionIRI().toOpenRDFURI();
         
-        this.testOWLManager.isPublished(ontologyID, this.testRepositoryConnection);
-        Assert.fail("TODO: Implement me");
+        // prepare: load the ontology into the test repository
+        final InputStream artifact1InputStreamAgain = this.getClass().getResourceAsStream(testResourcePath);
+        this.testRepositoryConnection.add(artifact1InputStreamAgain, "", RDFFormat.RDFXML, artifactGraph);
+        Assert.assertEquals("Not the expected number of statements in Repository", 24,
+                this.testRepositoryConnection.size(artifactGraph));
+        
+        return this.testOWLManager.isPublished(artifactOntologyID, this.testRepositoryConnection);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testIsPublishedOWLOntologyIDWithEmptyOntology() throws Exception
+    {
+        final OWLOntologyID emptyOntologyID =
+                this.testOWLManager.getOWLOntologyManager().createOntology().getOntologyID();
+        final boolean isPublished = this.testOWLManager.isPublished(emptyOntologyID, this.testRepositoryConnection);
+        
+        Assert.assertEquals("Empty Ontology cannot be Published", false, isPublished);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testIsPublishedOWLOntologyIDWithNullOntology() throws Exception
+    {
+        final boolean isPublished = this.testOWLManager.isPublished(null, this.testRepositoryConnection);
+        
+        Assert.assertEquals("Empty Ontology cannot be Published", false, isPublished);
     }
     
     /**
@@ -491,9 +559,8 @@ public abstract class AbstractPoddOWLManagerTest
         
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-        final List<Statement> statements =
-                this.testRepositoryConnection.getStatements(null, null, null, false, context).asList();
-        Assert.assertEquals("Not the expected number of statements in Repository", 278, statements.size());
+        Assert.assertEquals("Not the expected number of statements in Repository", 278,
+                this.testRepositoryConnection.size(context));
         
         final OWLOntologyID loadedOntologyID =
                 this.testOWLManager.parseRDFStatements(this.testRepositoryConnection, context);
