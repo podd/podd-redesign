@@ -9,6 +9,7 @@ import java.util.List;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
@@ -229,4 +230,19 @@ public interface PoddOWLManager
      *            The reasoner factory to use for all ontologies in this PoddOWLManager.
      */
     void setReasonerFactory(OWLReasonerFactory reasonerFactory);
+    
+    /**
+     * Dump ontology to the given repository connection, using the Version IRI from the given
+     * ontology as the context if a context is not given.
+     * 
+     * @param nextOntology
+     * @param nextRepositoryConnection
+     * @param contexts
+     *            If this is not null, it is used as the contexts, otherwise the Version IRI from
+     *            the ontology is used as the context.
+     * @throws IOException
+     * @throws RepositoryException
+     */
+    void dumpOntologyToRepository(OWLOntology nextOntology, RepositoryConnection nextRepositoryConnection,
+            URI... contexts) throws IOException, RepositoryException;
 }

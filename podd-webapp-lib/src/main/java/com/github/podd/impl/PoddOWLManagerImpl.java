@@ -13,6 +13,8 @@ import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.util.RDFInserter;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
@@ -24,6 +26,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.semanticweb.owlapi.rio.RioParserImpl;
+import org.semanticweb.owlapi.rio.RioRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -269,6 +272,51 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public void setReasonerFactory(final OWLReasonerFactory reasonerFactory)
     {
         this.reasonerFactory = reasonerFactory;
+    }
+    
+    /**
+     * Dump the triples representing a given ontology into a Sesame Repository.
+     * 
+     * @param nextOntology
+     *            The ontology to dump into the repository.
+     * @param nextRepositoryConnection
+     *            The repository connection to dump the triples into.
+     * @throws IOException
+     * @throws RepositoryException
+     */
+    @Override
+    public void dumpOntologyToRepository(final OWLOntology nextOntology,
+            final RepositoryConnection nextRepositoryConnection, URI... contexts) throws IOException,
+        RepositoryException
+    {
+        if(nextOntology.getOntologyID().getVersionIRI() == null)
+        {
+            throw new IllegalArgumentException(
+                    "Cannot dump and ontology to repository if it does not have a version IRI");
+        }
+        
+        // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
+        // into a specific context in the Sesame Repository
+        final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
+        RioRenderer renderer;
+        
+        if(contexts == null || contexts.length == 0)
+        {
+            repositoryHandler.enforceContext(nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
+            // Render the triples out from OWLAPI into a Sesame Repository
+            renderer =
+                    new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
+                            nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
+        }
+        else
+        {
+            repositoryHandler.enforceContext(contexts);
+            // Render the triples out from OWLAPI into a Sesame Repository
+            renderer =
+                    new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
+                            contexts);
+        }
+        renderer.render();
     }
     
 }

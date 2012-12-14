@@ -3,6 +3,7 @@
  */
 package com.github.podd.api.test;
 
+import java.io.InputStream;
 import java.util.Set;
 
 import org.junit.After;
@@ -10,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -18,6 +20,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.exception.EmptyOntologyException;
 
 /**
  * Abstract test to verify that the PoddSchemaManager API contract is followed by implementations.
@@ -426,11 +429,21 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologyEmpty() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
+            
+            this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
+            
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(EmptyOntologyException e)
+        {
+            Assert.assertEquals("Message was not as expected", "Loaded ontology is empty", e.getMessage());
+        }
     }
     
     /**
@@ -441,12 +454,23 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testUploadSchemaOntologyIDOverrideEmpty() throws Exception
     {
-        IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
-        IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
-        OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
-        this.owlapiManager.createOntology(emptyOntologyID);
-        
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+            IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
+            IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
+            OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
+            this.owlapiManager.createOntology(emptyOntologyID);
+            
+            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
+            
+            this.testSchemaManager.uploadSchemaOntology(emptyOntologyID, testInputStream, RDFFormat.RDFXML);
+            
+            Assert.fail("Did not receive expected exception");
+        }
+        catch(EmptyOntologyException e)
+        {
+            Assert.assertEquals("Message was not as expected", "Loaded ontology is empty", e.getMessage());
+        }
     }
     
     /**

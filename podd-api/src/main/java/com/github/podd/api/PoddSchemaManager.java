@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
@@ -128,6 +129,14 @@ public interface PoddSchemaManager
      *            The PoddRepositoryManager
      */
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
+    
+    /**
+     * Sets the URI context to use for the Schema Ontology Management.
+     * 
+     * @param context
+     *            The context to use for managing the schema ontologies.
+     */
+    void setSchemaManagementContext(URI context);
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
