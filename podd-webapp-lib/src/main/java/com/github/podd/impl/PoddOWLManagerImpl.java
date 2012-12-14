@@ -5,6 +5,7 @@ package com.github.podd.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
@@ -104,6 +105,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     @Override
     public OWLProfile getReasonerProfile()
     {
+        final Set<OWLProfile> profiles = this.reasonerFactory.getSupportedProfiles();
+        
         throw new RuntimeException("TODO: Implement getReasonerProfile");
     }
     
@@ -130,6 +133,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public boolean isPublished(final OWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
         throws OpenRDFException
     {
+        if(ontologyID == null || ontologyID.getOntologyIRI() == null || ontologyID.getVersionIRI() == null)
+        {
+            throw new NullPointerException("OWLOntology is incomplete");
+        }
+        
         final OWLOntology ontology = this.owlOntologyManager.getOntology(ontologyID);
         if(ontology == null || ontology.isEmpty())
         {

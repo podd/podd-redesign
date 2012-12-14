@@ -392,9 +392,16 @@ public abstract class AbstractPoddOWLManagerTest
     {
         final OWLOntologyID emptyOntologyID =
                 this.testOWLManager.getOWLOntologyManager().createOntology().getOntologyID();
-        final boolean isPublished = this.testOWLManager.isPublished(emptyOntologyID, this.testRepositoryConnection);
         
-        Assert.assertEquals("Empty Ontology cannot be Published", false, isPublished);
+        try
+        {
+            this.testOWLManager.isPublished(emptyOntologyID, this.testRepositoryConnection);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
+        }
     }
     
     /**
@@ -406,9 +413,15 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testIsPublishedOWLOntologyIDWithNullOntology() throws Exception
     {
-        final boolean isPublished = this.testOWLManager.isPublished(null, this.testRepositoryConnection);
-        
-        Assert.assertEquals("Empty Ontology cannot be Published", false, isPublished);
+        try
+        {
+            this.testOWLManager.isPublished(null, this.testRepositoryConnection);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
+        }
     }
     
     /**
