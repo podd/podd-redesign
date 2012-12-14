@@ -730,11 +730,12 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologyWithOntologyIRIAndVersionIRI() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        InputStream testInputStream = this.getClass().getResourceAsStream("/ontologies/poddBase.owl");
+        
+        this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
     }
     
 }

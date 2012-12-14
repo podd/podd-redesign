@@ -16,6 +16,7 @@ import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -114,15 +115,19 @@ public interface PoddOWLManager
     List<OWLOntologyID> getVersions(IRI ontologyIRI);
     
     /**
-     * Infer statements for the given {@link OWLOntologyID} into the given permanent repository
+     * Infer statements for the given {@link OWLOntology} into the given permanent repository
      * connection.
      * 
-     * @param ontologyID
+     * @param ontology
      * @param permanentRepositoryConnection
-     * @return The InferredOWLOntologyID representing the ontologyID, along with the IRI of the
+     * @return The InferredOWLOntologyID representing the ontology, along with the IRI of the
      *         Inferred Ontology.
+     * @throws OWLException 
+     * @throws OWLRuntimeException 
+     * @throws IOException 
+     * @throws OpenRDFException 
      */
-    InferredOWLOntologyID inferStatements(OWLOntologyID ontologyID, RepositoryConnection permanentRepositoryConnection);
+    InferredOWLOntologyID inferStatements(OWLOntology ontology, RepositoryConnection permanentRepositoryConnection) throws OWLRuntimeException, OWLException, OpenRDFException, IOException;
     
     /**
      * Returns true if the given ontologyIRI is either an Ontology IRI and it has a published

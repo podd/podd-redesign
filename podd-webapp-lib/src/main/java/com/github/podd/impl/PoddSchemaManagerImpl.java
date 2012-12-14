@@ -125,15 +125,35 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             throw new EmptyOntologyException(ontology, "Schema Ontology contained no axioms");
         }
         
+        if(schemaOntologyID != null)
+        {
+            // FIXME: Change OWLOntologyID to schemaOntologyID in this case
+        }
+        
         RepositoryConnection conn = null;
         
         try
         {
             conn = this.repositoryManager.getRepository().getConnection();
+            conn.begin();
             
             this.owlManager.dumpOntologyToRepository(ontology, conn);
             
+            final InferredOWLOntologyID nextInferredOntology = this.owlManager.inferStatements(ontology, conn);
             
+            conn.commit();
+            
+            // update the link in the schema ontology management graph
+            this.repositoryManager.updateCurrentManagedSchemaOntologyVersion(ontology.getOntologyID(),
+                    nextInferredOntology, true);
+            
+            // update the link in the schema ontology management graph
+            // TODO: This is probably not the right method for this purpose
+            this.repositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                    nextInferredOntology.getBaseOWLOntologyID(), nextInferredOntology.getInferredOWLOntologyID(), true);
+            
+            return new InferredOWLOntologyID(ontology.getOntologyID().getOntologyIRI(), ontology.getOntologyID()
+                    .getVersionIRI(), nextInferredOntology.getOntologyIRI());
         }
         catch(OpenRDFException | IOException e)
         {
@@ -141,6 +161,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             {
                 conn.rollback();
             }
+            
+            throw e;
         }
         finally
         {
@@ -150,6 +172,5 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
         
-        throw new RuntimeException("TODO: Implement uploadSchemaOntology(OWLOntologyID,InputStream,RDFFormat)");
     }
 }
