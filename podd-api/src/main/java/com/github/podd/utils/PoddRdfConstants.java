@@ -16,6 +16,8 @@ import org.openrdf.model.vocabulary.OWL;
  */
 public interface PoddRdfConstants
 {
+    public static final ValueFactory VALUE_FACTORY = ValueFactoryImpl.getInstance();
+
     /**
      * An arbitrary prefix to use for automatically assigning ontology IRIs to inferred ontologies.
      * There are no versions delegated to inferred ontologies, and the ontology IRI is generated
@@ -36,5 +38,4 @@ public interface PoddRdfConstants
     public static final URI PODDBASE_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "Published");
     
-    public static final ValueFactory VALUE_FACTORY = ValueFactoryImpl.getInstance();
 }
