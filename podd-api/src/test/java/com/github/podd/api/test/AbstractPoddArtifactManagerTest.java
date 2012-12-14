@@ -179,11 +179,10 @@ public abstract class AbstractPoddArtifactManagerTest
          * this.getNewHttpFileReferenceProcessorFactory();
          * Assert.assertNotNull("HTTP factory was null", httpFactory);
          * testFileRegistry.add(httpFactory);
-         * 
-         * // TODO: Implement these file reference managers and factories final
-         * PoddFileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
-         * testFileReferenceManager.setProcessorFactoryRegistry(testFileRegistry);
          */
+        
+        PoddFileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
+        testFileReferenceManager.setProcessorFactoryRegistry(testFileRegistry);
         
         /**
          * // TODO: Implement these purl processor factories PoddPurlProcessorFactory doiFactory =
@@ -209,8 +208,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         this.testArtifactManager = this.getNewArtifactManager();
         this.testArtifactManager.setRepositoryManager(this.testRepositoryManager);
-        // TODO: Implement File Reference Manager
-        // this.testArtifactManager.setFileReferenceManager(testFileReferenceManager);
+        this.testArtifactManager.setFileReferenceManager(testFileReferenceManager);
         this.testArtifactManager.setPurlManager(testPurlManager);
         this.testArtifactManager.setOwlManager(testOWLManager);
         this.testArtifactManager.setSchemaManager(this.testSchemaManager);
