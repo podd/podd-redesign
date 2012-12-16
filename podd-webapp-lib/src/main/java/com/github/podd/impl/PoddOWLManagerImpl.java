@@ -4,6 +4,7 @@
 package com.github.podd.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,16 +18,30 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.profiles.OWLProfile;
+import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.semanticweb.owlapi.rio.RioParserImpl;
 import org.semanticweb.owlapi.rio.RioRenderer;
+import org.semanticweb.owlapi.util.InferredAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredClassAssertionAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredDataPropertyCharacteristicAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredEquivalentClassAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredEquivalentDataPropertiesAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredEquivalentObjectPropertyAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredInverseObjectPropertiesAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredObjectPropertyCharacteristicAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredOntologyGenerator;
+import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredSubDataPropertyAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredSubObjectPropertyAxiomGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,11 +153,45 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public InferredOWLOntologyID inferStatements(final OWLOntologyID inferredOWLOntologyID,
+    public InferredOWLOntologyID inferStatements(final OWLOntologyID ontologyID,
             final RepositoryConnection permanentRepositoryConnection) throws OWLException, OpenRDFException,
         IOException
     {
-        throw new RuntimeException("TODO: Implement inferStatements");
+        InferredOWLOntologyID inferredOntologyID = this.generateInferredOntologyID(ontologyID);
+        
+        OWLOntology nextOntology = this.getOntology(ontologyID);
+        OWLReasoner nextReasoner = this.createReasoner(nextOntology);
+
+        // -- BEGIN inference computation
+        nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+        
+        final List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators =
+                new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
+        axiomGenerators.add(new InferredClassAssertionAxiomGenerator());
+        axiomGenerators.add(new InferredDataPropertyCharacteristicAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentDataPropertiesAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentObjectPropertyAxiomGenerator());
+        axiomGenerators.add(new InferredInverseObjectPropertiesAxiomGenerator());
+        axiomGenerators.add(new InferredObjectPropertyCharacteristicAxiomGenerator());
+        
+        // NOTE: InferredPropertyAssertionGenerator significantly slows down inference computation
+        // axiomGenerators.add(new InferredPropertyAssertionGenerator());
+        
+        axiomGenerators.add(new InferredSubClassAxiomGenerator());
+        axiomGenerators.add(new InferredSubDataPropertyAxiomGenerator());
+        axiomGenerators.add(new InferredSubObjectPropertyAxiomGenerator());
+        
+        final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
+        final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID.getInferredOWLOntologyID());
+        
+        iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
+        // -- END inference computation
+        
+        this.dumpOntologyToRepository(nextInferredAxiomsOntology, permanentRepositoryConnection);
+        
+
+        return inferredOntologyID;
     }
     
     @Override
