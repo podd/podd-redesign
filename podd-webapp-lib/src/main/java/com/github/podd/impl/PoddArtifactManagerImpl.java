@@ -273,9 +273,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // back
             // to them from permanentRepositoryConnection
             
-            final InferredOWLOntologyID inferredOWLOntologyID =
-                    this.getOWLManager().generateInferredOntologyID(nextOntology.getOntologyID());
-            
             // Use an OWLAPI InferredAxiomGenerator together with the reasoner to create inferred
             // axioms to store in the database
             // Serialise the inferred statements back to a different context in the permanent
@@ -283,7 +280,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // The contexts to use within the permanent repository connection are all encapsulated
             // in
             // the InferredOWLOntologyID object
-            this.getOWLManager().inferStatements(inferredOWLOntologyID, permanentRepositoryConnection);
+            InferredOWLOntologyID inferredOWLOntologyID =
+                    this.getOWLManager().inferStatements(nextOntology, permanentRepositoryConnection);
             
             // make sure in a finally block to remove the cache for the ontology
             this.getOWLManager().removeCache(inferredOWLOntologyID);

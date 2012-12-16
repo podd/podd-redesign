@@ -21,12 +21,18 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
 import org.semanticweb.owlapi.profiles.OWLProfile;
+import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
+import org.semanticweb.owlapi.reasoner.TimeOutException;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.semanticweb.owlapi.rio.RioParserImpl;
 import org.semanticweb.owlapi.rio.RioRenderer;
@@ -152,14 +158,67 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         throw new RuntimeException("TODO: Implement getVersions");
     }
     
-    @Override
-    public InferredOWLOntologyID inferStatements(final OWLOntologyID ontologyID,
-            final RepositoryConnection permanentRepositoryConnection) throws OWLException, OpenRDFException,
-        IOException
+    /**
+     * Computes the inferences using the given reasoner, which has previously been setup based on an
+     * ontology.
+     * 
+     * @param nextReasoner
+     *            The reasoner to use to compute the inferences.
+     * @param inferredOntologyID
+     *            The OWLOntologyID to use for the inferred ontology. This must be unique and not
+     *            previously used in either the repository or the OWLOntologyManager
+     * @return An OWLOntology instance containing the axioms that were inferred from the original
+     *         ontology.
+     * @throws ReasonerInterruptedException
+     * @throws TimeOutException
+     * @throws InconsistentOntologyException
+     * @throws OWLOntologyCreationException
+     * @throws OWLOntologyChangeException
+     */
+    private OWLOntology computeInferences(final OWLReasoner nextReasoner, final OWLOntologyID inferredOntologyID)
+        throws ReasonerInterruptedException, TimeOutException, InconsistentOntologyException,
+        OWLOntologyCreationException, OWLOntologyChangeException
     {
-        InferredOWLOntologyID inferredOntologyID = this.generateInferredOntologyID(ontologyID);
+        // long startedAt = System.currentTimeMillis();
+        nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+        // this.statsLogger.info("precomputeInferences()," + (System.currentTimeMillis() -
+        // startedAt));
         
-        OWLOntology nextOntology = this.getOntology(ontologyID);
+        final List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators =
+                new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
+        axiomGenerators.add(new InferredClassAssertionAxiomGenerator());
+        axiomGenerators.add(new InferredDataPropertyCharacteristicAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentDataPropertiesAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentObjectPropertyAxiomGenerator());
+        axiomGenerators.add(new InferredInverseObjectPropertiesAxiomGenerator());
+        axiomGenerators.add(new InferredObjectPropertyCharacteristicAxiomGenerator());
+        
+        // loading time for science-3k-objects reduced from 66s to 8.8s after commenting out
+        // the InferredPropertyAssertionGenerator below
+        // axiomGenerators.add(new InferredPropertyAssertionGenerator());
+        
+        axiomGenerators.add(new InferredSubClassAxiomGenerator());
+        axiomGenerators.add(new InferredSubDataPropertyAxiomGenerator());
+        axiomGenerators.add(new InferredSubObjectPropertyAxiomGenerator());
+        
+        final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
+        final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID);
+        
+        // startedAt = System.currentTimeMillis();
+        
+        iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
+        // this.statsLogger.info("fillOntology()," + (System.currentTimeMillis() - startedAt));
+        
+        return nextInferredAxiomsOntology;
+    }
+    
+    @Override
+    public InferredOWLOntologyID inferStatements(final OWLOntology nextOntology,
+            final RepositoryConnection nextRepositoryConnection) throws OWLRuntimeException, OWLException, OpenRDFException, IOException
+    {
+        InferredOWLOntologyID inferredOntologyID = this.generateInferredOntologyID(nextOntology.getOntologyID());
+        
         OWLReasoner nextReasoner = this.createReasoner(nextOntology);
 
         // -- BEGIN inference computation
@@ -188,8 +247,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
         // -- END inference computation
         
-        this.dumpOntologyToRepository(nextInferredAxiomsOntology, permanentRepositoryConnection);
-        
+        this.dumpOntologyToRepository(nextInferredAxiomsOntology, nextRepositoryConnection);
 
         return inferredOntologyID;
     }

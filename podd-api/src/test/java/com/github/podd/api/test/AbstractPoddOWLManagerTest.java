@@ -504,8 +504,7 @@ public abstract class AbstractPoddOWLManagerTest
         OWLOntologyID ontologyID = loadedOntology.getOntologyID();
 
         Assert.assertEquals("Nothing should be in the Repository at this stage", 0, this.testRepositoryConnection.size());
-        
-        InferredOWLOntologyID inferredOntologyID = this.testOWLManager.inferStatements(ontologyID, this.testRepositoryConnection);
+        InferredOWLOntologyID inferredOntologyID = this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
 
         // verify:
         Assert.assertNotNull("Inferred Ontology ID was null", inferredOntologyID);
