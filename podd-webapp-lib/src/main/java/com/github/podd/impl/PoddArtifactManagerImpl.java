@@ -213,7 +213,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // cached
             // in memory
             
-            // TODO: For each OWL:IMPORTS statement, call the following
+            // FIXME: For each OWL:IMPORTS statement, call the following
             final IRI schemaOntologyIRI = IRI.create("urn:test:");
             // Get the current version
             final InferredOWLOntologyID ontologyVersion =
