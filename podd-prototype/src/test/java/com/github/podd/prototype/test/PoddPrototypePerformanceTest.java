@@ -38,6 +38,7 @@ import com.github.podd.prototype.PoddPrototypeUtils;
  * @created 2012/10/23
  */
 @RunWith(value = Parameterized.class)
+@Ignore
 public class PoddPrototypePerformanceTest extends AbstractSesameTest
 {
     
@@ -150,7 +151,6 @@ public class PoddPrototypePerformanceTest extends AbstractSesameTest
         return Arrays.asList(data);
     }
     
-    @Ignore
     @Test
     public void testLoadArtifactPerformance() throws Exception
     {
