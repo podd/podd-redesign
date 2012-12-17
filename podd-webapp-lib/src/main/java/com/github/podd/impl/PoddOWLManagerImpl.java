@@ -10,8 +10,12 @@ import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -74,20 +78,72 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     
     @Override
     public void cacheSchemaOntology(final InferredOWLOntologyID ontologyID, final RepositoryConnection conn)
-        throws OpenRDFException
+        throws OpenRDFException, OWLException, IOException, PoddException
     {
+        if(ontologyID == null || ontologyID.getOntologyIRI() == null)
+        {
+            throw new NullPointerException("OWLOntology is incomplete");
+        }
+        // NOTE: if InferredOntologyIRI is null, only the base ontology is cached 
+        
+        IRI baseOntologyIRI = ontologyID.getOntologyIRI();
+        IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
+        IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
+        
+        // // check if already cached and silently return.
+        if (this.owlOntologyManager.contains(baseOntologyIRI) || this.owlOntologyManager.contains(baseOntologyVersionIRI))
+        {
+            return;
+        }
+
+        // TODO: load any ontologies imported by these schema ontologies 
+        // (do we have to recursively go through this imports?)
+
+        // identify imports from RepositoryConnection
+        String subjVar = "subject";
+        String objVar = "object";
+        /*
+         * SELECT ?subject ?object
+         * WHERE {
+         *  ?subject OWL:imports ?object
+         * }
+         */
+        String sparqlQuery = "SELECT ?" + subjVar + " ?"  + objVar + " " +
+        		"WHERE { ?" + subjVar +
+        		    " <" + OWL.IMPORTS.stringValue() + "> ?" 
+        		+ objVar +
+                " }";
+            
+        this.log.info("Generated SPARQL {}", sparqlQuery);
+        
+        final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        
+        // Create a dataset to specify the contexts
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(baseOntologyVersionIRI.toOpenRDFURI());
+        dataset.addNamedGraph(baseOntologyVersionIRI.toOpenRDFURI());
+        query.setDataset(dataset);
+        
+        TupleQueryResult result = query.evaluate();
+        List<BindingSet> resultList = result.asList();
+        this.log.info("SPARQL found {} imports ", resultList.size());
+        
+        for (BindingSet bindingSet : resultList)
+        {
+            // FIXME: hacky implementation here
+            String importedOntology = bindingSet.getValue(objVar).stringValue();
+            this.log.info(" ### imports {} ###", importedOntology);
+            
+            URI context = IRI.create(bindingSet.getValue(objVar).toString()).toOpenRDFURI();  //FIXME
+            this.parseRDFStatements(conn, context);
+        }
+
+        
         // load ontology statements and inferred statements from the respective graphs into OWL
         // Ontology Manager
+        this.parseRDFStatements(conn, baseOntologyVersionIRI.toOpenRDFURI()); 
+        this.parseRDFStatements(conn, inferredOntologyIRI.toOpenRDFURI()); 
         
-        /*
-         * IRI schemaOntologyGraph = ontologyID.getVersionIRI(); IRI inferredSchemaOntologyGraph =
-         * ontologyID.getInferredOntologyIRI();
-         * 
-         * RepositoryResult<Statement> baseStatements = conn.getStatements(null, null, null, true,
-         * schemaOntologyGraph.toOpenRDFURI()); RepositoryResult<Statement> inferredStatements =
-         * conn.getStatements(null, null, null, true, inferredSchemaOntologyGraph.toOpenRDFURI());
-         */
-        throw new RuntimeException("TODO: Implement cacheSchemaOntology");
     }
     
     @Override

@@ -38,8 +38,11 @@ public interface PoddOWLManager
      * @param ontologyID
      * @param conn
      * @throws OpenRDFException
+     * @throws PoddException 
+     * @throws IOException 
+     * @throws OWLException 
      */
-    void cacheSchemaOntology(InferredOWLOntologyID ontologyID, RepositoryConnection conn) throws OpenRDFException;
+    void cacheSchemaOntology(InferredOWLOntologyID ontologyID, RepositoryConnection conn) throws OpenRDFException, OWLException, IOException, PoddException;
     
     /**
      * Creates a reasoner over the given OWLOntology

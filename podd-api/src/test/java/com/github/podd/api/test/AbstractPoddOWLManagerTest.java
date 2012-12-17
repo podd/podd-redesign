@@ -13,12 +13,14 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
@@ -59,6 +61,8 @@ public abstract class AbstractPoddOWLManagerTest
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private String poddBaseResourcePath = "/ontologies/poddBase.owl";
+    
+    private String poddScienceResourcePath = "/ontologies/poddScience.owl";
     
     protected PoddOWLManager testOWLManager;
     
@@ -146,29 +150,175 @@ public abstract class AbstractPoddOWLManagerTest
      * .
      * 
      */
-    @Ignore
     @Test
-    public void testCacheSchemaOntology() throws Exception
+    public void testCacheSchemaOntologyWithNoImports() throws Exception
     {
-        // prepare: load a schema ontology independently
-        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        final OWLOntology loadedOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
+        // prepare: load a schema ontology, infer and store in test repository
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream1);
+        final OWLOntology loadedOntology =
+                this.testOWLManager.getOWLOntologyManager().loadOntologyFromOntologyDocument(inputStream1);
+        this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection);
         
-        final URI schemaOntologyGraph = loadedOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        // final URI inferredOntologyGraph = null;
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
         
-        // prepare: load poddBase schema ontology into the test repository
-        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, schemaOntologyGraph);
-        Assert.assertEquals("Not the expected number of statements in Repository", 24,
-                this.testRepositoryConnection.size(schemaOntologyGraph));
+        final URI ontologyVersionURI = loadedOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong statement count", 282, this.testRepositoryConnection.size(ontologyVersionURI));
         
-        final InferredOWLOntologyID inferredOntologyID = null;
+        final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong inferred statement count", 114,
+                this.testRepositoryConnection.size(inferredOntologyURI));
+        
+        // prepare: remove from cache
+        this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID());
+        this.testOWLManager.removeCache(inferredOntologyID.getInferredOWLOntologyID());
+        
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getInferredOntologyIRI()));
         
         this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection);
         
-        Assert.fail("TODO: Implement me");
+        // verify:
+        Assert.assertTrue("Ontology should be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertTrue("Ontology should be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getInferredOWLOntologyID()));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#cacheSchemaOntology(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
+     * .
+     * 
+     */
+    @Test
+    public void testCacheSchemaOntologyWithImports() throws Exception
+    {
+        // prepare: 1) load, store PODD-Base ontology and remove from manager cache
+        final InputStream pbInputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        Assert.assertNotNull("Could not find resource", pbInputStream);
+        final OWLOntologyDocumentSource pbOwlSource =
+                new StreamDocumentSource(pbInputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType()));
+        final OWLOntology pbBaseOntology = this.testOWLManager.loadOntology(pbOwlSource);
+        this.testOWLManager.dumpOntologyToRepository(pbBaseOntology, this.testRepositoryConnection);
+        
+        final URI pbVersionURI = pbBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong statement count", 282, this.testRepositoryConnection.size(pbVersionURI));
+        
+        // prepare: 2) load, infer, store PODD-Science ontology and remove from manager cache
+        final InputStream psInputStream = this.getClass().getResourceAsStream(this.poddScienceResourcePath);
+        Assert.assertNotNull("Could not find resource", psInputStream);
+        final OWLOntologyDocumentSource psOwlSource =
+                new StreamDocumentSource(psInputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType()));
+        final OWLOntology psBaseOntology = this.testOWLManager.loadOntology(psOwlSource);
+        this.testOWLManager.dumpOntologyToRepository(psBaseOntology, this.testRepositoryConnection);
+        final InferredOWLOntologyID psInferredOntologyID =
+                this.testOWLManager.inferStatements(psBaseOntology, this.testRepositoryConnection);
+        
+        this.testOWLManager.removeCache(pbBaseOntology.getOntologyID());
+        this.testOWLManager.removeCache(psInferredOntologyID.getBaseOWLOntologyID());
+        this.testOWLManager.removeCache(psInferredOntologyID.getInferredOWLOntologyID());
+        
+        final URI psOntologyVersionURI = psBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong statement count", 1588, this.testRepositoryConnection.size(psOntologyVersionURI));
+        
+        final URI inferredOntologyURI = psInferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong inferred statement count", 363,
+                this.testRepositoryConnection.size(inferredOntologyURI));
+        
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(psInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(psInferredOntologyID.getInferredOntologyIRI()));
+        
+        this.testOWLManager.cacheSchemaOntology(psInferredOntologyID, this.testRepositoryConnection);
+        
+        // verify:
+        Assert.assertTrue("Ontology should be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(psInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertTrue("Ontology should be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(psInferredOntologyID.getInferredOWLOntologyID()));
+        
+        final java.util.Set<OWLOntology> importsClosureSet =
+                this.testOWLManager.getOWLOntologyManager().getImportsClosure(psBaseOntology);
+        this.log.info("Imports closure has {} elements: {}", importsClosureSet.size(), importsClosureSet);
+        
+        this.printRepoSummary();
+    }
+    
+    protected void printRepoSummary()
+    {
+        RepositoryResult<Resource> contexts;
+        try
+        {
+            contexts = this.testRepositoryConnection.getContextIDs();
+            while(contexts.hasNext())
+            {
+                final Resource context = contexts.next();
+                System.out.println("    " + context.stringValue() + " :  "
+                        + this.testRepositoryConnection.size(context));
+            }
+        }
+        catch(final Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#cacheSchemaOntology(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
+     * .
+     * 
+     */
+    @Test
+    public void testCacheSchemaOntologyAlreadyInCache() throws Exception
+    {
+        // prepare: load a schema ontology using the same OWLManager
+        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntology loadedOntology =
+                this.testOWLManager.getOWLOntologyManager().loadOntologyFromOntologyDocument(inputStream);
+        
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
+        
+        Assert.assertNotNull("Ontology should already be in memory", this.testOWLManager.getOWLOntologyManager()
+                .getOntology(inferredOntologyID));
+        
+        // this call will silently return since the ontology is already in cache
+        this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection);
+        
+        // verify:
+        Assert.assertNotNull("Ontology should be in memory",
+                this.testOWLManager.getOWLOntologyManager().getOntology(inferredOntologyID));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#cacheSchemaOntology(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
+     * .
+     * 
+     */
+    @Test
+    public void testCacheSchemaOntologyWithNullOntologyID() throws Exception
+    {
+        final InferredOWLOntologyID inferredOntologyID = null;
+        
+        try
+        {
+            this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
+        }
     }
     
     /**
@@ -609,8 +759,8 @@ public abstract class AbstractPoddOWLManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     * 
+     * . This test depends on imported PODD Base ontology being resolvable from
+     * http://purl.org/podd/ns/poddBase.
      */
     @Test
     public void testIsPublishedOWLOntologyIDWithPublishedArtifact() throws Exception
@@ -623,8 +773,8 @@ public abstract class AbstractPoddOWLManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     * 
+     * . This test depends on imported PODD Base ontology being resolvable from
+     * http://purl.org/podd/ns/poddBase.
      */
     @Test
     public void testIsPublishedOWLOntologyIDWithUnPublishedArtifact() throws Exception
