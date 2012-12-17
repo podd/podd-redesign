@@ -3,7 +3,6 @@
  */
 package com.github.podd.api.test;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -14,25 +13,22 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.openrdf.OpenRDFException;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.io.UnparsableOntologyException;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyAlreadyExistsException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -46,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.EmptyOntologyException;
-import com.github.podd.exception.PoddException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -82,7 +77,7 @@ public abstract class AbstractPoddOWLManagerTest
     protected abstract PoddOWLManager getNewPoddOWLManagerInstance();
     
     /**
-     * Helper method for testing 
+     * Helper method for testing
      * {@link com.github.podd.api.PoddOWLManager#isPublished(OWLOntologyID, RepositoryConnection)}
      * 
      */
@@ -238,7 +233,7 @@ public abstract class AbstractPoddOWLManagerTest
             // this exception is thrown by the OWL API with a null message
         }
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
@@ -253,37 +248,14 @@ public abstract class AbstractPoddOWLManagerTest
         Assert.assertNotNull("Could not find resource", inputStream);
         final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         final OWLOntology nextOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
-
-        URI context = ValueFactoryImpl.getInstance().createURI("urn:test:dump:context:");
         
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:dump:context:");
         
         this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection, context);
         
         // verify:
-        Assert.assertEquals("Dumped statement count not expected value", 282, this.testRepositoryConnection.size(context));
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
-     * .
-     * 
-     */
-    @Test
-    public void testDumpOntologyToRepositoryWithoutContext() throws Exception
-    {
-        // prepare: load an Ontology independently
-        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        final OWLOntology nextOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
-
-        
-        this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection);
-        
-        // verify:
-        URI context = nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        Assert.assertEquals("Dumped statement count not expected value", 282, this.testRepositoryConnection.size(context));
+        Assert.assertEquals("Dumped statement count not expected value", 282,
+                this.testRepositoryConnection.size(context));
     }
     
     /**
@@ -303,12 +275,36 @@ public abstract class AbstractPoddOWLManagerTest
             this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection);
             Assert.fail("Should have thrown an IllegalArgumentException");
         }
-        catch (IllegalArgumentException e)
+        catch(final IllegalArgumentException e)
         {
-            Assert.assertEquals("Cannot dump an ontology to repository if it does not have a version IRI", e.getMessage());
+            Assert.assertEquals("Cannot dump an ontology to repository if it does not have a version IRI",
+                    e.getMessage());
         }
     }
-
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#dumpOntologyToRepository(OWLOntology, RepositoryConnection, URI...)}
+     * .
+     * 
+     */
+    @Test
+    public void testDumpOntologyToRepositoryWithoutContext() throws Exception
+    {
+        // prepare: load an Ontology independently
+        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        final OWLOntology nextOntology = testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
+        
+        this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection);
+        
+        // verify:
+        final URI context = nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        Assert.assertEquals("Dumped statement count not expected value", 282,
+                this.testRepositoryConnection.size(context));
+    }
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#generateInferredOntologyID(org.semanticweb.owlapi.model.OWLOntologyID)}
@@ -470,26 +466,6 @@ public abstract class AbstractPoddOWLManagerTest
      * 
      */
     @Test
-    public void testInferStatementsWithNullOntologyID() throws Exception
-    {
-        try
-        {
-            this.testOWLManager.inferStatements(null, this.testRepositoryConnection);
-            Assert.fail("Should have thrown a NullPointerException");
-        }
-        catch(final NullPointerException e)
-        {
-            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#inferStatements(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
-     * .
-     * 
-     */
-    @Test
     public void testInferStatements() throws Exception
     {
         // prepare: load an ontology into a StreamDocumentSource
@@ -501,27 +477,80 @@ public abstract class AbstractPoddOWLManagerTest
                         RDFFormat.RDFXML.getDefaultMIMEType()));
         
         final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
-        OWLOntologyID ontologyID = loadedOntology.getOntologyID();
-
-        Assert.assertEquals("Nothing should be in the Repository at this stage", 0, this.testRepositoryConnection.size());
-        InferredOWLOntologyID inferredOntologyID = this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
-
+        Assert.assertEquals("Nothing should be in the Repository at this stage", 0,
+                this.testRepositoryConnection.size());
+        
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
+        
         // verify:
         Assert.assertNotNull("Inferred Ontology ID was null", inferredOntologyID);
-        Assert.assertNotNull("Inferred Ontology ID was null", inferredOntologyID);
-        Assert.assertEquals("Incorrect no. of inferred statements", 
-                114, this.testRepositoryConnection.size(inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI()));
-
-        System.out.println(inferredOntologyID);
-        this.log.info("{} statements in context <{}>", this.testRepositoryConnection.size(ontologyID.getOntologyIRI().toOpenRDFURI()),
-                ontologyID.getOntologyIRI().toOpenRDFURI());
-        this.log.info("{} statements in context <{}>", this.testRepositoryConnection.size(inferredOntologyID.getVersionIRI().toOpenRDFURI()),
-                inferredOntologyID.getVersionIRI().toOpenRDFURI());
-        
-        URI context3 = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
-        this.log.info("{} statements in context <{}>", this.testRepositoryConnection.size(context3), context3);
+        Assert.assertNotNull("Inferred Ontology Version IRI was null", inferredOntologyID.getVersionIRI());
+        Assert.assertEquals("Incorrect no. of inferred statements", 114,
+                this.testRepositoryConnection.size(inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI()));
     }
-
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#inferStatements(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
+     * .
+     * 
+     */
+    @Test
+    public void testInferStatementsTwiceForSameOntology() throws Exception
+    {
+        // prepare: load an ontology into a StreamDocumentSource
+        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType()));
+        
+        final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
+        Assert.assertEquals("Nothing should be in the Repository at this stage", 0,
+                this.testRepositoryConnection.size());
+        
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
+        
+        Assert.assertNotNull("Inferred Ontology ID was null", inferredOntologyID);
+        Assert.assertNotNull("Inferred Ontology Version IRI was null", inferredOntologyID.getVersionIRI());
+        Assert.assertEquals("Incorrect no. of inferred statements", 114,
+                this.testRepositoryConnection.size(inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI()));
+        
+        // try to infer same ontology again
+        try
+        {
+            this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
+            Assert.fail("Should have thrown an OWLOntologyAlreadyExistsException");
+        }
+        catch(final OWLOntologyAlreadyExistsException e)
+        {
+            Assert.assertTrue(e.getMessage().contains("Ontology already exists"));
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#inferStatements(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
+     * .
+     * 
+     */
+    @Test
+    public void testInferStatementsWithNullOntology() throws Exception
+    {
+        try
+        {
+            this.testOWLManager.inferStatements(null, this.testRepositoryConnection);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertNull("Not the expected Exception", e.getMessage());
+        }
+    }
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.IRI)} .
