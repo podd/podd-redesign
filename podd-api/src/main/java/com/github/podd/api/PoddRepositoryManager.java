@@ -52,4 +52,8 @@ public interface PoddRepositoryManager
     
     void updateManagedPoddArtifactVersion(OWLOntologyID nextOntologyID, OWLOntologyID nextInferredOntologyID,
             boolean updateCurrent) throws RepositoryException;
+
+    URI getSchemaManagementGraph();
+
+    URI getArtifactManagementGraph();
 }

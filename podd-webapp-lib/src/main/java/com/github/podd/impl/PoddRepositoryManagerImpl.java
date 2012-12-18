@@ -305,9 +305,21 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
+    public URI getSchemaManagementGraph()
+    {
+        return this.schemaGraph;
+    }
+    
+    @Override
     public void setArtifactManagementGraph(URI artifactManagementGraph)
     {
         this.artifactGraph = artifactManagementGraph;
+    }
+    
+    @Override
+    public URI getArtifactManagementGraph()
+    {
+        return this.artifactGraph;
     }
     
 }
