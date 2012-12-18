@@ -209,9 +209,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 // statements/OWL Classes
             }
             
+            final RepositoryConnection permanentRepositoryConnection = null;
+            
+            // add direct imports from this ontology into the artifact management graph
+            
             // Before loading the statements into OWLAPI, ensure that the schema ontologies are
-            // cached
-            // in memory
+            // cached in memory
             
             // FIXME: For each OWL:IMPORTS statement, call the following
             final IRI schemaOntologyIRI = IRI.create("urn:test:");
@@ -219,9 +222,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final InferredOWLOntologyID ontologyVersion =
                     this.getSchemaManager().getCurrentSchemaOntologyVersion(schemaOntologyIRI);
             // Make sure it is cached in memory. This will not attempt to load the ontology again if
-            // it
-            // is already cached or already being loaded
-            this.getOWLManager().cacheSchemaOntology(ontologyVersion, temporaryRepositoryConnection);
+            // it is already cached or already being loaded
+            this.getOWLManager().cacheSchemaOntology(ontologyVersion, permanentRepositoryConnection, getRepositoryManager().getSchemaManagementGraph());
             
             // Load the statements into an OWLAPI OWLOntology
             final RioMemoryTripleSource owlSource =
@@ -247,8 +249,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             // create an OWL Reasoner using the Pellet library and ensure that the reasoner thinks
-            // the
-            // ontology is consistent so far
+            // the ontology is consistent so far
             // Use the factory that we found to create a reasoner over the ontology
             final OWLReasoner nextReasoner = this.getOWLManager().createReasoner(nextOntology);
             
@@ -265,7 +266,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // Once the reasoner determines that the ontology is consistent, copy the statements to
             // a
             // permanent repository connection
-            final RepositoryConnection permanentRepositoryConnection = null;
             
             // TODO: Copy the statements to permanentRepositoryConnection
             
