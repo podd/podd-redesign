@@ -13,14 +13,13 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
@@ -62,6 +61,8 @@ public abstract class AbstractPoddOWLManagerTest
     
     private String poddBaseResourcePath = "/ontologies/poddBase.owl";
     
+    private String poddPlantResourcePath = "/ontologies/poddPlant.owl";
+
     private String poddScienceResourcePath = "/ontologies/poddScience.owl";
     
     protected PoddOWLManager testOWLManager;
@@ -104,6 +105,45 @@ public abstract class AbstractPoddOWLManagerTest
         
         return this.testOWLManager.isPublished(artifactOntologyID, this.testRepositoryConnection);
     }
+    
+    /**
+     * Helper method which loads, infers and stores a given ontology using hte PoddOWLManager.
+     * 
+     * @param resourcePath
+     * @param format
+     * @param assertedStatements
+     * @param inferredStatements
+     * @return
+     * @throws Exception
+     */
+    private InferredOWLOntologyID loadInferStoreOntology(String resourcePath, RDFFormat format, long assertedStatements,
+            long inferredStatements) throws Exception
+    {
+        // load ontology to OWLManager
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        format.getDefaultMIMEType()));
+        final OWLOntology loadedBaseOntology = this.testOWLManager.loadOntology(owlSource);
+        
+        this.testOWLManager.dumpOntologyToRepository(loadedBaseOntology, this.testRepositoryConnection);
+        
+        // infer statements and dump to repository
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testOWLManager.inferStatements(loadedBaseOntology, this.testRepositoryConnection);
+
+        // verify statement counts
+        final URI versionURI = loadedBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong statement count", assertedStatements, this.testRepositoryConnection.size(versionURI));
+        
+        final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong inferred statement count", inferredStatements,
+                this.testRepositoryConnection.size(inferredOntologyURI));
+        
+        return inferredOntologyID;
+    }
+    
     
     /**
      * @throws java.lang.Exception
@@ -154,21 +194,7 @@ public abstract class AbstractPoddOWLManagerTest
     public void testCacheSchemaOntology() throws Exception
     {
         // prepare: load, infer and store PODD-Base ontology
-        final InputStream pbInputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
-        Assert.assertNotNull("Could not find resource", pbInputStream);
-        final OWLOntology pbBaseOntology =
-                this.testOWLManager.getOWLOntologyManager().loadOntologyFromOntologyDocument(pbInputStream);
-        this.testOWLManager.dumpOntologyToRepository(pbBaseOntology, this.testRepositoryConnection);
-        
-        final InferredOWLOntologyID inferredOntologyID =
-                this.testOWLManager.inferStatements(pbBaseOntology, this.testRepositoryConnection);
-        
-        final URI ontologyVersionURI = pbBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        Assert.assertEquals("Wrong statement count", 282, this.testRepositoryConnection.size(ontologyVersionURI));
-        
-        final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
-        Assert.assertEquals("Wrong inferred statement count", 114,
-                this.testRepositoryConnection.size(inferredOntologyURI));
+        final InferredOWLOntologyID inferredOntologyID = this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
         
         // prepare: remove from cache
         this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID());
@@ -195,89 +221,167 @@ public abstract class AbstractPoddOWLManagerTest
      * 
      */
     @Test
-    public void testCacheSchemaOntologyWithImports() throws Exception
+    public void testCacheSchemaOntologyWithOneImport() throws Exception
     {
-        // prepare: 1) load, store PODD-Base ontology
-        final InputStream pbInputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
-        Assert.assertNotNull("Could not find resource", pbInputStream);
-        final OWLOntologyDocumentSource pbOwlSource =
-                new StreamDocumentSource(pbInputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
-                        RDFFormat.RDFXML.getDefaultMIMEType()));
-        final OWLOntology pbBaseOntology = this.testOWLManager.loadOntology(pbOwlSource);
-        this.testOWLManager.dumpOntologyToRepository(pbBaseOntology, this.testRepositoryConnection);
-        
-        final URI pbVersionURI = pbBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        Assert.assertEquals("Wrong statement count", 282, this.testRepositoryConnection.size(pbVersionURI));
-        
+        // prepare: 1) load, infer, store PODD-Base ontology
+        InferredOWLOntologyID pbInferredOntologyID = this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+        final URI pbBaseOntologyURI = pbInferredOntologyID.getOntologyIRI().toOpenRDFURI();
+        final URI pbVersionURI = pbInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
         // prepare: 2) load, infer, store PODD-Science ontology
-        final InputStream psInputStream = this.getClass().getResourceAsStream(this.poddScienceResourcePath);
-        Assert.assertNotNull("Could not find resource", psInputStream);
-        final OWLOntologyDocumentSource psOwlSource =
-                new StreamDocumentSource(psInputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
-                        RDFFormat.RDFXML.getDefaultMIMEType()));
-        final OWLOntology psBaseOntology = this.testOWLManager.loadOntology(psOwlSource);
-        this.testOWLManager.dumpOntologyToRepository(psBaseOntology, this.testRepositoryConnection);
-        final InferredOWLOntologyID psInferredOntologyID =
-                this.testOWLManager.inferStatements(psBaseOntology, this.testRepositoryConnection);
-
-        final URI psOntologyVersionURI = psBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        Assert.assertEquals("Wrong statement count", 1588, this.testRepositoryConnection.size(psOntologyVersionURI));
-        
-        final URI inferredOntologyURI = psInferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
-        Assert.assertEquals("Wrong inferred statement count", 363,
-                this.testRepositoryConnection.size(inferredOntologyURI));
-        
+        InferredOWLOntologyID psInferredOntologyID = this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
+        final URI psBaseOntologyURI = psInferredOntologyID.getOntologyIRI().toOpenRDFURI();
+        final URI psVersionURI = psInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
         // prepare: 3) remove ontologies from manager cache
-        this.testOWLManager.removeCache(pbBaseOntology.getOntologyID());
+        this.testOWLManager.removeCache(pbInferredOntologyID.getBaseOWLOntologyID());
+        this.testOWLManager.removeCache(pbInferredOntologyID.getInferredOWLOntologyID());
         this.testOWLManager.removeCache(psInferredOntologyID.getBaseOWLOntologyID());
         this.testOWLManager.removeCache(psInferredOntologyID.getInferredOWLOntologyID());
         
         Assert.assertFalse("Ontology should not be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pbBaseOntology.getOntologyID()));
+                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertFalse("Ontology should not be in memory",
                 this.testOWLManager.getOWLOntologyManager().contains(psInferredOntologyID.getBaseOWLOntologyID()));
         Assert.assertFalse("Ontology should not be in memory",
                 this.testOWLManager.getOWLOntologyManager().contains(psInferredOntologyID.getInferredOntologyIRI()));
         
+        // prepare: 4) create schema management graph
+        final URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
+
+        // Podd-Base
+        this.testRepositoryConnection.add(pbBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
+        this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pbVersionURI,
+                schemaGraph);
+
+        // Podd-Science
+        this.testRepositoryConnection.add(psBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
+        this.testRepositoryConnection.add(psBaseOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, psVersionURI,
+                schemaGraph);
+        this.testRepositoryConnection.add(psBaseOntologyURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
+        
         
         // invoke method to test
-        this.testOWLManager.cacheSchemaOntology(psInferredOntologyID, this.testRepositoryConnection, null);
+        this.testOWLManager.cacheSchemaOntology(psInferredOntologyID, this.testRepositoryConnection, schemaGraph);
         
         
         // verify:
         Assert.assertTrue("Ontology should be in memory",
                 this.testOWLManager.getOWLOntologyManager().contains(psInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getInferredOntologyIRI()));
         Assert.assertTrue("Ontology should be in memory",
                 this.testOWLManager.getOWLOntologyManager().contains(psInferredOntologyID.getInferredOWLOntologyID()));
         Assert.assertTrue("Ontology should be in memory",
-                this.testOWLManager.getOWLOntologyManager().contains(pbBaseOntology.getOntologyID()));
-
-//        final java.util.Set<OWLOntology> importsClosureSet =
-//                this.testOWLManager.getOWLOntologyManager().getImportsClosure(psBaseOntology);
-//        this.log.info("Imports closure has {} elements: {}", importsClosureSet.size(), importsClosureSet);
-        
-//        this.printRepoSummary();
+                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
     }
     
-    protected void printRepoSummary()
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#cacheSchemaOntology(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
+     * .
+     * 
+     */
+    @Test
+    public void testCacheSchemaOntologyWithTwoImports() throws Exception
     {
-        RepositoryResult<Resource> contexts;
-        try
+        // prepare: 1) load, infer, store PODD-Base ontology
+        InferredOWLOntologyID pbInferredOntologyID = this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+        final URI pbBaseOntologyURI = pbInferredOntologyID.getOntologyIRI().toOpenRDFURI();
+        final URI pbVersionURI = pbInferredOntologyID.getVersionIRI().toOpenRDFURI();
+        
+        // prepare: 2) load, infer, store PODD-Science ontology
+        InferredOWLOntologyID pScienceInferredOntologyID = this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
+        final URI pScienceBaseOntologyURI = pScienceInferredOntologyID.getOntologyIRI().toOpenRDFURI();
+        final URI pScienceVersionURI = pScienceInferredOntologyID.getVersionIRI().toOpenRDFURI();
+        
+        // prepare: 3) load, infer, store PODD-Plant ontology
+        InferredOWLOntologyID pPlantInferredOntologyID = this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 109, 386);
+        final URI pPlantBaseOntologyURI = pPlantInferredOntologyID.getOntologyIRI().toOpenRDFURI();
+        final URI pPlantVersionURI = pPlantInferredOntologyID.getVersionIRI().toOpenRDFURI();
+
+        // prepare: 4) remove ontologies from manager cache
+        this.testOWLManager.removeCache(pbInferredOntologyID.getBaseOWLOntologyID());
+        this.testOWLManager.removeCache(pbInferredOntologyID.getInferredOWLOntologyID());
+        this.testOWLManager.removeCache(pScienceInferredOntologyID.getBaseOWLOntologyID());
+        this.testOWLManager.removeCache(pScienceInferredOntologyID.getInferredOWLOntologyID());
+        this.testOWLManager.removeCache(pPlantInferredOntologyID.getBaseOWLOntologyID());
+        this.testOWLManager.removeCache(pPlantInferredOntologyID.getInferredOWLOntologyID());
+        
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getInferredOntologyIRI()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pScienceInferredOntologyID.getInferredOntologyIRI()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pPlantInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertFalse("Ontology should not be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pPlantInferredOntologyID.getInferredOntologyIRI()));
+        
+        // prepare: 4) create schema management graph
+        final URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
+
+        // Podd-Base
+        this.testRepositoryConnection.add(pbBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
+        this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pbVersionURI,
+                schemaGraph);
+
+        // Podd-Science
+        this.testRepositoryConnection.add(pScienceBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
+        this.testRepositoryConnection.add(pScienceBaseOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pScienceVersionURI,
+                schemaGraph);
+        this.testRepositoryConnection.add(pScienceBaseOntologyURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
+        
+        // Podd-Plant
+        this.testRepositoryConnection.add(pPlantBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
+        this.testRepositoryConnection.add(pPlantBaseOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pPlantVersionURI,
+                schemaGraph);
+        this.testRepositoryConnection.add(pPlantBaseOntologyURI, OWL.IMPORTS, pScienceVersionURI, schemaGraph);
+        this.testRepositoryConnection.add(pPlantBaseOntologyURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
+        
+        printContents(testRepositoryConnection, schemaGraph);
+        
+        
+        // invoke method to test
+        this.testOWLManager.cacheSchemaOntology(pPlantInferredOntologyID, this.testRepositoryConnection, schemaGraph);
+        
+        
+        // verify:
+        Assert.assertTrue("Ontology should be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pScienceInferredOntologyID.getBaseOWLOntologyID()));
+        Assert.assertTrue("Ontology should be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pScienceInferredOntologyID.getInferredOWLOntologyID()));
+        Assert.assertTrue("Ontology should be in memory",
+                this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
+    }
+
+    private void printContents(RepositoryConnection conn, URI context) throws Exception
+    {
+        org.openrdf.repository.RepositoryResult<Statement> repoResults = conn.getStatements(null, OWL.IMPORTS, null, false, context);
+        while (repoResults.hasNext())
         {
-            contexts = this.testRepositoryConnection.getContextIDs();
-            while(contexts.hasNext())
-            {
-                final Resource context = contexts.next();
-                System.out.println("    " + context.stringValue() + " :  "
-                        + this.testRepositoryConnection.size(context));
-            }
+            Statement stmt = repoResults.next();
+            System.out.println("   " + stmt.toString());
         }
-        catch(final Exception e)
-        {
-            e.printStackTrace();
-        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#cacheSchemaOntology(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
+     * .
+     * E.g. Test caching schema ontology "A"
+     *   A :imports B
+     *   B :imports C
+     *   C :imports D
+     */
+    @Ignore
+    @Test
+    public void testCacheSchemaOntologyWithIndicrectImports() throws Exception
+    {
+        Assert.fail("TODO: implement me");
     }
     
     /**
@@ -290,14 +394,7 @@ public abstract class AbstractPoddOWLManagerTest
     public void testCacheSchemaOntologyAlreadyInCache() throws Exception
     {
         // prepare: load, infer and store a schema ontology
-        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntology loadedOntology =
-                this.testOWLManager.getOWLOntologyManager().loadOntologyFromOntologyDocument(inputStream);
-        this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection);
-        
-        final InferredOWLOntologyID inferredOntologyID =
-                this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
+        final InferredOWLOntologyID inferredOntologyID = this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
         
         Assert.assertNotNull("Ontology should already be in memory", 
                 this.testOWLManager.getOWLOntologyManager().getOntology(inferredOntologyID));
@@ -306,7 +403,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection, null);
         
         // verify:
-        Assert.assertNotNull("Ontology should be in memory",
+        Assert.assertNotNull("Ontology should still be in memory",
                 this.testOWLManager.getOWLOntologyManager().getOntology(inferredOntologyID));
     }
     
@@ -397,22 +494,15 @@ public abstract class AbstractPoddOWLManagerTest
     @Test
     public void testCacheSchemaOntologyNotInRepository() throws Exception
     {
-        // prepare: load, a schema ontology
-        final InputStream inputStream = this.getClass().getResourceAsStream(this.poddBaseResourcePath);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        final OWLOntology loadedOntology =
-                this.testOWLManager.getOWLOntologyManager().loadOntologyFromOntologyDocument(inputStream);
-        
-        final InferredOWLOntologyID inferredOntologyID =
-                this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
-        
-        this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID());
-        this.testOWLManager.removeCache(inferredOntologyID.getInferredOWLOntologyID());
-        
+        // prepare: a new InferredOWLOntologyID
+        final InferredOWLOntologyID inferredOntologyID = new InferredOWLOntologyID(
+                IRI.create("http://purl.org/podd/ns/poddBase"), 
+                IRI.create("http://purl.org/podd/ns/version/poddBase/1"), 
+                IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddBase/1")
+                );
         Assert.assertFalse("Ontology should not be in memory",
                 this.testOWLManager.getOWLOntologyManager().contains(inferredOntologyID.getBaseOWLOntologyID()));
 
-        // only the inferred statements are in the Repository
         try
         {
             this.testOWLManager.cacheSchemaOntology(inferredOntologyID, this.testRepositoryConnection, null);

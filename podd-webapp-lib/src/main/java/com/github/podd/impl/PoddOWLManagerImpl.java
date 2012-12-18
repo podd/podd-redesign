@@ -5,20 +5,25 @@ package com.github.podd.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
+import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.util.RDFInserter;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -77,64 +82,81 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     private OWLReasonerFactory reasonerFactory;
     
     @Override
-    public void cacheSchemaOntology(final InferredOWLOntologyID ontologyID, final RepositoryConnection conn, final URI uri)
-        throws OpenRDFException, OWLException, IOException, PoddException
+    public void cacheSchemaOntology(final InferredOWLOntologyID ontologyID, final RepositoryConnection conn,
+            final URI context) throws OpenRDFException, OWLException, IOException, PoddException
     {
         // -- validate input
         if(ontologyID == null || ontologyID.getOntologyIRI() == null)
         {
             throw new NullPointerException("OWLOntology is incomplete");
         }
-        // NOTE: if InferredOntologyIRI is null, only the base ontology is cached 
+        // NOTE: if InferredOntologyIRI is null, only the base ontology is cached
         
         IRI baseOntologyIRI = ontologyID.getOntologyIRI();
         IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
         IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
         
         // -- check if already cached and silently return.
-        if (this.owlOntologyManager.contains(baseOntologyIRI) || this.owlOntologyManager.contains(baseOntologyVersionIRI))
+        if(this.owlOntologyManager.contains(baseOntologyIRI)
+                || this.owlOntologyManager.contains(baseOntologyVersionIRI))
         {
             return;
         }
-
-        // -- find any other ontologies imported by this schema ontology using a SPARQL query on the Repository 
+        
+        List<String> imports = this.buildOrderedImports(ontologyID, conn, context);
+        this.log.info("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
+        
+        // -- load the imported ontologies into the Manager's cache. It is expected that they are
+        // already in the Repository
+        for(String importedOntology : imports)
+        {
+            URI contextToLoadFrom = IRI.create(importedOntology).toOpenRDFURI();
+            this.log.info("About to load {} from context {}", importedOntology, contextToLoadFrom);
+            this.parseRDFStatements(conn, contextToLoadFrom);
+        }
+        
+        // -- load the requested schema ontology (and inferred statements if they exist) into the
+        // Manager's cache
+        this.parseRDFStatements(conn, baseOntologyVersionIRI.toOpenRDFURI());
+        if(inferredOntologyIRI != null)
+        {
+            this.parseRDFStatements(conn, inferredOntologyIRI.toOpenRDFURI());
+        }
+    }
+    
+    public List<String> buildOrderedImports(final InferredOWLOntologyID ontologyID, final RepositoryConnection conn,
+            final URI context) throws OpenRDFException
+    {
+        // -- find any other ontologies imported by this schema ontology using a SPARQL query on the
+        // Repository
         String objVar = "object";
-        String sparqlQuery = "SELECT ?" + objVar + 
-        		" WHERE { ?subject <" + OWL.IMPORTS.stringValue() + "> ?" + objVar +
-        		" }";
+        String sparqlQuery =
+                "SELECT ?" + objVar + " WHERE { ?subject <" + OWL.IMPORTS.stringValue() + "> ?" + objVar + " }";
+        // TODO: Modify SPARQL to identify complete imports closure (i.e. indirect imports are not
+        // captured yet)
+        
         this.log.info("Generated SPARQL {}", sparqlQuery);
         
         final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         // Create a dataset and specify contexts for this query
         final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(baseOntologyVersionIRI.toOpenRDFURI());
-        dataset.addNamedGraph(baseOntologyVersionIRI.toOpenRDFURI());
+        dataset.addDefaultGraph(context);
+        dataset.addNamedGraph(context);
         query.setDataset(dataset);
         
         TupleQueryResult result = query.evaluate();
         List<String> imports = new ArrayList<String>();
-        while (result.hasNext())
+        while(result.hasNext())
         {
             String importedOntology = result.next().getValue(objVar).stringValue();
-            imports.add(importedOntology);
+            
+            if(!imports.contains(importedOntology))
+            {
+                this.log.info("Adding {} to imports Set", importedOntology);
+                imports.add(importedOntology);
+            }
         }
-        
-        this.log.info("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
-
-        // -- load the imported ontologies into the Manager's cache. It is expected that they are already in the Repository
-        for (String importedOntology : imports)
-        {
-            //FIXME: handle case where importedOntology is the base URI and not the version URI
-            URI context = IRI.create(importedOntology).toOpenRDFURI();
-            this.parseRDFStatements(conn, context);
-        }
-        
-        // -- load the requested schema ontology (and inferred statements if they exist) into the Manager's cache
-        this.parseRDFStatements(conn, baseOntologyVersionIRI.toOpenRDFURI()); 
-        if (inferredOntologyIRI != null)
-        {
-            this.parseRDFStatements(conn, inferredOntologyIRI.toOpenRDFURI()); 
-        }
+        return imports;
     }
     
     @Override
