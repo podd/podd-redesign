@@ -37,13 +37,14 @@ public interface PoddOWLManager
      * 
      * @param ontologyID
      * @param conn
-     * @param uri
+     * @param context
      * @throws OpenRDFException
-     * @throws PoddException 
-     * @throws IOException 
-     * @throws OWLException 
+     * @throws PoddException
+     * @throws IOException
+     * @throws OWLException
      */
-    void cacheSchemaOntology(InferredOWLOntologyID ontologyID, RepositoryConnection conn, URI uri) throws OpenRDFException, OWLException, IOException, PoddException;
+    void cacheSchemaOntology(InferredOWLOntologyID ontologyID, RepositoryConnection conn, URI context)
+        throws OpenRDFException, OWLException, IOException, PoddException;
     
     /**
      * Creates a reasoner over the given OWLOntology
@@ -122,16 +123,20 @@ public interface PoddOWLManager
      * Infer statements for the given {@link OWLOntology} into the given permanent repository
      * connection.
      * 
+     * TODO: Decide the behaviour if the asserted statements of the Ontology are not in the
+     * Repository when this method is invoked.
+     * 
      * @param ontology
      * @param permanentRepositoryConnection
      * @return The InferredOWLOntologyID representing the ontology, along with the IRI of the
      *         Inferred Ontology.
-     * @throws OWLException 
-     * @throws OWLRuntimeException 
-     * @throws IOException 
-     * @throws OpenRDFException 
+     * @throws OWLException
+     * @throws OWLRuntimeException
+     * @throws IOException
+     * @throws OpenRDFException
      */
-    InferredOWLOntologyID inferStatements(OWLOntology ontology, RepositoryConnection permanentRepositoryConnection) throws OWLRuntimeException, OWLException, OpenRDFException, IOException;
+    InferredOWLOntologyID inferStatements(OWLOntology ontology, RepositoryConnection permanentRepositoryConnection)
+        throws OWLRuntimeException, OWLException, OpenRDFException, IOException;
     
     /**
      * Returns true if the given ontologyIRI is either an Ontology IRI and it has a published
