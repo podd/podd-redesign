@@ -59,7 +59,11 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public InferredOWLOntologyID getCurrentSchemaOntologyVersion(final IRI schemaOntologyIRI)
         throws UnmanagedSchemaIRIException
     {
-        throw new RuntimeException("TODO: Implement getCurrentSchemaOntologyVersion");
+        if (schemaOntologyIRI == null)
+        {
+            throw new UnmanagedSchemaIRIException(schemaOntologyIRI, "NULL is not a managed schema ontology");
+        }
+        throw new RuntimeException("TODO: Implement getCurrentSchemaOntologyVersion(IRI)");
     }
     
     @Override

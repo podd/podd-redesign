@@ -22,6 +22,7 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.exception.EmptyOntologyException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 
 /**
  * Abstract test to verify that the PoddSchemaManager API contract is followed by implementations.
@@ -271,11 +272,18 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
      * .
      */
-    @Ignore
     @Test
     public final void testGetCurrentSchemaOntologyVersionNull() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+        this.testSchemaManager.getCurrentSchemaOntologyVersion(null);
+        Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
+        }
+        catch (UnmanagedSchemaIRIException e)
+        {
+            Assert.assertEquals("NULL is not a managed schema ontology", e.getMessage());
+        }
     }
     
     /**
