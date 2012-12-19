@@ -61,6 +61,7 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -100,10 +101,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             return;
         }
         
-        // Only direct imports and first-level indirect imports are identified. This works for the 
-        // current PODD schema ontologies which have a maximum import depth of 3 
+        // Only direct imports and first-level indirect imports are identified. This works for the
+        // current PODD schema ontologies which have a maximum import depth of 3
         // (PoddPlant -> PoddScience -> PoddBase)
-        // TODO: Fix this using a SPARQL which identifies the complete imports closure and sorts them
+        // TODO: Fix this using a SPARQL which identifies the complete imports closure and sorts
+        // them
         // in the proper order for loading.
         final List<InferredOWLOntologyID> imports = this.buildTwoLevelOrderedImportsList(ontologyID, conn, context);
         this.log.info("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
@@ -146,7 +148,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final List<InferredOWLOntologyID> directImportsList =
                     this.buildDirectImportsList(inferredOntologyID, conn, context);
             secondLevelImports.addAll(directImportsList);
-            //TODO - support multiple levels by converting into a recursive implementation
+            // TODO - support multiple levels by converting into a recursive implementation
         }
         
         for(final InferredOWLOntologyID secondImport : secondLevelImports)
@@ -233,6 +235,42 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public OWLOntologyID getCurrentVersion(final IRI ontologyIRI)
     {
         throw new RuntimeException("TODO: Implement getCurrentVersion");
+    }
+    
+    @Override
+    public InferredOWLOntologyID getCurrentSchemaVersion(final IRI ontologyIRI,
+            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
+        UnmanagedSchemaIRIException
+    {
+        final String subject = ontologyIRI.toQuotedString();
+        
+        //FIXME: pasted implementation. INCORRECT!!!
+        
+        final String sparqlQuery =
+                "SELECT ?x ?xv ?xiv WHERE { " + subject + " <" + OWL.IMPORTS.stringValue() + "> ?xv ." + "?x <"
+                        + PoddRdfConstants.OWL_VERSION_IRI + "> ?xv ." + "?x <"
+                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION + "> ?xiv ." + " }";
+        
+        this.log.info("Generated SPARQL {}", sparqlQuery);
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(managementGraph);
+        dataset.addNamedGraph(managementGraph);
+        query.setDataset(dataset);
+        
+        final TupleQueryResult queryResults = query.evaluate();
+        if(queryResults.hasNext())
+        {
+            final BindingSet nextResult = queryResults.next();
+            final String nextOntologyIRI = nextResult.getValue("x").stringValue();
+            final String nextVersionIRI = nextResult.getValue("xv").stringValue();
+            final String nextInferredIRI = nextResult.getValue("xiv").stringValue();
+            
+            return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI),
+                    IRI.create(nextInferredIRI));
+        }
+        throw new UnmanagedSchemaIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");
     }
     
     @Override

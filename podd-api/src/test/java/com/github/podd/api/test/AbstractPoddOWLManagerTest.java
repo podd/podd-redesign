@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.EmptyOntologyException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -287,7 +288,7 @@ public abstract class AbstractPoddOWLManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#cacheSchemaOntology(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
-     * . 
+     * .
      * 
      * Tests the following hierarchy of imports when caching PoddPlant schema ontology.
      * 
@@ -754,6 +755,71 @@ public abstract class AbstractPoddOWLManagerTest
     public void testGetCurrentVersion() throws Exception
     {
         Assert.fail("TODO: Implement me");
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model.IRI)}
+     * .
+     * 
+     */
+    @Test
+    public void testGetCurrentSchemaVersionNullOntologyIRI() throws Exception
+    {
+        final URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
+        try
+        {
+            this.testOWLManager.getCurrentSchemaVersion(null, this.testRepositoryConnection, schemaGraph);
+            Assert.fail("Should have thrown a RuntimeException");
+        }
+        catch(final RuntimeException e)
+        {
+            Assert.assertTrue("Not a NullPointerException as expected", e instanceof NullPointerException);
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model.IRI)}
+     * .
+     * 
+     */
+    @Test
+    public void testGetCurrentSchemaVersionWithUnmanagedOntologyIRI() throws Exception
+    {
+        final URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
+        final IRI ontologyIRI = IRI.create("urn:temp:abc:1");
+        try
+        {
+            this.testOWLManager.getCurrentSchemaVersion(ontologyIRI, this.testRepositoryConnection, schemaGraph);
+            Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
+        }
+        catch(final UnmanagedSchemaIRIException e)
+        {
+            Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
+                    e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddOWLManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model.IRI)}
+     * .
+     * 
+     */
+    @Test
+    public void testGetCurrentSchemaVersion() throws Exception
+    {
+        // prepare:
+        final URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
+        final IRI ontologyIRI = IRI.create("urn:temp:abc:1");
+        
+        // invoke test method:
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testOWLManager.getCurrentSchemaVersion(ontologyIRI, this.testRepositoryConnection, schemaGraph);
+        
+        // verify:
+        Assert.assertNotNull(inferredOntologyID);
     }
     
     /**

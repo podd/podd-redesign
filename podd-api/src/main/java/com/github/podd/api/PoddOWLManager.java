@@ -23,6 +23,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -71,6 +72,28 @@ public interface PoddOWLManager
      *         IRI, or the Version IRI.
      */
     OWLOntologyID getCurrentVersion(IRI ontologyIRI);
+    
+    /**
+     * Returns current version details of an ontology which has the given IRI as the Ontology IRI or
+     * Version IRI.
+     * 
+     * NOTE: It may be possible to merge this with {@link PoddOWLManager#getCurrentVersion(IRI)}.
+     * 
+     * @param ontologyIRI
+     *            The IRI of the ontology to get current version info.
+     * @param managementGraph
+     *            The context of the Schema Management Graph
+     * @param repositoryConnection
+     * @return An InferredOWLOntologyID containing details of the current managed version of the
+     *         ontology.
+     * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
+     *             If the given IRI does not refer to a managed schema ontology
+     * 
+     * @since 18/12/2012
+     */
+    InferredOWLOntologyID getCurrentSchemaVersion(IRI ontologyIRI, RepositoryConnection repositoryConnection,
+            URI managementGraph) throws OpenRDFException, UnmanagedSchemaIRIException;
     
     /**
      * NOTE: Restrict usage of this method, as it will always fetch the entire OWLOntology into
@@ -259,4 +282,5 @@ public interface PoddOWLManager
      */
     void dumpOntologyToRepository(OWLOntology nextOntology, RepositoryConnection nextRepositoryConnection,
             URI... contexts) throws IOException, RepositoryException;
+    
 }
