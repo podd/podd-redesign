@@ -27,8 +27,8 @@ public interface PoddRepositoryManager
     
     /**
      * 
-     * @return A new in-memory repository that can be used to store statements temporarily while
-     *         validating them before uploading them to a permanent repository.
+     * @return A new, initialized in-memory repository that can be used to store statements temporarily
+     *         while validating them before uploading them to a permanent repository.
      * @throws OpenRDFException
      */
     Repository getNewTemporaryRepository() throws OpenRDFException;
