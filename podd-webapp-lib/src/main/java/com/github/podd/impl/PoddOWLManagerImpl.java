@@ -5,25 +5,22 @@ package com.github.podd.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
-import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.util.RDFInserter;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -92,9 +89,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
         // NOTE: if InferredOntologyIRI is null, only the base ontology is cached
         
-        IRI baseOntologyIRI = ontologyID.getOntologyIRI();
-        IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
-        IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
+        final IRI baseOntologyIRI = ontologyID.getOntologyIRI();
+        final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
+        final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
         
         // -- check if already cached and silently return.
         if(this.owlOntologyManager.contains(baseOntologyIRI)
@@ -103,16 +100,27 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             return;
         }
         
-        List<String> imports = this.buildOrderedImports(ontologyID, conn, context);
+        // Only direct imports and first-level indirect imports are identified. This works for the 
+        // current PODD schema ontologies which have a maximum import depth of 3 
+        // (PoddPlant -> PoddScience -> PoddBase)
+        // TODO: Fix this using a SPARQL which identifies the complete imports closure and sorts them
+        // in the proper order for loading.
+        final List<InferredOWLOntologyID> imports = this.buildTwoLevelOrderedImportsList(ontologyID, conn, context);
         this.log.info("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
         
         // -- load the imported ontologies into the Manager's cache. It is expected that they are
         // already in the Repository
-        for(String importedOntology : imports)
+        for(final InferredOWLOntologyID inferredOntologyID : imports)
         {
-            URI contextToLoadFrom = IRI.create(importedOntology).toOpenRDFURI();
-            this.log.info("About to load {} from context {}", importedOntology, contextToLoadFrom);
+            final URI contextToLoadFrom = inferredOntologyID.getVersionIRI().toOpenRDFURI();
+            this.log.info("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
             this.parseRDFStatements(conn, contextToLoadFrom);
+            
+            final URI inferredContextToLoadFrom = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+            if(inferredContextToLoadFrom != null)
+            {
+                this.parseRDFStatements(conn, inferredContextToLoadFrom);
+            }
         }
         
         // -- load the requested schema ontology (and inferred statements if they exist) into the
@@ -124,39 +132,81 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
     }
     
-    public List<String> buildOrderedImports(final InferredOWLOntologyID ontologyID, final RepositoryConnection conn,
-            final URI context) throws OpenRDFException
+    private List<InferredOWLOntologyID> buildTwoLevelOrderedImportsList(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection conn, final URI context) throws OpenRDFException
     {
-        // -- find any other ontologies imported by this schema ontology using a SPARQL query on the
-        // Repository
-        String objVar = "object";
-        String sparqlQuery =
-                "SELECT ?" + objVar + " WHERE { ?subject <" + OWL.IMPORTS.stringValue() + "> ?" + objVar + " }";
-        // TODO: Modify SPARQL to identify complete imports closure (i.e. indirect imports are not
-        // captured yet)
+        // -- find ontologies directly imported by this schema ontology
+        final List<InferredOWLOntologyID> directImports = this.buildDirectImportsList(ontologyID, conn, context);
         
+        // -- find second level imports
+        final Set<InferredOWLOntologyID> secondLevelImports =
+                Collections.newSetFromMap(new ConcurrentHashMap<InferredOWLOntologyID, Boolean>());
+        for(final InferredOWLOntologyID inferredOntologyID : directImports)
+        {
+            final List<InferredOWLOntologyID> directImportsList =
+                    this.buildDirectImportsList(inferredOntologyID, conn, context);
+            secondLevelImports.addAll(directImportsList);
+        }
+        
+        for(final InferredOWLOntologyID secondImport : secondLevelImports)
+        {
+            if(directImports.contains(secondImport))
+            {
+                directImports.remove(secondImport);
+            }
+        }
+        
+        final List<InferredOWLOntologyID> orderedResultsList = new ArrayList<InferredOWLOntologyID>();
+        // add any indirect imports first
+        for(final InferredOWLOntologyID inferredOntologyID : secondLevelImports)
+        {
+            this.log.debug("adding {} to results", inferredOntologyID);
+            orderedResultsList.add(inferredOntologyID);
+        }
+        for(final InferredOWLOntologyID inferredOntologyID : directImports)
+        {
+            this.log.debug("adding {} to results", inferredOntologyID);
+            orderedResultsList.add(inferredOntologyID);
+        }
+        return orderedResultsList;
+    }
+    
+    private List<InferredOWLOntologyID> buildDirectImportsList(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection conn, final URI context) throws OpenRDFException
+    {
+        final List<InferredOWLOntologyID> importsList = new ArrayList<InferredOWLOntologyID>();
+        
+        final String subject = ontologyID.getOntologyIRI().toQuotedString();
+        final String sparqlQuery =
+                "SELECT ?x ?xv ?xiv WHERE { " + subject + " <" + OWL.IMPORTS.stringValue() + "> ?xv ." + "?x <"
+                        + PoddRdfConstants.OWL_VERSION_IRI + "> ?xv ." + "?x <"
+                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION + "> ?xiv ." + " }";
         this.log.info("Generated SPARQL {}", sparqlQuery);
-        
         final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
-        // Create a dataset and specify contexts for this query
+        
         final DatasetImpl dataset = new DatasetImpl();
         dataset.addDefaultGraph(context);
         dataset.addNamedGraph(context);
         query.setDataset(dataset);
         
-        TupleQueryResult result = query.evaluate();
-        List<String> imports = new ArrayList<String>();
-        while(result.hasNext())
+        final TupleQueryResult queryResults = query.evaluate();
+        while(queryResults.hasNext())
         {
-            String importedOntology = result.next().getValue(objVar).stringValue();
+            final BindingSet nextResult = queryResults.next();
+            final String ontologyIRI = nextResult.getValue("x").stringValue();
+            final String versionIRI = nextResult.getValue("xv").stringValue();
+            final String inferredIRI = nextResult.getValue("xiv").stringValue();
             
-            if(!imports.contains(importedOntology))
+            final InferredOWLOntologyID inferredOntologyID =
+                    new InferredOWLOntologyID(IRI.create(ontologyIRI), IRI.create(versionIRI), IRI.create(inferredIRI));
+            
+            if(!importsList.contains(inferredOntologyID))
             {
-                this.log.info("Adding {} to imports Set", importedOntology);
-                imports.add(importedOntology);
+                this.log.debug("Adding {} to imports list", ontologyIRI);
+                importsList.add(inferredOntologyID);
             }
         }
-        return imports;
+        return importsList;
     }
     
     @Override
