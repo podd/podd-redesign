@@ -146,6 +146,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final List<InferredOWLOntologyID> directImportsList =
                     this.buildDirectImportsList(inferredOntologyID, conn, context);
             secondLevelImports.addAll(directImportsList);
+            //TODO - support multiple levels by converting into a recursive implementation
         }
         
         for(final InferredOWLOntologyID secondImport : secondLevelImports)
