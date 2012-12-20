@@ -7,11 +7,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
@@ -171,6 +173,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             if(this.getPurlManager() != null)
             {
+                this.log.info("Handling Purl generation");
                 final Set<PoddPurlReference> purlResults =
                         this.getPurlManager().extractPurlReferences(temporaryRepositoryConnection, randomContext);
                 
@@ -179,6 +182,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // Then work on the file references
             // FIXME: implement file reference manager
+            this.log.info("Skipping file reference verification");
             final boolean isFileRefsFixed = false;
             if(this.getFileReferenceManager() != null && isFileRefsFixed)
             {
@@ -208,6 +212,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 final InferredOWLOntologyID ontologyVersion =
                         this.getOWLManager().getCurrentSchemaVersion(schemaOntologyIRI, permanentRepositoryConnection,
                                 this.getRepositoryManager().getSchemaManagementGraph());
+                
                 // Make sure it is cached in memory. This will not attempt to load the ontology
                 // again if it is already cached or already being loaded
                 this.getOWLManager().cacheSchemaOntology(ontologyVersion, permanentRepositoryConnection,
@@ -215,10 +220,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             // Load the statements into an OWLAPI OWLOntology
-            final RioMemoryTripleSource owlSource =
-                    new RioMemoryTripleSource(temporaryRepositoryConnection.getStatements(null, null, null, true,
-                            randomContext));
-            owlSource.setNamespaces(temporaryRepositoryConnection.getNamespaces());
+            final List<Statement> statements =
+                    temporaryRepositoryConnection.getStatements(null, null, null, true, randomContext).asList();
+            
+            final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
+
+            //FIXME: setting namespaces leads to a NullPointerException in
+            // RioOWLRDFConsumerAdapter.handleNamespace() line 70
+            //owlSource.setNamespaces(temporaryRepositoryConnection.getNamespaces());
             
             final OWLOntology nextOntology = this.getOWLManager().loadOntology(owlSource);
             

@@ -8,14 +8,25 @@ import java.io.InputStream;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
+import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
+import org.semanticweb.owlapi.io.StreamDocumentSource;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
@@ -35,6 +46,14 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public abstract class AbstractPoddArtifactManagerTest
 {
+    
+    protected Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    private String poddBaseResourcePath = "/ontologies/poddBase.owl";
+    
+    private String poddPlantResourcePath = "/ontologies/poddPlant.owl";
+    
+    private String poddScienceResourcePath = "/ontologies/poddScience.owl";
     
     private PoddArtifactManager testArtifactManager;
     private PoddRepositoryManager testRepositoryManager;
@@ -146,6 +165,72 @@ public abstract class AbstractPoddArtifactManagerTest
     protected abstract PoddPurlProcessorFactory getNewUUIDPurlProcessorFactory();
     
     /**
+     * Helper method which loads, infers and stores a given ontology using the PoddOWLManager.
+     * 
+     * @param resourcePath
+     * @param format
+     * @param assertedStatementCount
+     * @param inferredStatementCount
+     * @return
+     * @throws Exception
+     */
+    private InferredOWLOntologyID loadInferStoreOntology(final String resourcePath, final RDFFormat format,
+            final long assertedStatementCount, final long inferredStatementCount) throws Exception
+    {
+        // load ontology to OWLManager
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(inputStream, OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        format.getDefaultMIMEType()));
+        
+        final OWLOntology loadedBaseOntology = this.testArtifactManager.getOWLManager().loadOntology(owlSource);
+        
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            this.testArtifactManager.getOWLManager().dumpOntologyToRepository(loadedBaseOntology,
+                    nextRepositoryConnection);
+            
+            // infer statements and dump to repository
+            final InferredOWLOntologyID inferredOntologyID =
+                    this.testArtifactManager.getOWLManager().inferStatements(loadedBaseOntology,
+                            nextRepositoryConnection);
+            
+            // verify statement counts
+            final URI versionURI = loadedBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+            Assert.assertEquals("Wrong statement count", assertedStatementCount,
+                    nextRepositoryConnection.size(versionURI));
+            
+            final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+            Assert.assertEquals("Wrong inferred statement count", inferredStatementCount,
+                    nextRepositoryConnection.size(inferredOntologyURI));
+            
+            nextRepositoryConnection.commit();
+            
+            return inferredOntologyID;
+        }
+        catch(final Exception e)
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            throw e;
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+        }
+    }
+    
+    /**
      * @throws java.lang.Exception
      */
     @Before
@@ -199,6 +284,9 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final PoddOWLManager testOWLManager = this.getNewOWLManager();
         testOWLManager.setReasonerFactory(this.getNewReasonerFactory());
+        final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
+        testOWLManager.setOWLOntologyManager(manager);
         
         this.testRepositoryManager = this.getNewRepositoryManager();
         
@@ -261,6 +349,20 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactBasicSuccess() throws Exception
     {
+        // load schema ontologies
+        final InferredOWLOntologyID inferredPBaseOntologyID =
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+        final InferredOWLOntologyID inferredPScienceOntologyID =
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
+        
+        // update schema management graph
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
+                false);
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPScienceOntologyID.getBaseOWLOntologyID(),
+                inferredPScienceOntologyID.getInferredOWLOntologyID(), false);
+        
         final InputStream inputStream =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
         // MIME type should be either given by the user, detected from the content type on the
@@ -284,6 +386,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#publishArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
+    @Ignore
     @Test
     public final void testPublishArtifact() throws Exception
     {
@@ -317,6 +420,31 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateSchemaImport() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Helper method prints the contents of the given context of a Repository
+     */
+    private void printContents(final URI context) throws Exception
+    {
+        final RepositoryConnection conn = this.testRepositoryManager.getRepository().getConnection();
+        conn.begin();
+        
+        System.out.println("==================================================");
+        System.out.println("Graph = " + context);
+        System.out.println();
+        final org.openrdf.repository.RepositoryResult<Statement> repoResults =
+                conn.getStatements(null, null, null, false, context);
+        while(repoResults.hasNext())
+        {
+            final Statement stmt = repoResults.next();
+            System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {" + stmt.getObject()
+                    + "}");
+        }
+        System.out.println("==================================================");
+        
+        conn.rollback();
+        conn.close();
     }
     
 }
