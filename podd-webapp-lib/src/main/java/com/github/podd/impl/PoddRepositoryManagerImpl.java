@@ -6,7 +6,6 @@ package com.github.podd.impl;
 import java.util.List;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
@@ -31,7 +30,9 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
 {
     
     private Repository repository;
+    
     private URI artifactGraph = PoddRdfConstants.DEFAULT_ARTIFACT_MANAGEMENT_GRAPH;
+    
     private URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
     
     /**
@@ -60,23 +61,39 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         this.repository = repository;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.api.PoddRepositoryManager#getRepository()
-     */
+    @Override
+    public URI getArtifactManagementGraph()
+    {
+        return this.artifactGraph;
+    }
+    
+    @Override
+    public Repository getNewTemporaryRepository() throws OpenRDFException
+    {
+        final Repository result = new SailRepository(new MemoryStore());
+        result.initialize();
+        
+        return result;
+    }
+    
     @Override
     public Repository getRepository() throws OpenRDFException
     {
         return this.repository;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.github.podd.api.PoddRepositoryManager#setRepository(org.openrdf.repository.Repository)
-     */
+    @Override
+    public URI getSchemaManagementGraph()
+    {
+        return this.schemaGraph;
+    }
+    
+    @Override
+    public void setArtifactManagementGraph(final URI artifactManagementGraph)
+    {
+        this.artifactGraph = artifactManagementGraph;
+    }
+    
     @Override
     public void setRepository(final Repository repository) throws OpenRDFException
     {
@@ -84,30 +101,88 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public Repository getNewTemporaryRepository() throws OpenRDFException
+    public void setSchemaManagementGraph(final URI schemaManagementGraph)
     {
-        Repository result = new SailRepository(new MemoryStore());
-        result.initialize();
-        
-        return result;
+        this.schemaGraph = schemaManagementGraph;
     }
     
-    /**
-     * This method adds information to the PODD artifact management graph, and updates the links for
-     * the current version for both the ontology and the inferred ontology.
-     * 
-     * @param nextOntologyID
-     *            The ontology ID that contains the information about the original ontology.
-     * @param nextInferredOntologyID
-     *            The ontology ID that contains the information about the inferred ontology.
-     * @param updateCurrent
-     *            If true, will update the current version if it exists. If false it will only add
-     *            the current version if it does not exist.
-     * @throws RepositoryException
-     */
+    @Override
+    public void updateCurrentManagedSchemaOntologyVersion(final OWLOntologyID nextOntologyID,
+            final OWLOntologyID nextInferredOntologyID, final boolean updateCurrent) throws OpenRDFException
+    {
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.repository.getConnection();
+            nextRepositoryConnection.begin();
+            
+            final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
+            final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
+            // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must
+            // be generated for each new inferred ontology generation. For reference though, the
+            // version is equal to the ontology IRI in the prototype code. See
+            // generateInferredOntologyID method for the corresponding code.
+            final URI nextInferredOntologyUri = nextInferredOntologyID.getOntologyIRI().toOpenRDFURI();
+            
+            // type the ontology
+            nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
+            // setup a version number link for this version
+            nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri,
+                    this.schemaGraph);
+            
+            final List<Statement> currentVersions =
+                    nextRepositoryConnection.getStatements(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
+                            false, this.schemaGraph).asList();
+            
+            // If there are no current versions, or we must update the current version, then do it
+            // here
+            if(currentVersions.isEmpty() || updateCurrent)
+            {
+                // remove whatever was previously there for the current version marker
+                nextRepositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
+                        this.schemaGraph);
+                
+                // then insert the new current version marker
+                nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri,
+                        this.schemaGraph);
+            }
+            
+            // then do a similar process with the inferred axioms ontology
+            nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
+            
+            // remove whatever was previously there for the current inferred version marker
+            nextRepositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null,
+                    this.schemaGraph);
+            
+            // link from the ontology IRI to the current inferred axioms ontology version
+            nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+                    nextInferredOntologyUri, this.schemaGraph);
+            
+            // link from the ontology version IRI to the matching inferred axioms ontology version
+            nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                    nextInferredOntologyUri, this.schemaGraph);
+            
+            nextRepositoryConnection.commit();
+        }
+        catch(final RepositoryException e)
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+        }
+    }
+    
     @Override
     public void updateManagedPoddArtifactVersion(final OWLOntologyID nextOntologyID,
-            final OWLOntologyID nextInferredOntologyID, final boolean updateCurrent) throws RepositoryException
+            final OWLOntologyID nextInferredOntologyID, final boolean updateCurrent) throws OpenRDFException
     {
         
         RepositoryConnection nextRepositoryConnection = null;
@@ -142,7 +217,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri,
                     this.artifactGraph);
             
-            List<Statement> currentVersions =
+            final List<Statement> currentVersions =
                     nextRepositoryConnection.getStatements(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
                             false, this.artifactGraph).asList();
             
@@ -191,7 +266,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             
             nextRepositoryConnection.commit();
         }
-        catch(RepositoryException e)
+        catch(final RepositoryException e)
         {
             if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
             {
@@ -205,121 +280,6 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 nextRepositoryConnection.close();
             }
         }
-        
-    }
-    
-    /**
-     * This method adds information to the Schema Ontology management graph, and updates the links
-     * for the current version for both the ontology and the inferred ontology.
-     * 
-     * @param nextOntologyID
-     *            The ontology ID that contains the information about the original ontology.
-     * @param nextInferredOntologyID
-     *            The ontology ID that contains the information about the inferred ontology.
-     * @param updateCurrent
-     *            If true, will update the current version if it exists. If false it will only add
-     *            the current version if it does not exist.
-     * @throws RepositoryException
-     */
-    @Override
-    public void updateCurrentManagedSchemaOntologyVersion(final OWLOntologyID nextOntologyID,
-            final OWLOntologyID nextInferredOntologyID, final boolean updateCurrent) throws RepositoryException
-    {
-        RepositoryConnection nextRepositoryConnection = null;
-        try
-        {
-            nextRepositoryConnection = this.repository.getConnection();
-            nextRepositoryConnection.begin();
-            
-            final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
-            final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
-            // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must
-            // be
-            // generated for each new inferred ontology generation. For reference though, the
-            // version is
-            // equal to the ontology IRI in the prototype code. See generateInferredOntologyID
-            // method
-            // for the corresponding code.
-            final URI nextInferredOntologyUri = nextInferredOntologyID.getOntologyIRI().toOpenRDFURI();
-            
-            // type the ontology
-            nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-            // setup a version number link for this version
-            nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri,
-                    this.schemaGraph);
-            
-            List<Statement> currentVersions =
-                    nextRepositoryConnection.getStatements(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
-                            false, this.schemaGraph).asList();
-            
-            // If there are no current versions, or we must update the current version, then do it
-            // here
-            if(currentVersions.isEmpty() || updateCurrent)
-            {
-                // remove whatever was previously there for the current version marker
-                nextRepositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
-                        this.schemaGraph);
-                
-                // then insert the new current version marker
-                nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri,
-                        this.schemaGraph);
-            }
-            
-            // then do a similar process with the inferred axioms ontology
-            nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-            
-            // remove whatever was previously there for the current inferred version marker
-            nextRepositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null,
-                    this.schemaGraph);
-            
-            // link from the ontology IRI to the current inferred axioms ontology version
-            nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    nextInferredOntologyUri, this.schemaGraph);
-            
-            // link from the ontology version IRI to the matching inferred axioms ontology version
-            nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                    nextInferredOntologyUri, this.schemaGraph);
-            
-            nextRepositoryConnection.commit();
-        }
-        catch(RepositoryException e)
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
-            {
-                nextRepositoryConnection.rollback();
-            }
-        }
-        finally
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
-            {
-                nextRepositoryConnection.close();
-            }
-        }
-    }
-    
-    @Override
-    public void setSchemaManagementGraph(URI schemaManagementGraph)
-    {
-        this.schemaGraph = schemaManagementGraph;
-    }
-    
-    @Override
-    public URI getSchemaManagementGraph()
-    {
-        return this.schemaGraph;
-    }
-    
-    @Override
-    public void setArtifactManagementGraph(URI artifactManagementGraph)
-    {
-        this.artifactGraph = artifactManagementGraph;
-    }
-    
-    @Override
-    public URI getArtifactManagementGraph()
-    {
-        return this.artifactGraph;
     }
     
 }
