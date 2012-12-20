@@ -23,6 +23,8 @@ import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
+import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
+import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -464,8 +466,10 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         OWLOntology nextOntology;
         if(owlSource instanceof RioMemoryTripleSource)
         {
-            
-            final RioParserImpl owlParser = new RioParserImpl(null);
+            final RioRDFOntologyFormatFactory ontologyFormatFactory =
+                    (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                            "application/rdf+xml");
+            final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
             
             nextOntology = this.owlOntologyManager.createOntology();
             

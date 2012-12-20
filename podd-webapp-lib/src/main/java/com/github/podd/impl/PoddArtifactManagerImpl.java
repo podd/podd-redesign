@@ -225,9 +225,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
 
-            //FIXME: setting namespaces leads to a NullPointerException in
-            // RioOWLRDFConsumerAdapter.handleNamespace() line 70
-            //owlSource.setNamespaces(temporaryRepositoryConnection.getNamespaces());
+            owlSource.setNamespaces(temporaryRepositoryConnection.getNamespaces());
             
             final OWLOntology nextOntology = this.getOWLManager().loadOntology(owlSource);
             
@@ -274,7 +272,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             return inferredOWLOntologyID;
         }
-        catch(OpenRDFException | PoddException | IOException | OWLException e)
+        catch(Exception e)
         {
             if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isActive())
             {
@@ -291,7 +289,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         finally
         {
             // release resources
-            
             if(inferredOWLOntologyID != null)
             {
                 this.getOWLManager().removeCache(inferredOWLOntologyID);
