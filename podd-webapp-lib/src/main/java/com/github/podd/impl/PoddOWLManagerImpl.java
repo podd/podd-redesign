@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
@@ -242,34 +243,57 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedSchemaIRIException
     {
-        final String subject = ontologyIRI.toQuotedString();
-        
-        //FIXME: pasted implementation. INCORRECT!!!
-        
-        final String sparqlQuery =
-                "SELECT ?x ?xv ?xiv WHERE { " + subject + " <" + OWL.IMPORTS.stringValue() + "> ?xv ." + "?x <"
-                        + PoddRdfConstants.OWL_VERSION_IRI + "> ?xv ." + "?x <"
-                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION + "> ?xiv ." + " }";
-        
-        this.log.info("Generated SPARQL {}", sparqlQuery);
-        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
-        
         final DatasetImpl dataset = new DatasetImpl();
         dataset.addDefaultGraph(managementGraph);
         dataset.addNamedGraph(managementGraph);
-        query.setDataset(dataset);
         
-        final TupleQueryResult queryResults = query.evaluate();
-        if(queryResults.hasNext())
+        // 1: see if the given IRI exists as an ontology IRI
+        final String sparqlQuery1 =
+                "SELECT ?cv ?civ WHERE { " + ontologyIRI.toQuotedString() + " <" + RDF.TYPE.stringValue() + "> <"
+                        + OWL.ONTOLOGY.stringValue() + "> . " + ontologyIRI.toQuotedString() + " <"
+                        + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . "
+                        + ontologyIRI.toQuotedString() + " <"
+                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . " + " }";
+        // SELECT ?cv ?civ WHERE { <iri> :type owl:ontology . <iri> omv:current-version ?cv . <iri>
+        // :current-inferred-version ?civ . }
+        this.log.info("Generated SPARQL {}", sparqlQuery1);
+        
+        final TupleQuery query1 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery1);
+        query1.setDataset(dataset);
+        
+        final TupleQueryResult query1Results = query1.evaluate();
+        if(query1Results.hasNext())
         {
-            final BindingSet nextResult = queryResults.next();
-            final String nextOntologyIRI = nextResult.getValue("x").stringValue();
-            final String nextVersionIRI = nextResult.getValue("xv").stringValue();
-            final String nextInferredIRI = nextResult.getValue("xiv").stringValue();
+            final BindingSet nextResult = query1Results.next();
+            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
+            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
             
-            return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI),
-                    IRI.create(nextInferredIRI));
+            return new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), IRI.create(nextInferredIRI));
         }
+        
+        // 2: see if the given IRI exists as a version IRI
+        final String sparqlQuery2 =
+                "SELECT ?x ?civ WHERE { " + " ?x <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> "
+                        + ontologyIRI.toQuotedString() + " . " + " ?x <" + RDF.TYPE.stringValue() + "> <"
+                        + OWL.ONTOLOGY.stringValue() + "> . " + " ?x <"
+                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . " + " }";
+        // SELECT ?x ?civ WHERE { ?x omv:current-version <iri> . ?x :type owl:ontology . ?x
+        // :current-inferred-version ?civ . }
+        this.log.info("Generated SPARQL {}", sparqlQuery2);
+        
+        final TupleQuery query2 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery2);
+        query2.setDataset(dataset);
+        
+        final TupleQueryResult queryResults2 = query2.evaluate();
+        if(queryResults2.hasNext())
+        {
+            final BindingSet nextResult = queryResults2.next();
+            final String nextOntologyIRI = nextResult.getValue("x").stringValue();
+            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
+            
+            return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI.create(nextInferredIRI));
+        }
+        
         throw new UnmanagedSchemaIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");
     }
     
