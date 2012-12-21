@@ -194,21 +194,23 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
             final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
             // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must
-            // be
-            // generated for each new inferred ontology generation. For reference though, the
-            // version is
-            // equal to the ontology IRI in the prototype code. See generateInferredOntologyID
-            // method
-            // for the corresponding code.
+            // be generated for each new inferred ontology generation. For reference though, the
+            // version is equal to the ontology IRI in the prototype code. See
+            // generateInferredOntologyID method for the corresponding code.
             final URI nextInferredOntologyUri = nextInferredOntologyID.getOntologyIRI().toOpenRDFURI();
             
             // type the ontology
-            // 1st 3 parameters represent the triple.
-            // 4th (the artifactGraph) is the "context" in which the triple is stored
             nextRepositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
             
-            // TODO: remove the content of any contexts that are the object of versionIRI statements
-            
+            // remove the content of any contexts that are the object of versionIRI statements
+            final List<Statement> contextsToRemove =
+                    nextRepositoryConnection.getStatements(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, null,
+                            true, this.artifactGraph).asList();
+            for(final Statement stmnt : contextsToRemove)
+            {
+                final URI oldVersionIri = IRI.create(stmnt.getObject().stringValue()).toOpenRDFURI();
+                nextRepositoryConnection.clear(oldVersionIri);
+            }
             // remove previous versionIRI statements
             nextRepositoryConnection
                     .remove(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, null, this.artifactGraph);
@@ -235,6 +237,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             }
             
             // then do a similar process with the inferred axioms ontology
+            
+            // type the inferred ontology
             nextRepositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, this.artifactGraph);
             
             // remove whatever was previously there for the current inferred version marker

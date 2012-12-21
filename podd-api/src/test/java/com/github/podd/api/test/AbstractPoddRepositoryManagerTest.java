@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openrdf.OpenRDFException;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -46,6 +45,10 @@ public abstract class AbstractPoddRepositoryManagerTest
     {
         this.testRepositoryManager = this.getNewPoddRepositoryManagerInstance();
         
+        this.testRepositoryManager.setSchemaManagementGraph(ValueFactoryImpl.getInstance().createURI(
+                "urn:test:schema-graph"));
+        this.testRepositoryManager.setArtifactManagementGraph(ValueFactoryImpl.getInstance().createURI(
+                "urn:test:artifact-graph"));
     }
     
     /**
@@ -142,7 +145,7 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testSetSchemaManagementGraph() throws Exception
     {
-        final URI testSchemaMgtGraph = ValueFactoryImpl.getInstance().createURI("urn:test:schema-graph");
+        final URI testSchemaMgtGraph = ValueFactoryImpl.getInstance().createURI("urn:my-test:schema-management-graph");
         this.testRepositoryManager.setSchemaManagementGraph(testSchemaMgtGraph);
         Assert.assertEquals("Schema graph was not correctly set", testSchemaMgtGraph,
                 this.testRepositoryManager.getSchemaManagementGraph());
@@ -156,9 +159,6 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testUpdateCurrentManagedSchemaOntologyVersionWithoutUpdate() throws Exception
     {
-        final URI testSchemaMgtGraph = ValueFactoryImpl.getInstance().createURI("urn:test:schema-graph");
-        this.testRepositoryManager.setSchemaManagementGraph(testSchemaMgtGraph);
-        
         final IRI pOntologyIRI = IRI.create("http://purl.org/podd/ns/poddBase");
         final IRI pVersionIRI = IRI.create("http://purl.org/podd/ns/version/poddBase/1");
         final IRI pInferredVersionIRI = IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddBase/1");
@@ -169,7 +169,8 @@ public abstract class AbstractPoddRepositoryManagerTest
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID.getBaseOWLOntologyID(),
                 nextOntologyID.getInferredOWLOntologyID(), false);
         
-        this.verifySchemaManagementGraphContents(6, testSchemaMgtGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRI);
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getSchemaManagementGraph(), pOntologyIRI,
+                pVersionIRI, pInferredVersionIRI);
     }
     
     /**
@@ -180,9 +181,6 @@ public abstract class AbstractPoddRepositoryManagerTest
     @Test
     public final void testUpdateCurrentManagedSchemaOntologyVersionWithUpdate() throws Exception
     {
-        final URI testSchemaMgtGraph = ValueFactoryImpl.getInstance().createURI("urn:test:schema-graph");
-        this.testRepositoryManager.setSchemaManagementGraph(testSchemaMgtGraph);
-        
         final IRI pOntologyIRI = IRI.create("http://purl.org/podd/ns/poddBase");
         final IRI pVersionIRI = IRI.create("http://purl.org/podd/ns/version/poddBase/1");
         final IRI pInferredVersionIRI = IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddBase/1");
@@ -192,7 +190,8 @@ public abstract class AbstractPoddRepositoryManagerTest
         // first setting of schema versions in mgt graph
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID.getBaseOWLOntologyID(),
                 nextOntologyID.getInferredOWLOntologyID(), false);
-        this.verifySchemaManagementGraphContents(6, testSchemaMgtGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRI);
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getSchemaManagementGraph(), pOntologyIRI,
+                pVersionIRI, pInferredVersionIRI);
         
         final IRI pVersionIRIUpdated = IRI.create("http://purl.org/podd/ns/version/poddBase/4");
         final IRI pInferredVersionIRIUpdated = IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddBase/5");
@@ -204,41 +203,218 @@ public abstract class AbstractPoddRepositoryManagerTest
                 nextOntologyIDUpdated.getBaseOWLOntologyID(), nextOntologyIDUpdated.getInferredOWLOntologyID(), false);
         
         // verify only inferred ontology version is updated
-        this.verifySchemaManagementGraphContents(9, testSchemaMgtGraph, pOntologyIRI, pVersionIRI,
-                pInferredVersionIRIUpdated);
+        this.verifyManagementGraphContents(9, this.testRepositoryManager.getSchemaManagementGraph(), pOntologyIRI,
+                pVersionIRI, pInferredVersionIRIUpdated);
         
         // invoke with "updateCurrent" allowed
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
                 nextOntologyIDUpdated.getBaseOWLOntologyID(), nextOntologyIDUpdated.getInferredOWLOntologyID(), true);
         
         // verify both ontology current version and inferred ontology version haven been updated
-        this.verifySchemaManagementGraphContents(9, testSchemaMgtGraph, pOntologyIRI, pVersionIRIUpdated,
-                pInferredVersionIRIUpdated);
+        this.verifyManagementGraphContents(9, this.testRepositoryManager.getSchemaManagementGraph(), pOntologyIRI,
+                pVersionIRIUpdated, pInferredVersionIRIUpdated);
         
     }
     
-    private void verifySchemaManagementGraphContents(final int graphSize, final URI testSchemaMgtGraph,
-            final IRI pOntologyIRI, final IRI pVersionIRI, final IRI pInferredVersionIRI) throws OpenRDFException
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#updateManagedPoddArtifactVersion(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID, boolean)}
+     * .
+     * 
+     * Details of a new artifact are added to the management graph.
+     */
+    @Test
+    public final void testUpdateManagedPoddArtifactVersionWithNewArtifact() throws Exception
+    {
+        // prepare: add entries in the artifact graph for a test artifact
+        final IRI pArtifactIRI = IRI.create("http://purl.org/abc-def/artifact:1");
+        final IRI pVersionIRI = IRI.create("http://purl.org/abc-def/artifact:1:version:1");
+        final IRI pInferredVersionIRI = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:1");
+        final InferredOWLOntologyID nextOntologyID =
+                new InferredOWLOntologyID(pArtifactIRI, pVersionIRI, pInferredVersionIRI);
+        
+        // invoke method under test
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyID.getBaseOWLOntologyID(),
+                nextOntologyID.getInferredOWLOntologyID(), false);
+        
+        // verify:
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersionIRI, pInferredVersionIRI);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#updateManagedPoddArtifactVersion(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID, boolean)}
+     * .
+     * 
+     * Details of an existing artifact are updated in the management graph.
+     */
+    @Test
+    public final void testUpdateManagedPoddArtifactVersionWithExistingArtifact() throws Exception
+    {
+        // prepare: add entries in the artifact graph for a test artifact
+        final IRI pArtifactIRI = IRI.create("http://purl.org/abc-def/artifact:1");
+        final IRI pVersion1IRIv1 = IRI.create("http://purl.org/abc-def/artifact:1:version:1");
+        final IRI pInferredVersionIRIv1 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:1");
+        final InferredOWLOntologyID nextOntologyIDv1 =
+                new InferredOWLOntologyID(pArtifactIRI, pVersion1IRIv1, pInferredVersionIRIv1);
+        
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyIDv1.getBaseOWLOntologyID(),
+                nextOntologyIDv1.getInferredOWLOntologyID(), false);
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersion1IRIv1, pInferredVersionIRIv1);
+        
+        // prepare: update artifact version
+        final IRI pVersionIRIv2 = IRI.create("http://purl.org/abc-def/artifact:1:version:2");
+        final IRI pInferredVersionIRIv2 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:2");
+        final InferredOWLOntologyID nextOntologyIDv2 =
+                new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
+        
+        // invoke method under test
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyIDv2.getBaseOWLOntologyID(),
+                nextOntologyIDv2.getInferredOWLOntologyID(), true);
+        
+        // verify:
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersionIRIv2, pInferredVersionIRIv2);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#updateManagedPoddArtifactVersion(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID, boolean)}
+     * .
+     * 
+     * Details of an existing artifact are updated in the management graph, with "updateCurrent" =
+     * false. The "current version" does not change for base/asserted ontology while the current
+     * inferred version is updated.
+     */
+    @Test
+    public final void testUpdateManagedPoddArtifactVersionWithoutUpdateCurrent() throws Exception
+    {
+        // prepare: add entries in the artifact graph for a test artifact
+        final IRI pArtifactIRI = IRI.create("http://purl.org/abc-def/artifact:1");
+        final IRI pVersionIRIv1 = IRI.create("http://purl.org/abc-def/artifact:1:version:1");
+        final IRI pInferredVersionIRIv1 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:1");
+        final InferredOWLOntologyID nextOntologyIDv1 =
+                new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
+        
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyIDv1.getBaseOWLOntologyID(),
+                nextOntologyIDv1.getInferredOWLOntologyID(), false);
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersionIRIv1, pInferredVersionIRIv1);
+        
+        // prepare: version 2
+        final IRI pVersionIRIv2 = IRI.create("http://purl.org/abc-def/artifact:1:version:2");
+        final IRI pInferredVersionIRIv2 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:2");
+        final InferredOWLOntologyID nextOntologyIDv2 =
+                new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
+        
+        // invoke with "updateCurrent" disallowed
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyIDv2.getBaseOWLOntologyID(),
+                nextOntologyIDv2.getInferredOWLOntologyID(), false);
+        
+        // verify: only inferred version is updated
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersionIRIv1, pInferredVersionIRIv2);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#updateManagedPoddArtifactVersion(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID, boolean)}
+     * .
+     */
+    @Test
+    public final void testUpdateManagedPoddArtifactVersionWithUpdate() throws Exception
+    {
+        // prepare: add entries in the artifact graph for a test artifact
+        final IRI pArtifactIRI = IRI.create("http://purl.org/abc-def/artifact:1");
+        final IRI pVersionIRIv1 = IRI.create("http://purl.org/abc-def/artifact:1:version:1");
+        final IRI pInferredVersionIRIv1 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:1");
+        final InferredOWLOntologyID nextOntologyIDv1 =
+                new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
+        
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyIDv1.getBaseOWLOntologyID(),
+                nextOntologyIDv1.getInferredOWLOntologyID(), false);
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersionIRIv1, pInferredVersionIRIv1);
+        
+        // prepare: version 2
+        final IRI pVersionIRIv2 = IRI.create("http://purl.org/abc-def/artifact:1:version:2");
+        final IRI pInferredVersionIRIv2 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:2");
+        final InferredOWLOntologyID nextOntologyIDv2 =
+                new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
+        
+        // invoke with "updateCurrent" disallowed
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyIDv2.getBaseOWLOntologyID(),
+                nextOntologyIDv2.getInferredOWLOntologyID(), false);
+        
+        // verify: only inferred version is updated
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersionIRIv1, pInferredVersionIRIv2);
+        
+        // update to version 3
+        final IRI pVersionIRIv3 = IRI.create("http://purl.org/abc-def/artifact:1:version:3");
+        final IRI pInferredVersionIRIv3 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:3");
+        final InferredOWLOntologyID nextOntologyIDv3 =
+                new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv3, pInferredVersionIRIv3);
+        
+        // invoke with "updateCurrent" allowed
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyIDv3.getBaseOWLOntologyID(),
+                nextOntologyIDv3.getInferredOWLOntologyID(), true);
+        
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersionIRIv3, pInferredVersionIRIv3);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#updateManagedPoddArtifactVersion(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID, boolean)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testUpdateManagedPoddArtifactVersionForDeletingPreviousVersionContent() throws Exception
+    {
+        Assert.fail("TODO - implement me");
+    }
+    
+    /**
+     * Helper method to verify the contents of a management graph
+     * 
+     * @param graphSize
+     *            Expected size of the graph
+     * @param testGraph
+     *            The Graph/context to be tested
+     * @param pOntologyIRI
+     *            The ontology/artifact
+     * @param pVersionIRI
+     *            Version IRI of the ontology/artifact
+     * @param pInferredVersionIRI
+     *            Inferred version of the ontology/artifact
+     * @throws Exception
+     */
+    private void verifyManagementGraphContents(final int graphSize, final URI testGraph, final IRI pOntologyIRI,
+            final IRI pVersionIRI, final IRI pInferredVersionIRI) throws Exception
     {
         final RepositoryConnection repositoryConnection = this.testRepositoryManager.getRepository().getConnection();
         try
         {
             repositoryConnection.begin();
-            Assert.assertEquals("Schema graph not of expected size", graphSize, repositoryConnection.size());
+            Assert.assertEquals("Graph not of expected size", graphSize, repositoryConnection.size(testGraph));
             
             final RepositoryResult<Statement> statements =
                     repositoryConnection.getStatements(null, PoddRdfConstants.OMV_CURRENT_VERSION, null, false,
-                            testSchemaMgtGraph);
+                            testGraph);
             final List<Statement> stmtList = statements.asList();
-            Assert.assertEquals("Schema graph should have one OMV_CURRENT_VERSION statement", 1, stmtList.size());
+            Assert.assertEquals("Graph should have one OMV_CURRENT_VERSION statement", 1, stmtList.size());
             Assert.assertEquals("Wrong ontology IRI", pOntologyIRI.toString(), stmtList.get(0).getSubject().toString());
             Assert.assertEquals("Wrong version IRI", pVersionIRI.toString(), stmtList.get(0).getObject().toString());
             
             final RepositoryResult<Statement> inferredVersionStatements =
                     repositoryConnection.getStatements(null, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null,
-                            false, testSchemaMgtGraph);
+                            false, testGraph);
             final List<Statement> inferredVersionStatementList = inferredVersionStatements.asList();
-            Assert.assertEquals("Schema graph should have one CURRENT_INFERRED_VERSION statement", 1,
+            Assert.assertEquals("Graph should have one CURRENT_INFERRED_VERSION statement", 1,
                     inferredVersionStatementList.size());
             Assert.assertEquals("Wrong ontology IRI", pOntologyIRI.toString(), inferredVersionStatementList.get(0)
                     .getSubject().toString());
@@ -252,16 +428,5 @@ public abstract class AbstractPoddRepositoryManagerTest
         }
     }
     
-    /**
-     * Test method for
-     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#updateManagedPoddArtifactVersion(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID, boolean)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testUpdateManagedPoddArtifactVersion() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
+   
 }
