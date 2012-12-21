@@ -34,7 +34,8 @@ import com.github.podd.utils.InferredOWLOntologyID;
 public interface PoddOWLManager
 {
     /**
-     * Loads and caches the given schema ontology in memory from a Repository.
+     * Loads and caches the given schema ontology in memory from a Repository. Silently returns if
+     * the ontology is already cached.
      * 
      * @param ontologyID
      * @param conn

@@ -181,22 +181,22 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             // Then work on the file references
-            // FIXME: implement file reference manager
-            this.log.info("Skipping file reference verification");
-            final boolean isFileRefsFixed = false;
-            if(this.getFileReferenceManager() != null && isFileRefsFixed)
+            if(this.getFileReferenceManager() != null)
             {
+                this.log.info("Handling File reference validation");
                 // calls, to setup the results collection
                 final Set<PoddFileReference> fileReferenceResults =
                         this.getFileReferenceManager().extractFileReferences(temporaryRepositoryConnection,
                                 randomContext);
-                
+
                 // optionally verify the file references
-                this.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
-                        temporaryRepositoryConnection, randomContext);
-                
-                // TODO: Optionally remove invalid file references or mark them as invalid using RDF
-                // statements/OWL Classes
+                if (fileReferenceResults.size() > 0)
+                {
+                    this.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
+                            temporaryRepositoryConnection, randomContext);
+                    // TODO: Optionally remove invalid file references or mark them as invalid using RDF
+                    // statements/OWL Classes
+                }
             }
             
             final Repository permanentRepository = this.getRepositoryManager().getRepository();
@@ -213,8 +213,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         this.getOWLManager().getCurrentSchemaVersion(schemaOntologyIRI, permanentRepositoryConnection,
                                 this.getRepositoryManager().getSchemaManagementGraph());
                 
-                // Make sure it is cached in memory. This will not attempt to load the ontology
-                // again if it is already cached or already being loaded
+                // Make sure it is cached in memory
                 this.getOWLManager().cacheSchemaOntology(ontologyVersion, permanentRepositoryConnection,
                         this.getRepositoryManager().getSchemaManagementGraph());
             }
