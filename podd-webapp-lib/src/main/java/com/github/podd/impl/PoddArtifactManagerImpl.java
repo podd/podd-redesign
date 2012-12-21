@@ -188,13 +188,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 final Set<PoddFileReference> fileReferenceResults =
                         this.getFileReferenceManager().extractFileReferences(temporaryRepositoryConnection,
                                 randomContext);
-
+                
                 // optionally verify the file references
-                if (fileReferenceResults.size() > 0)
+                if(fileReferenceResults.size() > 0)
                 {
                     this.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
                             temporaryRepositoryConnection, randomContext);
-                    // TODO: Optionally remove invalid file references or mark them as invalid using RDF
+                    // TODO: Optionally remove invalid file references or mark them as invalid using
+                    // RDF
                     // statements/OWL Classes
                 }
             }
@@ -223,7 +224,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     temporaryRepositoryConnection.getStatements(null, null, null, true, randomContext).asList();
             
             final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
-
+            
             owlSource.setNamespaces(temporaryRepositoryConnection.getNamespaces());
             
             final OWLOntology nextOntology = this.getOWLManager().loadOntology(owlSource);
@@ -269,9 +270,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             permanentRepositoryConnection.commit();
             
+            this.getRepositoryManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID.getBaseOWLOntologyID(),
+                    inferredOWLOntologyID.getInferredOWLOntologyID(), true);
+            
             return inferredOWLOntologyID;
         }
-        catch(Exception e)
+        catch(final Exception e)
         {
             if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isActive())
             {

@@ -349,13 +349,13 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactBasicSuccess() throws Exception
     {
-        // load schema ontologies
+        // prepare: load schema ontologies
         final InferredOWLOntologyID inferredPBaseOntologyID =
                 this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
         final InferredOWLOntologyID inferredPScienceOntologyID =
                 this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
         
-        // update schema management graph
+        // prepare: update schema management graph
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
                 inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
                 false);
@@ -370,15 +370,117 @@ public abstract class AbstractPoddArtifactManagerTest
         final String mimeType = "application/rdf+xml";
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
+        // invoke test method
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
+        // verify:
         Assert.assertNotNull("Load artifact returned a null artifact ID", resultArtifactId);
         Assert.assertNotNull("Load artifact returned a null ontology IRI", resultArtifactId.getOntologyIRI());
         Assert.assertNotNull("Load artifact returned a null ontology version IRI", resultArtifactId.getVersionIRI());
         Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
                 resultArtifactId.getInferredOntologyIRI());
         
-        // FIXME: How do we verify that load artifact was successful on the underlying repository?
+        // verify: based on size of graphs
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            Assert.assertEquals("Incorrect number of asserted statements for artifact", 33,
+                    nextRepositoryConnection.size(resultArtifactId.getVersionIRI().toOpenRDFURI()));
+            
+            Assert.assertEquals("Incorrect number of inferred statements for artifact", 383,
+                    nextRepositoryConnection.size(resultArtifactId.getInferredOntologyIRI().toOpenRDFURI()));
+            
+            Assert.assertEquals("Artifact graph not of expected size", 6,
+                    nextRepositoryConnection.size(this.testRepositoryManager.getArtifactManagementGraph()));
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+        }
+        
+        // FIXME: further verification based on content in repository
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testLoadArtifactWithEmptyOntology() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testLoadArtifactWithIncorrectFormat() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testLoadArtifactWithMissingSchemaOntologiesInRepository() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testLoadArtifactWithInconsistency() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testLoadArtifactWithTwoArtifacts() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testLoadArtifactWithTwoVersionsOfSameArtifact() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
     }
     
     /**
