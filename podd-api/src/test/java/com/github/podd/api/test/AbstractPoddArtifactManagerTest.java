@@ -18,6 +18,7 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -26,6 +27,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,9 @@ import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
+import com.github.podd.exception.EmptyOntologyException;
+import com.github.podd.exception.InconsistentOntologyException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -425,10 +430,327 @@ public abstract class AbstractPoddArtifactManagerTest
                 nextRepositoryConnection.close();
             }
         }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testLoadArtifactWithEmptyOntology() throws Exception
+    {
+        final InputStream inputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
+        final RDFFormat format = Rio.getParserFormatForMIMEType("application/rdf+xml", RDFFormat.RDFXML);
         
-        this.printContents(this.testRepositoryManager.getArtifactManagementGraph());
-        this.printContents(resultArtifactId.getVersionIRI().toOpenRDFURI());
-        this.printContents(resultArtifactId.getInferredOntologyIRI().toOpenRDFURI());
+        try
+        {
+            // invoke test method
+            this.testArtifactManager.loadArtifact(inputStream, format);
+            Assert.fail("Should have thrown an EmptyOntologyException");
+        }
+        catch(final EmptyOntologyException e)
+        {
+            Assert.assertEquals("Exception does not have expected message.", "Loaded ontology is empty", e.getMessage());
+            Assert.assertTrue("The ontology is not empty", e.getOntology().isEmpty());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testLoadArtifactWithInconsistency() throws Exception
+    {
+        // prepare: load schema ontologies
+        final InferredOWLOntologyID inferredPBaseOntologyID =
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+        final InferredOWLOntologyID inferredPScienceOntologyID =
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
+        
+        // prepare: update schema management graph
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
+                false);
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPScienceOntologyID.getBaseOWLOntologyID(),
+                inferredPScienceOntologyID.getInferredOWLOntologyID(), false);
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/error-twoLeadInstitutions-1.rdf");
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        try
+        {
+            // invoke test method
+            this.testArtifactManager.loadArtifact(inputStream, format);
+            Assert.fail("Should have thrown an InconsistentOntologyException");
+        }
+        catch(final InconsistentOntologyException e)
+        {
+            final OWLReasoner reasoner = e.getReasoner();
+            Assert.assertFalse("Reasoner says ontology is consistent", reasoner.isConsistent());
+            Assert.assertEquals("Not the expected Root Ontology", "urn:temp:inconsistentArtifact:1", reasoner
+                    .getRootOntology().getOntologyID().getOntologyIRI().toString());
+            Assert.assertEquals("Not the expected error message", "Ontology is inconsistent", e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     * 
+     * This test attempts to load an RDF/XML serialized artifact after wrongly specifying the MIME
+     * type as turtle. The exception thrown depends on the expected and actual MIME type
+     * combination.
+     */
+    @Test
+    public final void testLoadArtifactWithIncorrectFormat() throws Exception
+    {
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        
+        try
+        {
+            // invoke test method with the invalid RDF Format of TURTLE
+            this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+            Assert.fail("Should have thrown an RDFParseException");
+        }
+        catch(final RDFParseException e)
+        {
+            Assert.assertTrue(e.getMessage().startsWith("Not a valid"));
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testLoadArtifactWithMissingSchemaOntologiesInRepository() throws Exception
+    {
+        // prepare: load schema ontologies
+        final InferredOWLOntologyID inferredPBaseOntologyID =
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+        final InferredOWLOntologyID inferredPScienceOntologyID =
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
+        
+        // prepare: update schema management graph
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
+                false);
+        // PODD-Science ontology is not added to schema management graph
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        final RDFFormat format = Rio.getParserFormatForMIMEType("application/rdf+xml", RDFFormat.RDFXML);
+        
+        try
+        {
+            // invoke test method
+            this.testArtifactManager.loadArtifact(inputStream, format);
+            Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
+        }
+        catch(final UnmanagedSchemaIRIException e)
+        {
+            Assert.assertEquals("The cause should have been the missing PODD Science ontology",
+                    inferredPScienceOntologyID.getBaseOWLOntologyID().getOntologyIRI(), e.getOntologyID());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     * Tests loading two artifacts one after the other.
+     * 
+     */
+    @Test
+    public final void testLoadArtifactWithTwoArtifacts() throws Exception
+    {
+        // prepare: load schema ontologies
+        final InferredOWLOntologyID inferredPBaseOntologyID =
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+        final InferredOWLOntologyID inferredPScienceOntologyID =
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
+        
+        // prepare: update schema management graph
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
+                false);
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPScienceOntologyID.getBaseOWLOntologyID(),
+                inferredPScienceOntologyID.getInferredOWLOntologyID(), false);
+        
+        
+        // load 1st artifact
+        final InputStream inputStream4FirstArtifact =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        final InferredOWLOntologyID firstArtifactId = this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
+        
+        // verify:
+        Assert.assertNotNull("Load artifact returned a null artifact ID", firstArtifactId);
+        Assert.assertNotNull("Load artifact returned a null ontology IRI", firstArtifactId.getOntologyIRI());
+        Assert.assertNotNull("Load artifact returned a null ontology version IRI", firstArtifactId.getVersionIRI());
+        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
+                firstArtifactId.getInferredOntologyIRI());
+        
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            // verify: based on size of graphs
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            Assert.assertEquals("Incorrect number of asserted statements for artifact", 33,
+                    nextRepositoryConnection.size(firstArtifactId.getVersionIRI().toOpenRDFURI()));
+            
+            Assert.assertEquals("Incorrect number of inferred statements for artifact", 383,
+                    nextRepositoryConnection.size(firstArtifactId.getInferredOntologyIRI().toOpenRDFURI()));
+            
+            // verify: artifact management graph contents
+            this.verifyArtifactManagementGraphContents(nextRepositoryConnection, 6,
+                    this.testRepositoryManager.getArtifactManagementGraph(), firstArtifactId.getOntologyIRI(),
+                    firstArtifactId.getVersionIRI(), firstArtifactId.getInferredOntologyIRI());
+            
+            // verify: PUBLICATION_STATUS statement in the asserted ontology
+            final List<Statement> publicationStatusStatementList =
+                    nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                            null, false, firstArtifactId.getVersionIRI().toOpenRDFURI()).asList();
+            Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
+                    publicationStatusStatementList.size());
+            Assert.assertEquals("Wrong publication status", PoddRdfConstants.PODDBASE_NOT_PUBLISHED.toString(),
+                    publicationStatusStatementList.get(0).getObject().toString());
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            
+            nextRepositoryConnection = null;
+        }
+        
+        
+        // load 2nd artifact
+        final InputStream inputStream4SecondArtifact =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-2.rdf");
+        final InferredOWLOntologyID secondArtifactId = this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
+        
+        // verify:
+        Assert.assertNotNull("Load artifact returned a null artifact ID", secondArtifactId);
+        Assert.assertNotNull("Load artifact returned a null ontology IRI", secondArtifactId.getOntologyIRI());
+        Assert.assertNotNull("Load artifact returned a null ontology version IRI", secondArtifactId.getVersionIRI());
+        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
+                secondArtifactId.getInferredOntologyIRI());
+        
+        try
+        {
+            // verify: based on size of graphs
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            Assert.assertEquals("Incorrect number of asserted statements for artifact", 29,
+                    nextRepositoryConnection.size(secondArtifactId.getVersionIRI().toOpenRDFURI()));
+            
+            Assert.assertEquals("Incorrect number of inferred statements for artifact", 378,
+                    nextRepositoryConnection.size(secondArtifactId.getInferredOntologyIRI().toOpenRDFURI()));
+            
+            // verify: artifact management graph contents
+            this.verifyArtifactManagementGraphContents(nextRepositoryConnection, 12,
+                    this.testRepositoryManager.getArtifactManagementGraph(), secondArtifactId.getOntologyIRI(),
+                    secondArtifactId.getVersionIRI(), secondArtifactId.getInferredOntologyIRI());
+            
+            // verify: PUBLICATION_STATUS statement in the asserted ontology
+            final List<Statement> publicationStatusStatementList =
+                    nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                            null, false, secondArtifactId.getVersionIRI().toOpenRDFURI()).asList();
+            Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
+                    publicationStatusStatementList.size());
+            Assert.assertEquals("Wrong publication status", PoddRdfConstants.PODDBASE_PUBLISHED.toString(),
+                    publicationStatusStatementList.get(0).getObject().toString());
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+        }
+        
+//         this.printContents(this.testRepositoryManager.getArtifactManagementGraph());
+//         this.printContents(secondArtifactId.getVersionIRI().toOpenRDFURI());
+//         this.printContents(secondArtifactId.getInferredOntologyIRI().toOpenRDFURI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testLoadArtifactWithTwoVersionsOfSameArtifact() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#publishArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testPublishArtifact() throws Exception
+    {
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        
+        Assert.assertNotNull("Load artifact returned a null artifact ID", resultArtifactId);
+        Assert.assertNotNull("Load artifact returned a null ontology IRI", resultArtifactId.getOntologyIRI());
+        Assert.assertNotNull("Load artifact returned a null ontology version IRI", resultArtifactId.getVersionIRI());
+        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
+                resultArtifactId.getInferredOntologyIRI());
+        
+        this.testArtifactManager.publishArtifact(resultArtifactId);
+        
+        // FIXME: How do we get information about whether an artifact is published and other
+        // metadata like who can access the artifact?
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImport(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testUpdateSchemaImport() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
     }
     
     /**
@@ -487,120 +809,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertEquals("Wrong CURRENT_INFERRED_VERSION in Object", inferredVersionIRI.toString(),
                 currentInferredVersionStatementList.get(0).getObject().toString());
     }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testLoadArtifactWithEmptyOntology() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testLoadArtifactWithIncorrectFormat() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testLoadArtifactWithMissingSchemaOntologiesInRepository() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testLoadArtifactWithInconsistency() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testLoadArtifactWithTwoArtifacts() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testLoadArtifactWithTwoVersionsOfSameArtifact() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#publishArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testPublishArtifact() throws Exception
-    {
-        final InputStream inputStream =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
-        // MIME type should be either given by the user, detected from the content type on the
-        // request, or autodetected using the Any23 Mime Detector
-        final String mimeType = "application/rdf+xml";
-        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
-        
-        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
-        
-        Assert.assertNotNull("Load artifact returned a null artifact ID", resultArtifactId);
-        Assert.assertNotNull("Load artifact returned a null ontology IRI", resultArtifactId.getOntologyIRI());
-        Assert.assertNotNull("Load artifact returned a null ontology version IRI", resultArtifactId.getVersionIRI());
-        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
-                resultArtifactId.getInferredOntologyIRI());
-        
-        this.testArtifactManager.publishArtifact(resultArtifactId);
-        
-        // FIXME: How do we get information about whether an artifact is published and other
-        // metadata like who can access the artifact?
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImport(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     */
-    @Test
-    public final void testUpdateSchemaImport() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
+
     /**
      * Helper method prints the contents of the given context of a Repository
      */
@@ -625,5 +834,4 @@ public abstract class AbstractPoddArtifactManagerTest
         conn.rollback();
         conn.close();
     }
-    
 }
