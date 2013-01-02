@@ -37,6 +37,9 @@ public interface PoddRdfConstants
     
     public static final URI PODDBASE_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "Published");
+
+    public static final URI PODDBASE_NOT_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "NotPublished");
     
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are
