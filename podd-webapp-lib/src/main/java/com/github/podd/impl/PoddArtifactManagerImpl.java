@@ -195,8 +195,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     this.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
                             temporaryRepositoryConnection, randomContext);
                     // TODO: Optionally remove invalid file references or mark them as invalid using
-                    // RDF
-                    // statements/OWL Classes
+                    // RDF statements/OWL Classes
                 }
             }
             
