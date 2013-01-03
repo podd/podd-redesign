@@ -261,6 +261,9 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 nextRepositoryConnection.remove(inferredVersionUri, null, null, this.artifactGraph);
             }
             
+            //FIXME: Inferred statements for previous versions are not removed from their contexts.
+            // This should be exposed via a test and fixed.
+            
             nextRepositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null,
                     this.artifactGraph);
             
