@@ -239,6 +239,37 @@ public abstract class AbstractPoddArtifactManagerTest
     }
     
     /**
+     * Helper method which loads the three PODD schema ontologies: PODD-Base, PODD-Science and
+     * PODD-Plant.
+     * 
+     * This method is not called from the setUp() method since some tests require not loading all
+     * schema ontologies.
+     * 
+     * @throws Exception
+     */
+    private void loadSchemaOntologies() throws Exception
+    {
+        // prepare: load schema ontologies
+        final InferredOWLOntologyID inferredPBaseOntologyID =
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+        final InferredOWLOntologyID inferredPScienceOntologyID =
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
+        final InferredOWLOntologyID inferredPPlantOntologyID =
+                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 109, 386);
+        
+        // prepare: update schema management graph
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
+                false);
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPScienceOntologyID.getBaseOWLOntologyID(),
+                inferredPScienceOntologyID.getInferredOWLOntologyID(), false);
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPPlantOntologyID.getBaseOWLOntologyID(), inferredPPlantOntologyID.getInferredOWLOntologyID(),
+                false);
+    }
+    
+    /**
      * @throws java.lang.Exception
      */
     @Before
@@ -312,6 +343,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testArtifactManager.setPurlManager(testPurlManager);
         this.testArtifactManager.setOwlManager(testOWLManager);
         this.testArtifactManager.setSchemaManager(this.testSchemaManager);
+        
     }
     
     /**
@@ -361,22 +393,11 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactBasicSuccess() throws Exception
     {
-        // prepare: load schema ontologies
-        final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
-        final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
-        
-        // prepare: update schema management graph
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
-                false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPScienceOntologyID.getBaseOWLOntologyID(),
-                inferredPScienceOntologyID.getInferredOWLOntologyID(), false);
+        this.loadSchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";
@@ -386,50 +407,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
         // verify:
-        Assert.assertNotNull("Load artifact returned a null artifact ID", resultArtifactId);
-        Assert.assertNotNull("Load artifact returned a null ontology IRI", resultArtifactId.getOntologyIRI());
-        Assert.assertNotNull("Load artifact returned a null ontology version IRI", resultArtifactId.getVersionIRI());
-        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
-                resultArtifactId.getInferredOntologyIRI());
-        
-        RepositoryConnection nextRepositoryConnection = null;
-        try
-        {
-            // verify: based on size of graphs
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
-            nextRepositoryConnection.begin();
-            
-            Assert.assertEquals("Incorrect number of asserted statements for artifact", 33,
-                    nextRepositoryConnection.size(resultArtifactId.getVersionIRI().toOpenRDFURI()));
-            
-            Assert.assertEquals("Incorrect number of inferred statements for artifact", 383,
-                    nextRepositoryConnection.size(resultArtifactId.getInferredOntologyIRI().toOpenRDFURI()));
-            
-            // verify: artifact management graph contents
-            this.verifyArtifactManagementGraphContents(nextRepositoryConnection, 6,
-                    this.testRepositoryManager.getArtifactManagementGraph(), resultArtifactId.getOntologyIRI(),
-                    resultArtifactId.getVersionIRI(), resultArtifactId.getInferredOntologyIRI());
-            
-            // verify: PUBLICATION_STATUS statement in the asserted ontology
-            final List<Statement> publicationStatusStatementList =
-                    nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                            null, false, resultArtifactId.getVersionIRI().toOpenRDFURI()).asList();
-            Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
-                    publicationStatusStatementList.size());
-            Assert.assertEquals("Wrong publication status", PoddRdfConstants.PODDBASE_NOT_PUBLISHED.toString(),
-                    publicationStatusStatementList.get(0).getObject().toString());
-        }
-        finally
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
-            {
-                nextRepositoryConnection.rollback();
-            }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
-            {
-                nextRepositoryConnection.close();
-            }
-        }
+        this.verifyLoadedArtifact(resultArtifactId, 6, 33, 383, false);
     }
     
     /**
@@ -464,19 +442,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testLoadArtifactWithInconsistency() throws Exception
     {
-        // prepare: load schema ontologies
-        final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
-        final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
-        
-        // prepare: update schema management graph
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
-                false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPScienceOntologyID.getBaseOWLOntologyID(),
-                inferredPScienceOntologyID.getInferredOWLOntologyID(), false);
+        this.loadSchemaOntologies();
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream("/test/artifacts/error-twoLeadInstitutions-1.rdf");
@@ -515,7 +481,6 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         final InputStream inputStream =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
-        
         try
         {
             // invoke test method with the invalid RDF Format of TURTLE
@@ -568,147 +533,92 @@ public abstract class AbstractPoddArtifactManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     * Tests loading two artifacts one after the other.
+     * . Tests loading two artifacts one after the other.
      * 
      */
     @Test
     public final void testLoadArtifactWithTwoArtifacts() throws Exception
     {
-        // prepare: load schema ontologies
-        final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
-        final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
-        
-        // prepare: update schema management graph
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
-                false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPScienceOntologyID.getBaseOWLOntologyID(),
-                inferredPScienceOntologyID.getInferredOWLOntologyID(), false);
-        
+        this.loadSchemaOntologies();
         
         // load 1st artifact
         final InputStream inputStream4FirstArtifact =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
-        final InferredOWLOntologyID firstArtifactId = this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
+        final InferredOWLOntologyID firstArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        // verify:
-        Assert.assertNotNull("Load artifact returned a null artifact ID", firstArtifactId);
-        Assert.assertNotNull("Load artifact returned a null ontology IRI", firstArtifactId.getOntologyIRI());
-        Assert.assertNotNull("Load artifact returned a null ontology version IRI", firstArtifactId.getVersionIRI());
-        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
-                firstArtifactId.getInferredOntologyIRI());
-        
-        RepositoryConnection nextRepositoryConnection = null;
-        try
-        {
-            // verify: based on size of graphs
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
-            nextRepositoryConnection.begin();
-            
-            Assert.assertEquals("Incorrect number of asserted statements for artifact", 33,
-                    nextRepositoryConnection.size(firstArtifactId.getVersionIRI().toOpenRDFURI()));
-            
-            Assert.assertEquals("Incorrect number of inferred statements for artifact", 383,
-                    nextRepositoryConnection.size(firstArtifactId.getInferredOntologyIRI().toOpenRDFURI()));
-            
-            // verify: artifact management graph contents
-            this.verifyArtifactManagementGraphContents(nextRepositoryConnection, 6,
-                    this.testRepositoryManager.getArtifactManagementGraph(), firstArtifactId.getOntologyIRI(),
-                    firstArtifactId.getVersionIRI(), firstArtifactId.getInferredOntologyIRI());
-            
-            // verify: PUBLICATION_STATUS statement in the asserted ontology
-            final List<Statement> publicationStatusStatementList =
-                    nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                            null, false, firstArtifactId.getVersionIRI().toOpenRDFURI()).asList();
-            Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
-                    publicationStatusStatementList.size());
-            Assert.assertEquals("Wrong publication status", PoddRdfConstants.PODDBASE_NOT_PUBLISHED.toString(),
-                    publicationStatusStatementList.get(0).getObject().toString());
-        }
-        finally
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
-            {
-                nextRepositoryConnection.rollback();
-            }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
-            {
-                nextRepositoryConnection.close();
-            }
-            
-            nextRepositoryConnection = null;
-        }
-        
+        this.verifyLoadedArtifact(firstArtifactId, 6, 33, 383, false);
         
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-2.rdf");
-        final InferredOWLOntologyID secondArtifactId = this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
+        final InferredOWLOntologyID secondArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
         
-        // verify:
-        Assert.assertNotNull("Load artifact returned a null artifact ID", secondArtifactId);
-        Assert.assertNotNull("Load artifact returned a null ontology IRI", secondArtifactId.getOntologyIRI());
-        Assert.assertNotNull("Load artifact returned a null ontology version IRI", secondArtifactId.getVersionIRI());
-        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
-                secondArtifactId.getInferredOntologyIRI());
-        
-        try
-        {
-            // verify: based on size of graphs
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
-            nextRepositoryConnection.begin();
-            
-            Assert.assertEquals("Incorrect number of asserted statements for artifact", 29,
-                    nextRepositoryConnection.size(secondArtifactId.getVersionIRI().toOpenRDFURI()));
-            
-            Assert.assertEquals("Incorrect number of inferred statements for artifact", 378,
-                    nextRepositoryConnection.size(secondArtifactId.getInferredOntologyIRI().toOpenRDFURI()));
-            
-            // verify: artifact management graph contents
-            this.verifyArtifactManagementGraphContents(nextRepositoryConnection, 12,
-                    this.testRepositoryManager.getArtifactManagementGraph(), secondArtifactId.getOntologyIRI(),
-                    secondArtifactId.getVersionIRI(), secondArtifactId.getInferredOntologyIRI());
-            
-            // verify: PUBLICATION_STATUS statement in the asserted ontology
-            final List<Statement> publicationStatusStatementList =
-                    nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                            null, false, secondArtifactId.getVersionIRI().toOpenRDFURI()).asList();
-            Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
-                    publicationStatusStatementList.size());
-            Assert.assertEquals("Wrong publication status", PoddRdfConstants.PODDBASE_PUBLISHED.toString(),
-                    publicationStatusStatementList.get(0).getObject().toString());
-        }
-        finally
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
-            {
-                nextRepositoryConnection.rollback();
-            }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
-            {
-                nextRepositoryConnection.close();
-            }
-        }
-        
-//         this.printContents(this.testRepositoryManager.getArtifactManagementGraph());
-//         this.printContents(secondArtifactId.getVersionIRI().toOpenRDFURI());
-//         this.printContents(secondArtifactId.getInferredOntologyIRI().toOpenRDFURI());
+        this.verifyLoadedArtifact(firstArtifactId, 12, 33, 383, false);
+        this.verifyLoadedArtifact(secondArtifactId, 12, 29, 378, true);
     }
     
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
+     * . Tests loading two versions of the same artifact one after the other.
+     * 
+     * The two RDF files used have PURLs instead of temporary URIs as they both need to be
+     * identified as the artifact.
+     */
+    @Test
+    public final void testLoadArtifactWithSameArtifactTwoVersions() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // load 1st artifact
+        final InputStream inputStream4FirstArtifact =
+                this.getClass().getResourceAsStream("/test/artifacts/project-with-purls-v1.rdf");
+        final InferredOWLOntologyID firstArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
+        
+        this.verifyLoadedArtifact(firstArtifactId, 6, 29, 378, false);
+        
+        // load 2nd artifact
+        final InputStream inputStream4SecondArtifact =
+                this.getClass().getResourceAsStream("/test/artifacts/project-with-purls-v2.rdf");
+        final InferredOWLOntologyID secondArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
+        
+        Assert.assertEquals("Both versions have the same artifact ID", firstArtifactId.getOntologyIRI(),
+                secondArtifactId.getOntologyIRI());
+        
+        this.verifyLoadedArtifact(secondArtifactId, 6, 29, 378, false);
+        
+        // this.printContents(this.testRepositoryManager.getArtifactManagementGraph());
+        // this.printContexts();
+        // this.printContents(secondArtifactId.getVersionIRI().toOpenRDFURI());
+        // this.printContents(secondArtifactId.getInferredOntologyIRI().toOpenRDFURI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * . Tests loading an artifact where the source RDF statements do not contain a version IRI.
+     * 
      */
     @Ignore
     @Test
-    public final void testLoadArtifactWithTwoVersionsOfSameArtifact() throws Exception
+    public final void testLoadArtifactWithNoVersionInfoInSource() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        this.loadSchemaOntologies();
+        
+        // load 1st artifact
+        final InputStream inputStream4FirstArtifact =
+                this.getClass().getResourceAsStream("/test/artifacts/project-with-no-version-info.rdf");
+        final InferredOWLOntologyID firstArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
+        
+        this.verifyLoadedArtifact(firstArtifactId, 6, 33, 383, false);
+        
+        this.printContents(this.testRepositoryManager.getArtifactManagementGraph());
+        
     }
     
     /**
@@ -729,11 +639,10 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
-        Assert.assertNotNull("Load artifact returned a null artifact ID", resultArtifactId);
-        Assert.assertNotNull("Load artifact returned a null ontology IRI", resultArtifactId.getOntologyIRI());
-        Assert.assertNotNull("Load artifact returned a null ontology version IRI", resultArtifactId.getVersionIRI());
-        Assert.assertNotNull("Load artifact returned a null inferred ontology IRI",
-                resultArtifactId.getInferredOntologyIRI());
+        Assert.assertNotNull("Null ontology ID", resultArtifactId);
+        Assert.assertNotNull("Null ontology IRI", resultArtifactId.getOntologyIRI());
+        Assert.assertNotNull("Null ontology version IRI", resultArtifactId.getVersionIRI());
+        Assert.assertNotNull("Null inferred ontology IRI", resultArtifactId.getInferredOntologyIRI());
         
         this.testArtifactManager.publishArtifact(resultArtifactId);
         
@@ -809,7 +718,82 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertEquals("Wrong CURRENT_INFERRED_VERSION in Object", inferredVersionIRI.toString(),
                 currentInferredVersionStatementList.get(0).getObject().toString());
     }
-
+    
+    /**
+     * Helper method to verify that the given InferredOWLOntologyID represents an artifact that has
+     * been successfully loaded.
+     * 
+     * @param inferredOntologyId
+     *            Identifies the loaded ontology
+     * @param mgtGraphSize
+     *            Expected size of the artifact management graph
+     * @param assertedStatementCount
+     *            Number of asserted statements in repository for this artifact
+     * @param inferredStatementCount
+     *            Number of inferred statements in repository for this artifact
+     * @param isPublished
+     *            True if the artifact is Published, false otherwise
+     * @throws Exception
+     */
+    private void verifyLoadedArtifact(final InferredOWLOntologyID inferredOntologyId, final int mgtGraphSize,
+            final long assertedStatementCount, final long inferredStatementCount, final boolean isPublished)
+        throws Exception
+    {
+        // verify: ontology ID has all details
+        Assert.assertNotNull("Null ontology ID", inferredOntologyId);
+        Assert.assertNotNull("Null ontology IRI", inferredOntologyId.getOntologyIRI());
+        Assert.assertNotNull("Null ontology version IRI", inferredOntologyId.getVersionIRI());
+        Assert.assertNotNull("Null inferred ontology IRI", inferredOntologyId.getInferredOntologyIRI());
+        
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            // verify: size of asserted graph
+            Assert.assertEquals("Incorrect number of asserted statements for artifact", assertedStatementCount,
+                    nextRepositoryConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()));
+            
+            // verify: size of inferred graph
+            Assert.assertEquals("Incorrect number of inferred statements for artifact", inferredStatementCount,
+                    nextRepositoryConnection.size(inferredOntologyId.getInferredOntologyIRI().toOpenRDFURI()));
+            
+            // verify: artifact management graph contents
+            this.verifyArtifactManagementGraphContents(nextRepositoryConnection, mgtGraphSize,
+                    this.testRepositoryManager.getArtifactManagementGraph(), inferredOntologyId.getOntologyIRI(),
+                    inferredOntologyId.getVersionIRI(), inferredOntologyId.getInferredOntologyIRI());
+            
+            // verify: a single PUBLICATION_STATUS in asserted ontology
+            final List<Statement> publicationStatusStatementList =
+                    nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                            null, false, inferredOntologyId.getVersionIRI().toOpenRDFURI()).asList();
+            Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
+                    publicationStatusStatementList.size());
+            
+            // verify: value of PUBLICATION_STATUS in asserted ontology
+            String publishedState = PoddRdfConstants.PODDBASE_NOT_PUBLISHED.toString();
+            if(isPublished)
+            {
+                publishedState = PoddRdfConstants.PODDBASE_PUBLISHED.toString();
+            }
+            Assert.assertEquals("Wrong publication status", publishedState, publicationStatusStatementList.get(0)
+                    .getObject().toString());
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+    }
+    
     /**
      * Helper method prints the contents of the given context of a Repository
      */
@@ -834,4 +818,34 @@ public abstract class AbstractPoddArtifactManagerTest
         conn.rollback();
         conn.close();
     }
+    
+    /**
+     * Helper method prints the contents of the given context of a Repository
+     */
+    private void printContexts() throws Exception
+    {
+        final java.util.HashSet<String> contextSet = new java.util.HashSet<String>();
+        
+        final RepositoryConnection conn = this.testRepositoryManager.getRepository().getConnection();
+        conn.begin();
+        final org.openrdf.repository.RepositoryResult<Statement> repoResults =
+                conn.getStatements(null, null, null, true);
+        while(repoResults.hasNext())
+        {
+            final Statement stmt = repoResults.next();
+            contextSet.add(stmt.getContext().stringValue());
+        }
+        
+        System.out.println("==================================================");
+        System.out.println("Contexts in Repository:  ");
+        for(final String context : contextSet)
+        {
+            System.out.println(context);
+        }
+        System.out.println("==================================================");
+        
+        conn.rollback();
+        conn.close();
+    }
+    
 }
