@@ -64,6 +64,7 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
@@ -240,10 +241,52 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         throw new RuntimeException("TODO: Implement getCurrentVersion");
     }
     
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.api.PoddOWLManager#getCurrentArtifactVersion(org.semanticweb.owlapi.model.IRI, 
+     * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
+     */
+    @Override
+    public InferredOWLOntologyID getCurrentArtifactVersion(final IRI ontologyIRI,
+            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
+        UnmanagedArtifactIRIException
+        {
+        InferredOWLOntologyID inferredOntologyID = this.getCurrentVersionInternal(ontologyIRI, repositoryConnection, managementGraph);
+        
+        if (inferredOntologyID != null)
+        {
+            return inferredOntologyID;
+        }
+        else {
+            throw new UnmanagedArtifactIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");    
+        }
+        }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.api.PoddOWLManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model.IRI, 
+     * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
+     */
     @Override
     public InferredOWLOntologyID getCurrentSchemaVersion(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedSchemaIRIException
+    {
+        InferredOWLOntologyID inferredOntologyID = this.getCurrentVersionInternal(ontologyIRI, repositoryConnection, managementGraph);
+        
+        if (inferredOntologyID != null)
+        {
+            return inferredOntologyID;
+        }
+        else {
+            throw new UnmanagedSchemaIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");    
+        }
+    }
+    
+    private InferredOWLOntologyID getCurrentVersionInternal(final IRI ontologyIRI,
+            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
         dataset.addDefaultGraph(managementGraph);
@@ -295,8 +338,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             
             return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI.create(nextInferredIRI));
         }
-        
-        throw new UnmanagedSchemaIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");
+        return null;
     }
     
     @Override

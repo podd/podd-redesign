@@ -23,6 +23,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
@@ -75,6 +76,27 @@ public interface PoddOWLManager
     OWLOntologyID getCurrentVersion(IRI ontologyIRI);
     
     /**
+     * Returns current version details of an artifact ontology which has the given IRI as the
+     * Ontology IRI or Version IRI.
+     * 
+     * @param ontologyIRI
+     *            The IRI of the ontology to get current version info.
+     * @param repositoryConnection
+     * @param managementGraph
+     *            The context of the Artifact Management Graph
+     * @return An InferredOWLOntologyID containing details of the current managed version of the
+     *         ontology.
+     * @throws OpenRDFException
+     * @throws UnmanagedArtifactIRIException
+     *             If the given IRI does not refer to a managed artifact ontology
+     * 
+     * @since 04/01/2013
+     */
+    InferredOWLOntologyID getCurrentArtifactVersion(final IRI ontologyIRI,
+            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
+        UnmanagedArtifactIRIException;
+    
+    /**
      * Returns current version details of an ontology which has the given IRI as the Ontology IRI or
      * Version IRI.
      * 
@@ -82,9 +104,9 @@ public interface PoddOWLManager
      * 
      * @param ontologyIRI
      *            The IRI of the ontology to get current version info.
+     * @param repositoryConnection
      * @param managementGraph
      *            The context of the Schema Management Graph
-     * @param repositoryConnection
      * @return An InferredOWLOntologyID containing details of the current managed version of the
      *         ontology.
      * @throws OpenRDFException
