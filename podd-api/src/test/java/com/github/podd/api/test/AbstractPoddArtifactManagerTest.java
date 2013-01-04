@@ -564,7 +564,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      */
     @Test
-    public final void testLoadArtifactWithTwoArtifacts() throws Exception
+    public final void testLoadArtifactWithTwoDistinctArtifacts() throws Exception
     {
         this.loadSchemaOntologies();
         
@@ -597,7 +597,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * identified as the same artifact.
      */
     @Test
-    public final void testLoadArtifactWithSameArtifactTwoVersions() throws Exception
+    public final void testLoadArtifactWithTwoVersionsOfSameArtifact() throws Exception
     {
         this.loadSchemaOntologies();
         
