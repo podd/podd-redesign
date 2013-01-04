@@ -533,7 +533,34 @@ public abstract class AbstractPoddArtifactManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * . Tests loading two artifacts one after the other.
+     * .
+     * 
+     * Tests loading an artifact where the source RDF statements do not contain a version IRI.
+     * 
+     */
+    @Test
+    public final void testLoadArtifactWithNoVersionIRIInSource() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // load artifact
+        final InputStream inputStream4FirstArtifact =
+                this.getClass().getResourceAsStream("/test/artifacts/project-with-no-version-info.rdf");
+        final InferredOWLOntologyID firstArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
+        
+        // verify
+        this.verifyLoadedArtifact(firstArtifactId, 6, 33, 383, false);
+        Assert.assertEquals("Version IRI of loaded ontology not expected value", firstArtifactId.getOntologyIRI()
+                .toString().concat(":version:1"), firstArtifactId.getVersionIRI().toString());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     * 
+     * Tests loading two artifacts one after the other.
      * 
      */
     @Test
@@ -562,10 +589,12 @@ public abstract class AbstractPoddArtifactManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * . Tests loading two versions of the same artifact one after the other.
+     * .
      * 
-     * The two RDF files used have PURLs instead of temporary URIs as they both need to be
-     * identified as the artifact.
+     * Tests loading two versions of the same artifact one after the other.
+     * 
+     * The two source RDF files have PURLs instead of temporary URIs since they both need to be
+     * identified as the same artifact.
      */
     @Test
     public final void testLoadArtifactWithSameArtifactTwoVersions() throws Exception
@@ -595,30 +624,6 @@ public abstract class AbstractPoddArtifactManagerTest
         // this.printContexts();
         // this.printContents(secondArtifactId.getVersionIRI().toOpenRDFURI());
         // this.printContents(secondArtifactId.getInferredOntologyIRI().toOpenRDFURI());
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * . Tests loading an artifact where the source RDF statements do not contain a version IRI.
-     * 
-     */
-    @Ignore
-    @Test
-    public final void testLoadArtifactWithNoVersionInfoInSource() throws Exception
-    {
-        this.loadSchemaOntologies();
-        
-        // load 1st artifact
-        final InputStream inputStream4FirstArtifact =
-                this.getClass().getResourceAsStream("/test/artifacts/project-with-no-version-info.rdf");
-        final InferredOWLOntologyID firstArtifactId =
-                this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
-        
-        this.verifyLoadedArtifact(firstArtifactId, 6, 33, 383, false);
-        
-        this.printContents(this.testRepositoryManager.getArtifactManagementGraph());
-        
     }
     
     /**

@@ -49,6 +49,7 @@ import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -203,6 +204,52 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             permanentRepositoryConnection = permanentRepository.getConnection();
             permanentRepositoryConnection.begin();
             
+            // Set a Version IRI for this artifact
+            /*
+             * Version information need not be available in uploaded artifacts (any existing values
+             * are ignored).
+             * 
+             * For a new artifact, a Version IRI is created based on the Ontology IRI while for a
+             * new version of a managed artifact, the most recent version is incremented.
+             */
+            final IRI ontologyIRI = this.getOntologyIRI(temporaryRepositoryConnection, randomContext);
+            if(ontologyIRI != null)
+            {
+                // check for managed version from artifact graph
+                OWLOntologyID currentManagedArtifactID = null;
+                try
+                {
+                    currentManagedArtifactID =
+                            this.getOWLManager().getCurrentArtifactVersion(ontologyIRI, permanentRepositoryConnection,
+                                    this.getRepositoryManager().getArtifactManagementGraph());
+                }
+                catch(final UnmanagedArtifactIRIException e)
+                {
+                    // ignore. indicates a new artifact is being uploaded
+                    this.log.debug("This is an unmanaged artifact IRI {}", ontologyIRI);
+                }
+                
+                IRI newVersionIRI = null;
+                if(currentManagedArtifactID == null || currentManagedArtifactID.getVersionIRI() == null)
+                {
+                    newVersionIRI = IRI.create(ontologyIRI.toString() + ":version:1");
+                }
+                else
+                {
+                    newVersionIRI =
+                            IRI.create(this.incrementVersion(currentManagedArtifactID
+                                    .getVersionIRI().toString()));
+                }
+                
+                // set version IRI in temporary repository
+                this.log.info("Setting version IRI to <{}>", newVersionIRI);
+                temporaryRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
+                        null, randomContext);
+                temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
+                        newVersionIRI.toOpenRDFURI(), randomContext);
+            }
+            
+            
             // Before loading the statements into OWLAPI, ensure that the schema ontologies are
             // cached in memory
             final Set<IRI> directImports = this.getDirectImports(temporaryRepositoryConnection, randomContext);
@@ -324,10 +371,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /**
-     * This is not an API method. Retrieves the ontology IRIs for all import statements found in the
-     * given repository.
-     * 
+     * This is not an API method. 
      * QUESTION: Should this be moved to a separate utility class or even to the PoddOWLManager?
+     * 
+     * Retrieves the ontology IRIs for all import statements found in the
+     * given repository.
      * 
      * @param repositoryConnection
      * @param context
@@ -358,24 +406,25 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         return results;
     }
-    
+
     /**
-     * This is not an API method. Extracts an OWLOntologyID from the statements in the given
-     * RepositoryConnection.
+     * This is not an API method. 
+     * QUESTION: Should this be moved to a separate utility class?
      * 
-     * QUESTION: Should this be moved to a separate utility class or even to the PoddOWLManager?
+     * Retrieves from the given Repository, an Ontology IRI which identifies an artifact.
      * 
      * @param repositoryConnection
      * @param context
      * @return
      * @throws OpenRDFException
      */
-    public OWLOntologyID extractOWLOntologyIDFromRepository(final RepositoryConnection repositoryConnection,
-            final URI context) throws OpenRDFException
+    public IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context)
+        throws OpenRDFException
     {
+        // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
         final String sparqlQuery =
-                "SELECT ?x ?xv WHERE { ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> ."
-                        + " ?x <" + PoddRdfConstants.OWL_VERSION_IRI + "> ?xv . }";
+                "SELECT ?x WHERE { ?x <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue() + ">  . " + " ?x <"
+                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT + "> ?y " + " }";
         this.log.info("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         
@@ -384,16 +433,52 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         dataset.addNamedGraph(context);
         query.setDataset(dataset);
         
+        IRI ontologyIRI = null;
+        
         final TupleQueryResult queryResults = query.evaluate();
         if(queryResults.hasNext())
         {
             final BindingSet nextResult = queryResults.next();
-            final String ontologyIRI = nextResult.getValue("x").stringValue();
-            final String versionIRI = nextResult.getValue("xv").stringValue();
-            
-            return new OWLOntologyID(IRI.create(ontologyIRI), IRI.create(versionIRI));
+            ontologyIRI = IRI.create(nextResult.getValue("x").stringValue());
         }
-        return new OWLOntologyID();
+        return ontologyIRI;
+    }
+    
+    /**
+     * This is not an API method. 
+     * QUESTION: Should this be moved to a separate utility class?
+     * 
+     * This method takes a String terminating with a colon (":") followed by an integer and
+     * increments this integer by one. If the input String is not of the expected format, "1" to the
+     * end of the String.
+     * 
+     * E.g.: "http://purl.org/ab/artifact:55" is converted to "http://purl.org/ab/artifact:56"
+     * "http://purl.org/ab/artifact:5A" is converted to "http://purl.org/ab/artifact:5A1"
+     * 
+     * @param oldVersion
+     * @return
+     */
+    public String incrementVersion(final String oldVersion)
+    {
+        final char versionSeparatorChar = ':';
+        
+        final int positionVersionSeparator = oldVersion.lastIndexOf(versionSeparatorChar);
+        if(positionVersionSeparator > 1)
+        {
+            final String prefix = oldVersion.substring(0, positionVersionSeparator);
+            final String version = oldVersion.substring(positionVersionSeparator + 1);
+            try
+            {
+                int versionInt = Integer.parseInt(version);
+                versionInt++;
+                return prefix + versionSeparatorChar + versionInt;
+            }
+            catch(final NumberFormatException e)
+            {
+                return oldVersion.concat("1");
+            }
+        }
+        return oldVersion.concat("1");
     }
     
     /*

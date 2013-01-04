@@ -122,7 +122,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Test
-    public void testExtractOWLOntologyIDFromRepository() throws Exception
+    public void testGetOntologyIRI() throws Exception
     {
         final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
@@ -145,15 +145,12 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
             final PoddArtifactManagerImpl testArtifactManager = new PoddArtifactManagerImpl();
             
             // invoke method under test:
-            final OWLOntologyID ontologyID =
-                    testArtifactManager.extractOWLOntologyIDFromRepository(testRepositoryConnection, context);
+            final IRI ontologyIRI =
+                    testArtifactManager.getOntologyIRI(testRepositoryConnection, context);
             
             // verify:
-            Assert.assertNotNull("Generated Ontology ID was null", ontologyID);
-            Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyID.getOntologyIRI()
-                    .toString());
-            Assert.assertEquals("Wrong Version IRI", "urn:temp:uuid:artifact:version:1", ontologyID.getVersionIRI()
-                    .toString());
+            Assert.assertNotNull("Ontology IRI was null", ontologyIRI);
+            Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyIRI.toString());
         }
         finally
         {
@@ -200,6 +197,22 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
             testRepositoryConnection.close();
             testRepository.shutDown();
         }
+    }
+    
+    @Test
+    public void testIncrementVersion() throws Exception
+    {
+        String artifactURI = "http://some/artifact:15";
+
+        final PoddArtifactManagerImpl testArtifactManager = new PoddArtifactManagerImpl();
+        
+        // increment the version number
+        String newIncrementedVersion = testArtifactManager.incrementVersion(artifactURI + ":version:1");
+        Assert.assertEquals("Version not incremented as expected", artifactURI + ":version:2", newIncrementedVersion);
+        
+        // append a number when version number cannot be extracted
+        String newAppendedVersion = testArtifactManager.incrementVersion(artifactURI + ":v5");
+        Assert.assertEquals("Version not incremented as expected", artifactURI + ":v51", newAppendedVersion);
     }
     
 }
