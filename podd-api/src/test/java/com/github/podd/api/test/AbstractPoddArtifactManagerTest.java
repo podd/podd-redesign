@@ -615,8 +615,11 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID secondArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
         
-        Assert.assertEquals("Both versions have the same artifact ID", firstArtifactId.getOntologyIRI(),
+        Assert.assertEquals("Both versions should have the same artifact ID", firstArtifactId.getOntologyIRI(),
                 secondArtifactId.getOntologyIRI());
+        
+        Assert.assertFalse("Two versions should NOT have the same Version IRI", 
+                firstArtifactId.getVersionIRI().toString().equals(secondArtifactId.getVersionIRI().toString()));
         
         this.verifyLoadedArtifact(secondArtifactId, 6, 29, 378, false);
         
@@ -624,6 +627,32 @@ public abstract class AbstractPoddArtifactManagerTest
         // this.printContexts();
         // this.printContents(secondArtifactId.getVersionIRI().toOpenRDFURI());
         // this.printContents(secondArtifactId.getInferredOntologyIRI().toOpenRDFURI());
+    }
+    
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     * 
+     * Tests that the version IRI in the source file is ignored.
+     * 
+     */
+    @Test
+    public final void testLoadArtifactWithVersionIRIInSourceIgnored() throws Exception 
+    {
+        this.loadSchemaOntologies();
+        
+        // load 1st artifact
+        final InputStream inputStream4Artifact =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-published.rdf");
+        final InferredOWLOntologyID artifactId =
+                this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
+        
+        this.verifyLoadedArtifact(artifactId, 6, 29, 378, true);
+        
+        Assert.assertFalse("Version IRI in source should have been ignored", artifactId.getVersionIRI().toString().endsWith(":55"));
+        Assert.assertTrue("New generated Version IRI should start from 1", artifactId.getVersionIRI().toString().endsWith(":1"));
     }
     
     /**
