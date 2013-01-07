@@ -6,22 +6,14 @@ package com.github.podd.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -260,7 +252,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // Before loading the statements into OWLAPI, ensure that the schema ontologies are
             // cached in memory
-            final Set<IRI> directImports = this.getDirectImports(temporaryRepositoryConnection, randomContext);
+            final Set<IRI> directImports = this.getSesameManager().getDirectImports(temporaryRepositoryConnection, randomContext);
             for(final IRI schemaOntologyIRI : directImports)
             {
                 // Get the current version
@@ -376,42 +368,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
             }
         }
-    }
-    
-    /**
-     * This is not an API method. QUESTION: Should this be moved to a separate utility class or even
-     * to the PoddOWLManager?
-     * 
-     * Retrieves the ontology IRIs for all import statements found in the given repository.
-     * 
-     * @param repositoryConnection
-     * @param context
-     * @return
-     * @throws OpenRDFException
-     */
-    public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException
-    {
-        final String sparqlQuery = "SELECT ?x WHERE { ?y <" + OWL.IMPORTS.stringValue() + "> ?x ." + " }";
-        this.log.info("Generated SPARQL {}", sparqlQuery);
-        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
-        
-        final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(context);
-        dataset.addNamedGraph(context);
-        query.setDataset(dataset);
-        
-        final Set<IRI> results = Collections.newSetFromMap(new ConcurrentHashMap<IRI, Boolean>());
-        
-        final TupleQueryResult queryResults = query.evaluate();
-        while(queryResults.hasNext())
-        {
-            final BindingSet nextResult = queryResults.next();
-            final String ontologyIRI = nextResult.getValue("x").stringValue();
-            results.add(IRI.create(ontologyIRI));
-            
-        }
-        return results;
     }
     
     /**

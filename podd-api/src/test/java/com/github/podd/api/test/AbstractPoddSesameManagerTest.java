@@ -4,6 +4,7 @@
 package com.github.podd.api.test;
 
 import java.io.InputStream;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -365,6 +366,33 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Not the expected current inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddScience/43"),
                 inferredOntologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getDirectImports(RepositoryConnection, URI)}.
+     */
+    @Test
+    public void testGetDirectImports() throws Exception
+    {
+        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        
+        final Repository testRepository = new SailRepository(new MemoryStore());
+        testRepository.initialize();
+        
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
+        
+        // invoke method under test:
+        final Set<IRI> importedOntologyIRIs =
+                this.testPoddSesameManager.getDirectImports(this.testRepositoryConnection, context);
+        
+        // verify:
+        Assert.assertNotNull("No imports could be found", importedOntologyIRIs);
+        Assert.assertEquals("Incorrect number of imports found", 2, importedOntologyIRIs.size());
     }
     
     /**

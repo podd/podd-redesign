@@ -3,6 +3,10 @@
  */
 package com.github.podd.impl;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
@@ -144,6 +148,36 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI.create(nextInferredIRI));
         }
         return null;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see com.github.podd.api.PoddSesameManager#getDirectImports(org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
+     */
+    @Override
+    public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI context)
+        throws OpenRDFException
+    {
+        final String sparqlQuery = "SELECT ?x WHERE { ?y <" + OWL.IMPORTS.stringValue() + "> ?x ." + " }";
+        this.log.info("Generated SPARQL {}", sparqlQuery);
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(context);
+        dataset.addNamedGraph(context);
+        query.setDataset(dataset);
+        
+        final Set<IRI> results = Collections.newSetFromMap(new ConcurrentHashMap<IRI, Boolean>());
+        
+        final TupleQueryResult queryResults = query.evaluate();
+        while(queryResults.hasNext())
+        {
+            final BindingSet nextResult = queryResults.next();
+            final String ontologyIRI = nextResult.getValue("x").stringValue();
+            results.add(IRI.create(ontologyIRI));
+            
+        }
+        return results;
     }
     
     /*

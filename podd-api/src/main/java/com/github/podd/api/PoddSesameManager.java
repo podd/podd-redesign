@@ -3,6 +3,8 @@
  */
 package com.github.podd.api;
 
+import java.util.Set;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
@@ -62,6 +64,18 @@ public interface PoddSesameManager
     InferredOWLOntologyID getCurrentArtifactVersion(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedArtifactIRIException;
+    
+    /**
+     * Retrieves the ontology IRIs for all import statements found in the given Repository Connection.
+     * 
+     * @param repositoryConnection
+     * @param context
+     * @return A Set containing ontology IRIs for all import statements.
+     * @throws OpenRDFException
+     */
+    Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI context)
+        throws OpenRDFException;
+    
     
     /**
      * Retrieves from the given Repository Connection, an Ontology IRI which identifies an artifact.
