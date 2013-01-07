@@ -41,6 +41,9 @@ public interface PoddRdfConstants
     public static final URI PODDBASE_NOT_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "NotPublished");
     
+    public static final URI PODDBASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "PoddFileReference");
+    
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are
      * reusing it here.
