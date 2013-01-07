@@ -370,12 +370,111 @@ public abstract class AbstractPoddRepositoryManagerTest
      * Test method for
      * {@link com.github.podd.impl.PoddRepositoryManagerImpl#updateManagedPoddArtifactVersion(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID, boolean)}
      * .
+     * 
+     * Tests that when updating an artifact version, repository content for previous versions of the
+     * artifact (both asserted and inferred statements) are deleted.
+     * 
      */
-    @Ignore
     @Test
     public final void testUpdateManagedPoddArtifactVersionForDeletingPreviousVersionContent() throws Exception
     {
-        Assert.fail("TODO - implement me");
+        // prepare: add entries in the artifact graph for a test artifact
+        final IRI pArtifactIRI = IRI.create("http://purl.org/abc-def/artifact:1");
+        final IRI pVersionIRIv1 = IRI.create("http://purl.org/abc-def/artifact:1:version:1");
+        final IRI pInferredVersionIRIv1 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:1");
+        final InferredOWLOntologyID nextOntologyIDv1 =
+                new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
+        
+        // prepare: add dummy statements in relevant contexts to represent test artifact
+        final RepositoryConnection repositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+        try
+        {
+            repositoryConnection.begin();
+            
+            final URI subject = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
+            repositoryConnection.add(subject, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                    PoddRdfConstants.PODDBASE_NOT_PUBLISHED, pVersionIRIv1.toOpenRDFURI());
+            
+            final URI inferredSubject = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
+            repositoryConnection.add(inferredSubject, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                    PoddRdfConstants.PODDBASE_NOT_PUBLISHED, pInferredVersionIRIv1.toOpenRDFURI());
+            
+            // verify: contexts populated for test artifact
+            Assert.assertEquals("Asserted graph should have 1 statement", 1,
+                    repositoryConnection.size(pVersionIRIv1.toOpenRDFURI()));
+            Assert.assertEquals("Inferred graph should have 1 statement", 1,
+                    repositoryConnection.size(pInferredVersionIRIv1.toOpenRDFURI()));
+        }
+        finally
+        {
+            repositoryConnection.commit();
+            repositoryConnection.close();
+        }
+        
+        // invoke method under test
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyIDv1.getBaseOWLOntologyID(),
+                nextOntologyIDv1.getInferredOWLOntologyID(), false);
+        // verify: artifact management graph
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersionIRIv1, pInferredVersionIRIv1);
+        
+        // prepare: version 2 of test artifact
+        final IRI pVersionIRIv2 = IRI.create("http://purl.org/abc-def/artifact:1:version:2");
+        final IRI pInferredVersionIRIv2 = IRI.create("urn:inferred:http://purl.org/abc-def/artifact:1:version:2");
+        final InferredOWLOntologyID nextOntologyIDv2 =
+                new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
+        
+        // prepare: add dummy statements in relevant contexts for version 2 of test artifact
+        final RepositoryConnection nextRepositoryConnection =
+                this.testRepositoryManager.getRepository().getConnection();
+        try
+        {
+            nextRepositoryConnection.begin();
+            
+            final URI subject = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
+            nextRepositoryConnection.add(subject, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                    PoddRdfConstants.PODDBASE_NOT_PUBLISHED, pVersionIRIv2.toOpenRDFURI());
+            
+            final URI inferredSubject = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
+            nextRepositoryConnection.add(inferredSubject, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                    PoddRdfConstants.PODDBASE_NOT_PUBLISHED, pInferredVersionIRIv2.toOpenRDFURI());
+            
+            // verify: contexts populated for test artifact
+            Assert.assertEquals("Asserted graph should have 1 statement", 1,
+                    nextRepositoryConnection.size(pVersionIRIv2.toOpenRDFURI()));
+            Assert.assertEquals("Inferred graph should have 1 statement", 1,
+                    nextRepositoryConnection.size(pInferredVersionIRIv2.toOpenRDFURI()));
+        }
+        finally
+        {
+            nextRepositoryConnection.commit();
+            nextRepositoryConnection.close();
+        }
+        
+        // invoke method under test
+        this.testRepositoryManager.updateManagedPoddArtifactVersion(nextOntologyIDv2.getBaseOWLOntologyID(),
+                nextOntologyIDv2.getInferredOWLOntologyID(), true);
+        
+        // verify:
+        this.verifyManagementGraphContents(6, this.testRepositoryManager.getArtifactManagementGraph(), pArtifactIRI,
+                pVersionIRIv2, pInferredVersionIRIv2);
+        
+        // verify: contexts for previous version deleted from repository
+        final RepositoryConnection thirdRepositoryConnection =
+                this.testRepositoryManager.getRepository().getConnection();
+        try
+        {
+            thirdRepositoryConnection.begin();
+            Assert.assertEquals("Old asserted graph should be deleted", 0,
+                    thirdRepositoryConnection.size(pVersionIRIv1.toOpenRDFURI()));
+            Assert.assertEquals("Old inferred graph should be deleted", 0,
+                    thirdRepositoryConnection.size(pInferredVersionIRIv1.toOpenRDFURI()));
+        }
+        finally
+        {
+            thirdRepositoryConnection.commit();
+            thirdRepositoryConnection.close();
+        }
     }
     
     /**
@@ -428,5 +527,4 @@ public abstract class AbstractPoddRepositoryManagerTest
         }
     }
     
-   
 }

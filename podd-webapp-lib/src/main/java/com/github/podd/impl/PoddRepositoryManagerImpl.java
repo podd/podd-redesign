@@ -258,11 +258,13 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             while(repoResults.hasNext())
             {
                 final URI inferredVersionUri = IRI.create(repoResults.next().getObject().stringValue()).toOpenRDFURI();
+                
+                // clear inferred statements for previous inferred version
+                nextRepositoryConnection.clear(inferredVersionUri);
+                
+                // remove all references from artifact graph
                 nextRepositoryConnection.remove(inferredVersionUri, null, null, this.artifactGraph);
             }
-            
-            //FIXME: Inferred statements for previous versions are not removed from their contexts.
-            // This should be exposed via a test and fixed.
             
             nextRepositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null,
                     this.artifactGraph);
