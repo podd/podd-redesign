@@ -146,4 +146,37 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return null;
     }
     
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.github.podd.api.PoddSesameManager#getOntologyIRI(org.openrdf.repository.RepositoryConnection
+     * , org.openrdf.model.URI)
+     */
+    @Override
+    public IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context)
+        throws OpenRDFException
+    {
+        // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
+        final String sparqlQuery =
+                "SELECT ?x WHERE { ?x <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue() + ">  . " + " ?x <"
+                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT + "> ?y " + " }";
+        this.log.info("Generated SPARQL {}", sparqlQuery);
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(context);
+        dataset.addNamedGraph(context);
+        query.setDataset(dataset);
+        
+        IRI ontologyIRI = null;
+        
+        final TupleQueryResult queryResults = query.evaluate();
+        if(queryResults.hasNext())
+        {
+            final BindingSet nextResult = queryResults.next();
+            ontologyIRI = IRI.create(nextResult.getValue("x").stringValue());
+        }
+        return ontologyIRI;
+    }
 }

@@ -3,6 +3,8 @@
  */
 package com.github.podd.api.test;
 
+import java.io.InputStream;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +16,7 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
@@ -362,6 +365,29 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Not the expected current inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddScience/43"),
                 inferredOntologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getOntologyIRI(RepositoryConnection, URI).
+     */
+    @Test
+    public void testGetOntologyIRI() throws Exception
+    {
+        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
+        
+        // invoke method under test:
+        final IRI ontologyIRI = this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, context);
+        
+        // verify:
+        Assert.assertNotNull("Ontology IRI was null", ontologyIRI);
+        Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyIRI.toString());
     }
     
 }

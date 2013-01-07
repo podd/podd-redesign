@@ -17,7 +17,6 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
@@ -221,7 +220,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
              * For a new artifact, a Version IRI is created based on the Ontology IRI while for a
              * new version of a managed artifact, the most recent version is incremented.
              */
-            final IRI ontologyIRI = this.getOntologyIRI(temporaryRepositoryConnection, randomContext);
+            final IRI ontologyIRI =
+                    this.getSesameManager().getOntologyIRI(temporaryRepositoryConnection, randomContext);
             if(ontologyIRI != null)
             {
                 // check for managed version from artifact graph
@@ -229,7 +229,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 try
                 {
                     currentManagedArtifactID =
-                            this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, permanentRepositoryConnection,
+                            this.getSesameManager().getCurrentArtifactVersion(ontologyIRI,
+                                    permanentRepositoryConnection,
                                     this.getRepositoryManager().getArtifactManagementGraph());
                 }
                 catch(final UnmanagedArtifactIRIException e)
@@ -246,8 +247,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 else
                 {
                     newVersionIRI =
-                            IRI.create(this.incrementVersion(currentManagedArtifactID
-                                    .getVersionIRI().toString()));
+                            IRI.create(this.incrementVersion(currentManagedArtifactID.getVersionIRI().toString()));
                 }
                 
                 // set version IRI in temporary repository
@@ -258,7 +258,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         newVersionIRI.toOpenRDFURI(), randomContext);
             }
             
-            
             // Before loading the statements into OWLAPI, ensure that the schema ontologies are
             // cached in memory
             final Set<IRI> directImports = this.getDirectImports(temporaryRepositoryConnection, randomContext);
@@ -266,8 +265,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 // Get the current version
                 final InferredOWLOntologyID ontologyVersion =
-                        this.getSesameManager().getCurrentSchemaVersion(schemaOntologyIRI, permanentRepositoryConnection,
-                                this.getRepositoryManager().getSchemaManagementGraph());
+                        this.getSesameManager().getCurrentSchemaVersion(schemaOntologyIRI,
+                                permanentRepositoryConnection, this.getRepositoryManager().getSchemaManagementGraph());
                 
                 // Make sure it is cached in memory
                 this.getOWLManager().cacheSchemaOntology(ontologyVersion, permanentRepositoryConnection,
@@ -380,11 +379,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /**
-     * This is not an API method. 
-     * QUESTION: Should this be moved to a separate utility class or even to the PoddOWLManager?
+     * This is not an API method. QUESTION: Should this be moved to a separate utility class or even
+     * to the PoddOWLManager?
      * 
-     * Retrieves the ontology IRIs for all import statements found in the
-     * given repository.
+     * Retrieves the ontology IRIs for all import statements found in the given repository.
      * 
      * @param repositoryConnection
      * @param context
@@ -415,53 +413,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         return results;
     }
-
-    /**
-     * This is not an API method. 
-     * QUESTION: Should this be moved to a separate utility class?
-     * 
-     * Retrieves from the given Repository, an Ontology IRI which identifies an artifact.
-     * 
-     * @param repositoryConnection
-     * @param context
-     * @return
-     * @throws OpenRDFException
-     */
-    public IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException
-    {
-        // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
-        final String sparqlQuery =
-                "SELECT ?x WHERE { ?x <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue() + ">  . " + " ?x <"
-                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT + "> ?y " + " }";
-        this.log.info("Generated SPARQL {}", sparqlQuery);
-        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
-        
-        final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(context);
-        dataset.addNamedGraph(context);
-        query.setDataset(dataset);
-        
-        IRI ontologyIRI = null;
-        
-        final TupleQueryResult queryResults = query.evaluate();
-        if(queryResults.hasNext())
-        {
-            final BindingSet nextResult = queryResults.next();
-            ontologyIRI = IRI.create(nextResult.getValue("x").stringValue());
-        }
-        return ontologyIRI;
-    }
     
     /**
      * This is not an API method. 
      * QUESTION: Should this be moved to a separate utility class?
      * 
      * This method takes a String terminating with a colon (":") followed by an integer and
-     * increments this integer by one. If the input String is not of the expected format, "1" to the
-     * end of the String.
+     * increments this integer by one. If the input String is not of the expected format, appends
+     * "1" to the end of the String.
      * 
-     * E.g.: "http://purl.org/ab/artifact:55" is converted to "http://purl.org/ab/artifact:56"
+     * E.g.: 
+     * "http://purl.org/ab/artifact:55" is converted to "http://purl.org/ab/artifact:56"
      * "http://purl.org/ab/artifact:5A" is converted to "http://purl.org/ab/artifact:5A1"
      * 
      * @param oldVersion

@@ -130,45 +130,6 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Test
-    public void testGetOntologyIRI() throws Exception
-    {
-        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
-        
-        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        
-        final Repository testRepository = new SailRepository(new MemoryStore());
-        testRepository.initialize();
-        
-        RepositoryConnection testRepositoryConnection = null;
-        
-        try
-        {
-            testRepositoryConnection = testRepository.getConnection();
-            testRepositoryConnection.begin();
-            
-            testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-            
-            final PoddArtifactManagerImpl testArtifactManager = new PoddArtifactManagerImpl();
-            
-            // invoke method under test:
-            final IRI ontologyIRI =
-                    testArtifactManager.getOntologyIRI(testRepositoryConnection, context);
-            
-            // verify:
-            Assert.assertNotNull("Ontology IRI was null", ontologyIRI);
-            Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyIRI.toString());
-        }
-        finally
-        {
-            testRepositoryConnection.rollback();
-            testRepositoryConnection.close();
-            testRepository.shutDown();
-        }
-    }
-    
-    @Test
     public void testGetDirectImports() throws Exception
     {
         final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";

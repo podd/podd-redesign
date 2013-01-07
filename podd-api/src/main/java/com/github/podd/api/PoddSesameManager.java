@@ -63,4 +63,16 @@ public interface PoddSesameManager
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedArtifactIRIException;
     
+    /**
+     * Retrieves from the given Repository Connection, an Ontology IRI which identifies an artifact.
+     * 
+     * @param repositoryConnection
+     * @param context
+     * @return The IRI of the ontology, or null if the Repository does not contain statements
+     *         representing an ontology.
+     * @throws OpenRDFException
+     */
+    public abstract IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context)
+        throws OpenRDFException;
+    
 }
