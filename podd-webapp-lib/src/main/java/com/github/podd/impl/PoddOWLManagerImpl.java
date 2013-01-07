@@ -219,6 +219,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     @Override
     public OWLReasoner createReasoner(final OWLOntology nextOntology)
     {
+        if(this.reasonerFactory == null)
+        {
+            throw new NullPointerException("Could not find OWL Reasoner Factory");
+        }
+        
         return this.reasonerFactory.createReasoner(nextOntology);
     }
     
@@ -244,29 +249,33 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.PoddOWLManager#getCurrentArtifactVersion(org.semanticweb.owlapi.model.IRI, 
-     * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
+     * @see
+     * com.github.podd.api.PoddOWLManager#getCurrentArtifactVersion(org.semanticweb.owlapi.model
+     * .IRI, org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
      */
     @Override
     public InferredOWLOntologyID getCurrentArtifactVersion(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedArtifactIRIException
-        {
-        InferredOWLOntologyID inferredOntologyID = this.getCurrentVersionInternal(ontologyIRI, repositoryConnection, managementGraph);
+    {
+        InferredOWLOntologyID inferredOntologyID =
+                this.getCurrentVersionInternal(ontologyIRI, repositoryConnection, managementGraph);
         
-        if (inferredOntologyID != null)
+        if(inferredOntologyID != null)
         {
             return inferredOntologyID;
         }
-        else {
-            throw new UnmanagedArtifactIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");    
+        else
+        {
+            throw new UnmanagedArtifactIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");
         }
-        }
+    }
     
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.PoddOWLManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model.IRI, 
+     * @see
+     * com.github.podd.api.PoddOWLManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model.IRI,
      * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
      */
     @Override
@@ -274,14 +283,16 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedSchemaIRIException
     {
-        InferredOWLOntologyID inferredOntologyID = this.getCurrentVersionInternal(ontologyIRI, repositoryConnection, managementGraph);
+        InferredOWLOntologyID inferredOntologyID =
+                this.getCurrentVersionInternal(ontologyIRI, repositoryConnection, managementGraph);
         
-        if (inferredOntologyID != null)
+        if(inferredOntologyID != null)
         {
             return inferredOntologyID;
         }
-        else {
-            throw new UnmanagedSchemaIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");    
+        else
+        {
+            throw new UnmanagedSchemaIRIException(ontologyIRI, "This IRI does not refer to a managed ontology");
         }
     }
     
