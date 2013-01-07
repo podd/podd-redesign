@@ -41,6 +41,7 @@ import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
@@ -68,6 +69,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     private PoddPurlManager purlManager;
     private PoddSchemaManager schemaManager;
     private PoddRepositoryManager repositoryManager;
+    
+    private PoddSesameManager sesameManager;
     
     /**
      * 
@@ -133,6 +136,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public PoddSchemaManager getSchemaManager()
     {
         return this.schemaManager;
+    }
+    
+    @Override
+    public PoddSesameManager getSesameManager()
+    {
+        return this.sesameManager;
     }
     
     /*
@@ -220,7 +229,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 try
                 {
                     currentManagedArtifactID =
-                            this.getOWLManager().getCurrentArtifactVersion(ontologyIRI, permanentRepositoryConnection,
+                            this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, permanentRepositoryConnection,
                                     this.getRepositoryManager().getArtifactManagementGraph());
                 }
                 catch(final UnmanagedArtifactIRIException e)
@@ -257,7 +266,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 // Get the current version
                 final InferredOWLOntologyID ontologyVersion =
-                        this.getOWLManager().getCurrentSchemaVersion(schemaOntologyIRI, permanentRepositoryConnection,
+                        this.getSesameManager().getCurrentSchemaVersion(schemaOntologyIRI, permanentRepositoryConnection,
                                 this.getRepositoryManager().getSchemaManagementGraph());
                 
                 // Make sure it is cached in memory
@@ -565,6 +574,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public void setSchemaManager(final PoddSchemaManager schemaManager)
     {
         this.schemaManager = schemaManager;
+    }
+    
+    @Override
+    public void setSesameManager(final PoddSesameManager sesameManager)
+    {
+        this.sesameManager = sesameManager;
     }
     
     /*

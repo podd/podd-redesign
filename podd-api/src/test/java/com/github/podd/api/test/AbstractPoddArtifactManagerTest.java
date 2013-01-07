@@ -36,6 +36,7 @@ import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
@@ -66,6 +67,7 @@ public abstract class AbstractPoddArtifactManagerTest
     private PoddArtifactManager testArtifactManager;
     private PoddRepositoryManager testRepositoryManager;
     private PoddSchemaManager testSchemaManager;
+    private PoddSesameManager testSesameManager;
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of PoddArtifactManager
@@ -152,6 +154,14 @@ public abstract class AbstractPoddArtifactManagerTest
      * @return A new empty instance of an implementation of PoddSchemaManager.
      */
     protected abstract PoddSchemaManager getNewSchemaManager();
+    
+    /**
+     * Concrete tests must override this to provide a new, empty, instance of
+     * {@link PoddSesameManager}.
+     * 
+     * @return
+     */
+    protected abstract PoddSesameManager getNewSesameManager();
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -333,12 +343,15 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testSchemaManager.setOwlManager(testOWLManager);
         this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
         
+        this.testSesameManager = this.getNewSesameManager();
+        
         this.testArtifactManager = this.getNewArtifactManager();
         this.testArtifactManager.setRepositoryManager(this.testRepositoryManager);
         this.testArtifactManager.setFileReferenceManager(testFileReferenceManager);
         this.testArtifactManager.setPurlManager(testPurlManager);
         this.testArtifactManager.setOwlManager(testOWLManager);
         this.testArtifactManager.setSchemaManager(this.testSchemaManager);
+        this.testArtifactManager.setSesameManager(this.testSesameManager);
         
     }
     

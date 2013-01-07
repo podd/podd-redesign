@@ -26,6 +26,7 @@ import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
 import com.github.podd.api.purl.PoddPurlManager;
@@ -35,6 +36,7 @@ import com.github.podd.impl.PoddArtifactManagerImpl;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
+import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.impl.file.PoddFileReferenceManagerImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
@@ -106,6 +108,12 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     protected PoddSchemaManager getNewSchemaManager()
     {
         return new PoddSchemaManagerImpl();
+    }
+    
+    @Override
+    protected PoddSesameManager getNewSesameManager()
+    {
+        return new PoddSesameManagerImpl();
     }
     
     @Override

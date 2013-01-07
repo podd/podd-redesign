@@ -97,6 +97,12 @@ public interface PoddArtifactManager
     PoddSchemaManager getSchemaManager();
     
     /**
+     * 
+     * @return The {@link PoddSesameManager} used to perform operations on a Sesame Repository
+     */
+    PoddSesameManager getSesameManager();
+    
+    /**
      * Loads an artifact into the manager.
      * 
      * NOTE: After this method completes the Artifact may no longer be in memory in the
@@ -149,6 +155,8 @@ public interface PoddArtifactManager
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
     
     void setSchemaManager(PoddSchemaManager schemaManager);
+    
+    void setSesameManager(PoddSesameManager sesameManager);
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
