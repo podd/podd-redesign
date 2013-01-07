@@ -443,7 +443,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final OWLOntology nextInferredAxiomsOntology =
                 this.computeInferences(nextReasoner, inferredOntologyID.getInferredOWLOntologyID());
         
-        this.dumpOntologyToRepository(nextInferredAxiomsOntology, nextRepositoryConnection);
+        this.dumpOntologyToRepository(nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology
+                .getOntologyID().getVersionIRI().toOpenRDFURI());
         
         return inferredOntologyID;
     }
