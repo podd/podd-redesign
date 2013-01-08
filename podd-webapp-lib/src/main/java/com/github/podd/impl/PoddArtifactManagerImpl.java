@@ -415,35 +415,80 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * OWLOntologyID)
      */
     @Override
-    public InferredOWLOntologyID publishArtifact(final OWLOntologyID ontologyId) throws PublishArtifactException
+    public InferredOWLOntologyID publishArtifact(final OWLOntologyID ontologyId) throws OpenRDFException,
+        PublishArtifactException, UnmanagedArtifactIRIException
     {
-        if(ontologyId.getVersionIRI() == null)
+        final IRI ontologyIRI = ontologyId.getOntologyIRI();
+        final IRI versionIRI = ontologyId.getVersionIRI();
+        
+        if(versionIRI == null)
         {
             throw new PublishArtifactException("Could not publish artifact as version was not specified.", ontologyId);
         }
         
-        if(this.getOWLManager().isPublished(ontologyId.getOntologyIRI()))
+        Repository repository = null;
+        RepositoryConnection repositoryConnection = null;
+        try
         {
-            // Cannot publish multiple versions of a single artifact
-            throw new PublishArtifactException("Could not publish artifact as a version was already published",
-                    ontologyId);
+            repository = this.getRepositoryManager().getRepository();
+            repositoryConnection = repository.getConnection();
+            repositoryConnection.begin();
+            
+            if(this.getOWLManager().isPublished(ontologyId, repositoryConnection))
+            {
+                // Cannot publish multiple versions of a single artifact
+                throw new PublishArtifactException("Could not publish artifact as a version was already published",
+                        ontologyId);
+            }
+            
+            final OWLOntologyID currentVersion =
+                    this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, repositoryConnection,
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            if(!currentVersion.getVersionIRI().equals(versionIRI))
+            {
+                // User must make the given artifact version the current version manually before
+                // publishing, to ensure that work from the current version is not lost accidentally
+                throw new PublishArtifactException(
+                        "Could not publish artifact as it was not the most current version.", ontologyId);
+            }
+            
+            this.getSesameManager().setPublished(ontologyIRI, repositoryConnection, versionIRI.toOpenRDFURI());
+            
+            final InferredOWLOntologyID published =
+                    this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, repositoryConnection,
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            repositoryConnection.commit();
+            
+            return published;
         }
-        
-        final OWLOntologyID currentVersion = this.getOWLManager().getCurrentVersion(ontologyId.getOntologyIRI());
-        
-        if(!currentVersion.getVersionIRI().equals(ontologyId.getVersionIRI()))
+        catch(final OpenRDFException | PublishArtifactException | UnmanagedArtifactIRIException e)
         {
-            // User must make the given artifact version the current version manually before
-            // publishing, to ensure that work from the current version is not lost accidentally
-            throw new PublishArtifactException("Could not publish artifact as it was not the most current version.",
-                    ontologyId);
+            if(repositoryConnection != null && repositoryConnection.isActive())
+            {
+                repositoryConnection.rollback();
+            }
+            
+            throw e;
         }
-        
-        final InferredOWLOntologyID published = this.getOWLManager().setPublished(ontologyId);
-        
-        return published;
+        finally
+        {
+            // release resources
+            if(repositoryConnection != null && repositoryConnection.isOpen())
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
+            }
+        }
     }
-    
+
     /*
      * (non-Javadoc)
      * 

@@ -66,7 +66,8 @@ public interface PoddSesameManager
         UnmanagedArtifactIRIException;
     
     /**
-     * Retrieves the ontology IRIs for all import statements found in the given Repository Connection.
+     * Retrieves the ontology IRIs for all import statements found in the given Repository
+     * Connection.
      * 
      * @param repositoryConnection
      * @param context
@@ -75,7 +76,6 @@ public interface PoddSesameManager
      */
     Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI context)
         throws OpenRDFException;
-    
     
     /**
      * Retrieves from the given Repository Connection, an Ontology IRI which identifies an artifact.
@@ -88,5 +88,20 @@ public interface PoddSesameManager
      */
     public abstract IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context)
         throws OpenRDFException;
+    
+    /**
+     * Sets the given Ontology IRI to be published. This restricts the ability to publish the
+     * ontology again.
+     * 
+     * @param ontologyIRI
+     *            The Ontology IRI identifying the ontology that needs to be published
+     * @param repositoryConnection
+     * @param context
+     * @throws OpenRDFException
+     * @throws UnmanagedArtifactIRIException
+     *             If this is not a managed ontology
+     */
+    void setPublished(IRI ontologyIRI, RepositoryConnection repositoryConnection, URI context) throws OpenRDFException,
+        UnmanagedArtifactIRIException;
     
 }

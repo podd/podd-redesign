@@ -22,7 +22,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.github.podd.exception.PoddException;
-import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -63,15 +62,6 @@ public interface PoddOWLManager
      * @return
      */
     InferredOWLOntologyID generateInferredOntologyID(OWLOntologyID ontologyID);
-    
-    /**
-     * 
-     * @param ontologyIRI
-     *            The IRI of the ontology to get.
-     * @return The managed current version of the ontology with ontologyIRI as either the Ontology
-     *         IRI, or the Version IRI.
-     */
-    OWLOntologyID getCurrentVersion(IRI ontologyIRI);
     
     /**
      * NOTE: Restrict usage of this method, as it will always fetch the entire OWLOntology into
@@ -140,15 +130,8 @@ public interface PoddOWLManager
         throws OWLRuntimeException, OWLException, OpenRDFException, IOException;
     
     /**
-     * Returns true if the given ontologyIRI is either an Ontology IRI and it has a published
-     * version, or is a version IRI that was previously published.
+     * TODO: This seems to fit into PoddSesameManager more than here.
      * 
-     * @param ontologyIRI
-     * @return
-     */
-    boolean isPublished(IRI ontologyIRI);
-    
-    /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
      * ontologyID were previously published.
      * 
@@ -225,17 +208,6 @@ public interface PoddOWLManager
      *            The manager for all PODD {@link OWLOntology} instances.
      */
     void setOWLOntologyManager(OWLOntologyManager manager);
-    
-    /**
-     * Sets the given OWLOntologyID to be published, restricting the ability of the ontology to be
-     * published again.
-     * 
-     * @param ontologyID
-     *            The OWLOntologyID that needs to be published
-     * @throws PublishArtifactException
-     *             If the ontologyID could not be published.
-     */
-    InferredOWLOntologyID setPublished(OWLOntologyID ontologyID) throws PublishArtifactException;
     
     /**
      * Sets the {@link OWLReasonerFactory} to use when creating instances of {@link OWLReasoner} to

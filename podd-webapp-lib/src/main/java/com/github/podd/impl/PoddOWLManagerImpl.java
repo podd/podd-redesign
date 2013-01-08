@@ -62,7 +62,6 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.PoddException;
-import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -238,12 +237,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     }
     
     @Override
-    public OWLOntologyID getCurrentVersion(final IRI ontologyIRI)
-    {
-        throw new RuntimeException("TODO: Implement getCurrentVersion");
-    }
-    
-    @Override
     public OWLOntology getOntology(final OWLOntologyID ontologyID) throws IllegalArgumentException, OWLException
     {
         return this.owlOntologyManager.getOntology(ontologyID);
@@ -349,12 +342,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 .getOntologyID().getVersionIRI().toOpenRDFURI());
         
         return inferredOntologyID;
-    }
-    
-    @Override
-    public boolean isPublished(final IRI ontologyIRI)
-    {
-        throw new RuntimeException("TODO: Implement isPublished(IRI)");
     }
     
     @Override
@@ -487,12 +474,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     {
         this.owlOntologyManager = manager;
         
-    }
-    
-    @Override
-    public InferredOWLOntologyID setPublished(final OWLOntologyID ontologyID) throws PublishArtifactException
-    {
-        throw new RuntimeException("TODO: Implement setPublished");
     }
     
     @Override

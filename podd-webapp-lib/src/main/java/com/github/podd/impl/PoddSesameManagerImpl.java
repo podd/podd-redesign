@@ -152,7 +152,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     
     /*
      * (non-Javadoc)
-     * @see com.github.podd.api.PoddSesameManager#getDirectImports(org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
+     * 
+     * @see com.github.podd.api.PoddSesameManager#getDirectImports(org.openrdf.repository.
+     * RepositoryConnection, org.openrdf.model.URI)
      */
     @Override
     public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI context)
@@ -213,4 +215,53 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         return ontologyIRI;
     }
+    
+    /**
+     * Internal helper method to retrieve the Top-Object IRI for a given ontology.
+     * 
+     */
+    private IRI getTopObjectIRI(final IRI ontologyIRI, final RepositoryConnection repositoryConnection,
+            final URI context) throws OpenRDFException
+    {
+        // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
+        final String sparqlQuery =
+                "SELECT ?y WHERE { " + ontologyIRI.toQuotedString() + " <" + RDF.TYPE + "> <"
+                        + OWL.ONTOLOGY.stringValue() + ">  . " + ontologyIRI.toQuotedString() + " <"
+                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT + "> ?y " + " }";
+        this.log.info("Generated SPARQL {}", sparqlQuery);
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(context);
+        dataset.addNamedGraph(context);
+        query.setDataset(dataset);
+        
+        IRI topObjectIRI = null;
+        
+        final TupleQueryResult queryResults = query.evaluate();
+        if(queryResults.hasNext())
+        {
+            final BindingSet nextResult = queryResults.next();
+            topObjectIRI = IRI.create(nextResult.getValue("y").stringValue());
+        }
+        return topObjectIRI;
+    }
+    
+    @Override
+    public void setPublished(final IRI ontologyIRI, final RepositoryConnection repositoryConnection, final URI context)
+        throws OpenRDFException
+    {
+        final IRI topObjectIRI = this.getTopObjectIRI(ontologyIRI, repositoryConnection, context);
+        
+        // remove previous value for publication status
+        repositoryConnection.remove(topObjectIRI.toOpenRDFURI(), PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                null, context);
+        
+        // then insert the publication status as #Published
+        repositoryConnection.add(topObjectIRI.toOpenRDFURI(), PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                PoddRdfConstants.PODDBASE_PUBLISHED, context);
+        
+        this.log.info("{} was set as Published", topObjectIRI);
+    }
+    
 }

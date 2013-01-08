@@ -18,6 +18,7 @@ import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -123,6 +124,7 @@ public interface PoddArtifactManager
         PoddException, IOException, OWLException;
     
     /**
+     * Sets the given OWLOntologyID to be published.
      * 
      * NOTE: After publication PODD Artifacts cannot be modified. New versions must be created as
      * new PODD Artifacts, which may then be published when they are ready.
@@ -131,9 +133,12 @@ public interface PoddArtifactManager
      *            The OWL Ontology ID of the PODD Artifact that needs to be published.
      * @return The full inferred OWL Ontology ID of the published Artifact.
      * @throws PublishArtifactException
-     *             If the artifact could not be published for any reason.
+     *            If the artifact could not be published for any reason.
+     * @throws OpenRDFException
+     * @throws UnmanagedArtifactIRIException
+     *            If this is not a managed artifact  
      */
-    InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId) throws PublishArtifactException;
+    InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId) throws PublishArtifactException, OpenRDFException, UnmanagedArtifactIRIException;
     
     void setFileReferenceManager(PoddFileReferenceManager fileManager);
     

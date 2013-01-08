@@ -669,10 +669,11 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#publishArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
-    @Ignore
     @Test
-    public final void testPublishArtifact() throws Exception
+    public final void testPublishArtifactBasicSuccess() throws Exception
     {
+        this.loadSchemaOntologies();
+
         final InputStream inputStream =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
         // MIME type should be either given by the user, detected from the content type on the
@@ -680,14 +681,43 @@ public abstract class AbstractPoddArtifactManagerTest
         final String mimeType = "application/rdf+xml";
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
-        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 6, 33, 383, false);
+
         
-        Assert.assertNotNull("Null ontology ID", resultArtifactId);
-        Assert.assertNotNull("Null ontology IRI", resultArtifactId.getOntologyIRI());
-        Assert.assertNotNull("Null ontology version IRI", resultArtifactId.getVersionIRI());
-        Assert.assertNotNull("Null inferred ontology IRI", resultArtifactId.getInferredOntologyIRI());
+        // invoke method under test
+        final InferredOWLOntologyID publishedArtifactId = this.testArtifactManager.publishArtifact(unpublishedArtifactId);
         
-        this.testArtifactManager.publishArtifact(resultArtifactId);
+        // verify: publication status is correctly updated
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            // verify: a single PUBLICATION_STATUS in asserted ontology
+            final List<Statement> publicationStatusStatementList =
+                    nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                            null, false, publishedArtifactId.getVersionIRI().toOpenRDFURI()).asList();
+            Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement.", 1,
+                    publicationStatusStatementList.size());
+            
+            // verify: artifact is PUBLISHED
+            Assert.assertEquals("Wrong publication status", PoddRdfConstants.PODDBASE_PUBLISHED.toString(),
+                    publicationStatusStatementList.get(0).getObject().toString());
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
         
         // FIXME: How do we get information about whether an artifact is published and other
         // metadata like who can access the artifact?
