@@ -1,0 +1,18 @@
+<h3 class="underlined_heading">TAB Import</h3>
+<h4>Overview</h4>
+<p>PODD-TAB is a tab delimited file format for loading objects into PODD without having to go through the input screens or write custom middleware to communicate with PODDs web services.</p>
+<p>Users are able to update/create a PODD-TAB file, bundle it with the data files and upload the bundle into PODD. PODD will create the required objects and add the files as datastreams to the objects.</p>
+<p>Note that the the PODD-TAB import function is currently restricted to users with either Repository Administrator or Proejct Creator roles.</p>
+<h4>How to Import a TAB file</h4>
+<p>The TAB file can be submitted via the PODD web interface. A <em>Tab Import </em>link is listed on the PODD Navigation Menu Bar when a Project Creator or a Repository Administrator is logged in. Click the link and that will take you to the following form submission:</p>
+<p class="rtecenter"><img src="../images/TAB1.jpg" width="666" height="513" alt="" border="1" /></p>
+<p class="rteleft"> <em>Figure 15.1: Sample screen of TAB file import</em></p>
+<p>The user clicks the <strong>Browse</strong> button on the screen (Figure 15.1), a normal file upload dialog window will open. Then the  user selects the TAB file to be uploaded from the local directory or network drive. If the File meets the format requirement, a new window will be displayed as follows:</p>
+<p class="rtecenter"><img width="681" height="547" src="../images/TAB3.jpg" alt="" /></p>
+<p class="rteleft"> <em>Figure 15.2: TAB file submit screen with a TAB file uploaded</em></p>
+<p>The detailed specification of the TAB file can be found <a href=${baseUrl}/help/tab_specification>here</a>.</p>
+<h4>How to Submit a TAB file</h4>
+<p>As shown in Figure 15.2, the uploaded file name is displayed and it states that the file was uploaded successfully. The user can also attach files in the file attach window. These files will have been identified in the PODD-TAB file. Then the user clicks the <strong>Submit</strong> button.</p>
+<p>Validation is performed. If no errors are detected, the system will generate a new PODD project based on the information provided in the TAB file. In the main pane the object titles and object numbers of all the objects created will be listed. The object numbers are hyperlinked to the object view.  An email message is sent to the user advising that a new project has been created. The link to the project is also provided in the message.</p>
+<p>In the newly created project, the creation date is set to current date. The user is set as the Project Administrator if the user hasn't assigned a project role to himself.</p>
+<p>If any errors are detected, an error message will be displayed at the top of the window advising of the problem. All newly created objects are deleted during the backout process. The user should click the <strong>Reset</strong> button to remove the TAB file from the system.  The user can modify the TAB file and upload/submit it again.</p>

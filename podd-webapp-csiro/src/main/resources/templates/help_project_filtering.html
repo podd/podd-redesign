@@ -1,0 +1,56 @@
+<h3 class="underlined_heading">Filtering Projects</h3>
+<br>
+<h4>Overview</h4>
+<p>Filtering Projects is a persistent function that can be applied to a project list so that a registered user can determine which projects they see in their project listing.</p>
+<br>
+<h4>Actors</h4>
+<ul class="stylized">
+    <li>Public users can not filter projects</li>
+    <li>Registered users can filter Public Projects and My Projects</li>
+    <li>Administrator can filter All Projects</li>
+</ul>
+<p>For registered users the filter will persist across sessions.</p>
+<br>
+<h4>Filtering the Project List</h4>
+<p>To filter the project list the registered user first selects the <strong>Filter Projects</strong> button on the Project List View. The button is not visible to public users.</p>
+<p>The view in the Projects tab will change to the following Filter Projects Dialog (see Figure 9.1).</p>
+<p class="rtecenter"><img alt="" style="width: 785px; height: 592px;" border="1" src="../images/filter01.jpg" /></p>
+<p class="rteleft"><em>Figure 9.1 &ndash; Filter Projects Dialog</em></p>
+<p>The user may enter any combination of the following information:</p>
+<ul class="stylized">
+    <li>Project Type: Check boxes for My Projects and Public Projects (checked by default).</li>
+    <li>Filter Terms (these are search terms applied to project metadata fields only, e.g. Title, Description, Lead institution, etc).
+    <ul class="stylized-circle">
+        <li>Containing all these words: Is equivalent to joining search terms with a logical and operator. So a search on salt water will be treated as salt and water.</li>
+        <li>Containing any of these words: Is equivalent to joining search terms with a logical or operator. So a search on salt water will be treated as salt or water.</li>
+        <li>Containing the phrase: Is equivalent to wrapping the search terms in quotes and searching for the exact phrase.</li>
+        <li>Excluding these words: Will exclude results containing these words.</li>
+    </ul>
+    </li>
+    <li>Filter Dates: There are two sets of date fields. The user may filter for dates falling between the from and to fields, or the user may search only after a particular date by using the From field only, or only before a particular date by using the To field only. The user can select which relevant project date field to search from, the options are: <br />
+    <ul class="stylized-circle">
+        <li>Start Date</li>
+        <li>Completion Date</li>
+        <li>Publication Date</li>
+    </ul>
+    </li>
+</ul>
+<p>When <strong>Reset</strong> button is clicked, the system will reset all fields to the default values.</p>
+<p>When the <strong>Filter </strong>Button at the bottom of the page is clciked, the Project Listing view in the Projects Pane with the filtered list of projects will be returned.</p>
+<p class="rtecentre"><img style="width: 669px; height: 457px;" border="1" alt="" src="../images/filter-result.jpg" /></p>
+<p class="rteleft"><em>Figure 9.2 &ndash; Filtered Project List View (Project Creator)</em></p>
+<p>Projects so filtered are still separated between My Projects and Public Projects. On this page, a new button, Remove Filter, is displayed next to the Filter Projects button.</p>
+<br>
+<h4>Persistence of Filters</h4>
+<p>For a registered user a filter persists during and between sessions. If a registered user sets a project filter, then anytime the user visits the Projects View, the view will be filtered as per the filter the user last created.</p>
+<p>When a user has a persistent filter in place, if they go to List Projects view the project list will be filtered as the user had filtered them the last time they submitted the Filter Projects dialog.</p>
+<p>When a user has a persistent filter in place, if they go to the Filter Projects dialog, the fields will be populated as the user had populated them the last time the user submitted this dialog.</p>
+<p>When a user has a persistent filter in place, the user will see a <strong>Remove Filter </strong>button on the List Projects view. If there is no persistent filter in place, the user will not see this button.</p>
+<br>
+<h4>Resetting the Filter</h4>
+<p>The user can reset the filter in two ways:</p>
+<ul class="stylized">
+    <li>By clicking the <strong>Remove Filter</strong> button on the List Projects view. This will change the List Projects view to display all projects the user may access: My Projects and Public Projects.</li>
+    <li>By clicking the <strong>Filter </strong><strong>Projects&nbsp;</strong> button in the Projects tab and then selecting the <strong>Reset</strong> button in the Filter Project dialog. This will reset all fields to their default values. The user then clicks the <strong>Filter </strong>button, the system will list all projects the user may access, including My Projects and Public Projects.</li>
+    <li>If a repository administrator wants to filter all project he can access, then both My Projects and Public Projects should be unchecked.</li>
+</ul>

@@ -1,0 +1,66 @@
+<h3 class="underlined_heading">Search</h3>
+<br>
+<h4>Overview</h4>
+<p>PODD allows a user to search the content of object metadata streams to locate objects of interest.</p>
+<p>Note that,</p>
+<ul class="stylized">
+    <li>Searches will not return results for data which a user does not have access to.</li>
+    <li>Contents of data objects will not be searchable/indexable.</li>
+</ul>
+<br>
+<h4>Actors</h4>
+<p>All users, whether registered or public access, are able to access the search functions.</p>
+<p>Results will be determined by the user's repository role and their project role.</p>
+<ul class="stylized">
+    <li>Public users can search on public access projects.</li>
+    <li>Registered users can search on public access projects and may search on projects they are associated with.</li>
+    <li>Administrators can search on all projects in the PODD instance.</li>
+</ul>
+<br>
+<h4>Basic Search</h4>
+<p>The PODD interface displays a search box in the top banner area of the screen (see figure 17.1). The user can type in search terms into this box and click the <strong>Search</strong> button. This is called Basic Search.</p>
+<p class="rtecentre"><img alt="" style="width: 832px; height: 133px;" border="1" src="../images/search1.jpg" /></p>
+<p><em>Figure 17.1 &ndash; Search Box in PODD Banner (top right corner of the page)&nbsp;</em></p>
+<p>Basic search separates terms based on white space. Exact phrases can be searched for by encapsulating the search phrase in &quot;quotes&quot;. Basic search ignores logical operators such as and, or, &amp;, |, etc.</p>
+<p>Results are displayed as follows:</p>
+<p class="rtecentre"><img alt="" style="width: 590px; height: 302px;" border="1" src="../images/searchresult.jpg" /></p>
+<p class="rteleft"><em>Figure 17.2 &ndash; Example screen shot of Search Results</em></p>
+<p>The search results list the Project for which the object was found first. It lists the Project Title as a hyperlink to the Project view. The project information is the same as showed when a user lists projects in the Projects Pane.</p>
+<p>Then the search results display the object for which the matches  were found. The following information is included:</p>
+<ul class="stylized">
+    <li>The object type</li>
+    <li>The object title</li>
+    <li>The object attribute in which the match was found (Note that if the attribute is the title, this will not be repeated).</li>
+</ul>
+<p>Where the matching terms or phrases show up, they will be bolded (not hyperlinked). Normal rules to limiting the amount of text shown apply. If there is no matching text in the limiting characters, so be it.</p>
+<br>
+<h4>Advanced Search</h4>
+<p>The user clicks on the <em>Advanced Search</em> link next to the <strong>Search</strong> button in the top banner area of the screen, or clicks on the <em>Search</em> link in the Navigation Menu Bar. The user is then presented with the <strong>Advance Search</strong> screen (see Figure 17.3). The user fills in the following fields (they are all optional).</p>
+<p class="rtecentre"><img alt="" style="width: 689px; height: 611px;" border="1" src="../images/search advanced.jpg" />
+<p class="rteleft"><em>Figure 17.3 &ndash; Advanced Search Screen</em></p>
+<br>
+<h4>Search Terms</h4>
+<p>The Search Terms fields on the advanced search screen have the following behaviour:</p>
+<ul class="stylized">
+    <li>Containing all these words: Is equivalent to joining search terms with a logical and operator. So a search on salt water will be treated as salt and water.</li>
+    <li>Containing any of these words: Is equivalent to joining search terms with a logical or operator. So a search on salt water will be treated as salt or water.</li>
+    <li>Containing the phrase: Is equivalent to wrapping the search terms in quotes and searching for the exact phrase.</li>
+    <li>Excluding these words: Will exclude results containing these words.</li>
+</ul>
+<br>
+<h4>Scope</h4>
+<p>There are two scope checkboxes, both are checked by default:</p>
+<ul class="stylized">
+    <li>My Projects: Search all projects for which the current user has a project role.</li>
+    <li>Public Projects: Search all published projects.</li>
+</ul>
+<p>*Note that an advanced search for a public user would only be able to search Public Projects, therefore the Scope section of the search is not displayed.</p>
+<br>
+<h4>PODD Creation Date</h4>
+<p>Searches can be filtered based on the date the objects were lodged in PODD. The date fields provide a Start Date and an End Date for the search criteria. One can be entered without the other, e.g. only enter a Start Date to search for all objects created on or after dd/mm/yyyy, or only enter an End Data to search for all objects created on or before dd/mm/yyyy.</p>
+<p>To search for a specific date the user would have to fill in both field sets with the same date.</p>
+<br>
+<h4>Object Type</h4>
+<p>The search can be limited to specific object types through a multi-select box. The multi-select box will list <em>All</em> as the first option and it will be selected by default. By holding the ctrl key the user can select multiple individual object types, or by holding the shift key they can select a range of object types.</p>
+<p>The user clicks <strong>Search</strong>. Results are then returned as the same in the Basic Search section (as per Figure 17.2.)</p>
+<p>The <strong>Reset</strong> button resets all advanced search fields to their default values.</p>

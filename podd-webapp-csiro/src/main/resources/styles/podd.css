@@ -1,0 +1,686 @@
+/*
+ * Copyright (c) 2009 - 2010. School of Information Technology and Electrical
+ * Engineering, The University of Queensland.  This software is being developed
+ * for the "Phenomics Ontoogy Driven Data Management Project (PODD)" project.
+ * PODD is a National e-Research Architecture Taskforce (NeAT) project
+ * co-funded by ANDS and ARCS.
+ *
+ * PODD is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PODD is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PODD.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* remove default browser position, margins and padding */
+* {
+position: relative;
+margin: 0;
+padding: 0;
+word-wrap: break-word;
+}
+
+/* -- Standard HTML Elements -- */
+body {
+    font: 75% Arial, Verdana;
+    margin: 10px 10px 0px 10px;
+}
+input {
+    font: 100% Arial, Verdana;
+    width: 300px;
+}
+input.narrow {
+    width: 50px;
+}
+input.medium {
+    width: 150px;
+}
+input.wide {
+    width: 400px;
+}
+textarea {
+    font: 100% Arial, Verdana;
+    width: 400px;
+	height: 40px;
+    padding: 2px 2px 2px 2px;
+}
+textarea.high {
+    height: 80px;
+}
+
+textarea.gigantic {
+    width: 600px;
+    height: 300px;
+    padding: 2px 2px 2px 2px;
+}
+
+p {
+    padding: 10px;
+}
+p.no_padding {
+    padding: 0px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Lucida Grande", Verdana, Lucida, Helvetica, Arial, sans-serif;
+    font-weight: normal;
+    background-color: transparent;
+    border-bottom: 1px solid;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 160%;
+}
+
+h2 {
+    font-size: 150%;
+    border-bottom: none;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 125%;
+    border-bottom: none;
+    font-weight: bold;
+}
+
+h4 {
+    font-size: 110%;
+    border-bottom: none;
+    font-weight: bold;
+}
+
+h5 {
+    font-size: 100%;
+    border-bottom: none;
+    font-weight: bold;
+}
+
+h6 {
+    font-size: 85%;
+    border-bottom: none;
+    font-weight: bold;
+}
+
+.underlined_heading {
+	border-bottom: thin solid;
+}
+
+a {
+    text-decoration: none;
+    font-weight: normal;
+}
+a img {
+    border: none;
+    z-index: 1;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+/* -- Page Layout Blocks -- */
+.fieldset, .fieldset_without_border {
+    border: solid thin;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    position: relative;
+}
+.fieldset_without_border {
+    border: none;
+}
+.legend, .legend_no_indent {
+    position: absolute;
+    left: 1em;
+    top: -0.8em;
+    font-weight: bold;
+    padding: 0 0.5em 0 0.5em;
+    border: none;
+}
+.legend_no_indent {
+    left: 0;
+}
+.legend a {
+    font-weight: bold;
+    text-decoration: none;
+}
+.fieldset .inner .legend {
+    /* IE7 hack */
+    *display: inline-block;
+    /* end - IE7 hack */
+    display: block;
+    *height: 20px;
+    *width:100px;
+}
+.legend_no_indent .radioGroup {
+    top: -1em;
+    font-weight: normal;
+    white-space: nowrap;
+}
+.legend button {
+    position: relative;
+    margin: -20px 10px 0 10px;
+    padding: 0;
+    border: black hidden thin;   /* hide the border so the icon will display correctly in IE8 */
+    height: 20px;
+    float: right;
+}
+/* fix button placement in firefox */
+@-moz-document url-prefix() {
+    .legend button {
+        margin: -5px 10px 0 10px;            
+    }
+}
+.fieldset .inner, .fieldset_without_border .inner  {
+	padding: 1em 1em 0 1em
+}
+.radioGroup ol {
+	padding: 0.5em 0 0 1em;
+}
+.radioGroup ol li label {
+	display: inline;
+}
+.fieldset ol, #hierarchy ol, .fieldset_without_border ol {
+	padding: 1em 1em 0 1em;
+	list-style: none;
+}
+.fieldset li, #hierarchy li, .fieldset_without_border li {
+	padding-bottom: 1em;
+	list-style: none;
+}
+.fieldset li label, .fieldset_without_border li label {
+	display: block;
+}
+
+.fieldset li div.radioGroup label, .fieldset_without_border li div.radioGroup label {
+	display: inline;
+}
+
+/* search panel */
+#search {
+    margin: 10px 10px 10px 0px;
+    float: right;
+    width: 26em;
+}
+
+.searchTextField{
+	border: 1px solid;
+    width: 140px;
+	z-index: 1;
+}
+.searchTextField:focus {
+	border: 2px solid;
+}
+.searchButton{
+	height: 20px;
+    width: 60px;
+}
+
+/* site banner */
+#site_banner {
+    margin: 10px 0px -10px 10px;
+    min-height: 90px;
+    background-repeat: no-repeat;
+}
+
+#site_banner span {
+    position: absolute;
+    top: 35px;
+    left: 110px;
+    right: 0px;
+    border-bottom: thick solid;
+}
+
+/* menu bar and login/logout bar */
+#user_div, #toolbar_div {
+    width: 100%;
+    line-height: 1.6em;
+    list-style: none;
+}
+#toolbar_div {
+    margin-top: 5px;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+}
+#user_div li, #toolbar_div li {
+    display: inline;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+#user_div li a, #toolbar_div li a {
+    text-decoration: none;
+}
+.float_right {
+    float: right;
+}
+.no_image {
+    background-image: none ! important;
+}
+.left_image {
+    /* IE7 hack to render the image correctly */
+    *display: inline-block;
+    *position: relative;
+    /* end - IE7 hack */
+	background: no-repeat left;
+}
+
+/* buttons */
+#buttonwrapper {
+	display: block;
+	clear: both;
+	margin: 10px 10px 10px 10px;
+}
+#buttonwrapper a, #buttonwrapper_right a, button {
+    display: block;
+    float: left;
+    margin: 0 7px 0 0;
+    border: thin solid;
+    cursor: pointer;
+    font: 100% Arial, Verdana;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px 6px 7px; /* Links */
+   	z-index: 1;
+}
+#buttonwrapper_right a, #buttonwrapper_right button {
+	float: right;
+}
+button, .button {
+    width: auto;
+    overflow: visible;
+    border: thin solid;
+    cursor: pointer;
+    font: 100% Arial, Verdana;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 4px 10px 3px 7px; /* IE6 */
+}
+.button:hover, .remove_file_btn:hover,
+.previous_btn:hover, .next_btn:hover  {
+    text-decoration: none;
+}
+.remove_file_btn, .previous_btn, .next_btn {
+    width: auto;
+    margin-right: 10px;
+    border: none;
+    background: no-repeat center top;
+}
+a.previous_btn span, a.next_btn span {
+    visibility: hidden;
+}
+button[type] {
+    padding:5px 10px 5px 7px; /* Firefox */
+}
+*:first-child+html button[type] {
+    padding:4px 10px 3px 7px; /* IE7 */
+}
+
+/* title pane */
+#title_pane {
+    margin-left: 20px;
+    padding-top: 20px;
+}
+
+/* content pane */
+#content_pane {
+	margin: 10px 0px 10px 0px;
+    padding: 10px 10px 10px 10px;
+    border: 1px solid;
+  	min-width: 750px;
+    min-height: 600px;
+  	max-height: none;
+  	overflow: auto;
+}
+
+/* auxiliary and main pane */
+#aux {
+	margin: 10px 0px 10px 10px;
+    padding-top: 10px;
+    padding-left: 10px;
+    border: 1px solid;
+    width: 15%;
+    min-width: 130px;
+    min-height: 300px;
+    float: left;
+}
+
+#main {
+	margin: 10px 0 0 20px;
+    padding-top: 10px;
+    padding-left: 10px;
+    border: none;
+    width: 75%;
+    float: left;
+    min-height: 600px;
+  	max-height: none;
+  	overflow: auto;
+}
+
+li.errorMsg {
+    padding-left: 1em;
+	list-style: none;
+}
+
+[icon] {
+    /* IE7 hack to render the icons */
+    *display: inline-block;
+    *display: inline;
+    *position: absolute;
+    /* end - IE7 hack */
+    background: no-repeat right center;
+    border: none;
+    padding-right: 20px;
+}
+
+/* hierarchy display */
+
+/* IE7 hack to render the hierarchy correclty */
+li .hierarchy a, li .hierarchy span {
+    *display: inline-block;
+    *display: inline;
+    *position: relative;
+}
+.padded {
+    *display: inline-block;
+    *display: inline;
+    *position: relative;
+    *padding-left: 30px;
+}
+.minorPadding {
+    padding: 10px;
+}
+
+.parent, .current, .child {
+    *display: inline-block;
+    *display: inline;
+    *position: absolute;
+}
+/* end - IE7 hack */
+
+.parent, .current, .child {
+    width: auto;
+    border: none;
+    padding-right: 20px;
+    text-indent: -1000em;
+    background: no-repeat left top;
+}
+.bold {
+    font-weight: bold;
+}
+.center {
+    text-align: center;
+}
+
+ /* login page */
+#login {
+	float: left;
+}
+#login label {
+	display: inline;
+	width: 6em;
+	margin-right: 1em;
+	float: left;
+	text-align: left;
+}
+#login #rememberMe {
+	display: inline;
+	margin-right: 1em;
+	float: left;
+}
+#login #rememberMeLabel {
+	width:20em;
+}
+
+/* administration - create user page elements */
+#admin_left_pane {
+	float: left;
+}
+#admin_right_pane {
+	float: left;
+}
+
+/* administration - list users page */
+#auditLog_filter li, #userFilter li{
+	padding: 0 0 1em 1em;
+	display: inline-block;
+	min-width: 20em;
+}
+#userFilter #label{
+	min-width: 5em;
+}
+
+/* search results */
+.objectField {
+	padding-left: 10px;
+}
+
+/* tables */
+table {
+	margin:10px 0pt 15px;
+	width: 100%;
+	text-align: left;
+	border-collapse: collapse;
+	empty-cells: show;
+}
+
+/* bordered table layout */
+table.tableborder {
+	border-left: thin solid;
+	border-right: thin solid;
+}
+table.tableborder thead, table.tableborder tfoot {
+	border-left-style: hidden;
+	border-right-style: hidden;
+}
+
+/* sort-able table layout */
+table.tablesorter thead tr th {
+	border-bottom: thick solid;
+	padding: 4px;
+}
+table.tablesorter tfoot tr td {
+	border-top: thick solid;
+	padding: 4px;
+}
+table.tablesorter thead tr .header {
+    background: no-repeat center right;
+    cursor: pointer;
+}
+table.tablesorter tbody tr td {
+	padding: 4px;
+	vertical-align: top;
+	border-bottom: thin solid !important;
+}
+
+table.tablesorter tfoot {
+    text-align: center;
+}
+table.tablesorter tfoot .first {
+	cursor: pointer;
+}
+table.tablesorter tfoot .first,
+table.tablesorter tfoot .prev,
+table.tablesorter tfoot .next,
+table.tablesorter tfoot .last {
+	margin-right: 10px;
+	cursor: pointer;
+}
+table.tablesorter tfoot .pagedisplay {
+	padding: 0 5px 0 5px;
+	text-align: center;
+}
+table.tablesorter tfoot .pagesize {
+	margin-left: 10px;
+}
+
+/* jquery auto-complete */
+.ac_results {
+	padding: 0px;
+	border: 1px solid;
+	overflow: hidden;
+	z-index: 99999;
+}
+.ac_results ul {
+	width: 100%;
+    list-style: none outside none;
+    padding: 0;
+	margin: 0;
+}
+.ac_results li {
+	margin: 0px;
+	padding: 2px 5px;
+	cursor: default;
+	display: block;
+	/*
+	if width will be 100% horizontal scrollbar will apear
+	when scroll mode will be used
+	*/
+	/*width: 100%;*/
+	font: 100% Arial, Verdana;
+	/*
+	it is very important, if line-height not setted or setted
+	in relative units scroll will be broken in firefox
+	*/
+	line-height: 16px;
+	overflow: hidden;
+}
+.ac_loading {
+    background: no-repeat;
+}
+/* jquery auto-complete - end */
+
+/* jquery text litmiter */
+.limiterBox {
+    border: 1px solid;
+    padding: 3px 6px;
+    font-size:10px;
+}
+
+.allow_space {
+    padding-right: 50px;
+    width: 90%;
+    float: left;
+}
+.no-style {
+    list-style-type: none;
+}
+.stylized, .stylized-small, .stylized-circle, .stylized-decimal {
+    list-style-type: square;
+    left: 50px;
+    right: 10px;
+    width: 80%;
+}
+.stylized-circle, .stylized-small-circle {
+    list-style-type: circle;
+}
+.stylized-decimal {
+    list-style-type: decimal;
+}
+.stylized-small, .stylized-small-circle {
+    left: 25px;
+}
+.stylized-last {
+    padding-bottom: 10px;
+}
+.stylized li {
+    padding-bottom: 5px;
+}
+
+
+/* jquery treeview */
+.treeview, .treeview ul {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.treeview ul {
+    margin-top: 4px;
+}
+
+.treeview .hitarea {
+	background: -64px -25px no-repeat;
+	height: 16px;
+	width: 16px;
+	margin-left: -16px;
+	float: left;
+	cursor: pointer;
+}
+/* fix for IE6 & IE7 */
+.hitarea {
+	*display: inline-block;
+    *display: inline;
+	*float: none;
+}
+.treeview .hover {
+    cursor: pointer;
+}
+.treeview li {
+    /* IE7 hack to render the browser images correclty */
+    *display: inline-block;
+    *position: relative;
+    /* end - IE7 hack */
+	margin: 0;
+	padding: 3px 0px 3px 16px;
+    background: 0 0 no-repeat;
+}
+.treeview li.collapsable, .treeview li.expandable {
+    background-position: 0 -176px;
+}
+.treeview .expandable-hitarea {
+    background-position: -80px -3px;
+}
+.treeview li.last {
+    background-position: 0 -1766px;
+}
+.treeview li.lastCollapsable {
+    background-position: 0 -111px;
+}
+.treeview li.lastExpandable {
+    background-position: -32px -67px;
+}
+.treeview div.lastCollapsable-hitarea, .treeview div.lastExpandable-hitarea {
+    background-position: 0;
+}
+.filetree li {
+    padding: 3px 0 2px 16px;
+}
+.filetree li.expandable {
+    background: 0 0 no-repeat;
+}
+.project, .predicate, .data, .file {
+    /* IE7 hack to render the browser images correclty */
+    *display: inline-block;
+    *display: inline;
+    *position: absolute;
+    /* end - IE7 hack */
+    width: auto;
+    border: none;
+    padding-right: 20px;
+    text-indent: -1000em;
+    background: no-repeat left top;
+}
+/* IE7 hack to render the browser images correclty */
+.treeview ins.padded {
+    *display: inline-block;
+    *display: inline;
+    *position: relative;
+    *padding-left: 20px;
+    text-decoration: none;
+}
+/* end - IE7 hack */
+
+/* jquery treeview - end */

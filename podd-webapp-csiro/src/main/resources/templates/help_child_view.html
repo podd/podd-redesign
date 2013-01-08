@@ -1,0 +1,44 @@
+<h3 class="underlined_heading">Viewing a Child Object</h3>
+<br>
+<p>The <strong>View Object</strong> screen is arrived as a result of <strong>Adding a Child </strong>object or <strong>Editing an Object.</strong> It can also be displayed by selecting the object&rsquo;s <em>View</em> link from the <strong>Browser Pane</strong> or click the object title anywhere (object hirarchy, clipbord, refersTo table etc).</p>
+<p>The <strong>View Object</strong> screen is displayed as follows (See figure 14.2.1). The following sections are displayed in the View Object page:</p>
+<ul class="stylized">
+    <li>Parent Details,</li>
+    <li>Object Details,</li>
+    <li>RefersTo tables (could be zero or more than one depending on the object type),</li>
+    <li>File Attachemnt,</li>
+    <li>Hierarchy.</li>
+</ul>
+<p>All the sections are displayed in an expanding state by default. At the bottom of the page, available action buttons are listed for the user.</p>
+<p class="rtecentre"><img style="width: 685px; height: 601px;" alt="" border="1" src="../images/viewchildobject.jpg" /></p>
+<p class="rteleft"><em>Figure 14.2.1 &ndash; Example screen shot for viewing an Investigation object &amp; relationships.</em></p>
+<br>
+<h4>Parent Details</h4>
+<p>The first section of the <strong>View Object </strong>screen is the <strong>Parent Details</strong> section. It is exactly the same as described in the <strong>Adding a Child Object</strong> screen, including the parent object's ID, type, Title and relationship with the child object.</p>
+<br>
+<h4>Object Details</h4>
+<p>The Second section is the <strong>Object Details</strong> section. It presents the available attributes of the object being viewed. The title of this section is determined by the object type. Diferent Object type has different object details.&nbsp;</p>
+<br>
+<h4>Refers To Tables</h4>
+<p><strong>Refers To table</strong> is displayed only when the data model permits. i.e., a Material Object may refer to an Environment object, a Genotype object, a protocol object and a Treatment Object. A Project Plan will not refer to any other objects and this section is not visible. Even no refersTo objects are selected, the empty table is still displayed.</p>
+<br>
+<h4>File Attachment</h4>
+<p>The next section is the <strong>File attachments</strong> section. All the attached files are listed with their File Name, Size, Type, Format and Description. The File details can be viewed by clicking the file name link. The user can also download an individual file or all files together.</p>
+<br>
+<h4>Hierarchy</h4>
+<p>The <strong>Hierarchy</strong> section is the similar to the one in the Viewing Project screen except that the project object does not have a parent object. As stated under the Hierarchy header: Hierarchy displays only the parent and existing children of the current object. It displays entries for:</p>
+<ul class="stylized">
+    <li>The current object's Parent Object;</li>
+    <li>The current object; and</li>
+    <li>The current object's children.</li>
+</ul>
+<br>
+<h4>Action Buttons</h4>
+<p>The bottom of the page displays some action buttons, <strong>Edit Object, Add Child Objects, Copy, Paste</strong> and <strong>Delete</strong>. &nbsp;Whether a button is visible or invisible depends on the object&rsquo;s project Status, the user&rsquo;s repository role and project specific role, and the object&rsquo;s position in the domain model as well. &nbsp;</p>
+<ul class="stylized">
+    <li>The <strong>Edit</strong> button takes the user to the Edit Object page for the current object (it is only displayed in Active project, and only available to repository administrator, project administrator and project member). It will be described in next section: Editing an Object.</li>
+    <li>The <strong>Add Child Objects</strong> will make this current object the current parent object and will take the user to the Add Child Object screen as described in the previous section: adding a child Object. (This button will only be available if the model permits. i.e. If a Project Plan does not allow for any child objects, then this button would not be available).</li>
+    <li>The <strong>Copy</strong> button will allow the authorised user to copy the current object to the Clipboard.</li>
+    <li>The <strong>Paste</strong> button will brings the authorised the user to the Clipboard where the user can select objects/predicates to paste.</li>
+    <li>The <strong>Delete</strong> button is only available for the repository administrator or project administrator.</li>
+</ul>

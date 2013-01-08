@@ -1,0 +1,26 @@
+<h3 class="underlined_heading">Maintaining a Child Object</h3>
+<br>
+<h4>Overview</h4>
+<p>A child object means an object of another object. In PODD, every object is an child object of a parent object except Project object.</p>
+<p>Child Objects are defined as Concrete Objects. They are an instance of a Concept Object. This section will describe how a concrete object is initiated and maintained as Child Objects of a Parent Object, including</p>
+<ul class="stylized">
+    <li><a href="./child_add">Adding a Child Object</a></li>
+    <li><a href="./child_view">Viewing a Child Object</a></li>
+    <li><a href="./child_edit">Editing a Child Object</a></li>
+    <li><a href="./child_delete">Deleting a Child Object</a></li>
+</ul>
+<br>
+<h4>Actors</h4>
+<p>For repository users:</p>
+<ul class="stylized">
+    <li>Public users can view objects descended from public access projects.</li>
+    <li>Registered users can view objects descended from public access projects and may access objects descended from other projects as determined by their project role.</li>
+    <li>Project Creators are as per registered users.</li>
+    <li>Administrators can add/edit/view/delete/undelete objects.</li>
+</ul>
+<p>For users with project specific roles:</p>
+<ul class="stylized">
+    <li>Project Administrators can add/edit/view/delete objects descended from a project object they have admin access to.</li>
+    <li>Project Members may can/edit/view objects descended from a project object they have member access to.</li>
+    <li>Project Observers can view objects descended from a project object that they have observer access to.</li>
+</ul>

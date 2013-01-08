@@ -1,0 +1,33 @@
+<h3 class="underlined_heading">AAF Login</h3>
+<h4>Overview</h4>
+<p>PODD supports the single sign-on services enabled by the AAF (the Australian Access Federation). The process is for a user's institutional credentials to be validated by the institution and PODD is then notified of the user's authentication. User attributes will be supplied to PODD by the institution. PODD then matches the user to PODD's own internal user database, or if the user is not in the database, requests user registration information. Authorisation processes are then enacted, such as determining the repository and project access rights based on the user's role.</p>
+<p>All level of users (except anonymous public access) may login to PODD using AAF based Authentication. It would require the user to have a valid account with an IdP (Identity Provider) who are registered with the AAF.  User must have user credentials for an institution within the federation and may not be suspended from their institutional systems for any reason, or blocked within PODD.</p>
+<h4>AAF Login</h4>
+<p>As shown in Figure 4.1.2, there is a AAF login logo on the LHS of the main login screen.</p>
+<p class="rtecenter"><img src="../images/login-5.jpg" border="1" width="416" height="329" alt="" /></p>
+<p class="rteleft"><em>Figure 4.3.1 Screen shot of the AAF login logo</em></p>
+<p>When the AAF logo is clicked, a new window will be displayed similar to figure 4.3.2</p>
+<p class="rtecenter"><img src="../images/login-6.jpg" border="1" width="448" height="242" alt="" /></p>
+<p class="rteleft"><em>Figure 4.3.2 Screen shot of the AAF institution selector
+</em></p>
+<p>The user clicks the arrow next to the Select button, a drop down list will be displayed with all available Institutions who are registered with the AAF.</p>
+<p>The user selects their home institution from the drop down list and clicks the <strong>Select </strong>button, the Identity Provider's AAF sign in screen will be then displayed (see Figure 4.3.3).</p>
+<p class="rtecenter"><img src="../images/login-8.jpg" border="1" width="509" height="263" alt="" /></p>
+<p class="rteleft"><em>Figure 4.3.3 Example of an Identity Provider's AAF sign in screen</em></p>
+<p>Figure 4.3.3. is an example of an institution's AAF sign in screen. The users are required to supply their institutional user name and password.</p>
+<p>Occassionally on first sign-in the user will be presented with a Digital ID card. The Digital ID card displays the user details that are going to be passed on to PODD from the Identity Provider. The user confirms the Digital ID card. PODD then retrieves the user's details from the User table in the PODD database.</p>
+<p>If the user is valid then PODD logs the user in and redirects the user to the User's page. If the user is <i>Blocked</i> then an appropriate message will be displayed.</p>
+<p>If PODD detects that the user has not logged in before. PODD presents an <i>Edit User Details</i> screen (see figure 4.3.4). This screen is a variation on the screen used by logged in users to maintain their details.</p>
+<p class="rtecenter"><img src="../images/AAF-login0.jpg" border="1" width="573" height="761" alt="" /></p>
+<p class="rteleft"><em>Figure 4.3.4 Example screen of an AAF user's first login to PODD</em></p>
+<p>AAF user's first login screen consists of two parts: <strong>Merge Account </strong>and <strong>AAF Registration</strong>.</p>
+<ul class="stylized">
+    <li>The <strong>Merge Account</strong> section is displayed at the top of the screen. This allows a user with an existing PODD user name will to use the AAF to log in instead of their PODD credentials. The user enters their PODD username and password and clicks the <strong><i>Merge</i></strong> button. PODD updates the PODD User details with the AAF based token received from the Digital ID card. The user is logged in and taken to the Projects screen. The user's institutional credentials are linked with PODD User details now (note, not their institutional user name or password). They can either signon via the AAF or via their PODD username and password. </li>
+</ul>
+<ul>
+    <li>The <strong>AAF Registration </strong>Section is displayed in the bottom half of the screen (Figure 4.3.4). If the user does not fill in the <strong>Merge Account </strong>section at the top section, he/she has to complete this section to login. This section does not contain a Username or Password fields.  The system prefills some fields with information received from their home institution (this does not include their institutional user name or password). The user updates the details and clicks <strong><i>Update Details</i></strong>. PODD creates a user account for the user and assigns it the role of <i>Registered User</i>. PODD then logs the user in and redirects the user to the Project pane. In registering a new user logging in via the AAF an appropriate unique PODD username is required. The system will auto-generate it with the user's email. If it is not available, the user has to manually enter their email address then that email address becomes their user id.
+     </li>
+</ul>
+<p>If the user neither completes the <strong>Merge Account </strong>section nor the <strong>AAF Registration </strong>section,  then the user is not logged in. If an institution authenticates a user, but does not provide sufficient information to PODD in the Digital ID card, then the user cannot log in to PODD this way. The user will be presented with an updated login screen that advises them of the problem.
+ </p>
+<p>Note that the AAF supports the concept of a persistent identity, meaning that if a person swaps institutions and subsequently change their username and password, and their personal information, certain attributes provided in the Digital ID card can remain the same. PODD will attempt to detect a change in the user's institutional details as provided by the Digital ID card and suggest the user update their user details.</p>

@@ -1,0 +1,65 @@
+<h3 class="underlined_heading">Metadata Objects</h3>
+<br>
+<h4>Overview of Objects</h4>
+<p>The core of PODD is the capability to manage metadata and data at the object level. Objects can be considered as a general &quot;thing&quot; for which data or metadata can be captured. e.g.,</p>
+<ul class="stylized">
+    <li>a Project object;</li>
+    <li>an Investigation object;</li>
+    <li>a Material object;</li>
+    <li>a Measurement object;</li>
+    <li>a Data object.</li>
+</ul>
+<p>Concept Objects and Concrete Objects are defined in PODD. A Concept Object is an OWL (Web Ontology Language) class from which concrete objects are instantiated. It is written in OWL/RDF (Resource Description Framework). Concept objects are maintained as an OWL file.</p>
+<p>Concrete objects are instances of a concept object. A Project is a concept object, objects of the project are concrete objects, such as Investigation Objects, Material Objects etc.</p>
+<br>
+<h4>The Parent-Child Relationship</h4>
+<p>PODD object relationships are governed by Subject-Predicate-Object rules defined in OWL/RDF. The predicate determines the nature of the relationship between objects.</p>
+<p>The Parent-Child relationship is where a new object is added to PODD as a child of an existing object. The relationship is identified by the predicate selected, e.g.,</p>
+<ul class="stylized">
+    <li>Project A (subject) hasProjectPlan (predicate) Project Plan B (object).</li>
+    <li>Genotype X (subject) hasGene (predicate) Gene Y (object).</li>
+</ul>
+<p>All objects with the exception of Project objects cannot exist in isolation. When instantiating concrete objects the appropriate predicate must also be selected. Consequently objects will be created in relation to their parent object.</p>
+<p class="rtecentre">&nbsp;<img style="width: 656px; height: 382px;" border="1" alt="" src="../images/parent-child2.jpg" /></p>
+<p class="rteleft"><em>Figure 6.1 &ndash; Screen shot of the Parent-Child relationship in an Object View</em></p>
+<br>
+<h4>The Object Hierarchy</h4>
+<p>The PODD data model allows for data and metadata to be grouped into a DAG (directed acyclic graph) like structure, with a project object as the highest possible node.</p>
+<p class="rtecentre"><img alt="" style="width: 606px; height: 330px;" border="1" src="../images/hierarchy3.jpg" /></p>
+<p class="rteleft"><em>Firgure 6.2 &ndash; Screen shot of an object hierarchy in a View Project Object page</em></p>
+<p>Figure 6.2 shows a screen shot of the object hierarchy of PODD project (Gav&rsquo;s Project). &nbsp;The Hierarchy section is displayed at the end of each View Object page.</p>
+<p>The hierarchy section displays the parent and direct children of the current object. It means only the existing children of the projects are displayed. All existing children would be listed. The next level children are not listed, only the number of objects is displayed at the end. It does not display any nodes above the current parent either.</p>
+<p>The Hierarchy display is semi-interactive. The user may navigate to an object's view by clicking on the object title in the hierarchy display (The titles of the child objects are hyperlinked.).</p>
+<p>The Hierarchy will display the current parent object, its Title, Type and Number  of Children. It will not display any nodes above the current parent.<br />
+The  Hierarchy will display entries for:</p>
+<ul class="stylized">
+    <li>The current object's Parent Object;</li>
+    <li>The current object;</li>
+    <li>The current object's children;</li>
+    <li>Action Buttons</li>
+</ul>
+<p>Based to the user&rsquo;s repository and project specific role, different action  buttons will be displayed at the bottom of the page: Edit Object, Paste, Add  Child Object, Delete and Publish Project (see the table below).</p>
+<ul class="stylized">
+    <li>An <strong>Edit Object</strong> button takes the user to Edit Project Object page. The user can edit  the project details, update the project participants, add or delete data items.  The same action would be effected by clicking on the edit tab.</li>
+    <li>An <strong>Add Child </strong>button would take the user to an Add Child Object page,  with the project as the parent.</li>
+    <li>A <strong>Paste</strong> button takes the user to the clipboard screen. The user can select  objects/predicates to paste to the Project if there are any previously copied  objects/predicates available on the screen.</li>
+    <li>A <strong>Delete</strong> button allows the authorised user to delete the project if there is  no child object or all child projects have been already deleted.</li>
+    <li>A <strong>Publish Project</strong> button is displayed on the View Project Object page only  when the Project status has been set to Complete.</li>
+</ul>
+<p>The Object Hierarchy can also be viewed in the Browser Pane, the whole object hierarchy can be listed when displayed in an expanding state (details will be described later).</p>
+<br>
+<h4>Object References</h4>
+<p>Besides the Parent-Child relationship, objects can have another form of relationship to each other&mdash;Object references.</p>
+<p>Object references describe the on-screen functionality for selecting objects to be referenced by the current object. e.g.</p>
+<ul class="stylized">
+    <li>an Analysis Object may refer to a Platform object</li>
+    <li>a Data object may refer to a Material object</li>
+    <li>an Event object may refer to a Protocol object.</li>
+</ul>
+<p>Object references are displayed as Refers To tables on the <strong>View Project</strong> Object page. Where the subject is the object being referenced from, a &quot;Refers To&quot; relationship will look up to the project level and then down to every level except the lowest level Investigation branch that the subject is on. A &quot;Refers To&quot; relationship will not look at any branches below the branch the subject is on.</p>
+<p class="rtecentre"><img style="width: 718px; height: 634px;" border="1" alt="" src="../images/viewreference.jpg" /></p>
+<p class="rteleft"><em>Figure 6.3 &ndash; View Object Screen Shot with Referencing Sections</em></p>
+<p>When a user adds/edits an object that references another object (as opposed to having a parent-child relationship) a section of the screen will display available objects of the correct type and within the correct scope as a table.</p>
+<p class="rtecentre"><img style="width: 593px; height: 321px;" alt="" src="../images/objectreference2.jpg" /></p>
+<p class="rteleft"><em>Figure 6.4 &ndash; Edit Object Screen Shot including Referencing Sections</em></p>
+<p>Figure 6.4 is a screen shot of the <strong>Edit Data Object</strong> page, the &quot;Refers To&quot; tables are displayed under the Object Details section. All object types which can be referenced to Data object are listed.</p>
