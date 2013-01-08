@@ -12,12 +12,14 @@ import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -245,6 +247,48 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             topObjectIRI = IRI.create(nextResult.getValue("y").stringValue());
         }
         return topObjectIRI;
+    }
+    
+    @Override
+    public boolean isPublished(final OWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
+        throws OpenRDFException
+    {
+        if(ontologyID == null || ontologyID.getOntologyIRI() == null || ontologyID.getVersionIRI() == null)
+        {
+            throw new NullPointerException("OWLOntology is incomplete");
+        }
+        
+        final URI artifactGraphUri = ontologyID.getVersionIRI().toOpenRDFURI();
+        
+        /*
+         * ASK {
+         * 
+         * ?artifact owl:versionIRI ontology-version .
+         * 
+         * ?artifact poddBase:hasTopObject ?top .
+         * 
+         * ?top poddBase:hasPublicationStatus poddBase:Published .
+         * 
+         * }
+         */
+        final String sparqlQuery =
+                "ASK { " + "?artifact <" + PoddRdfConstants.OWL_VERSION_IRI.stringValue() + "> "
+                        + ontologyID.getVersionIRI().toQuotedString() + " . " + "?artifact <"
+                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT.stringValue() + "> ?top ." + " ?top <"
+                        + PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS.stringValue() + "> <"
+                        + PoddRdfConstants.PODDBASE_PUBLISHED.stringValue() + ">" + " }";
+        
+        this.log.info("Generated SPARQL {}", sparqlQuery);
+        
+        final BooleanQuery booleanQuery = repositoryConnection.prepareBooleanQuery(QueryLanguage.SPARQL, sparqlQuery);
+        
+        // Create a dataset to specify the contexts
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(artifactGraphUri);
+        dataset.addNamedGraph(artifactGraphUri);
+        booleanQuery.setDataset(dataset);
+        
+        return booleanQuery.evaluate();
     }
     
     @Override

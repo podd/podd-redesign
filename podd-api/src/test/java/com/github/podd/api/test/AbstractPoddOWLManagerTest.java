@@ -82,31 +82,6 @@ public abstract class AbstractPoddOWLManagerTest
     protected abstract PoddOWLManager getNewPoddOWLManagerInstance();
     
     /**
-     * Helper method for testing
-     * {@link com.github.podd.api.PoddOWLManager#isPublished(OWLOntologyID, RepositoryConnection)}
-     * 
-     */
-    private boolean internalTestIsPublishedOWLOntologyID(final String testResourcePath) throws Exception
-    {
-        // prepare: load the ontology into the OWLManager
-        final InputStream artifact1InputStream = this.getClass().getResourceAsStream(testResourcePath);
-        Assert.assertNotNull("Could not find resource", artifact1InputStream);
-        final OWLOntologyDocumentSource owlSource =
-                new StreamDocumentSource(artifact1InputStream, OWLOntologyFormatFactoryRegistry.getInstance()
-                        .getByMIMEType(RDFFormat.RDFXML.getDefaultMIMEType()));
-        final OWLOntologyID artifactOntologyID = this.testOWLManager.loadOntology(owlSource).getOntologyID();
-        final URI artifactGraph = artifactOntologyID.getVersionIRI().toOpenRDFURI();
-        
-        // prepare: load the ontology into the test repository
-        final InputStream artifact1InputStreamAgain = this.getClass().getResourceAsStream(testResourcePath);
-        this.testRepositoryConnection.add(artifact1InputStreamAgain, "", RDFFormat.RDFXML, artifactGraph);
-        Assert.assertEquals("Not the expected number of statements in Repository", 24,
-                this.testRepositoryConnection.size(artifactGraph));
-        
-        return this.testOWLManager.isPublished(artifactOntologyID, this.testRepositoryConnection);
-    }
-    
-    /**
      * Helper method which loads, infers and stores a given ontology using the PoddOWLManager.
      * 
      * @param resourcePath
@@ -142,95 +117,6 @@ public abstract class AbstractPoddOWLManagerTest
                 this.testRepositoryConnection.size(inferredOntologyURI));
         
         return inferredOntologyID;
-    }
-    
-    /**
-     * Helper method which populates a graph with artifact management triples.
-     * 
-     * @return The URI of the test artifact management graph
-     * @throws Exception
-     */
-    private URI populateArtifactManagementGraph() throws Exception
-    {
-        final URI artifactGraph = ValueFactoryImpl.getInstance().createURI("urn:test:artifact-mgt-graph:");
-        
-        final URI testOntologyURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/99-99/artifact:99");
-        final URI testVersionURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd//99-99/version:1");
-        final URI testInferredURI =
-                ValueFactoryImpl.getInstance().createURI("urn:inferred:http://purl.org/podd/99-99/version:1");
-        
-        this.testRepositoryConnection.add(testOntologyURI, RDF.TYPE, OWL.ONTOLOGY, artifactGraph);
-        this.testRepositoryConnection.add(testInferredURI, RDF.TYPE, OWL.ONTOLOGY, artifactGraph);
-        this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, testVersionURI,
-                artifactGraph);
-        this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, testVersionURI,
-                artifactGraph);
-        this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                testInferredURI, artifactGraph);
-        this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                testInferredURI, artifactGraph);
-        
-        return artifactGraph;
-    }
-    
-    /**
-     * Helper method which populates a graph with schema management triples.
-     * 
-     * @return The URI of the test schema management graph
-     * @throws Exception
-     */
-    private URI populateSchemaManagementGraph() throws Exception
-    {
-        final URI schemaGraph = ValueFactoryImpl.getInstance().createURI("urn:test:schema-mgt-graph:");
-        
-        final URI pbBaseOntologyURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase");
-        final URI pbVersionURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddBase/1");
-        final URI pbInferredURI =
-                ValueFactoryImpl.getInstance().createURI("urn:inferred:http://purl.org/podd/ns/version/poddBase/1");
-        
-        final URI pScienceOntologyURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddScience");
-        final URI pScienceVersionURI =
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/27");
-        final URI pScienceInferredURI =
-                ValueFactoryImpl.getInstance().createURI("urn:inferred:http://purl.org/podd/ns/version/poddScience/43");
-        
-        final URI pPlantOntologyURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddPlant");
-        final URI pPlantVersionURI =
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddPlant/1");
-        final URI pPlantInferredURI =
-                ValueFactoryImpl.getInstance().createURI("urn:inferred:http://purl.org/podd/ns/version/poddPlant/1");
-        
-        // Podd-Base
-        this.testRepositoryConnection.add(pbBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pbVersionURI,
-                schemaGraph);
-        this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, pbVersionURI,
-                schemaGraph);
-        this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                pbInferredURI, schemaGraph);
-        
-        // Podd-Science
-        this.testRepositoryConnection.add(pScienceOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pScienceVersionURI,
-                schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION,
-                pScienceVersionURI, schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
-        this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                pScienceInferredURI, schemaGraph);
-        
-        // Podd-Plant
-        this.testRepositoryConnection.add(pPlantOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
-        this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pPlantVersionURI,
-                schemaGraph);
-        this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, pPlantVersionURI,
-                schemaGraph);
-        this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pScienceVersionURI, schemaGraph);
-        this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
-        this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                pPlantInferredURI, schemaGraph);
-        
-        return schemaGraph;
     }
     
     /**
@@ -1007,77 +893,6 @@ public abstract class AbstractPoddOWLManagerTest
         {
             Assert.assertNull("Not the expected Exception", e.getMessage());
         }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     * 
-     */
-    @Test
-    public void testIsPublishedOWLOntologyIDWithEmptyOntology() throws Exception
-    {
-        final OWLOntologyID emptyOntologyID =
-                this.testOWLManager.getOWLOntologyManager().createOntology().getOntologyID();
-        
-        try
-        {
-            this.testOWLManager.isPublished(emptyOntologyID, this.testRepositoryConnection);
-            Assert.fail("Should have thrown a NullPointerException");
-        }
-        catch(final NullPointerException e)
-        {
-            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * .
-     * 
-     */
-    @Test
-    public void testIsPublishedOWLOntologyIDWithNullOntology() throws Exception
-    {
-        try
-        {
-            this.testOWLManager.isPublished(null, this.testRepositoryConnection);
-            Assert.fail("Should have thrown a NullPointerException");
-        }
-        catch(final NullPointerException e)
-        {
-            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * . This test depends on imported PODD Base ontology being resolvable from
-     * http://purl.org/podd/ns/poddBase.
-     */
-    @Test
-    public void testIsPublishedOWLOntologyIDWithPublishedArtifact() throws Exception
-    {
-        final String testResourcePath = "/test/artifacts/basicProject-1-published.rdf";
-        final boolean isPublished = this.internalTestIsPublishedOWLOntologyID(testResourcePath);
-        Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
-     * . This test depends on imported PODD Base ontology being resolvable from
-     * http://purl.org/podd/ns/poddBase.
-     */
-    @Test
-    public void testIsPublishedOWLOntologyIDWithUnPublishedArtifact() throws Exception
-    {
-        final String testResourcePath = "/test/artifacts/basicProject-1.rdf";
-        final boolean isPublished = this.internalTestIsPublishedOWLOntologyID(testResourcePath);
-        Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
     }
     
     /**

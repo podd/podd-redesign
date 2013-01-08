@@ -130,19 +130,6 @@ public interface PoddOWLManager
         throws OWLRuntimeException, OWLException, OpenRDFException, IOException;
     
     /**
-     * TODO: This seems to fit into PoddSesameManager more than here.
-     * 
-     * Returns true if the combination of the Ontology IRI and the Version IRI in the given
-     * ontologyID were previously published.
-     * 
-     * @param ontologyID
-     * @param repositoryConnection
-     * @return
-     * @throws OpenRDFException
-     */
-    boolean isPublished(OWLOntologyID ontologyID, RepositoryConnection repositoryConnection) throws OpenRDFException;
-    
-    /**
      * Loads an ontology into memory from an OWLOntologyDocumentSource.
      * 
      * @param owlSource

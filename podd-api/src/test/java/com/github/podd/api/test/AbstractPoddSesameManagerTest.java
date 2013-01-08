@@ -20,6 +20,7 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,28 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepository.shutDown();
         
         this.testPoddSesameManager = null;
+    }
+    
+    /**
+     * Helper method for testing
+     * {@link com.github.podd.api.PoddSesameManager#isPublished(OWLOntologyID, RepositoryConnection)}
+     * 
+     */
+    private boolean internalTestIsPublished(final String testResourcePath, final URI contextCumVersionIRI)
+        throws Exception
+    {
+        // prepare: load the ontology into the test repository
+        final InputStream artifact1InputStreamAgain = this.getClass().getResourceAsStream(testResourcePath);
+        this.testRepositoryConnection.add(artifact1InputStreamAgain, "", RDFFormat.RDFXML, contextCumVersionIRI);
+        Assert.assertEquals("Not the expected number of statements in Repository", 24,
+                this.testRepositoryConnection.size(contextCumVersionIRI));
+        
+        // prepare: build an OWLOntologyID
+        final IRI ontologyIRI =
+                this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, contextCumVersionIRI);
+        final OWLOntologyID ontologyID = new OWLOntologyID(ontologyIRI.toOpenRDFURI(), contextCumVersionIRI);
+        
+        return this.testPoddSesameManager.isPublished(ontologyID, this.testRepositoryConnection);
     }
     
     /**
@@ -416,6 +439,79 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Ontology IRI was null", ontologyIRI);
         Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyIRI.toString());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testIsPublishedWithEmptyOntology() throws Exception
+    {
+        final OWLOntologyID emptyOntologyID = new OWLOntologyID();
+        
+        try
+        {
+            this.testPoddSesameManager.isPublished(emptyOntologyID, this.testRepositoryConnection);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     */
+    @Test
+    public void testIsPublishedWithNullOntology() throws Exception
+    {
+        try
+        {
+            this.testPoddSesameManager.isPublished(null, this.testRepositoryConnection);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "OWLOntology is incomplete", e.getMessage());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * . This test depends on imported PODD Base ontology being resolvable from
+     * http://purl.org/podd/ns/poddBase.
+     */
+    @Test
+    public void testIsPublishedWithPublishedArtifact() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/basicProject-1-published.rdf";
+        final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:uuid:artifact:version:55");
+        
+        final boolean isPublished = this.internalTestIsPublished(testResourcePath, versionUri);
+        Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * . This test depends on imported PODD Base ontology being resolvable from
+     * http://purl.org/podd/ns/poddBase.
+     */
+    @Test
+    public void testIsPublishedWithUnPublishedArtifact() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/basicProject-1.rdf";
+        final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:artifact:version:1");
+        final boolean isPublished = this.internalTestIsPublished(testResourcePath, versionUri);
+        Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
     }
     
 }

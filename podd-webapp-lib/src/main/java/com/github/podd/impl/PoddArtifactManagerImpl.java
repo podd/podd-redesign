@@ -434,7 +434,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             repositoryConnection = repository.getConnection();
             repositoryConnection.begin();
             
-            if(this.getOWLManager().isPublished(ontologyId, repositoryConnection))
+            if(this.getSesameManager().isPublished(ontologyId, repositoryConnection))
             {
                 // Cannot publish multiple versions of a single artifact
                 throw new PublishArtifactException("Could not publish artifact as a version was already published",

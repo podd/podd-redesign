@@ -9,6 +9,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -88,6 +89,17 @@ public interface PoddSesameManager
      */
     public abstract IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context)
         throws OpenRDFException;
+    
+    /**
+     * Returns true if the combination of the Ontology IRI and the Version IRI in the given
+     * ontologyID were previously published.
+     * 
+     * @param ontologyID
+     * @param repositoryConnection
+     * @return
+     * @throws OpenRDFException
+     */
+    boolean isPublished(OWLOntologyID ontologyID, RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     /**
      * Sets the given Ontology IRI to be published. This restricts the ability to publish the
