@@ -7,8 +7,9 @@
         <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>podd-webapp-csiro</artifactId>
-    <name>PODD Webapp CSIRO</name>
+    <name>PODD :: Web App For CSIRO</name>
     <description>PODD Web application for PODD CSIRO distribution</description>
+    <packaging>war</packaging>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
