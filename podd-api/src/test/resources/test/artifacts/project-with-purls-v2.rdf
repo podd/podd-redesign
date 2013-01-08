@@ -34,14 +34,6 @@
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
-<rdf:Description rdf:about="http://www.podd.org/user#Xavier.Sirault@csiro.au">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://www.podd.org/user#Helen.Daily@csiro.au">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-</rdf:Description>
-
 <rdf:Description rdf:about="http://purl.org/podd/abc-def/object:2323">
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Project"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
@@ -49,7 +41,7 @@
 	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Characterising normal and okra leaf shapes</rdfs:comment>
 	<dcterms:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2012-06-05T01:57:16.643Z</dcterms:date>
 	<dcterms:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Helen.Daily@csiro.au</dcterms:creator>
-	<poddBase:hasPrincipalInvestigator rdf:resource="http://www.podd.org/user#Xavier.Sirault@csiro.au"/>
+	<poddBase:hasPrincipalInvestigator rdf:resource="http://www.podd.org/user#Xueqin.Wang@csiro.au"/>
 	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
 	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-06-05T01:57:16.643Z</poddBase:createdAt>
 	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CSIRO HRPPC</poddBase:hasLeadInstitution>

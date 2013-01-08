@@ -630,7 +630,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertFalse("Two versions should NOT have the same Version IRI", 
                 firstArtifactId.getVersionIRI().toString().equals(secondArtifactId.getVersionIRI().toString()));
         
-        this.verifyLoadedArtifact(secondArtifactId, 6, 29, 378, false);
+        this.verifyLoadedArtifact(secondArtifactId, 6, 25, 374, false);
         
         // this.printContents(this.testRepositoryManager.getArtifactManagementGraph());
         // this.printContexts();
