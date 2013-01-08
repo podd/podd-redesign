@@ -1011,18 +1011,6 @@ public abstract class AbstractPoddOWLManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.IRI)} .
-     * 
-     */
-    @Ignore
-    @Test
-    public void testIsPublishedIRI() throws Exception
-    {
-        Assert.fail("TODO: Implement me");
-    }
-    
-    /**
-     * Test method for
      * {@link com.github.podd.api.PoddOWLManager#isPublished(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      * 
