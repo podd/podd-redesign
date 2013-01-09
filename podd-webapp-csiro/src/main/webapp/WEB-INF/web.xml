@@ -4,4 +4,34 @@
 
 <web-app>
     <display-name>PODD WebApp CSIRO HRPPC</display-name>
-</web-app>
+
+    <!-- Servlet to Restlet adapter declaration (Mandatory) -->
+    <servlet>
+        <servlet-name>RestletAdapterPoddWebSite</servlet-name>
+        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+        <init-param>
+            <!-- Application class name -->
+            <param-name>org.restlet.application</param-name>
+            <param-value>com.github.podd.web.PoddRestletApplication</param-value>
+        </init-param>
+        <init-param>
+            <!-- Add the Servlet context path to routes (Optional) -->
+            <param-name>org.restlet.autoWire</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        
+        <!-- Your component class name (Optional - For mode 2) -->
+<!-- 
+        <init-param>
+            <param-name>org.restlet.component</param-name>
+            <param-value>net.maenad.oas.testwebsite.OASTestWebsiteComponent</param-value>
+        </init-param>
+ -->       
+    </servlet>
+
+    <!-- Mapping catching all requests on a given path (Mandatory) -->
+    <servlet-mapping>
+        <servlet-name>RestletAdapterPoddWebSite</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+</web-app>  
