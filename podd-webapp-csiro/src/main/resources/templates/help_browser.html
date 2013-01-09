@@ -1,0 +1,54 @@
+<h3 class="underlined_heading">Browser Pane</h3>
+<br>
+<h4>Overview</h4>
+<p>This section describes the functionality of the UI Browser Pane and how PODD objects may be browsed at the project level.</p>
+<ul class="stylized">
+    <li>All users have access to the browser pane.</li>
+    <li>Users are able to browse projects within the browse pane as per their repository wide role and their project specific role.</li>
+</ul>
+<br>
+<h4>Project View in Browser Pane</h4>
+<p>A <em>Browse Project</em> link is listed at the end of each project on the Listing Projects page (see <a href="./project_listing">Listing Projects</a>). When the <em>Browse Project</em> link is selected, the Browse Pane is selected and loaded with the project selected. The default view will be of the project hierarchy in a collapsed state.</p>
+<p>Expander (+) and Collapser icons (-) are used to expand and collapse the browser, similar to a windows explorer view.</p>
+<p class="rtecentre"><img alt="" style="width: 646px; height: 466px;" border="1" src="../images/browser pane.jpg" /></p>
+<p class="rteleft"><em>Figure 15.1 &ndash; Browse pane with expanded project view</em></p>
+<p>Figure 15.1 shows the features of the Browser Pane that support project browsing. It is displayed in a way of project hierarchy, including the following features:</p>
+<ul class="stylized">
+    <li>All objects displayed shows the object title, the concept object type, and hyperlinks for actions the user can perform against that object (View | Copy | Paste | Edit | Add Child).</li>
+    <li>Links between a parent object and child objects are in the form of predicates (based on subject/predicate/object format of RDF triples). These predicates are displayed in the hierarchy as a &quot;Predicate Overview&quot; and include the Predicate Title and the number of objects that are related to the parent object via the same predicate (i.e. the number direct child objects of the parent object).</li>
+    <li>An object has icons beside it (LHS from user perspective) to describe it as either:&nbsp;
+    <ul class="stylized-circle">
+        <li>A project object (highest level object in the hierarchy), this is currently shown as a folder. Hover text for these icons would be &quot;Project&quot;</li>
+        <li>A metadata object, or rather an object with a metadata stream, this is currently shown as an icon representing a document with bullet points. Hover text for these icons would be &quot;Metadata&quot;.</li>
+        <li>A Predicate Overview. This is currently shown as an icon with a down right turn arrow. Hover text for these icons would be &quot;Predicate Overview&quot;.</li>
+        <li>A data object, or rather an object with a metadata stream and a data stream. In PODD there is currently only one conceptual object of this description, the 'data' object. This is currently shown as an icon representing a document. Hover text for these icons would be &quot;Data&quot;     *</li>
+    </ul>
+    </li>
+    <li>To the further left are hierarchy traversal icons:
+    <ul class="stylized-circle">
+        <li>The plus icon (expander) expands the view to include the current view plus the direct predicates of the object expanded or the direct objects (children) of the Predicate Overview expanded. Hover text for these icons would read &quot;Expand&quot;.</li>
+        <li>The minus icon (collapser) collapses the displayed hierarchy of children objects underneath the Predicate Overview or object collapsed. Hover text for these icons would read &quot;Collapse&quot;.</li>
+    </ul>
+    </li>
+</ul>
+<p>* Where a project has not been selected, the Browser Pane will display only the message &quot;No project selected. Please select a project in the Projects pane.&quot; A hyperlink should link the words &quot;Projects pane&quot; back to the projects pane</p>
+<br>
+<h4>Pagination of Browsing Objects (not working)</h4>
+<p>Where there are more than 10 objects related to a parent object by a single Predicate Overview these objects will be paginated when the Predicate Overview is expanded. Similarly if there are more than 10 Predicate Overview to an expanded object then these would be paginated.</p>
+<p>Note that the pagination bar:</p>
+<ul class="stylized">
+    <li>Has a link for Previous to move back one page in the pagination.</li>
+    <li>Has a link for Next to move forward in the pagination.</li>
+    <li>Highlights the current page.</li>
+    <li>Displays the page selectors for up to x pages prior to the current page and x pages after the current page (x also being a system variable, also set at 10).</li>
+</ul>
+<p>When moving through paginated pages the hierarchy view outside of the pagination does not change.  The pagination is hidden when the paginated Predicate Overview/expanded object is collapsed. If the paginated Predicate Overview/expanded object is collapsed, the system will not retain the last page viewed. Meaning that when it is re-expanded the user will always see page 1.</p>
+<p>Pagination can be nested.</p>
+<p>* Please note that Pagination only applies to displaying files.</p>
+<br>
+<h4>Sorting</h4>
+<p>Objects in the hierarchy are sorted by first order then second order sorting. First order will be sorting the properties of the parent object (e.g. has Project Plan, has Platform, etc). The Project properties will not be sorted, they appear in the order they were entered. Second order will be sorting the child objects of a parent, and would be based on attributes of the child. Since only Title is visible then it should be sorted alphabetically by title. Data files should be similarly sorted.</p>
+<br>
+<h4>Tab Persistence</h4>
+<p>The Browse tab will be persistent; if a user is in the browser pane and has interacted with the hierarchy, and then selects another tab (e.g. View or Edit) either via the tabs or as a consequent of selecting an action in the browser pane (i.e. View or Edit or Add Child object) then when they select the browse tab the hierarchy will be displayed in the state it was last in, and the pane will scroll back to the last interaction point (e.g. the last expander/collapsor/object clicked).</p>
+<p>If the user is viewing a project (project 1) and changes projects (to project 2) via the Projects tab and then returns to project 1, the browse pane will have been reset and the project will be presented in the default collapsed view.</p>

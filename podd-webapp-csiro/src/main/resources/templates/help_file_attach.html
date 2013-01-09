@@ -1,0 +1,29 @@
+<h3 class="underlined_heading">Attaching Files</h3>
+<br>
+<h4>Overview</h4>
+<p>The third section on the <strong>Create Project Object </strong>page is the File Attachment section. A user may choose to add some files as data items to the project through this section.</p>
+<p>A Data Item is considered to be a data stream (i.e. a file) attached to a concrete PODD object. One concrete PODD object can have zero to many Data Items. Each data item carries its own metadata.</p>
+<p>Note that Data streams are attached to the relevant PODD object (e.g. Measurement, Analysis, etc), not the PODD data object.</p>
+<br>
+<h4>Uploading Data Files</h4>
+<p class="rtecenter"><img alt="" style="width: 690px; height: 476px;" border="1" src="../images/attachfiles1.jpg" /></p>
+<p class="rteleft"><em>Figure 10.3.1 &ndash; Example screen shot for an Attach File dialog</em></p>
+<p>Figure 10.3.1 shows a clean screen of an Attach Files dialog. Before attaching the files, the user may enter some description to accompany the files in the File Description field.</p>
+<p>To attach a file, the user clicks the <strong>Browse </strong>button to open a standard browser File Upload dialog window. A single file or multiple files can be opened in the File Upload dialog. The file location is then filled with the file name, size, directory (location of the file on the user's system or network) and modified date (see Figure 10.3.2).</p>
+<p class="rtecenter"><img style="width: 690px; height: 504px;" border="1" alt="" src="../images/attach files2.jpg" /></p>
+<p class="rteleft"><em>Figure 10.3.2 &ndash; Example screen shot for an Attach File dialog with two files selected for uploading</em></p>
+<p>At this stage the user may refine the list by removing all the files, or highlighting some of the files and clicking the <strong>Remove Selected</strong> button.</p>
+<p>Once satisfied with the files selected, the user then clicks the <strong>Upload</strong> button and the files are attached and the description is attached to the files uploaded. Note that the user can also click the <strong>Stop</strong> button to cancel the upload before the Upload process is completed.</p>
+<p>In the load process a data stream is created for the current PODD object. Default metadata fields for the data item, such as Date, Type, Format, File Size, are determined from the file (<em><strong>see viewing attached files</strong></em>).</p>
+<p>* Note that the data items uploaded are not saved unless the <strong>Submit</strong> button at the bottom is clicked.</p>
+<br>
+<h4>Managing the Uploaded files before Submitting the Object</h4>
+<p class="rtecentre"><img style="width: 681px; height: 665px;" border="1" alt="" src="../images/attachfile3_0.jpg" />&nbsp;</p>
+<p class="rteleft"><em>Figure 10.3.3 &ndash; Example screen of the Attach File section (with some files attached already and some files opened for upload)</em></p>
+<p>Uploaded files are listed under the Attach new File dialog (see Figure 10.3.3). More files can be uploaded as attachment if necessary. For the files uploaded already:</p>
+<ul class="stylized">
+    <li>By default they are listed in order of uploading.</li>
+    <li>A red cross icon is displayed next to each uploaded file. By clicking the red-cross icon, individual file can be removed from the section.</li>
+    <li>The files uploaded can also be replaced. If the user uploads a new file with the same name as a previously uploaded one, the new one would replace the existing file with a new version. The original file is retained by Fedora-Commons with a version number if submitted, but there is no provision for users to access earlier versions of the file.</li>
+</ul>
+<p>After submitting, the uploaded files/ data items are then saved in PODD as attachement to the PODD&nbsp;object. They can be downloaded, viewed, edited or deleted by authorised users later (see <a href="./manage_files"><strong><em>Managing Data Items</em></strong></a>).</p>

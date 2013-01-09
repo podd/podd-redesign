@@ -1,0 +1,23 @@
+<h3 class="underlined_heading">Auto-completion Functionality</h3>
+<br>
+<p>User Auto-completion is a very useful function in PODD. The system lists all users which matches the characters typed in the field. The user can then select the Project Participant from the list without typing all the complete user name, institution and email address.&nbsp;</p>
+<p>Figure 10.2.2.1 shows an example of the functionality. When &quot;f&quot; is typed in the Project Member field, a drop down list which displays all users with letter &quot;f&quot; in their user name, institution and email address pops up. So the user can select the disired user to the field.</p>
+<p class="rtecenter">&nbsp;<img style="width: 597px; height: 236px;" border="1" alt="Selectable List to autocomplete fields" src="../images/project%20participants2.jpg" /></p>
+<p class="rteleft"><em>Figure 10.2.1.1 &ndash; Detail showing selectable list to autocomplete fields</em></p>
+<p>The detailed process of the auto-completion functionality is described as follows:</p>
+<ol class="stylized-decimal">
+    <li>The user starts to type in the required field.</li>
+    <li>For the first letter, number or symbol typed the system will list all available users that:</li>
+    <li>Has a first name or first name component that starts with the letter (a name component is any part of a name separated by a space or a symbol, e.g. Yuan-Fang has two name components, Yuan and Fang);</li>
+    <li>Has a last name or last name component that starts with the letter;</li>
+    <li>Has an institution or institution name component that starts with the letter;</li>
+    <li>Has an email address or email address component that starts with the letter, number or symbol (email address components are separated by @ and .).</li>
+    <li>As the user types in subsequent letters, numbers or symbols the list will be further filtered;</li>
+    <li>The list will be in the form of a drop down box below the required text field;</li>
+    <li>The first name on the list will be highlighted;</li>
+    <li>The letters, numbers, etc, in the first part of the user details that match what is being typed in will be bolded in the list.</li>
+    <li>The user can use the up and down arrow keys to select the desired project participant;</li>
+    <li>The user hits enter once the selection is made (or clicks on a selection), the field where the letters, etc, were being typed is now updated with the full name, institution and email address of the participant, followed by a line return, which will delimit this participant and the next participant;</li>
+    <li>The input fields are static sizes, if the Project Administrators, Project Members or Project Observers fields fill up then a scroll bar should appear (standard text field behaviour).</li>
+    <li>Validation is not performed until the user clicks <strong>Submit</strong> at the bottom of the page. Fields must be validated as there is no mechanism to prevent the user from mangling a field after it is auto-completed.</li>
+</ol>

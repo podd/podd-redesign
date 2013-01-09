@@ -6,23 +6,14 @@ package com.github.podd.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -41,6 +32,7 @@ import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
@@ -68,6 +60,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     private PoddPurlManager purlManager;
     private PoddSchemaManager schemaManager;
     private PoddRepositoryManager repositoryManager;
+    
+    private PoddSesameManager sesameManager;
     
     /**
      * 
@@ -133,6 +127,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public PoddSchemaManager getSchemaManager()
     {
         return this.schemaManager;
+    }
+    
+    @Override
+    public PoddSesameManager getSesameManager()
+    {
+        return this.sesameManager;
     }
     
     /*
@@ -212,7 +212,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
              * For a new artifact, a Version IRI is created based on the Ontology IRI while for a
              * new version of a managed artifact, the most recent version is incremented.
              */
-            final IRI ontologyIRI = this.getOntologyIRI(temporaryRepositoryConnection, randomContext);
+            final IRI ontologyIRI =
+                    this.getSesameManager().getOntologyIRI(temporaryRepositoryConnection, randomContext);
             if(ontologyIRI != null)
             {
                 // check for managed version from artifact graph
@@ -220,7 +221,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 try
                 {
                     currentManagedArtifactID =
-                            this.getOWLManager().getCurrentArtifactVersion(ontologyIRI, permanentRepositoryConnection,
+                            this.getSesameManager().getCurrentArtifactVersion(ontologyIRI,
+                                    permanentRepositoryConnection,
                                     this.getRepositoryManager().getArtifactManagementGraph());
                 }
                 catch(final UnmanagedArtifactIRIException e)
@@ -237,8 +239,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 else
                 {
                     newVersionIRI =
-                            IRI.create(this.incrementVersion(currentManagedArtifactID
-                                    .getVersionIRI().toString()));
+                            IRI.create(this.incrementVersion(currentManagedArtifactID.getVersionIRI().toString()));
                 }
                 
                 // set version IRI in temporary repository
@@ -249,16 +250,15 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         newVersionIRI.toOpenRDFURI(), randomContext);
             }
             
-            
             // Before loading the statements into OWLAPI, ensure that the schema ontologies are
             // cached in memory
-            final Set<IRI> directImports = this.getDirectImports(temporaryRepositoryConnection, randomContext);
+            final Set<IRI> directImports = this.getSesameManager().getDirectImports(temporaryRepositoryConnection, randomContext);
             for(final IRI schemaOntologyIRI : directImports)
             {
                 // Get the current version
                 final InferredOWLOntologyID ontologyVersion =
-                        this.getOWLManager().getCurrentSchemaVersion(schemaOntologyIRI, permanentRepositoryConnection,
-                                this.getRepositoryManager().getSchemaManagementGraph());
+                        this.getSesameManager().getCurrentSchemaVersion(schemaOntologyIRI,
+                                permanentRepositoryConnection, this.getRepositoryManager().getSchemaManagementGraph());
                 
                 // Make sure it is cached in memory
                 this.getOWLManager().cacheSchemaOntology(ontologyVersion, permanentRepositoryConnection,
@@ -372,87 +372,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     /**
      * This is not an API method. 
-     * QUESTION: Should this be moved to a separate utility class or even to the PoddOWLManager?
-     * 
-     * Retrieves the ontology IRIs for all import statements found in the
-     * given repository.
-     * 
-     * @param repositoryConnection
-     * @param context
-     * @return
-     * @throws OpenRDFException
-     */
-    public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException
-    {
-        final String sparqlQuery = "SELECT ?x WHERE { ?y <" + OWL.IMPORTS.stringValue() + "> ?x ." + " }";
-        this.log.info("Generated SPARQL {}", sparqlQuery);
-        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
-        
-        final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(context);
-        dataset.addNamedGraph(context);
-        query.setDataset(dataset);
-        
-        final Set<IRI> results = Collections.newSetFromMap(new ConcurrentHashMap<IRI, Boolean>());
-        
-        final TupleQueryResult queryResults = query.evaluate();
-        while(queryResults.hasNext())
-        {
-            final BindingSet nextResult = queryResults.next();
-            final String ontologyIRI = nextResult.getValue("x").stringValue();
-            results.add(IRI.create(ontologyIRI));
-            
-        }
-        return results;
-    }
-
-    /**
-     * This is not an API method. 
-     * QUESTION: Should this be moved to a separate utility class?
-     * 
-     * Retrieves from the given Repository, an Ontology IRI which identifies an artifact.
-     * 
-     * @param repositoryConnection
-     * @param context
-     * @return
-     * @throws OpenRDFException
-     */
-    public IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException
-    {
-        // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
-        final String sparqlQuery =
-                "SELECT ?x WHERE { ?x <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue() + ">  . " + " ?x <"
-                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT + "> ?y " + " }";
-        this.log.info("Generated SPARQL {}", sparqlQuery);
-        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
-        
-        final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(context);
-        dataset.addNamedGraph(context);
-        query.setDataset(dataset);
-        
-        IRI ontologyIRI = null;
-        
-        final TupleQueryResult queryResults = query.evaluate();
-        if(queryResults.hasNext())
-        {
-            final BindingSet nextResult = queryResults.next();
-            ontologyIRI = IRI.create(nextResult.getValue("x").stringValue());
-        }
-        return ontologyIRI;
-    }
-    
-    /**
-     * This is not an API method. 
      * QUESTION: Should this be moved to a separate utility class?
      * 
      * This method takes a String terminating with a colon (":") followed by an integer and
-     * increments this integer by one. If the input String is not of the expected format, "1" to the
-     * end of the String.
+     * increments this integer by one. If the input String is not of the expected format, appends
+     * "1" to the end of the String.
      * 
-     * E.g.: "http://purl.org/ab/artifact:55" is converted to "http://purl.org/ab/artifact:56"
+     * E.g.: 
+     * "http://purl.org/ab/artifact:55" is converted to "http://purl.org/ab/artifact:56"
      * "http://purl.org/ab/artifact:5A" is converted to "http://purl.org/ab/artifact:5A1"
      * 
      * @param oldVersion
@@ -488,35 +415,80 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * OWLOntologyID)
      */
     @Override
-    public InferredOWLOntologyID publishArtifact(final OWLOntologyID ontologyId) throws PublishArtifactException
+    public InferredOWLOntologyID publishArtifact(final OWLOntologyID ontologyId) throws OpenRDFException,
+        PublishArtifactException, UnmanagedArtifactIRIException
     {
-        if(ontologyId.getVersionIRI() == null)
+        final IRI ontologyIRI = ontologyId.getOntologyIRI();
+        final IRI versionIRI = ontologyId.getVersionIRI();
+        
+        if(versionIRI == null)
         {
             throw new PublishArtifactException("Could not publish artifact as version was not specified.", ontologyId);
         }
         
-        if(this.getOWLManager().isPublished(ontologyId.getOntologyIRI()))
+        Repository repository = null;
+        RepositoryConnection repositoryConnection = null;
+        try
         {
-            // Cannot publish multiple versions of a single artifact
-            throw new PublishArtifactException("Could not publish artifact as a version was already published",
-                    ontologyId);
+            repository = this.getRepositoryManager().getRepository();
+            repositoryConnection = repository.getConnection();
+            repositoryConnection.begin();
+            
+            if(this.getSesameManager().isPublished(ontologyId, repositoryConnection))
+            {
+                // Cannot publish multiple versions of a single artifact
+                throw new PublishArtifactException("Could not publish artifact as a version was already published",
+                        ontologyId);
+            }
+            
+            final OWLOntologyID currentVersion =
+                    this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, repositoryConnection,
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            if(!currentVersion.getVersionIRI().equals(versionIRI))
+            {
+                // User must make the given artifact version the current version manually before
+                // publishing, to ensure that work from the current version is not lost accidentally
+                throw new PublishArtifactException(
+                        "Could not publish artifact as it was not the most current version.", ontologyId);
+            }
+            
+            this.getSesameManager().setPublished(ontologyIRI, repositoryConnection, versionIRI.toOpenRDFURI());
+            
+            final InferredOWLOntologyID published =
+                    this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, repositoryConnection,
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            repositoryConnection.commit();
+            
+            return published;
         }
-        
-        final OWLOntologyID currentVersion = this.getOWLManager().getCurrentVersion(ontologyId.getOntologyIRI());
-        
-        if(!currentVersion.getVersionIRI().equals(ontologyId.getVersionIRI()))
+        catch(final OpenRDFException | PublishArtifactException | UnmanagedArtifactIRIException e)
         {
-            // User must make the given artifact version the current version manually before
-            // publishing, to ensure that work from the current version is not lost accidentally
-            throw new PublishArtifactException("Could not publish artifact as it was not the most current version.",
-                    ontologyId);
+            if(repositoryConnection != null && repositoryConnection.isActive())
+            {
+                repositoryConnection.rollback();
+            }
+            
+            throw e;
         }
-        
-        final InferredOWLOntologyID published = this.getOWLManager().setPublished(ontologyId);
-        
-        return published;
+        finally
+        {
+            // release resources
+            if(repositoryConnection != null && repositoryConnection.isOpen())
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
+            }
+        }
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -565,6 +537,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public void setSchemaManager(final PoddSchemaManager schemaManager)
     {
         this.schemaManager = schemaManager;
+    }
+    
+    @Override
+    public void setSesameManager(final PoddSesameManager sesameManager)
+    {
+        this.sesameManager = sesameManager;
     }
     
     /*

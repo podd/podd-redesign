@@ -1,0 +1,49 @@
+<h3 class="underlined_heading">Copy and Paste</h3>
+<br>
+<h4>Overview</h4>
+<p>PODD objects, whether data or metadata objects, are linked to a project through the project hierarchy. A feature of PODD to support data sharing is the ability to copy PODD objects from one place and paste it to another. This can be from one project to another, or within a single project. Copy, Paste and Clone in this section are difined as follows:</p>
+<ul class="stylized">
+    <li>Copy: means to copy objects, predicates and file streams to the clipboard.</li>
+    <li>Paste: means to paste objects, predicates and file streams to their new location.</li>
+    <li>Clone: making a copy of an object or set of objects through a copy and paste function.</li>
+</ul>
+<br>
+<h4>Actors</h4>
+<ul class="stylized">
+    <li>Public Access users do not have the ability to copy, paste or view the clipboard.</li>
+    <li>Registered users can copy any objects/  they can see. They can paste objects/predicate as determined by their project role. They can edit their Clipboard.</li>
+    <li>Project Creator: as per registered users.</li>
+    <li>Administrators can copy objects from all projects and paste to all projects. They can edit their Clipboard.</li>
+</ul>
+<p>For users with project specific roles:</p>
+<ul class="stylized">
+    <li>Project Administrators can copy objects to and from projects they have admin access to.</li>
+    <li>Project Members can copy objects to and from projects they have member access to.</li>
+    <li>Project Observers can copy objects from a project that they have observer access to.</li>
+</ul>
+<br>
+<h4>Rules and Restraints</h4>
+<p>Copy and Paste can be done via <strong>Object View</strong> or <strong>Browser Pane</strong>. Either way,&nbsp; the following rules and constraints apply to Copy and Paste:</p>
+<ol class="stylized-decimal">
+    <li>Objects can be copied by Predicate or by Object.</li>
+    <li>A Project object cannot be copied to the <strong>Clipboard</strong>.</li>
+    <li>A Project object can be pasted to.</li>
+    <li>An object or predicate can only be pasted to places that are allowable by the domain model. E.g. a Project Plan object cannot be pasted to an Investigation object, but can be pasted to a Project object.</li>
+    <li>An object can be cloned between projects, as defined by the user's project roles.</li>
+    <li>An object can be cloned within projects, as defined by the user's project role.</li>
+    <li>An object can be cloned to itself (e.g. the user may wish to create a hierarchy of materials by cloning one object to different levels and then going back to modify the details).</li>
+    <li>When pasting individual or hierarchies of predicates/objects the references will not be maintained, unless a deep paste is performed on a predicate/object and the references in the hierarchy so pasted refer to objects contained within the hierarchy. e.g. If a has Investigation predicate is deep pasted and it has Data objects that reference Material objects within the same hierarchy, then the integrity of these references need to be maintained.</li>
+    <li>Pastes are performed in real time, the users screen will lock while a paste is performed.</li>
+    <li>The clipboard has a limit of 40 items (This value is a system parameter, it can be updated). It works on a FIFO basis. If the clipboard is full the user is advised that they are copying to a full clipboard each time they copy.</li>
+    <li>The on-screen rendering of the Clipboard shows all objects in the Clipboard at all times (i.e. no pagination).</li>
+    <li>The Clipboard lists its contents in the order they were copied, from most recent to least recent (i.e. no sorting).</li>
+    <li>Data streams representing files can be copied to the clipboard, they should be called File Streams as the term 'Data Streams' is confused with Data type objects.</li>
+    <li>Multiple objects and predicates can be pasted at once, providing the model supports it.</li>
+</ol>
+<br>
+<p>Objects can be cloned via Browser Pane or Obeject view. Predicates can only be cloned via Browser Pane. They will be described in details as follows:</p>
+<ul class="stylized">
+    <li><a href="./clipboard_add_predicate">Cloning Predicates via the Browser Pane</a></li>
+    <li><a href="./clipboard_add_object">Cloning Objects via the Browser Pane or the Object View</a></li>
+</ul>
+<p>Also, objects copied to the Clipboard can be edited (see <a href="./clipboard_edit">Editing the Clipboard</a>) and objects deleted between copy and paste can be handled accordingly (see <a href="clipboard_deleted_objects">Handling deleted Objects</a>).</p>

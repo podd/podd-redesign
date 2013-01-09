@@ -1,0 +1,58 @@
+<h3 class="underlined_heading">Editing a Project</h3>
+<br>
+<h4>Overview</h4>
+<p>The <strong>Edit Project</strong> screen is displayed as either a consequence of clicking the <strong>Edit</strong> button from the <strong>Project view</strong> page&nbsp; or as a result of selecting the <em>Edit</em> link next to the Project object in the <strong>Browser Pane</strong>.</p>
+<p>The user is presented with the <strong>Edit Project</strong> screen.&nbsp; The following sections can be edited by authorised users on this page</p>
+<ul class="stylized">
+    <li>Project Details</li>
+    <li>Project Participants</li>
+    <li>Attach Files</li>
+</ul>
+<p>Three action buttons, <strong>Submit</strong>, <strong>Cancel</strong> and <strong>Reset</strong>, are listed at the bottom of the page.</p>
+<br>
+<h4>Editing the Project Details</h4>
+<p>As shown in Figure 12.1, the following fields are available in the Project Details section for editing:</p>
+<ul class="stylized">
+    <li>Title: *</li>
+    <li>Description: *</li>
+    <li>Lead Institution: *</li>
+    <li>Start Date: *</li>
+    <li>Duration: (expected duration, free form text)</li>
+    <li>Project Status (not available for project member): * Drop down list, select from Current/Inactive/Complete.</li>
+</ul>
+<p class="rtecentre"><img alt="" style="width: 710px; height: 709px;" border="1" src="../images/edit01project.jpg" /></p>
+<p class="rteleft"><em>Figure 12.1 &ndash; Screen shot of Editing Project details on <strong>Edit Object</strong> screen</em></p>
+<p>Creator, Creation Date, Last modified by and Last modified date are displayed in a Read Only mode.</p>
+<p>The Repository administrator and the Project Administrator /Principle Investigator can change all project details. A project member can modify the Project Title, description, lead institution, Start date and duration, but NOT the Project Status.</p>
+<br>
+<h4>Updating the Project Participants</h4>
+<p>Only Repository Administrator and Project Administrator / Principle Investigator can update the Project Participants. Figure 12.2 displayed the Project Participants section on the <strong>Edit Object</strong> screen. This section is not visible to the project member when the project member edits a Project.</p>
+<p>For the project participant fields, users can modify the existing participants as described previous sections: Creating a Project.</p>
+<p class="rtecentre"><img alt="" style="width: 672px; height: 441px;" border="1" src="../images/editproject02.jpg" /></p>
+<p class="rteleft"><em>Figure 12.2 &ndash; Updated Project Participants fields in <strong>Edit Project</strong> Screen</em></p>
+<p>The following rules apply to this section:</p>
+<ul class="stylized">
+    <li>Principal Investigator must have only one valid participant. It can be replaced.</li>
+    <li>If the user is not the project administrator, the user will be added to the Project Administrator field automatically.</li>
+    <li>The text fields only accept valid participants and participants are separated by line returns.</li>
+    <li>A participant can only be associated with a project once. If a username is applied in two fields then an error should occur.</li>
+    <li>Existing participants can be removed from the fields, new New users can be added to the field.</li>
+</ul>
+<br>
+<h4>Attaching Files</h4>
+<p>This section is the same as per Attaching Files in <strong>Creating a Project</strong>. More Files can be attached. Existing Files are listed (Figure 12.3).</p>
+<p class="rtecentre"><img alt="" style="width: 680px; height: 486px;" border="1" src="../images/editproject03.jpg" /></p>
+<p class="rteleft"><em>Figure 12.3 &ndash; Screen shot of the Attach Files section on the <strong>Edit Object</strong> screen</em></p>
+<p>Repository Administrator, Project Administrator / Principle Investigator and Project Member all have the same access to this section.</p>
+<br>
+<h4>Validation</h4>
+<p>The user clicks <strong>Submit</strong>. &nbsp;Validation is performed. &nbsp;If any fields are in error then the user is returned to the top of the page. An error box will appear at top of the page advising there are errors on the page. An error box will also appear beneath the fields in error describing the nature of the error and remedial action.<br />
+The system confirms the submission to the administrator by switching to the view tab and displaying the project details page in view (read only mode).<br />
+The following additional values will be automatically updated against the Project concrete object:</p>
+<ul class="stylized">
+    <li>Last Modified by is set as the current user</li>
+    <li>Last Modified on is set to the current date</li>
+    <li>Completion Date is set to the current date if the Project Status is set to complete.</li>
+</ul>
+<p>The user may click <strong>Cancel</strong> instead of Submit to abandon the Edit Screen and get back to the View Screen.</p>
+<p>The user may click <strong>Reset</strong> to change the modified information back to the original values and stays on the Edit Screen.</p>

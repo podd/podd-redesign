@@ -1,0 +1,61 @@
+<h3 class="underlined_heading">Publishing a Project</h3>
+<br>
+<h4>Overview</h4>
+<p>When a project is complete, the user may choose to publish the project. No information in a project is publicly available until the project is flagged as published.&nbsp;</p>
+<p>This section will show you how to publish a project. The behaviour of the system is also described when a project is published. It includes the checks that are required and the additional functions (e.g. allocating ANDS PIDS) that are to be executed at the time of publication.</p>
+<br>
+<h4>Actors</h4>
+<ul class="stylized">
+    <li>Public users cannot modify projects at all.</li>
+    <li>Registered users cannot update a project's status and publish a project, unless they have an appropriate project specific role.</li>
+    <li>Administrators may update a project's status and publish a project.</li>
+</ul>
+<p>For users with project specific roles:</p>
+<ul class="stylized">
+    <li>Principal Investigator may update a project's status and publish a project.</li>
+    <li>Project Administrators may update a project's status and publish a project.</li>
+    <li>Project Members may modify and view a project object, but cannot update a project's status and publish a project.</li>
+    <li>Project Observers cannot update a project's status and publish a project.</li>
+</ul>
+<br>
+<h4>How to Publish a Project</h4>
+<br>
+<h5>Set the Project status to complete</h5>
+<p>The Publication Status field is not available to update until the Project Status field is set to complete.</p>
+<p>Navigate to the <strong>Edit Project</strong> page, change the project status to Complete and then click the <strong>Submit</strong> button at the bottom of the page. A new <strong>View Project Object </strong>page is then returned (Figure 13.1).</p>
+<p class="rtecentre"><img style="width: 824px; height: 704px;" border="1" alt="" src="../images/publish01_0.jpg" /></p>
+<p class="rteleft"><em>Figure 13.1 &ndash; Sample Screen of Project View of a complete project</em></p>
+<p>Figure 13.1 shows the Project View of a complete project in a Project Administrator/Principal Investigator's view. It is displayed in a read only mode. A<strong> Publish Project</strong> button is displayed on the page.</p>
+<p>For Project members and Project Observers, the Project is also displayed in a read only mode, the <strong>Publish Project</strong> button is not displayed.</p>
+<p>Only a Repository Administrator can update a Completed Project.</p>
+<br>
+<h4>Publish the project</h4>
+<p>When a project is completed, a Repository Administrator or a Project Administrator/principle Investigator can set the Publication Status field to Published by clicking the <strong>Publish Project </strong>button at the bottom of the <strong>View Project Object</strong> page (Figure 13.1).</p>
+<p>Once the <strong>Publish Project</strong> button is clicked, the request is submited to the system. A new screen will be displayed advising that the project has been successfully published (Figure 13.2).&nbsp;</p>
+<p class="rtecentre"><img border="1" alt="" src="../images/publish02.jpg" /></p>
+<p class="rteleft"><em>Figure 13.2 &ndash; Screen shot after the project is published</em></p>
+<p>At the same time, an email is sent to the project administrator notifying that the Projet is published. The email reads as follows:</p>
+<p>Dear firstname lastname,</p>
+<p>The following project has been published in PODD and is now publicly available.</p>
+<p>&nbsp; ID: poddObject: 10034</p>
+<p>&nbsp; Title: Tab Test 1 - Arabidopsis stomatal closure mutants OST1-2 growth analysis</p>
+<p>&nbsp; Description: Comparison between OST1-2 mutants and Ler wild types under various conditions</p>
+<p>You should receive an email notifying you of the projects persistant URL shortly.</p>
+<br>
+<h4>Project View of a Published Project</h4>
+<p>Click the <strong>Back to Project</strong> button on the page (Figure 13.2), an updated <strong>View Project object</strong> page is displayed.</p>
+<p>All fields in all objects can no longer be updated by anyone except the Repository Administrator (The Repository Administrator can also revert the publication status and project status).</p>
+<ul class="stylized">
+    <li>All objects in the project hierarchy, including the project object, will become publicly available.</li>
+    <li>The Publised project is still listed under My Project header when the project participants list the projects.</li>
+    <li>Paste,&nbsp; Edit Object and Add Child Object buttons are not available on the View Object page. Therefore, no objects or data files can be pasted to the published project and its child objects. Data files can still be downloaded and child objects can be copied.&nbsp;</li>
+    <li>In the Browser Pane, all the Edit/Add Child links are not visible. Only the View and Copy links are displayed.</li>
+    <li>All objects will be registered with the ANDS (Australian National Data Service) Persistent Identifier Service.</li>
+</ul>
+<br>
+<h4>System Behavior</h4>
+<p>The following system behavior are discribed here when a project is published. Please click the links for more details.</p>
+<ul class="stylized">
+    <li><a href="./project_publishing_ANDS"><strong>PID and ANDs</strong></a></li>
+    <li><a href="./project_publishing_persistent_URL"><strong>Persistent URLs</strong></a></li>
+</ul>

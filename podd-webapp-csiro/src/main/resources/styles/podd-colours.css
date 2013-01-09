@@ -1,0 +1,229 @@
+/*
+ * Copyright (c) 2009 - 2010. School of Information Technology and Electrical
+ * Engineering, The University of Queensland.  This software is being developed
+ * for the "Phenomics Ontoogy Driven Data Management Project (PODD)" project.
+ * PODD is a National e-Research Architecture Taskforce (NeAT) project
+ * co-funded by ANDS and ARCS.
+ *
+ * PODD is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PODD is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PODD.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Standard HTML Elements */
+
+body {
+    background-color: White;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: Black;
+    border-bottom-color: #556B2F;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: Black;
+    border-bottom-color: #556B2F;
+}
+.errorMsg {
+    color: Red ! important;
+}
+
+.descriptive {
+    color: Gray;
+}
+
+a {
+    color: #556B2F;
+}
+
+.fieldset {
+    border-color: #556B2F;
+}
+.legend {
+    background: #e5eecc;
+}
+.legend a {
+    color: black;
+}
+
+[icon='required'] {
+    background-image: url(../images/required.png);
+}
+[icon='toggle'] {
+    background-image: url(../images/toggle.png);
+}
+[icon='addField'] {
+    background-image: url(../images/add.png);
+}
+[icon='first'] {
+    background-image: url(../images/btn_first.png);
+}
+[icon='last'] {
+    background-image: url(../images/btn_last.png);
+}
+[icon='next'], .next_btn {
+    background-image: url(../images/btn_next.png);
+}
+[icon='prev'], .previous_btn {
+    background-image: url(../images/btn_prev.png);
+}
+
+/* Page Layout Blocks */
+
+/* search */
+.searchTextField {
+	background-color: #e5eecc;
+}
+.searchHeader {
+	color: #2F4F4F;
+}
+.objectField {
+	color: #2F4F4F;
+}
+
+/* site banner */
+#site_banner {
+	background-image: url('../images/podd_logo2_sm.png');
+}
+
+#site_banner span {
+	border-color: #e5eecc;
+}
+
+/* highlight the selected menu item */
+body#home #toolbar_div a#home_tab,
+body#projects #toolbar_div a#project_tab,
+body#admin #toolbar_div a#admin_tab {
+    color: #556B2F;
+    font-weight: bold;
+}
+/* menu bar */
+#user_div {
+    background-color: white;
+}
+#toolbar_div {
+    background-color: #e5eecc;
+    border-top-color: #556B2F;
+    border-bottom-color: #556B2F;
+}
+#user_div, #user_div li, #user_div li a, 
+#toolbar_div, #toolbar_div li, #toolbar_div li a {
+    color: black;
+}
+.left_image {
+	background-image: url('../images/menu-divider.png');
+}
+
+/* underlined headings */
+.underlined_heading {
+	border-color: #556B2F;
+}
+
+/* buttons */
+#buttonwrapper a, #buttonwrapper_right a, button, .button {
+    background-color: #E0E0E0;
+    border-color: #556B2F;
+    color: black;
+}
+.remove_file_btn {
+    background-image: url(../images/cross.png);
+}
+
+/* content pane */
+#content_pane {
+    background: #e5eecc;
+    border-color: #556B2F;
+}
+
+/* hierarchy display */
+.parent {
+    background-image: url(../images/parent.png);
+}
+.current {
+    background-image: url(../images/current.png);
+}
+.child {
+    background-image: url(../images/child.png);
+}
+
+#aux {
+    background: #e5eecc;
+    border-color: #556B2F;
+}
+
+#main {
+    background: #e5eecc;
+    border-color: #556B2F;
+}
+
+#userFilter {
+	border-color: #556B2F;
+}
+
+/* table */
+table.tableborder {
+	border-color: black;
+}
+table.tablesorter thead tr th, 
+table.tablesorter tfoot tr, table.tablesorter tfoot tr td {
+	border-color: #556B2F;
+}
+table.tablesorter thead tr .headerSortUp {
+	background-image: url('../images/bullet_arrow_up.png');
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url('../images/bullet_arrow_down.png');
+}
+
+/* jquery auto-complete */
+.ac_results {
+	border-color: black;
+	background-color: #e5eecc;
+}
+.ac_loading {
+    background: white url('../images/indicator.gif');
+}
+.ac_odd {
+	background-color: #e5eecc;
+}
+.ac_over {
+	background-color: #ccff99;
+}
+/* jquery auto-complete - end */
+
+/* jquery text litmiter */
+.limiterBox {
+    border-color:  black;
+    background-color: #ccff99;
+}
+
+/* jquery treeview */
+.treeview .hitarea, .treeview li.lastCollapsable, .treeview li.lastExpandable {
+    background-image: url(../images/treeview.gif);
+}
+.treeview li {
+    background-image: url(../images/treeview-line.gif);
+}
+.project {
+    background-image: url(../images/parent.png);
+}
+[icon='predicate'], .predicate {
+    background-image: url(../images/predicate.png);
+}
+[icon='object'], .data {
+    background-image: url(../images/data.png);
+}
+[icon='file'], .file {
+    background-image: url(../images/file.png);
+}
+/* jquery treeview - end */

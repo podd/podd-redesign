@@ -26,6 +26,7 @@
   --> 
         <module>podd-api</module>
         <module>podd-webapp-lib</module>
+        <module>podd-webapp-csiro</module>
     </modules>
 
     <scm>
