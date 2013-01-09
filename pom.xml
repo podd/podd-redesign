@@ -71,16 +71,16 @@
     </mailingLists>
 
     <properties>
-        <junit.version>4.10</junit.version>
+        <junit.version>4.11</junit.version>
         <mockito.version>1.9.5</mockito.version>
         <podd-ontologies.version>1-SNAPSHOT</podd-ontologies.version>
-        <owlapi.version>3.4.3.1-ansell-SNAPSHOT</owlapi.version>
-        <pellet.version>2.3.2-SNAPSHOT</pellet.version>
+        <owlapi.version>3.4.3.1-ansell</owlapi.version>
+        <pellet.version>2.3.2</pellet.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <restlet.version>2.1.0</restlet.version>
-        <sesame.version>2.7-SNAPSHOT</sesame.version>
-        <sesame-rio-extensions.version>0.1-SNAPSHOT</sesame-rio-extensions.version>
+        <sesame.version>2.7.0-beta1</sesame.version>
+        <sesame-rio-extensions.version>0.2</sesame-rio-extensions.version>
         <slf4j.version>1.7.2</slf4j.version>
         <sshj.version>0.9.0-SNAPSHOT</sshj.version>
     </properties>
@@ -227,13 +227,6 @@
                 <artifactId>commons-io</artifactId>
                 <version>2.4</version>
             </dependency>
-            <dependency>
-                <groupId>info.aduna.commons</groupId>
-                <artifactId>aduna-commons-iteration</artifactId>
-                <version>2.10.0</version>
-            </dependency>
-            <!-- <dependency> <groupId>net.fortytwo.sesametools</groupId> 
-                <artifactId>common</artifactId> <version>1.7-SNAPSHOT</version> </dependency> -->
             <dependency>
                 <groupId>com.github.ansell.owlapi</groupId>
                 <artifactId>owlapi-api</artifactId>
