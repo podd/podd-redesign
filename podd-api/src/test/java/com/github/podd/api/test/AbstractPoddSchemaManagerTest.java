@@ -4,7 +4,6 @@
 package com.github.podd.api.test;
 
 import java.io.InputStream;
-import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -14,9 +13,9 @@ import org.junit.Test;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.io.UnparsableOntologyException;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
@@ -42,6 +41,13 @@ public abstract class AbstractPoddSchemaManagerTest
      * @return A new instance of PoddOWLManager, for each call to this method.
      */
     protected abstract PoddOWLManager getNewPoddOwlManagerInstance();
+    
+    /**
+     * 
+     * @return  A new empty instance of an implementation of OWLReasonerFactory.
+     */
+    protected abstract OWLReasonerFactory getNewReasonerFactory();
+
     
     /**
      * 
@@ -73,6 +79,8 @@ public abstract class AbstractPoddSchemaManagerTest
         this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
         
         this.testOwlManager = this.getNewPoddOwlManagerInstance();
+        this.testOwlManager.setReasonerFactory(this.getNewReasonerFactory());
+        
         this.owlapiManager = this.getNewOwlOntologyManagerInstance();
         this.testOwlManager.setOWLOntologyManager(owlapiManager);
         this.testSchemaManager.setOwlManager(this.testOwlManager);

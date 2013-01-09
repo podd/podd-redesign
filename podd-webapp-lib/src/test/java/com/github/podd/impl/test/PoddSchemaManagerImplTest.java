@@ -5,6 +5,8 @@ package com.github.podd.impl.test;
 
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
@@ -30,6 +32,12 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     protected PoddOWLManager getNewPoddOwlManagerInstance()
     {
         return new PoddOWLManagerImpl();
+    }
+    
+    @Override
+    protected OWLReasonerFactory getNewReasonerFactory()
+    {
+        return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
     }
     
     @Override

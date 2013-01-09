@@ -9,7 +9,6 @@ import java.io.OutputStream;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
