@@ -20,7 +20,14 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>podd-api</artifactId>
+            <artifactId>podd-webapp-lib</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>podd-webapp-lib</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
@@ -34,15 +41,15 @@
             <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet</artifactId>
       </dependency>
-        <dependency>
+      <dependency>
             <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.freemarker</artifactId>
       </dependency>
-        <dependency>
+      <dependency>
             <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.servlet</artifactId>
       </dependency>
-        <dependency>
+      <dependency>
             <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.crypto</artifactId>
       </dependency>
@@ -50,9 +57,17 @@
             <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.html</artifactId>
         </dependency>
-        <dependency>
+         <dependency>
             <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
