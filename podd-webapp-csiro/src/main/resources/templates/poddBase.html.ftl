@@ -33,8 +33,6 @@
 
     <meta name="keywords" content="${keywords}" />
 
-    <meta name="google-site-verification" content="MHQqak5CHV0OaRKlDLnIZAHNYI9IWIPS0djMdKvxJW0" />
-
 
     <script type="text/javascript" src="${baseUrl}/scripts/jquery-1.6.2.js"></script>
     <script type="text/javascript" src="${baseUrl}/scripts/podd_main.js"></script>
@@ -116,12 +114,8 @@
             <!-- main menu items -->
             <li class="no_image"><a href="${baseUrl}/project">Projects</a></li>
             <li class="left_image"><a href="${baseUrl}/browser">Browser</a></li>
-            <li class="left_image"><a href="${baseUrl}/search">Search</a></li>
+<!--            <li class="left_image"><a href="${baseUrl}/search">Search</a></li> -->
             <#if user??>
-                <li class="left_image"><a href="${baseUrl}/clipboard">Clipboard</a></li>
-                <#if displayTabImport>
-                <li class="left_image"><a href="${baseUrl}/tabImport">Tab Import</a></li>
-                </#if>
                 <#if user.isAdministrator>
                 <li class="left_image"><a href="${baseUrl}/admin/user/list">Administrator</a></li>
                 </#if>
@@ -137,19 +131,7 @@
     <script type="text/javascript" src="${baseUrl}/scripts/jquery.metadata.js"></script>
     <script type="text/javascript" src="${baseUrl}/scripts/jquery.inputlimiter.1.2.js"></script>
 
-    <#if deployMode?? && deployMode>
-        <!-- Google Analytics tracker -->
-        <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-        </script>
-        <script type="text/javascript">
-            try {
-                var pageTracker = _gat._getTracker("UA-1867495-2");
-                pageTracker._trackPageview();
-            } catch(err) {}
-        </script>
-    </#if>
+
     <div id="rdfadebug">
     &nbsp;
     </div>
