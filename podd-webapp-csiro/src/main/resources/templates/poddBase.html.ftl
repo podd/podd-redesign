@@ -1,10 +1,8 @@
-<#-- @ftlvariable name="deployMode" type="boolean" -->
 <#-- @ftlvariable name="keywords" type="java.lang.String" -->
 <#-- @ftlvariable name="pageTitle" type="java.lang.String" -->
 <#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="contentTemplate" type="java.lang.String" -->
 <#-- @ftlvariable name="user" type="podd.model.user.User" -->
-<#-- @ftlvariable name="displayTabImport" type="boolean" -->
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
@@ -17,7 +15,7 @@
 	xmlns:ex="http://example.org/"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
 	xmlns:sioc="http://rdfs.org/sioc/ns#"
-	xmlns:podd="http://www.podd.org/poddModel#" 
+	xmlns:podd="http://purl.org/ns/poddBase#" 
 	version="XHTML+RDFa 1.0">
 <head>
 	<title>${pageTitle}</title>
@@ -116,7 +114,7 @@
             <li class="left_image"><a href="${baseUrl}/browser">Browser</a></li>
 <!--            <li class="left_image"><a href="${baseUrl}/search">Search</a></li> -->
             <#if user??>
-                <#if user.isAdministrator>
+                <#if isAdmin>
                 <li class="left_image"><a href="${baseUrl}/admin/user/list">Administrator</a></li>
                 </#if>
             </#if>

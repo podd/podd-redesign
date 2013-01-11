@@ -45,17 +45,17 @@
 			<td>
 			</td>
 			<td style="width: 400px">
-			    <form name="f" action="${baseUrl}/j_spring_security_check" method="POST">
+			    <form name="f" action="${baseUrl}/submitlogininfo" method="POST">
 				    <div class="fieldset" id="login" style="width: 327px; height: 180px; text-align: centre">
 						<div class="legend">Login with PODD username and password</div>
 						<ol> 
 							<li> 
 								<label for="user" class="bold">User: </label>
-								<input id="user" class="medium" name="j_username" type="text" value=""> 
+								<input id="user" class="medium" name="username" type="text" value=""> 
 							</li> 
 							<li> 
 								<label for="password" class="bold">Password:</label>
-								<input id="password" class="medium" name="j_password" type="password">
+								<input id="password" class="medium" name="password" type="password">
 							</li>
 							<li> 
 								<div class="radioGroup">

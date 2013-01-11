@@ -9,24 +9,31 @@
     <servlet>
         <servlet-name>RestletAdapterPoddWebSite</servlet-name>
         <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
-        <init-param>
-            <!-- Application class name -->
-            <param-name>org.restlet.application</param-name>
-            <param-value>com.github.podd.web.PoddRestletApplication</param-value>
+        
+        <!-- Restlet: Component class name (Optional - For mode 2) -->
+        <init-param> <param-name>org.restlet.component</param-name> 
+            <param-value>com.github.podd.oas.PoddTestWebsiteComponent</param-value> 
         </init-param>
+
+        <!-- Restlet: Application class name -->
+<!-- 
         <init-param>
-            <!-- Add the Servlet context path to routes (Optional) -->
+            <param-name>org.restlet.application</param-name>
+            <param-value>com.github.podd.oas.PoddWebServiceApplicationImpl</param-value>
+        </init-param>
+ --> 
+        <!-- Restlet: Add the Servlet context path to routes (Optional) -->
+        <init-param>
             <param-name>org.restlet.autoWire</param-name>
             <param-value>true</param-value>
         </init-param>
-        
-        <!-- Your component class name (Optional - For mode 2) -->
-<!-- 
-        <init-param>
-            <param-name>org.restlet.component</param-name>
-            <param-value>net.maenad.oas.testwebsite.OASTestWebsiteComponent</param-value>
+
+        <!-- Restlet: List of supported client protocols (Optional - Only in mode 3) -->
+<!--         <init-param>
+            <param-name>org.restlet.clients</param-name>
+            <param-value>HTTP CLAP</param-value>
         </init-param>
- -->       
+     -->   
     </servlet>
 
     <!-- Mapping catching all requests on a given path (Mandatory) -->
