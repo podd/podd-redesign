@@ -143,10 +143,20 @@
             <groupId>org.kohsuke.metainf-services</groupId>
             <artifactId>metainf-services</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.github.ansell.restlet-utils</groupId>
-            <artifactId>restlet-utils</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>com.github.ansell.restlet-utils</groupId>
+			<artifactId>restlet-utils</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ansell.restlet-utils</groupId>
+			<artifactId>restlet-utils</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<scope>test</scope>
+			<type>test-jar</type>
+		</dependency>
         <dependency>
             <groupId>com.github.ansell.property-util</groupId>
             <artifactId>property-util</artifactId>
