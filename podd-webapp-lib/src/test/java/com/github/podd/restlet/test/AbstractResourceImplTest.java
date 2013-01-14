@@ -70,8 +70,7 @@ public class AbstractResourceImplTest
         // Attach the sample application.
         this.component.getDefaultHost().attach(
         // PropertyUtil.get(OasProps.PROP_WS_URI_PATH, OasProps.DEF_WS_URI_PATH),
-                "/podd",
-                nextApplication);
+                "/podd", nextApplication);
         
         // The application cannot be setup properly until it is attached, as it requires
         // Application.getContext() to not return null
@@ -79,6 +78,26 @@ public class AbstractResourceImplTest
         
         // Start the component.
         this.component.start();
+    }
+    
+    /**
+     * Returns the URI that can be used to access the given path.
+     * 
+     * @param path
+     *            The path on the temporary test server to access. This path must start with a
+     *            slash.
+     * @return A full URI that can be used to dereference the given path on the test server.
+     */
+    public String getUrl(String path)
+    {
+        if(!path.startsWith("/"))
+        {
+            return "http://localhost:" + TEST_PORT + "/podd/" + path;
+        }
+        else
+        {
+            return "http://localhost:" + TEST_PORT + "/podd" + path;
+        }
     }
     
     /**
