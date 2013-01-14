@@ -12,7 +12,7 @@
         
         <!-- Restlet: Component class name (Optional - For mode 2) -->
         <init-param> <param-name>org.restlet.component</param-name> 
-            <param-value>com.github.podd.oas.PoddTestWebsiteComponent</param-value> 
+            <param-value>com.github.podd.restlet.PoddRestletComponent</param-value> 
         </init-param>
 
         <!-- Restlet: Application class name -->

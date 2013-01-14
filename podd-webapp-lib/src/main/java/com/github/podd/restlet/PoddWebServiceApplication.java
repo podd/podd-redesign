@@ -1,4 +1,4 @@
-package com.github.podd.oas;
+package com.github.podd.restlet;
 
 import org.restlet.Application;
 import org.restlet.Request;

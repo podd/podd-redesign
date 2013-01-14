@@ -1,4 +1,4 @@
-package com.github.podd.oas;
+package com.github.podd.restlet;
 
 import org.restlet.Context;
 import org.restlet.Request;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
-import com.github.podd.web.HelloWorldResource;
+import com.github.podd.resources.CookieLoginResourceImpl;
 
 import freemarker.template.Configuration;
 
@@ -115,20 +115,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     /**
      * Create the necessary connections between the application and its handlers.
      */
-    public synchronized Restlet temp_createInboundRoot()
-    {
-        // Create a router Restlet that routes each call to a new instance of HelloWorldResource.
-        Context context = this.getContext();
-        final Router router = new Router(context);
-        
-        // Defines only one route
-        router.attach("/", HelloWorldResource.class);
-        router.attach("/hello.html", HelloWorldResource.class);
-        
-        this.log.info("Router attached");
-        return router;
-    }
-    
     @Override
     public Restlet createInboundRoot()
     {

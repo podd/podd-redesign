@@ -1,4 +1,4 @@
-package com.github.podd.oas;
+package com.github.podd.resources;
 
 import java.util.List;
 
@@ -9,6 +9,9 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.podd.restlet.PoddAction;
+import com.github.podd.restlet.PoddWebServiceApplication;
 
 public abstract class AbstractPoddResourceImpl extends ServerResource
 {

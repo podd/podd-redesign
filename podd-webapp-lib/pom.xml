@@ -117,6 +117,22 @@
             <groupId>org.kohsuke.metainf-services</groupId>
             <artifactId>metainf-services</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.ansell.restlet-utils</groupId>
+            <artifactId>restlet-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ansell.property-util</groupId>
+            <artifactId>property-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-http</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <testResources>

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.podd.oas;
+package com.github.podd.restlet;
 
 import org.restlet.Component;
 import org.restlet.Context;
@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.ClassLoaderDirectory;
 import com.github.ansell.restletutils.CompositeClassLoader;
 
@@ -23,12 +22,14 @@ import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 
 /**
- * 
+ * Restlet Component used by the PODD web application.
+ *  
+ * Copied from OAS project (https://github.com/ansell/oas)
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public class PoddTestWebsiteComponent extends Component
+public class PoddRestletComponent extends Component
 {
-    private static final Logger log = LoggerFactory.getLogger(PoddTestWebsiteComponent.class);
+    private static final Logger log = LoggerFactory.getLogger(PoddRestletComponent.class);
     private String resetKey;
     
     static
@@ -40,7 +41,7 @@ public class PoddTestWebsiteComponent extends Component
     /**
      * 
      */
-    public PoddTestWebsiteComponent()
+    public PoddRestletComponent()
     {
         super();
         
@@ -52,7 +53,7 @@ public class PoddTestWebsiteComponent extends Component
     /**
      * @param arg0
      */
-    public PoddTestWebsiteComponent(final Reference arg0)
+    public PoddRestletComponent(final Reference arg0)
     {
         super(arg0);
         
@@ -64,7 +65,7 @@ public class PoddTestWebsiteComponent extends Component
     /**
      * @param xmlConfigRepresentation
      */
-    public PoddTestWebsiteComponent(final Representation xmlConfigRepresentation)
+    public PoddRestletComponent(final Representation xmlConfigRepresentation)
     {
         super(xmlConfigRepresentation);
         
@@ -76,7 +77,7 @@ public class PoddTestWebsiteComponent extends Component
     /**
      * @param xmlConfigurationRef
      */
-    public PoddTestWebsiteComponent(final String xmlConfigurationRef)
+    public PoddRestletComponent(final String xmlConfigurationRef)
     {
         super(xmlConfigurationRef);
         
@@ -109,7 +110,7 @@ public class PoddTestWebsiteComponent extends Component
         
         final String resourcesPath = "/resources/";
         
-        PoddTestWebsiteComponent.log.info("attaching resource handler to path={}", resourcesPath);
+        PoddRestletComponent.log.info("attaching resource handler to path={}", resourcesPath);
         
         // NOTE: This needs to be Impl as Restlet is not designed using interfaces, so we cannot
         // easily include our interface in the process.
@@ -132,38 +133,10 @@ public class PoddTestWebsiteComponent extends Component
         // be null during the setup process
         ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
         
-        PoddTestWebsiteComponent.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
+        PoddRestletComponent.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
         
     }
     
-    
-    public void kinitialise()
-    {
-        // FIXME: Make this configurable
-        final LocalReference localReference = LocalReference.createClapReference(LocalReference.CLAP_THREAD, "static/");
-
-        final String resourcesPath = "/resources/";
-        
-        PoddTestWebsiteComponent.log.info("attaching resource handler to path={}", resourcesPath);
-        
-        // NOTE: This needs to be Impl as Restlet is not designed using interfaces, so we cannot
-        // easily include our interface in the process.
-        final PoddWebServiceApplication nextApplication = new PoddWebServiceApplicationImpl();
-        
-        
-        // Oas attaches a CompositeClassLoader to the router
-        // Oas attaches a reset resource to the router - for use in integration tests
-        
-        // attach the web services application
-        this.getDefaultHost().attach("/", nextApplication);
-        
-        // setup the application after attaching it, as it requires Application.getContext() to not
-        // be null during the setup process
-        this.setupApplication(nextApplication, nextApplication.getContext());
-        
-        PoddTestWebsiteComponent.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
-        
-    }
     
     /**
      * This field is used in testing to enable the resetting of the internal elements of the website
@@ -180,10 +153,13 @@ public class PoddTestWebsiteComponent extends Component
         this.resetKey = key;
     }
     
+    /**
+     * @deprecated temporarily added by Kutila. Now using Applicationutils.setupApplication()
+     */
     private void setupApplication(PoddWebServiceApplication application, Context applicationContext)
     {
         // final Context templateChildContext = applicationContext.createChildContext();
-        final Configuration newTemplateConfiguration = PoddTestWebsiteComponent.getNewTemplateConfiguration(applicationContext);
+        final Configuration newTemplateConfiguration = PoddRestletComponent.getNewTemplateConfiguration(applicationContext);
         application.setTemplateConfiguration(newTemplateConfiguration);
         
         // create a custom error handler using our overridden PoddStatusService together with the
@@ -192,6 +168,9 @@ public class PoddTestWebsiteComponent extends Component
         application.setStatusService(statusService);
     }
     
+    /**
+     * @deprecated temporarily added by Kutila. Now using Applicationutils.getNewTemplateConfiguration()
+     */
     public static Configuration getNewTemplateConfiguration(final Context newChildContext)
     {
         final Configuration result = new Configuration();

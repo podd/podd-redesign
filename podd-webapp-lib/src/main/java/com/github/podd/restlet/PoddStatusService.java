@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.podd.oas;
+package com.github.podd.restlet;
 
 import java.util.Map;
 

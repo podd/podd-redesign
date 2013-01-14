@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.podd.oas;
+package com.github.podd.resources;
 
 import java.util.Map;
 
@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
+import com.github.podd.restlet.RestletUtils;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com

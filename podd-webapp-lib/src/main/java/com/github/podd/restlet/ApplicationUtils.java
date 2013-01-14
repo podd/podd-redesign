@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.podd.oas;
+package com.github.podd.restlet;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -42,6 +42,7 @@ import freemarker.template.Configuration;
 public class ApplicationUtils
 {
     private static final Logger log = LoggerFactory.getLogger(ApplicationUtils.class);
+    
     
     public static ChallengeAuthenticator getNewAuthenticator(final Realm nextRealm, final Context newChildContext)
     {
@@ -141,6 +142,7 @@ public class ApplicationUtils
         return result;
     }
     
+    
     public static Repository getNewRepository()
     {
         final String repositoryUrl = ""; //PropertyUtil.getProperty(OasProperties.PROPERTY_SESAME_URL, "");
@@ -184,6 +186,7 @@ public class ApplicationUtils
         }
     }
     
+    
     public static Configuration getNewTemplateConfiguration(final Context newChildContext)
     {
         final Configuration result = new Configuration();
@@ -196,6 +199,7 @@ public class ApplicationUtils
         
         return result;
     }
+    
     
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
     {
@@ -273,7 +277,7 @@ public class ApplicationUtils
         final Configuration newTemplateConfiguration = ApplicationUtils.getNewTemplateConfiguration(applicationContext);
         application.setTemplateConfiguration(newTemplateConfiguration);
         
-        // create a custom error handler using our overridden OasStatusService together with the
+        // create a custom error handler using our overridden PoddStatusService together with the
         // freemarker configuration
         final PoddStatusService statusService = new PoddStatusService(newTemplateConfiguration);
         application.setStatusService(statusService);

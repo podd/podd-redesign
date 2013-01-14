@@ -1,4 +1,4 @@
-package com.github.podd.oas;
+package com.github.podd.resources;
 
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
