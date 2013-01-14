@@ -357,11 +357,6 @@
 				<version>1.4</version>
 			</dependency>
 			<dependency>
-				<groupId>com.github.ansell.restlet-utils</groupId>
-				<artifactId>restlet-utils</artifactId>
-				<version>0.1-SNAPSHOT</version>
-			</dependency>
-			<dependency>
 				<groupId>com.github.ansell.property-util</groupId>
 				<artifactId>property-util</artifactId>
 				<version>0.1-SNAPSHOT</version>
