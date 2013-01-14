@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
+import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
 
 import freemarker.template.Configuration;
@@ -129,29 +130,22 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         
         // Add a route for Login form. Login service is handled by the authenticator
         final String login = "login";
-//                PropertyUtil
-//                        .getProperty(PropertyUtils.PROPERTY_LOGIN_FORM_PATH, PoddPropertyUtils.DEFAULT_LOGIN_FORM_PATH);
-        
-        if(this.log.isInfoEnabled())
-        {
-            this.log.info("attaching login service to path=" + login);
-        }
+        // PropertyUtil.getProperty(PropertyUtils.PROPERTY_LOGIN_FORM_PATH, PoddPropertyUtils.DEFAULT_LOGIN_FORM_PATH);
+        this.log.info("attaching login service to path={}", login);
         
         // NOTE: This only displays the login form. All HTTP POST requests to the login path should
         // be handled by the Authenticator
         router.attach(login, CookieLoginResourceImpl.class);
-        
-        
-        // // Add a route for Logout service
-        // final String logout =
-        // PropertyUtils.getProperty(PropertyUtils.PROPERTY_LOGOUT_FORM_PATH,
-        // PropertyUtils.DEFAULT_LOGOUT_FORM_PATH);
-        //
-        // if(this.log.isInfoEnabled())
-        // {
-        // this.log.info("attaching logout service to path=" + logout);
-        // }
-        
+
+        // Add a route for the About page.
+        final String about = "about";
+        this.log.info("attaching about service to path={}", about);
+        router.attach(about, AboutResourceImpl.class);
+
+        // Add a route for Logout service
+        // final String logout = "logout";
+        // PropertyUtils.getProperty(PropertyUtils.PROPERTY_LOGOUT_FORM_PATH, PropertyUtils.DEFAULT_LOGOUT_FORM_PATH);
+        // this.log.info("attaching logout service to path={}", logout);
         // FIXME: Switch between the logout resource implementations here based on the authenticator
         // router.attach(logout, CookieLogoutResourceImpl.class);
         

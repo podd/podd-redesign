@@ -54,7 +54,14 @@ public final class RestletUtils
         dataModel.put("resourceRef", nextRequest.getResourceRef());
         dataModel.put("rootRef", nextRequest.getRootRef());
         dataModel.put("keywords", "podd, ontology, phenomics");
-        dataModel.put("baseUrl", nextRequest.getRootRef().toString());
+        
+        String baseUrl = nextRequest.getRootRef().toString();
+        if (baseUrl.endsWith("/"))
+        {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        dataModel.put("baseUrl", baseUrl);
+        
         dataModel.put("clientInfo", nextClientInfo);
         dataModel.put("isAuthenticated", nextClientInfo.isAuthenticated());
         final List<Role> roles = nextClientInfo.getRoles();
@@ -310,23 +317,6 @@ public final class RestletUtils
         return result;
         
     }
-    
-    public static Configuration getNewTemplateConfiguration(final Context newChildContext)
-    {
-        final Configuration configuration = new Configuration();
-        
-        configuration.setTemplateLoader(new ContextTemplateLoader(newChildContext, 
-                "clap://class/templates"
-                ));
-        
-        final BeansWrapper myWrapper = new BeansWrapper();
-        myWrapper.setSimpleMapWrapper(true);
-        configuration.setObjectWrapper(myWrapper);
-        
-        return configuration;
-    }
-    
-    
     
     /**
      * Private default constructor

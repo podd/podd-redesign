@@ -4,11 +4,9 @@
 package com.github.podd.restlet;
 
 import org.restlet.Component;
-import org.restlet.Context;
 import org.restlet.data.LocalReference;
 import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
-import org.restlet.ext.freemarker.ContextTemplateLoader;
 import org.restlet.representation.Representation;
 import org.restlet.routing.Router;
 import org.slf4j.Logger;
@@ -18,18 +16,17 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.github.ansell.restletutils.ClassLoaderDirectory;
 import com.github.ansell.restletutils.CompositeClassLoader;
 
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.template.Configuration;
-
 /**
  * Restlet Component used by the PODD web application.
- *  
+ * 
  * Copied from OAS project (https://github.com/ansell/oas)
+ * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
 public class PoddRestletComponent extends Component
 {
-    private static final Logger log = LoggerFactory.getLogger(PoddRestletComponent.class);
+    private final Logger log = LoggerFactory.getLogger(PoddRestletComponent.class);
+    
     private String resetKey;
     
     static
@@ -110,7 +107,7 @@ public class PoddRestletComponent extends Component
         
         final String resourcesPath = "/resources/";
         
-        PoddRestletComponent.log.info("attaching resource handler to path={}", resourcesPath);
+        this.log.info("attaching resource handler to path={}", resourcesPath);
         
         // NOTE: This needs to be Impl as Restlet is not designed using interfaces, so we cannot
         // easily include our interface in the process.
@@ -133,10 +130,8 @@ public class PoddRestletComponent extends Component
         // be null during the setup process
         ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
         
-        PoddRestletComponent.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
-        
+        this.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
     }
-    
     
     /**
      * This field is used in testing to enable the resetting of the internal elements of the website
@@ -152,38 +147,5 @@ public class PoddRestletComponent extends Component
     {
         this.resetKey = key;
     }
-    
-    /**
-     * @deprecated temporarily added by Kutila. Now using Applicationutils.setupApplication()
-     */
-    private void setupApplication(PoddWebServiceApplication application, Context applicationContext)
-    {
-        // final Context templateChildContext = applicationContext.createChildContext();
-        final Configuration newTemplateConfiguration = PoddRestletComponent.getNewTemplateConfiguration(applicationContext);
-        application.setTemplateConfiguration(newTemplateConfiguration);
-        
-        // create a custom error handler using our overridden PoddStatusService together with the
-        // freemarker configuration
-        final PoddStatusService statusService = new PoddStatusService(newTemplateConfiguration);
-        application.setStatusService(statusService);
-    }
-    
-    /**
-     * @deprecated temporarily added by Kutila. Now using Applicationutils.getNewTemplateConfiguration()
-     */
-    public static Configuration getNewTemplateConfiguration(final Context newChildContext)
-    {
-        final Configuration result = new Configuration();
-        // FIXME: Make this configurable
-        result.setTemplateLoader(new ContextTemplateLoader(newChildContext, "clap://class/templates"));
-        
-        final BeansWrapper myWrapper = new BeansWrapper();
-        myWrapper.setSimpleMapWrapper(true);
-        result.setObjectWrapper(myWrapper);
-        
-        return result;
-    }
-    
-    
     
 }

@@ -10,7 +10,7 @@ import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import freemarker.template.Configuration;
 
 /**
- * The application which is the parent of all OAS Restlet resources. It provides the application
+ * The application which is the parent of all Podd Restlet resources. It provides the application
  * level functions for restlets including the DataHandler and the authentication implementation.
  * 
  * @author Peter Ansell p_ansell@yahoo.com

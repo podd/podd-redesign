@@ -5,7 +5,6 @@ package com.github.podd.resources;
 
 import java.util.Map;
 
-
 import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
@@ -15,8 +14,8 @@ import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -46,7 +45,7 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
         {
             this.log.info("In getLoginPageHtml");
             final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-            dataModel.put("contentTemplate", "login.html.ftl");
+            dataModel.put("contentTemplate", PoddWebConstants.PROPERTY_TEMPLATE_LOGIN);
             
             dataModel.put("shibbolethEnabled", Boolean.valueOf("true"));
             dataModel.put("invalidDomain", Boolean.valueOf("false"));
@@ -62,8 +61,8 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
             // template
             // to use for the content in the body of the page
             return RestletUtils
-                    .getHtmlRepresentation("poddBase.html.ftl", dataModel, MediaType.TEXT_HTML, this
-                            .getPoddApplication().getTemplateConfiguration());
+                    .getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel, MediaType.TEXT_HTML, 
+                            this.getPoddApplication().getTemplateConfiguration());
         }
         else
         {

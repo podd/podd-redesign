@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.http.HTTPRepository;
@@ -26,11 +25,11 @@ import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
 import com.github.ansell.restletutils.RestletUtilRoles;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.ansell.restletutils.RestletUtilUser;
+import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
@@ -158,7 +157,7 @@ public class ApplicationUtils
             {
                 repository.initialize();
                 
-                ApplicationUtils.log.info("Created an in memory store as repository for OAS data");
+                ApplicationUtils.log.info("Created an in memory store as repository for PODD");
                 
                 return repository;
             }
@@ -175,7 +174,7 @@ public class ApplicationUtils
             {
                 repository.initialize();
                 
-                ApplicationUtils.log.info("Using sesame http repository as repository for OAS data");
+                ApplicationUtils.log.info("Using sesame http repository as repository for PODD");
                 
                 return repository;
             }
@@ -221,8 +220,7 @@ public class ApplicationUtils
         // DigestAuthenticator.setWrappedVerifier
         final RestletUtilSesameRealm nextRealm =
                 new RestletUtilSesameRealm(nextRepository,
-                        ValueFactoryImpl.getInstance().createURI("urn:podd:auth:graph"));
-//                        SesameUtils.USER_MANAGER_GRAPH);
+                                PoddWebConstants.DEF_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
