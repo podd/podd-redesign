@@ -38,7 +38,7 @@ import com.github.podd.api.file.FileReferenceConstants;
  * 
  */
 @Ignore
-public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
+public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegrationTest
 {
     @Rule
     public TemporaryFolder tempDirectory = new TemporaryFolder();
@@ -122,7 +122,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     protected String loginAndAddArtifact(final InputStream path, final MediaType mediaType, final int expectedStatusCode)
         throws Exception
     {
-        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
+        this.login(AbstractPoddRestletClientIntegrationTest.TEST_USERNAME, AbstractPoddRestletClientIntegrationTest.TEST_PASSWORD);
         
         final Request addRequest = new Request(Method.POST, this.BASE_URL + "/podd/artifact/new");
         addRequest.setCookies(this.cookies);
@@ -509,7 +509,7 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
     @Test
     public void testLogin() throws Exception
     {
-        this.login(AbstractPoddIntegrationTest.TEST_USERNAME, AbstractPoddIntegrationTest.TEST_PASSWORD);
+        this.login(AbstractPoddRestletClientIntegrationTest.TEST_USERNAME, AbstractPoddRestletClientIntegrationTest.TEST_PASSWORD);
         
         // -- logout without sending cookie: should fail with Status 401 (UNAUTHORIZED)
         final Request incorrectLogoutRequest = new Request(Method.GET, this.BASE_URL + "/logout");
