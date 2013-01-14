@@ -6,24 +6,24 @@
         <artifactId>podd-parent</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
-    <artifactId>podd-integrationtest</artifactId>
-    <name>PODD :: Integration Tests</name>
+    <artifactId>podd-prototype-integrationtest</artifactId>
+    <name>PODD :: Prototype Integration Tests</name>
     <packaging>war</packaging>
-    <description>PODD Integration Tests.</description>
+    <description>PODD Prototype Integration Tests.</description>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>podd-api</artifactId>
+            <artifactId>podd-prototype</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
-            <scope>compile</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>podd-webapp-lib</artifactId>
+            <artifactId>podd-prototype</artifactId>
             <version>${project.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

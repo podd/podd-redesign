@@ -17,14 +17,6 @@
 	<url>https://github.com/podd</url>
 	<inceptionYear>2012</inceptionYear>
 
-	<modules>
-		<!-- no longer building prototype regularly <module>podd-prototype</module> 
-			<module>podd-integrationtest</module> <module>podd-prototype-csiro</module> -->
-		<module>podd-api</module>
-		<module>podd-webapp-lib</module>
-		<module>podd-webapp-csiro</module>
-	</modules>
-
 	<scm>
 		<connection>scm:git:git@github.com:podd/podd-redesign.git</connection>
 		<developerConnection>scm:git:git@github.com:podd/podd-redesign.git</developerConnection>
@@ -95,6 +87,34 @@
 			<properties>
 				<default-podd-home>${basedir}/target/.podd</default-podd-home>
 			</properties>
+		</profile>
+		<profile>
+			<id>poddredesign</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<default-podd-home>${basedir}/target/.podd</default-podd-home>
+			</properties>
+			<modules>
+				<module>podd-api</module> 
+				<module>podd-webapp-lib</module> 
+				<module>podd-webapp-csiro</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>prototype</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<default-podd-home>${basedir}/target/.podd</default-podd-home>
+			</properties>
+			<modules>
+				<module>podd-prototype</module> 
+				<module>podd-prototype-integrationtest</module> 
+				<module>podd-prototype-csiro</module>
+			</modules>
 		</profile>
 
 	</profiles>

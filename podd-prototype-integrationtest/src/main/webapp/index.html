@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>PODD Prototype Web Service</title>
+</head>
+<body>
+	<h1>PODD Prototype Web Service</h1>
+	<hr>
+	<h3>Authentication Service</h3>
+    <ul>
+    <li>Authenticates users of the PODD web service</li>
+    <li>Login</li>
+    	<ul>
+        <li>Http Method: POST</li>
+        <li>URL: http://&lt;server_path&gt;/login</li>
+        <li>Parameters: 
+        	<ul>
+        		<li>username</li>
+        		<li>password</li>
+        	</ul>
+        <li>Expected response: Status code 200 (with session information as a cookie)</li>
+        </ul>
+	<li>Logout</li>
+		<ul>
+        <li>Http Method: GET</li>
+        <li>URL: http://&lt;server_path&gt;/logout</li>
+        <li>This method does not expect any parameters.</li>
+        <li>Expected response: Status code 200</li>
+        </ul>
+	</ul>
+	<br>
+	
+	<h3>Add PODD Artifact Service</h3>
+	<ul>
+		<li>Load a new artifact (i.e. a PODD object) to the PODD application.</li>
+		<li>The user must be authenticated to access this service.</li>
+	    <li>Http Method: POST</li>
+	    <li>URL: http://&lt;server_path&gt;/artifact/new</li>
+	    <li>Parameters: Artifact content in request body. Currently supports RDF/XML only.</li>
+	    <li>Expected response: Status code 200. Response body contains the URI of the added artifact</li>
+	</ul>
+	<br>
+
+	<h3>Get PODD artifact service</h3>
+	<ul>
+    	<li>Download a copy of the specified PODD artifact (i.e. PODD object) as an RDF file.</li>
+		<li>The user must be authenticated to access this service.</li>
+    	<li>Http Method: GET</li>
+    	<li>URL: http://&lt;server_path&gt;/artifact/[base|inferred]/URI
+    	<li>Parameters:</li>
+    	<ul>
+        	<li>URI - The URI of the artifact to retrieve. The URI should be URL-encoded and the scheme
+        	 should be followed by a <code>/</code> character instead of the usual <code>://</code>. 
+        	 (E.g. <code>http/example.org/permanenturl/2c8abf88-3036-4ac5-90d5-5e558d142d64/artifact%3A1)</code></li>
+        	<li>base - Requests the base (asserted) artifact</li>
+        	<li>inferred - Requests the artifact including inferred statements</li>
+        </ul>
+    	<li>Expected response: Status code 200. Response body containing the artifact</li>
+	</ul>
+	<br>
+	
+	<h3>Edit PODD artifact service</h3>
+	<ul>
+    	<li>Allows editing part of an existing PODD object.</li>
+		<li>The user must be authenticated to access this service.</li>
+    	<li>Http Method: POST</li>
+    	<li>URL: http://&lt;server_path&gt;/artifact/edit/[merge|replace]/URI
+    	<li>Parameters:</li>
+    	<ul>
+        	<li>URI - The URI of the artifact to retrieve. The URI should be URL-encoded and the scheme
+        	 should be followed by a <code>/</code> character instead of the usual <code>://</code>. 
+        	 (E.g. <code>http/example.org/permanenturl/2c8abf88-3036-4ac5-90d5-5e558d142d64/artifact%3A1)</code></li>
+        	<li>merge - Merge with existing artifact</li>
+        	<li>replace - Replace any existing statements about these objects</li>
+        	<li>The modified RDF statements are sent in the request body. (Currently supports RDF/XML only.)</li>
+        </ul>
+    	<li>Expected response: Status code 200. Response body containing the edited artifact URI</li>
+	    <li>NOTE: The previous version of the artifact is no longer available to users.</li>
+	</ul>
+	<br>
+	
+	<h3>Delete PODD artifact service</h3>
+	<ul>
+	    <li>An object can be deleted only if it does not have any active children.</li>
+		<li>The user must be authenticated to access this service.</li>
+    	<li>Http Method: DELETE</li>
+    	<li>URL: http://&lt;server_path&gt;/artifact/URI
+    	<li>Parameters:</li>
+   		<ul>
+        	<li>URI - The URI of the artifact to delete. The URI should be URL-encoded and the scheme
+        	 should be followed by a <code>/</code> character instead of the usual <code>://</code>. 
+        	 (E.g. <code>http/example.org/permanenturl/2c8abf88-3036-4ac5-90d5-5e558d142d64/artifact%3A1)</code></li>
+   		</ul>
+    	<li>Expected response: Status code 200. Response body contains a message with the deleted artifact URI</li>
+	</ul>
+	<br>
+
+	<h3>File reference attachment service</h3>
+	<ul>
+	    <li>"This web service makes it possible to attach existing files to a PODD artifact by defining references 
+	    to it without having to explicitly upload the files. This is especially useful for very large files 
+	    that would take up too much bandwidth if uploaded to PODD directly. This also leaves the responsibility 
+	    of file management to the remote data store of the files." - adapted from PODD1.</li>
+		<li>The user must be authenticated to access this service.</li>
+    	<li>Http Method: POST</li>
+    	<li>URL: http://&lt;server_path&gt;/attachref
+   		<li>Parameters required to construct a valid file reference vary depending on the type of file reference.
+     			For HTTP and SSH file references which are supported at present, the following are expected:</li>
+    		<ul>
+    			<li>file_reference_type - either SSH or HTTP</li>
+		        <li>artifact_uri - The URI of the artifact where the file reference needs to be attached</li>
+        		<li>object_uri - The URI of the object within the artifact to which the file reference is to be attached</li>
+        		<li>file_server_alias - An alias pointing to more details about the service which hosts this file</li>
+        		<li>file_path - The path through which this file can be located on its hosting service</li>
+        		<li>file_name - A name identifying the file</li>
+        		<li>file_description - A textual description of this file</li>
+			</ul>
+    	<li>Expected response: Status code 200. Response body contains the file reference's URI</li>
+	</ul>
+	<br>
+	
+	<p>For more details of these web services, see the PODD Redesign 
+	<a href="https://github.com/podd/podd-redesign/wiki/Web-services">Wiki</a>
+	</p>
+	<p>
+	Version: PODD/0.0.1_21.11.12
+	</p>
+	<br>
+	<hr>
+	<center>Copyright&copy;2012</center>
+</body>
+</html>
