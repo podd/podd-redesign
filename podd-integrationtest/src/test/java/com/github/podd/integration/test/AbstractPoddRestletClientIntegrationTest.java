@@ -1,4 +1,4 @@
-package com.github.podd.prototype.test;
+package com.github.podd.integration.test;
 
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.restlet.Client;
 import org.restlet.data.Protocol;
 
-public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
+public abstract class AbstractPoddRestletClientIntegrationTest extends AbstractSesameTest
 {
     
     protected static String TEST_USERNAME = null;
@@ -68,9 +68,9 @@ public abstract class AbstractPoddIntegrationTest extends AbstractSesameTest
         final Enumeration<Object> keys = passwords.keys();
         if(keys.hasMoreElements())
         {
-            AbstractPoddIntegrationTest.TEST_USERNAME = (String)keys.nextElement();
-            AbstractPoddIntegrationTest.TEST_PASSWORD =
-                    passwords.getProperty(AbstractPoddIntegrationTest.TEST_USERNAME);
+            AbstractPoddRestletClientIntegrationTest.TEST_USERNAME = (String)keys.nextElement();
+            AbstractPoddRestletClientIntegrationTest.TEST_PASSWORD =
+                    passwords.getProperty(AbstractPoddRestletClientIntegrationTest.TEST_USERNAME);
         }
         
         // Assert alias file exists
