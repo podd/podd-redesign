@@ -1,4 +1,4 @@
-package com.github.podd.prototype.test;
+package com.github.podd.integration.test;
 
 import java.io.InputStream;
 import java.util.Enumeration;

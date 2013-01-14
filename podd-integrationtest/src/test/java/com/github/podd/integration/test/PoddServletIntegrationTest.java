@@ -1,4 +1,4 @@
-package com.github.podd.prototype.test;
+package com.github.podd.integration.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -29,7 +30,7 @@ import org.restlet.representation.Representation;
 import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.prototype.FileReferenceUtils;
+import com.github.podd.api.file.FileReferenceConstants;
 
 /**
  * This integration test class validates the PODD-prototype web service operations.
@@ -192,13 +193,13 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         // -- generate and send an attach request
         final Form form = new Form();
-        form.add(FileReferenceUtils.KEY_FILE_REF_TYPE, "HTTP");
-        form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
-        form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
-        form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "w3");
-        form.add(FileReferenceUtils.KEY_FILE_PATH, "Protocols/rfc2616");
-        form.add(FileReferenceUtils.KEY_FILE_NAME, "rfc2616.html");
-        form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION, "http RFC");
+        form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
+        form.add(FileReferenceConstants.KEY_ARTIFACT_URI, artifactUri);
+        form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
+        form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
+        form.add(FileReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616");
+        form.add(FileReferenceConstants.KEY_FILE_NAME, "rfc2616.html");
+        form.add(FileReferenceConstants.KEY_FILE_DESCRIPTION, "http RFC");
         
         final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
         editRequest.setCookies(this.cookies);
@@ -261,13 +262,13 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
             
             // -- generate and send an attach request
             final Form form = new Form();
-            form.add(FileReferenceUtils.KEY_FILE_REF_TYPE, "SSH");
-            form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
-            form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
-            form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "localssh");
-            form.add(FileReferenceUtils.KEY_FILE_PATH, tempFolder.toPath().toAbsolutePath().toString());
-            form.add(FileReferenceUtils.KEY_FILE_NAME, tempFile.getFileName().toString());
-            form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION,
+            form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "SSH");
+            form.add(FileReferenceConstants.KEY_ARTIFACT_URI, artifactUri);
+            form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
+            form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "localssh");
+            form.add(FileReferenceConstants.KEY_FILE_PATH, tempFolder.toPath().toAbsolutePath().toString());
+            form.add(FileReferenceConstants.KEY_FILE_NAME, tempFile.getFileName().toString());
+            form.add(FileReferenceConstants.KEY_FILE_DESCRIPTION,
                     "Refers to one of the test artifacts, to be accessed through an ssh server");
             
             final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
@@ -321,13 +322,13 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         // -- generate and send an attach request
         final Form form = new Form();
-        form.add(FileReferenceUtils.KEY_FILE_REF_TYPE, "HTTP");
-        form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
+        form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
+        form.add(FileReferenceConstants.KEY_ARTIFACT_URI, artifactUri);
         // object URI is missing here
-        form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "w3");
-        form.add(FileReferenceUtils.KEY_FILE_PATH, "Protocols/rfc2616");
-        form.add(FileReferenceUtils.KEY_FILE_NAME, "rfc2616.html");
-        form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION, "http RFC");
+        form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
+        form.add(FileReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616");
+        form.add(FileReferenceConstants.KEY_FILE_NAME, "rfc2616.html");
+        form.add(FileReferenceConstants.KEY_FILE_DESCRIPTION, "http RFC");
         
         final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
         editRequest.setCookies(this.cookies);
@@ -362,13 +363,13 @@ public class PoddServletIntegrationTest extends AbstractPoddIntegrationTest
         
         // -- generate and send an attach request
         final Form form = new Form();
-        form.add(FileReferenceUtils.KEY_FILE_REF_TYPE, "HTTP");
-        form.add(FileReferenceUtils.KEY_ARTIFACT_URI, artifactUri);
-        form.add(FileReferenceUtils.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
-        form.add(FileReferenceUtils.KEY_FILE_SERVER_ALIAS, "w3");
-        form.add(FileReferenceUtils.KEY_FILE_PATH, "Protocols/rfc2616thisiswrong");
-        form.add(FileReferenceUtils.KEY_FILE_NAME, "rfc2616.html");
-        form.add(FileReferenceUtils.KEY_FILE_DESCRIPTION, "http RFC");
+        form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
+        form.add(FileReferenceConstants.KEY_ARTIFACT_URI, artifactUri);
+        form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
+        form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
+        form.add(FileReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616thisiswrong");
+        form.add(FileReferenceConstants.KEY_FILE_NAME, "rfc2616.html");
+        form.add(FileReferenceConstants.KEY_FILE_DESCRIPTION, "http RFC");
         
         final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
         editRequest.setCookies(this.cookies);
