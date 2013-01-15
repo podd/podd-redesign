@@ -58,8 +58,7 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
             this.log.info("referrerRef={}", this.getRequest().getReferrerRef());
             
             // Output the base template, with contentTemplate from the dataModel defining the
-            // template
-            // to use for the content in the body of the page
+            // template to use for the content in the body of the page
             return RestletUtils
                     .getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel, MediaType.TEXT_HTML, 
                             this.getPoddApplication().getTemplateConfiguration());

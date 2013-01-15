@@ -13,16 +13,18 @@ import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * 
- * Resource for the "about" page. Does not require authentication.
+ * Attempt at serving a simple non-authenticated page
  * 
  * @author kutila
  * 
  */
-public class AboutResourceImpl extends AbstractPoddResourceImpl
+public class IndexResourceImpl extends AbstractPoddResourceImpl
 {
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -32,27 +34,21 @@ public class AboutResourceImpl extends AbstractPoddResourceImpl
     {
         // Enable the following to test authenticated access
         //this.getPoddApplication().authenticate(PoddAction.ROLE_EDIT, getRequest(), getResponse());
-        this.log.info("getAboutPageHtml");
+        this.log.info("getIndexPageHtml");
         final User user = this.getRequest().getClientInfo().getUser();
+        
         
         this.log.info("authenticated user: {}", user);
         
-        this.log.info("In getAboutPageHtml");
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "about.html.ftl");
+        dataModel.put("contentTemplate", "index.html.ftl");
         
-        dataModel.put("pageTitle", "PODD About Page");
-        
-        // FIXME: By default use the referrer to populate the redirectTo field internally for
-        // use after a successful login
-        dataModel.put("referrerRef", this.getRequest().getReferrerRef());
-        this.log.info("referrerRef={}", this.getRequest().getReferrerRef());
+        dataModel.put("pageTitle", "PODD Index Page");
         
         // Output the base template, with contentTemplate from the dataModel defining the
-        // template
-        // to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation("poddBase.html.ftl", dataModel, MediaType.TEXT_HTML, this
-                .getPoddApplication().getTemplateConfiguration());
+        // template to use for the content in the body of the page
+        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE,
+                dataModel, MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
 }

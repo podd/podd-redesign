@@ -3,9 +3,7 @@
  */
 package com.github.podd.restlet.test;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.data.MediaType;
@@ -16,11 +14,12 @@ import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
+import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author kutila
- *
+ * 
  */
 public class AboutResourceImplTest extends AbstractResourceImplTest
 {
@@ -30,7 +29,7 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetAboutWithoutAuthentication() throws Exception
     {
-        final ClientResource aboutClientResource = new ClientResource(getUrl(PoddWebConstants.PATH_ABOUT));
+        final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
         
         final Representation results =
                 PoddRestletTestUtils.doTestUnAuthenticatedRequest(aboutClientResource, Method.GET, null,
@@ -38,16 +37,21 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
         
         Assert.assertTrue(results.getText().contains("The University of Queensland"));
     }
-
+   
     /**
      * Tests that no error occurs when trying to get the get user resource while authenticated with
      * the admin role.
+     * 
+     * Login page cannot be tested using this approach as in the unit test environment, the server
+     * uses DIGEST authentication.
+     * 
      */
     @Ignore
     @Test
     public void testGetUserBasicAuthorised() throws Exception
     {
-        final ClientResource creationClientResource = new ClientResource(getUrl(PoddWebConstants.PATH_LOGIN_SUBMIT));
+        final ClientResource creationClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGIN_SUBMIT));
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(false);
@@ -56,11 +60,10 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
         form.getEntries().add(new FormData("password", "testAdminPassword"));
         
         final Representation results =
-                PoddRestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.POST, form,
+                RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.POST, form,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
         
     }
-
     
     /**
      * Test authenticated access to /about
@@ -69,29 +72,11 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetAboutWithAuthentication() throws Exception
     {
-        final ClientResource aboutClientResource = new ClientResource(getUrl(PoddWebConstants.PATH_ABOUT));
+        final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
         
         final Representation results =
-                PoddRestletTestUtils.doTestAuthenticatedRequest(aboutClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
-        
-    }
-
-    
-    /**
-     * Tests that no error occurs when trying to get the get "about" resource while unauthenticated.
-     */
-    @Test
-    @Ignore
-    public void testGetWithoutAuthentication() throws Exception
-    {
-        final ClientResource creationClientResource = new ClientResource(getUrl("about"));
-        
-        final Representation results =
-                PoddRestletTestUtils.doTestUnAuthenticatedRequest(creationClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK);
-        
-        Assert.assertNotNull(results);
+                RestletTestUtils.doTestAuthenticatedRequest(aboutClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                        Status.SUCCESS_OK, this.testNoAdminPrivileges);
         
     }
     

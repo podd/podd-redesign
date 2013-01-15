@@ -22,6 +22,7 @@ public interface PoddWebConstants
     public static final String PROPERTY_TEMPLATE_LOGIN = "login.html.ftl";
     
     public static final String PATH_ABOUT = "/about";
+    public static final String PATH_INDEX = "/index";
     public static final String PATH_LOGIN_FORM = "/login";
     public static final String PATH_LOGIN_SUBMIT = "/submitlogininfo";
     public static final String PATH_LOGOUT = "/deauthenticate";
@@ -39,6 +40,8 @@ public interface PoddWebConstants
     public static final String URI_PODD_PLANT = "http://purl.org/podd/ns/poddPlant";
     public static final String URI_PODD_SCIENCE = "http://purl.org/podd/ns/poddScience";
     public static final String URI_PODD_BASE = "http://purl.org/podd/ns/poddBase";
+
+
 
 
 
