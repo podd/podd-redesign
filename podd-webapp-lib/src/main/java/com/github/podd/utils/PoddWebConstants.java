@@ -23,6 +23,7 @@ public interface PoddWebConstants
     
     public static final String PATH_ABOUT = "/about";
     public static final String PATH_INDEX = "/index";
+    public static final String PATH_USER_DETAILS = "/userdetails";
     public static final String PATH_LOGIN_FORM = "/login";
     public static final String PATH_LOGIN_SUBMIT = "/submitlogininfo";
     public static final String PATH_LOGOUT = "/deauthenticate";

@@ -30,19 +30,19 @@ public class IndexResourceImpl extends AbstractPoddResourceImpl
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     @Get
-    public Representation getAboutPageHtml(final Representation entity) throws ResourceException
+    public Representation getIndexPageHtml(final Representation entity) throws ResourceException
     {
-        // Enable the following to test authenticated access
+        // Enable either of the following to test authenticated access
         //this.getPoddApplication().authenticate(PoddAction.ROLE_EDIT, getRequest(), getResponse());
+        //this.checkAuthentication(PoddAction.ROLE_EDIT);
+        
         this.log.info("getIndexPageHtml");
         final User user = this.getRequest().getClientInfo().getUser();
-        
         
         this.log.info("authenticated user: {}", user);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "index.html.ftl");
-        
         dataModel.put("pageTitle", "PODD Index Page");
         
         // Output the base template, with contentTemplate from the dataModel defining the

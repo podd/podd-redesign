@@ -25,10 +25,10 @@ public class IndexResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetIndexWithoutAuthentication() throws Exception
     {
-        final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_INDEX));
+        final ClientResource indexClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_INDEX));
         
         final Representation results =
-                PoddRestletTestUtils.doTestUnAuthenticatedRequest(aboutClientResource, Method.GET, null,
+                PoddRestletTestUtils.doTestUnAuthenticatedRequest(indexClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK);
         
         final String body = results.getText();

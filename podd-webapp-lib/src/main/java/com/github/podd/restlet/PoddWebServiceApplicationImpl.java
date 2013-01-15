@@ -17,6 +17,7 @@ import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
+import com.github.podd.resources.UserDetailsResourceImpl;
 
 import freemarker.template.Configuration;
 
@@ -149,6 +150,10 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.info("attaching index service to path={}", index);
         router.attach(index, IndexResourceImpl.class);
         
+        // Add a route for the Index page.
+        final String userDetails = "userdetails";
+        this.log.info("attaching user details service to path={}", userDetails);
+        router.attach(userDetails, UserDetailsResourceImpl.class);
         
         // Add a route for Logout service
         // final String logout = "logout";
