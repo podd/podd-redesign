@@ -26,7 +26,7 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
      * Checks the ability of the currently authenticated user to perform the given action.
      * 
      * @param action
-     *            The OasAction that is to be performed.
+     *            The PoddAction that is to be performed.
      * @throws ResourceException
      *             with Status.CLIENT_ERROR_UNAUTHORIZED (HTTP 401) if the user is not authorised to
      *             perform the given action
@@ -35,6 +35,7 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
     {
         if(!this.getPoddApplication().authenticate(action, this.getRequest(), this.getResponse()))
         {
+            this.log.warn("Client unauthorized. Throwing a ResourceException");
             throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, action.getErrorMessage());
         }
     }

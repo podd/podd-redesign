@@ -136,6 +136,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // NOTE: This only displays the login form. All HTTP POST requests to the login path should
         // be handled by the Authenticator
         router.attach(login, CookieLoginResourceImpl.class);
+        //router.attach("submitlogininfo", CookieLoginResourceImpl.class);
 
         // Add a route for the About page.
         final String about = "about";

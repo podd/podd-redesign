@@ -70,7 +70,7 @@ public class AbstractResourceImplTest
         // Attach the sample application.
         this.component.getDefaultHost().attach(
         // PropertyUtil.get(OasProps.PROP_WS_URI_PATH, OasProps.DEF_WS_URI_PATH),
-                "/podd", nextApplication);
+                "/podd/", nextApplication);
         
         // The application cannot be setup properly until it is attached, as it requires
         // Application.getContext() to not return null

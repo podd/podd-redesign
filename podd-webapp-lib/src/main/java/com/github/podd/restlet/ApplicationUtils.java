@@ -47,7 +47,7 @@ public class ApplicationUtils
     {
         ChallengeAuthenticator result = null;
         
-        final String authMethod = "Cookie";
+        final String authMethod = "digest";
 //                PropertyUtil.getProperty(OasProperties.PROPERTY_CHALLENGE_AUTH_METHOD,
 //                        OasProperties.DEFAULT_CHALLENGE_AUTH_METHOD);
         
@@ -93,11 +93,11 @@ public class ApplicationUtils
 //                    PropertyUtil.getProperty(
 //                    OasProperties.PROPERTY_LOGIN_FORM_PATH, OasProperties.DEFAULT_LOGIN_FORM_PATH));
             
-            ((FixedRedirectCookieAuthenticator)result).setLoginPath("/submitlogininfo");
+            ((FixedRedirectCookieAuthenticator)result).setLoginPath(PoddWebConstants.PATH_LOGIN_SUBMIT);
 //                    PropertyUtil.getProperty(
 //                    OasProperties.PROPERTY_LOGIN_PATH, OasProperties.DEFAULT_LOGIN_PATH));
 //            
-            ((FixedRedirectCookieAuthenticator)result).setLogoutPath("/logout");
+            ((FixedRedirectCookieAuthenticator)result).setLogoutPath(PoddWebConstants.PATH_LOGOUT);
 //                    PropertyUtil.getProperty(
 //                    OasProperties.PROPERTY_LOGOUT_PATH, OasProperties.DEFAULT_LOGOUT_PATH));
 //            
@@ -105,14 +105,14 @@ public class ApplicationUtils
 //                    OasProperties.PROPERTY_LOGIN_REDIRECT_FIELD, OasProperties.DEFAULT_LOGIN_REDIRECT_FIELD));
             
             // FIXME: Make this configurable
-            ((FixedRedirectCookieAuthenticator)result).setCookieName("PODDAuthentication");
+            ((FixedRedirectCookieAuthenticator)result).setCookieName(PoddWebConstants.COOKIE_NAME);
             // FIXME: Make this configurable
             ((FixedRedirectCookieAuthenticator)result).setIdentifierFormName("username");
             // FIXME: Make this configurable
             ((FixedRedirectCookieAuthenticator)result).setSecretFormName("password");
             ((FixedRedirectCookieAuthenticator)result).setInterceptingLogin(true);
             ((FixedRedirectCookieAuthenticator)result).setInterceptingLogout(true);
-            ((FixedRedirectCookieAuthenticator)result).setFixedRedirectUri("/redirectedhere");
+            ((FixedRedirectCookieAuthenticator)result).setFixedRedirectUri(PoddWebConstants.PATH_REDIRECT_LOGGED_IN);
 //                    PropertyUtil.getProperty(
 //                    OasProperties.PROPERTY_ONTOLOGY_MANAGER_PATH, OasProperties.DEFAULT_ONTOLOGY_MANAGER_PATH));
             
@@ -120,7 +120,6 @@ public class ApplicationUtils
             
             result.setVerifier(nextRealm.getVerifier());
             result.setEnroler(nextRealm.getEnroler());
-            
             result.setOptional(true);
 //                    Boolean.valueOf(PropertyUtil.getProperty(OasProperties.PROPERTY_CHALLENGE_AUTH_OPTIONAL,
 //                    OasProperties.DEFAULT_CHALLENGE_AUTH_OPTIONAL)));
@@ -205,7 +204,7 @@ public class ApplicationUtils
         ApplicationUtils.log.info("application {}", application);
         ApplicationUtils.log.info("applicationContext {}", applicationContext);
         
-        final List<Role> roles = ((org.restlet.Application)application).getRoles();
+        final List<Role> roles = application.getRoles();
         roles.clear();
         roles.addAll(RestletUtilRoles.getRoles());
         
