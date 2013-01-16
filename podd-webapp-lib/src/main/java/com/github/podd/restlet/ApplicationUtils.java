@@ -221,6 +221,10 @@ public class ApplicationUtils
                 new RestletUtilSesameRealm(nextRepository,
                                 PoddWebConstants.DEF_USER_MANAGEMENT_GRAPH);
         
+        PoddApiUtils apiUtils = new PoddApiUtils();
+        apiUtils.setRepository(nextRepository);
+        apiUtils.setUp();
+        
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
         
