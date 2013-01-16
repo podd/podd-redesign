@@ -18,20 +18,81 @@ public interface PoddWebConstants
             .createURI("urn:podd:default:usermanagementgraph:");
 
     
-    public static final String PROPERTY_TEMPLATE_BASE = "poddBase.html.ftl";
-    public static final String PROPERTY_TEMPLATE_LOGIN = "login.html.ftl";
-    
-    public static final String PATH_ABOUT = "/about";
-    public static final String PATH_INDEX = "/index";
-    public static final String PATH_USER_DETAILS = "/userdetails";
-    public static final String PATH_UPLOAD_ARTIFACT = "/uploadartifact";
-    public static final String PATH_LOGIN_FORM = "/login";
-    public static final String PATH_LOGIN_SUBMIT = "/submitlogininfo";
-    public static final String PATH_LOGOUT = "/deauthenticate";
-    public static final String PATH_REDIRECT_LOGGED_IN = "/about";
-    
-
     public static final String COOKIE_NAME = "PODDAuthentication";
+
+    
+    /**
+     * Freemarker template used as the base for rendering all HTML pages 
+     */
+    public static final String PROPERTY_TEMPLATE_BASE = "poddBase.html.ftl";
+    
+    /**
+     * Path to login page
+     */
+    public static final String PATH_LOGIN_FORM = "loginpage";
+    
+    /**
+     * Path to submit login details
+     */
+    public static final String PATH_LOGIN_SUBMIT = "/login";
+    
+    /**
+     * Path to logout from PODD
+     */
+    public static final String PATH_LOGOUT = "/logout";
+    
+    
+    public static final String PATH_REDIRECT_LOGGED_IN = "/index";
+    
+    /**
+     * Path to "about" page
+     */
+    public static final String PATH_ABOUT = "about";
+    
+    /**
+     * Path to "index" page
+     */
+    public static final String PATH_INDEX = "index";
+    
+    /**
+     * Path to "user details" page
+     */
+    public static final String PATH_USER_DETAILS = "userdetails";
+    
+    /**
+     * Path to load a new artifact into PODD
+     */
+    public static final String PATH_ARTIFACT_UPLOAD = "artifact/new";
+
+    /**
+     * Path to get the base (asserted) statements of an artifact 
+     */
+    public static final String PATH_ARTIFACT_GET_BASE = "artifact/base";
+    
+    /**
+     * Path to get the inferred statements of an artifact 
+     */
+    public static final String PATH_ARTIFACT_GET_INFERRED = "artifact/inferred";
+    
+    /**
+     * Path to edit an artifact, merging it with existing statements 
+     */
+    public static final String PATH_ARTIFACT_EDIT_MERGE = "artifact/edit/merge";
+
+    /**
+     * Path to edit an artifact, replacing previous statements about the edited objects 
+     */
+    public static final String PATH_ARTIFACT_EDIT_REPLACE = "artifact/edit/replace";
+
+    /**
+     * Path to delete an artifact. This uses HTTP delete method 
+     */
+    public static final String PATH_ARTIFACT_DELETE = "artifact";
+    
+    /**
+     * Path to the file reference attachment service
+     */
+    public static final String PATH_ATTACH_FILE_REF = "attachref";
     
     
     

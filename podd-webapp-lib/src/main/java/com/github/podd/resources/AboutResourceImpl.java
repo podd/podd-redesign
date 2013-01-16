@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * 
@@ -51,8 +52,8 @@ public class AboutResourceImpl extends AbstractPoddResourceImpl
         // Output the base template, with contentTemplate from the dataModel defining the
         // template
         // to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation("poddBase.html.ftl", dataModel, MediaType.TEXT_HTML, this
-                .getPoddApplication().getTemplateConfiguration());
+        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
 }

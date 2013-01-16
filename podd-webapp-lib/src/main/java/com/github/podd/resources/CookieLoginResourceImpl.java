@@ -45,7 +45,7 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
         {
             this.log.info("In getLoginPageHtml");
             final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-            dataModel.put("contentTemplate", PoddWebConstants.PROPERTY_TEMPLATE_LOGIN);
+            dataModel.put("contentTemplate", "login.html.ftl");
             
             dataModel.put("shibbolethEnabled", Boolean.valueOf("true"));
             dataModel.put("invalidDomain", Boolean.valueOf("false"));

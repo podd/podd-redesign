@@ -51,7 +51,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     private final Path tempDirectory;
     
     /**
-     * Constructore: prepare temp directory
+     * Constructor: prepare temp directory
      */
     public UploadArtifactResourceImpl()
     {

@@ -19,6 +19,7 @@ import com.github.podd.resources.CookieLoginResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
+import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.template.Configuration;
 
@@ -31,6 +32,7 @@ import freemarker.template.Configuration;
  */
 public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
 {
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     /**
@@ -132,32 +134,31 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final Router router = new Router(this.getContext());
         
         // Add a route for Login form. Login service is handled by the authenticator
-        final String login = "login";
+        final String login = PoddWebConstants.PATH_LOGIN_FORM;
         // PropertyUtil.getProperty(PropertyUtils.PROPERTY_LOGIN_FORM_PATH, PoddPropertyUtils.DEFAULT_LOGIN_FORM_PATH);
         this.log.info("attaching login service to path={}", login);
         
         // NOTE: This only displays the login form. All HTTP POST requests to the login path should
         // be handled by the Authenticator
         router.attach(login, CookieLoginResourceImpl.class);
-        //router.attach("submitlogininfo", CookieLoginResourceImpl.class);
 
         // Add a route for the About page.
-        final String about = "about";
+        final String about = PoddWebConstants.PATH_ABOUT;
         this.log.info("attaching about service to path={}", about);
         router.attach(about, AboutResourceImpl.class);
 
         // Add a route for the Index page.
-        final String index = "index";
+        final String index = PoddWebConstants.PATH_INDEX;
         this.log.info("attaching index service to path={}", index);
         router.attach(index, IndexResourceImpl.class);
         
         // Add a route for the User Details page.
-        final String userDetails = "userdetails";
+        final String userDetails = PoddWebConstants.PATH_USER_DETAILS;
         this.log.info("attaching user details service to path={}", userDetails);
         router.attach(userDetails, UserDetailsResourceImpl.class);
         
         // Add a route for the Upload Artifact page.
-        final String uploadArtifact = "uploadartifact";
+        final String uploadArtifact = PoddWebConstants.PATH_ARTIFACT_UPLOAD;
         this.log.info("attaching Upload Artifact service to path={}", uploadArtifact);
         router.attach(uploadArtifact, UploadArtifactResourceImpl.class);
 

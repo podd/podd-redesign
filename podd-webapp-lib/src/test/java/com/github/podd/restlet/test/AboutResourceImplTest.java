@@ -29,7 +29,7 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetAboutWithoutAuthentication() throws Exception
     {
-        final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
+        final ClientResource aboutClientResource = new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_ABOUT));
         
         final Representation results =
                 PoddRestletTestUtils.doTestUnAuthenticatedRequest(aboutClientResource, Method.GET, null,
@@ -72,7 +72,7 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetAboutWithAuthentication() throws Exception
     {
-        final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
+        final ClientResource aboutClientResource = new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_ABOUT));
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(aboutClientResource, Method.GET, null, MediaType.TEXT_HTML,

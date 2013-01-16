@@ -47,6 +47,7 @@ public class ApplicationUtils
     {
         ChallengeAuthenticator result = null;
         
+        //FIXME: read from a property
         final String authMethod = "digest";
 //                PropertyUtil.getProperty(OasProperties.PROPERTY_CHALLENGE_AUTH_METHOD,
 //                        OasProperties.DEFAULT_CHALLENGE_AUTH_METHOD);

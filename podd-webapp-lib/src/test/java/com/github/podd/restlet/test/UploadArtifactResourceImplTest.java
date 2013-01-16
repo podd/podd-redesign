@@ -34,7 +34,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
     public void testErrorPostWithoutAuthentication() throws Exception
     {
         final ClientResource uploadArtifactResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_UPLOAD_ARTIFACT));
+                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(true);
@@ -56,7 +56,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
     public void testErrorPostUploadWithoutFile() throws Exception
     {
         final ClientResource uploadArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_UPLOAD_ARTIFACT));
+                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(true);
@@ -84,7 +84,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
     public void testPostUploadArtifactBasic() throws Exception
     {
         final ClientResource uploadArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_UPLOAD_ARTIFACT));
+                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(true);
