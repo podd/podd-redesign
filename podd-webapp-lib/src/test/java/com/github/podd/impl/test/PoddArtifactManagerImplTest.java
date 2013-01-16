@@ -3,8 +3,7 @@
  */
 package com.github.podd.impl.test;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
