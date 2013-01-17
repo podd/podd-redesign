@@ -16,6 +16,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+import org.openrdf.rio.RDFFormat;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -39,6 +40,7 @@ import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
+import com.github.podd.exception.PoddException;
 import com.github.podd.impl.PoddArtifactManagerImpl;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
@@ -392,11 +394,20 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.poddArtifactManager.setSchemaManager(this.poddSchemaManager);
         this.poddArtifactManager.setSesameManager(this.poddSesameManager);
         
+        /*
+         * Since the schema ontology upload feature is not yet supported, necessary schemas
+         * are uploaded here at application starts up.
+         */    
         try
         {
-            this.loadSchemaOntologies();
+            this.getPoddSchemaManager().uploadSchemaOntology(
+                    this.getClass().getResourceAsStream(PoddWebConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
+            this.getPoddSchemaManager().uploadSchemaOntology(
+                    this.getClass().getResourceAsStream(PoddWebConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
+            this.getPoddSchemaManager().uploadSchemaOntology(
+                    this.getClass().getResourceAsStream(PoddWebConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
         }
-        catch(IOException | OpenRDFException | OWLException e)
+        catch(IOException | OpenRDFException | OWLException | PoddException e)
         {
             this.log.error("Fatal Error!!! Could not load schema ontologies", e);
         }
@@ -420,98 +431,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             }
         }
         this.nextRepository = null;
-    }
-    
-    /**
-     * The implementation does not yet support uploading of new Schema Ontologies. Therefore, this
-     * method should be called at initialization to load the schemas.
-     * 
-     * @throws IOException
-     * @throws OpenRDFException
-     * @throws OWLException
-     * 
-     */
-    private void loadSchemaOntologies() throws OWLException, OpenRDFException, IOException
-    {
-        this.log.info("loadSchemaOntologies ... start");
-        
-        final List<Entry<URI, String>> schemaOntologyList = new ArrayList<>();
-        schemaOntologyList.add(new SimpleEntry<URI, String>(this.nextRepository.getValueFactory().createURI(
-                PoddWebConstants.URI_PODD_BASE), PoddWebConstants.PATH_PODD_BASE));
-        schemaOntologyList.add(new SimpleEntry<URI, String>(this.nextRepository.getValueFactory().createURI(
-                PoddWebConstants.URI_PODD_SCIENCE), PoddWebConstants.PATH_PODD_SCIENCE));
-        schemaOntologyList.add(new SimpleEntry<URI, String>(this.nextRepository.getValueFactory().createURI(
-                PoddWebConstants.URI_PODD_PLANT), PoddWebConstants.PATH_PODD_PLANT));
-        
-        RepositoryConnection repositoryConnection = null;
-        
-        final List<URI> loadedSchemas = new ArrayList<>();
-        
-        try
-        {
-            repositoryConnection = this.nextRepository.getConnection();
-            repositoryConnection.begin();
-            
-            for(final Entry<URI, String> schemaOntology : schemaOntologyList)
-            {
-                final RepositoryResult<Statement> repoResult =
-                        repositoryConnection.getStatements(schemaOntology.getKey(),
-                                PoddRdfConstants.OMV_CURRENT_VERSION, null, false,
-                                PoddWebServiceApplicationImpl.SCHEMA_MGT_GRAPH);
-                if(repoResult.hasNext())
-                {
-                    final Value object = repoResult.next().getObject();
-                    if(object instanceof Resource)
-                    {
-                        this.log.info("loadSchemaOntology ... {} (from Repository)", object);
-                        
-                        // FIXME: load schema ontology
-                        // this.utils.loadOntology(repositoryConnection,
-                        // RDFFormat.RDFXML.getDefaultMIMEType(),
-                        // (Resource)object);
-                        loadedSchemas.add(schemaOntology.getKey());
-                    }
-                }
-            }
-            
-            // load remaining schema ontologies from classpath resources
-            for(final Entry<URI, String> schemaOntology : schemaOntologyList)
-            {
-                if(!loadedSchemas.contains(schemaOntology.getKey()))
-                {
-                    this.log.info("loadSchemaOntology ... {} (from Classpath) ({})", schemaOntology.getKey(),
-                            repositoryConnection.size());
-                    // FIXME: load schema ontology
-                    // this.utils.loadInferAndStoreSchemaOntology(schemaOntology.getValue(),
-                    // RDFFormat.RDFXML.getDefaultMIMEType(), repositoryConnection);
-                }
-            }
-            
-            this.log.info("loadSchemaOntology ... completed ({})", repositoryConnection.size());
-            repositoryConnection.commit();
-        }
-        catch(final OpenRDFException e)
-        {
-            if(repositoryConnection != null)
-            {
-                repositoryConnection.rollback();
-            }
-            throw e;
-        }
-        finally
-        {
-            if(repositoryConnection != null)
-            {
-                try
-                {
-                    repositoryConnection.close();
-                }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Repository connection could not be closed", e);
-                }
-            }
-        }
     }
     
 }

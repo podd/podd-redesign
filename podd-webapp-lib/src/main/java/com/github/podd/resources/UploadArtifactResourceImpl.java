@@ -33,7 +33,9 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
+import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -90,16 +92,14 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         // - extract file from incoming Representation and load artifact to PODD
-        this.uploadFileAndLoadArtifactIntoPodd(entity);
+        InferredOWLOntologyID loadedArtifactID = this.uploadFileAndLoadArtifactIntoPodd(entity);
+
+        this.log.info("Successfully loaded artifact {}", loadedArtifactID);
         
         // TODO - create and write to a template informing success
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "index.html.ftl");
-        dataModel.put("pageTitle", "PODD Upload New Artifact Page (Index)");
-        
-        user.setFirstName("David");
-        user.setLastName("Admin");
-        dataModel.put("user", user);
+        dataModel.put("pageTitle", "PODD Upload New Artifact Page (Index)" + loadedArtifactID.toString());
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page
@@ -107,7 +107,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    public void uploadFileAndLoadArtifactIntoPodd(final Representation entity) throws ResourceException
+    public InferredOWLOntologyID uploadFileAndLoadArtifactIntoPodd(final Representation entity) throws ResourceException
     {
         List<FileItem> items;
         Path file = null;
@@ -191,21 +191,20 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
          * MediaType.valueOf(guessedMIMEType.toString());
          */
         final RDFFormat format = RDFFormat.RDFXML;
-        final PoddArtifactManager artifactManager = null;
-        
+        final PoddArtifactManager artifactManager = ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
         try
         {
-            // TODO - get PoddArtifactManager instance
             if(artifactManager != null)
             {
-                artifactManager.loadArtifact(inputStream, format);
+                return artifactManager.loadArtifact(inputStream, format);
             }
         }
         catch(OpenRDFException | PoddException | IOException | OWLException e)
         {
+            this.log.error("Failed to load artifact {}", e);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Error loading artifact to PODD", e);
         }
-        
+        return null;
     }
     
 }
