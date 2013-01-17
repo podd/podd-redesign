@@ -17,6 +17,8 @@ public interface PoddWebConstants
     public static final URI DEF_USER_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
             .createURI("urn:podd:default:usermanagementgraph:");
 
+    public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";
+
     
     public static final String COOKIE_NAME = "PODDAuthentication";
 
@@ -103,6 +105,11 @@ public interface PoddWebConstants
     public static final String URI_PODD_PLANT = "http://purl.org/podd/ns/poddPlant";
     public static final String URI_PODD_SCIENCE = "http://purl.org/podd/ns/poddScience";
     public static final String URI_PODD_BASE = "http://purl.org/podd/ns/poddBase";
+
+
+    public static final String PROPERTY_CHALLENGE_AUTH_METHOD = "podd.webservice.auth.challenge.method";
+
+
 
 
 

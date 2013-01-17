@@ -25,6 +25,7 @@ import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
 import com.github.ansell.restletutils.RestletUtilRoles;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
@@ -48,9 +49,9 @@ public class ApplicationUtils
         ChallengeAuthenticator result = null;
         
         //FIXME: read from a property
-        final String authMethod = "digest";
-//                PropertyUtil.getProperty(OasProperties.PROPERTY_CHALLENGE_AUTH_METHOD,
-//                        OasProperties.DEFAULT_CHALLENGE_AUTH_METHOD);
+        final String authMethod = 
+                PropertyUtil.get(PoddWebConstants.PROPERTY_CHALLENGE_AUTH_METHOD,
+                        PoddWebConstants.DEF_CHALLENGE_AUTH_METHOD);
         
         if(authMethod.equalsIgnoreCase("digest"))
         {
