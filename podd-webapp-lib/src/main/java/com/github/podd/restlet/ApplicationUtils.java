@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
@@ -210,7 +211,17 @@ public class ApplicationUtils
         roles.clear();
         roles.addAll(RestletUtilRoles.getRoles());
         
-        final Repository nextRepository = ApplicationUtils.getNewRepository();
+        
+        Repository nextRepository = null;
+        try
+        {
+            nextRepository = application.getPoddRepositoryManager().getRepository();
+        }
+        catch(final OpenRDFException e)
+        {
+            ApplicationUtils.log.error("Could not retrieve Repository from Application", e);
+            // Throw exception up ??
+        } 
         
         // FIXME: Stub implementation in memory, based on the example restlet MemoryRealm class,
         // need to create a realm implementation that backs onto a database for persistence
@@ -222,10 +233,6 @@ public class ApplicationUtils
         final RestletUtilSesameRealm nextRealm =
                 new RestletUtilSesameRealm(nextRepository,
                                 PoddWebConstants.DEF_USER_MANAGEMENT_GRAPH);
-        
-        PoddApiUtils apiUtils = new PoddApiUtils();
-        apiUtils.setRepository(nextRepository);
-        apiUtils.setUp();
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");

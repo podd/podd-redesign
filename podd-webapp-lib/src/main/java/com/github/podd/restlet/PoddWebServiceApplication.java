@@ -6,6 +6,10 @@ import org.restlet.Response;
 import org.restlet.security.ChallengeAuthenticator;
 
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
+import com.github.podd.impl.PoddArtifactManagerImpl;
+import com.github.podd.impl.PoddRepositoryManagerImpl;
+import com.github.podd.impl.PoddSchemaManagerImpl;
+import com.github.podd.impl.PoddSesameManagerImpl;
 
 import freemarker.template.Configuration;
 
@@ -15,7 +19,7 @@ import freemarker.template.Configuration;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
- * Copied from OAS project (https://github.com/ansell/oas)
+ *         Copied from OAS project (https://github.com/ansell/oas)
  */
 public abstract class PoddWebServiceApplication extends Application
 {
@@ -39,6 +43,14 @@ public abstract class PoddWebServiceApplication extends Application
      *         require authentication.
      */
     public abstract ChallengeAuthenticator getAuthenticator();
+    
+    public abstract PoddArtifactManagerImpl getPoddArtifactManager();
+    
+    public abstract PoddRepositoryManagerImpl getPoddRepositoryManager();
+    
+    public abstract PoddSchemaManagerImpl getPoddSchemaManager();
+    
+    public abstract PoddSesameManagerImpl getPoddSesameManager();
     
     /**
      * Gets the realm which is used to manage users and roles.
