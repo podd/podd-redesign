@@ -32,21 +32,21 @@
     <meta name="keywords" content="${keywords}" />
 
 
-    <script type="text/javascript" src="${baseUrl}/scripts/jquery-1.6.2.js"></script>
-    <script type="text/javascript" src="${baseUrl}/scripts/podd_main.js"></script>
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/podd_main.js"></script>
     <script type="text/javascript">
         // display an alert if the browser is IE6 or older
         displayBrowserAlert();
     </script>
 
-    <script type="text/javascript" src="${baseUrl}/scripts/jquery.json.js"></script>
-    <script type="text/javascript" src="${baseUrl}/scripts/jquery.rdfquery.rules-1.1-SNAPSHOT.js"></script>
-    <script type="text/javascript" src="${baseUrl}/scripts/oas-rdf.js"></script>
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdfquery.rules-1.1-SNAPSHOT.js"></script>
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/oas-rdf.js"></script>
     
-    <link rel="stylesheet" href="${baseUrl}/styles/podd.css" media="screen" type="text/css" />
-    <link rel="stylesheet" href="${baseUrl}/styles/podd-colours.css" media="screen" type="text/css" />
-    <link rel="icon" href="${baseUrl}/images/podd.ico" type="image/png" />
-    <link rel="shortcut icon" href="${baseUrl}/images/podd_ico.png" type="image/png" />
+    <link rel="stylesheet" href="${baseUrl}/resources/styles/podd.css" media="screen" type="text/css" />
+    <link rel="stylesheet" href="${baseUrl}/resources/styles/podd-colours.css" media="screen" type="text/css" />
+    <link rel="icon" href="${baseUrl}/resources/images/podd.ico" type="image/png" />
+    <link rel="shortcut icon" href="${baseUrl}/resources/images/podd_ico.png" type="image/png" />
 </head>
 
 <body>
@@ -93,13 +93,13 @@
         <ul id="user_list">
             <!-- user details -->
             <#if user??>
-                <li class="left_image float_right"><a href="${baseUrl}/j_spring_security_logout">Logout</a></li>
+                <li class="left_image float_right"><a href="${baseUrl}/logout">Logout</a></li>
                 <li class="left_image float_right"><a href="${baseUrl}/help">Help</a></li>
                 <li class="left_image float_right"><a href="${baseUrl}/supportDesk">Support</a></li>
                 <li class="left_image float_right"><a href="${baseUrl}/user/${user.userName!"unknown-username"}">Settings</a></li>
                 <li class="no_image float_right">${user.firstName!""} ${user.lastName!""}</li>
             <#else>
-                <li class="left_image float_right"><a href="${baseUrl}/login">Login</a></li>
+                <li class="left_image float_right"><a href="${baseUrl}/loginpage">Login</a></li>
                 <li class="left_image float_right"><a href="${baseUrl}/help">Help</a></li>
                 <li class="no_image float_right"><a href="${baseUrl}/about">Support</a></li>
             </#if>
@@ -126,8 +126,8 @@
 
     <a class="no_image float_right" href="${baseUrl}/about">About us</a>
 
-    <script type="text/javascript" src="${baseUrl}/scripts/jquery.metadata.js"></script>
-    <script type="text/javascript" src="${baseUrl}/scripts/jquery.inputlimiter.1.2.js"></script>
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.metadata.js"></script>
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.inputlimiter.1.2.js"></script>
 
 
     <div id="rdfadebug">
