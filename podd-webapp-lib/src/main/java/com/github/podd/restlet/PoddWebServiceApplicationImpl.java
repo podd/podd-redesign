@@ -16,6 +16,10 @@ import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
+import com.github.podd.resources.DeleteArtifactResourceImpl;
+import com.github.podd.resources.EditArtifactResourceImpl;
+import com.github.podd.resources.FileReferenceAttachResourceImpl;
+import com.github.podd.resources.GetArtifactResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
@@ -162,6 +166,33 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.info("attaching Upload Artifact service to path={}", uploadArtifact);
         router.attach(uploadArtifact, UploadArtifactResourceImpl.class);
 
+        // Add a route for the Get Artifact page.
+        final String getArtifactBase = PoddWebConstants.PATH_ARTIFACT_GET_BASE;
+        this.log.info("attaching Get Artifact (base) service to path={}", getArtifactBase);
+        router.attach(getArtifactBase, GetArtifactResourceImpl.class);
+
+        final String getArtifactInferred = PoddWebConstants.PATH_ARTIFACT_GET_INFERRED;
+        this.log.info("attaching Get Artifact (inferred) service to path={}", getArtifactInferred);
+        router.attach(getArtifactInferred, GetArtifactResourceImpl.class);
+        
+        // Add a route for the Edit Artifact page.
+        final String editArtifactMerge = PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE;
+        this.log.info("attaching Edit Artifact (merge) service to path={}", editArtifactMerge);
+        router.attach(editArtifactMerge, EditArtifactResourceImpl.class);
+        
+        final String editArtifactReplace = PoddWebConstants.PATH_ARTIFACT_EDIT_REPLACE;
+        this.log.info("attaching Edit Artifact (replace) service to path={}", editArtifactReplace);
+        router.attach(editArtifactReplace, EditArtifactResourceImpl.class);
+
+        // Add a route for the Delete Artifact page.
+        final String deleteArtifact = PoddWebConstants.PATH_ARTIFACT_DELETE;
+        this.log.info("attaching Delete Artifact service to path={}", deleteArtifact);
+        router.attach(deleteArtifact, DeleteArtifactResourceImpl.class);
+        
+        // Add a route for the Delete Artifact page.
+        final String attachFileReference = PoddWebConstants.PATH_ATTACH_FILE_REF;
+        this.log.info("attaching File Reference Attach service to path={}", attachFileReference);
+        router.attach(attachFileReference, FileReferenceAttachResourceImpl.class);
         
         // Add a route for Logout service
         // final String logout = "logout";

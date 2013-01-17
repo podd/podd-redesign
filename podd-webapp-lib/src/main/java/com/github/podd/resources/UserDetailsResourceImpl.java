@@ -44,7 +44,9 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("contentTemplate", "userDetails.html.ftl");
         dataModel.put("pageTitle", "PODD User Details Page");
         
+        //TODO: Username is firstName + Lastname, not the identifier 
         dataModel.put("authenticatedUsername", user.getIdentifier());
+        
         final Map<String, Object> tempUserMap = this.getUserInfoInternal();
         
         dataModel.put("requestedUser", tempUserMap);
