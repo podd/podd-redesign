@@ -12,6 +12,7 @@ import org.restlet.security.ChallengeAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.resources.AboutResourceImpl;
@@ -209,7 +210,10 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // to OasWebServiceApplication.authenticate
         authenticator.setNext(router);
         
-        return authenticator;
+        CrossOriginResourceSharingFilter corsFilter = new CrossOriginResourceSharingFilter();
+        corsFilter.setNext(authenticator);
+        
+        return corsFilter;
     }
     
     /**
