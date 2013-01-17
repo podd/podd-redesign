@@ -27,7 +27,12 @@ public interface PoddWebConstants
      * Freemarker template used as the base for rendering all HTML pages 
      */
     public static final String PROPERTY_TEMPLATE_BASE = "poddBase.html.ftl";
-    
+
+    /**
+     * Path to locate resources
+     */
+    public static final String PATH_RESOURCES = "/resources/";
+
     /**
      * Path to login page
      */
@@ -36,15 +41,18 @@ public interface PoddWebConstants
     /**
      * Path to submit login details
      */
-    public static final String PATH_LOGIN_SUBMIT = "/login";
+    public static final String PATH_LOGIN_SUBMIT = "login";
     
     /**
      * Path to logout from PODD
      */
-    public static final String PATH_LOGOUT = "/logout";
+    public static final String PATH_LOGOUT = "logout";
     
     
-    public static final String PATH_REDIRECT_LOGGED_IN = "/index";
+    /**
+     * Path to redirect user on successful login 
+     */
+    public static final String PATH_REDIRECT_LOGGED_IN = "index";
     
     /**
      * Path to "about" page
@@ -108,13 +116,6 @@ public interface PoddWebConstants
 
 
     public static final String PROPERTY_CHALLENGE_AUTH_METHOD = "podd.webservice.auth.challenge.method";
-
-
-
-
-
-
-
 
 
 

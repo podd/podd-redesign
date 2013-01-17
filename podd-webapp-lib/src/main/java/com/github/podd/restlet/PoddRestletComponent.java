@@ -15,6 +15,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.github.ansell.restletutils.ClassLoaderDirectory;
 import com.github.ansell.restletutils.CompositeClassLoader;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Restlet Component used by the PODD web application.
@@ -105,7 +106,7 @@ public class PoddRestletComponent extends Component
         
         directory.setListingAllowed(true);
         
-        final String resourcesPath = "/resources/";
+        final String resourcesPath = PoddWebConstants.PATH_RESOURCES;
         
         this.log.info("attaching resource handler to path={}", resourcesPath);
         
