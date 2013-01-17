@@ -10,6 +10,6 @@
     <p>Welcome, ${user.firstName!""}  ${user.lastName!""}.</p>
     <p>Places to go to: <a href="${baseUrl}/user/${user.userName!"unknown-username"}">User page</a></p>
 <#else>
-    <p>Welcome to PODD, please <a href="${baseUrl}/login">login</a>.</p>
+    <p>Welcome to PODD, please <a href="${baseUrl}/loginpage">login</a>.</p>
 </#if>
 </div>  <!-- content pane -->

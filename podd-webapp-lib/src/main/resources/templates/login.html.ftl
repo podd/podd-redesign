@@ -38,7 +38,7 @@
 				    <div class="fieldset" id="login" style="width: 340px; height: 180px; text-align: center">
 						<div class="legend" style="text-align: left">Login with AAF username and password</div>
 						<br />
-						<a href="${baseUrl}/aaf" style="outline: 0"><img id="AAFLOGINLOGO"  src="${baseUrl}/images/AAF.png" align="middle" style="vertical-align: middle; border-style: solid; border-width: 1px"></a>
+						<a href="${baseUrl}/aaf" style="outline: 0"><img id="AAFLOGINLOGO"  src="${baseUrl}/resources/images/AAF.png" align="middle" style="vertical-align: middle; border-style: solid; border-width: 1px"></a>
 				  	</div>
 			  	</form>
 			</td>
