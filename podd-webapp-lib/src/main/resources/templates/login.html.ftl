@@ -45,7 +45,7 @@
 			<td>
 			</td>
 			<td style="width: 400px">
-			    <form name="f" action="${baseUrl}/submitlogininfo" method="POST">
+			    <form name="f" action="${baseUrl}/login" method="POST">
 				    <div class="fieldset" id="login" style="width: 327px; height: 180px; text-align: centre">
 						<div class="legend">Login with PODD username and password</div>
 						<ol> 
