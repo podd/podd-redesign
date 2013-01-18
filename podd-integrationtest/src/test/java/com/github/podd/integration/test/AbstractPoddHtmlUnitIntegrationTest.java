@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Abstracts the WebTester setup and tear down actions from test implementations so they will always
@@ -109,7 +110,7 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
         try
         {
             // Reset using the maven build configured reset key from oas.properties
-            this.getWebTester().gotoPage("/reset/" + PropertyUtil.get("oas.test.website.reset.key", ""));
+            this.getWebTester().gotoPage("/reset" + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, ""));
         }
         catch(final Exception ex)
         {

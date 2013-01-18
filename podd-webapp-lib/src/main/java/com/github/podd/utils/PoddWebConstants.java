@@ -104,6 +104,11 @@ public interface PoddWebConstants
      */
     public static final String PATH_ATTACH_FILE_REF = "attachref";
     
+    /**
+     * Path prefix of the reset service
+     */
+    public static final String PATH_RESET_PREFIX = "reset";
+    
     
     
     public static final String PATH_PODD_PLANT = "/ontologies/poddPlant.owl";
@@ -116,6 +121,7 @@ public interface PoddWebConstants
 
 
     public static final String PROPERTY_CHALLENGE_AUTH_METHOD = "podd.webservice.auth.challenge.method";
+    public static final String PROPERTY_TEST_WEBSERVICE_RESET_KEY = "podd.webservice.reset.key";
 
 
 

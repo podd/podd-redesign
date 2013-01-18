@@ -22,6 +22,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
@@ -51,6 +52,7 @@ import com.github.podd.resources.EditArtifactResourceImpl;
 import com.github.podd.resources.FileReferenceAttachResourceImpl;
 import com.github.podd.resources.GetArtifactResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
+import com.github.podd.resources.TestResetResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
 import com.github.podd.utils.PoddWebConstants;
@@ -180,14 +182,17 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final Router router = new Router(this.getContext());
         
         // Add a route for Login form. Login service is handled by the authenticator
-        final String login = PoddWebConstants.PATH_LOGIN_FORM;
-        // PropertyUtil.getProperty(PropertyUtils.PROPERTY_LOGIN_FORM_PATH,
-        // PoddPropertyUtils.DEFAULT_LOGIN_FORM_PATH);
-        this.log.info("attaching login service to path={}", login);
-        
         // NOTE: This only displays the login form. All HTTP POST requests to the login path should
         // be handled by the Authenticator
+        final String login = PoddWebConstants.PATH_LOGIN_FORM;
+        this.log.info("attaching login service to path={}", login);
         router.attach(login, CookieLoginResourceImpl.class);
+        
+        // Add a route for the reset service.
+        final String resetPath = PoddWebConstants.PATH_RESET_PREFIX 
+                + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
+        this.log.info("attaching reset service to path={}", resetPath);
+        router.attach(resetPath, TestResetResourceImpl.class);
         
         // Add a route for the About page.
         final String about = PoddWebConstants.PATH_ABOUT;
