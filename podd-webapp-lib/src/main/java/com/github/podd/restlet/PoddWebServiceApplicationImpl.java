@@ -1,21 +1,12 @@
 package com.github.podd.restlet;
 
 import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -34,7 +25,11 @@ import org.slf4j.LoggerFactory;
 import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
+import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
+import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlManager;
@@ -58,7 +53,6 @@ import com.github.podd.resources.GetArtifactResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.template.Configuration;
@@ -88,10 +82,9 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     
     private Repository nextRepository;
     
-    private PoddRepositoryManagerImpl poddRepositoryManager;
-    private PoddSchemaManagerImpl poddSchemaManager;
-    private PoddSesameManagerImpl poddSesameManager;
-    private PoddArtifactManagerImpl poddArtifactManager;
+    private PoddRepositoryManager poddRepositoryManager;
+    private PoddSchemaManager poddSchemaManager;
+    private PoddArtifactManager poddArtifactManager;
     
     /**
      * Default Constructor.
@@ -282,27 +275,21 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public PoddArtifactManagerImpl getPoddArtifactManager()
+    public PoddArtifactManager getPoddArtifactManager()
     {
         return this.poddArtifactManager;
     }
     
     @Override
-    public PoddRepositoryManagerImpl getPoddRepositoryManager()
+    public PoddRepositoryManager getPoddRepositoryManager()
     {
         return this.poddRepositoryManager;
     }
     
     @Override
-    public PoddSchemaManagerImpl getPoddSchemaManager()
+    public PoddSchemaManager getPoddSchemaManager()
     {
         return this.poddSchemaManager;
-    }
-    
-    @Override
-    public PoddSesameManagerImpl getPoddSesameManager()
-    {
-        return this.poddSesameManager;
     }
     
     @Override
@@ -384,7 +371,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.poddSchemaManager.setOwlManager(nextOWLManager);
         this.poddSchemaManager.setRepositoryManager(this.poddRepositoryManager);
         
-        this.poddSesameManager = new PoddSesameManagerImpl();
+        final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
         
         this.poddArtifactManager = new PoddArtifactManagerImpl();
         this.poddArtifactManager.setRepositoryManager(this.poddRepositoryManager);
@@ -392,7 +379,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.poddArtifactManager.setPurlManager(nextPurlManager);
         this.poddArtifactManager.setOwlManager(nextOWLManager);
         this.poddArtifactManager.setSchemaManager(this.poddSchemaManager);
-        this.poddArtifactManager.setSesameManager(this.poddSesameManager);
+        this.poddArtifactManager.setSesameManager(poddSesameManager);
         
         /*
          * Since the schema ontology upload feature is not yet supported, necessary schemas

@@ -6,6 +6,9 @@ import org.restlet.Response;
 import org.restlet.security.ChallengeAuthenticator;
 
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
+import com.github.podd.api.PoddArtifactManager;
+import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.impl.PoddArtifactManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
@@ -44,13 +47,11 @@ public abstract class PoddWebServiceApplication extends Application
      */
     public abstract ChallengeAuthenticator getAuthenticator();
     
-    public abstract PoddArtifactManagerImpl getPoddArtifactManager();
+    public abstract PoddArtifactManager getPoddArtifactManager();
     
-    public abstract PoddRepositoryManagerImpl getPoddRepositoryManager();
+    public abstract PoddRepositoryManager getPoddRepositoryManager();
     
-    public abstract PoddSchemaManagerImpl getPoddSchemaManager();
-    
-    public abstract PoddSesameManagerImpl getPoddSesameManager();
+    public abstract PoddSchemaManager getPoddSchemaManager();
     
     /**
      * Gets the realm which is used to manage users and roles.
