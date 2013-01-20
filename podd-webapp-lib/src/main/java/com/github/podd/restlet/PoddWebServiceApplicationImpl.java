@@ -97,6 +97,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     {
         super();
         
+        System.out.println("==============================");
+        System.out.println("PODD Web Application");
+        System.out.println("starting...");
+        System.out.println("==============================");
+        this.log.info("== Starting PODD Web Application ==");
+        
         // List of protocols required by the application
         this.getConnectorService().getClientProtocols().add(Protocol.HTTP);
         this.getConnectorService().getClientProtocols().add(Protocol.CLAP);
@@ -184,9 +190,9 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // Add a route for Login form. Login service is handled by the authenticator
         // NOTE: This only displays the login form. All HTTP POST requests to the login path should
         // be handled by the Authenticator
-        final String login = PoddWebConstants.PATH_LOGIN_FORM;
-        this.log.info("attaching login service to path={}", login);
-        router.attach(login, CookieLoginResourceImpl.class);
+        final String loginFormPath = PoddWebConstants.PATH_LOGIN_FORM;
+        this.log.info("attaching login service to path={}", loginFormPath);
+        router.attach(loginFormPath, CookieLoginResourceImpl.class);
         
         // Add a route for the reset service.
         final String resetPath = PoddWebConstants.PATH_RESET_PREFIX 
@@ -195,24 +201,24 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(resetPath, TestResetResourceImpl.class);
         
         // Add a route for the About page.
-        final String about = PoddWebConstants.PATH_ABOUT;
-        this.log.info("attaching about service to path={}", about);
-        router.attach(about, AboutResourceImpl.class);
+        final String aboutPagePath = PoddWebConstants.PATH_ABOUT;
+        this.log.info("attaching about service to path={}", aboutPagePath);
+        router.attach(aboutPagePath, AboutResourceImpl.class);
         
         // Add a route for the Index page.
-        final String index = PoddWebConstants.PATH_INDEX;
-        this.log.info("attaching index service to path={}", index);
-        router.attach(index, IndexResourceImpl.class);
+        final String indexPagePath = PoddWebConstants.PATH_INDEX;
+        this.log.info("attaching index service to path={}", indexPagePath);
+        router.attach(indexPagePath, IndexResourceImpl.class);
         
         // Add a route for the User Details page.
-        final String userDetails = PoddWebConstants.PATH_USER_DETAILS;
-        this.log.info("attaching user details service to path={}", userDetails);
-        router.attach(userDetails, UserDetailsResourceImpl.class);
+        final String userDetailsPath = PoddWebConstants.PATH_USER_DETAILS;
+        this.log.info("attaching user details service to path={}", userDetailsPath);
+        router.attach(userDetailsPath, UserDetailsResourceImpl.class);
         
         // Add a route for the Upload Artifact page.
-        final String uploadArtifact = PoddWebConstants.PATH_ARTIFACT_UPLOAD;
-        this.log.info("attaching Upload Artifact service to path={}", uploadArtifact);
-        router.attach(uploadArtifact, UploadArtifactResourceImpl.class);
+        final String uploadArtifactPath = PoddWebConstants.PATH_ARTIFACT_UPLOAD;
+        this.log.info("attaching Upload Artifact service to path={}", uploadArtifactPath);
+        router.attach(uploadArtifactPath, UploadArtifactResourceImpl.class);
         
         // Add a route for the Get Artifact page.
         final String getArtifactBase = PoddWebConstants.PATH_ARTIFACT_GET_BASE;
@@ -254,8 +260,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         
         // put the authenticator in front of the resource router so it can handle challenge
         // responses and forward them on to the right location after locking in the authentication
-        // data Authentication of individual methods on individual resources is handled using calls
-        // to OasWebServiceApplication.authenticate
+        // data. Authentication of individual methods on individual resources is handled using calls
+        // to PoddWebServiceApplication.authenticate()
         authenticator.setNext(router);
         
         final CrossOriginResourceSharingFilter corsFilter = new CrossOriginResourceSharingFilter();
@@ -423,6 +429,15 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             }
         }
         this.nextRepository = null;
+    }
+    
+    @Override
+    public void stop() throws Exception 
+    {
+        super.stop();
+        this.cleanUpResources();
+        this.log.info("== Shutting down PODD Web Application ==");
+        System.out.println("===== Shutting down PODD =====");
     }
     
 }
