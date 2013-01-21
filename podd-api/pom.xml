@@ -65,6 +65,10 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.ansell.restlet-utils</groupId>
+            <artifactId>restlet-utils</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

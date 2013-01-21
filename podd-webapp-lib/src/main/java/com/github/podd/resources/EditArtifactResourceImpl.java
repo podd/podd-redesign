@@ -36,7 +36,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation editArtifactPageHtml(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ROLE_EDIT);
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
         this.log.info("editArtifactHtml");
         final User user = this.getRequest().getClientInfo().getUser();

@@ -5,48 +5,129 @@ package com.github.podd.utils;
 
 import org.openrdf.model.URI;
 
+import com.github.ansell.restletutils.RestletUtilUser;
+
 /**
- * This interface represents a PODD User.
+ * This class represents a PODD user.
  * 
- * An email address is used as the "login name" for a user and needs to be unique. The URI is also a
- * unique identifier of a user.
+ * In PODD, the unique "identifier" of a user is also the email address.  
+ * The URI is also a unique identifier of a user.
+ * 
+ * Equality between two users is computed in {@link RestletUtilUser} using
+ * only the email, identifier, firstName and lastName fields.
  * 
  * @author kutila
- * 
  */
-public interface PoddUser
+public class PoddUser extends RestletUtilUser
 {
+    /** 
+     * The ORCID (see {@link http://orcid.org}) identifier of the user. 
+     */
+    private volatile String orcid;
     
-    public abstract String getEmail();
+    /** The organization */
+    private volatile String organization;
     
-    public abstract String getFirstName();
+    /** The status of this user */
+    private volatile PoddUserStatus userStatus;
     
-    public abstract String getLastName();
+    /** The unique URI for this user */
+    private volatile URI uri;
     
-    public abstract String getOrcid();
+    /**
+     * Constructor.
+     * 
+     * @param identifier
+     *            The identifier (login).
+     * @param secret
+     *            The identification secret.
+     * @param firstName
+     *            The first name.
+     * @param lastName
+     *            The last name.
+     * @param email
+     *            The email.
+     * @param userStatus
+     *            The user status.
+     */
+    public PoddUser(final String identifier, final char[] secret, final String firstName, final String lastName,
+            final String email, final PoddUserStatus userStatus)
+    {
+        super(identifier, secret, firstName, lastName, email);
+        this.userStatus = userStatus;
+    }
     
-    public abstract String getOrganization();
+    /**
+     * Constructor.
+     * 
+     * @param identifier
+     *            The identifier (login).
+     * @param secret
+     *            The identification secret.
+     * @param firstName
+     *            The first name.
+     * @param lastName
+     *            The last name.
+     * @param email
+     *            The email.
+     * @param userStatus
+     *            The user status.
+     * @param uri
+     *            The URI of the user.
+     * @param organization
+     *            The organization.
+     * @param orcid
+     *            The ORCID identifier.
+     */
+    public PoddUser(final String identifier, final char[] secret, final String firstName, final String lastName,
+            final String email, final PoddUserStatus userStatus, final URI uri, final String organization, final String orcid)
+    {
+        super(identifier, secret, firstName, lastName, email);
+        this.userStatus = userStatus;
+        this.uri = uri;
+        this.organization = organization;
+        this.orcid = orcid;
+    }
     
-    public abstract char[] getSecret();
     
-    public abstract PoddUserStatus getStatus();
+    public String getOrcid()
+    {
+        return orcid;
+    }
     
-    public abstract URI getUri();
+    public String getOrganization()
+    {
+        return organization;
+    }
     
-    public abstract void setEmail(String email);
+    public PoddUserStatus getUserStatus()
+    {
+        return userStatus;
+    }
     
-    public abstract void setFirstName(String firstName);
+    public URI getUri()
+    {
+        return uri;
+    }
     
-    public abstract void setLastName(String lastName);
+    public void setOrcid(String orcid)
+    {
+        this.orcid = orcid;
+    }
     
-    public abstract void setOrcid(String orcid);
+    public void setOrganization(String organization)
+    {
+        this.organization = organization;
+    }
     
-    public abstract void setOrganization(String organization);
+    public void setUserStatus(PoddUserStatus userStatus)
+    {
+        this.userStatus = userStatus;
+    }
     
-    public abstract void setSecret(char[] secret);
-    
-    public abstract void setStatus(PoddUserStatus status);
-    
-    public abstract void setUri(URI uri);
+    public void setUri(URI uri)
+    {
+        this.uri = uri;
+    }
     
 }

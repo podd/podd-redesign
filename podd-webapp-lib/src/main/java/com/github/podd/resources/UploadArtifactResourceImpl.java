@@ -78,7 +78,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation getUploadArtifactPage(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ROLE_EDIT);
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
         this.log.info("getArtifactFile");
         
@@ -98,7 +98,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     @Post
     public Representation uploadArtifactFile(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ROLE_EDIT);
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
         this.log.info("postArtifactFile");
         

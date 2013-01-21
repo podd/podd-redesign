@@ -3,13 +3,13 @@
  */
 package com.github.podd.restlet;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.restlet.security.Role;
-
-import com.github.ansell.restletutils.RestletUtilRoles;
 
 /**
  * Provides constants to use in the authentication interface, including whether authentication is
@@ -23,13 +23,62 @@ import com.github.ansell.restletutils.RestletUtilRoles;
 public enum PoddAction
 {
     /**
-     * An action by an administrator asking to edit the roles for a user.
+     * An action by a user asking to create a new artifact, or update an existing artifact.
      * 
-     * By default only admin users are allowed to edit the roles for users.
+     * By default superuser, project admin and project editor users are allowed to create/update artifacts.
      */
-    ROLE_EDIT("true", "Action Failed: error message should come here", Collections.singleton(RestletUtilRoles.ADMIN
-            .getRole())),
+    ARTIFACT_CREATE("true", "Could not create/edit artifact.", 
+            new HashSet<Role>(Arrays.asList(PoddRoles.SUPERUSER.getRole(), PoddRoles.PROJECT_EDITOR.getRole()
+                    , PoddRoles.PROJECT_ADMIN.getRole()))),
     
+    /**
+     * An action by a user asking to delete an artifact.
+     * 
+     * By default superuser, project admin and project editor users are allowed to delete artifacts.
+     */
+    ARTIFACT_DELETE("true", "Could not delete artifact",
+            new HashSet<Role>(Arrays.asList(PoddRoles.SUPERUSER.getRole(), PoddRoles.PROJECT_EDITOR.getRole()
+                    , PoddRoles.PROJECT_ADMIN.getRole()))),
+    
+    /**
+     * An action by a user asking to read an artifact.
+     * 
+     * By default all unauthenticated users are allowed to read artifacts.
+     */
+    ARTIFACT_READ("false", "Failed to read artifact", Collections.<Role> emptySet()),
+    
+    /**
+     * An action by a user asking to publish an artifact.
+     * 
+     * By default only the superuser and project admins are allowed to publish projects.
+     */
+    ARTIFACT_PUBLISH("true", "Could not publish artifact",
+            new HashSet<Role>(Arrays.asList(PoddRoles.SUPERUSER.getRole(), PoddRoles.PROJECT_ADMIN.getRole()))),
+            
+    /**
+     * An action by an administrator asking to create a new user, or update an existing user.
+     * 
+     * By default only the superuser is allowed to create new users.
+     */
+    USER_CREATE("true", "Could not create/update user.", 
+            Collections.singleton(PoddRoles.SUPERUSER.getRole())),
+    
+    /**
+     * An action by an administrator asking to delete an existing user.
+     * 
+     * By default only admin users are allowed to delete existing users.
+     */
+    USER_DELETE("true", "Could not delete user", Collections.singleton(PoddRoles.SUPERUSER.getRole())),
+    
+    /**
+     * An action by a user asking to fetch a user
+     * 
+     * By default all authenticated users can request user details, although if they are not
+     * admins, they will not be able to see information about other users.
+     */
+    USER_READ("true", "Could not retrieve user details", 
+            new HashSet<Role>(Arrays.asList(
+            PoddRoles.SUPERUSER.getRole(), PoddRoles.PROJECT_READER.getRole()))),
     ;
     
     private final boolean authRequired;

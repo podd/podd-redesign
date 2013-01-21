@@ -66,7 +66,7 @@ public final class RestletUtils
         dataModel.put("clientInfo", nextClientInfo);
         dataModel.put("isAuthenticated", nextClientInfo.isAuthenticated());
         final List<Role> roles = nextClientInfo.getRoles();
-        final boolean isAdmin = roles.contains(RestletUtilRoles.ADMIN.getRole());
+        final boolean isAdmin = roles.contains(PoddRoles.SUPERUSER.getRole());
         dataModel.put("isAdmin", isAdmin);
         dataModel.put("user", nextClientInfo.getUser());
         

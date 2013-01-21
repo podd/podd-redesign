@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
-import com.github.ansell.restletutils.RestletUtilRoles;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.podd.utils.PoddWebConstants;
@@ -209,7 +208,7 @@ public class ApplicationUtils
         
         final List<Role> roles = application.getRoles();
         roles.clear();
-        roles.addAll(RestletUtilRoles.getRoles());
+        roles.addAll(PoddRoles.getRoles());
         
         
         Repository nextRepository = null;
@@ -240,13 +239,13 @@ public class ApplicationUtils
         final RestletUtilUser testUser =
                 new RestletUtilUser("testUser", "testPassword", "Test", "User", "test.user@example.com");
         final URI testUserUri = nextRealm.addUser(testUser);
-        nextRealm.map(testUser, RestletUtilRoles.AUTHENTICATED.getRole());
+        nextRealm.map(testUser, PoddRoles.PROJECT_ADMIN.getRole());
         
         final RestletUtilUser testAdminUser =
                 new RestletUtilUser("testAdminUser", "testAdminPassword", "Test Admin", "User",
                         "test.admin.user@example.com");
         final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
-        nextRealm.map(testAdminUser, RestletUtilRoles.ADMIN.getRole());
+        nextRealm.map(testAdminUser, PoddRoles.SUPERUSER.getRole());
         
         final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);
         
