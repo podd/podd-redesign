@@ -21,17 +21,14 @@ import com.github.ansell.restletutils.RestletUtilRole;
  */
 public enum PoddRoles implements RestletUtilRole
 {
-    SUPERUSER("Super User", "An administrator (super user) of the Podd System",
-            "http://purl.org/podd/roles/superuser"),
-    
-    PROJECT_ADMIN("Project Administrator", "An administrator of a PODD project",
-            "http://purl.org/podd/roles/project_admin"),
+    ADMIN("Administrator", "An administrator of the PODD System",
+            "http://purl.org/podd/oas/roles/administrator"),
 
-    PROJECT_EDITOR("Project Editor", "A PODD user who can edit projects",
-            "http://purl.org/podd/roles/project_editor"),
-    
-    PROJECT_READER("Project Reader", "A PODD user who can only read projects",
-            "http://purl.org/podd/roles/project_reader");
+    AUTHENTICATED("Authenticated User", "A user of the PODD System",
+            "http://purl.org/podd/oas/roles/authenticated"),
+
+    PROJECT_OBSERVER("Project observer", "A user who can only view projects", 
+            "http://purl.org/podd/oas/roles/project_observer"), ;
     
     public static RestletUtilRole getRoleByName(final String name)
     {

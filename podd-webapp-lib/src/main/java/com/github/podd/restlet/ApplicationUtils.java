@@ -28,7 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
-import com.github.ansell.restletutils.RestletUtilSesameRealm;
+import com.github.ansell.restletutils.RestletUtilRoles;
+//import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -229,8 +230,8 @@ public class ApplicationUtils
         // last name, and email address as necessary
         // FIXME: Restlet MemoryRealm creates a DefaultVerifier class that is not compatible with
         // DigestAuthenticator.setWrappedVerifier
-        final RestletUtilSesameRealm nextRealm =
-                new RestletUtilSesameRealm(nextRepository,
+        final PoddRestletUtilSesameRealm nextRealm =
+                new PoddRestletUtilSesameRealm(nextRepository,
                                 PoddWebConstants.DEF_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
@@ -239,17 +240,18 @@ public class ApplicationUtils
         final RestletUtilUser testUser =
                 new RestletUtilUser("testUser", "testPassword", "Test", "User", "test.user@example.com");
         final URI testUserUri = nextRealm.addUser(testUser);
-        nextRealm.map(testUser, PoddRoles.PROJECT_ADMIN.getRole());
+        nextRealm.map(testUser, PoddRoles.AUTHENTICATED.getRole());
+        
         
         final RestletUtilUser testAdminUser =
                 new RestletUtilUser("testAdminUser", "testAdminPassword", "Test Admin", "User",
                         "test.admin.user@example.com");
         final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
-        nextRealm.map(testAdminUser, PoddRoles.SUPERUSER.getRole());
+        nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
         
         final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);
         
-        ApplicationUtils.log.info("testAdminUserRoles: {}", testAdminUserRoles);
+        ApplicationUtils.log.info("testAdminUserRoles: {}, {}", testAdminUserRoles, testAdminUserRoles.size());
         
         final User findUser = nextRealm.findUser("testAdminUser");
         

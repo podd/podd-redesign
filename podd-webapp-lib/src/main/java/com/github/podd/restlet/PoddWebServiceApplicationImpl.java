@@ -15,6 +15,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
 import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
+import org.restlet.security.Realm;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
@@ -80,7 +81,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
      */
     private volatile Configuration freemarkerConfiguration;
     private volatile ChallengeAuthenticator auth;
-    private volatile RestletUtilSesameRealm realm;
+    private volatile Realm realm;
     
     private Repository nextRepository;
     
@@ -304,7 +305,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public RestletUtilSesameRealm getRealm()
+    public Realm getRealm()
     {
         return this.realm;
     }
@@ -332,7 +333,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public void setRealm(final RestletUtilSesameRealm nextRealm)
+    public void setRealm(final Realm nextRealm)
     {
         this.realm = nextRealm;
     }

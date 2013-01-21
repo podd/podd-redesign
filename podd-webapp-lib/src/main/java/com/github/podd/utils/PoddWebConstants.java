@@ -17,6 +17,13 @@ public interface PoddWebConstants
     public static final URI DEF_USER_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
             .createURI("urn:podd:default:usermanagementgraph:");
 
+    public static final URI SCOPE_ARTIFACT = PoddRdfConstants.VALUE_FACTORY
+            .createURI("http://purl.org/podd/poddBase#PoddArtifact"); 
+            
+    public static final URI SCOPE_REPOSITORY = PoddRdfConstants.VALUE_FACTORY
+            .createURI("http://purl.org/podd/poddBase#PoddRepository"); 
+
+    
     public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";
 
     

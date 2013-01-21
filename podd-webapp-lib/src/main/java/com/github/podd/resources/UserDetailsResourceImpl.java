@@ -33,7 +33,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation getUserDetailsPageHtml(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
+        this.checkAuthentication(PoddAction.USER_READ);
         
         this.log.info("getUserDetailsHtml");
         final User user = this.getRequest().getClientInfo().getUser();
