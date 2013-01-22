@@ -5,7 +5,6 @@ package com.github.podd.restlet;
 
 import java.util.Set;
 
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
 import org.openrdf.repository.Repository;
@@ -22,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
-import com.github.ansell.restletutils.RestletUtilRoles;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.utils.PoddUser;

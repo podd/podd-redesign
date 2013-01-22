@@ -78,9 +78,11 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation getUploadArtifactPage(final Representation entity) throws ResourceException
     {
+        //even though this only does a page READ, we're checking authorization for CREATE since the page
+        //is for creating a new artifact via a file upload
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
-        this.log.info("getArtifactFile");
+        this.log.info("@Get UploadArtifactFile Page");
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "artifact_upload.html.ftl");
@@ -100,7 +102,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     {
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
-        this.log.info("postArtifactFile");
+        this.log.info("@Post UploadArtifactFile Page");
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
