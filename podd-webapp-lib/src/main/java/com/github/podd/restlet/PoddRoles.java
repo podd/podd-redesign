@@ -17,18 +17,27 @@ import com.github.ansell.restletutils.RestletUtilRole;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
- * Copied from http://github.com/ansell/restlet-utils
+ *         Copied from http://github.com/ansell/restlet-utils
  */
 public enum PoddRoles implements RestletUtilRole
 {
-    ADMIN("Administrator", "An administrator of the PODD System",
+    ADMIN("Administrator", "A repository administrator of the PODD System",
             "http://purl.org/podd/oas/roles/administrator"),
+    
+    AUTHENTICATED("Authenticated User", "A user of the PODD System", "http://purl.org/podd/oas/roles/authenticated"),
+    
+    PROJECT_MEMBER("Project member", "A user who is a member of a particular project",
+            "http://purl.org/podd/oas/roles/project_member"),
+    
+    PROJECT_OBSERVER("Project observer", "A user who is an observer of a particular project",
+            "http://purl.org/podd/oas/roles/project_member"),
+    
+    PROJECT_ADMIN("Project Administrator", "A user who is an administrator of a particular project",
+            "http://purl.org/podd/oas/roles/project_administrator"),
 
-    AUTHENTICATED("Authenticated User", "A user of the PODD System",
-            "http://purl.org/podd/oas/roles/authenticated"),
-
-    PROJECT_OBSERVER("Project observer", "A user who can only view projects", 
-            "http://purl.org/podd/oas/roles/project_observer"), ;
+    ROLE_A("Role A", "A generic role", "http://purl.org/podd/oas/roles/role_a"),
+    
+    ;
     
     public static RestletUtilRole getRoleByName(final String name)
     {
