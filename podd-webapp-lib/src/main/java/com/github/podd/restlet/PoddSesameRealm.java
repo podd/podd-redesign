@@ -5,6 +5,7 @@ package com.github.podd.restlet;
 
 import java.util.Set;
 
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
 import org.openrdf.repository.Repository;
@@ -20,6 +21,8 @@ import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.restletutils.RestletUtilRole;
+import com.github.ansell.restletutils.RestletUtilRoles;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.utils.PoddUser;
@@ -257,5 +260,30 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
                         PoddUserStatus.ACTIVE);
         return result;
     }
+    
+    /**
+     * @param role
+     * @return
+     */
+    @Override
+    protected RestletUtilRole getRoleByName(final String name)
+    {
+        final RestletUtilRole oasRole = PoddRoles.getRoleByName(name);
+        return oasRole;
+    }
+    
+    /**
+     * @param nextRoleMappingStatement
+     * @return
+     */
+    @Override
+    protected RestletUtilRole getRoleByUri(final URI uri)
+    {
+        final RestletUtilRole nextStandardRole =
+                PoddRoles.getRoleByUri(uri);
+        return nextStandardRole;
+    }
+    
+    
 }
 

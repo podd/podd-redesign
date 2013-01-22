@@ -247,6 +247,7 @@ public class ApplicationUtils
                         "test.admin.user@example.com", PoddUserStatus.ACTIVE);
         final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
         nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
+        nextRealm.map(testAdminUser, PoddRoles.PROJECT_ADMIN.getRole());
         
         final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);
         

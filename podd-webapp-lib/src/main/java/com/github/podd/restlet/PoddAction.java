@@ -34,8 +34,10 @@ public enum PoddAction
             true, 
             "Could not create/edit artifact.", 
             new HashSet<Role>(Arrays.asList(
+                    PoddRoles.ADMIN.getRole(),
                     PoddRoles.AUTHENTICATED.getRole(),
-                    PoddRoles.ADMIN.getRole())), 
+                    PoddRoles.PROJECT_ADMIN.getRole()
+                    )), 
             new HashSet<URI>(Arrays.asList(PoddWebConstants.SCOPE_ARTIFACT))
             ),
     

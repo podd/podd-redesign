@@ -83,6 +83,13 @@ public enum PoddRoles implements RestletUtilRole
     
     private URI uri;
     
+    /**
+     * Constructor
+     * 
+     * @param roleName
+     * @param description
+     * @param uriString
+     */
     PoddRoles(final String roleName, final String description, final String uriString)
     {
         this.role = new Role(roleName, description);
