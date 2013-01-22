@@ -4,16 +4,11 @@ import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.security.ChallengeAuthenticator;
-import org.restlet.security.Realm;
 
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
-import com.github.podd.impl.PoddArtifactManagerImpl;
-import com.github.podd.impl.PoddRepositoryManagerImpl;
-import com.github.podd.impl.PoddSchemaManagerImpl;
-import com.github.podd.impl.PoddSesameManagerImpl;
 
 import freemarker.template.Configuration;
 
@@ -59,7 +54,7 @@ public abstract class PoddWebServiceApplication extends Application
      * 
      * @return
      */
-    public abstract Realm getRealm();
+    public abstract RestletUtilSesameRealm getRealm();
     
     /**
      * Returns the FreeMarker template configuration object for this application.
@@ -81,7 +76,7 @@ public abstract class PoddWebServiceApplication extends Application
      * 
      * @param nextRealm
      */
-    public abstract void setRealm(Realm nextRealm);
+    public abstract void setRealm(RestletUtilSesameRealm nextRealm);
     
     /**
      * Set a new Freemarker Template Configuration for this application.
