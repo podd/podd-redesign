@@ -23,6 +23,11 @@ public interface PoddWebConstants
     public static final URI SCOPE_REPOSITORY = PoddRdfConstants.VALUE_FACTORY
             .createURI("http://purl.org/podd/poddBase#PoddRepository"); 
 
+    public static final String PODD_USER_BASE = "http://purl.org/podd/ns/poddUser#";
+    
+    public static final URI PODD_ROLEMAPPEDOBJECT = PoddRdfConstants.VALUE_FACTORY
+            .createURI(PODD_USER_BASE, "roleMappedObject"); 
+
     
     public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";
 

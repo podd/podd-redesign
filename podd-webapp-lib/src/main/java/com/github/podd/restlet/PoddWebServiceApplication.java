@@ -1,5 +1,8 @@
 package com.github.podd.restlet;
 
+import java.util.Collection;
+
+import org.openrdf.model.URI;
 import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -32,9 +35,10 @@ public abstract class PoddWebServiceApplication extends Application
      * @param authentication
      * @param request
      * @param response
+     * @param optionalObjectUris
      * @return True if the request is authenticated, and false otherwise.
      */
-    public abstract boolean authenticate(PoddAction authentication, Request request, Response response);
+    public abstract boolean authenticate(PoddAction authentication, Request request, Response response, Collection<URI> optionalObjectUris);
     
     /**
      * 
@@ -54,7 +58,7 @@ public abstract class PoddWebServiceApplication extends Application
      * 
      * @return
      */
-    public abstract RestletUtilSesameRealm getRealm();
+    public abstract PoddSesameRealm getRealm();
     
     /**
      * Returns the FreeMarker template configuration object for this application.

@@ -26,45 +26,77 @@ import com.github.podd.utils.PoddWebConstants;
 public enum PoddAction
 {
     /**
-     * An action by a user asking to create a new artifact, or update an existing artifact.
+     * An action by a user asking to create a new artifact.
      * 
-     * By default superuser, project admin and project editor users are allowed to create/update artifacts.
+     * By default superuser, project admin and project editor users are allowed to create artifacts.
      */
     ARTIFACT_CREATE(
             true, 
-            "Could not create/edit artifact.", 
+            "Could not create artifact.", 
             new HashSet<Role>(Arrays.asList(
                     PoddRoles.ADMIN.getRole(),
                     PoddRoles.AUTHENTICATED.getRole(),
                     PoddRoles.PROJECT_ADMIN.getRole()
                     )), 
-            new HashSet<URI>(Arrays.asList(PoddWebConstants.SCOPE_ARTIFACT))
+            false
             ),
     
     /**
-     * An action by a user asking to delete an artifact.
+     * An action by a user asking to update an existing artifact.
      * 
-     * By default superuser, project admin and project editor users are allowed to delete artifacts.
+     * By default superuser, project admin and project editor users are allowed to update artifacts.
      */
-    ARTIFACT_DELETE(
+    ARTIFACT_EDIT(
+            true, 
+            "Could not edit artifact.", 
+            new HashSet<Role>(Arrays.asList(
+                    PoddRoles.ADMIN.getRole(),
+                    PoddRoles.AUTHENTICATED.getRole(),
+                    PoddRoles.PROJECT_ADMIN.getRole()
+                    )), 
+            true
+            ),
+    
+
+    /**
+     * An action by a user asking to delete an unpublished artifact.
+     * 
+     * By default only superuser and project admin are allowed to delete artifacts.
+     */
+    UNPUBLISHED_ARTIFACT_DELETE(
             true,
             "Could not delete artifact",
             new HashSet<Role>(Arrays.asList(
                     PoddRoles.AUTHENTICATED.getRole(),
                     PoddRoles.ADMIN.getRole())),
-            new HashSet<URI>(Arrays.asList(PoddWebConstants.SCOPE_ARTIFACT))
+            true
             ),
     
     /**
-     * An action by a user asking to read an artifact.
+     * An action by a user asking to read an unpublished artifact.
      * 
-     * By default all unauthenticated users are allowed to read artifacts.
+     * By default only project editors, project admin, and administrators are allowed to read
+     * unpublished artifacts.
      */
-    ARTIFACT_READ(
+    UNPUBLISHED_ARTIFACT_READ(
+            false, 
+            "Failed to read artifact", 
+            new HashSet<Role>(Arrays.asList(
+                    PoddRoles.AUTHENTICATED.getRole(),
+                    PoddRoles.ADMIN.getRole())),
+            true
+            ),
+            
+    /**
+     * An action by a user asking to read a published artifact.
+     * 
+     * By default all unauthenticated users are allowed to read published artifacts.
+     */
+    PUBLISHED_ARTIFACT_READ(
             false, 
             "Failed to read artifact", 
             Collections.<Role> emptySet(),
-            new HashSet<URI>(Arrays.asList(PoddWebConstants.SCOPE_ARTIFACT))
+            true
             ),
     
     /**
@@ -78,7 +110,7 @@ public enum PoddAction
             new HashSet<Role>(Arrays.asList(
                     PoddRoles.AUTHENTICATED.getRole(),
                     PoddRoles.ADMIN.getRole())),
-            new HashSet<URI>(Arrays.asList(PoddWebConstants.SCOPE_ARTIFACT))
+            true
             ),
             
     /**
@@ -89,10 +121,8 @@ public enum PoddAction
     USER_CREATE(
             true, 
             "Could not create/update user.", 
-            new HashSet<Role>(Arrays.asList(
-                    PoddRoles.AUTHENTICATED.getRole(),
-                    PoddRoles.ADMIN.getRole())),
-            new HashSet<URI>(Arrays.asList(PoddWebConstants.SCOPE_REPOSITORY))
+            Collections.singleton(PoddRoles.ADMIN.getRole()),
+            false
             ),
     
     /**
@@ -104,34 +134,48 @@ public enum PoddAction
             true, 
             "Could not delete user", 
             Collections.singleton(PoddRoles.ADMIN.getRole()),
-            new HashSet<URI>(Arrays.asList(PoddWebConstants.SCOPE_REPOSITORY))
+            true
             ),
     
     /**
-     * An action by a user asking to fetch a user
+     * An action by a user asking to fetch their details
      * 
-     * By default all authenticated users can request user details, although if they are not
-     * admins, they will not be able to see information about other users.
+     * By default all authenticated users can request their user details.
      */
-    USER_READ(
+    CURRENT_USER_READ(
             true, 
-            "Could not retrieve user details", 
-            new HashSet<Role>(Arrays.asList(
-                    PoddRoles.AUTHENTICATED.getRole(),
-                    PoddRoles.ADMIN.getRole())),
-            new HashSet<URI>(Arrays.asList(PoddWebConstants.SCOPE_REPOSITORY))
+            "Could not retrieve current user details", 
+            Collections.singleton(PoddRoles.AUTHENTICATED.getRole()),
+            false
             ),
+            
+    /**
+     * An action by a user asking to fetch information about another user.
+     * 
+     * By default if they are not admins, they will not be able to see information about other
+     * users.
+     */
+    OTHER_USER_READ(
+            true, 
+            "Could not retrieve other user details", 
+            Collections.singleton(PoddRoles.ADMIN.getRole()),
+            true
+            ),
+    
+            
     ;
     
     private final boolean authRequired;
     private final String errorMessage;
     private final Set<Role> roles;
+    private final boolean requiresObjectUris;
     
-    PoddAction(final boolean authenticationRequired, final String errorMessage, final Set<Role> roles, final Set<URI> scopeTypes)
+    PoddAction(final boolean authenticationRequired, final String errorMessage, final Set<Role> roles, final boolean requiresObjectUris)
     {
         this.authRequired = authenticationRequired;
         this.errorMessage = errorMessage;
         this.roles = roles;
+        this.requiresObjectUris = requiresObjectUris;
     }
     
     public String getErrorMessage()
@@ -177,5 +221,10 @@ public enum PoddAction
         }
         
         return false;
+    }
+
+    public boolean requiresObjectUris()
+    {
+        return this.requiresObjectUris;
     }
 }

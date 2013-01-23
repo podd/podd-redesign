@@ -1,6 +1,7 @@
 package com.github.podd.restlet;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
@@ -15,6 +16,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
 import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
+import org.restlet.security.Role;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
+import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
@@ -62,9 +65,9 @@ import freemarker.template.Configuration;
 /**
  * This class handles all requests from clients to the OAS Web Service.
  * 
- * @author Peter Ansell p_ansell@yahoo.com 
+ * @author Peter Ansell p_ansell@yahoo.com
  * 
- * Copied from OAS project (https://github.com/ansell/oas)
+ *         Copied from OAS project (https://github.com/ansell/oas)
  * 
  */
 public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
@@ -80,7 +83,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
      */
     private volatile Configuration freemarkerConfiguration;
     private volatile ChallengeAuthenticator auth;
-    private volatile RestletUtilSesameRealm realm;
+    private volatile PoddSesameRealm realm;
     
     private Repository nextRepository;
     
@@ -135,9 +138,13 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public boolean authenticate(final PoddAction authenticationScope, final Request request, final Response response)
+    public boolean authenticate(final PoddAction action, final Request request, final Response response, final Collection<URI> optionalObjectUris)
     {
-        if(authenticationScope.isAuthRequired() && !request.getClientInfo().isAuthenticated())
+        if(!action.isAuthRequired())
+        {
+            return true;
+        }
+        else if(!request.getClientInfo().isAuthenticated())
         {
             if(this.getAuthenticator() == null)
             {
@@ -151,17 +158,48 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             // response
             return false;
         }
-        else if(authenticationScope.isAuthRequired() && request.getClientInfo().isAuthenticated()
-                && authenticationScope.isRoleRequired()
-                && !authenticationScope.matchesForRoles(request.getClientInfo().getRoles()))
+        else if(action.isRoleRequired() && !action.matchesForRoles(request.getClientInfo().getRoles()))
         {
-            this.log.error("Authenticated user does not have enough privileges to execute the given action");
+            this.log.error("Authenticated user does not have enough privileges to execute the given action: {}", action);
             
             // FIXME: Implement auditing here
             // this.getDataHandler().addLogDetailsForRequest(message, referenceUri,
             // authenticationScope, get, currentUser, currentRole);
             
             return false;
+        }
+        else if(!action.requiresObjectUris())
+        {
+            return true;
+        }
+        else if(optionalObjectUris == null || optionalObjectUris.isEmpty())
+        {
+            this.log.error("Action requires object URIs and none were given: {}", action);
+            
+            return false;
+        }
+        else
+        {
+            Collection<Role> rolesCommonAcrossGivenObjects = this.getRealm().getCommonRolesForObjects(
+                    request.getClientInfo().getUser(), optionalObjectUris);
+            
+            if(action.matchesForRoles(rolesCommonAcrossGivenObjects))
+            {
+                // TODO: check if artifact associated with this request
+                // is also in the user-role mappings
+                
+                // URI actionArtifactUri = pass in a collection of URIs that access is needed to
+                //
+                org.restlet.security.User user = request.getClientInfo().getUser();
+                
+                // retrieve role mappings for user
+                // check if artifactUri contained in there
+                
+            }
+            else
+            {
+                
+            }
         }
         
         if(request.getClientInfo().isAuthenticated() && request.getClientInfo().getRoles().isEmpty())
@@ -195,8 +233,9 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(loginFormPath, CookieLoginResourceImpl.class);
         
         // Add a route for the reset service.
-        final String resetPath = PoddWebConstants.PATH_RESET_PREFIX 
-                + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
+        final String resetPath =
+                PoddWebConstants.PATH_RESET_PREFIX
+                        + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
         this.log.info("attaching reset service to path={}", resetPath);
         router.attach(resetPath, TestResetResourceImpl.class);
         
@@ -304,7 +343,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public RestletUtilSesameRealm getRealm()
+    public PoddSesameRealm getRealm()
     {
         return this.realm;
     }
@@ -334,7 +373,14 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     @Override
     public void setRealm(final RestletUtilSesameRealm nextRealm)
     {
-        this.realm = nextRealm;
+        if(nextRealm instanceof PoddSesameRealm)
+        {
+            this.realm = (PoddSesameRealm)nextRealm;
+        }
+        else
+        {
+            throw new IllegalArgumentException("We only know how to handle PoddSesameRealm");
+        }
     }
     
     @Override
@@ -393,9 +439,9 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.poddArtifactManager.setSesameManager(poddSesameManager);
         
         /*
-         * Since the schema ontology upload feature is not yet supported, necessary schemas
-         * are uploaded here at application starts up.
-         */    
+         * Since the schema ontology upload feature is not yet supported, necessary schemas are
+         * uploaded here at application starts up.
+         */
         try
         {
             this.getPoddSchemaManager().uploadSchemaOntology(
@@ -432,7 +478,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public void stop() throws Exception 
+    public void stop() throws Exception
     {
         super.stop();
         this.cleanUpResources();

@@ -3,11 +3,24 @@
  */
 package com.github.podd.restlet;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.ntriples.NTriplesUtil;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -22,9 +35,12 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
+import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Customises RestletUtilSesameRealm.java to use PODDUsers and PoddRoles.
@@ -136,6 +152,8 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
     protected static final String PARAM_USER_ORGANIZATION = "userOrganization";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    private final ValueFactory vf = PoddRdfConstants.VALUE_FACTORY;
     
     /**
      * Constructor
@@ -277,9 +295,208 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
     @Override
     protected RestletUtilRole getRoleByUri(final URI uri)
     {
-        final RestletUtilRole nextStandardRole =
-                PoddRoles.getRoleByUri(uri);
+        final RestletUtilRole nextStandardRole = PoddRoles.getRoleByUri(uri);
         return nextStandardRole;
+    }
+
+    /**
+     * This method maps a User to a Role with an optional collection of URIs included.
+     * 
+     * Example 1: John (User) is a PROJECT_MEMBER (Role) of the "Flax Rust" and "Water Stress" projects (URIs). 
+     * Example 2: Bob (User) is an ADMIN (Role) for the whole repository (no URI).
+     * 
+     * @param user
+     * @param role
+     * @param optionalObjectUris
+     */
+    public void map(User user, Role role, Collection<URI> optionalObjectUris)
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepository().getConnection();
+            conn.begin();
+            
+            final URI nextRoleMappingUUID = this.vf.createURI("urn:oas:rolemapping:", UUID.randomUUID().toString());
+            
+            conn.add(this.vf.createStatement(nextRoleMappingUUID, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING),
+                    this.getContexts());
+            
+            conn.add(this.vf.createStatement(nextRoleMappingUUID, SesameRealmConstants.OAS_ROLEMAPPEDROLE, this
+                    .getRoleByName(role.getName()).getURI()), this.getContexts());
+            
+            conn.add(this.vf.createStatement(nextRoleMappingUUID, SesameRealmConstants.OAS_ROLEMAPPEDUSER,
+                            this.vf.createLiteral(user.getIdentifier())), this.getContexts());
+            
+            if (optionalObjectUris != null && !optionalObjectUris.isEmpty())
+            {
+                for (URI objectURI : optionalObjectUris)
+                {
+                    conn.add(this.vf.createStatement(nextRoleMappingUUID, PoddWebConstants.PODD_ROLEMAPPEDOBJECT,
+                            objectURI), this.getContexts());
+                }
+            }
+            
+            conn.commit();
+        }
+        catch(final RepositoryException e)
+        {
+            this.log.error("Found exception while adding role mapping", e);
+            if(conn != null)
+            {
+                try
+                {
+                    conn.rollback();
+                }
+                catch(RepositoryException e1)
+                {
+                    //throw a RuntimeException to be consistent with the behaviour of super.map(user, role)
+                    throw new RuntimeException("Found unexpected exception while adding role mapping", e);
+                }
+            }
+        }
+        finally
+        {
+            if(conn != null)
+            {
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * For the given User, find Role Mappings for ALL the given object URIs and return the
+     * resultant Roles. 
+     * 
+     * @param user
+     * @param optionalObjectUris
+     * @return A Collection of Roles that match
+     */
+    public Collection<Role> getCommonRolesForObjects(User user, Collection<URI> optionalObjectUris)
+    {
+        if(user == null)
+        {
+            throw new NullPointerException("User was null");
+        }
+        
+        Collection<Role> roleCollection = new HashSet<Role>();
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepository().getConnection();
+            
+            final String query = this.buildSparqlQueryForCommonObjectRoles(user.getIdentifier(), optionalObjectUris);
+            this.log.info("getCommonRolesForObjects: query={}", query);
+            
+            if(this.log.isDebugEnabled())
+            {
+                this.log.debug("getCommonRolesForObjects: query={}", query);
+            }
+            
+            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+            
+            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            
+            try
+            {
+                if (!queryResult.hasNext())
+                {
+                    this.log.info("Could not find role with mappings for user: {}", user.getIdentifier());
+                }
+                
+                while(queryResult.hasNext())
+                {
+                    final BindingSet bindingSet = queryResult.next();
+                    URI roleUri = this.vf.createURI(bindingSet.getValue("role").stringValue());
+                    
+                    System.out.println(" Result = " + roleUri);
+                    
+                    Role role = PoddRoles.getRoleByUri(roleUri).getRole();
+                    roleCollection.add(role);
+                }
+            }
+            finally
+            {
+                queryResult.close();
+            }
+            
+        }
+        catch(final RepositoryException e)
+        {
+            throw new RuntimeException("Failure finding user in repository", e);
+        }
+        catch(final MalformedQueryException e)
+        {
+            throw new RuntimeException("Failure finding user in repository", e);
+        }
+        catch(final QueryEvaluationException e)
+        {
+            throw new RuntimeException("Failure finding user in repository", e);
+        }
+        finally
+        {
+            try
+            {
+                conn.close();
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Failure to close connection", e);
+            }
+        }
+        
+        
+        return roleCollection;
+    }
+
+
+    private String buildSparqlQueryForCommonObjectRoles(String userIdentifier, Collection<URI> uris)
+    {
+        //FIXME: pasted source code
+        
+        // SELECT ?role WHERE {
+        // ?roleMappingUri <roleMappedUser> ?userUri .
+        // ?roleMappingUri <roleMappedRole> ?role .
+        // ?roleMappingUri <roleMappedObject> ?objectUri_1 .
+        // ?roleMappingUri <roleMappedObject> ?objectUri_2 .
+        //  . }
+        this.log.info("Building SPARQL query");
+        
+        final StringBuilder query = new StringBuilder();
+        query.append(" SELECT ?roleMappingUri ?role ");
+        query.append(" WHERE ");
+        query.append(" { ");
+        query.append(" ?roleMappingUri");
+        query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ");
+        query.append(" \"");
+        query.append(NTriplesUtil.escapeString(userIdentifier));
+        query.append("\" . ");
+
+        query.append(" ?roleMappingUri");
+        query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ");
+        query.append(" ?role . ");
+        
+                
+        for (URI objectUri : uris)
+        {
+            query.append(" ?roleMappingUri");
+            query.append(" <" + PoddWebConstants.PODD_ROLEMAPPEDOBJECT + "> ");
+            query.append(" <");
+            query.append(objectUri);
+            query.append("> . ");
+        }
+        query.append(" } ");
+        
+        return query.toString();
     }
     
     

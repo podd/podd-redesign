@@ -1,7 +1,9 @@
 package com.github.podd.resources;
 
+import java.util.Collection;
 import java.util.List;
 
+import org.openrdf.model.URI;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.Variant;
@@ -33,7 +35,10 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
      */
     protected void checkAuthentication(final PoddAction action) throws ResourceException
     {
-        if(!this.getPoddApplication().authenticate(action, this.getRequest(), this.getResponse()))
+        //TODO - get the URIs
+        Collection<URI> optionalObjectUris = null;
+        
+        if(!this.getPoddApplication().authenticate(action, this.getRequest(), this.getResponse(), optionalObjectUris))
         {
             this.log.warn("Client unauthorized. Throwing a ResourceException");
             throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, action.getErrorMessage());
