@@ -30,7 +30,7 @@ public enum PoddRoles implements RestletUtilRole
             "http://purl.org/podd/oas/roles/project_member"),
     
     PROJECT_OBSERVER("Project observer", "A user who is an observer of a particular project",
-            "http://purl.org/podd/oas/roles/project_member"),
+            "http://purl.org/podd/oas/roles/project_observer"),
     
     PROJECT_ADMIN("Project Administrator", "A user who is an administrator of a particular project",
             "http://purl.org/podd/oas/roles/project_administrator"),
