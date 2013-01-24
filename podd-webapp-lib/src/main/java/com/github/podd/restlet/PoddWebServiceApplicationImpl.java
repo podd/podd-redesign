@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
-import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
@@ -137,8 +136,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.initializePoddManagers();
     }
     
+    /**
+     * 
+     */
     @Override
-    public boolean authenticate(final PoddAction action, final Request request, final Response response, final Collection<URI> optionalObjectUris)
+    public boolean authenticate(final PoddAction action, final Request request, final Response response,
+            final Collection<URI> optionalObjectUris)
     {
         if(!action.isAuthRequired())
         {
@@ -180,30 +183,18 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         }
         else
         {
-            Collection<Role> rolesCommonAcrossGivenObjects = this.getRealm().getCommonRolesForObjects(
-                    request.getClientInfo().getUser(), optionalObjectUris);
+            final Collection<Role> rolesCommonAcrossGivenObjects =
+                    this.getRealm().getCommonRolesForObjects(request.getClientInfo().getUser(), optionalObjectUris);
             
-            if(action.matchesForRoles(rolesCommonAcrossGivenObjects))
+            if(!action.matchesForRoles(rolesCommonAcrossGivenObjects))
             {
-                // TODO: check if artifact associated with this request
-                // is also in the user-role mappings
-                
-                // URI actionArtifactUri = pass in a collection of URIs that access is needed to
-                //
-                org.restlet.security.User user = request.getClientInfo().getUser();
-                
-                // retrieve role mappings for user
-                // check if artifactUri contained in there
-                
-            }
-            else
-            {
-                
+                return false;
             }
         }
         
         if(request.getClientInfo().isAuthenticated() && request.getClientInfo().getRoles().isEmpty())
         {
+            // TODO: can this case still occur?
             this.log.warn("Authenticated user did not have any roles: user={}", request.getClientInfo().getUser());
         }
         
