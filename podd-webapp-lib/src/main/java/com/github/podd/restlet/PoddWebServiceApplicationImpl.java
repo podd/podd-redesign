@@ -161,7 +161,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             // response
             return false;
         }
-        else if(action.isRoleRequired() && !action.matchesForRoles(request.getClientInfo().getRoles()))
+        else if (!action.isRoleRequired())
+        {
+            return true;
+        }
+        else if(!action.matchesForRoles(request.getClientInfo().getRoles()))
         {
             this.log.error("Authenticated user does not have enough privileges to execute the given action: {}", action);
             
@@ -188,6 +192,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             
             if(!action.matchesForRoles(rolesCommonAcrossGivenObjects))
             {
+                this.log.error("Authenticated user does not have enough privileges to execute the given action: {}" +
+                		" on the given objects: {}", action, optionalObjectUris);
                 return false;
             }
         }
