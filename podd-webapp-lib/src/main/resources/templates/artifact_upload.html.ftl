@@ -8,7 +8,7 @@
 <div id="content_pane">
 <#if user??>
     <p>Welcome, ${user.firstName!""}  ${user.lastName!""}.</p>
-    <p>Places to go to: <a href="${baseUrl}/user/${user.userName!"unknown-username"}">User page</a></p>
+    <p>Places to go to: <a href="${baseUrl}/user/${user.identifier!"unknown-username"}">User page</a></p>
     
     <#if artifact??>
 	    <div class="fieldset" id="upload">
