@@ -6,7 +6,7 @@ package com.github.podd.api.test;
 import java.io.InputStream;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -354,26 +354,7 @@ public abstract class AbstractPoddOWLManagerTest
         Assert.assertTrue("Ontology should be in memory",
                 this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
     }
-    
-    /**
-     * Helper method prints the contents of the given context of a Repository
-     */
-    private void printContents(final RepositoryConnection conn, final URI context) throws Exception
-    {
-        System.out.println("==================================================");
-        System.out.println("Graph = " + context);
-        System.out.println();
-        final org.openrdf.repository.RepositoryResult<Statement> repoResults =
-                conn.getStatements(null, null, null, false, context);
-        while(repoResults.hasNext())
-        {
-            final Statement stmt = repoResults.next();
-            System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {" + stmt.getObject()
-                    + "}");
-        }
-        System.out.println("==================================================");
-    }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#cacheSchemaOntology(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
