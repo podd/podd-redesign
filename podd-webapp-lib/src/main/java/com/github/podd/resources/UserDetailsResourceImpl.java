@@ -3,13 +3,17 @@
  */
 package com.github.podd.resources;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openrdf.model.URI;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
+import org.restlet.security.Role;
 import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +38,8 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
     public Representation getUserDetailsPageHtml(final Representation entity) throws ResourceException
     {
         //TODO: figure out if CURRENT_USER_READ or OTHER_USER_READ
-        this.checkAuthentication(PoddAction.CURRENT_USER_READ, null);
+        Collection<URI> objectUris = Collections.<URI>emptySet();
+        this.checkAuthentication(PoddAction.CURRENT_USER_READ, objectUris);
         
         this.log.info("getUserDetailsHtml");
         final User user = this.getRequest().getClientInfo().getUser();

@@ -99,11 +99,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     {
         super();
         
-        System.out.println("==============================");
-        System.out.println("PODD Web Application");
-        System.out.println("starting...");
-        System.out.println("==============================");
-        this.log.info("== Starting PODD Web Application ==");
+        this.log.info("\r\n" +
+        		"============================== \r\n" +
+        		"PODD Web Application \r\n" +
+        		"starting... \r\n" +
+        		"==============================");
         
         // List of protocols required by the application
         this.getConnectorService().getClientProtocols().add(Protocol.HTTP);
@@ -480,7 +480,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         super.stop();
         this.cleanUpResources();
         this.log.info("== Shutting down PODD Web Application ==");
-        System.out.println("===== Shutting down PODD =====");
     }
     
 }

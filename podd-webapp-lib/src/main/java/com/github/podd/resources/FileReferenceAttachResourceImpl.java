@@ -3,9 +3,12 @@
  */
 package com.github.podd.resources;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openrdf.model.URI;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -35,7 +38,9 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation editArtifactPageHtml(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null);
+        //TODO: set required object URIs
+        Collection<URI> objectUris = Collections.<URI>emptySet();
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, objectUris);
         
         this.log.info("attachFileRefHtml");
         final User user = this.getRequest().getClientInfo().getUser();

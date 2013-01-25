@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 
 /**
- * Tests the OAS Services with text/html requests, which should mimic those from browsers. Other
+ * Tests the PODD web applicaiton with text/html requests, which should mimic those from browsers. Other
  * tests can be setup to allow other Accept headers.
  * 
  * @author Peter Ansell p_ansell@yahoo.com
@@ -823,7 +823,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     {
         this.login("testUser", "testPassword");
         
-        // we should be at the ontology manager page with a 200 HTTP status after login
+        // we should be at the index page with a 200 HTTP status after login
         this.getWebTester().assertResponseCode(200);
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
                 .endsWith("/index"));
@@ -849,7 +849,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     {
         this.login("testAdminUser", "testAdminPassword");
         
-        // we should be at the ontology manager page with a 200 HTTP status after login
+        // we should be at the index page with a 200 HTTP status after login
         this.getWebTester().assertResponseCode(200);
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
                 .endsWith("/index"));

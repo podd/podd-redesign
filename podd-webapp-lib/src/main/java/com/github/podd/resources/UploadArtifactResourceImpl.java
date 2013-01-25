@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -80,7 +83,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     {
         //even though this only does a page READ, we're checking authorization for CREATE since the page
         //is for creating a new artifact via a file upload
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null);
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI>emptySet());
         
         this.log.info("@Get UploadArtifactFile Page");
         
@@ -100,7 +103,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     @Post
     public Representation uploadArtifactFile(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null);
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI>emptySet());
         
         this.log.info("@Post UploadArtifactFile Page");
         
