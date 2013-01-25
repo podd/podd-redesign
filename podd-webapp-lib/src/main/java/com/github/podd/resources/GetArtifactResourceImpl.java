@@ -36,7 +36,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation getArtifactPageHtml(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null);
         
         this.log.info("getArtifactHtml");
         final User user = this.getRequest().getClientInfo().getUser();

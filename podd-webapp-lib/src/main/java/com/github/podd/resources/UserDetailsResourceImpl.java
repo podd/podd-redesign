@@ -34,7 +34,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
     public Representation getUserDetailsPageHtml(final Representation entity) throws ResourceException
     {
         //TODO: figure out if CURRENT_USER_READ or OTHER_USER_READ
-        this.checkAuthentication(PoddAction.CURRENT_USER_READ);
+        this.checkAuthentication(PoddAction.CURRENT_USER_READ, null);
         
         this.log.info("getUserDetailsHtml");
         final User user = this.getRequest().getClientInfo().getUser();

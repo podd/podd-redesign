@@ -35,7 +35,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation editArtifactPageHtml(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null);
         
         this.log.info("attachFileRefHtml");
         final User user = this.getRequest().getClientInfo().getUser();

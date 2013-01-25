@@ -29,14 +29,14 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
      * 
      * @param action
      *            The PoddAction that is to be performed.
+     * @param optionalObjectUris 
+     *            Optional collection of object URIs to be used for authorization.
      * @throws ResourceException
      *             with Status.CLIENT_ERROR_UNAUTHORIZED (HTTP 401) if the user is not authorised to
      *             perform the given action
      */
-    protected void checkAuthentication(final PoddAction action) throws ResourceException
+    protected void checkAuthentication(final PoddAction action, Collection<URI> optionalObjectUris) throws ResourceException
     {
-        //TODO - get the URIs
-        Collection<URI> optionalObjectUris = null;
         
         if(!this.getPoddApplication().authenticate(action, this.getRequest(), this.getResponse(), optionalObjectUris))
         {

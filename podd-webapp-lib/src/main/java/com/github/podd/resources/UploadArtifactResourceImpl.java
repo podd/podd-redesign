@@ -80,7 +80,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     {
         //even though this only does a page READ, we're checking authorization for CREATE since the page
         //is for creating a new artifact via a file upload
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null);
         
         this.log.info("@Get UploadArtifactFile Page");
         
@@ -100,7 +100,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     @Post
     public Representation uploadArtifactFile(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null);
         
         this.log.info("@Post UploadArtifactFile Page");
         
