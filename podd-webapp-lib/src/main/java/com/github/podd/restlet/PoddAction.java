@@ -9,10 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.openrdf.model.URI;
 import org.restlet.security.Role;
-
-import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Provides constants to use in the authentication interface, including whether authentication is
@@ -28,30 +25,26 @@ public enum PoddAction
     /**
      * An action by a user asking to create a new artifact.
      * 
-     * By default superuser, project admin and project editor users are allowed to create artifacts.
+     * By default only administrator users are allowed to create artifacts.
      */
     ARTIFACT_CREATE(
             true, 
             "Could not create artifact.", 
-            new HashSet<Role>(Arrays.asList(
-                    PoddRoles.ADMIN.getRole(),
-                    PoddRoles.AUTHENTICATED.getRole(),
-                    PoddRoles.PROJECT_ADMIN.getRole()
-                    )), 
+            Collections.singleton(PoddRoles.ADMIN.getRole()),
             false
             ),
     
     /**
      * An action by a user asking to update an existing artifact.
      * 
-     * By default superuser, project admin and project editor users are allowed to update artifacts.
+     * By default administrator, project-admin and project-member users are allowed to update artifacts.
      */
     ARTIFACT_EDIT(
             true, 
             "Could not edit artifact.", 
             new HashSet<Role>(Arrays.asList(
                     PoddRoles.ADMIN.getRole(),
-                    PoddRoles.AUTHENTICATED.getRole(),
+                    PoddRoles.PROJECT_MEMBER.getRole(),
                     PoddRoles.PROJECT_ADMIN.getRole()
                     )), 
             true
@@ -61,13 +54,13 @@ public enum PoddAction
     /**
      * An action by a user asking to delete an unpublished artifact.
      * 
-     * By default only superuser and project admin are allowed to delete artifacts.
+     * By default only administrators and project-admin users are allowed to delete artifacts.
      */
     UNPUBLISHED_ARTIFACT_DELETE(
             true,
             "Could not delete artifact",
             new HashSet<Role>(Arrays.asList(
-                    PoddRoles.AUTHENTICATED.getRole(),
+                    PoddRoles.PROJECT_ADMIN.getRole(),
                     PoddRoles.ADMIN.getRole())),
             true
             ),
@@ -75,14 +68,15 @@ public enum PoddAction
     /**
      * An action by a user asking to read an unpublished artifact.
      * 
-     * By default only project editors, project admin, and administrators are allowed to read
+     * By default only project-member, project-admin, and administrator users are allowed to read
      * unpublished artifacts.
      */
     UNPUBLISHED_ARTIFACT_READ(
             false, 
             "Failed to read artifact", 
             new HashSet<Role>(Arrays.asList(
-                    PoddRoles.AUTHENTICATED.getRole(),
+                    PoddRoles.PROJECT_ADMIN.getRole(),
+                    PoddRoles.PROJECT_MEMBER.getRole(),
                     PoddRoles.ADMIN.getRole())),
             true
             ),
@@ -102,13 +96,13 @@ public enum PoddAction
     /**
      * An action by a user asking to publish an artifact.
      * 
-     * By default only the superuser and project admins are allowed to publish projects.
+     * By default only the administrators and project-admin users are allowed to publish projects.
      */
     ARTIFACT_PUBLISH(
             true, 
             "Could not publish artifact",
             new HashSet<Role>(Arrays.asList(
-                    PoddRoles.AUTHENTICATED.getRole(),
+                    PoddRoles.PROJECT_ADMIN.getRole(),
                     PoddRoles.ADMIN.getRole())),
             true
             ),
@@ -116,7 +110,7 @@ public enum PoddAction
     /**
      * An action by an administrator asking to create a new user, or update an existing user.
      * 
-     * By default only the superuser is allowed to create new users.
+     * By default only the administrators are allowed to create new users.
      */
     USER_CREATE(
             true, 
@@ -128,7 +122,7 @@ public enum PoddAction
     /**
      * An action by an administrator asking to delete an existing user.
      * 
-     * By default only admin users are allowed to delete existing users.
+     * By default only administrators are allowed to delete existing users.
      */
     USER_DELETE(
             true, 
@@ -152,8 +146,8 @@ public enum PoddAction
     /**
      * An action by a user asking to fetch information about another user.
      * 
-     * By default if they are not admins, they will not be able to see information about other
-     * users.
+     * By default if they are not administrators, they will not be able to see information 
+     * about other users.
      */
     OTHER_USER_READ(
             true, 
