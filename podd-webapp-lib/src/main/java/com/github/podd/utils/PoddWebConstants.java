@@ -79,7 +79,7 @@ public interface PoddWebConstants
     /**
      * Path to "user details" page
      */
-    public static final String PATH_USER_DETAILS = "userdetails";
+    public static final String PATH_USER_DETAILS = "user/";
     
     /**
      * Path to load a new artifact into PODD

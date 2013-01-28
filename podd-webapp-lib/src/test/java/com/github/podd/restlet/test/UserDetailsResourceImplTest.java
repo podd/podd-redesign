@@ -30,7 +30,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testErrorGetUserDetailsWithoutAuthentication() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS));
+                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
         
         try
         {
@@ -50,7 +50,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testGetUserDetailsWithAuthentication() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS));
+                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,

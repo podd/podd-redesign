@@ -38,13 +38,17 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
     public Representation getUserDetailsPageHtml(final Representation entity) throws ResourceException
     {
         //TODO: figure out if CURRENT_USER_READ or OTHER_USER_READ
+        // extract user identifier from URL
         Collection<URI> objectUris = Collections.<URI>emptySet();
         this.checkAuthentication(PoddAction.CURRENT_USER_READ, objectUris);
         
         this.log.info("getUserDetailsHtml");
         final User user = this.getRequest().getClientInfo().getUser();
         
+        final String requestedUserIdentifier = (String) this.getRequest().getAttributes().get("key");
+        
         this.log.info("authenticated user: {}", user);
+        this.log.info("requested user: {}", requestedUserIdentifier);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "userDetails.html.ftl");
