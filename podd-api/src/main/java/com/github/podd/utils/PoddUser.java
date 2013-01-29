@@ -31,8 +31,13 @@ public class PoddUser extends RestletUtilUser
     /** The status of this user */
     private volatile PoddUserStatus userStatus;
     
+    /** The Home Page of this user */
+    private volatile URI homePage;
+    
     /** The unique URI for this user */
     private volatile URI uri;
+    
+    // TODO - include title, phone, address
     
     /**
      * Constructor.
@@ -72,19 +77,19 @@ public class PoddUser extends RestletUtilUser
      *            The email.
      * @param userStatus
      *            The user status.
-     * @param uri
-     *            The URI of the user.
+     * @param homePage
+     *            The Home page of the user.
      * @param organization
      *            The organization.
      * @param orcid
      *            The ORCID identifier.
      */
     public PoddUser(final String identifier, final char[] secret, final String firstName, final String lastName,
-            final String email, final PoddUserStatus userStatus, final URI uri, final String organization, final String orcid)
+            final String email, final PoddUserStatus userStatus, final URI homePage, final String organization, final String orcid)
     {
         super(identifier, secret, firstName, lastName, email);
         this.userStatus = userStatus;
-        this.uri = uri;
+        this.homePage = homePage;
         this.organization = organization;
         this.orcid = orcid;
     }
@@ -104,10 +109,26 @@ public class PoddUser extends RestletUtilUser
     {
         return userStatus;
     }
-    
+
+    /**
+     * Get the URL of a home page containing details about the User.
+     * This value is set by the user.
+     * @return
+     */
+    public URI getHomePage()
+    {
+        return this.homePage;
+    }
+
+    /**
+     * Get the Unique URI allocated to each user. This value is 
+     * usually generated and set by PODD. 
+     * 
+     * @return
+     */
     public URI getUri()
     {
-        return uri;
+        return this.uri;
     }
     
     public void setOrcid(String orcid)
@@ -125,9 +146,43 @@ public class PoddUser extends RestletUtilUser
         this.userStatus = userStatus;
     }
     
+    /**
+     * Set the URL of a home page containing details about the User.
+     * This value is usually set by the user.
+     * @param homePage
+     */
+    public void setHomePage(URI homePage)
+    {
+        this.homePage = homePage;
+    }
+    
+    /**
+     * Set the Unique URI allocated to each user. This value is 
+     * usually generated and set by PODD. 
+     * 
+     * @param uri
+     */
     public void setUri(URI uri)
     {
         this.uri = uri;
+    }
+    
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder b = new StringBuilder();
+        b.append(super.toString());
+        b.append(":");
+        b.append(this.getUserStatus());
+        b.append(":");
+        b.append(this.getOrganization());
+        b.append(":");
+        b.append(this.getOrcid());
+        b.append(":");
+        b.append(this.getHomePage());
+        
+        return b.toString();
     }
     
 }

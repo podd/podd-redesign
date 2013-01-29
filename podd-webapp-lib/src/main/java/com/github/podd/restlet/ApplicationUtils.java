@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
@@ -237,15 +238,17 @@ public class ApplicationUtils
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
         
+        final URI testUserHomePage = PoddRdfConstants.VALUE_FACTORY.createURI("http://www.example.com/testUser");
         final PoddUser testUser =
                 new PoddUser("testUser", "testPassword".toCharArray(), "Test", "User", "test.user@example.com",
-                        PoddUserStatus.ACTIVE);
+                        PoddUserStatus.ACTIVE, testUserHomePage, "CSIRO", "Orcid-Test-User");
         final URI testUserUri = nextRealm.addUser(testUser);
         nextRealm.map(testUser, PoddRoles.AUTHENTICATED.getRole());
         
+        final URI testAdminUserHomePage = PoddRdfConstants.VALUE_FACTORY.createURI("http://www.example.com/testAdmin");
         final PoddUser testAdminUser =
                 new PoddUser("testAdminUser", "testAdminPassword".toCharArray(), "Test Admin", "User",
-                        "test.admin.user@example.com", PoddUserStatus.ACTIVE);
+                        "test.admin.user@example.com", PoddUserStatus.ACTIVE, testAdminUserHomePage, "UQ", "Orcid-Test-Admin");
         final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
         nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
         nextRealm.map(testAdminUser, PoddRoles.AUTHENTICATED.getRole());

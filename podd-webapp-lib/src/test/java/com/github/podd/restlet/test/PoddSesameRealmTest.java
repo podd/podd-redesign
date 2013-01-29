@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -23,6 +22,7 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.restlet.security.Role;
 
+import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.PoddSesameRealm;
@@ -43,7 +43,6 @@ public class PoddSesameRealmTest
     private Repository testRepository;
     private PoddSesameRealm testRealm;
     
-    
     /**
      * Helper method to create a test User and add it to the SesameRealm.
      * 
@@ -53,12 +52,16 @@ public class PoddSesameRealmTest
      */
     protected PoddUser addTestUser(final String userId)
     {
-        final URI testUserUri =
-                PoddRdfConstants.VALUE_FACTORY.createURI("urn:oas:user:" + userId + ":" + UUID.randomUUID().toString());
+        
+        final URI testUserHomePage = PoddRdfConstants.VALUE_FACTORY.createURI("http://example.org/" + userId);
         final PoddUser testUser =
                 new PoddUser(userId, "secret".toCharArray(), "First", "Last", userId, PoddUserStatus.ACTIVE,
-                        testUserUri, "Some Organization", "SOME_ORCID_ID");
+                        testUserHomePage, "Some Organization", "SOME_ORCID_ID");
         
+        // final URI testUserUri =
+        // PoddRdfConstants.VALUE_FACTORY.createURI("urn:oas:user:" + userId + ":" +
+        // UUID.randomUUID().toString());
+        // testUser.setUri(testUserUri);
         this.testRealm.addUser(testUser);
         return testUser;
     }
@@ -67,27 +70,25 @@ public class PoddSesameRealmTest
      * Wrapper to get statements from the Repository
      */
     protected List<Statement> getStatementList(final URI subject, final URI predicate, final Value object)
-            throws Exception
+        throws Exception
+    {
+        RepositoryConnection conn = null;
+        try
         {
-            RepositoryConnection conn = null;
-            try
+            conn = this.testRepository.getConnection();
+            conn.begin();
+            
+            return conn.getStatements(subject, predicate, object, true, PoddSesameRealmTest.userMgtContext).asList();
+        }
+        finally
+        {
+            if(conn != null)
             {
-                conn = this.testRepository.getConnection();
-                conn.begin();
-                
-                return conn.getStatements(subject, predicate, object, true, PoddSesameRealmTest.userMgtContext).asList();
-            }
-            finally
-            {
-                if(conn != null)
-                {
-                    conn.rollback();
-                    conn.close();
-                }
+                conn.rollback();
+                conn.close();
             }
         }
-        
-
+    }
     
     @Before
     public void setUp() throws Exception
@@ -286,6 +287,37 @@ public class PoddSesameRealmTest
         Assert.assertTrue("Role_A role missing", user2CommonRolesForObjects1And2.contains(PoddRoles.ROLE_A.getRole()));
     }
     
+    @Test
+    public void testGetUserRoles() throws Exception
+    {
+        // -prepare: users
+        final PoddUser user1 = this.addTestUser("john@example.com");
+        final PoddUser user2 = this.addTestUser("bob@hope.com");
+        
+        // -prepare: test objects
+        final URI object1URI = PoddRdfConstants.VALUE_FACTORY.createURI("urn:podd:artifact:1");
+        final URI object2URI = PoddRdfConstants.VALUE_FACTORY.createURI("urn:podd:artifact:2");
+        
+        // -prepare: map Users - Roles and Objects together
+        this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
+        this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object2URI);
+        this.testRealm.map(user1, PoddRoles.ADMIN.getRole(), null);
+        
+        this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object1URI);
+        this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object2URI);
+        
+        // -get Roles of user1
+        final Set<Role> user1Roles = this.testRealm.findRoles(user1);
+        Assert.assertNotNull("Null set for user roles", user1Roles);
+        Assert.assertFalse("No roles allocated to user 1", user1Roles.isEmpty());
+        Assert.assertTrue("Admin role wasn't allocated to user 1", user1Roles.contains(PoddRoles.ADMIN.getRole()));
+        Assert.assertTrue("PROJECT_MEMBER role wasn't allocated to user 1",
+                user1Roles.contains(PoddRoles.PROJECT_MEMBER.getRole()));
+        
+        final Set<Role> user2Roles = this.testRealm.findRoles(user2);
+        Assert.assertTrue("ROLE_A role wasn't allocated to user 2", user2Roles.contains(PoddRoles.ROLE_A.getRole()));
+    }
+    
     /**
      * Test that mappings between a User, a Role and an optional Object URI can be added.
      */
@@ -330,7 +362,31 @@ public class PoddSesameRealmTest
         Assert.assertFalse(list4.isEmpty());
         Assert.assertEquals(2, list4.size());
     }
-
+    
+    /**
+     * Test that a User can be added with PODD-specific attributes (Organization, ORCID, HomePage).
+     */
+    @Test
+    public void testAddUserSimple() throws Exception
+    {
+        final String testUserId1 = "john@example.com";
+        final PoddUser testUser = this.addTestUser(testUserId1);
+        
+        // - add a test user
+        this.testRealm.addUser(testUser);
+        
+        final RestletUtilUser retrievedUser = this.testRealm.findUser(testUserId1);
+        Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
+        Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
+        
+        final PoddUser recvdPoddUser = (PoddUser)retrievedUser;
+        Assert.assertEquals("Returned user ORCID different to original", "SOME_ORCID_ID", recvdPoddUser.getOrcid());
+        Assert.assertEquals("Returned user URI different to original", testUser.getHomePage(),
+                recvdPoddUser.getHomePage());
+        Assert.assertEquals("Returned user Organization different to original", "Some Organization",
+                recvdPoddUser.getOrganization());
+    }
+    
     /**
      * Test some of the functionality provided by the super class RestletUtilSesameRealm.java
      */

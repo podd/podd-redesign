@@ -247,7 +247,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(indexPagePath, IndexResourceImpl.class);
         
         // Add a route for the User Details page.
-        final String userDetailsPath = PoddWebConstants.PATH_USER_DETAILS + "{identifier}";
+        final String userDetailsPath = PoddWebConstants.PATH_USER_DETAILS + 
+                "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
         this.log.info("attaching user details service to path={}", userDetailsPath);
         router.attach(userDetailsPath, UserDetailsResourceImpl.class);
         

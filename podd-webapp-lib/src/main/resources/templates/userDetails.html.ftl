@@ -26,12 +26,19 @@
                 <li><span class="bold">User Name: </span>${requestedUser.userName!""}</li>
                 <li><span class="bold">Email Address: </span>${requestedUser.email!""}</li>
                 <li><span class="bold">Status: </span>${requestedUser.status!""}</li>
-                <li><span class="bold">Role: </span>${requestedUser.repositoryRole.description!""}</li>
+                
+				<#if requestedUser.repositoryRoleList??>
+                <#list requestedUser.repositoryRoleList as role>
+			 		<li><span class="bold">Role: </span>${role.name!""}</li>
+				</#list>
+                </#if>
+                
+                
             </ol>
         </div>
 
         <div id="admin_right_pane" class="fieldset_without_border">
-            <div class="legend_no_indent">Contact Details</div>
+            <div class="legend_no_indent">Personal Details</div>
             <ol>
                 <li><span class="bold">Title: </span>${requestedUser.title!""}</li>
                 <li><span class="bold">First Name: </span>${requestedUser.firstName!""}</li>
@@ -41,6 +48,7 @@
                 <li><span class="bold">Phone Number: </span>${requestedUser.phoneNumber!""}</li>
                 <li><span class="bold">Mailing Address: </span>${requestedUser.postalAddress!""}</li>
                 <li><span class="bold">URL: </span>${requestedUser.homepage!""}</li>
+                <li><span class="bold">ORCID ID: </span>${requestedUser.orcid!""}</li>
             </ol>
         </div>
 

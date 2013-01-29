@@ -58,7 +58,25 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         
         final String body = results.getText();
         Assert.assertTrue(body.contains("User Name: "));
-        Assert.assertTrue(body.contains("john.test"));
+        Assert.assertTrue(body.contains("test.admin.user"));
+    }
+    
+    /**
+     * Test authenticated Admin user requesting details of another user
+     */
+    @Test
+    public void testGetUserDetailsOfOtherUserByAdministrator() throws Exception
+    {
+        final ClientResource userDetailsClientResource =
+                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS + "testUser"));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        Assert.assertTrue(body.contains("User Name: "));
+        Assert.assertTrue(body.contains("test.user"));
     }
     
 }

@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
@@ -144,6 +145,7 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
     protected static final String PARAM_USER_LASTNAME = "userLastName";
     protected static final String PARAM_USER_EMAIL = "userEmail";
     protected static final String PARAM_USER_STATUS = "userStatus";
+    protected static final String PARAM_USER_HOMEPAGE = "userHomePage";
     
     protected static final String PARAM_USER_ORCID = "userOrcid";
     protected static final String PARAM_USER_ORGANIZATION = "userOrganization";
@@ -170,6 +172,77 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
     }
     
     /**
+     * This method adds a User entry to the Realm and underlying Sesame Repository
+     * including PODD-specific user parameters.
+     *  
+     * @param nextUser
+     * @return
+     */
+    public URI addUser(final PoddUser nextUser)
+    {
+        URI nextUserUUID = super.addUser(nextUser);
+        
+        this.log.info("adding org, orcid, uri");
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepository().getConnection();
+            conn.begin();
+            
+            if(nextUser.getOrganization() != null)
+            {
+                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_ORGANIZATION,
+                        this.vf.createLiteral(nextUser.getOrganization()), this.getContexts());
+            }
+            
+            if(nextUser.getOrcid() != null)
+            {
+                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_ORCID,
+                        this.vf.createLiteral(nextUser.getOrcid()), this.getContexts());
+            }
+            
+            if(nextUser.getHomePage() != null)
+            {
+                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_HOMEPAGE, nextUser.getHomePage(),
+                        this.getContexts());
+            }
+            
+            conn.commit();
+        }
+        catch(final RepositoryException e)
+        {
+            this.log.error("Found repository exception while adding user", e);
+            try
+            {
+                conn.rollback();
+            }
+            catch(final RepositoryException e1)
+            {
+                this.log.error("Found unexpected exception while rolling back repository connection after exception");
+            }
+        }
+        finally
+        {
+            if(conn != null)
+            {
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found unexpected repository exception", e);
+                }
+            }
+        }
+        
+        return nextUserUUID;
+    }
+    
+    
+    
+    /**
      * Overridden to build a PoddUser from the data retrieved in a SPARQL result.
      * 
      * @param userIdentifier
@@ -191,6 +264,31 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
                         bindingSet.getValue(PARAM_USER_LASTNAME).stringValue(),
                         bindingSet.getValue(PARAM_USER_EMAIL).stringValue(),
                         PoddUserStatus.ACTIVE);
+        
+        Value organizationVal = bindingSet.getValue(PARAM_USER_ORGANIZATION);
+        if (organizationVal != null)
+        {
+            result.setOrganization(organizationVal.stringValue());
+        }
+        
+        Value orcidVal = bindingSet.getValue(PARAM_USER_ORCID);
+        if (orcidVal != null)
+        {
+            result.setOrcid(orcidVal.stringValue());
+        }
+        
+        Value homePageVal = bindingSet.getValue(PARAM_USER_HOMEPAGE);
+        if (homePageVal != null)
+        {
+            result.setHomePage(PoddRdfConstants.VALUE_FACTORY.createURI(homePageVal.stringValue()));
+        }
+
+        Value uriVal = bindingSet.getValue(PARAM_USER_URI);
+        if (uriVal != null)
+        {
+            result.setUri(PoddRdfConstants.VALUE_FACTORY.createURI(uriVal.stringValue()));
+        }
+        
         return result;
     }
     
@@ -299,6 +397,8 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORCID);
+        query.append(" ?"); 
+        query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
         
         query.append(" WHERE ");
         query.append(" { ");
@@ -312,12 +412,34 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
         query.append(" . ");
+
+        
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddWebConstants.PODD_USER_ORCID + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_ORCID);
+        query.append(" . ");
        
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USERSECRET + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_SECRET);
+        query.append(" . ");
+
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddWebConstants.PODD_USER_HOMEPAGE + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
+        query.append(" . ");
+
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddWebConstants.PODD_USER_ORGANIZATION + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         query.append(" . ");
 
         query.append(" OPTIONAL{ ?");

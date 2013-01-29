@@ -28,6 +28,17 @@ public interface PoddWebConstants
     public static final URI PODD_ROLEMAPPEDOBJECT = PoddRdfConstants.VALUE_FACTORY
             .createURI(PODD_USER_BASE, "roleMappedObject"); 
 
+    public static final URI PODD_USER_ORGANIZATION = PoddRdfConstants.VALUE_FACTORY
+            .createURI(PODD_USER_BASE, "organization");
+
+    public static final URI PODD_USER_ORCID = PoddRdfConstants.VALUE_FACTORY
+            .createURI(PODD_USER_BASE, "orcid");
+
+    public static final URI PODD_USER_HOMEPAGE = PoddRdfConstants.VALUE_FACTORY
+            .createURI(PODD_USER_BASE, "uri");
+
+    
+    
     
     public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";
 
@@ -121,7 +132,10 @@ public interface PoddWebConstants
      */
     public static final String PATH_RESET_PREFIX = "reset";
     
-    
+    /**
+     * Key used to represent user identifier part of a URL 
+     */
+    public static final String KEY_USER_IDENTIFIER = "identifier";
     
     public static final String PATH_PODD_PLANT = "/ontologies/poddPlant.owl";
     public static final String PATH_PODD_SCIENCE = "/ontologies/poddScience.owl";
@@ -132,10 +146,9 @@ public interface PoddWebConstants
     public static final String URI_PODD_BASE = "http://purl.org/podd/ns/poddBase";
 
 
+    
     public static final String PROPERTY_CHALLENGE_AUTH_METHOD = "podd.webservice.auth.challenge.method";
     public static final String PROPERTY_TEST_WEBSERVICE_RESET_KEY = "podd.webservice.reset.key";
-
-
 
     
     
