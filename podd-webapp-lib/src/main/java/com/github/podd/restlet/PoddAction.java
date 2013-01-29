@@ -153,7 +153,7 @@ public enum PoddAction
             true, 
             "Could not retrieve other user details", 
             Collections.singleton(PoddRoles.ADMIN.getRole()),
-            true
+            false
             ),
     
             
