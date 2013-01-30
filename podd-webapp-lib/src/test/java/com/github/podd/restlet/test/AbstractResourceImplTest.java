@@ -1,13 +1,13 @@
 package com.github.podd.restlet.test;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.PoddWebServiceApplicationImpl;
@@ -45,6 +45,18 @@ public class AbstractResourceImplTest
     public AbstractResourceImplTest()
     {
         super();
+    }
+    
+    /**
+     * Utility method to verify that freemarker has not encountered errors when generating output.
+     * 
+     * @param body
+     *            Generated output in which to look for possible freemarker errors.
+     */
+    public void assertFreemarker(final String body)
+    {
+        Assert.assertFalse("Freemarker error.", body.contains("Java backtrace for programmers:"));
+        Assert.assertFalse("Freemarker error.", body.contains("freemarker.core."));
     }
     
     /**
@@ -88,15 +100,15 @@ public class AbstractResourceImplTest
      *            slash.
      * @return A full URI that can be used to dereference the given path on the test server.
      */
-    public String getUrl(String path)
+    public String getUrl(final String path)
     {
         if(!path.startsWith("/"))
         {
-            return "http://localhost:" + TEST_PORT + "/podd/" + path;
+            return "http://localhost:" + AbstractResourceImplTest.TEST_PORT + "/podd/" + path;
         }
         else
         {
-            return "http://localhost:" + TEST_PORT + "/podd" + path;
+            return "http://localhost:" + AbstractResourceImplTest.TEST_PORT + "/podd" + path;
         }
     }
     

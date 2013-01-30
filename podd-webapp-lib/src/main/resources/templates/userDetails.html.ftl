@@ -1,7 +1,7 @@
 <#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
 <#-- @ftlvariable name="authenticatedUsername" type="java.lang.String" -->
-<#-- @ftlvariable name="requestedUser" type="podd.model.user.User" -->
+<#-- @ftlvariable name="requestedUser" type="java.util.Map" -->
 <#-- @ftlvariable name="isAdmin" type="boolean" -->
 
 <div id="title_pane">
@@ -26,12 +26,20 @@
                 <li><span class="bold">User Name: </span>${requestedUser.userName!""}</li>
                 <li><span class="bold">Email Address: </span>${requestedUser.email!""}</li>
                 <li><span class="bold">Status: </span>${requestedUser.status!""}</li>
-                <li><span class="bold">Role: </span>${requestedUser.repositoryRole.description!""}</li>
+                
+				<#if requestedUser.repositoryRoleList??>
+	                <li><span class="bold">Roles: </span></li>
+	                <#list requestedUser.repositoryRoleList as role>
+				 		<li><span class="bold">&nbsp;&nbsp;&nbsp;&nbsp;</span>${role.name!""}</li>
+					</#list>
+                </#if>
+                
+                
             </ol>
         </div>
 
         <div id="admin_right_pane" class="fieldset_without_border">
-            <div class="legend_no_indent">Contact Details</div>
+            <div class="legend_no_indent">Personal Details</div>
             <ol>
                 <li><span class="bold">Title: </span>${requestedUser.title!""}</li>
                 <li><span class="bold">First Name: </span>${requestedUser.firstName!""}</li>
@@ -40,7 +48,8 @@
                 <li><span class="bold">Professional Position: </span>${requestedUser.position!""}</li>
                 <li><span class="bold">Phone Number: </span>${requestedUser.phoneNumber!""}</li>
                 <li><span class="bold">Mailing Address: </span>${requestedUser.postalAddress!""}</li>
-                <li><span class="bold">URL: </span>${requestedUser.homepage!""}</li>
+                <li><span class="bold">URL: </span><a href=${requestedUser.homepage!""}>${requestedUser.homepage!""}</a></li>
+                <li><span class="bold">ORCID ID: </span>${requestedUser.orcid!""}</li>
             </ol>
         </div>
 

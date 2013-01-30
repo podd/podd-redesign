@@ -44,10 +44,9 @@ public abstract class AbstractPoddSchemaManagerTest
     
     /**
      * 
-     * @return  A new empty instance of an implementation of OWLReasonerFactory.
+     * @return A new empty instance of an implementation of OWLReasonerFactory.
      */
     protected abstract OWLReasonerFactory getNewReasonerFactory();
-
     
     /**
      * 
@@ -285,10 +284,10 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         try
         {
-        this.testSchemaManager.getCurrentSchemaOntologyVersion(null);
-        Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
+            this.testSchemaManager.getCurrentSchemaOntologyVersion(null);
+            Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
         }
-        catch (UnmanagedSchemaIRIException e)
+        catch(UnmanagedSchemaIRIException e)
         {
             Assert.assertEquals("NULL is not a managed schema ontology", e.getMessage());
         }
@@ -752,6 +751,8 @@ public abstract class AbstractPoddSchemaManagerTest
         InputStream testInputStream = this.getClass().getResourceAsStream("/ontologies/poddBase.owl");
         
         this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
+        
+        //TODO: verify
     }
     
 }

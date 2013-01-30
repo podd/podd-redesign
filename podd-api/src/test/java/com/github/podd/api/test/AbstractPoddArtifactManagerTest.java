@@ -315,7 +315,7 @@ public abstract class AbstractPoddArtifactManagerTest
         testFileReferenceManager.setProcessorFactoryRegistry(testFileRegistry);
         
         /**
-         * // TODO: Implement these purl processor factories PoddPurlProcessorFactory doiFactory =
+         * // FIXME: Implement these purl processor factories PoddPurlProcessorFactory doiFactory =
          * this.getNewDoiPurlProcessorFactory(); testPurlRegistry.add(doiFactory);
          * Assert.assertNotNull("DOI factory was null", httpFactory);
          * 
@@ -867,58 +867,5 @@ public abstract class AbstractPoddArtifactManagerTest
         }
     }
     
-    /**
-     * Helper method prints the contents of the given context of a Repository
-     */
-    private void printContents(final URI context) throws Exception
-    {
-        final RepositoryConnection conn = this.testRepositoryManager.getRepository().getConnection();
-        conn.begin();
-        
-        System.out.println("==================================================");
-        System.out.println("Graph = " + context);
-        System.out.println();
-        final org.openrdf.repository.RepositoryResult<Statement> repoResults =
-                conn.getStatements(null, null, null, false, context);
-        while(repoResults.hasNext())
-        {
-            final Statement stmt = repoResults.next();
-            System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {" + stmt.getObject()
-                    + "}");
-        }
-        System.out.println("==================================================");
-        
-        conn.rollback();
-        conn.close();
-    }
-    
-    /**
-     * Helper method prints the contents of the given context of a Repository
-     */
-    private void printContexts() throws Exception
-    {
-        final java.util.HashSet<String> contextSet = new java.util.HashSet<String>();
-        
-        final RepositoryConnection conn = this.testRepositoryManager.getRepository().getConnection();
-        conn.begin();
-        final org.openrdf.repository.RepositoryResult<Statement> repoResults =
-                conn.getStatements(null, null, null, true);
-        while(repoResults.hasNext())
-        {
-            final Statement stmt = repoResults.next();
-            contextSet.add(stmt.getContext().stringValue());
-        }
-        
-        System.out.println("==================================================");
-        System.out.println("Contexts in Repository:  ");
-        for(final String context : contextSet)
-        {
-            System.out.println(context);
-        }
-        System.out.println("==================================================");
-        
-        conn.rollback();
-        conn.close();
-    }
-    
+
 }

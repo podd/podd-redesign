@@ -1,6 +1,7 @@
 package com.github.podd.restlet;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
@@ -15,6 +16,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
 import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
+import org.restlet.security.Role;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
@@ -55,6 +57,7 @@ import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.TestResetResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
+import com.github.podd.resources.ViewArtifactResourceImpl;
 import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.template.Configuration;
@@ -62,9 +65,9 @@ import freemarker.template.Configuration;
 /**
  * This class handles all requests from clients to the OAS Web Service.
  * 
- * @author Peter Ansell p_ansell@yahoo.com 
+ * @author Peter Ansell p_ansell@yahoo.com
  * 
- * Copied from OAS project (https://github.com/ansell/oas)
+ *         Copied from OAS project (https://github.com/ansell/oas)
  * 
  */
 public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
@@ -80,7 +83,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
      */
     private volatile Configuration freemarkerConfiguration;
     private volatile ChallengeAuthenticator auth;
-    private volatile RestletUtilSesameRealm realm;
+    private volatile PoddSesameRealm realm;
     
     private Repository nextRepository;
     
@@ -97,11 +100,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     {
         super();
         
-        System.out.println("==============================");
-        System.out.println("PODD Web Application");
-        System.out.println("starting...");
-        System.out.println("==============================");
-        this.log.info("== Starting PODD Web Application ==");
+        this.log.info("\r\n" +
+        		"============================== \r\n" +
+        		"PODD Web Application \r\n" +
+        		"starting... \r\n" +
+        		"==============================");
         
         // List of protocols required by the application
         this.getConnectorService().getClientProtocols().add(Protocol.HTTP);
@@ -134,10 +137,18 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.initializePoddManagers();
     }
     
+    /**
+     * 
+     */
     @Override
-    public boolean authenticate(final PoddAction authenticationScope, final Request request, final Response response)
+    public boolean authenticate(final PoddAction action, final Request request, final Response response,
+            final Collection<URI> optionalObjectUris)
     {
-        if(authenticationScope.isAuthRequired() && !request.getClientInfo().isAuthenticated())
+        if(!action.isAuthRequired())
+        {
+            return true;
+        }
+        else if(!request.getClientInfo().isAuthenticated())
         {
             if(this.getAuthenticator() == null)
             {
@@ -151,11 +162,13 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             // response
             return false;
         }
-        else if(authenticationScope.isAuthRequired() && request.getClientInfo().isAuthenticated()
-                && authenticationScope.isRoleRequired()
-                && !authenticationScope.matchesForRoles(request.getClientInfo().getRoles()))
+        else if (!action.isRoleRequired())
         {
-            this.log.error("Authenticated user does not have enough privileges to execute the given action");
+            return true;
+        }
+        else if(!action.matchesForRoles(request.getClientInfo().getRoles()))
+        {
+            this.log.error("Authenticated user does not have enough privileges to execute the given action: {}", action);
             
             // FIXME: Implement auditing here
             // this.getDataHandler().addLogDetailsForRequest(message, referenceUri,
@@ -163,9 +176,32 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             
             return false;
         }
+        else if(!action.requiresObjectUris())
+        {
+            return true;
+        }
+        else if(optionalObjectUris == null || optionalObjectUris.isEmpty())
+        {
+            this.log.error("Action requires object URIs and none were given: {}", action);
+            
+            return false;
+        }
+        else
+        {
+            final Collection<Role> rolesCommonAcrossGivenObjects =
+                    this.getRealm().getCommonRolesForObjects(request.getClientInfo().getUser(), optionalObjectUris);
+            
+            if(!action.matchesForRoles(rolesCommonAcrossGivenObjects))
+            {
+                this.log.error("Authenticated user does not have enough privileges to execute the given action: {}" +
+                		" on the given objects: {}", action, optionalObjectUris);
+                return false;
+            }
+        }
         
         if(request.getClientInfo().isAuthenticated() && request.getClientInfo().getRoles().isEmpty())
         {
+            // TODO: can this case still occur?
             this.log.warn("Authenticated user did not have any roles: user={}", request.getClientInfo().getUser());
         }
         
@@ -195,8 +231,9 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(loginFormPath, CookieLoginResourceImpl.class);
         
         // Add a route for the reset service.
-        final String resetPath = PoddWebConstants.PATH_RESET_PREFIX 
-                + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
+        final String resetPath =
+                PoddWebConstants.PATH_RESET_PREFIX
+                        + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
         this.log.info("attaching reset service to path={}", resetPath);
         router.attach(resetPath, TestResetResourceImpl.class);
         
@@ -211,7 +248,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(indexPagePath, IndexResourceImpl.class);
         
         // Add a route for the User Details page.
-        final String userDetailsPath = PoddWebConstants.PATH_USER_DETAILS;
+        final String userDetailsPath = PoddWebConstants.PATH_USER_DETAILS + 
+                "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
         this.log.info("attaching user details service to path={}", userDetailsPath);
         router.attach(userDetailsPath, UserDetailsResourceImpl.class);
         
@@ -247,6 +285,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String attachFileReference = PoddWebConstants.PATH_ATTACH_FILE_REF;
         this.log.info("attaching File Reference Attach service to path={}", attachFileReference);
         router.attach(attachFileReference, FileReferenceAttachResourceImpl.class);
+        
+        // Add a route for the View Artifact page.
+        final String viewArtifact = PoddWebConstants.PATH_ARTIFACT_VIEW;
+        this.log.info("attaching View Artifact service to path={}", viewArtifact);
+        router.attach(viewArtifact, ViewArtifactResourceImpl.class);
+        
         
         // Add a route for Logout service
         // final String logout = "logout";
@@ -304,7 +348,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public RestletUtilSesameRealm getRealm()
+    public PoddSesameRealm getRealm()
     {
         return this.realm;
     }
@@ -334,7 +378,14 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     @Override
     public void setRealm(final RestletUtilSesameRealm nextRealm)
     {
-        this.realm = nextRealm;
+        if(nextRealm instanceof PoddSesameRealm)
+        {
+            this.realm = (PoddSesameRealm)nextRealm;
+        }
+        else
+        {
+            throw new IllegalArgumentException("We only know how to handle PoddSesameRealm");
+        }
     }
     
     @Override
@@ -393,9 +444,9 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.poddArtifactManager.setSesameManager(poddSesameManager);
         
         /*
-         * Since the schema ontology upload feature is not yet supported, necessary schemas
-         * are uploaded here at application starts up.
-         */    
+         * Since the schema ontology upload feature is not yet supported, necessary schemas are
+         * uploaded here at application starts up.
+         */
         try
         {
             this.getPoddSchemaManager().uploadSchemaOntology(
@@ -432,12 +483,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public void stop() throws Exception 
+    public void stop() throws Exception
     {
         super.stop();
         this.cleanUpResources();
         this.log.info("== Shutting down PODD Web Application ==");
-        System.out.println("===== Shutting down PODD =====");
     }
     
 }

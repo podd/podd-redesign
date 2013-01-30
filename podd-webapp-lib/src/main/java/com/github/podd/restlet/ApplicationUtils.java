@@ -4,6 +4,7 @@
 package com.github.podd.restlet;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -28,9 +29,9 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
-import com.github.ansell.restletutils.RestletUtilRoles;
-import com.github.ansell.restletutils.RestletUtilSesameRealm;
-import com.github.ansell.restletutils.RestletUtilUser;
+import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddUser;
+import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.ext.beans.BeansWrapper;
@@ -44,13 +45,12 @@ public class ApplicationUtils
 {
     private static final Logger log = LoggerFactory.getLogger(ApplicationUtils.class);
     
-    
     public static ChallengeAuthenticator getNewAuthenticator(final Realm nextRealm, final Context newChildContext)
     {
         ChallengeAuthenticator result = null;
         
-        //FIXME: read from a property
-        final String authMethod = 
+        // FIXME: read from a property
+        final String authMethod =
                 PropertyUtil.get(PoddWebConstants.PROPERTY_CHALLENGE_AUTH_METHOD,
                         PoddWebConstants.DEF_CHALLENGE_AUTH_METHOD);
         
@@ -80,8 +80,8 @@ public class ApplicationUtils
             result.setEnroler(nextRealm.getEnroler());
             
             result.setOptional(true);
-//                    Boolean.valueOf(PropertyUtil.getProperty(OasProperties.PROPERTY_CHALLENGE_AUTH_OPTIONAL,
-//                    OasProperties.DEFAULT_CHALLENGE_AUTH_OPTIONAL)));
+            // Boolean.valueOf(PropertyUtil.getProperty(OasProperties.PROPERTY_CHALLENGE_AUTH_OPTIONAL,
+            // OasProperties.DEFAULT_CHALLENGE_AUTH_OPTIONAL)));
         }
         else if(authMethod.equalsIgnoreCase("cookie"))
         {
@@ -92,20 +92,21 @@ public class ApplicationUtils
             
             result = new FixedRedirectCookieAuthenticator(newChildContext, nextRealm.getName(), secretKey);
             
-//            ((FixedRedirectCookieAuthenticator)result).setLoginFormPath("");
-//                    PropertyUtil.getProperty(
-//                    OasProperties.PROPERTY_LOGIN_FORM_PATH, OasProperties.DEFAULT_LOGIN_FORM_PATH));
+            // ((FixedRedirectCookieAuthenticator)result).setLoginFormPath("");
+            // PropertyUtil.getProperty(
+            // OasProperties.PROPERTY_LOGIN_FORM_PATH, OasProperties.DEFAULT_LOGIN_FORM_PATH));
             
             ((FixedRedirectCookieAuthenticator)result).setLoginPath(PoddWebConstants.PATH_LOGIN_SUBMIT);
-//                    PropertyUtil.getProperty(
-//                    OasProperties.PROPERTY_LOGIN_PATH, OasProperties.DEFAULT_LOGIN_PATH));
-//            
+            // PropertyUtil.getProperty(
+            // OasProperties.PROPERTY_LOGIN_PATH, OasProperties.DEFAULT_LOGIN_PATH));
+            //
             ((FixedRedirectCookieAuthenticator)result).setLogoutPath(PoddWebConstants.PATH_LOGOUT);
-//                    PropertyUtil.getProperty(
-//                    OasProperties.PROPERTY_LOGOUT_PATH, OasProperties.DEFAULT_LOGOUT_PATH));
-//            
-//            ((FixedRedirectCookieAuthenticator)result).setRedirectQueryName(PropertyUtil.getProperty(
-//                    OasProperties.PROPERTY_LOGIN_REDIRECT_FIELD, OasProperties.DEFAULT_LOGIN_REDIRECT_FIELD));
+            // PropertyUtil.getProperty(
+            // OasProperties.PROPERTY_LOGOUT_PATH, OasProperties.DEFAULT_LOGOUT_PATH));
+            //
+            // ((FixedRedirectCookieAuthenticator)result).setRedirectQueryName(PropertyUtil.getProperty(
+            // OasProperties.PROPERTY_LOGIN_REDIRECT_FIELD,
+            // OasProperties.DEFAULT_LOGIN_REDIRECT_FIELD));
             
             // FIXME: Make this configurable
             ((FixedRedirectCookieAuthenticator)result).setCookieName(PoddWebConstants.COOKIE_NAME);
@@ -116,16 +117,17 @@ public class ApplicationUtils
             ((FixedRedirectCookieAuthenticator)result).setInterceptingLogin(true);
             ((FixedRedirectCookieAuthenticator)result).setInterceptingLogout(true);
             ((FixedRedirectCookieAuthenticator)result).setFixedRedirectUri(PoddWebConstants.PATH_REDIRECT_LOGGED_IN);
-//                    PropertyUtil.getProperty(
-//                    OasProperties.PROPERTY_ONTOLOGY_MANAGER_PATH, OasProperties.DEFAULT_ONTOLOGY_MANAGER_PATH));
+            // PropertyUtil.getProperty(
+            // OasProperties.PROPERTY_ONTOLOGY_MANAGER_PATH,
+            // OasProperties.DEFAULT_ONTOLOGY_MANAGER_PATH));
             
             result.setMultiAuthenticating(false);
             
             result.setVerifier(nextRealm.getVerifier());
             result.setEnroler(nextRealm.getEnroler());
             result.setOptional(true);
-//                    Boolean.valueOf(PropertyUtil.getProperty(OasProperties.PROPERTY_CHALLENGE_AUTH_OPTIONAL,
-//                    OasProperties.DEFAULT_CHALLENGE_AUTH_OPTIONAL)));
+            // Boolean.valueOf(PropertyUtil.getProperty(OasProperties.PROPERTY_CHALLENGE_AUTH_OPTIONAL,
+            // OasProperties.DEFAULT_CHALLENGE_AUTH_OPTIONAL)));
             
         }
         else if(authMethod.equalsIgnoreCase("http"))
@@ -143,10 +145,10 @@ public class ApplicationUtils
         return result;
     }
     
-    
     public static Repository getNewRepository()
     {
-        final String repositoryUrl = ""; //PropertyUtil.getProperty(OasProperties.PROPERTY_SESAME_URL, "");
+        final String repositoryUrl = ""; // PropertyUtil.getProperty(OasProperties.PROPERTY_SESAME_URL,
+                                         // "");
         
         // if we weren't able to find a repository URL in the configuration, we setup an
         // in
@@ -187,10 +189,12 @@ public class ApplicationUtils
         }
     }
     
-    
     public static Configuration getNewTemplateConfiguration(final Context newChildContext)
     {
         final Configuration result = new Configuration();
+        result.setDefaultEncoding("UTF-8");
+        result.setURLEscapingCharset("UTF-8");
+        
         // FIXME: Make this configurable
         result.setTemplateLoader(new ContextTemplateLoader(newChildContext, "clap://class/templates"));
         
@@ -201,7 +205,6 @@ public class ApplicationUtils
         return result;
     }
     
-    
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
     {
         ApplicationUtils.log.info("application {}", application);
@@ -209,8 +212,7 @@ public class ApplicationUtils
         
         final List<Role> roles = application.getRoles();
         roles.clear();
-        roles.addAll(RestletUtilRoles.getRoles());
-        
+        roles.addAll(PoddRoles.getRoles());
         
         Repository nextRepository = null;
         try
@@ -221,7 +223,7 @@ public class ApplicationUtils
         {
             ApplicationUtils.log.error("Could not retrieve Repository from Application", e);
             // Throw exception up ??
-        } 
+        }
         
         // FIXME: Stub implementation in memory, based on the example restlet MemoryRealm class,
         // need to create a realm implementation that backs onto a database for persistence
@@ -230,27 +232,33 @@ public class ApplicationUtils
         // last name, and email address as necessary
         // FIXME: Restlet MemoryRealm creates a DefaultVerifier class that is not compatible with
         // DigestAuthenticator.setWrappedVerifier
-        final RestletUtilSesameRealm nextRealm =
-                new RestletUtilSesameRealm(nextRepository,
-                                PoddWebConstants.DEF_USER_MANAGEMENT_GRAPH);
+        final PoddSesameRealm nextRealm =
+                new PoddSesameRealm(nextRepository, PoddWebConstants.DEF_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
         
-        final RestletUtilUser testUser =
-                new RestletUtilUser("testUser", "testPassword", "Test", "User", "test.user@example.com");
+        final URI testUserHomePage = PoddRdfConstants.VALUE_FACTORY.createURI("http://www.example.com/testUser");
+        final PoddUser testUser =
+                new PoddUser("testUser", "testPassword".toCharArray(), "Test", "User", "test.user@example.com",
+                        PoddUserStatus.ACTIVE, testUserHomePage, "CSIRO", "Orcid-Test-User");
         final URI testUserUri = nextRealm.addUser(testUser);
-        nextRealm.map(testUser, RestletUtilRoles.AUTHENTICATED.getRole());
+        nextRealm.map(testUser, PoddRoles.AUTHENTICATED.getRole());
         
-        final RestletUtilUser testAdminUser =
-                new RestletUtilUser("testAdminUser", "testAdminPassword", "Test Admin", "User",
-                        "test.admin.user@example.com");
+        final URI testAdminUserHomePage = PoddRdfConstants.VALUE_FACTORY.createURI("http://www.example.com/testAdmin");
+        final PoddUser testAdminUser =
+                new PoddUser("testAdminUser", "testAdminPassword".toCharArray(), "Test Admin", "User",
+                        "test.admin.user@example.com", PoddUserStatus.ACTIVE, testAdminUserHomePage, "UQ", "Orcid-Test-Admin");
         final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
-        nextRealm.map(testAdminUser, RestletUtilRoles.ADMIN.getRole());
+        nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
+        nextRealm.map(testAdminUser, PoddRoles.AUTHENTICATED.getRole());
+        
+        final URI testArtifactUri = PoddRdfConstants.VALUE_FACTORY.createURI("http://purl.org/podd/ns/artifact/artifact89");
+         nextRealm.map(testAdminUser, PoddRoles.PROJECT_ADMIN.getRole(), testArtifactUri);
         
         final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);
         
-        ApplicationUtils.log.info("testAdminUserRoles: {}", testAdminUserRoles);
+        ApplicationUtils.log.info("testAdminUserRoles: {}, {}", testAdminUserRoles, testAdminUserRoles.size());
         
         final User findUser = nextRealm.findUser("testAdminUser");
         
