@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 
 import net.sourceforge.jwebunit.api.IElement;
+import net.sourceforge.jwebunit.exception.TestingEngineResponseException;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -787,35 +788,6 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     }
     
     /**
-     * Verify that the admin user in testing has the admin role.
-     */
-    @Ignore
-    @Test
-    public void testGetRolesAdmin()
-    {
-        this.login("testAdminUser", "testAdminPassword");
-        
-        // we should be at the ontology manager page with a 200 HTTP status after login
-        this.getWebTester().assertResponseCode(200);
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/service/testontologies/ontologymanager/"));
-        
-        // verify that the Login link has disappeared
-        this.getWebTester().assertTextNotPresent("Login");
-        
-        // verify the correct user was logged in and their name now appears
-        this.getWebTester().assertTextPresent("testAdminUser");
-        
-        // verify the Logout link is available
-        this.getWebTester().assertTextPresent("Logout");
-        
-        // verify the Administrator-only Upload link is available
-        this.getWebTester().assertTextPresent("Upload");
-        
-        this.getWebTester().gotoPage("/user");
-    }
-    
-    /**
      * Verify that the login process using the HTML login form does not fall over.
      */
     @Test
@@ -868,6 +840,157 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     }
     
     /**
+     * Verify that the login with invalid credentials is not possible.
+     */
+    @Test
+    public void testHtmlLoginInvalidCredentials()
+    {
+        this.login("testUser", "wrongPassword");
+        
+        // we should be at the index page with a 200 status code, but not logged in
+        this.getWebTester().assertResponseCode(200);
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
+                .endsWith("/index"));
+        
+        // verify that the Login link has disappeared
+        this.getWebTester().assertTextPresent("Login");
+        
+        // verify the user was NOT logged in
+        this.getWebTester().assertTextNotPresent("Test User");
+        
+        // verify the Logout link is NOT available
+        this.getWebTester().assertTextNotPresent("Logout");
+    }
+
+
+    /**
+     * Test viewing current user details
+     */
+    @Test
+    public void testUserDetailsPage()
+    {
+        this.login("testUser", "testPassword");
+        this.getWebTester().assertResponseCode(200);
+
+        this.getWebTester().clickLinkWithText("User page");
+        this.getWebTester().assertResponseCode(200);
+        
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
+                .endsWith("/testUser"));
+        
+        // verify user details page headings are present
+        this.getWebTester().assertTextPresent("Account Details");
+        this.getWebTester().assertTextPresent("Personal Details");
+        
+        // verify the Administrator links are NOT available
+        this.getWebTester().assertTextNotPresent("List Users");
+        this.getWebTester().assertTextNotPresent("Create User");
+    }
+    
+    /**
+     * Test viewing current user details as Admin
+     */
+    @Test
+    public void testUserDetailsPageAsAdmin()
+    {
+        this.login("testAdminUser", "testAdminPassword");
+        this.getWebTester().assertResponseCode(200);
+
+        this.getWebTester().clickLinkWithText("User page");
+        this.getWebTester().assertResponseCode(200);
+        
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
+                .endsWith("/testAdminUser"));
+        
+        // verify user details page headings are present
+        this.getWebTester().assertTextPresent("Account Details");
+        this.getWebTester().assertTextPresent("Personal Details");
+        
+        // verify the Administrator links are available
+        this.getWebTester().assertTextPresent("List Users");
+        this.getWebTester().assertTextPresent("Create User");
+        this.getWebTester().assertTextPresent("Administrator");
+    }
+    
+    /**
+     * Test viewing user details of a non-existent user as Admin
+     */
+    @Test
+    public void testUserDetailsPageOfNonExistentUser()
+    {
+        this.login("testAdminUser", "testAdminPassword");
+        this.getWebTester().assertResponseCode(200);
+
+        try
+        {
+            this.getWebTester().gotoPage("/user/noSuchUser");
+            Assert.fail("An exception should've been thrown here.");
+        }
+        catch (TestingEngineResponseException e)
+        {
+            Assert.assertTrue("Not the expected exception", e.getMessage().contains("unexpected status code"));
+        }
+        this.getWebTester().assertResponseCode(404);
+        
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
+                .endsWith("/noSuchUser"));
+        
+        // verify error message is present
+        this.getWebTester().assertTextPresent("ERROR");
+    }
+    
+    /**
+     * Test viewing user details of another user while logged in as Admin
+     */
+    @Test
+    public void testUserDetailsPageOfOtherUserAsAdmin()
+    {
+        this.login("testAdminUser", "testAdminPassword");
+        this.getWebTester().assertResponseCode(200);
+
+        this.getWebTester().gotoPage("/user/testUser");
+        this.getWebTester().assertResponseCode(200);
+        
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
+                .endsWith("/testUser"));
+        
+        // verify user details page headings are present
+        this.getWebTester().assertTextPresent("Account Details");
+        this.getWebTester().assertTextPresent("Personal Details");
+        
+        // verify the Administrator links are available
+        this.getWebTester().assertTextPresent("List Users");
+        this.getWebTester().assertTextPresent("Create User");
+    }
+    
+    /**
+     * Test viewing user details of another user which is unauthorized
+     */
+    @Test
+    public void testUserDetailsPageOfOtherUserUnauthorized()
+    {
+        this.login("testUser", "testPassword");
+        this.getWebTester().assertResponseCode(200);
+
+        try
+        {
+            this.getWebTester().gotoPage("/user/testAdminUser");
+            Assert.fail("An exception should've been thrown here.");
+        }
+        catch (TestingEngineResponseException e)
+        {
+            Assert.assertTrue("Not the expected exception", e.getMessage().contains("unexpected status code"));
+        }
+        this.getWebTester().assertResponseCode(401);
+        
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
+                .endsWith("/testAdminUser"));
+        
+        // verify an error indication is present
+        this.getWebTester().assertTextPresent("ERROR");
+    }
+
+    /**
      * Quick test for resource loading and the clicking of a button on a page to generate a dialog
      * using Javascript.
      */
@@ -885,20 +1008,15 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     }
     
     /**
-     * Tests whether an HTTP GET request to the Ontology Manager main page using text/html generates
+     * Tests whether an HTTP GET request to the index page using text/html generates
      * an HTTP 200 response.
-     * 
      */
-    @Ignore
     @Test
-    public void testSuccessEmptyOntologyManagerMainPageHtml()
+    public void testSuccessIndexPageHtml()
     {
-        // setupTestAcceptHeader();
-        
-        this.getWebTester().beginAt("/service/testontologies/ontologymanager/");
+        this.getWebTester().beginAt("/index");
         
         this.getWebTester().assertHeaderEquals("Content-Type", "text/html; charset=UTF-8");
-        
         this.getWebTester().assertResponseCode(200);
     }
     

@@ -28,9 +28,10 @@
                 <li><span class="bold">Status: </span>${requestedUser.status!""}</li>
                 
 				<#if requestedUser.repositoryRoleList??>
-                <#list requestedUser.repositoryRoleList as role>
-			 		<li><span class="bold">Role: </span>${role.name!""}</li>
-				</#list>
+	                <li><span class="bold">Roles: </span></li>
+	                <#list requestedUser.repositoryRoleList as role>
+				 		<li><span class="bold">&nbsp;&nbsp;&nbsp;&nbsp;</span>${role.name!""}</li>
+					</#list>
                 </#if>
                 
                 
@@ -47,7 +48,7 @@
                 <li><span class="bold">Professional Position: </span>${requestedUser.position!""}</li>
                 <li><span class="bold">Phone Number: </span>${requestedUser.phoneNumber!""}</li>
                 <li><span class="bold">Mailing Address: </span>${requestedUser.postalAddress!""}</li>
-                <li><span class="bold">URL: </span>${requestedUser.homepage!""}</li>
+                <li><span class="bold">URL: </span><a href=${requestedUser.homepage!""}>${requestedUser.homepage!""}</a></li>
                 <li><span class="bold">ORCID ID: </span>${requestedUser.orcid!""}</li>
             </ol>
         </div>
