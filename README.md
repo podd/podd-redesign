@@ -6,9 +6,11 @@ The prototype module contains some simple code in the form of JUnit tests to hig
 
 # Dependencies
 
-This project uses three libraries that do not have the required versions available in maven repositories. These dependencies can be compiled by running "mvn clean install" on the following three repositories in the order they are given here:
+The following dependencies are fetched by maven from the Sonatype Snapshots repository for snapshots, or from Maven Central for releases.
 
-* SesameTools: https://github.com/ansell/sesametools/tree/develop
-* OWLAPI: https://github.com/ansell/owlapi/tree/ansellpatches
-* Pellet: https://github.com/ansell/pellet/tree/develop
-
+* OWLAPI: https://github.com/ansell/owlapi/tree/ansellpatches This is patched to provide direct interaction with OpenRDF Sesame.
+* OpenRDF Sesame: https://github.com/ansell/openrdf-sesame/tree/master
+* Pellet: https://github.com/ansell/pellet/tree/develop This is patched to use the OWLAPI Sesame patches.
+* Restlet Utils: https://github.com/ansell/restlet-utils/tree/master
+* Property Util: https://github.com/ansell/property-util/tree/master
+* Abstract Service Loader: https://github.com/ansell/abstract-service-loader/tree/master
