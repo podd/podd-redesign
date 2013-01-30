@@ -62,8 +62,8 @@ public class ViewArtifactResourceImpl extends AbstractPoddResourceImpl
         this.log.info("authenticated user: {}", user);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-//        dataModel.put("contentTemplate", "index.html.ftl");
-        dataModel.put("contentTemplate", "objectDetails.html.ftl");
+        dataModel.put("contentTemplate", "index.html.ftl");
+//        dataModel.put("contentTemplate", "objectDetails.html.ftl");
         dataModel.put("pageTitle", "View Artifact");
         
         final Map<String, Object> artifactDataMap = this.getRequestedArtifact(artifactUri);
