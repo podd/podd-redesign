@@ -1,7 +1,7 @@
 <#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
 <#-- @ftlvariable name="authenticatedUsername" type="java.lang.String" -->
-<#-- @ftlvariable name="requestedUser" type="podd.model.user.User" -->
+<#-- @ftlvariable name="requestedUser" type="java.util.Map" -->
 <#-- @ftlvariable name="isAdmin" type="boolean" -->
 
 <div id="title_pane">
