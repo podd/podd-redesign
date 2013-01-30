@@ -252,7 +252,9 @@ public class ApplicationUtils
         final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
         nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
         nextRealm.map(testAdminUser, PoddRoles.AUTHENTICATED.getRole());
-        // nextRealm.map(testAdminUser, PoddRoles.PROJECT_ADMIN.getRole(), null);
+        
+        final URI testArtifactUri = PoddRdfConstants.VALUE_FACTORY.createURI("http://purl.org/podd/ns/artifact/artifact89");
+         nextRealm.map(testAdminUser, PoddRoles.PROJECT_ADMIN.getRole(), testArtifactUri);
         
         final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);
         

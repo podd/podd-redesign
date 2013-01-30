@@ -121,6 +121,11 @@ public interface PoddWebConstants
      * Path to delete an artifact. This uses HTTP delete method 
      */
     public static final String PATH_ARTIFACT_DELETE = "artifact";
+
+    /**
+     * Path to view an artifact.
+     */
+    public static final String PATH_ARTIFACT_VIEW = "artifact/view";
     
     /**
      * Path to the file reference attachment service
@@ -136,6 +141,11 @@ public interface PoddWebConstants
      * Key used to represent user identifier part of a URL 
      */
     public static final String KEY_USER_IDENTIFIER = "identifier";
+
+    /**
+     * Key used to represent an artifact id as part of a request 
+     */
+    public static final String KEY_ARTIFACT_IDENTIFIER = "artifacturi";
     
     public static final String PATH_PODD_PLANT = "/ontologies/poddPlant.owl";
     public static final String PATH_PODD_SCIENCE = "/ontologies/poddScience.owl";
@@ -150,6 +160,5 @@ public interface PoddWebConstants
     public static final String PROPERTY_CHALLENGE_AUTH_METHOD = "podd.webservice.auth.challenge.method";
     public static final String PROPERTY_TEST_WEBSERVICE_RESET_KEY = "podd.webservice.reset.key";
 
-    
     
 }
