@@ -72,7 +72,7 @@ public enum PoddAction
      * unpublished artifacts.
      */
     UNPUBLISHED_ARTIFACT_READ(
-            false, 
+            true, 
             "Failed to read artifact", 
             new HashSet<Role>(Arrays.asList(
                     PoddRoles.PROJECT_ADMIN.getRole(),
