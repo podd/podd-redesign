@@ -3,9 +3,12 @@
  */
 package com.github.podd.resources;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openrdf.model.URI;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -36,7 +39,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation getArtifactPageHtml(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ROLE_EDIT);
+        //TODO: set requested artifact URI
+        Collection<URI> objectUris = Collections.<URI>emptySet();
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, objectUris);
         
         this.log.info("getArtifactHtml");
         final User user = this.getRequest().getClientInfo().getUser();
