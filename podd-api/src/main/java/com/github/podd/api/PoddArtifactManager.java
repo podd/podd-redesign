@@ -60,9 +60,12 @@ public interface PoddArtifactManager
      * artifact is returned.
      * 
      * @param artifactIRI
-     * @return
+     *            The IRI of the Artifact to fetch. Can be either the version or the ontology IRI.
+     * @return An {@link InferredOWLOntologyID} containing the full details for the artifact.
+     * @throws UnmanagedArtifactIRIException
+     *             If the artifact is not managed.
      */
-    InferredOWLOntologyID getArtifactByIRI(IRI artifactIRI);
+    InferredOWLOntologyID getArtifactByIRI(IRI artifactIRI) throws UnmanagedArtifactIRIException;
     
     /**
      * 

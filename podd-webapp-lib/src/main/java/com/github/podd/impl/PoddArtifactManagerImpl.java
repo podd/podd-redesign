@@ -115,9 +115,35 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public InferredOWLOntologyID getArtifactByIRI(final IRI artifactIRI)
+    public InferredOWLOntologyID getArtifactByIRI(final IRI artifactIRI) throws UnmanagedArtifactIRIException
     {
-        throw new RuntimeException("TODO: Implement getArtifactByIRI");
+        RepositoryConnection repositoryConnection = null;
+        
+        try
+        {
+            repositoryConnection = this.getRepositoryManager().getRepository().getConnection();
+            
+            return this.getSesameManager().getCurrentArtifactVersion(artifactIRI, repositoryConnection,
+                    this.getRepositoryManager().getArtifactManagementGraph());
+        }
+        catch(OpenRDFException e)
+        {
+            throw new UnmanagedArtifactIRIException(artifactIRI, e);
+        }
+        finally
+        {
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(RepositoryException e)
+                {
+                    this.log.error("Failed to close repository connection", e);
+                }
+            }
+        }
     }
     
     /*
