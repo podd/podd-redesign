@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -76,23 +77,27 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
         
-        // FIXME: Change the URI munging approach from the prototype to use a query parameter
-        String artifactUri = this.getRequest().getResourceRef().getQueryAsForm().getFirstValue("artifact", true);
-        
-        InferredOWLOntologyID ontologyID =
-                this.getPoddApplication().getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
-        
-        // TODO: support prototype method for this
-        String includeInferredString =
-                this.getRequest().getResourceRef().getQueryAsForm().getFirstValue("includeInferred", true);
-        boolean includeInferred = Boolean.valueOf(includeInferredString);
-        
         try
         {
+            // FIXME: Change the URI munging approach from the prototype to use a query parameter
+            String artifactUri = this.getRequest().getResourceRef().getQueryAsForm().getFirstValue("artifact", true);
+            
+            InferredOWLOntologyID ontologyID =
+                    this.getPoddApplication().getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+            
+            // TODO: support prototype method for this
+            String includeInferredString =
+                    this.getRequest().getResourceRef().getQueryAsForm().getFirstValue("includeInferred", true);
+            boolean includeInferred = Boolean.valueOf(includeInferredString);
+            
             this.getPoddApplication()
                     .getPoddArtifactManager()
                     .exportArtifact(ontologyID, stream,
                             RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE), includeInferred);
+        }
+        catch(UnmanagedArtifactIRIException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
         catch(OpenRDFException | PoddException | IOException e)
         {
