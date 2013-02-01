@@ -72,7 +72,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    @Get("rdf|rj")
+    @Get("rdf|rj|ttl")
     public Representation getArtifactRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
