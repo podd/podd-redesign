@@ -33,8 +33,8 @@ public interface PoddArtifactManager
      * Exports the given artifact to the given output stream using an RDF format.
      * 
      * @param ontologyId
-     *            The {@link OWLOntologyID} of the artifact to export. This must contain both an
-     *            ontology IRI and a version IRI.
+     *            The {@link InferredOWLOntologyID} of the artifact to export. This must contain
+     *            both an ontology IRI and a version IRI.
      * @param outputStream
      *            The {@link OutputStream} to export the RDF statements to.
      * @param format
@@ -50,8 +50,8 @@ public interface PoddArtifactManager
      *             If there is an error accessing the RDF storage, or an error writing to the output
      *             stream.
      */
-    void exportArtifact(OWLOntologyID ontologyId, OutputStream outputStream, RDFFormat format, boolean includeInferred)
-        throws OpenRDFException, PoddException, IOException;
+    void exportArtifact(InferredOWLOntologyID ontologyId, OutputStream outputStream, RDFFormat format,
+            boolean includeInferred) throws OpenRDFException, PoddException, IOException;
     
     /**
      * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI.
@@ -133,12 +133,13 @@ public interface PoddArtifactManager
      *            The OWL Ontology ID of the PODD Artifact that needs to be published.
      * @return The full inferred OWL Ontology ID of the published Artifact.
      * @throws PublishArtifactException
-     *            If the artifact could not be published for any reason.
+     *             If the artifact could not be published for any reason.
      * @throws OpenRDFException
      * @throws UnmanagedArtifactIRIException
-     *            If this is not a managed artifact  
+     *             If this is not a managed artifact
      */
-    InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId) throws PublishArtifactException, OpenRDFException, UnmanagedArtifactIRIException;
+    InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId) throws PublishArtifactException, OpenRDFException,
+        UnmanagedArtifactIRIException;
     
     void setFileReferenceManager(PoddFileReferenceManager fileManager);
     
