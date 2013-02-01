@@ -23,7 +23,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserDetailsResourceImplTest extends AbstractResourceImplTest
 {
-
+    
     /**
      * Test requesting details of a non-existent user results in a 404 response
      */
@@ -31,12 +31,12 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testErrorGetUserDetailsOfNonExistentUser() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS + "noSuchUser"));
-
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "noSuchUser"));
+        
         try
         {
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
+            RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                    MediaType.TEXT_HTML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
         }
         catch(final ResourceException e)
         {
@@ -51,7 +51,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testErrorGetUserDetailsOfOtherUserByNonAdmin() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
         
         try
         {
@@ -72,7 +72,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testErrorGetUserDetailsWithoutAuthentication() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
         
         try
         {
@@ -92,7 +92,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testGetUserDetailsOfOtherUserByAdministrator() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS + "testUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "testUser"));
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
@@ -110,7 +110,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testGetUserDetailsWithAuthentication() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,

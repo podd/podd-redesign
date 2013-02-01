@@ -18,7 +18,7 @@ import com.github.podd.utils.PoddWebConstants;
  * Test View Artifacts resource at "artifact/view"
  * 
  * @author kutila
- *
+ * 
  */
 public class ViewArtifactResourceImplTest extends AbstractResourceImplTest
 {
@@ -30,9 +30,10 @@ public class ViewArtifactResourceImplTest extends AbstractResourceImplTest
     public void testViewArtifactSimple() throws Exception
     {
         final ClientResource viewArtifactClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_ARTIFACT_VIEW));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_VIEW));
         
-        viewArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, "http://purl.org/podd/ns/artifact/artifact89");
+        viewArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
+                "http://purl.org/podd/ns/artifact/artifact89");
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(viewArtifactClientResource, Method.GET, null,

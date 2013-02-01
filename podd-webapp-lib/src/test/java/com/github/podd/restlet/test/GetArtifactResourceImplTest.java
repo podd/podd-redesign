@@ -34,7 +34,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     public void testErrorGetArtifactWithoutAuthentication() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         
         try
         {
@@ -54,7 +54,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     public void testGetArtifactWithAuthentication() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl("/" + PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
