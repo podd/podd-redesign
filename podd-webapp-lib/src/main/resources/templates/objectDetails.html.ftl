@@ -21,7 +21,7 @@
 <#-- @ftlvariable name="canUndelete" type="boolean" -->
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
 
-<script type="text/javascript" src="${baseUrl}/scripts/animatedcollapse.js">
+<script type="text/javascript" src="${baseUrl}/resources/scripts/animatedcollapse.js">
     /* this needs to be placed at the top of the file so that we can add divs as they are created !!!! */
     /***********************************************
     * Animated Collapsible DIV v2.4- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
@@ -56,14 +56,14 @@
     <div id="details">  <!-- Collapsible div -->
         <!-- standard_attributes -->
         <#if forbidden?? && forbidden>
-            <h4 class="errorMsg">Object: ${pid} is deleted or inactive. Please contact repository administrator
+            <h4 class="errorMsg">Object: [${pid}] is deleted or inactive. Please contact repository administrator
             if you believe it has been deleted in error.</h4>
         <#elseif poddObject??>
-            <div about="${baseUrl}/object/${poddObject.getPid()!"unknown-pid"}" id="${objectType!"object"}_details" class="fieldset">
+            <div about="${baseUrl}/object/${poddObject.pid!"unknown-pid"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
-                    <li><span class="bold">ID: </span><span property="podd:hasID" datatype="xsd:string">${poddObject.getPid()!""}</span></li>
-                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.getLocalName()!""}</span></li>
-                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.getLabel()!""}</span></li>
+                    <li><span class="bold">ID: </span><span property="podd:hasID" datatype="xsd:string">${poddObject.pid!""}</span></li>
+                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.localName!""}</span></li>
+                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.label!""}</span></li>
                     <!-- data, object and field set attributes -->
                     <#if elementList??>
                        <#list elementList  as field>
@@ -71,10 +71,10 @@
                         </#list>
                     </#if>
                     <!-- creation infomation -->
-                    <li><span class="bold">Creator: </span><span property="dcterms:creator" datatype="xsd:string">${poddObject.getCreator().getFirstName()!""} ${poddObject.getCreator().getLastName()!""}</span></li>
+                    <li><span class="bold">Creator: </span><span property="dcterms:creator" datatype="xsd:string">${poddObject.creator.firstName!""} ${poddObject.creator.lastName!""}</span></li>
                     <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
                     <li><span class="bold">Creation Date: </span><span property="dcterms:date" datatype="xsd:string">${creationDate!""}</span></li>
-                    <li><span class="bold">Last modified by: </span><span property="dcterms:creator" datatype="xsd:string">${poddObject.getLastModifier().getFirstName()!""} ${poddObject.getLastModifier().getLastName()!""}</span></li>
+                    <li><span class="bold">Last modified by: </span><span property="dcterms:creator" datatype="xsd:string">${poddObject.lastModifier.firstName!""} ${poddObject.lastModifier.lastName!""}</span></li>
                     <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
                     <li><span class="bold">Last modification date: </span><span property="dcterms:modified" datatype="xsd:string">${modifiedDate!""}</span></li>
                 </ol>
@@ -104,38 +104,38 @@
 <#include "attachedFilesDetails.html.ftl"/>
 
 <br />
-<#include "hierarchy.html.ftl"/>
+<#--include "hierarchy.html.ftl"/-->
 
 <br />    
 <div id="buttonwrapper">
     <#if poddObject??>
 	    <#if  canEditObject?? && canEditObject>
-        <a href="${baseUrl}/object/${poddObject.getPid()!"unknown-pid"}/edit">Edit Object</a>
+        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/edit">Edit Object</a>
         </#if>
         <#if canCopyObject?? && canCopyObject>
-        <a href="${baseUrl}/services/manageClipboard?type=object&pid=${poddObject.getPid()}" id="copy_btn">Copy</a>
+        <a href="${baseUrl}/services/manageClipboard?type=object&pid=${poddObject.pid}" id="copy_btn">Copy</a>
         </#if>
         <#if  canEditObject?? && canEditObject>
-        <a href="${baseUrl}/clipboard?type=object&mp;target=${poddObject.getPid()}">Paste</a>
+        <a href="${baseUrl}/clipboard?type=object&mp;target=${poddObject.pid}">Paste</a>
         </#if>
         <#if  canAddChildren?? && canAddChildren>
-        <a href="${baseUrl}/object/${poddObject.getPid()!"unknown-pid"}/add">Add Child Object</a>
+        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/add">Add Child Object</a>
         </#if>
         <#if  canPublish?? && canPublish>
-        <a href="${baseUrl}/object/${poddObject.getPid()!"unknown-pid"}/publish?publish=true">Publish Project</a>
+        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/publish?publish=true">Publish Project</a>
         </#if>
         <#if  canUnpublish?? && canUnpublish>
-        <a href="${baseUrl}/object/${poddObject.getPid()!"unknown-pid"}/generatePURLs">Update PURLs</a>
-        <a href="${baseUrl}/object/${poddObject.getPid()!"unknown-pid"}/publish?publish=false">Unpublish Project</a>
+        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/generatePURLs">Update PURLs</a>
+        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/publish?publish=false">Unpublish Project</a>
         </#if>
         <#if objectType?? && objectType == 'Investigation'>
-        	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.getPid()!"unknown-pid"}">Download hierarchy attachments</a>
+        	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.pid!"unknown-pid"}">Download hierarchy attachments</a>
         </#if>        
         <#if canDelete?? && canDelete>
-        <a href="${baseUrl}/object/${poddObject.getPid()!"unknown-pid"}/delete">Delete</a>
+        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/delete">Delete</a>
         </#if>
         <#if canUndelete?? && canUndelete>
-        <a href="${baseUrl}/object/${poddObject.getPid()!"unknown-pid"}/delete">Undelete</a>
+        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/delete">Undelete</a>
         </#if>
     <#else>
     <a href="${baseUrl}/project">Cancel</a>    
@@ -182,25 +182,25 @@
 </#macro>
 
 <#macro refersToTable element>
-    <h3 class="underlined_heading">${element.getLabel()!""}
-        <a href="javascript:animatedcollapse.toggle('${element.getPropertyUriWithoutNamespace()}_details')" icon="toggle" title="View Details"></a>
+    <h3 class="underlined_heading">${element.label!""}
+        <a href="javascript:animatedcollapse.toggle('${element.propertyUriWithoutNamespace}_details')" icon="toggle" title="View Details"></a>
     </h3>
-	<div id="${element.getPropertyUriWithoutNamespace()}_details">
+	<div id="${element.propertyUriWithoutNamespace}_details">
 
     <#assign selectedObjectCount = 0>
     <#if isAdmin>
-        <#assign selectedObjectCount = element.getAvailableObjects()?size>
+        <#assign selectedObjectCount = element.availableObjects?size>
     <#else>
         <#assign selectedObjectCount = 0>
-        <#list element.getAvailableObjects() as object>
-            <#if object.isSelected() && object.getState() == "A">
+        <#list element.availableObjects as object>
+            <#if object.isSelected && object.state == "A">
             <#assign selectedObjectCount = selectedObjectCount + 1>
             </#if>
         </#list>
     </#if>
     
-    <#if element.areSelectedObjects() && selectedObjectCount != 0>
-    <table id='${element.getPropertyUriWithoutNamespace()}' class="tablesorter {sortlist: [[0,0]]}" cellspacing="0">
+    <#if element.areSelectedObjects && selectedObjectCount != 0>
+    <table id='${element.propertyUriWithoutNamespace}' class="tablesorter {sortlist: [[0,0]]}" cellspacing="0">
 		<thead>
 			<tr>
 			    <th>ID</th>
@@ -217,22 +217,22 @@
             </tr>
         </tfoot>
         <tbody>
-			<#list element.getAvailableObjects() as object>
-            <#if object.isSelected() && (object.getState() == "A" || isAdmin)>
+			<#list element.availableObjects as object>
+            <#if object.isSelected && (object.state == "A" || isAdmin)>
             <tr>
-                <#if object.getType() == "error">
-                    <td class="errorMsg"><a href="${baseUrl}/object/${object.getPid()}">${object.getPid()!""}</a></td>
-                    <td class="errorMsg">${object.getTitle()!""}</td>
-                    <td class="errorMsg">${object.getDescription()!" - "}</td>
+                <#if object.type == "error">
+                    <td class="errorMsg"><a href="${baseUrl}/object/${object.pid}">${object.pid!""}</a></td>
+                    <td class="errorMsg">${object.title!""}</td>
+                    <td class="errorMsg">${object.description!" - "}</td>
                 <#else>
-                    <td><a href="${baseUrl}/object/${object.getPid()}">${object.getPid()!""}</a>
-                        <#if object.getState() != "A">
+                    <td><a href="${baseUrl}/object/${object.pid}">${object.pid!""}</a>
+                        <#if object.state != "A">
                          (<span class="descriptive">Deleted</span>)
                         </#if>
                     </td>
-                    <td>${object.getTitle()!""}</td>
+                    <td>${object.title!""}</td>
                     <td>
-                        <script type="text/javascript">writeAbstractWholeWords("${object.getDescription()!" - "}", 200);</script>
+                        <script type="text/javascript">writeAbstractWholeWords("${object.description!" - "}", 200);</script>
                     </td>
                 </#if>
 			</tr>
@@ -246,12 +246,12 @@
     </div>
 
     <script type="text/javascript">
-	    animatedcollapse.addDiv('${element.getPropertyUriWithoutNamespace()}_details', 'fade=1,hide=0');
+	    animatedcollapse.addDiv('${element.propertyUriWithoutNamespace}_details', 'fade=1,hide=0');
     </script>
-    <#if element.areSelectedObjects() && selectedObjectCount != 0>
+    <#if element.areSelectedObjects && selectedObjectCount != 0>
     <script type="text/javascript">
         $(document).ready(function() {
-            $("#${element.getPropertyUriWithoutNamespace()}")
+            $("#${element.propertyUriWithoutNamespace}")
             .tablesorter({
                 headers: {
                     0: { sorter: 'checkbox'}
@@ -291,7 +291,7 @@
             <#list referencedByList as object>
             <tr>
 				<td>${object.getConcept().getConceptName()!"-"}</td>
-                <td><a href="${baseUrl}/object/${object.getPid()}">${object.getPid()!""}</a>
+                <td><a href="${baseUrl}/object/${object.pid}">${object.pid!""}</a>
                     <#if object.getState() != "A">
                      (<span class="descriptive">Deleted</span>)
                     </#if>
@@ -306,7 +306,7 @@
     </table>
     <#if referencedByList?size < referencedByCount>
         ${referencedByList?size} of ${referencedByCount} referencing objects displayed. &nbsp;&nbsp;
-        <a href="${baseUrl}/allReferers/${poddObject.getPid()}" id="referee_btn" class="button">View All</a>
+        <a href="${baseUrl}/allReferers/${poddObject.pid}" id="referee_btn" class="button">View All</a>
         <br>
     </#if>
     </div>

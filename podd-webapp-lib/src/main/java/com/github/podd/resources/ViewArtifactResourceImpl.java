@@ -3,8 +3,11 @@
  */
 package com.github.podd.resources;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openrdf.model.URI;
@@ -62,12 +65,11 @@ public class ViewArtifactResourceImpl extends AbstractPoddResourceImpl
         this.log.info("authenticated user: {}", user);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "index.html.ftl");
-//        dataModel.put("contentTemplate", "objectDetails.html.ftl");
+//        dataModel.put("contentTemplate", "index.html.ftl");
+        dataModel.put("contentTemplate", "objectDetails.html.ftl");
         dataModel.put("pageTitle", "View Artifact");
-        
-        final Map<String, Object> artifactDataMap = this.getRequestedArtifact(artifactUri);
-        dataModel.put("poddObject", artifactDataMap);
+
+        this.populateDataModelWithArtifactData(artifactUri, dataModel);
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page
@@ -75,33 +77,89 @@ public class ViewArtifactResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    //FIXME: populate the data model with appropriate info as required by objectDetails.html.ftl
-    private Map<String, Object> getRequestedArtifact(URI artifactUri)
+    /**
+     * FIXME: populate the data model with appropriate info as required by objectDetails.html.ftl
+     * 
+     *  1. get artifact via the PODD API (as an OWLOntology object?)
+     *  2. populate Map with required info to go into data model
+     * 
+     * 
+     * @param artifactUri
+     * @param dataModel
+     */
+    private void populateDataModelWithArtifactData(URI artifactUri, Map<String, Object> dataModel)
     {
         final PoddArtifactManager artifactManager =
                 ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
         
 //        InferredOWLOntologyID ontologyID = artifactManager.getArtifactByIRI(IRI.create(artifactUri));
         
+        // hard-code the required values first to display a valid html page
+        //DEBUG
+        dataModel.put("forbidden", false);
+        dataModel.put("canEditObject", false);
+        dataModel.put("pid", artifactUri.stringValue());
+        dataModel.put("objectType", "artifact");
+        dataModel.put("creationDate", "2013-01-01");
+        dataModel.put("modifiedDate", "2013-01-31");
+
         
-        final Map<String, Object> objectDetailsMap = new HashMap<String, Object>();
-        objectDetailsMap.put("TODO: ", "Implement GetArtifactResourceImpl");
+//        dataModel.put("elementList", Arrays.asList("element1", "element2")); - TODO
         
-        objectDetailsMap.put("pid", artifactUri.stringValue());
-        objectDetailsMap.put("", "");
-        objectDetailsMap.put("", "");
-        objectDetailsMap.put("", "");
-        objectDetailsMap.put("", "");
-        objectDetailsMap.put("", "");
-        objectDetailsMap.put("", "");
-        objectDetailsMap.put("", "");
+        final Map<String, Object> poddObject = new HashMap<String, Object>();
+        poddObject.put("pid", artifactUri.stringValue());
+        poddObject.put("localName", "Hardcoded project title");
+        poddObject.put("label", "Dummy project from the resource");
+
+        // poddObject.creator
+        final Map<String, String> creator = new HashMap<String, String>();
+        poddObject.put("creator", creator);
+        creator.put("firstName", "Alice");
+        creator.put("lastName", "Land");
+
+        // poddObject.lastModifier
+        final Map<String, String> lastModifier = new HashMap<String, String>();
+        poddObject.put("lastModifier", lastModifier);
+        lastModifier.put("firstName", "Bob");
+        lastModifier.put("lastName", "Colt");
         
-        
-        final Map<String, String> roleMap = new HashMap<String, String>();
-        roleMap.put("description", "A dummy user account for testing");
-        objectDetailsMap.put("repositoryRole", roleMap);
+//        final Map<String, String> roleMap = new HashMap<String, String>();
+//        roleMap.put("description", "A dummy user account for testing");
+//        objectDetailsMap.put("repositoryRole", roleMap);
             
-        return objectDetailsMap;
+        dataModel.put("poddObject", poddObject);
+        
+        
+        final List<Object> refersToList = new ArrayList<Object>();
+        
+        final Map<String, Object> refersToElement = new HashMap<String, Object>();
+        refersToElement.put("label", "Refers To Label");
+        refersToElement.put("propertyUriWithoutNamespace", "artifact89");
+        refersToElement.put("availableObjects", this.getAvailableObjects());
+        refersToElement.put("areSelectedObjects", true);
+        
+        refersToList.add(refersToElement);
+        
+        dataModel.put("refersToList", refersToList);        
+    }
+
+    private List<Object> getAvailableObjects()
+    {
+        List<Object> list = new ArrayList<Object>();
+        for (int i = 0; i < 4; i++)
+        {
+            final Map<String, Object> anObject = new HashMap<String, Object>();
+            anObject.put("isSelected", true);
+            anObject.put("state", "A");
+            anObject.put("type", "IntrnalObject");
+            anObject.put("pid", "object:34343");
+            anObject.put("title", "Object " + i);
+            anObject.put("description", "This is a simple object within an artifact");
+            
+            list.add(anObject);
+        }
+        
+        return list;
     }
     
 }
