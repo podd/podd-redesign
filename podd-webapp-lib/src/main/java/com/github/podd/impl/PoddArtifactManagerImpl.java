@@ -6,11 +6,13 @@ package com.github.podd.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -18,6 +20,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -40,6 +43,7 @@ import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -72,16 +76,74 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public void exportArtifact(final OWLOntologyID ontologyId, final OutputStream outputStream, final RDFFormat format,
-            final boolean includeInferred) throws OpenRDFException, PoddException, IOException
+    public void exportArtifact(final InferredOWLOntologyID ontologyId, final OutputStream outputStream,
+            final RDFFormat format, final boolean includeInferred) throws OpenRDFException, PoddException, IOException
     {
-        throw new RuntimeException("TODO: Implement exportArtifact");
+        if(ontologyId.getOntologyIRI() == null || ontologyId.getVersionIRI() == null)
+        {
+            throw new PoddRuntimeException("Ontology IRI and Version IRI cannot be null");
+        }
+        
+        if(includeInferred && ontologyId.getInferredOntologyIRI() == null)
+        {
+            throw new PoddRuntimeException("Inferred Ontology IRI cannot be null");
+        }
+        
+        RepositoryConnection connection = this.getRepositoryManager().getRepository().getConnection();
+        
+        List<URI> contexts;
+        
+        if(includeInferred)
+        {
+            contexts =
+                    Arrays.asList(ontologyId.getVersionIRI().toOpenRDFURI(), ontologyId.getInferredOntologyIRI()
+                            .toOpenRDFURI());
+        }
+        else
+        {
+            contexts = Arrays.asList(ontologyId.getVersionIRI().toOpenRDFURI());
+        }
+        
+        try
+        {
+            connection.export(Rio.createWriter(format, outputStream), contexts.toArray(new Resource[] {}));
+        }
+        finally
+        {
+            connection.close();
+        }
     }
     
     @Override
-    public InferredOWLOntologyID getArtifactByIRI(final IRI artifactIRI)
+    public InferredOWLOntologyID getArtifactByIRI(final IRI artifactIRI) throws UnmanagedArtifactIRIException
     {
-        throw new RuntimeException("TODO: Implement getArtifactByIRI");
+        RepositoryConnection repositoryConnection = null;
+        
+        try
+        {
+            repositoryConnection = this.getRepositoryManager().getRepository().getConnection();
+            
+            return this.getSesameManager().getCurrentArtifactVersion(artifactIRI, repositoryConnection,
+                    this.getRepositoryManager().getArtifactManagementGraph());
+        }
+        catch(OpenRDFException e)
+        {
+            throw new UnmanagedArtifactIRIException(artifactIRI, e);
+        }
+        finally
+        {
+            if(repositoryConnection != null)
+            {
+                try
+                {
+                    repositoryConnection.close();
+                }
+                catch(RepositoryException e)
+                {
+                    this.log.error("Failed to close repository connection", e);
+                }
+            }
+        }
     }
     
     /*
@@ -252,7 +314,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // Before loading the statements into OWLAPI, ensure that the schema ontologies are
             // cached in memory
-            final Set<IRI> directImports = this.getSesameManager().getDirectImports(temporaryRepositoryConnection, randomContext);
+            final Set<IRI> directImports =
+                    this.getSesameManager().getDirectImports(temporaryRepositoryConnection, randomContext);
             for(final IRI schemaOntologyIRI : directImports)
             {
                 // Get the current version
@@ -371,15 +434,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /**
-     * This is not an API method. 
-     * QUESTION: Should this be moved to a separate utility class?
+     * This is not an API method. QUESTION: Should this be moved to a separate utility class?
      * 
      * This method takes a String terminating with a colon (":") followed by an integer and
      * increments this integer by one. If the input String is not of the expected format, appends
      * "1" to the end of the String.
      * 
-     * E.g.: 
-     * "http://purl.org/ab/artifact:55" is converted to "http://purl.org/ab/artifact:56"
+     * E.g.: "http://purl.org/ab/artifact:55" is converted to "http://purl.org/ab/artifact:56"
      * "http://purl.org/ab/artifact:5A" is converted to "http://purl.org/ab/artifact:5A1"
      * 
      * @param oldVersion
@@ -488,7 +549,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
     }
-
+    
     /*
      * (non-Javadoc)
      * 

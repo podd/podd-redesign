@@ -36,6 +36,8 @@ import com.github.podd.utils.PoddWebConstants;
  * View a PODD artifact in HTML format.
  * This Resource could potentially be merged with GetArtifactResourceImpl.java
  * 
+ * PA: Why was this created when GetArtifactResourceImpl was available??
+ * 
  * @author kutila
  * 
  */

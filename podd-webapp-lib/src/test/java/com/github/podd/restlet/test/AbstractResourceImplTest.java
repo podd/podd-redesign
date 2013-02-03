@@ -96,8 +96,8 @@ public class AbstractResourceImplTest
      * Returns the URI that can be used to access the given path.
      * 
      * @param path
-     *            The path on the temporary test server to access. This path must start with a
-     *            slash.
+     *            The path on the temporary test server to access. If the path does not start with a
+     *            slash one will be added.
      * @return A full URI that can be used to dereference the given path on the test server.
      */
     public String getUrl(final String path)
