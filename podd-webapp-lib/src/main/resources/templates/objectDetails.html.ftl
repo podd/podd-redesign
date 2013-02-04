@@ -112,9 +112,6 @@
 	    <#if  canEditObject?? && canEditObject>
         <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/edit">Edit Object</a>
         </#if>
-        <#if canCopyObject?? && canCopyObject>
-        <a href="${baseUrl}/services/manageClipboard?type=object&pid=${poddObject.pid}" id="copy_btn">Copy</a>
-        </#if>
         <#if  canEditObject?? && canEditObject>
         <a href="${baseUrl}/clipboard?type=object&mp;target=${poddObject.pid}">Paste</a>
         </#if>
