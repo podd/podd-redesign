@@ -92,7 +92,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
             }
             
-            this.log.info("requesting get artifact (HTML): {}", artifactUri);
+            this.log.info("requesting get artifact ({}): {}",variant.getMediaType().getName(), artifactUri);
             
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, 
                     Collections.<URI> singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));

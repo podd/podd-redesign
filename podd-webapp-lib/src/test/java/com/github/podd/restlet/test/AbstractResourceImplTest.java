@@ -41,6 +41,8 @@ public class AbstractResourceImplTest
     protected final boolean testNoAdminPrivileges = false;
     
     private Component component;
+
+    private PoddWebServiceApplication nextApplication;
     
     public AbstractResourceImplTest()
     {
@@ -77,7 +79,7 @@ public class AbstractResourceImplTest
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);
         
-        final PoddWebServiceApplication nextApplication = new PoddWebServiceApplicationImpl();
+        nextApplication = new PoddWebServiceApplicationImpl();
         
         // Attach the sample application.
         this.component.getDefaultHost().attach(
@@ -90,6 +92,16 @@ public class AbstractResourceImplTest
         
         // Start the component.
         this.component.start();
+    }
+    
+    /**
+     * Get a reference to the Restlet Application.
+     * 
+     * @return
+     */
+    public PoddWebServiceApplication getApplication()
+    {
+        return this.nextApplication;
     }
     
     /**
