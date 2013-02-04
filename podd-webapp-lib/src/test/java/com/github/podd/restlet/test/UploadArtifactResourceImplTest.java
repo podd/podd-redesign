@@ -28,18 +28,24 @@ import com.github.podd.utils.PoddWebConstants;
 public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
 {
     /**
-     * Test unauthenticated access to "upload artifact" leads to error.
+     * Test unauthenticated access to "upload artifact" leads to an UNAUTHORIZED error.
      */
     @Test
-    public void testErrorPostWithoutAuthentication() throws Exception
+    public void testErrorUploadWithoutAuthentication() throws Exception
     {
         final ClientResource uploadArtifactResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(true);
-        form.getEntries().add(new FormData("username", "testAdminUser"));
-        form.getEntries().add(new FormData("password", "testAdminPassword"));
+        
+        final URL fileUrl = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf");
+        Assert.assertNotNull("Null artifact file", fileUrl);
+        
+        final File artifactDiskFile = new File(fileUrl.toURI());
+        final FileRepresentation fileRep = new FileRepresentation(artifactDiskFile, MediaType.APPLICATION_RDF_XML);
+        
+        form.getEntries().add(new FormData("file", fileRep));
         
         try
         {
@@ -52,8 +58,11 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         }
     }
     
+    /**
+     * Test upload attempt without actual file leads to a BAD_REQUEST error
+     */
     @Test
-    public void testErrorPostUploadWithoutFile() throws Exception
+    public void testErrorUploadWithoutFile() throws Exception
     {
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
@@ -76,12 +85,11 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
-     * Tests that no error occurs when trying to upload a new artifact file while authenticated with
-     * the admin role.
-     * 
+     * Test successful upload of a new artifact file while authenticated with the admin role.
+     * Expects an HTML response.
      */
     @Test
-    public void testPostUploadArtifactBasic() throws Exception
+    public void testUploadArtifactBasicHtml() throws Exception
     {
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
@@ -109,6 +117,65 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         // TODO: verify results once a proper success page is incorporated.
         final String body = results.getText();
         Assert.assertTrue(body.contains("Welcome"));
+        this.assertFreemarker(body);
+    }
+    
+    /**
+     * Test successful upload of a new artifact file while authenticated with the admin role.
+     * Expects a plain text response.
+     */
+    @Test
+    public void testUploadArtifactBasicRdf() throws Exception
+    {
+        final ClientResource uploadArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        
+        final FormDataSet form = new FormDataSet();
+        form.setMultipart(true);
+        form.getEntries().add(new FormData("username", "testAdminUser"));
+        form.getEntries().add(new FormData("password", "testAdminPassword"));
+        
+        final URL fileUrl = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf");
+        
+        this.log.info("The URL is {}", fileUrl);
+        Assert.assertNotNull("Null artifact file", fileUrl);
+        
+        final File artifactDiskFile = new File(fileUrl.toURI());
+        final FileRepresentation fileRep = new FileRepresentation(artifactDiskFile, MediaType.APPLICATION_RDF_XML);
+        Assert.assertNotNull("Null FileRepresentation", fileRep);
+        
+        form.getEntries().add(new FormData("file", fileRep));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
+                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        // verify: results (expecting the added artifact's ontology IRI)
+        final String body = results.getText();
+        Assert.assertTrue(body.contains("http://"));
+        Assert.assertFalse(body.contains("html"));
+        Assert.assertFalse(body.contains("\n"));
+    }
+    
+    /**
+     * Test authenticated access to the upload Artifact page in HTML
+     */
+    @Test
+    public void testGetUploadArtifactPageBasicHtml() throws Exception
+    {
+        // prepare: add an artifact
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        Assert.assertTrue(body.contains("Upload new artifact"));
+        Assert.assertTrue(body.contains("type=\"file\""));
+        
+        this.assertFreemarker(body);
     }
     
 }

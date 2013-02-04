@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +25,8 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
@@ -96,12 +97,49 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
+
+
+    /**
+     * Handle http POST submitting a new artifact file
+     * Returns a text String containing the added artifact's Ontology IRI.
+     */
+    @Post(":rdf|txt|rj|ttl")
+    public Representation uploadArtifact(final Representation entity, final Variant variant) throws ResourceException
+    {
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI>emptySet());
+        
+        this.log.info("@Post uploadArtifactFile ({})",variant.getMediaType().getName());
+        
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
+        
+        if(entity == null)
+        {
+            // POST request with no entity.
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
+        }
+        
+        if(!MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
+        {
+            // format NOT multipart form data
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Multipart/form-data required");
+        }
+        
+        // - extract file from incoming Representation and load artifact to PODD
+        final Map<String, String> artifactMap = this.uploadFileAndLoadArtifactIntoPodd(entity);
+        
+        this.log.info("Successfully loaded artifact {}", artifactMap.get("iri"));
+        
+        
+        return new StringRepresentation(artifactMap.get("iri"));
+    }    
+    
     
     /**
      * Handle http POST submitting a new artifact file
      */
-    @Post
-    public Representation uploadArtifactFile(final Representation entity) throws ResourceException
+    @Post(":html")
+    public Representation uploadArtifactFileHtml(final Representation entity) throws ResourceException
     {
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI>emptySet());
         
