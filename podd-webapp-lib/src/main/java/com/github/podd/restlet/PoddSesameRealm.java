@@ -374,7 +374,7 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
      * @return A String representation of the SPARQL Select query
      */
     @Override
-    protected String buildSparqlQueryToFindUser(final String userIdentifier)
+    protected String buildSparqlQueryToFindUser(final String userIdentifier, boolean findAllUsers)
     {
         this.log.info("Building SPARQL query");
         
@@ -464,8 +464,11 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         query.append(" . } ");
 
         //TODO: firstname, lastname, email are mandatory. add optional parameters: ORCID, Organization
+        if(!findAllUsers)
+        {
+            query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
+        }
         
-        query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
         query.append(" } ");
         return query.toString();
     }
