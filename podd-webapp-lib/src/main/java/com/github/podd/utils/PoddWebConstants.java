@@ -81,6 +81,12 @@ public interface PoddWebConstants
      * Path to "about" page
      */
     public static final String PATH_ABOUT = "about";
+
+    /**
+     * Path to "help" pages
+     */
+    public static final String PATH_HELP = "help";
+
     
     /**
      * Path to "index" page
@@ -142,6 +148,11 @@ public interface PoddWebConstants
      */
     public static final String KEY_ARTIFACT_IDENTIFIER = "artifacturi";
     
+    /**
+     * Key used to represent a specific help page as part of a request 
+     */
+    public static final String KEY_HELP_PAGE_IDENTIFIER = "helppage";
+
     public static final String PATH_PODD_PLANT = "/ontologies/poddPlant.owl";
     public static final String PATH_PODD_SCIENCE = "/ontologies/poddScience.owl";
     public static final String PATH_PODD_BASE = "/ontologies/poddBase.owl";

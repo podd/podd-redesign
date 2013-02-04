@@ -53,6 +53,7 @@ import com.github.podd.resources.DeleteArtifactResourceImpl;
 import com.github.podd.resources.EditArtifactResourceImpl;
 import com.github.podd.resources.FileReferenceAttachResourceImpl;
 import com.github.podd.resources.GetArtifactResourceImpl;
+import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.TestResetResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
@@ -242,6 +243,15 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.info("attaching about service to path={}", aboutPagePath);
         router.attach(aboutPagePath, AboutResourceImpl.class);
         
+        // Add a route for the Help pages.
+        final String helpOverviewPath = PoddWebConstants.PATH_HELP;
+        this.log.info("attaching about service to path={}", helpOverviewPath);
+        router.attach(helpOverviewPath, HelpResourceImpl.class);
+        final String helpPagePath = PoddWebConstants.PATH_HELP +
+                "/{" + PoddWebConstants.KEY_HELP_PAGE_IDENTIFIER + "}";
+        this.log.info("attaching about service to path={}", helpPagePath);
+        router.attach(helpPagePath, HelpResourceImpl.class);
+
         // Add a route for the Index page.
         final String indexPagePath = PoddWebConstants.PATH_INDEX;
         this.log.info("attaching index service to path={}", indexPagePath);

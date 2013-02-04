@@ -20,12 +20,12 @@
     <li>Genotype X (subject) hasGene (predicate) Gene Y (object).</li>
 </ul>
 <p>All objects with the exception of Project objects cannot exist in isolation. When instantiating concrete objects the appropriate predicate must also be selected. Consequently objects will be created in relation to their parent object.</p>
-<p class="rtecentre">&nbsp;<img style="width: 656px; height: 382px;" border="1" alt="" src="../images/parent-child2.jpg" /></p>
+<p class="rtecentre">&nbsp;<img style="width: 656px; height: 382px;" border="1" alt="" src="${baseUrl}/resources/images/parent-child2.jpg" /></p>
 <p class="rteleft"><em>Figure 6.1 &ndash; Screen shot of the Parent-Child relationship in an Object View</em></p>
 <br>
 <h4>The Object Hierarchy</h4>
 <p>The PODD data model allows for data and metadata to be grouped into a DAG (directed acyclic graph) like structure, with a project object as the highest possible node.</p>
-<p class="rtecentre"><img alt="" style="width: 606px; height: 330px;" border="1" src="../images/hierarchy3.jpg" /></p>
+<p class="rtecentre"><img alt="" style="width: 606px; height: 330px;" border="1" src="${baseUrl}/resources/images/hierarchy3.jpg" /></p>
 <p class="rteleft"><em>Firgure 6.2 &ndash; Screen shot of an object hierarchy in a View Project Object page</em></p>
 <p>Figure 6.2 shows a screen shot of the object hierarchy of PODD project (Gav&rsquo;s Project). &nbsp;The Hierarchy section is displayed at the end of each View Object page.</p>
 <p>The hierarchy section displays the parent and direct children of the current object. It means only the existing children of the projects are displayed. All existing children would be listed. The next level children are not listed, only the number of objects is displayed at the end. It does not display any nodes above the current parent either.</p>
@@ -57,9 +57,9 @@ The  Hierarchy will display entries for:</p>
     <li>an Event object may refer to a Protocol object.</li>
 </ul>
 <p>Object references are displayed as Refers To tables on the <strong>View Project</strong> Object page. Where the subject is the object being referenced from, a &quot;Refers To&quot; relationship will look up to the project level and then down to every level except the lowest level Investigation branch that the subject is on. A &quot;Refers To&quot; relationship will not look at any branches below the branch the subject is on.</p>
-<p class="rtecentre"><img style="width: 718px; height: 634px;" border="1" alt="" src="../images/viewreference.jpg" /></p>
+<p class="rtecentre"><img style="width: 718px; height: 634px;" border="1" alt="" src="${baseUrl}/resources/images/viewreference.jpg" /></p>
 <p class="rteleft"><em>Figure 6.3 &ndash; View Object Screen Shot with Referencing Sections</em></p>
 <p>When a user adds/edits an object that references another object (as opposed to having a parent-child relationship) a section of the screen will display available objects of the correct type and within the correct scope as a table.</p>
-<p class="rtecentre"><img style="width: 593px; height: 321px;" alt="" src="../images/objectreference2.jpg" /></p>
+<p class="rtecentre"><img style="width: 593px; height: 321px;" alt="" src="${baseUrl}/resources/images/objectreference2.jpg" /></p>
 <p class="rteleft"><em>Figure 6.4 &ndash; Edit Object Screen Shot including Referencing Sections</em></p>
 <p>Figure 6.4 is a screen shot of the <strong>Edit Data Object</strong> page, the &quot;Refers To&quot; tables are displayed under the Object Details section. All object types which can be referenced to Data object are listed.</p>
