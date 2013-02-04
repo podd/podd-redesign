@@ -123,11 +123,6 @@ public interface PoddWebConstants
     public static final String PATH_ARTIFACT_DELETE = "artifact";
 
     /**
-     * Path to view an artifact.
-     */
-    public static final String PATH_ARTIFACT_VIEW = "artifact/view";
-    
-    /**
      * Path to the file reference attachment service
      */
     public static final String PATH_ATTACH_FILE_REF = "attachref";

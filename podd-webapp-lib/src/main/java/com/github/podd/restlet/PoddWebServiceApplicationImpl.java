@@ -57,7 +57,6 @@ import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.TestResetResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
-import com.github.podd.resources.ViewArtifactResourceImpl;
 import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.template.Configuration;
@@ -285,12 +284,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String attachFileReference = PoddWebConstants.PATH_ATTACH_FILE_REF;
         this.log.info("attaching File Reference Attach service to path={}", attachFileReference);
         router.attach(attachFileReference, FileReferenceAttachResourceImpl.class);
-        
-        // Add a route for the View Artifact page.
-        final String viewArtifact = PoddWebConstants.PATH_ARTIFACT_VIEW;
-        this.log.info("attaching View Artifact service to path={}", viewArtifact);
-        router.attach(viewArtifact, ViewArtifactResourceImpl.class);
-        
         
         // Add a route for Logout service
         // final String logout = "logout";
