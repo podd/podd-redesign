@@ -11,7 +11,7 @@
         <ul class="stylized-small">
         	<li><a href="${baseUrl}/help/self_register">Self Registration</a></li>
 	        <li><a href="${baseUrl}/help/login">PODD Login</a></li>
-    	    <li><a href="${baseUrl}/help/aaf_login">Institutional Login</a></li>
+    	    <li><del><a href="${baseUrl}/help/aaf_login">Institutional Login</a></del></li>
 	        <li><a href="${baseUrl}/help/logout">Logout</a></li>
 	        <li><a href="${baseUrl}/help/user_accounts">Account Settings</a></li>
         </ul>
@@ -51,6 +51,7 @@
         </ul>
         <li><a href="${baseUrl}/help/tab_import">TAB Import</a></li>
         <li><a href="${baseUrl}/help/browser">Browser Pane</a></li>
+        <del>
         <li><a href="${baseUrl}/help/clipboard_copy">Copy and Paste</a></li>
         <ul class="stylized-small">
             <li><a href="${baseUrl}/help/clipboard_add_predicate">Cloning Predicates via Browser Pane</a></li>
@@ -58,6 +59,7 @@
             <li><a href="${baseUrl}/help/clipboard_edit">Editing Clipboard</a></li>
             <li><a href="${baseUrl}/help/clipboard_deleted_objects">Handling Deleted Objects</a></li>
         </ul>
+        </del>
         <li><a href="${baseUrl}/help/search">Search</a></li>
         <li class="stylized-last"><a href="${baseUrl}/help/support">Support and Help</a></li>
     </ul>
