@@ -36,15 +36,14 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource uploadArtifactResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final FormDataSet form = new FormDataSet();
-        form.setMultipart(true);
-        
         final URL fileUrl = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf");
         Assert.assertNotNull("Null artifact file", fileUrl);
         
         final File artifactDiskFile = new File(fileUrl.toURI());
         final FileRepresentation fileRep = new FileRepresentation(artifactDiskFile, MediaType.APPLICATION_RDF_XML);
         
+        final FormDataSet form = new FormDataSet();
+        form.setMultipart(true);
         form.getEntries().add(new FormData("file", fileRep));
         
         try
@@ -69,8 +68,6 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(true);
-        form.getEntries().add(new FormData("username", "testAdminUser"));
-        form.getEntries().add(new FormData("password", "testAdminPassword"));
         
         try
         {
@@ -94,11 +91,6 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final FormDataSet form = new FormDataSet();
-        form.setMultipart(true);
-        form.getEntries().add(new FormData("username", "testAdminUser"));
-        form.getEntries().add(new FormData("password", "testAdminPassword"));
-        
         final URL fileUrl = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf");
         
         this.log.info("The URL is {}", fileUrl);
@@ -108,6 +100,8 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final FileRepresentation fileRep = new FileRepresentation(artifactDiskFile, MediaType.APPLICATION_RDF_XML);
         Assert.assertNotNull("Null FileRepresentation", fileRep);
         
+        final FormDataSet form = new FormDataSet();
+        form.setMultipart(true);
         form.getEntries().add(new FormData("file", fileRep));
         
         final Representation results =
@@ -130,11 +124,6 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final FormDataSet form = new FormDataSet();
-        form.setMultipart(true);
-        form.getEntries().add(new FormData("username", "testAdminUser"));
-        form.getEntries().add(new FormData("password", "testAdminPassword"));
-        
         final URL fileUrl = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf");
         
         this.log.info("The URL is {}", fileUrl);
@@ -144,6 +133,8 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final FileRepresentation fileRep = new FileRepresentation(artifactDiskFile, MediaType.APPLICATION_RDF_XML);
         Assert.assertNotNull("Null FileRepresentation", fileRep);
         
+        final FormDataSet form = new FormDataSet();
+        form.setMultipart(true);
         form.getEntries().add(new FormData("file", fileRep));
         
         final Representation results =

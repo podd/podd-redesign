@@ -26,9 +26,11 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
+import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
@@ -72,7 +74,19 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
         dataModel.put("pageTitle", "View Artifact");
         
-        this.populateDataModelWithArtifactData(artifactUri, dataModel);
+        InferredOWLOntologyID ontologyID;
+        try
+        {
+            final PoddArtifactManager artifactManager =
+                    ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
+            ontologyID = artifactManager.getArtifactByIRI(IRI.create(artifactUri));
+        }
+        catch(UnmanagedArtifactIRIException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
+        }
+        
+        this.populateDataModelWithArtifactData(ontologyID, dataModel);
         
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
@@ -134,20 +148,16 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      *  2. populate Map with required info to go into data model
      * 
      * 
-     * @param artifactUri
+     * @param ontologyID
      * @param dataModel
      */
-    private void populateDataModelWithArtifactData(String artifactUri, Map<String, Object> dataModel)
+    private void populateDataModelWithArtifactData(InferredOWLOntologyID ontologyID, Map<String, Object> dataModel)
     {
-//        final PoddArtifactManager artifactManager =
-//                ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
-//        InferredOWLOntologyID ontologyID = artifactManager.getArtifactByIRI(IRI.create(artifactUri));
-        
         // hard-code the required values first to display a valid html page
         //DEBUG
         dataModel.put("forbidden", false);
         dataModel.put("canEditObject", false);
-        dataModel.put("pid", artifactUri);
+        dataModel.put("pid", ontologyID.getOntologyIRI().toString());
         dataModel.put("objectType", "artifact");
         dataModel.put("creationDate", "2013-01-01");
         dataModel.put("modifiedDate", "2013-01-31");
@@ -156,7 +166,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
 //        dataModel.put("elementList", Arrays.asList("element1", "element2")); - TODO
         
         final Map<String, Object> poddObject = new HashMap<String, Object>();
-        poddObject.put("pid", artifactUri);
+        poddObject.put("pid", ontologyID.getOntologyIRI().toString());
         poddObject.put("localName", "Hardcoded project title");
         poddObject.put("label", "Dummy project from the resource");
 

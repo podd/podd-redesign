@@ -1,16 +1,29 @@
 package com.github.podd.restlet.test;
 
+import java.io.File;
+import java.net.URL;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.restlet.Component;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.Protocol;
+import org.restlet.data.Status;
+import org.restlet.ext.html.FormData;
+import org.restlet.ext.html.FormDataSet;
+import org.restlet.representation.FileRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ClientResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.PoddWebServiceApplicationImpl;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Abstract test implementation that contains common components required by resource implementation
@@ -41,8 +54,6 @@ public class AbstractResourceImplTest
     protected final boolean testNoAdminPrivileges = false;
     
     private Component component;
-
-    private PoddWebServiceApplication nextApplication;
     
     public AbstractResourceImplTest()
     {
@@ -59,49 +70,6 @@ public class AbstractResourceImplTest
     {
         Assert.assertFalse("Freemarker error.", body.contains("Java backtrace for programmers:"));
         Assert.assertFalse("Freemarker error.", body.contains("freemarker.core."));
-    }
-    
-    /**
-     * Create a new server for each test.
-     * 
-     * State will only be shared when they use a common database.
-     * 
-     * @throws Exception
-     */
-    @Before
-    public void setUp() throws Exception
-    {
-        this.component = new Component();
-        
-        // Add a new HTTP server listening on the given TEST_PORT.
-        this.component.getServers().add(Protocol.HTTP, AbstractResourceImplTest.TEST_PORT);
-        
-        this.component.getClients().add(Protocol.CLAP);
-        this.component.getClients().add(Protocol.HTTP);
-        
-        nextApplication = new PoddWebServiceApplicationImpl();
-        
-        // Attach the sample application.
-        this.component.getDefaultHost().attach(
-        // PropertyUtil.get(OasProps.PROP_WS_URI_PATH, OasProps.DEF_WS_URI_PATH),
-                "/podd/", nextApplication);
-        
-        // The application cannot be setup properly until it is attached, as it requires
-        // Application.getContext() to not return null
-        ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
-        
-        // Start the component.
-        this.component.start();
-    }
-    
-    /**
-     * Get a reference to the Restlet Application.
-     * 
-     * @return
-     */
-    public PoddWebServiceApplication getApplication()
-    {
-        return this.nextApplication;
     }
     
     /**
@@ -122,6 +90,76 @@ public class AbstractResourceImplTest
         {
             return "http://localhost:" + AbstractResourceImplTest.TEST_PORT + "/podd" + path;
         }
+    }
+    
+    /**
+     * Loads a test artifact.
+     * 
+     * @param resourceName
+     * @return The loaded artifact's URI
+     * @throws Exception
+     */
+    public String loadTestArtifact(final String resourceName) throws Exception
+    {
+        final ClientResource uploadArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        
+        final URL fileUrl = this.getClass().getResource(resourceName);
+        
+        Assert.assertNotNull("Null artifact file", fileUrl);
+        
+        final File artifactDiskFile = new File(fileUrl.toURI());
+        final FileRepresentation fileRep = new FileRepresentation(artifactDiskFile, MediaType.APPLICATION_RDF_XML);
+        Assert.assertNotNull("Null FileRepresentation", fileRep);
+        
+        final FormDataSet form = new FormDataSet();
+        form.setMultipart(true);
+        form.getEntries().add(new FormData("file", fileRep));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
+                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        // verify: results (expecting the added artifact's ontology IRI)
+        final String body = results.getText();
+        Assert.assertTrue("Artifact URI should start with http", body.startsWith("http://"));
+        Assert.assertFalse("Should have no references to HTML", body.contains("html"));
+        Assert.assertFalse("Artifact URI should not contain newline character", body.contains("\n"));
+        
+        return body;
+    }
+    
+    /**
+     * Create a new server for each test.
+     * 
+     * State will only be shared when they use a common database.
+     * 
+     * @throws Exception
+     */
+    @Before
+    public void setUp() throws Exception
+    {
+        this.component = new Component();
+        
+        // Add a new HTTP server listening on the given TEST_PORT.
+        this.component.getServers().add(Protocol.HTTP, AbstractResourceImplTest.TEST_PORT);
+        
+        this.component.getClients().add(Protocol.CLAP);
+        this.component.getClients().add(Protocol.HTTP);
+        
+        final PoddWebServiceApplication nextApplication = new PoddWebServiceApplicationImpl();
+        
+        // Attach the sample application.
+        this.component.getDefaultHost().attach(
+        // PropertyUtil.get(OasProps.PROP_WS_URI_PATH, OasProps.DEF_WS_URI_PATH),
+                "/podd/", nextApplication);
+        
+        // The application cannot be setup properly until it is attached, as it requires
+        // Application.getContext() to not return null
+        ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
+        
+        // Start the component.
+        this.component.start();
     }
     
     /**
