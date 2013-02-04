@@ -30,16 +30,23 @@ public abstract class PoddWebServiceApplication extends Application
      * Checks whether the client is authenticated for the given action, and if they are not, the
      * response will have challenges inserted and the status will be set to HTTP 401.
      * 
+     * Checking client authorization for the given action and optional set of Object URIs is also
+     * performed by this method.
+     * 
      * Only call this method if authentication is needed for the given request.
      * 
-     * @param authentication
+     * @param action
+     *            The action to perform
      * @param request
      * @param response
      * @param optionalObjectUris
+     *            Optional set of Object URIs on which the action is to be performed. If present, 
+     *            these should be used to check client authority.
      * @return True if the request is authenticated, and false otherwise.
      */
-    public abstract boolean authenticate(PoddAction authentication, Request request, Response response, Collection<URI> optionalObjectUris);
-    
+    public abstract boolean authenticate(PoddAction action, Request request, Response response,
+            Collection<URI> optionalObjectUris);
+
     /**
      * 
      * @return The ChallengeAuthenticator which is currently being used to respond to queries that
