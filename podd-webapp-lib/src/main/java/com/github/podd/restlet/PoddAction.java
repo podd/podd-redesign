@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.restlet.security.Role;
@@ -217,8 +218,13 @@ public enum PoddAction
         return false;
     }
 
-    public boolean requiresObjectUris()
+    public boolean requiresObjectUris(List<Role> roles)
     {
+        if(roles != null && roles.contains(PoddRoles.ADMIN.getRole()))
+        {
+            // if client has ADMIN role, no need to match object URIs  
+            return false;
+        }
         return this.requiresObjectUris;
     }
 }
