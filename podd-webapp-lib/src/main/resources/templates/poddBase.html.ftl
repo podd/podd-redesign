@@ -97,7 +97,7 @@
                 <li class="left_image float_right"><a href="${baseUrl}/help">Help</a></li>
                 <li class="left_image float_right"><a href="${baseUrl}/supportDesk">Support</a></li>
                 <li class="left_image float_right"><a href="${baseUrl}/user/${user.identifier!"unknown-username"}">Settings</a></li>
-                <li class="no_image float_right">${user.firstName!""} ${user.lastName!""}</li>
+                <li class="no_image float_right"><i>${user.firstName!""} ${user.lastName!""}</i></li>
             <#else>
                 <li class="left_image float_right"><a href="${baseUrl}/loginpage">Login</a></li>
                 <li class="left_image float_right"><a href="${baseUrl}/help">Help</a></li>

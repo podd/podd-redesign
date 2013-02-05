@@ -69,11 +69,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        // dataModel.put("contentTemplate", "index.html.ftl");
-        dataModel.put("contentTemplate", "objectDetails.html.ftl");
-        dataModel.put("pageTitle", "View Artifact");
-        
         InferredOWLOntologyID ontologyID;
         try
         {
@@ -85,6 +80,10 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
+        
+        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
+        dataModel.put("contentTemplate", "objectDetails.html.ftl");
+        dataModel.put("pageTitle", "View Artifact");
         
         this.populateDataModelWithArtifactData(ontologyID, dataModel);
         
@@ -156,7 +155,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // hard-code the required values first to display a valid html page
         //DEBUG
         dataModel.put("forbidden", false);
-        dataModel.put("canEditObject", false);
+        dataModel.put("canEditObject", true);
         dataModel.put("pid", ontologyID.getOntologyIRI().toString());
         dataModel.put("objectType", "artifact");
         dataModel.put("creationDate", "2013-01-01");
@@ -182,6 +181,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         lastModifier.put("firstName", "Bob");
         lastModifier.put("lastName", "Colt");
         
+        poddObject.put("members", new HashMap<String, String>());
+        
 //        final Map<String, String> roleMap = new HashMap<String, String>();
 //        roleMap.put("description", "A dummy user account for testing");
 //        objectDetailsMap.put("repositoryRole", roleMap);
@@ -189,6 +190,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("poddObject", poddObject);
         
         
+        // -populate refers to list
         final List<Object> refersToList = new ArrayList<Object>();
         
         final Map<String, Object> refersToElement = new HashMap<String, Object>();
@@ -200,6 +202,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         refersToList.add(refersToElement);
         
         dataModel.put("refersToList", refersToList);        
+        
+        dataModel.put("childHierarchyList", Collections.emptyList());
+        
     }
 
     private List<Object> getAvailableObjects()

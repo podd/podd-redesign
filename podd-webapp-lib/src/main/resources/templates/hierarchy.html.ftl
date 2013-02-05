@@ -13,7 +13,7 @@
 
         <ol>
             <#if  parentHierarchy??>
-            <li class="hierarchy"><label class="parent"></label><a href="${baseUrl}/object/${parentHierarchy.poddObject.pid}" class="padded">${parentHierarchy.poddObject.localName}</a><span>: Type: ${parentHierarchy.type}, Children:
+            <li class="hierarchy"><label class="parent"></label><a href="${baseUrl}/artifact/base?artifacturi=${parentHierarchy.poddObject.pid}" class="padded">${parentHierarchy.poddObject.localName}</a><span>: Type: ${parentHierarchy.type}, Children:
             	<#--
             		For performance reasons we don't want hibernate to fetch all the children just to count the number of children objects,
             		so if the childrenCountMap exists, then we use it to fetch the count, otherwise, load it from hibernate to do the count.            	
@@ -37,7 +37,7 @@
             <ol>
             <#list childHierarchyList as child>
                 <#if child.state == "A" || isAdmin>
-                    <li class="hierarchy"><label class="child"></label><a href="${baseUrl}/object/${child.poddObject.pid}" class="padded">${child.poddObject.localName}</a>
+                    <li class="hierarchy"><label class="child"></label><a href="${baseUrl}/artifact/base?artifacturi=${child.poddObject.pid}" class="padded">${child.poddObject.localName}</a>
                         <#if child.state != "A">
                             (<span class="descriptive">deleted</span>)
                         </#if>

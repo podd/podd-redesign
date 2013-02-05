@@ -59,7 +59,7 @@
             <h4 class="errorMsg">Object: [${pid}] is deleted or inactive. Please contact repository administrator
             if you believe it has been deleted in error.</h4>
         <#elseif poddObject??>
-            <div about="${baseUrl}/object/${poddObject.pid!"unknown-pid"}" id="${objectType!"object"}_details" class="fieldset">
+            <div about="${poddObject.pid!"unknown-pid"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
                     <li><span class="bold">ID: </span><span property="podd:hasID" datatype="xsd:string">${poddObject.pid!""}</span></li>
                     <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.localName!""}</span></li>
@@ -104,35 +104,32 @@
 <#include "attachedFilesDetails.html.ftl"/>
 
 <br />
-<#--include "hierarchy.html.ftl"/-->
+<#include "hierarchy.html.ftl"/>
 
 <br />    
 <div id="buttonwrapper">
     <#if poddObject??>
 	    <#if  canEditObject?? && canEditObject>
-        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/edit">Edit Object</a>
-        </#if>
-        <#if  canEditObject?? && canEditObject>
-        <a href="${baseUrl}/clipboard?type=object&mp;target=${poddObject.pid}">Paste</a>
+        <a href="${baseUrl}/artifact/edit/merge?artifacturi=${poddObject.pid!"unknown-pid"}/edit">Edit Object</a>
         </#if>
         <#if  canAddChildren?? && canAddChildren>
         <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/add">Add Child Object</a>
         </#if>
         <#if  canPublish?? && canPublish>
-        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/publish?publish=true">Publish Project</a>
+        <a href="${baseUrl}/artifact/publish?artifacturi=${poddObject.pid!"unknown-pid"}/publish?publish=true">Publish Project</a>
         </#if>
         <#if  canUnpublish?? && canUnpublish>
-        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/generatePURLs">Update PURLs</a>
-        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/publish?publish=false">Unpublish Project</a>
+        <a href="${baseUrl}/artifact/updatepurls?artifacturi=${poddObject.pid!"unknown-pid"}">Update PURLs</a>
+        <a href="${baseUrl}/artifact/unpublish?artifacturi=${poddObject.pid!"unknown-pid"}">Unpublish Project</a>
         </#if>
         <#if objectType?? && objectType == 'Investigation'>
         	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.pid!"unknown-pid"}">Download hierarchy attachments</a>
         </#if>        
         <#if canDelete?? && canDelete>
-        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/delete">Delete</a>
+        <a href="${baseUrl}/artifact/delete?artifacturi=${poddObject.pid!"unknown-pid"}">Delete</a>
         </#if>
         <#if canUndelete?? && canUndelete>
-        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/delete">Undelete</a>
+        <a href="${baseUrl}/artifact/undelete?artifacturi=${poddObject.pid!"unknown-pid"}">Undelete</a>
         </#if>
     <#else>
     <a href="${baseUrl}/project">Cancel</a>    

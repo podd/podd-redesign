@@ -88,6 +88,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         final String body = results.getText();
         Assert.assertTrue(body.contains("Administrator"));
+        Assert.assertFalse(body.contains("404"));
+        Assert.assertTrue(body.contains(artifactUri));
         
         this.assertFreemarker(body);
     }

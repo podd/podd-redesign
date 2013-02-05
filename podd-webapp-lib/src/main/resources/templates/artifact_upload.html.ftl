@@ -7,12 +7,11 @@
 
 <div id="content_pane">
 <#if user??>
-    <p>Welcome, ${user.firstName!""}  ${user.lastName!""}.</p>
-    <p>Places to go to: <a href="${baseUrl}/user/${user.identifier!"unknown-username"}">User page</a></p>
-    
     <#if artifact??>
+    	<h4>Artifact successfully uploaded.</h4>
+	    <p><a href="${baseUrl}/artifact/base?artifacturi=${artifact.iri}" class="padded">View project.</a></p>
 	    <div class="fieldset" id="upload">
-			<div class="legend">Artifact added</div>
+			<div class="legend">Artifact Details</div>
 			<ol> 
 				<li><span class="bold">Ontology IRI: </span>${artifact.iri}</li>
 				<li><span class="bold">Version IRI: </span>${artifact.versionIri}</li>
@@ -20,6 +19,7 @@
 			</div>
 		</div>
 	<#else>    
+    	<p>Upload a new Artifact.</p>
 	    <form name="f" enctype="multipart/form-data" action="${baseUrl}/artifact/new" method="POST">
 	    <div class="fieldset" id="upload">
 			<div class="legend">Upload new artifact</div>

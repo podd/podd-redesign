@@ -110,7 +110,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         
         // TODO: verify results once a proper success page is incorporated.
         final String body = results.getText();
-        Assert.assertTrue(body.contains("Welcome"));
+        Assert.assertTrue(body.contains("Artifact successfully uploaded"));
         this.assertFreemarker(body);
     }
     
