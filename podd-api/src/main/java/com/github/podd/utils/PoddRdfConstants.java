@@ -44,6 +44,9 @@ public interface PoddRdfConstants
     public static final URI PODDBASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "PoddFileReference");
     
+    public static final URI PODDBASE_CONTAINS = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "contains");
+    
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are
      * reusing it here.
@@ -70,5 +73,6 @@ public interface PoddRdfConstants
     
     public static final URI DEFAULT_SCHEMA_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
             .createURI("urn:podd:default:schemamanagementgraph");
+
     
 }
