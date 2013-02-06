@@ -1,0 +1,192 @@
+@prefix : <http://purl.org/podd/basic-2-20130206/artifact:1#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
+@prefix poddScience: <http://purl.org/podd/ns/poddScience#> .
+@base <http://purl.org/podd/basic-2-20130206/artifact:1> .
+
+<http://purl.org/podd/basic-2-20130206/artifact:1> rdf:type owl:Ontology ;
+                                                   
+                                                   poddBase:artifactHasTopObject <http://purl.org/podd/basic-1-20130205/object:2966> ;
+                                                   
+                                                   owl:versionIRI <http://purl.org/podd/basic-2-20130206/artifact:version:1> ;
+                                                   
+                                                   owl:imports <http://purl.org/podd/ns/poddBase> ,
+                                                               <http://purl.org/podd/ns/poddScience> .
+
+
+#################################################################
+#
+#    Annotation properties
+#
+#################################################################
+
+
+dcterms:creator rdf:type owl:AnnotationProperty .
+
+
+
+dcterms:date rdf:type owl:AnnotationProperty .
+
+
+
+
+
+#################################################################
+#
+#    Datatypes
+#
+#################################################################
+
+
+
+
+#################################################################
+#
+#    Individuals
+#
+#################################################################
+
+
+###  http://purl.org/podd/basic-1-20130205/object:2966
+
+<http://purl.org/podd/basic-1-20130205/object:2966> rdf:type poddScience:Project ,
+                                                             owl:NamedIndividual ,
+                                                             owl:Thing ;
+                                                    
+                                                    rdfs:label "Project#2012-0006_ Cotton Leaf Morphology"^^xsd:string ;
+                                                    
+                                                    poddBase:hasStartDate "2012-05-22"^^xsd:date ;
+                                                    
+                                                    poddBase:createdAt "2012-06-05T01:57:16.643Z"^^xsd:dateTime ;
+                                                    
+                                                    dcterms:date "2012-06-05T01:57:16.643Z"^^xsd:string ;
+                                                    
+                                                    poddBase:hasLeadInstitution "CSIRO HRPPC"^^xsd:string ;
+                                                    
+                                                    rdfs:comment "Characterising normal and okra leaf shapes"^^xsd:string ;
+                                                    
+                                                    dcterms:creator "Helen.Daily@csiro.au"^^xsd:string ;
+                                                    
+                                                    poddScience:hasAnalysis :Demo_Analysis ;
+                                                    
+                                                    poddScience:hasInvestigation :Demo_Investigation ;
+                                                    
+                                                    poddBase:contains :Demo_Investigation ;
+                                                    
+                                                    poddScience:hasProjectPlan :Demo_Plan ;
+                                                    
+                                                    poddScience:hasProcess :Demo_Process1 ,
+                                                                           :Demo_Process2 ;
+                                                    
+                                                    poddBase:hasTopObjectStatus poddBase:Active ;
+                                                    
+                                                    poddScience:hasANZSRC poddBase:NotApplicable ;
+                                                    
+                                                    poddBase:hasPublicationStatus poddBase:NotPublished ;
+                                                    
+                                                    poddBase:hasPrincipalInvestigator <http://www.podd.org/user#Xavier.Sirault@csiro.au> .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis
+
+:Demo_Analysis rdf:type poddScience:Analysis ,
+                        owl:NamedIndividual ;
+               
+               rdfs:label "Demo analysis" .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation
+
+:Demo_Investigation rdf:type poddScience:Investigation ,
+                             owl:NamedIndividual ;
+                    
+                    rdfs:label "Demo investigation" ;
+                    
+                    poddScience:hasMaterial :Demo_Material ,
+                                            :SqueekeeMaterial .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material
+
+:Demo_Material rdf:type poddScience:Material ,
+                        owl:NamedIndividual ;
+               
+               rdfs:label "Demo material" .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan
+
+:Demo_Plan rdf:type poddScience:ProjectPlan ,
+                    owl:NamedIndividual ;
+           
+           rdfs:label "Demo Project Plan" .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1
+
+:Demo_Process1 rdf:type poddScience:Process ,
+                        owl:NamedIndividual ;
+               
+               rdfs:label "Demo Process 1" .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2
+
+:Demo_Process2 rdf:type poddScience:Process ,
+                        owl:NamedIndividual ;
+               
+               rdfs:label "Demo Process 2" .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial
+
+:SqueekeeMaterial rdf:type poddScience:Material ,
+                           owl:NamedIndividual ;
+                  
+                  rdfs:label "Squeekee material" .
+
+
+
+###  http://www.podd.org/user#Alyssa.Weirman@csiro.au
+
+<http://www.podd.org/user#Alyssa.Weirman@csiro.au> rdf:type owl:NamedIndividual ,
+                                                            owl:Thing .
+
+
+
+###  http://www.podd.org/user#Helen.Daily@csiro.au
+
+<http://www.podd.org/user#Helen.Daily@csiro.au> rdf:type owl:NamedIndividual ,
+                                                         owl:Thing .
+
+
+
+###  http://www.podd.org/user#Xavier.Sirault@csiro.au
+
+<http://www.podd.org/user#Xavier.Sirault@csiro.au> rdf:type owl:NamedIndividual ,
+                                                            owl:Thing .
+
+
+
+###  http://www.podd.org/user#Xueqin.Wang@csiro.au
+
+<http://www.podd.org/user#Xueqin.Wang@csiro.au> rdf:type owl:NamedIndividual ,
+                                                         owl:Thing .
+
+
+
+
+###  Generated by the OWL API (version 3.3.1957) http://owlapi.sourceforge.net
+
