@@ -47,6 +47,9 @@ public interface PoddRdfConstants
     public static final URI PODDBASE_CONTAINS = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "contains");
     
+    public static final URI PODDBASE_WEIGHT = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "weight");
+
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are
      * reusing it here.
