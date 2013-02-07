@@ -593,4 +593,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	<modules>
+		<module>podd-client-api</module>
+	</modules>
 </project>
