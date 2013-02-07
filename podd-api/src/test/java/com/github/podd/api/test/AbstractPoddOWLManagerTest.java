@@ -169,7 +169,7 @@ public abstract class AbstractPoddOWLManagerTest
     {
         // prepare: load, infer and store PODD-Base ontology
         final InferredOWLOntologyID inferredOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 291, 114);
         
         // prepare: remove from cache
         this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID());
@@ -200,13 +200,13 @@ public abstract class AbstractPoddOWLManagerTest
     {
         // prepare: 1) load, infer, store PODD-Base ontology
         final InferredOWLOntologyID pbInferredOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 291, 114);
         final URI pbBaseOntologyURI = pbInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pbVersionURI = pbInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
         // prepare: 2) load, infer, store PODD-Science ontology
         final InferredOWLOntologyID pScienceInferredOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1142, 363);
         final URI pScienceBaseOntologyURI = pScienceInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pScienceVersionURI = pScienceInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
@@ -273,19 +273,19 @@ public abstract class AbstractPoddOWLManagerTest
     {
         // prepare: 1) load, infer, store PODD-Base ontology
         final InferredOWLOntologyID pbInferredOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 291, 114);
         final URI pbBaseOntologyURI = pbInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pbVersionURI = pbInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
         // prepare: 2) load, infer, store PODD-Science ontology
         final InferredOWLOntologyID pScienceInferredOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1588, 363);
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1142, 363);
         final URI pScienceBaseOntologyURI = pScienceInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pScienceVersionURI = pScienceInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
         // prepare: 3) load, infer, store PODD-Plant ontology
         final InferredOWLOntologyID pPlantInferredOntologyID =
-                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 109, 386);
+                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 83, 386);
         final URI pPlantBaseOntologyURI = pPlantInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pPlantVersionURI = pPlantInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
@@ -378,7 +378,7 @@ public abstract class AbstractPoddOWLManagerTest
     {
         // prepare: load, infer and store a schema ontology
         final InferredOWLOntologyID inferredOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 282, 114);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 291, 114);
         
         Assert.assertNotNull("Ontology should already be in memory", this.testOWLManager.getOWLOntologyManager()
                 .getOntology(inferredOntologyID));
@@ -579,7 +579,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection, context);
         
         // verify:
-        Assert.assertEquals("Dumped statement count not expected value", 282,
+        Assert.assertEquals("Dumped statement count not expected value", 291,
                 this.testRepositoryConnection.size(context));
     }
     
@@ -626,7 +626,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         // verify:
         final URI context = nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        Assert.assertEquals("Dumped statement count not expected value", 282,
+        Assert.assertEquals("Dumped statement count not expected value", 291,
                 this.testRepositoryConnection.size(context));
     }
     
@@ -948,7 +948,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
         final List<Statement> statements =
                 this.testRepositoryConnection.getStatements(null, null, null, false, context).asList();
-        Assert.assertEquals("Not the expected number of statements in Repository", 278, statements.size());
+        Assert.assertEquals("Not the expected number of statements in Repository", 284, statements.size());
         
         final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
         
@@ -1024,7 +1024,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-        Assert.assertEquals("Not the expected number of statements in Repository", 278,
+        Assert.assertEquals("Not the expected number of statements in Repository", 284,
                 this.testRepositoryConnection.size(context));
         
         final OWLOntologyID loadedOntologyID =
