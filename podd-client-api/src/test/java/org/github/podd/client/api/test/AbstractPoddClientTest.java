@@ -32,7 +32,7 @@ public abstract class AbstractPoddClientTest
      * 
      * @return The URL of the PODD Server to test using.
      */
-    protected abstract String getPoddServerUrl();
+    protected abstract String getTestPoddServerUrl();
     
     /**
      * @throws java.lang.Exception
@@ -59,7 +59,7 @@ public abstract class AbstractPoddClientTest
      * .
      */
     @Test
-    public final void testAppendArtifact()
+    public final void testAppendArtifact() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -70,7 +70,7 @@ public abstract class AbstractPoddClientTest
      * .
      */
     @Test
-    public final void testAttachFileReference()
+    public final void testAttachFileReference() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -81,7 +81,7 @@ public abstract class AbstractPoddClientTest
      * .
      */
     @Test
-    public final void testDeleteArtifact()
+    public final void testDeleteArtifact() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -90,7 +90,7 @@ public abstract class AbstractPoddClientTest
      * Test method for {@link com.github.podd.client.api.PoddClient#getPoddServerUrl()}.
      */
     @Test
-    public final void testGetPoddServerUrlNull()
+    public final void testGetPoddServerUrlNull() throws Exception
     {
         // Server URL is null by default until setPoddServerUrl is called
         Assert.assertNull(this.testClient.getPoddServerUrl());
@@ -101,7 +101,7 @@ public abstract class AbstractPoddClientTest
      * .
      */
     @Test
-    public final void testListFileReferenceRepositories()
+    public final void testListFileReferenceRepositories() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -110,7 +110,7 @@ public abstract class AbstractPoddClientTest
      * Test method for {@link com.github.podd.client.api.PoddClient#listPublishedArtifacts()}.
      */
     @Test
-    public final void testListPublishedArtifacts()
+    public final void testListPublishedArtifacts() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -119,7 +119,7 @@ public abstract class AbstractPoddClientTest
      * Test method for {@link com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()}.
      */
     @Test
-    public final void testListUnpublishedArtifacts()
+    public final void testListUnpublishedArtifacts() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -129,16 +129,18 @@ public abstract class AbstractPoddClientTest
      * .
      */
     @Test
-    public final void testLogin()
+    public final void testLogin() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
+        
+        this.testClient.login("testAdminUser", "testAdminPassword");
     }
     
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#logout()}.
      */
     @Test
-    public final void testLogout()
+    public final void testLogout() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -149,7 +151,7 @@ public abstract class AbstractPoddClientTest
      * .
      */
     @Test
-    public final void testPublishArtifact()
+    public final void testPublishArtifact() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -159,11 +161,11 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#setPoddServerUrl(java.lang.String)}.
      */
     @Test
-    public final void testSetPoddServerUrl()
+    public final void testSetPoddServerUrl() throws Exception
     {
         Assert.assertNull(this.testClient.getPoddServerUrl());
         
-        this.testClient.setPoddServerUrl(this.getPoddServerUrl());
+        this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
     }
     
     /**
@@ -183,7 +185,7 @@ public abstract class AbstractPoddClientTest
      * .
      */
     @Test
-    public final void testUpdateArtifact()
+    public final void testUpdateArtifact() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -194,7 +196,7 @@ public abstract class AbstractPoddClientTest
      * .
      */
     @Test
-    public final void testUploadNewArtifact()
+    public final void testUploadNewArtifact() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }

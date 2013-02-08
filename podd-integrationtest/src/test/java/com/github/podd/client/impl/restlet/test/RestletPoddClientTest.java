@@ -32,7 +32,7 @@ public class RestletPoddClientTest extends AbstractPoddClientTest
      * @see org.github.podd.client.api.test.AbstractPoddClientTest#getPoddServerUrl()
      */
     @Override
-    protected String getPoddServerUrl()
+    protected String getTestPoddServerUrl()
     {
         return "";
     }
