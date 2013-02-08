@@ -125,7 +125,7 @@ public abstract class AbstractPoddClientTest
     }
     
     /**
-     * Test method for {@link com.github.podd.client.api.PoddClient#login(java.lang.String, char[])}
+     * Test method for {@link com.github.podd.client.api.PoddClient#login(java.lang.String, String)}
      * .
      */
     @Test

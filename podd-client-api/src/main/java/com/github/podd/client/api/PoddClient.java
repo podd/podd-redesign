@@ -108,7 +108,7 @@ public interface PoddClient
      *            A character array containing the password to submit to the login service.
      * @return True if the user was successfully logged in and false otherwise.
      */
-    boolean login(String username, char[] password) throws PoddClientException;
+    boolean login(String username, String password) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Logout service to logout the user and close the session.
