@@ -30,7 +30,8 @@ public interface PoddClient
      *            that will be appended to the given artifact.
      * @return An {@link OWLOntologyID} object containing the details of the updated artifact.
      */
-    OWLOntologyID appendArtifact(IRI ontologyIRI, InputStream partialInputStream, RDFFormat format);
+    OWLOntologyID appendArtifact(IRI ontologyIRI, InputStream partialInputStream, RDFFormat format)
+        throws PoddClientException;
     
     /**
      * Submits a request to the PODD File Reference Attachment service to attach a file reference
@@ -49,7 +50,7 @@ public interface PoddClient
      * @return An {@link OWLOntologyID} object containing the details of the updated artifact.
      */
     OWLOntologyID attachFileReference(IRI ontologyIRI, IRI objectIRI, String label, String repositoryAlias,
-            String filePathInRepository);
+            String filePathInRepository) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Delete Artifact service to delete the artifact identified by
@@ -59,7 +60,7 @@ public interface PoddClient
      *            The IRI of the artifact to delete.
      * @return True if the artifact was deleted and false otherwise.
      */
-    boolean deleteArtifact(IRI ontologyIRI);
+    boolean deleteArtifact(IRI ontologyIRI) throws PoddClientException;
     
     /**
      * Gets the base server URL to use when submitting requests using this client.
@@ -74,7 +75,7 @@ public interface PoddClient
      * @return A list of Strings identifying the possible values for the repository alias in calls
      *         to {@link #attachFileReference(IRI, String, String)}.
      */
-    List<String> listFileReferenceRepositories();
+    List<String> listFileReferenceRepositories() throws PoddClientException;
     
     /**
      * 
@@ -82,14 +83,14 @@ public interface PoddClient
      *         to which are published. This may include artifacts that the user cannot modify or
      *         fork.
      */
-    List<OWLOntologyID> listPublishedArtifacts();
+    List<OWLOntologyID> listPublishedArtifacts() throws PoddClientException;
     
     /**
      * 
      * @return A list of {@link OWLOntologyID}s identifying the artifacts that the user has access
      *         to which are unpublished.
      */
-    List<OWLOntologyID> listUnpublishedArtifacts();
+    List<OWLOntologyID> listUnpublishedArtifacts() throws PoddClientException;
     
     /**
      * Submits a request to the PODD Login service to login the user with the given username and
@@ -107,14 +108,14 @@ public interface PoddClient
      *            A character array containing the password to submit to the login service.
      * @return True if the user was successfully logged in and false otherwise.
      */
-    boolean login(String username, char[] password);
+    boolean login(String username, char[] password) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Logout service to logout the user and close the session.
      * 
      * @return True if the user was successfully logged out and false otherwise.
      */
-    boolean logout();
+    boolean logout() throws PoddClientException;
     
     /**
      * Submits a request to the PODD Publish Artifact service to publish an artifact that was
@@ -126,7 +127,7 @@ public interface PoddClient
      *         a different IRI after they are published, to distinguish them from the previously
      *         unpublished artifact.
      */
-    OWLOntologyID publishArtifact(IRI ontologyIRI);
+    OWLOntologyID publishArtifact(IRI ontologyIRI) throws PoddClientException;
     
     /**
      * Sets the base server URL to use when submitting requests using this client.
@@ -146,7 +147,7 @@ public interface PoddClient
      *         may be given a different IRI after they unpublished, to distinguish them from the
      *         previously available artifact.
      */
-    OWLOntologyID unpublishArtifact(IRI ontologyIRI);
+    OWLOntologyID unpublishArtifact(IRI ontologyIRI) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Edit Artifact service to update the entire artifact, replacing
@@ -161,7 +162,8 @@ public interface PoddClient
      *            that will be used to update the given artifact.
      * @return An {@link OWLOntologyID} object containing the details of the updated artifact.
      */
-    OWLOntologyID updateArtifact(IRI ontologyIRI, InputStream fullInputStream, RDFFormat format);
+    OWLOntologyID updateArtifact(IRI ontologyIRI, InputStream fullInputStream, RDFFormat format)
+        throws PoddClientException;
     
     /**
      * Submits a request to the PODD Load Artifact service.
@@ -176,5 +178,5 @@ public interface PoddClient
      *         to get the version IRI to determine if there have been changes to the ontology in
      *         future.
      */
-    OWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format);
+    OWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format) throws PoddClientException;
 }
