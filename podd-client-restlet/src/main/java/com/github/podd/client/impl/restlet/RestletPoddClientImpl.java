@@ -20,10 +20,14 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
+import org.restlet.data.CharacterSet;
+import org.restlet.data.CookieSetting;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.representation.InputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
+import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -42,6 +46,8 @@ public class RestletPoddClientImpl implements PoddClient
     public static final String NEW_ARTIFACT = "";
     
     private String serverUrl = null;
+    
+    private Series<CookieSetting> currentCookies = null;
     
     public RestletPoddClientImpl()
     {
@@ -205,11 +211,19 @@ public class RestletPoddClientImpl implements PoddClient
      * @see com.github.podd.client.api.PoddClient#login(java.lang.String, char[])
      */
     @Override
-    public boolean login(final String username, final char[] password) throws PoddClientException
+    public boolean login(final String username, final String password) throws PoddClientException
     {
         final ClientResource resource = new ClientResource(this.getUrl(RestletPoddClientImpl.LOGIN));
         
-        return false;
+        final Form form = new Form();
+        form.add("username", username);
+        form.add("password", password);
+        
+        final Representation result = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
+        
+        this.currentCookies = resource.getCookieSettings();
+        
+        return !this.currentCookies.isEmpty();
     }
     
     /*
