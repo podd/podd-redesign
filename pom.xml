@@ -97,11 +97,12 @@
 				<default-podd-home>${basedir}/target/.podd</default-podd-home>
 			</properties>
 			<modules>
-				<module>podd-api</module> 
+				<module>podd-api</module>
 				<module>podd-client-api</module>
-				<module>podd-webapp-lib</module> 
+				<module>podd-webapp-lib</module>
 				<module>podd-webapp-csiro</module>
 				<module>podd-integrationtest</module>
+				<module>podd-client-restlet</module>
 			</modules>
 		</profile>
 		<profile>
@@ -113,8 +114,8 @@
 				<default-podd-home>${basedir}/target/.podd</default-podd-home>
 			</properties>
 			<modules>
-				<module>podd-prototype</module> 
-				<module>podd-prototype-integrationtest</module> 
+				<module>podd-prototype</module>
+				<module>podd-prototype-integrationtest</module>
 				<module>podd-prototype-csiro</module>
 			</modules>
 		</profile>
@@ -398,9 +399,9 @@
 				<type>test-jar</type>
 			</dependency>
 			<dependency>
-			    <groupId>org.restlet.jee</groupId>
-			    <artifactId>org.restlet.ext.fileupload</artifactId>
-			    <version>2.1.0</version>
+				<groupId>org.restlet.jee</groupId>
+				<artifactId>org.restlet.ext.fileupload</artifactId>
+				<version>2.1.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
