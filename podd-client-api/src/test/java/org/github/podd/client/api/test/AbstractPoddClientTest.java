@@ -6,6 +6,7 @@ package org.github.podd.client.api.test;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.github.podd.client.api.PoddClient;
@@ -58,6 +59,7 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#appendArtifact(org.semanticweb.owlapi.model.IRI, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testAppendArtifact() throws Exception
     {
@@ -69,6 +71,7 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#attachFileReference(org.semanticweb.owlapi.model.IRI, org.semanticweb.owlapi.model.IRI, java.lang.String, java.lang.String, java.lang.String)}
      * .
      */
+    @Ignore
     @Test
     public final void testAttachFileReference() throws Exception
     {
@@ -80,6 +83,7 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#deleteArtifact(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testDeleteArtifact() throws Exception
     {
@@ -100,6 +104,7 @@ public abstract class AbstractPoddClientTest
      * Test method for {@link com.github.podd.client.api.PoddClient#listFileReferenceRepositories()}
      * .
      */
+    @Ignore
     @Test
     public final void testListFileReferenceRepositories() throws Exception
     {
@@ -109,6 +114,7 @@ public abstract class AbstractPoddClientTest
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listPublishedArtifacts()}.
      */
+    @Ignore
     @Test
     public final void testListPublishedArtifacts() throws Exception
     {
@@ -118,6 +124,7 @@ public abstract class AbstractPoddClientTest
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()}.
      */
+    @Ignore
     @Test
     public final void testListUnpublishedArtifacts() throws Exception
     {
@@ -144,6 +151,7 @@ public abstract class AbstractPoddClientTest
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#logout()}.
      */
+    @Ignore
     @Test
     public final void testLogout() throws Exception
     {
@@ -155,6 +163,7 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#publishArtifact(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testPublishArtifact() throws Exception
     {
@@ -178,6 +187,7 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#unpublishArtifact(org.semanticweb.owlapi.model.IRI)}
      * .
      */
+    @Ignore
     @Test
     public final void testUnpublishArtifact()
     {
@@ -189,6 +199,7 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#updateArtifact(org.semanticweb.owlapi.model.IRI, java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUpdateArtifact() throws Exception
     {
@@ -200,6 +211,7 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#uploadNewArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
+    @Ignore
     @Test
     public final void testUploadNewArtifact() throws Exception
     {
