@@ -47,7 +47,7 @@ public class RestletPoddClientImpl implements PoddClient
     
     private String serverUrl = null;
     
-    private Series<CookieSetting> currentCookies = null;
+    private Series<CookieSetting> currentCookies = new Series<CookieSetting>(CookieSetting.class);
     
     public RestletPoddClientImpl()
     {
@@ -167,6 +167,12 @@ public class RestletPoddClientImpl implements PoddClient
         {
             return this.serverUrl + "/podd" + path;
         }
+    }
+    
+    @Override
+    public boolean isLoggedIn()
+    {
+        return !this.currentCookies.isEmpty();
     }
     
     /*

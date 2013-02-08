@@ -111,6 +111,13 @@ public interface PoddClient
     boolean login(String username, String password) throws PoddClientException;
     
     /**
+     * Returns the current login status.
+     * 
+     * @return True if the client was logged in after the last request, and false otherwise.
+     */
+    boolean isLoggedIn();
+    
+    /**
      * Submits a request to the PODD Logout service to logout the user and close the session.
      * 
      * @return True if the user was successfully logged out and false otherwise.

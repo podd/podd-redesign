@@ -133,7 +133,12 @@ public abstract class AbstractPoddClientTest
     {
         this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
         
-        this.testClient.login("testAdminUser", "testAdminPassword");
+        Assert.assertFalse(this.testClient.isLoggedIn());
+        
+        Assert.assertTrue("Client was not successfully logged in",
+                this.testClient.login("testAdminUser", "testAdminPassword"));
+        
+        Assert.assertTrue(this.testClient.isLoggedIn());
     }
     
     /**
