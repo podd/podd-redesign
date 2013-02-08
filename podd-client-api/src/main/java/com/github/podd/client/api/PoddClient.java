@@ -62,6 +62,14 @@ public interface PoddClient
     boolean deleteArtifact(IRI ontologyIRI);
     
     /**
+     * Gets the base server URL to use when submitting requests using this client.
+     * 
+     * @return The server URL. For example, <tt>http://localhost:8080/podd/</tt> if the server is
+     *         hosted locally. Returns null if a server URL has not been set.
+     */
+    String getPoddServerUrl();
+    
+    /**
      * 
      * @return A list of Strings identifying the possible values for the repository alias in calls
      *         to {@link #attachFileReference(IRI, String, String)}.
@@ -86,9 +94,12 @@ public interface PoddClient
     /**
      * Submits a request to the PODD Login service to login the user with the given username and
      * password.
-     * 
+     * <p>
      * Once the user is logged in, future queries using this client, prior to calling the logout
      * method, will be authenticated as the given user, barring any session timeouts that may occur.
+     * <p>
+     * If the given user is already logged in, this method may return true immediately without
+     * reauthentication.
      * 
      * @param username
      *            The username to submit to the login service.
