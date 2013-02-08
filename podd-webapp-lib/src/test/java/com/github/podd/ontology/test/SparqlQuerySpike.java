@@ -58,7 +58,7 @@ public class SparqlQuerySpike
     }
     
     /**
-     * Helper method to execute a given SPARQL SELECT query.
+     * Helper method to execute a given SPARQL Tuple query.
      * 
      * @param sparqlQuery
      * @param contexts
@@ -79,11 +79,20 @@ public class SparqlQuerySpike
     }
     
     /**
-     * Retrieve all objects in the given graphs that have a "contains" property or a sub-property of
-     * "contains" pointed towards them.
+     * Retrieve all objects with which the given object has a "contains" property or a sub-property
+     * of "contains".
+     * 
+     * NOTE on sorting of results:
+     * 
+     * For a non-recursive call, results are sorted based on poddBase:weight and label.
+     * Recursive calls are first sorted by parent, weight and label. Parents themselves are sorted
+     * by depth and their weight.
      * 
      * @param parentObject
+     *            The object whose contained "children" are searched for.
      * @param recursive
+     *            If false, only returns immediate contained objects. If true, all descendants are
+     *            included.
      * @param repositoryConnection
      * @param contexts
      * @return
@@ -92,10 +101,6 @@ public class SparqlQuerySpike
     public List<PoddObject> getContainedObjects(final URI parentObject, final boolean recursive,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
-        if(recursive)
-        {
-            throw new RuntimeException("Recursion not yet supported.");
-        }
         
         final String sparqlQuery =
                 "SELECT ?containsProperty ?containedObject ?containedObjectLabel WHERE { \r\n"
@@ -107,29 +112,45 @@ public class SparqlQuerySpike
         
         this.log.info("Executing SPARQL: \r\n {}", sparqlQuery);
         
-        // TODO: 1. For recursing into descendant contained objects, use property paths - ?containsProperty+
-        // NOTE: Cannot use property paths with variables
-        
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         tupleQuery.setBinding("parent", parentObject);
         
         final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
         
-        final List<PoddObject> resultList = new ArrayList<PoddObject>();
-        
-        // populate HashMap with all details
-        BindingSet nextResult = null;
-        while(queryResults.hasNext())
+        final List<PoddObject> children = new ArrayList<PoddObject>();
+        final List<URI> childURIs = new ArrayList<URI>();
+        try
         {
-            nextResult = queryResults.next();
-            final PoddObject obj = new PoddObject((URI)nextResult.getValue("containedObject"));
-            obj.setLabel(nextResult.getValue("containedObjectLabel").stringValue());
-            obj.setDirectParent(parentObject);
-            obj.setRelationshipFromDirectParent(nextResult.getValue("containsProperty").stringValue());
-            
-            resultList.add(obj);
+            while(queryResults.hasNext())
+            {
+                final BindingSet nextResult = queryResults.next();
+                
+                final PoddObject containedObject = new PoddObject((URI)nextResult.getValue("containedObject"));
+                containedObject.setLabel(nextResult.getValue("containedObjectLabel").stringValue());
+                containedObject.setDirectParent(parentObject);
+                containedObject.setRelationshipFromDirectParent(nextResult.getValue("containsProperty").stringValue());
+                
+                children.add(containedObject);
+                childURIs.add(containedObject.getUri());
+            }
         }
-        return resultList;
+        finally
+        {
+            queryResults.close();
+        }
+        
+        // NOTE: recursive as SPARQL doesn't allow property paths when predicates are variables
+        if(recursive)
+        {
+            for(final URI childUri : childURIs)
+            {
+                final List<PoddObject> descendantList =
+                        this.getContainedObjects(childUri, true, repositoryConnection, contexts);
+                children.addAll(descendantList);
+            }
+        }
+        
+        return children;
     }
     
     /**
@@ -144,55 +165,33 @@ public class SparqlQuerySpike
         final TupleQueryResult queryResults = this.executeSparqlQuery(sparqlQuery, repositoryConnection, contexts);
         
         final Set<IRI> results = Collections.newSetFromMap(new ConcurrentHashMap<IRI, Boolean>());
-        while(queryResults.hasNext())
+        try
         {
-            final BindingSet nextResult = queryResults.next();
-            final String ontologyIRI = nextResult.getValue("x").stringValue();
-            results.add(IRI.create(ontologyIRI));
-            
+            while(queryResults.hasNext())
+            {
+                final BindingSet nextResult = queryResults.next();
+                final String ontologyIRI = nextResult.getValue("x").stringValue();
+                results.add(IRI.create(ontologyIRI));
+                
+            }
+        }
+        finally
+        {
+            queryResults.close();
         }
         return results;
     }
     
     /**
-     * Retrieve statements about the "Top Object" (e.g. a Project).
+     * Retrieve statements about the "Top Object" (e.g. a PoddBase:Project).
      * 
-     * This method expects that there is only one top object is present in the given graphs.
+     * This method expects that there is only one top object present in the given contexts.
      * 
      * @param repositoryConnection
      * @param contexts
      * @return A Map containing all statements about the Top Object.
      * @throws OpenRDFException
      */
-    public Map<String, Object> getTopObjectDetailsOld(final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
-    {
-        final String sparqlQuery =
-                "SELECT ?top ?predicate ?value WHERE { \r\n" + "   ?artifact <"
-                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT.stringValue() + "> ?top . \r\n"
-                        + "   ?top ?predicate ?value . \r\n" + " }";
-        final TupleQueryResult queryResults = this.executeSparqlQuery(sparqlQuery, repositoryConnection, contexts);
-        
-        final Map<String, Object> resultMap = new ConcurrentHashMap<String, Object>();
-        
-        BindingSet nextResult = null;
-        while(queryResults.hasNext())
-        {
-            nextResult = queryResults.next();
-            final String pred = nextResult.getValue("predicate").stringValue();
-            final String obj = nextResult.getValue("value").stringValue();
-            
-            resultMap.put(pred, obj);
-        }
-        
-        // finally add top object URI
-        if(nextResult != null)
-        {
-            resultMap.put("objecturi", nextResult.getValue("top").stringValue());
-        }
-        return resultMap;
-    }
-    
     public Map<String, List<Object>> getTopObjectDetails(final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
@@ -200,6 +199,7 @@ public class SparqlQuerySpike
         if(topObject.size() != 1)
         {
             throw new RuntimeException("Exactly 1 top object is required");
+            // TODO - throw a PODD-specific exception
         }
         
         final Map<String, List<Object>> allStatements =
@@ -230,22 +230,27 @@ public class SparqlQuerySpike
         
         final Map<String, List<Object>> resultMap = new ConcurrentHashMap<String, List<Object>>();
         
-        while(queryResults.hasNext())
+        try
         {
-            final BindingSet nextResult = queryResults.next();
-            final String pred = nextResult.getValue("predicate").stringValue();
-            if(!resultMap.containsKey(pred))
+            while(queryResults.hasNext())
             {
-                final List<Object> list = new ArrayList<Object>();
-                list.add(nextResult.getValue("value"));
-                resultMap.put(pred, list);
+                final BindingSet nextResult = queryResults.next();
+                final String pred = nextResult.getValue("predicate").stringValue();
+                if(!resultMap.containsKey(pred))
+                {
+                    final List<Object> list = new ArrayList<Object>();
+                    list.add(nextResult.getValue("value"));
+                    resultMap.put(pred, list);
+                }
+                else
+                {
+                    resultMap.get(pred).add(nextResult.getValue("value"));
+                }
             }
-            else
-            {
-                resultMap.get(pred).add(nextResult.getValue("value"));
-            }
-            
-            System.out.println(pred + " = " + resultMap.get(pred));
+        }
+        finally
+        {
+            queryResults.close();
         }
         
         return resultMap;
@@ -267,12 +272,18 @@ public class SparqlQuerySpike
                 "SELECT ?top WHERE { ?y <" + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT.stringValue() + "> ?top ." + " }";
         
         final TupleQueryResult queryResults = this.executeSparqlQuery(sparqlQuery, repositoryConnection, contexts);
-        while(queryResults.hasNext())
+        try
         {
-            final URI pred = (URI)queryResults.next().getValue("top");
-            topObjectList.add(pred);
+            while(queryResults.hasNext())
+            {
+                final URI pred = (URI)queryResults.next().getValue("top");
+                topObjectList.add(pred);
+            }
         }
-        
+        finally
+        {
+            queryResults.close();
+        }
         return topObjectList;
     }
     

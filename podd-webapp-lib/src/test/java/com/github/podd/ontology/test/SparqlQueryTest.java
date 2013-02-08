@@ -193,7 +193,6 @@ public class SparqlQueryTest extends AbstractOntologyTest
     /**
      * Test retrieve list of direct children of the Top Object
      */
-    @Ignore
     @Test
     public void testgetContainedObjectsFromTopObjectWithRecursion() throws Exception
     {
