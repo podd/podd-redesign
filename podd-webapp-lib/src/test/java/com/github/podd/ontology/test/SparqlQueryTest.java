@@ -12,6 +12,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.RepositoryConnection;
@@ -64,16 +65,6 @@ public class SparqlQueryTest extends AbstractOntologyTest
     {
         Assert.fail("TODO");
     }
-
-    /**
-     * Test retrieving objects sorted by "weight" allocated in the schema ontologies.
-     */
-    @Ignore
-    @Test
-    public void testRetrieveObjectsSortedByWeight() throws Exception
-    {
-        Assert.fail("TODO");
-    }
     
     /**
      * Test the performance of above queries. Move this to a separate test class.
@@ -89,7 +80,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
      * Test retrieve information about Top Object
      */
     @Test
-    public void testRetrieveTopObjectDetails() throws Exception
+    public void testGetTopObjectDetails() throws Exception
     {
         final String testResourcePath = "/test/artifacts/basic-1.ttl";
         final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
@@ -97,23 +88,53 @@ public class SparqlQueryTest extends AbstractOntologyTest
         
         this.conn = this.getConnection();
         
-        final Map<String, Object> map =
+        final Map<String, List<Object>> map =
                 this.testSpike.getTopObjectDetails(this.conn, contextUri, nextOntologyID.getInferredOntologyIRI()
                         .toOpenRDFURI());
         
         Assert.assertEquals("Incorrect number of statements about Top Object", 13, map.size());
         Assert.assertNotNull("Top Object's URI was null", map.get("objecturi"));
-        Assert.assertTrue("URI start not expected format",
-                map.get("objecturi").toString().startsWith("http://purl.org/podd/"));
-        Assert.assertTrue("Missing NotPublished status",
-                map.containsValue("http://purl.org/podd/ns/poddBase#NotPublished"));
+        
+        Assert.assertEquals("Not the expected top object URI",
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966"),
+                map.get("objecturi").get(0));
+        Assert.assertEquals("Publication status not as expected",
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#NotPublished"),
+                map.get("http://purl.org/podd/ns/poddBase#hasPublicationStatus").get(0));
     }
     
     /**
-     * Test retrieve list of level 1 objects in a project
+     * Test retrieve all direct statements about a given object
      */
     @Test
-    public void testRetrieveDirectChildren() throws Exception
+    public void testGetAllDirectStatements() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/basic-1.ttl";
+        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
+        final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
+        
+        this.conn = this.getConnection();
+        
+        final URI objectUri =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
+        
+        final Map<String, List<Object>> map =
+                this.testSpike.getAllDirectStatements(objectUri, this.conn, contextUri, nextOntologyID
+                        .getInferredOntologyIRI().toOpenRDFURI());
+        
+        Assert.assertEquals("Incorrect number of statements about object", 12, map.size());
+        Assert.assertEquals("Lead institution not as expected", "CSIRO HRPPC",
+                ((Literal)map.get("http://purl.org/podd/ns/poddBase#hasLeadInstitution").get(0)).stringValue());
+        Assert.assertEquals("Publication status not as expected",
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#NotPublished"),
+                map.get("http://purl.org/podd/ns/poddBase#hasPublicationStatus").get(0));
+    }
+    
+    /**
+     * Test retrieve list of direct children of the Top Object
+     */
+    @Test
+    public void testgetContainedObjectsFromTopObject() throws Exception
     {
         final String testResourcePath = "/test/artifacts/basic-2.ttl";
         final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
@@ -121,54 +142,111 @@ public class SparqlQueryTest extends AbstractOntologyTest
         
         this.conn = this.getConnection();
         
-        URI parentObjectURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
+        final URI parentObjectURI =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
         
-        final List<PoddObject> map =
-                this.testSpike.getContainedObjects(parentObjectURI, this.conn, contextUri, nextOntologyID.getInferredOntologyIRI()
-                        .toOpenRDFURI());
-
-        // print results
-        for (PoddObject poddObj : map)
+        final List<PoddObject> childObjectList =
+                this.testSpike.getContainedObjects(parentObjectURI, false, this.conn, contextUri, nextOntologyID
+                        .getInferredOntologyIRI().toOpenRDFURI());
+        
+        final String[] expectedLabels =
+                { "Demo Analysis", "Demo Process 1", "Demo Process 2", "Demo Project Plan", "Demo investigation" };
+        
+        Assert.assertEquals("Incorrect number of direct child objects", 5, childObjectList.size());
+        for(int i = 0; i < childObjectList.size(); i++)
         {
-            System.out.println("   " + poddObj.getLabel() + " : (" + poddObj.getUri().stringValue() +
-                    ") <contained-by> " + poddObj.getContainer().stringValue());
+            Assert.assertEquals("Incorrect direct parent", parentObjectURI, childObjectList.get(i).getDirectParent());
+            Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getLabel());
         }
-        
-        
-        Assert.assertEquals("Incorrect number of statements about Top Object", 5, map.size());
-        // Assert.assertNotNull("Top Object's URI was null", map.get("objecturi"));
-        // Assert.assertTrue("URI start not expected format",
-        // map.get("objecturi").toString().startsWith("http://purl.org/podd/"));
-        // Assert.assertTrue("Missing NotPublished status",map.containsValue("http://purl.org/podd/ns/poddBase#NotPublished"));
-        
-        
-//        this.printContents(this.conn, ValueFactoryImpl.getInstance().createURI(
-//                "http://purl.org/podd/basic-2-20130206/artifact:1:version:1"));
-//        this.printContents(this.conn, ValueFactoryImpl.getInstance().createURI(
-//                "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/basic-2-20130206/artifact:1:version:1"));
-//        this.printContexts(this.conn);
     }
     
     /**
-     * Test retrieving all Top Objects of an artifact. 
+     * Test retrieve list of direct children of an inner object
      */
     @Test
-    public void testGetTopObjectsWithOnlyOne() throws Exception
+    public void testgetContainedObjectsFromInnerObject() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/basic-2.ttl";
+        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
+        final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
+        
+        this.conn = this.getConnection();
+        
+        final URI parentObjectURI =
+                ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation");
+        
+        final List<PoddObject> childObjectList =
+                this.testSpike.getContainedObjects(parentObjectURI, false, this.conn, contextUri, nextOntologyID
+                        .getInferredOntologyIRI().toOpenRDFURI());
+        
+        final String[] expectedLabels = { "Demo material", "Squeekee material" };
+        
+        Assert.assertEquals("Incorrect number of direct child objects", 2, childObjectList.size());
+        for(int i = 0; i < childObjectList.size(); i++)
+        {
+            Assert.assertEquals("Incorrect direct parent", parentObjectURI, childObjectList.get(i).getDirectParent());
+            Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getLabel());
+        }
+    }
+    
+    /**
+     * Test retrieve list of direct children of the Top Object
+     */
+    @Ignore
+    @Test
+    public void testgetContainedObjectsFromTopObjectWithRecursion() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/basic-2.ttl";
+        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
+        final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
+        
+        this.conn = this.getConnection();
+        
+        final URI parentObjectURI =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
+        
+        final List<PoddObject> childObjectList =
+                this.testSpike.getContainedObjects(parentObjectURI, true, this.conn, contextUri, nextOntologyID
+                        .getInferredOntologyIRI().toOpenRDFURI());
+        
+        // String[] expectedLabels = {"Demo Analysis", "Demo Process 1", "Demo Process 2",
+        // "Demo Project Plan", "Demo investigation"};
+        
+        Assert.assertEquals("Incorrect number of direct child objects", 7, childObjectList.size());
+        for(int i = 0; i < childObjectList.size(); i++)
+        {
+            System.out.println(childObjectList.get(i).getLabel());
+            // Assert.assertEquals("Incorrect direct parent", parentObjectURI,
+            // childObjectList.get(i).getDirectParent());
+            // Assert.assertEquals("Incorrect object at position", expectedLabels[i],
+            // childObjectList.get(i).getLabel());
+        }
+    }
+    
+    /**
+     * Test retrieving all Top Objects of an artifact when the artifact has one top object.
+     */
+    @Test
+    public void testGetTopObjectsOne() throws Exception
     {
         final String testResourcePath = "/test/artifacts/basic-1.ttl";
         final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
         final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
         
         this.conn = this.getConnection();
-        List<String> topObjects = this.testSpike.getTopObjects(conn, contextUri);
+        final List<URI> topObjects = this.testSpike.getTopObjects(this.conn, contextUri);
         
-        Assert.assertEquals("Should be only 1 top object", 1, topObjects.size());
-        Assert.assertEquals("Not the expected top object", "http://purl.org/podd/basic-1-20130205/object:2966", 
+        Assert.assertEquals("Expected 1 top object", 1, topObjects.size());
+        Assert.assertEquals("Not the expected top object",
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966"),
                 topObjects.get(0));
     }
-
+    
     /**
-     * Test retrieving all Top Objects of an artifact. 
+     * Test retrieving all Top Objects of an artifact when the artifact has multiple top objects.
+     * 
+     * NOTE: a PODD artifact should currently have only 1 top object.
      */
     @Test
     public void testGetTopObjectsWithMultiple() throws Exception
@@ -178,14 +256,22 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
         
         this.conn = this.getConnection();
-        List<String> topObjects = this.testSpike.getTopObjects(conn, contextUri);
+        final List<URI> topObjects = this.testSpike.getTopObjects(this.conn, contextUri);
         
-        Assert.assertEquals("Should be only 3 top object", 3, topObjects.size());
-        Assert.assertTrue("Missing top object", topObjects.contains("http://purl.org/podd/basic-1-20130205/object:2966"));
-        Assert.assertTrue("Missing top object", topObjects.contains("http://purl.org/podd/basic-1-20130205/object:2977"));
-        Assert.assertTrue("Missing top object", topObjects.contains("http://purl.org/podd/basic-1-20130205/object:2988"));
+        Assert.assertEquals("Expected 3 top objects", 3, topObjects.size());
+        Assert.assertTrue(
+                "Missing top object",
+                topObjects.contains(ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-1-20130205/object:2966")));
+        Assert.assertTrue(
+                "Missing top object",
+                topObjects.contains(ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-1-20130205/object:2977")));
+        Assert.assertTrue(
+                "Missing top object",
+                topObjects.contains(ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-1-20130205/object:2988")));
     }
-    
     
     /**
      * Test that direct imports are correctly identified.
@@ -193,10 +279,10 @@ public class SparqlQueryTest extends AbstractOntologyTest
      * Originally from from PoddSesameManagerImpl.java
      */
     @Test
-    public void testOntologyImports() throws Exception
+    public void testGetDirectImports() throws Exception
     {
-        final String testResourcePath = "/test/artifacts/basic-1.rdf";
-        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.RDFXML);
+        final String testResourcePath = "/test/artifacts/basic-1.ttl";
+        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
         final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
         
         this.conn = this.getConnection();

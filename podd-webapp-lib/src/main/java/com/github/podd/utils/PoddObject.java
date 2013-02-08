@@ -19,45 +19,57 @@ public class PoddObject
     private String label;
     
     /** The parent of this object */
-    private URI container;
+    private URI directParent = null;
+    
+    private String relationshipFromDirectParent = null;
     
     /**
      * Constructor
      * 
      * @param uri
      */
-    public PoddObject(URI uri)
+    public PoddObject(final URI uri)
     {
         this.uri = uri;
     }
     
     public URI getUri()
     {
-        return uri;
+        return this.uri;
     }
     
     public String getLabel()
     {
-        return label;
+        return this.label;
     }
     
-    public URI getContainer()
-    {
-        return container;
-    }
-    
-    public void setLabel(String label)
+    public void setLabel(final String label)
     {
         this.label = label;
     }
     
-    public void setContainer(URI container)
+    public URI getDirectParent()
     {
-        this.container = container;
+        return this.directParent;
     }
     
-    public boolean hasContainer()
+    public void setDirectParent(final URI container)
     {
-        return (this.container != null);
+        this.directParent = container;
+    }
+    
+    public boolean hasDirectParent()
+    {
+        return (this.directParent != null);
+    }
+    
+    public void setRelationshipFromDirectParent(final String relationshipFromDirectParent)
+    {
+        this.relationshipFromDirectParent = relationshipFromDirectParent;
+    }
+    
+    public String getRelationshipFromDirectParent()
+    {
+        return this.relationshipFromDirectParent;
     }
 }
