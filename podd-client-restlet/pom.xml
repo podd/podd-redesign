@@ -16,5 +16,25 @@
 			<artifactId>podd-client-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.restlet.jee</groupId>
+			<artifactId>org.restlet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jee</groupId>
+			<artifactId>org.restlet.ext.crypto</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jee</groupId>
+			<artifactId>org.restlet.ext.httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 	</dependencies>
 </project>
