@@ -91,8 +91,8 @@ public class SparqlQuerySpike
      * @param parentObject
      *            The object whose contained "children" are searched for.
      * @param recursive
-     *            If false, only returns immediate contained objects. If true, all descendants are
-     *            included.
+     *            If false, only returns immediate contained objects. If true, this method is 
+     *            recursively called to obtain all descendants.
      * @param repositoryConnection
      * @param contexts
      * @return

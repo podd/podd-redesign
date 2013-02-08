@@ -180,9 +180,9 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 this.testSpike.getContainedObjects(parentObjectURI, false, this.conn, contextUri, nextOntologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         
-        final String[] expectedLabels = { "Demo material", "Squeekee material" };
+        final String[] expectedLabels = { "Demo material", "Squeekee material" , "my treatment 1"};
         
-        Assert.assertEquals("Incorrect number of direct child objects", 2, childObjectList.size());
+        Assert.assertEquals("Incorrect number of direct child objects", 3, childObjectList.size());
         for(int i = 0; i < childObjectList.size(); i++)
         {
             Assert.assertEquals("Incorrect direct parent", parentObjectURI, childObjectList.get(i).getDirectParent());
@@ -212,7 +212,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         // String[] expectedLabels = {"Demo Analysis", "Demo Process 1", "Demo Process 2",
         // "Demo Project Plan", "Demo investigation"};
         
-        Assert.assertEquals("Incorrect number of direct child objects", 7, childObjectList.size());
+        Assert.assertEquals("Incorrect number of direct child objects", 13, childObjectList.size());
         for(int i = 0; i < childObjectList.size(); i++)
         {
             System.out.println(childObjectList.get(i).getLabel());

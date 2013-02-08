@@ -91,6 +91,15 @@ dcterms:date rdf:type owl:AnnotationProperty .
 
 
 
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype
+
+:Demo-Genotype rdf:type poddScience:Genotype ,
+                        owl:NamedIndividual ;
+               
+               rdfs:label "Demo genotype" .
+
+
+
 ###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis
 
 :Demo_Analysis rdf:type poddScience:Analysis ,
@@ -107,8 +116,11 @@ dcterms:date rdf:type owl:AnnotationProperty .
                     
                     rdfs:label "Demo investigation" ;
                     
-                    poddScience:hasMaterial :Demo_Material ,
-                                            :SqueekeeMaterial .
+                    poddScience:hasMaterial :Demo_Material ;
+                    
+                    poddScience:hasTreatment :My_Treatment1 ;
+                    
+                    poddScience:hasMaterial :SqueekeeMaterial .
 
 
 
@@ -117,7 +129,10 @@ dcterms:date rdf:type owl:AnnotationProperty .
 :Demo_Material rdf:type poddScience:Material ,
                         owl:NamedIndividual ;
                
-               rdfs:label "Demo material" .
+               rdfs:label "Demo material" ;
+               
+               poddScience:hasGenotype :Demo-Genotype ,
+                                       :Demo_genotype_2 .
 
 
 
@@ -135,7 +150,9 @@ dcterms:date rdf:type owl:AnnotationProperty .
 :Demo_Process1 rdf:type poddScience:Process ,
                         owl:NamedIndividual ;
                
-               rdfs:label "Demo Process 1" .
+               rdfs:label "Demo Process 1" ;
+               
+               poddScience:hasPlatform :Platform_1 .
 
 
 
@@ -148,12 +165,61 @@ dcterms:date rdf:type owl:AnnotationProperty .
 
 
 
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2
+
+:Demo_genotype_2 rdf:type poddScience:Genotype ,
+                          owl:NamedIndividual ;
+                 
+                 rdfs:label "Genotype 2" .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3
+
+:Demo_genotype_3 rdf:type poddScience:Genotype ,
+                          owl:NamedIndividual ;
+                 
+                 rdfs:label "Genotype 3" ;
+                 
+                 poddScience:hasSequence :Sequence_A .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1
+
+:My_Treatment1 rdf:type poddScience:Treatment ,
+                        owl:NamedIndividual ;
+               
+               rdfs:label "my treatment 1" .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1
+
+:Platform_1 rdf:type poddScience:Platform ,
+                     owl:NamedIndividual ;
+            
+            rdfs:label "Platform 1" .
+
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A
+
+:Sequence_A rdf:type poddScience:Sequence ,
+                     owl:NamedIndividual ;
+            
+            rdfs:label "sequence a" .
+
+
+
 ###  http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial
 
 :SqueekeeMaterial rdf:type poddScience:Material ,
                            owl:NamedIndividual ;
                   
-                  rdfs:label "Squeekee material" .
+                  rdfs:label "Squeekee material" ;
+                  
+                  poddScience:hasGenotype :Demo_genotype_3 .
 
 
 
