@@ -12,7 +12,7 @@ import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class RestletPoddClientTest extends AbstractPoddClientTest
+public class RestletPoddClientIntegrationTest extends AbstractPoddClientTest
 {
     
     /*

@@ -30,6 +30,8 @@ import org.restlet.resource.ClientResource;
 import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
@@ -41,6 +43,8 @@ import com.github.podd.client.api.PoddClientException;
  */
 public class RestletPoddClientImpl implements PoddClient
 {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    
     public static final String LOGIN = "login";
     public static final String LOGOUT = "logout";
     public static final String NEW_ARTIFACT = "";
@@ -226,6 +230,23 @@ public class RestletPoddClientImpl implements PoddClient
         form.add("password", password);
         
         final Representation result = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
+        
+        try
+        {
+            log.info("login result status: {}", resource.getStatus());
+            if(result != null)
+            {
+                log.info("login result: {}", result.getText());
+            }
+            else
+            {
+                log.info("login result was null");
+            }
+        }
+        catch(IOException e)
+        {
+            log.warn("Error with getting result text for debugging");
+        }
         
         this.currentCookies = resource.getCookieSettings();
         
