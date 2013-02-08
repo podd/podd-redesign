@@ -13,6 +13,8 @@ import java.util.Map;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -35,6 +37,7 @@ import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
+import com.github.podd.utils.SparqlQueryHelper;
 
 /**
  * 
@@ -85,7 +88,14 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
         dataModel.put("pageTitle", "View Artifact");
         
-        this.populateDataModelWithArtifactData(ontologyID, dataModel);
+        try
+        {
+            this.populateDataModelWithArtifactData(ontologyID, dataModel);
+        }
+        catch(OpenRDFException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
+        }
         
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
@@ -149,9 +159,39 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      * 
      * @param ontologyID
      * @param dataModel
+     * @throws OpenRDFException 
      */
-    private void populateDataModelWithArtifactData(InferredOWLOntologyID ontologyID, Map<String, Object> dataModel)
+    private void populateDataModelWithArtifactData(InferredOWLOntologyID ontologyID, Map<String, Object> dataModel) throws OpenRDFException
     {
+        
+        RepositoryConnection conn = this.getPoddApplication().getPoddRepositoryManager().getRepository().getConnection();
+        conn.begin();
+        try
+        {
+            SparqlQueryHelper spike = new SparqlQueryHelper();
+            Map<String, List<Value>> topObjectMap = spike.getTopObjectDetails(conn, 
+                    ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+            
+            for (String key : topObjectMap.keySet())
+            {
+                List<Value> values = topObjectMap.get(key);
+                if (values.size() == 1)
+                {
+                    dataModel.put(this.formatFreemarkerName(key), values.get(0).stringValue());
+                    System.out.println("     " + this.formatFreemarkerName(key) + "   =   " + values.get(0).stringValue());
+                }
+            }
+            
+            
+        }
+        finally
+        {
+            if (conn != null)
+            {
+                conn.rollback(); //read only, nothing to commit
+                conn.close();
+            }
+        }
         // hard-code the required values first to display a valid html page
         //DEBUG
         dataModel.put("forbidden", false);
@@ -227,5 +267,26 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     }
     
     
+    /**
+     * Convert object URIs to variable names acceptable to Freemarker.
+     * 
+     * http://purl.org/podd/ns/poddBase#topObject -> http___purl_org_podd_ns_poddBase$topObject
+     * 
+     * This is a lossy process and is not reversible. 
+     * 
+     * TODO: Move to a separate utility class.
+     * 
+     * @param name
+     * @return
+     */
+    public String formatFreemarkerName(String name)
+    {
+        if (name == null)
+        {
+            return name;
+        }
+        
+        return name.replace('.', '_').replace(':', '_').replace('/', '_').replace('-', '_').replace('#', '$');
+    }
     
 }

@@ -14,6 +14,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -21,9 +22,10 @@ import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObject;
+import com.github.podd.utils.SparqlQueryHelper;
 
 /**
- * Test for SparqlQuerySpike.java
+ * Test for SparqlQueryHelper.java
  * 
  * @author kutila
  * 
@@ -31,7 +33,7 @@ import com.github.podd.utils.PoddObject;
 public class SparqlQueryTest extends AbstractOntologyTest
 {
     
-    private SparqlQuerySpike testSpike;
+    private SparqlQueryHelper sparqlHelper;
     
     protected RepositoryConnection conn;
     
@@ -40,7 +42,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
     public void setUp() throws Exception
     {
         super.setUp();
-        this.testSpike = new SparqlQuerySpike();
+        this.sparqlHelper = new SparqlQueryHelper();
     }
     
     @Override
@@ -88,8 +90,8 @@ public class SparqlQueryTest extends AbstractOntologyTest
         
         this.conn = this.getConnection();
         
-        final Map<String, List<Object>> map =
-                this.testSpike.getTopObjectDetails(this.conn, contextUri, nextOntologyID.getInferredOntologyIRI()
+        final Map<String, List<Value>> map =
+                this.sparqlHelper.getTopObjectDetails(this.conn, contextUri, nextOntologyID.getInferredOntologyIRI()
                         .toOpenRDFURI());
         
         Assert.assertEquals("Incorrect number of statements about Top Object", 13, map.size());
@@ -118,8 +120,8 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI objectUri =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
         
-        final Map<String, List<Object>> map =
-                this.testSpike.getAllDirectStatements(objectUri, this.conn, contextUri, nextOntologyID
+        final Map<String, List<Value>> map =
+                this.sparqlHelper.getAllDirectStatements(objectUri, this.conn, contextUri, nextOntologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         
         Assert.assertEquals("Incorrect number of statements about object", 12, map.size());
@@ -146,7 +148,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
         
         final List<PoddObject> childObjectList =
-                this.testSpike.getContainedObjects(parentObjectURI, false, this.conn, contextUri, nextOntologyID
+                this.sparqlHelper.getContainedObjects(parentObjectURI, false, this.conn, contextUri, nextOntologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         
         final String[] expectedLabels =
@@ -177,7 +179,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation");
         
         final List<PoddObject> childObjectList =
-                this.testSpike.getContainedObjects(parentObjectURI, false, this.conn, contextUri, nextOntologyID
+                this.sparqlHelper.getContainedObjects(parentObjectURI, false, this.conn, contextUri, nextOntologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         
         final String[] expectedLabels = { "Demo material", "Squeekee material" , "my treatment 1"};
@@ -206,7 +208,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
         
         final List<PoddObject> childObjectList =
-                this.testSpike.getContainedObjects(parentObjectURI, true, this.conn, contextUri, nextOntologyID
+                this.sparqlHelper.getContainedObjects(parentObjectURI, true, this.conn, contextUri, nextOntologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         
         // String[] expectedLabels = {"Demo Analysis", "Demo Process 1", "Demo Process 2",
@@ -234,7 +236,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
         
         this.conn = this.getConnection();
-        final List<URI> topObjects = this.testSpike.getTopObjects(this.conn, contextUri);
+        final List<URI> topObjects = this.sparqlHelper.getTopObjects(this.conn, contextUri);
         
         Assert.assertEquals("Expected 1 top object", 1, topObjects.size());
         Assert.assertEquals("Not the expected top object",
@@ -255,7 +257,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
         
         this.conn = this.getConnection();
-        final List<URI> topObjects = this.testSpike.getTopObjects(this.conn, contextUri);
+        final List<URI> topObjects = this.sparqlHelper.getTopObjects(this.conn, contextUri);
         
         Assert.assertEquals("Expected 3 top objects", 3, topObjects.size());
         Assert.assertTrue(
@@ -287,7 +289,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         this.conn = this.getConnection();
         Assert.assertEquals("Not the expected number of statements in Repository", 33, this.conn.size(contextUri));
         
-        final Set<IRI> imports = this.testSpike.getDirectImports(this.conn, contextUri);
+        final Set<IRI> imports = this.sparqlHelper.getDirectImports(this.conn, contextUri);
         Assert.assertEquals("Podd-Base should have 2 imports", 2, imports.size());
         Assert.assertTrue("Missing import", imports.contains(IRI.create("http://purl.org/podd/ns/poddBase")));
         Assert.assertTrue("Missing import", imports.contains(IRI.create("http://purl.org/podd/ns/poddScience")));

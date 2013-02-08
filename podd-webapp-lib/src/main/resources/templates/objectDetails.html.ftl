@@ -63,7 +63,7 @@
                 <ol>
                     <li><span class="bold">ID: </span><span property="podd:hasID" datatype="xsd:string">${poddObject.pid!""}</span></li>
                     <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.localName!""}</span></li>
-                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.label!""}</span></li>
+                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${http___www_w3_org_2000_01_rdf_schema$comment!""}</span></li>
                     <!-- data, object and field set attributes -->
                     <#if elementList??>
                        <#list elementList  as field>

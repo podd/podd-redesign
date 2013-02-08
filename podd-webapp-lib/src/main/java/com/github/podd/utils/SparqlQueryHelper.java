@@ -1,4 +1,4 @@
-package com.github.podd.ontology.test;
+package com.github.podd.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
@@ -30,10 +31,12 @@ import com.github.podd.utils.PoddRdfConstants;
  * 
  * These implementations can then be copied on to PODD.
  * 
+ * TODO: This class should be hidden behind the PODD API manager classes
+ * 
  * @author kutila
  * 
  */
-public class SparqlQuerySpike
+public class SparqlQueryHelper
 {
     
     private Logger log = LoggerFactory.getLogger(this.getClass());
@@ -192,7 +195,7 @@ public class SparqlQuerySpike
      * @return A Map containing all statements about the Top Object.
      * @throws OpenRDFException
      */
-    public Map<String, List<Object>> getTopObjectDetails(final RepositoryConnection repositoryConnection,
+    public Map<String, List<Value>> getTopObjectDetails(final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
         final List<URI> topObject = this.getTopObjects(repositoryConnection, contexts);
@@ -202,9 +205,9 @@ public class SparqlQuerySpike
             // TODO - throw a PODD-specific exception
         }
         
-        final Map<String, List<Object>> allStatements =
+        final Map<String, List<Value>> allStatements =
                 this.getAllDirectStatements(topObject.get(0), repositoryConnection, contexts);
-        final List<Object> list = new ArrayList<Object>();
+        final List<Value> list = new ArrayList<Value>();
         list.add(topObject.get(0));
         allStatements.put("objecturi", list);
         return allStatements;
@@ -219,7 +222,7 @@ public class SparqlQuerySpike
      * @return A Map containing all statements about the given object.
      * @throws OpenRDFException
      */
-    public Map<String, List<Object>> getAllDirectStatements(final URI objectUri,
+    public Map<String, List<Value>> getAllDirectStatements(final URI objectUri,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final String sparqlQuery = "SELECT ?predicate ?value WHERE { ?poddObject ?predicate ?value .  }";
@@ -228,7 +231,7 @@ public class SparqlQuerySpike
         tupleQuery.setBinding("poddObject", objectUri);
         final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
         
-        final Map<String, List<Object>> resultMap = new ConcurrentHashMap<String, List<Object>>();
+        final Map<String, List<Value>> resultMap = new ConcurrentHashMap<String, List<Value>>();
         
         try
         {
@@ -238,7 +241,7 @@ public class SparqlQuerySpike
                 final String pred = nextResult.getValue("predicate").stringValue();
                 if(!resultMap.containsKey(pred))
                 {
-                    final List<Object> list = new ArrayList<Object>();
+                    final List<Value> list = new ArrayList<Value>();
                     list.add(nextResult.getValue("value"));
                     resultMap.put(pred, list);
                 }
@@ -286,5 +289,6 @@ public class SparqlQuerySpike
         }
         return topObjectList;
     }
+
     
 }
