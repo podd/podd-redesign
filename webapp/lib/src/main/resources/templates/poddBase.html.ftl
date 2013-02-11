@@ -111,7 +111,7 @@
         <ul id="nav_list">
             <!-- main menu items -->
             <li class="no_image"><a href="${baseUrl}/project">Projects</a></li>
-            <li class="left_image"><a href="${baseUrl}/browser">Browser</a></li>
+<!--            <li class="left_image"><a href="${baseUrl}/browser">Browser</a></li> -->
 <!--            <li class="left_image"><a href="${baseUrl}/search">Search</a></li> -->
             <#if user??>
                 <#if isAdmin>
