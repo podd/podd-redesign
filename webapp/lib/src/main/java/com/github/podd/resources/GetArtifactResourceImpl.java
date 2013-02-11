@@ -177,11 +177,10 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 List<Value> values = topObjectMap.get(key);
                 if (values.size() == 1)
                 {
-                    dataModel.put(this.formatFreemarkerName(key), values.get(0).stringValue());
-                    System.out.println("     " + this.formatFreemarkerName(key) + "   =   " + values.get(0).stringValue());
+                    dataModel.put(key, values.get(0).stringValue());
+                    System.out.println("     " + key + "   =   " + values.get(0).stringValue());
                 }
             }
-            
             
         }
         finally
@@ -207,7 +206,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         final Map<String, Object> poddObject = new HashMap<String, Object>();
         poddObject.put("pid", ontologyID.getOntologyIRI().toString());
         poddObject.put("localName", "Hardcoded project title");
-        poddObject.put("label", "Dummy project from the resource");
+        poddObject.put("description", "Dummy project from the resource");
 
         // poddObject.creator
         final Map<String, String> creator = new HashMap<String, String>();
@@ -235,6 +234,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         final Map<String, Object> refersToElement = new HashMap<String, Object>();
         refersToElement.put("label", "Refers To Label");
+        // DESIGN FIXME: Figure out a way of doing this without removing characters. It is not an option to remove characters or split URIs. 
         refersToElement.put("propertyUriWithoutNamespace", "artifact89");
         refersToElement.put("availableObjects", this.getAvailableObjects());
         refersToElement.put("areSelectedObjects", true);
@@ -264,29 +264,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         return list;
-    }
-    
-    
-    /**
-     * Convert object URIs to variable names acceptable to Freemarker.
-     * 
-     * http://purl.org/podd/ns/poddBase#topObject -> http___purl_org_podd_ns_poddBase$topObject
-     * 
-     * This is a lossy process and is not reversible. 
-     * 
-     * TODO: Move to a separate utility class.
-     * 
-     * @param name
-     * @return
-     */
-    public String formatFreemarkerName(String name)
-    {
-        if (name == null)
-        {
-            return name;
-        }
-        
-        return name.replace('.', '_').replace(':', '_').replace('/', '_').replace('-', '_').replace('#', '$');
     }
     
 }
