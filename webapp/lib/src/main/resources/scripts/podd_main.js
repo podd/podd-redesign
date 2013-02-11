@@ -52,7 +52,9 @@ function removeFilter() {
 
 /*
  * Write the string shortened to the given length, including only whole words. 
- * FIXME: This function causes the AuditLog page to crash.
+ * 
+ * TODO: When the user clicks on the abstract, show the entire string
+ * 
  */
 function writeAbstractWholeWords(inputStr, length) {
 	var space = " ";
