@@ -12,8 +12,10 @@
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
 	<owl:versionIRI rdf:resource="urn:temp:uuid:artifact:version:1" />
 	<poddBase:artifactHasTopObject rdf:resource="urn:temp:uuid:object:2966"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/dcTerms" />
 	<owl:imports rdf:resource="http://purl.org/podd/ns/poddBase" />
 	<owl:imports rdf:resource="http://purl.org/podd/ns/poddScience" />
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddUser" />
 </rdf:Description>
 
 <!-- FIXME: Is there any standard OWL2-DL ontology we can import to get dublin core terms -->
@@ -26,19 +28,19 @@
 </rdf:Description>
 
 <!-- FIXME: How should we be creating links to users -->
-<rdf:Description rdf:about="http://www.podd.org/user#Xueqin.Wang@csiro.au">
+<rdf:Description rdf:about="mailto:xueqin.wang@csiro.au">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
-<rdf:Description rdf:about="http://www.podd.org/user#Alyssa.Weirman@csiro.au">
+<rdf:Description rdf:about="mailto:alyssa.weirman@csiro.au">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
-<rdf:Description rdf:about="http://www.podd.org/user#Xavier.Sirault@csiro.au">
+<rdf:Description rdf:about="mailto:xavier.sirault@csiro.au">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
-<rdf:Description rdf:about="http://www.podd.org/user#Helen.Daily@csiro.au">
+<rdf:Description rdf:about="mailto:helen.daily@csiro.au">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
@@ -49,19 +51,22 @@
 </rdf:Description>
 
 <rdf:Description rdf:about="urn:temp:uuid:object:2966">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Project"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Project"/>
 	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Project#2012-0006_ Cotton Leaf Morphology</rdfs:label>
 	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Characterising normal and okra leaf shapes</rdfs:comment>
-	<dcterms:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2012-06-05T01:57:16.643Z</dcterms:date>
-	<dcterms:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Helen.Daily@csiro.au</dcterms:creator>
-	<poddBase:hasPrincipalInvestigator rdf:resource="http://www.podd.org/user#Xavier.Sirault@csiro.au"/>
-	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
-	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-06-05T01:57:16.643Z</poddBase:createdAt>
 	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CSIRO HRPPC</poddBase:hasLeadInstitution>
 	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-05-22</poddBase:hasStartDate>
-	<poddBase:hasTopObjectStatus rdf:resource="http://purl.org/podd/ns/poddBase#Active"/>
 	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddBase#NotApplicable"/>
+	<poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
+
+	<!-- To be added by PODD, not to be submitted by user -->
+	<dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2012-06-05T01:57:16.643Z</dcterms:created>
+	<dcterms:creator rdf:resource="mailto:helen.daily@csiro.au" />
+	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
+	<poddBase:hasTopObjectStatus rdf:resource="http://purl.org/podd/ns/poddBase#Active"/>
+
 </rdf:Description>
 
 

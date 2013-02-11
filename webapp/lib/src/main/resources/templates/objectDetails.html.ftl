@@ -40,47 +40,34 @@
 
 <div id="content_pane">
 
-<#if errorMessage?? && errorMessage != "">
-<p>
-<h4 class="errorMsg">${errorMessage!""}</h4>
-</p>
-<#else>
-<br />
-</#if>
-
 <#include "parent_details.html.ftl"/>
 
 <h3 class="underlined_heading">${objectType!"Object"} Details
     <a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 </h3>
     <div id="details">  <!-- Collapsible div -->
-        <!-- standard_attributes -->
-        <#if forbidden?? && forbidden>
-            <h4 class="errorMsg">Object: [${pid}] is deleted or inactive. Please contact repository administrator
-            if you believe it has been deleted in error.</h4>
-        <#elseif poddObject??>
-            <div about="${poddObject.pid!"unknown-pid"}" id="${objectType!"object"}_details" class="fieldset">
+        <#if poddObject?? && poddObject.uri??>
+            <div about="${poddObject.uri!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
-                    <li><span class="bold">ID: </span><span property="podd:hasID" datatype="xsd:string">${poddObject.pid!""}</span></li>
-                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.localName!""}</span></li>
-                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${http___www_w3_org_2000_01_rdf_schema$comment!""}</span></li>
+                    <li><span class="bold">ID: </span>${poddObject.uri!""}</li>
+                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title!""}</span></li>
+                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
                     <!-- data, object and field set attributes -->
                     <#if elementList??>
                        <#list elementList  as field>
                         <@addField anField=field/>
                         </#list>
                     </#if>
+                    <!-- TODO: Move this up to parent_details.html.ftl -->
                     <!-- creation infomation -->
-                    <li><span class="bold">Creator: </span><span property="dcterms:creator" datatype="xsd:string">${poddObject.creator.firstName!""} ${poddObject.creator.lastName!""}</span></li>
+                    <li><span class="bold">Creator: </span><span property="dcterms:creator" resource="${poddObject.creator.uri}">${poddObject.creator.firstName!""} ${poddObject.creator.lastName!""} (${poddObject.creator.email!""})</span></li>
                     <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
                     <li><span class="bold">Creation Date: </span><span property="dcterms:date" datatype="xsd:string">${creationDate!""}</span></li>
-                    <li><span class="bold">Last modified by: </span><span property="dcterms:creator" datatype="xsd:string">${poddObject.lastModifier.firstName!""} ${poddObject.lastModifier.lastName!""}</span></li>
+                    <li><span class="bold">Last modified by: </span><span property="dcterms:contributor" resource="${poddObject.lastModifier.uri}">${poddObject.lastModifier.firstName!""} ${poddObject.lastModifier.lastName!""}</span></li>
                     <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
                     <li><span class="bold">Last modification date: </span><span property="dcterms:modified" datatype="xsd:string">${modifiedDate!""}</span></li>
                 </ol>
             </div>
-        <#else>
-            <h4 class="errorMsg">Object: ${pid} could not be found</h4>
         </#if>
     </div>  <!-- details - Collapsable div -->
 
@@ -132,69 +119,48 @@
         <a href="${baseUrl}/artifact/undelete?artifacturi=${poddObject.pid!"unknown-pid"}">Undelete</a>
         </#if>
     <#else>
+    <!-- TODO: Remove me. -->
     <a href="${baseUrl}/project">Cancel</a>    
     </#if>
 </div>
 </div>  <!-- content pane -->
 
 <#macro addField anField>
-    <#if anField.getType() == enums["podd.template.content.HTMLElementType"].FIELD_SET>
-        <@addFieldset element=anField/>
-    <#else>
     <li><span class="bold">${anField.label}: </span>
     <#if anField.enteredValues?has_content>
         <#if anField.enteredValues[1]??>
         <ol>
         <#list anField.enteredValues as value>
-            <li>${value}</li>
+        	<#if value.isUri>
+        	<!-- TODO: Determine if this is a URI or a literal and render it as a link here if necessary -->
+            <li property="${value.propertyUri}" resource="${value.datatype}"><a href="${value.uri}>${value.label}</a></li>
+        	<#else>
+            <li property="${value.propertyUri}" datatype="${value.datatype}">${value.label}</li>
+            </#if>
         </#list>
         </ol>
         <#else>
-        ${anField.enteredValues[0]!""}
+    	<#if anField.enteredValues[0].isUri>
+    	<!-- TODO: Determine if this is a URI or a literal and render it as a link here if necessary -->
+        <li property="${anField.enteredValues[0].propertyUri}" resource="${anField.enteredValues[0].datatype}"><a href="${anField.enteredValues[0].uri}>${anField.enteredValues[0].label}</a></li>
+    	<#else>
+        <!-- FIXME: Move these renderings into a macro -->
+        <li property="${anField.enteredValues[0].propertyUri}" datatype="${anField.enteredValues[0].datatype}">${anField.enteredValues[0].label}</li>
+        
         </#if>
     </#if>
-    </li>
     </#if>
+    </li>
 </#macro>
 
-<#macro addFieldset element>
-    <div id="${element.getPropertyURI()}_fieldset" class="fieldset inner">
-        <div class="legend">${element.getLabel()}</div>
-         <#if element.getFieldsetElementList()?? && element.getFieldsetElementList()?has_content>
-             <!-- add the items fron each of the lists (data, object, fieldset and refersTo properties) to the field set -->
-             <#list element.getFieldsetElementList() as elementList>
-                <#if elementList?? && elementList?has_content>
-                <ol>
-                <#list elementList as element>
-                    <@addField anField=element/>
-                </#list>
-                </ol>
-                </#if>
-            </#list>
-         </#if>
-    </div>
-</#macro>
 
 <#macro refersToTable element>
     <h3 class="underlined_heading">${element.label!""}
         <a href="javascript:animatedcollapse.toggle('${element.propertyUriWithoutNamespace}_details')" icon="toggle" title="View Details"></a>
     </h3>
-	<div id="${element.propertyUriWithoutNamespace}_details">
-
-    <#assign selectedObjectCount = 0>
-    <#if isAdmin>
-        <#assign selectedObjectCount = element.availableObjects?size>
-    <#else>
-        <#assign selectedObjectCount = 0>
-        <#list element.availableObjects as object>
-            <#if object.isSelected && object.state == "A">
-            <#assign selectedObjectCount = selectedObjectCount + 1>
-            </#if>
-        </#list>
-    </#if>
     
-    <#if element.areSelectedObjects && selectedObjectCount != 0>
-    <table id='${element.propertyUriWithoutNamespace}' class="tablesorter {sortlist: [[0,0]]}" cellspacing="0">
+	<div id="${element.propertyUriWithoutNamespace?html}_details">
+    <table id='${element.propertyUriWithoutNamespace?html}' class="tablesorter" cellspacing="0">
 		<thead>
 			<tr>
 			    <th>ID</th>
@@ -202,6 +168,19 @@
 			    <th>Description</th>
 			</tr>
 		</thead>
+        <tbody>
+			<#list element.availableObjects as object>
+			<tr>
+				<!-- TODO: Fix url and property -->
+                <td><a href="${baseUrl}/object/${object.pid}">${object.pid!""}</a>
+                </td>
+                <td>${object.title!""}</td>
+                <td>
+                    <script type="text/javascript">writeAbstractWholeWords("${object.description!" - "}", 200);</script>
+                </td>
+			</tr>
+			</#list>
+		</tbody>
         <tfoot>
         <!-- empty table row, so that the footer appears and table looks complete -->
             <tr>
@@ -210,33 +189,7 @@
                 <td></td>
             </tr>
         </tfoot>
-        <tbody>
-			<#list element.availableObjects as object>
-            <#if object.isSelected && (object.state == "A" || isAdmin)>
-            <tr>
-                <#if object.type == "error">
-                    <td class="errorMsg"><a href="${baseUrl}/object/${object.pid}">${object.pid!""}</a></td>
-                    <td class="errorMsg">${object.title!""}</td>
-                    <td class="errorMsg">${object.description!" - "}</td>
-                <#else>
-                    <td><a href="${baseUrl}/object/${object.pid}">${object.pid!""}</a>
-                        <#if object.state != "A">
-                         (<span class="descriptive">Deleted</span>)
-                        </#if>
-                    </td>
-                    <td>${object.title!""}</td>
-                    <td>
-                        <script type="text/javascript">writeAbstractWholeWords("${object.description!" - "}", 200);</script>
-                    </td>
-                </#if>
-			</tr>
-            </#if>
-			</#list>
-		</tbody>
     </table>
-    <#else>
-    <p>No objects selected.</p>
-    </#if>
     </div>
 
     <script type="text/javascript">
@@ -257,68 +210,8 @@
     </#if>
 </#macro>
 
+<!-- Use refersTo macro instead of referencedByTable for maintainability -->
 <#macro referencedByTable>
-    <h3 class="underlined_heading">Referenced By
-        <a href="javascript:animatedcollapse.toggle('referencedBy_details')" icon="toggle" title="View Details"></a>
-    </h3>
-	<div id="referencedBy_details">
-
-    <table id='referencedBy_table' class="tablesorter {sortlist: [[0,0],[2,0]]}" cellspacing="0">
-		<thead>
-			<tr>
-			    <th>Type</th>
-                <th>ID</th>
-			    <th>Title</th>
-			    <th>Description</th>
-			</tr>
-		</thead>
-        <tfoot>
-        <!-- empty table row, so that the footer appears and table looks complete -->
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tfoot>
-        <tbody>
-            <#list referencedByList as object>
-            <tr>
-				<td>${object.getConcept().getConceptName()!"-"}</td>
-                <td><a href="${baseUrl}/object/${object.pid}">${object.pid!""}</a>
-                    <#if object.getState() != "A">
-                     (<span class="descriptive">Deleted</span>)
-                    </#if>
-                </td>
-				<td>${object.getLocalName()!""}</td>
-				<td>
-                    <script type="text/javascript">writeAbstractWholeWords("${object.getLabel()!" - "}", 200);</script>
-                </td>
-			</tr>
-            </#list>
-		</tbody>
-    </table>
-    <#if referencedByList?size < referencedByCount>
-        ${referencedByList?size} of ${referencedByCount} referencing objects displayed. &nbsp;&nbsp;
-        <a href="${baseUrl}/allReferers/${poddObject.pid}" id="referee_btn" class="button">View All</a>
-        <br>
-    </#if>
-    </div>
-
-    <script type="text/javascript">
-	    animatedcollapse.addDiv('referencedBy_details', 'fade=1,hide=0');
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $("#referencedBy_table")
-            .tablesorter({
-                headers: {
-                    0: { sorter: 'checkbox'}
-                },
-                sortMultiSortKey: 'ctrlKey'
-            });
-        });
-    </script>
 </#macro>
 
 <script type="text/javascript" src="${baseUrl}/scripts/jquery.tablesorter.js"></script>
@@ -339,21 +232,3 @@
 	animatedcollapse.init();
 </script>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        $("#copy_btn").click(function() {
-            $.ajax({
-                type: "POST",
-                url: "${baseUrl}/services/manageClipboard?type=object&amp;pid=${pid}",
-                success: function(data) {
-                    var responseObject = eval('(' + data + ')');
-                    alert(responseObject.message);
-                },
-                error: function(xhr, status, error) {
-                    alert(error.message);
-                }
-            });
-            return false;
-        });
-    });
-</script>
