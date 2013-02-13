@@ -5,6 +5,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix poddUser: <http://purl.org/podd/ns/poddUser#> .
 @prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
 @prefix poddScience: <http://purl.org/podd/ns/poddScience#> .
 @base <http://purl.org/podd/basic-1-20130205/artifact:1> .
@@ -15,7 +16,9 @@
                                                    
                                                    poddBase:artifactHasTopObject <http://purl.org/podd/basic-1-20130205/object:2966> ;
                                                    
-                                                   owl:imports <http://purl.org/podd/ns/poddBase> ,
+                                                   owl:imports <http://purl.org/podd/ns/dcTerms> ,
+                                                   			   <http://purl.org/podd/ns/poddUser> ,
+                                                   			   <http://purl.org/podd/ns/poddBase> ,
                                                                <http://purl.org/podd/ns/poddScience> .
 
 
@@ -24,14 +27,6 @@
 #    Annotation properties
 #
 #################################################################
-
-
-dcterms:creator rdf:type owl:AnnotationProperty .
-
-
-
-dcterms:date rdf:type owl:AnnotationProperty .
-
 
 
 
@@ -64,13 +59,11 @@ dcterms:date rdf:type owl:AnnotationProperty .
                                                     
                                                     poddBase:createdAt "2012-06-05T01:57:16.643Z"^^xsd:dateTime ;
                                                     
-                                                    dcterms:date "2012-06-05T01:57:16.643Z"^^xsd:string ;
-                                                    
                                                     poddBase:hasLeadInstitution "CSIRO HRPPC"^^xsd:string ;
                                                     
                                                     rdfs:comment "Characterising normal and okra leaf shapes"^^xsd:string ;
                                                     
-                                                    dcterms:creator "Helen.Daily@csiro.au"^^xsd:string ;
+                                                    dcterms:creator <mailto:helen.daily@csiro.au> ;
                                                     
                                                     poddBase:hasTopObjectStatus poddBase:Active ;
                                                     
@@ -78,35 +71,35 @@ dcterms:date rdf:type owl:AnnotationProperty .
                                                     
                                                     poddBase:hasPublicationStatus poddBase:NotPublished ;
                                                     
-                                                    poddBase:hasPrincipalInvestigator <http://www.podd.org/user#Xavier.Sirault@csiro.au> .
+                                                    poddBase:hasPrincipalInvestigator <mailto:xavier.sirault@csiro.au> .
 
 
 
-###  http://www.podd.org/user#Alyssa.Weirman@csiro.au
+###  mailto:alyssa.weirman@csiro.au
 
-<http://www.podd.org/user#Alyssa.Weirman@csiro.au> rdf:type owl:NamedIndividual ,
-                                                            owl:Thing .
-
-
-
-###  http://www.podd.org/user#Helen.Daily@csiro.au
-
-<http://www.podd.org/user#Helen.Daily@csiro.au> rdf:type owl:NamedIndividual ,
-                                                         owl:Thing .
+<mailto:alyssa.weirman@csiro.au> rdf:type owl:NamedIndividual ,
+                                                            poddUser:User .
 
 
 
-###  http://www.podd.org/user#Xavier.Sirault@csiro.au
+###  mailto:helen.daily@csiro.au
 
-<http://www.podd.org/user#Xavier.Sirault@csiro.au> rdf:type owl:NamedIndividual ,
-                                                            owl:Thing .
+<mailto:helen.daily@csiro.au> rdf:type owl:NamedIndividual ,
+                                                            poddUser:User .
 
 
 
-###  http://www.podd.org/user#Xueqin.Wang@csiro.au
+###  mailto:xavier.sirault@csiro.au
 
-<http://www.podd.org/user#Xueqin.Wang@csiro.au> rdf:type owl:NamedIndividual ,
-                                                         owl:Thing .
+<mailto:xavier.sirault@csiro.au> rdf:type owl:NamedIndividual ,
+                                                            poddUser:User .
+
+
+
+###  mailto:xueqin.wang@csiro.au
+
+<mailto:xueqin.wang@csiro.au> rdf:type owl:NamedIndividual ,
+                                                            poddUser:User .
 
 
 

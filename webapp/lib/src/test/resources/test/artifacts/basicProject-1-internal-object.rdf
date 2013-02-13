@@ -5,6 +5,7 @@
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
 	xmlns:owl="http://www.w3.org/2002/07/owl#"
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:poddUser="http://purl.org/podd/ns/poddUser#"
 	xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
 	xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
 
@@ -13,35 +14,25 @@
 	<owl:versionIRI rdf:resource="urn:temp:uuid:artifact:version:1" />
 	<poddBase:artifactHasTopObject rdf:resource="urn:temp:uuid:object:2966"/>
 	<owl:imports rdf:resource="http://purl.org/podd/ns/dcTerms" />
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddUser" />
 	<owl:imports rdf:resource="http://purl.org/podd/ns/poddBase" />
 	<owl:imports rdf:resource="http://purl.org/podd/ns/poddScience" />
-	<owl:imports rdf:resource="http://purl.org/podd/ns/poddUser" />
 </rdf:Description>
 
-<!-- FIXME: Is there any standard OWL2-DL ontology we can import to get dublin core terms -->
-<rdf:Description rdf:about="http://purl.org/dc/terms/date">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://purl.org/dc/terms/creator">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
-</rdf:Description>
-
-<!-- FIXME: How should we be creating links to users -->
 <rdf:Description rdf:about="mailto:xueqin.wang@csiro.au">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#User"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="mailto:alyssa.weirman@csiro.au">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#User"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="mailto:xavier.sirault@csiro.au">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#User"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="mailto:helen.daily@csiro.au">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#User"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0">
@@ -62,7 +53,7 @@
 	<poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
 
 	<!-- To be added by PODD, not to be submitted by user -->
-	<dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2012-06-05T01:57:16.643Z</dcterms:created>
+	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2012-06-05T01:57:16.643Z</poddBase:createdAt>
 	<dcterms:creator rdf:resource="mailto:helen.daily@csiro.au" />
 	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
 	<poddBase:hasTopObjectStatus rdf:resource="http://purl.org/podd/ns/poddBase#Active"/>
