@@ -18,8 +18,10 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.Form;
@@ -226,6 +228,8 @@ public class RestletPoddClientImpl implements PoddClient
     public boolean login(final String username, final String password) throws PoddClientException
     {
         final ClientResource resource = new ClientResource(this.getUrl(RestletPoddClientImpl.LOGIN));
+        resource.getCookieSettings().addAll(this.currentCookies);
+        
         // TODO: when Cookies natively supported by Client Resource, or another method remove this
         // Until then, this is necessary to manually attach the cookies after login to the
         // redirected address.
@@ -262,11 +266,13 @@ public class RestletPoddClientImpl implements PoddClient
         }
         catch(final ResourceException e)
         {
+            this.currentCookies.clear();
             this.log.warn("Error with request", e);
             throw new PoddClientException(e);
         }
         catch(final IOException e)
         {
+            this.currentCookies.clear();
             this.log.warn("Error with getting login result text for debugging", e);
             throw new PoddClientException(e);
         }
@@ -289,6 +295,8 @@ public class RestletPoddClientImpl implements PoddClient
         
         final Representation rep = resource.get();
         
+        this.currentCookies = resource.getCookieSettings();
+        
         try
         {
             this.log.info("logout result status: {}", resource.getStatus());
@@ -301,6 +309,8 @@ public class RestletPoddClientImpl implements PoddClient
             {
                 this.log.info("logout result was null");
             }
+            
+            this.log.info("cookies: {}", this.currentCookies);
             
             this.currentCookies.clear();
             
@@ -321,9 +331,12 @@ public class RestletPoddClientImpl implements PoddClient
     private Model parseRdf(final InputStream stream, final RDFFormat format) throws RDFParseException,
         RDFHandlerException, UnsupportedRDFormatException, IOException
     {
-        Rio.createParser(format).parse(stream, this.getUrl(""));
-        
         final Model result = new LinkedHashModel();
+        StatementCollector handler = new StatementCollector(result);
+        
+        RDFParser parser = Rio.createParser(format);
+        parser.setRDFHandler(handler);
+        parser.parse(stream, this.getUrl(""));
         
         return result;
     }
