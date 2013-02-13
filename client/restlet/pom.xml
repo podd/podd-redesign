@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.github.podd</groupId>
-		<artifactId>podd-parent</artifactId>
+		<artifactId>podd-client-parent</artifactId>
 		<version>0.2.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>podd-client-restlet</artifactId>
-	<name>PODD Client - Restlet</name>
+	<name>PODD :: Client Restlet implementation</name>
 	<description>Implementation of the PODD Client API using Restlet</description>
 
 	<dependencies>

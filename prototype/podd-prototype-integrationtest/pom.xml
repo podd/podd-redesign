@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.podd</groupId>
-        <artifactId>podd-parent</artifactId>
+        <artifactId>podd-prototype-parent</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
-    <artifactId>podd-prototype-csiro</artifactId>
-    <name>PODD :: Prototype For CSIRO</name>
+    <artifactId>podd-prototype-integrationtest</artifactId>
+    <name>PODD :: Prototype Integration Tests</name>
     <packaging>war</packaging>
-    <description>Prototype webapp for CSIRO.</description>
+    <description>PODD Prototype Integration Tests.</description>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -18,15 +18,46 @@
             <type>jar</type>
             <scope>runtime</scope>
         </dependency>
-
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>podd-prototype</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.htmlunit</groupId>
+            <artifactId>htmlunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryparser-sparql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
     <build>
-        <finalName>podd-prototype-csiro</finalName>
+        <finalName>podd-prototype</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

@@ -3,29 +3,42 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.github.podd</groupId>
-		<artifactId>podd-parent</artifactId>
+		<artifactId>podd-webapp-parent</artifactId>
 		<version>0.2.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>podd-client-api</artifactId>
-	<name>PODD Client API</name>
-	<description>API for clients to interact with the various PODD services.</description>
+	<artifactId>podd-webapp-api</artifactId>
+	<name>PODD :: Webapp API</name>
+	<description>API for PODD Webapp implementations</description>
+
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>podd-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-model</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.ansell.owlapi</groupId>
-			<artifactId>owlapi-api</artifactId>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-repository-sail</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-sail-memory</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

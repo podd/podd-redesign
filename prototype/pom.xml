@@ -1,0 +1,18 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.github.podd</groupId>
+		<artifactId>podd-parent</artifactId>
+		<version>0.2.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>podd-prototype-parent</artifactId>
+	<packaging>pom</packaging>
+	<name>PODD :: Prototype Parent POM</name>
+	<description>Parent pom for the PODD Redesign Project code. Manages the versions of dependencies and plugins for all child modules.</description>
+	<modules>
+		<module>podd-prototype</module>
+		<module>podd-prototype-integrationtest</module>
+		<module>podd-prototype-csiro</module>
+	</modules>
+</project>
