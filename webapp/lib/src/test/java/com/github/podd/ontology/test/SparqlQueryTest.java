@@ -94,7 +94,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 this.sparqlHelper.getTopObjectDetails(this.conn, contextUri, nextOntologyID.getInferredOntologyIRI()
                         .toOpenRDFURI());
         
-        Assert.assertEquals("Incorrect number of statements about Top Object", 13, map.size());
+        Assert.assertEquals("Incorrect number of statements about Top Object", 12, map.size());
         Assert.assertNotNull("Top Object's URI was null", map.get("objecturi"));
         
         Assert.assertEquals("Not the expected top object URI",
@@ -124,7 +124,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 this.sparqlHelper.getAllDirectStatements(objectUri, this.conn, contextUri, nextOntologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         
-        Assert.assertEquals("Incorrect number of statements about object", 12, map.size());
+        Assert.assertEquals("Incorrect number of statements about object", 11, map.size());
         Assert.assertEquals("Lead institution not as expected", "CSIRO HRPPC",
                 ((Literal)map.get("http://purl.org/podd/ns/poddBase#hasLeadInstitution").get(0)).stringValue());
         Assert.assertEquals("Publication status not as expected",
@@ -287,10 +287,10 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
         
         this.conn = this.getConnection();
-        Assert.assertEquals("Not the expected number of statements in Repository", 33, this.conn.size(contextUri));
+        Assert.assertEquals("Not the expected number of statements in Repository", 32, this.conn.size(contextUri));
         
         final Set<IRI> imports = this.sparqlHelper.getDirectImports(this.conn, contextUri);
-        Assert.assertEquals("Podd-Base should have 2 imports", 2, imports.size());
+        Assert.assertEquals("Podd-Base should have 4 imports", 4, imports.size());
         Assert.assertTrue("Missing import", imports.contains(IRI.create("http://purl.org/podd/ns/poddBase")));
         Assert.assertTrue("Missing import", imports.contains(IRI.create("http://purl.org/podd/ns/poddScience")));
     }

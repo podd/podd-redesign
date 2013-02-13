@@ -415,7 +415,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         // verify:
         Assert.assertNotNull("No imports could be found", importedOntologyIRIs);
-        Assert.assertEquals("Incorrect number of imports found", 2, importedOntologyIRIs.size());
+        Assert.assertEquals("Incorrect number of imports found", 4, importedOntologyIRIs.size());
     }
     
     /**

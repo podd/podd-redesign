@@ -260,14 +260,29 @@ public abstract class AbstractPoddArtifactManagerTest
     private void loadSchemaOntologies() throws Exception
     {
         // prepare: load schema ontologies
+        final InferredOWLOntologyID inferredDctermsOntologyID =
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
+        final InferredOWLOntologyID inferredFoafOntologyID =
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
+        final InferredOWLOntologyID inferredPUserOntologyID =
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 291, 114);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 289, 195);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1142, 363);
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1143, 444);
         final InferredOWLOntologyID inferredPPlantOntologyID =
-                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 83, 386);
+                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 83, 467);
         
         // prepare: update schema management graph
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredDctermsOntologyID.getBaseOWLOntologyID(), inferredDctermsOntologyID.getInferredOWLOntologyID(),
+                false);
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredFoafOntologyID.getBaseOWLOntologyID(), inferredFoafOntologyID.getInferredOWLOntologyID(),
+                false);
+        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
+                inferredPUserOntologyID.getBaseOWLOntologyID(), inferredPUserOntologyID.getInferredOWLOntologyID(),
+                false);
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
                 inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
                 false);

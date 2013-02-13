@@ -748,9 +748,18 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testUploadSchemaOntologyWithOntologyIRIAndVersionIRI() throws Exception
     {
-        InputStream testInputStream = this.getClass().getResourceAsStream("/ontologies/poddBase.owl");
+        String[] resourcePaths = {"/ontologies/dcTerms.owl",
+                "/ontologies/foaf.owl",
+                "/ontologies/poddUser.owl",
+                "/ontologies/poddBase.owl",
+        };
         
-        this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
+        for (String path : resourcePaths)
+        {
+            InputStream testInputStream = this.getClass().getResourceAsStream(path);
+            
+            this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
+        }
         
         //TODO: verify
     }
