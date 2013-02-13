@@ -165,11 +165,11 @@ public class RestletPoddClientImpl implements PoddClient
         
         if(!path.startsWith("/"))
         {
-            return this.serverUrl + "/podd/" + path;
+            return this.serverUrl + "/" + path;
         }
         else
         {
-            return this.serverUrl + "/podd" + path;
+            return this.serverUrl + path;
         }
     }
     

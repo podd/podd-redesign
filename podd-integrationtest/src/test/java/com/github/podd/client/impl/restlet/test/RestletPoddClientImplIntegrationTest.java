@@ -12,7 +12,7 @@ import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class RestletPoddClientIntegrationTest extends AbstractPoddClientTest
+public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
 {
     
     /*
@@ -34,7 +34,7 @@ public class RestletPoddClientIntegrationTest extends AbstractPoddClientTest
     @Override
     protected String getTestPoddServerUrl()
     {
-        return "";
+        return "http://localhost:9090/podd-test";
     }
     
 }
