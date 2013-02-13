@@ -28,6 +28,7 @@ import org.restlet.data.Status;
 import org.restlet.representation.InputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -259,6 +260,11 @@ public class RestletPoddClientImpl implements PoddClient
             
             return !this.currentCookies.isEmpty();
         }
+        catch(final ResourceException e)
+        {
+            this.log.warn("Error with request", e);
+            throw new PoddClientException(e);
+        }
         catch(final IOException e)
         {
             this.log.warn("Error with getting login result text for debugging", e);
@@ -299,6 +305,11 @@ public class RestletPoddClientImpl implements PoddClient
             this.currentCookies.clear();
             
             return true;
+        }
+        catch(final ResourceException e)
+        {
+            this.log.warn("Error with request", e);
+            throw new PoddClientException(e);
         }
         catch(final IOException e)
         {
