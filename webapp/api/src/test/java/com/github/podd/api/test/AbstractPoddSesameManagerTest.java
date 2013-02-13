@@ -79,13 +79,13 @@ public abstract class AbstractPoddSesameManagerTest
      * {@link com.github.podd.api.PoddSesameManager#isPublished(OWLOntologyID, RepositoryConnection)}
      * 
      */
-    private boolean internalTestIsPublished(final String testResourcePath, final URI contextCumVersionIRI)
+    private boolean internalTestIsPublished(final String testResourcePath, final int expectedSize, final URI contextCumVersionIRI)
         throws Exception
     {
         // prepare: load the ontology into the test repository
-        final InputStream artifact1InputStreamAgain = this.getClass().getResourceAsStream(testResourcePath);
-        this.testRepositoryConnection.add(artifact1InputStreamAgain, "", RDFFormat.RDFXML, contextCumVersionIRI);
-        Assert.assertEquals("Not the expected number of statements in Repository", 24,
+        final InputStream inputStream = this.getClass().getResourceAsStream(testResourcePath);
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, contextCumVersionIRI);
+        Assert.assertEquals("Not the expected number of statements in Repository", expectedSize,
                 this.testRepositoryConnection.size(contextCumVersionIRI));
         
         // prepare: build an OWLOntologyID
@@ -495,7 +495,7 @@ public abstract class AbstractPoddSesameManagerTest
         final String testResourcePath = "/test/artifacts/basicProject-1-published.rdf";
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:uuid:artifact:version:55");
         
-        final boolean isPublished = this.internalTestIsPublished(testResourcePath, versionUri);
+        final boolean isPublished = this.internalTestIsPublished(testResourcePath, 23, versionUri);
         Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
     }
     
@@ -510,7 +510,7 @@ public abstract class AbstractPoddSesameManagerTest
     {
         final String testResourcePath = "/test/artifacts/basicProject-1.rdf";
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:artifact:version:1");
-        final boolean isPublished = this.internalTestIsPublished(testResourcePath, versionUri);
+        final boolean isPublished = this.internalTestIsPublished(testResourcePath, 23, versionUri);
         Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
     }
     

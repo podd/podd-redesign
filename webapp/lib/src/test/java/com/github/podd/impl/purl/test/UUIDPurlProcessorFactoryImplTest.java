@@ -5,7 +5,7 @@ package com.github.podd.impl.purl.test;
 
 import java.io.InputStream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.openrdf.model.Statement;
@@ -93,7 +93,7 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
                                         .startsWith(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix());
                 Assert.assertTrue("Generated graph contains statement without temporary URIs: ", tempUriFound);
             }
-            Assert.assertEquals("SPARQL query did not match expected number of statements", 19, count);
+            Assert.assertEquals("SPARQL query did not match expected number of statements", 20, count);
             
             result.close();
             repositoryConnection.rollback();
@@ -153,7 +153,7 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
                 Assert.assertEquals("Subject was not what was requested", subject, statement.getSubject());
                 count++;
             }
-            Assert.assertEquals("SPARQL query did not match expected number of statements", 13, count);
+            Assert.assertEquals("SPARQL query did not match expected number of statements", 12, count);
             result.close();
             repositoryConnection.rollback();
         }
