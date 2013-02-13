@@ -53,11 +53,10 @@
 	<poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
 
 	<!-- To be added by PODD, not to be submitted by user -->
-	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2012-06-05T01:57:16.643Z</poddBase:createdAt>
-	<dcterms:creator rdf:resource="mailto:helen.daily@csiro.au" />
+	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-06-05T01:57:16.643Z</poddBase:createdAt>
+	<dcterms:creator rdf:resource="mailto:helen.daily@csiro.au"/>
 	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
 	<poddBase:hasTopObjectStatus rdf:resource="http://purl.org/podd/ns/poddBase#Active"/>
-
 </rdf:Description>
 
 

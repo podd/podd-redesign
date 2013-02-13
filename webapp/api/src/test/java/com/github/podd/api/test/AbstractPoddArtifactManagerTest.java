@@ -598,7 +598,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 6, 33, 383, false);
+        this.verifyLoadedArtifact(firstArtifactId, 6, 32, 479, false);
         
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
@@ -606,8 +606,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID secondArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 12, 33, 383, false);
-        this.verifyLoadedArtifact(secondArtifactId, 12, 29, 378, true);
+        this.verifyLoadedArtifact(firstArtifactId, 12, 32, 479, false);
+        this.verifyLoadedArtifact(secondArtifactId, 12, 28, 474, true);
     }
     
     /**
@@ -673,7 +673,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID artifactId =
                 this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(artifactId, 6, 29, 378, true);
+        this.verifyLoadedArtifact(artifactId, 6, 28, 474, true);
         
         Assert.assertFalse("Version IRI in source should have been ignored", artifactId.getVersionIRI().toString().endsWith(":55"));
         Assert.assertTrue("New generated Version IRI should start from 1", artifactId.getVersionIRI().toString().endsWith(":1"));
