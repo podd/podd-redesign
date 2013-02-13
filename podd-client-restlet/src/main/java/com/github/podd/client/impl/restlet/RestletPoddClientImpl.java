@@ -261,7 +261,7 @@ public class RestletPoddClientImpl implements PoddClient
         }
         catch(final IOException e)
         {
-            this.log.warn("Error with getting result text for debugging", e);
+            this.log.warn("Error with getting login result text for debugging", e);
             throw new PoddClientException(e);
         }
     }
@@ -285,15 +285,15 @@ public class RestletPoddClientImpl implements PoddClient
         
         try
         {
-            this.log.info("login result status: {}", resource.getStatus());
+            this.log.info("logout result status: {}", resource.getStatus());
             
             if(rep != null)
             {
-                this.log.info("login result: {}", rep.getText());
+                this.log.info("logout result: {}", rep.getText());
             }
             else
             {
-                this.log.info("login result was null");
+                this.log.info("logout result was null");
             }
             
             this.currentCookies.clear();
@@ -302,7 +302,7 @@ public class RestletPoddClientImpl implements PoddClient
         }
         catch(final IOException e)
         {
-            this.log.warn("Error with getting result text for debugging", e);
+            this.log.warn("Error with getting logout result text for debugging", e);
             throw new PoddClientException(e);
         }
     }
