@@ -58,6 +58,7 @@ import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.TestResetResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.template.Configuration;
@@ -454,11 +455,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         try
         {
             this.getPoddSchemaManager().uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddWebConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
             this.getPoddSchemaManager().uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddWebConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
             this.getPoddSchemaManager().uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddWebConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
         }
         catch(IOException | OpenRDFException | OWLException | PoddException e)
         {

@@ -17,6 +17,37 @@ import org.openrdf.model.vocabulary.OWL;
 public interface PoddRdfConstants
 {
     public static final ValueFactory VALUE_FACTORY = ValueFactoryImpl.getInstance();
+
+    /** Path to dcTerms.owl */
+    public static final String PATH_PODD_DCTERMS = "/ontologies/dcTerms.owl";
+
+    /** Path to foaf.owl */
+    public static final String PATH_PODD_FOAF = "/ontologies/foaf.owl";
+
+    /** Path to poddUser.owl */
+    public static final String PATH_PODD_USER = "/ontologies/poddUser.owl";
+
+    /** Path to poddBase.owl */
+    public static final String PATH_PODD_BASE = "/ontologies/poddBase.owl";
+
+    /** Path to poddScience.owl */
+    public static final String PATH_PODD_SCIENCE = "/ontologies/poddScience.owl";
+
+    /** Path to poddPlant.owl */
+    public static final String PATH_PODD_PLANT = "/ontologies/poddPlant.owl";
+
+    /** Path to poddAnimal.owl */
+    public static final String PATH_PODD_ANIMAL = "/ontologies/poddAnimal.owl";
+
+    
+    public static final String PODD_USER_BASE = "http://purl.org/podd/ns/poddUser#";
+
+    public static final String PODD_BASE = "http://purl.org/podd/ns/poddBase#";
+    
+    public static final String PODD_SCIENCE = "http://purl.org/podd/ns/poddScience#";
+
+    public static final String PODD_PLANT = "http://purl.org/podd/ns/poddPlant#";
+
     
     /**
      * An arbitrary prefix to use for automatically assigning ontology IRIs to inferred ontologies.
@@ -24,10 +55,11 @@ public interface PoddRdfConstants
      * using the version IRI of the original ontology, which must be unique.
      */
     public static final String INFERRED_PREFIX = "urn:podd:inferred:ontologyiriprefix:";
+
+    
+    
     
     public static final URI OWL_VERSION_IRI = PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "versionIRI");
-    
-    public static final String PODD_BASE = "http://purl.org/podd/ns/poddBase#";
     
     public static final URI PODDBASE_HAS_PUBLICATION_STATUS = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasPublicationStatus");
@@ -71,11 +103,16 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "inferredVersion");
     
+    /** Default value is urn:podd:default:artifactmanagementgraph:  */
     public static final URI DEFAULT_ARTIFACT_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
             .createURI("urn:podd:default:artifactmanagementgraph:");
     
+    /** Default value is urn:podd:default:schemamanagementgraph  */
     public static final URI DEFAULT_SCHEMA_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
             .createURI("urn:podd:default:schemamanagementgraph");
 
+    /** Default value is urn:podd:default:usermanagementgraph:  */
+    public static final URI DEF_USER_MANAGEMENT_GRAPH = VALUE_FACTORY
+            .createURI("urn:podd:default:usermanagementgraph:");
     
 }

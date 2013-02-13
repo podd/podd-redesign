@@ -11,31 +11,23 @@ import org.openrdf.model.URI;
  */
 public interface PoddWebConstants
 {
-    /**
-     * Default value is urn:podd:default:usermanagementgraph:
-     */
-    public static final URI DEF_USER_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
-            .createURI("urn:podd:default:usermanagementgraph:");
-
     public static final URI SCOPE_ARTIFACT = PoddRdfConstants.VALUE_FACTORY
             .createURI("http://purl.org/podd/poddBase#PoddArtifact"); 
             
     public static final URI SCOPE_REPOSITORY = PoddRdfConstants.VALUE_FACTORY
             .createURI("http://purl.org/podd/poddBase#PoddRepository"); 
 
-    public static final String PODD_USER_BASE = "http://purl.org/podd/ns/poddUser#";
-    
     public static final URI PODD_ROLEMAPPEDOBJECT = PoddRdfConstants.VALUE_FACTORY
-            .createURI(PODD_USER_BASE, "roleMappedObject"); 
+            .createURI(PoddRdfConstants.PODD_USER_BASE, "roleMappedObject"); 
 
     public static final URI PODD_USER_ORGANIZATION = PoddRdfConstants.VALUE_FACTORY
-            .createURI(PODD_USER_BASE, "organization");
+            .createURI(PoddRdfConstants.PODD_USER_BASE, "organization");
 
     public static final URI PODD_USER_ORCID = PoddRdfConstants.VALUE_FACTORY
-            .createURI(PODD_USER_BASE, "orcid");
+            .createURI(PoddRdfConstants.PODD_USER_BASE, "orcid");
 
     public static final URI PODD_USER_HOMEPAGE = PoddRdfConstants.VALUE_FACTORY
-            .createURI(PODD_USER_BASE, "uri");
+            .createURI(PoddRdfConstants.PODD_USER_BASE, "uri");
 
     
     
@@ -153,16 +145,6 @@ public interface PoddWebConstants
      */
     public static final String KEY_HELP_PAGE_IDENTIFIER = "helppage";
 
-    public static final String PATH_PODD_PLANT = "/ontologies/poddPlant.owl";
-    public static final String PATH_PODD_SCIENCE = "/ontologies/poddScience.owl";
-    public static final String PATH_PODD_BASE = "/ontologies/poddBase.owl";
-    
-    public static final String URI_PODD_PLANT = "http://purl.org/podd/ns/poddPlant";
-    public static final String URI_PODD_SCIENCE = "http://purl.org/podd/ns/poddScience";
-    public static final String URI_PODD_BASE = "http://purl.org/podd/ns/poddBase";
-
-
-    
     public static final String PROPERTY_CHALLENGE_AUTH_METHOD = "podd.webservice.auth.challenge.method";
     public static final String PROPERTY_TEST_WEBSERVICE_RESET_KEY = "podd.webservice.reset.key";
 

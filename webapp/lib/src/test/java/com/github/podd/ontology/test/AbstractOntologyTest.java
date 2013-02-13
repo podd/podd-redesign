@@ -43,7 +43,7 @@ import com.github.podd.impl.file.PoddFileReferenceManagerImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddWebConstants;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Abstract test class for testing PODD artifacts and schema ontologies in a Sesame repository.
@@ -139,11 +139,17 @@ public class AbstractOntologyTest
         try
         {
             this.poddSchemaManager.uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddWebConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS), RDFFormat.RDFXML);
             this.poddSchemaManager.uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddWebConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF), RDFFormat.RDFXML);
             this.poddSchemaManager.uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddWebConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_USER), RDFFormat.RDFXML);
+            this.poddSchemaManager.uploadSchemaOntology(
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
+            this.poddSchemaManager.uploadSchemaOntology(
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
+            this.poddSchemaManager.uploadSchemaOntology(
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
         }
         catch(IOException | OpenRDFException | OWLException | PoddException e)
         {
