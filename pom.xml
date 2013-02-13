@@ -67,7 +67,7 @@
 		<pellet.version>2.3.2</pellet.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<restlet.version>2.1.0</restlet.version>
+		<restlet.version>2.1.1</restlet.version>
 		<sesame.version>2.7.0-beta2</sesame.version>
 		<sesame-rio-extensions.version>0.3</sesame-rio-extensions.version>
 		<slf4j.version>1.7.2</slf4j.version>
@@ -401,7 +401,7 @@
 			<dependency>
 				<groupId>org.restlet.jee</groupId>
 				<artifactId>org.restlet.ext.fileupload</artifactId>
-				<version>2.1.0</version>
+				<version>${restlet.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
