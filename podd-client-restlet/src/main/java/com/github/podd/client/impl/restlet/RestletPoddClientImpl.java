@@ -24,6 +24,7 @@ import org.restlet.data.CharacterSet;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.representation.InputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
@@ -224,33 +225,45 @@ public class RestletPoddClientImpl implements PoddClient
     public boolean login(final String username, final String password) throws PoddClientException
     {
         final ClientResource resource = new ClientResource(this.getUrl(RestletPoddClientImpl.LOGIN));
+        // TODO: when Cookies natively supported by Client Resource, or another method remove this
+        // Until then, this is necessary to manually attach the cookies after login to the
+        // redirected address.
+        // GitHub issue for this: https://github.com/restlet/restlet-framework-java/issues/21
+        resource.setFollowingRedirects(false);
         
         final Form form = new Form();
         form.add("username", username);
         form.add("password", password);
         
-        final Representation result = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
+        final Representation rep = resource.post(form.getWebRepresentation(CharacterSet.UTF_8));
         
         try
         {
-            log.info("login result status: {}", resource.getStatus());
-            if(result != null)
+            this.log.info("login result status: {}", resource.getStatus());
+            if(rep != null)
             {
-                log.info("login result: {}", result.getText());
+                this.log.info("login result: {}", rep.getText());
             }
             else
             {
-                log.info("login result was null");
+                this.log.info("login result was null");
             }
+            
+            // HACK
+            if(resource.getStatus().equals(Status.REDIRECTION_SEE_OTHER))
+            {
+                this.currentCookies = resource.getCookieSettings();
+            }
+            
+            this.log.info("cookies: {}", this.currentCookies);
+            
+            return !this.currentCookies.isEmpty();
         }
-        catch(IOException e)
+        catch(final IOException e)
         {
-            log.warn("Error with getting result text for debugging");
+            this.log.warn("Error with getting result text for debugging", e);
+            throw new PoddClientException(e);
         }
-        
-        this.currentCookies = resource.getCookieSettings();
-        
-        return !this.currentCookies.isEmpty();
     }
     
     /*
@@ -261,8 +274,37 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean logout() throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return false;
+        final ClientResource resource = new ClientResource(this.getUrl(RestletPoddClientImpl.LOGOUT));
+        // TODO: when Cookies natively supported by Client Resource, or another method remove this
+        // Until then, this is necessary to manually attach the cookies after login to the
+        // redirected address.
+        // GitHub issue for this: https://github.com/restlet/restlet-framework-java/issues/21
+        resource.setFollowingRedirects(false);
+        
+        final Representation rep = resource.get();
+        
+        try
+        {
+            this.log.info("login result status: {}", resource.getStatus());
+            
+            if(rep != null)
+            {
+                this.log.info("login result: {}", rep.getText());
+            }
+            else
+            {
+                this.log.info("login result was null");
+            }
+            
+            this.currentCookies.clear();
+            
+            return true;
+        }
+        catch(final IOException e)
+        {
+            this.log.warn("Error with getting result text for debugging", e);
+            throw new PoddClientException(e);
+        }
     }
     
     private Model parseRdf(final InputStream stream, final RDFFormat format) throws RDFParseException,

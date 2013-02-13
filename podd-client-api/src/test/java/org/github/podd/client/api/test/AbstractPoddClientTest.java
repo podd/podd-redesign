@@ -151,11 +151,21 @@ public abstract class AbstractPoddClientTest
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#logout()}.
      */
-    @Ignore
     @Test
     public final void testLogout() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
+        
+        Assert.assertFalse(this.testClient.isLoggedIn());
+        
+        Assert.assertTrue("Client was not successfully logged in",
+                this.testClient.login("testAdminUser", "testAdminPassword"));
+        
+        Assert.assertTrue(this.testClient.isLoggedIn());
+        
+        Assert.assertTrue("Client was not successfully logged out", this.testClient.logout());
+        
+        Assert.assertFalse(this.testClient.isLoggedIn());
     }
     
     /**
