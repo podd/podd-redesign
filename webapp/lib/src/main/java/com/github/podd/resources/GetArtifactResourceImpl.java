@@ -242,7 +242,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         refersToList.add(refersToElement);
         
         dataModel.put("refersToList", refersToList);        
-        
+
+        dataModel.put("selectedObjectCount", 0);
         dataModel.put("childHierarchyList", Collections.emptyList());
         
     }
