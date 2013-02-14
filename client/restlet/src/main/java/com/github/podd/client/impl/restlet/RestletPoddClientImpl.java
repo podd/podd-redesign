@@ -51,7 +51,7 @@ public class RestletPoddClientImpl implements PoddClient
     
     public static final String LOGIN = "login";
     public static final String LOGOUT = "logout";
-    public static final String NEW_ARTIFACT = "";
+    public static final String NEW_ARTIFACT = "artifact/new";
     
     private String serverUrl = null;
     
@@ -423,6 +423,10 @@ public class RestletPoddClientImpl implements PoddClient
         final InputRepresentation rep = new InputRepresentation(input, MediaType.valueOf(format.getDefaultMIMEType()));
         
         final ClientResource resource = new ClientResource(this.getUrl(RestletPoddClientImpl.NEW_ARTIFACT));
+        resource.getCookies().addAll(this.currentCookies);
+        
+        this.log.info("cookies: {}", this.currentCookies);
+        resource.getQuery().add("format", format.getDefaultMIMEType());
         
         final Representation post = resource.post(rep);
         

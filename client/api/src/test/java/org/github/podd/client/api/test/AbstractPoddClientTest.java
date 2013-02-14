@@ -3,11 +3,15 @@
  */
 package org.github.podd.client.api.test;
 
+import java.io.InputStream;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openrdf.rio.RDFFormat;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.client.api.PoddClient;
 
@@ -18,6 +22,8 @@ import com.github.podd.client.api.PoddClient;
  */
 public abstract class AbstractPoddClientTest
 {
+    private static final String TEST_ADMIN_PASSWORD = "testAdminPassword";
+    private static final String TEST_ADMIN_USER = "testAdminUser";
     private PoddClient testClient;
     
     /**
@@ -43,6 +49,8 @@ public abstract class AbstractPoddClientTest
     {
         this.testClient = this.getNewPoddClientInstance();
         Assert.assertNotNull("PODD Client implementation was null", this.testClient);
+        
+        this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
     }
     
     /**
@@ -96,7 +104,10 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testGetPoddServerUrlNull() throws Exception
     {
-        // Server URL is null by default until setPoddServerUrl is called
+        Assert.assertNotNull(this.testClient.getPoddServerUrl());
+        
+        this.testClient.setPoddServerUrl(null);
+        
         Assert.assertNull(this.testClient.getPoddServerUrl());
     }
     
@@ -138,8 +149,6 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testLogin() throws Exception
     {
-        this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
-        
         Assert.assertFalse(this.testClient.isLoggedIn());
         
         Assert.assertTrue("Client was not successfully logged in",
@@ -187,9 +196,11 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testSetPoddServerUrl() throws Exception
     {
-        Assert.assertNull(this.testClient.getPoddServerUrl());
+        Assert.assertNotNull(this.testClient.getPoddServerUrl());
         
-        this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
+        this.testClient.setPoddServerUrl(null);
+        
+        Assert.assertNull(this.testClient.getPoddServerUrl());
     }
     
     /**
@@ -221,11 +232,18 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#uploadNewArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      */
-    @Ignore
     @Test
     public final void testUploadNewArtifact() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        this.testClient.login(TEST_ADMIN_USER, TEST_ADMIN_PASSWORD);
+        
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        OWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        Assert.assertNotNull(newArtifact);
+        Assert.assertNotNull(newArtifact.getOntologyIRI());
+        Assert.assertNotNull(newArtifact.getVersionIRI());
     }
     
 }
