@@ -120,6 +120,10 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
         }
         
+        // TODO: Remove this restriction and allow the document to directly be uploaded without the
+        // multi-part/form-data wrapper
+        // There are no other additional fields, and if there were, they might be able to be
+        // supported using query parameters
         if(!MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
         {
             log.error("Multi-part/form-data required");
