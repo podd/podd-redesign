@@ -128,7 +128,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             InferredOWLOntologyID ontologyID =
                     this.getPoddApplication().getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
             
-            // TODO: support prototype method for this
+            // FIXME: support prototype method for this
+            // use this instead of ../base/ ../inferred/.. in the Prototype. Change documentation too.
             String includeInferredString =
                     this.getRequest().getResourceRef().getQueryAsForm().getFirstValue("includeInferred", true);
             boolean includeInferred = Boolean.valueOf(includeInferredString);
@@ -169,6 +170,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             SparqlQueryHelper spike = new SparqlQueryHelper();
+            
+            //FIXME: put in a Model to freemarker instead of Maps
+            
             Map<String, List<Value>> topObjectMap = spike.getTopObjectDetails(conn, 
                     ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID.getInferredOntologyIRI().toOpenRDFURI());
             

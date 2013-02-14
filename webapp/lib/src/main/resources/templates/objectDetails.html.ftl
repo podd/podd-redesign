@@ -53,14 +53,14 @@
                     <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title!""}</span></li>
                     <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
                     
-                    <!-- data, object and field set attributes -->
+                    <!-- data, object attributes -->
                     <#if elementList??>
                        <#list elementList  as field>
                         <@addField anField=field/>
                         </#list>
                     </#if>
                     
-                    <#if objectType?? && objectType == "Project">
+                    <#if objectType?? && objectType.contains("TopObject")>
 	                    <!-- creation infomation -->
 	                    <li><span class="bold">Creator: </span><span property="dcterms:creator" resource="${poddObject.creator.uri}">${poddObject.creator.firstName!""} ${poddObject.creator.lastName!""} (${poddObject.creator.email!""})</span></li>
 	                    <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
