@@ -147,12 +147,12 @@ public class ApplicationUtils
     
     public static Repository getNewRepository()
     {
+        // FIXME: Enable this before deploying
         final String repositoryUrl = ""; // PropertyUtil.getProperty(OasProperties.PROPERTY_SESAME_URL,
                                          // "");
         
         // if we weren't able to find a repository URL in the configuration, we setup an
-        // in
-        // memory store
+        // in-memory store
         if(repositoryUrl.trim().isEmpty())
         {
             final Repository repository = new SailRepository(new MemoryStore());
