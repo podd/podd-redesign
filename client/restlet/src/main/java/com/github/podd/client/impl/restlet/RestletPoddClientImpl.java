@@ -426,12 +426,14 @@ public class RestletPoddClientImpl implements PoddClient
         resource.getCookies().addAll(this.currentCookies);
         
         this.log.info("cookies: {}", this.currentCookies);
+        
         resource.getQuery().add("format", format.getDefaultMIMEType());
         
-        final Representation post = resource.post(rep);
+        final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_XML);
         
         try
         {
+            // TODO: Even if you ask for RDF, you get back a string
             final Model parsedStatements = this.parseRdf(post);
             
             final OWLOntologyID result = this.getOntologyFromModel(parsedStatements);
