@@ -49,23 +49,26 @@
         <#if poddObject?? && poddObject.uri??>
             <div about="${poddObject.uri!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
-                    <li><span class="bold">ID: </span>${poddObject.uri!""}</li>
+                    <li><span class="bold">ID (URI): </span>${poddObject.uri!""}</li>
                     <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title!""}</span></li>
                     <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
+                    
                     <!-- data, object and field set attributes -->
                     <#if elementList??>
                        <#list elementList  as field>
                         <@addField anField=field/>
                         </#list>
                     </#if>
-                    <!-- TODO: Move this up to parent_details.html.ftl -->
-                    <!-- creation infomation -->
-                    <li><span class="bold">Creator: </span><span property="dcterms:creator" resource="${poddObject.creator.uri}">${poddObject.creator.firstName!""} ${poddObject.creator.lastName!""} (${poddObject.creator.email!""})</span></li>
-                    <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
-                    <li><span class="bold">Creation Date: </span><span property="dcterms:date" datatype="xsd:string">${creationDate!""}</span></li>
-                    <li><span class="bold">Last modified by: </span><span property="dcterms:contributor" resource="${poddObject.lastModifier.uri}">${poddObject.lastModifier.firstName!""} ${poddObject.lastModifier.lastName!""}</span></li>
-                    <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
-                    <li><span class="bold">Last modification date: </span><span property="dcterms:modified" datatype="xsd:string">${modifiedDate!""}</span></li>
+                    
+                    <#if objectType?? && objectType == "Project">
+	                    <!-- creation infomation -->
+	                    <li><span class="bold">Creator: </span><span property="dcterms:creator" resource="${poddObject.creator.uri}">${poddObject.creator.firstName!""} ${poddObject.creator.lastName!""} (${poddObject.creator.email!""})</span></li>
+	                    <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
+	                    <li><span class="bold">Creation Date: </span><span property="dcterms:date" datatype="xsd:string">${creationDate!""}</span></li>
+	                    <li><span class="bold">Last modified by: </span><span property="dcterms:contributor" resource="${poddObject.lastModifier.uri}">${poddObject.lastModifier.firstName!""} ${poddObject.lastModifier.lastName!""}</span></li>
+	                    <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
+	                    <li><span class="bold">Last modification date: </span><span property="dcterms:modified" datatype="xsd:string">${modifiedDate!""}</span></li>
+                    </#if>
                 </ol>
             </div>
         </#if>
