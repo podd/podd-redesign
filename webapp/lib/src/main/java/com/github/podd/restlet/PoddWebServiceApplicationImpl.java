@@ -455,6 +455,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         try
         {
             this.getPoddSchemaManager().uploadSchemaOntology(
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS), RDFFormat.RDFXML);
+            this.getPoddSchemaManager().uploadSchemaOntology(
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF), RDFFormat.RDFXML);
+            this.getPoddSchemaManager().uploadSchemaOntology(
+                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_USER), RDFFormat.RDFXML);
+            this.getPoddSchemaManager().uploadSchemaOntology(
                     this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
             this.getPoddSchemaManager().uploadSchemaOntology(
                     this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
