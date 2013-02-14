@@ -21,6 +21,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.ext.fileupload.RestletFileUpload;
@@ -102,6 +103,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     /**
      * Handle http POST submitting a new artifact file Returns a text String containing the added
      * artifact's Ontology IRI.
+     * 
+     * TODO: implement more of this in common with the version that returns an HTML file.
      */
     @Post(":rdf|txt|rj|ttl")
     public Representation uploadArtifact(final Representation entity, final Variant variant) throws ResourceException
@@ -110,32 +113,11 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("@Post uploadArtifactFile ({})", variant.getMediaType().getName());
         
-        final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
-        
-        if(entity == null)
-        {
-            log.error("Client did not submit anything");
-            // POST request with no entity.
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
-        }
-        
-        // TODO: Remove this restriction and allow the document to directly be uploaded without the
-        // multi-part/form-data wrapper
-        // There are no other additional fields, and if there were, they might be able to be
-        // supported using query parameters
-        if(!MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
-        {
-            log.error("Multi-part/form-data required");
-            // format NOT multipart form data
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Multipart/form-data required");
-        }
-        
-        // - extract file from incoming Representation and load artifact to PODD
-        final Map<String, String> artifactMap = this.uploadFileAndLoadArtifactIntoPodd(entity);
+        Map<String, String> artifactMap = doUpload(entity);
         
         this.log.info("Successfully loaded artifact {}", artifactMap.get("iri"));
         
+        // FIXME: Structure this response as RDF, as they may have asked for it in RDF.
         return new StringRepresentation(artifactMap.get("iri"));
     }
     
@@ -149,6 +131,26 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("@Post UploadArtifactFile Page");
         
+        Map<String, String> artifactMap = doUpload(entity);
+        
+        this.log.info("Successfully loaded artifact {}", artifactMap.get("iri"));
+        
+        // TODO - create and write to a template informing success
+        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
+        dataModel.put("contentTemplate", "artifact_upload.html.ftl");
+        dataModel.put("pageTitle", UploadArtifactResourceImpl.UPLOAD_PAGE_TITLE_TEXT);
+        // FIXME: Why not pass in an InferredOWLOntologyID? The properties in the map come from that
+        // object.
+        dataModel.put("artifact", artifactMap);
+        
+        // Output the base template, with contentTemplate from the dataModel defining the
+        // template to use for the content in the body of the page
+        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+    }
+    
+    private Map<String, String> doUpload(final Representation entity) throws ResourceException
+    {
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
@@ -158,33 +160,45 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
         }
         
-        if(!MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
+        Map<String, String> artifactMap;
+        
+        if(MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
         {
-            // format NOT multipart form data
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Multipart/form-data required");
+            // - extract file from incoming Representation and load artifact to PODD
+            artifactMap = this.uploadFileAndLoadArtifactIntoPodd(entity);
+        }
+        else
+        {
+            
+            String formatString = this.getQuery().getFirstValue("format");
+            
+            if(formatString == null)
+            {
+                // Use the media type that was attached to the entity as a fallback if they did not
+                // specify it as a query parameter
+                formatString = entity.getMediaType().getName();
+            }
+            
+            RDFFormat format = Rio.getParserFormatForMIMEType(formatString, RDFFormat.RDFXML);
+            
+            InputStream inputStream = null;
+            
+            try
+            {
+                inputStream = entity.getStream();
+            }
+            catch(IOException e)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
+            }
+            artifactMap = this.uploadFileAndLoadArtifactIntoPodd(inputStream, format);
         }
         
-        // - extract file from incoming Representation and load artifact to PODD
-        final Map<String, String> artifactMap = this.uploadFileAndLoadArtifactIntoPodd(entity);
-        
-        this.log.info("Successfully loaded artifact {}", artifactMap.get("iri"));
-        
-        // TODO - create and write to a template informing success
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "artifact_upload.html.ftl");
-        dataModel.put("pageTitle", UploadArtifactResourceImpl.UPLOAD_PAGE_TITLE_TEXT);
-        dataModel.put("artifact", artifactMap);
-        
-        // Output the base template, with contentTemplate from the dataModel defining the
-        // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return artifactMap;
     }
     
     private Map<String, String> uploadFileAndLoadArtifactIntoPodd(final Representation entity) throws ResourceException
     {
-        final Map<String, String> resultsMap = new HashMap<String, String>();
-        
         List<FileItem> items;
         Path file = null;
         String contentType = null;
@@ -257,6 +271,27 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "File IO error occurred", e);
         }
+        // FIXME: Avoid using hardcoded format where possible by having user specify the format,
+        // which could be an alternative property in the multi-part/form-data map
+        final RDFFormat format = RDFFormat.RDFXML;
+        return uploadFileAndLoadArtifactIntoPodd(inputStream, format);
+    }
+    
+    /**
+     * 
+     * @param inputStream
+     *            The input stream containing an RDF document in the given format that is to be
+     *            uploaded.
+     * @param format
+     *            The determined, or at least specified, format for the serialised RDF triples in
+     *            the input.
+     * @return
+     * @throws ResourceException
+     */
+    private Map<String, String> uploadFileAndLoadArtifactIntoPodd(final InputStream inputStream, RDFFormat format)
+        throws ResourceException
+    {
+        final Map<String, String> resultsMap = new HashMap<String, String>();
         
         /*
          * Guess mime type using any23 final MIMEType parsedContentType =
@@ -266,7 +301,6 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
          * inputStream, parsedContentType); final MediaType finalMimeType =
          * MediaType.valueOf(guessedMIMEType.toString());
          */
-        final RDFFormat format = RDFFormat.RDFXML;
         final PoddArtifactManager artifactManager =
                 ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
         try
