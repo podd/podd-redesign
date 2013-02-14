@@ -9,13 +9,13 @@
 <#if user??>
     <#if artifact??>
     	<h4>Artifact successfully uploaded.</h4>
-	    <p><a href="${baseUrl}/artifact/base?artifacturi=${artifact.iri}" class="padded">View project.</a></p>
+	    <p><a href="${baseUrl}/artifact/base?artifacturi=${artifact.ontologyIRI}" class="padded">View project.</a></p>
 	    <div class="fieldset" id="upload">
 			<div class="legend">Artifact Details</div>
 			<ol> 
-				<li><span class="bold">Ontology IRI: </span>${artifact.iri}</li>
-				<li><span class="bold">Version IRI: </span>${artifact.versionIri}</li>
-				<li><span class="bold">Inferred IRI: </span>${artifact.inferredIri}</li>
+				<li><span class="bold">Ontology IRI: </span>${artifact.ontologyIRI}</li>
+				<li><span class="bold">Version IRI: </span>${artifact.versionIRI}</li>
+				<li><span class="bold">Inferred IRI: </span>${artifact.inferredOntologyIRI}</li>
 			</div>
 		</div>
 	<#else>    
