@@ -82,9 +82,10 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation getUploadArtifactPage(final Representation entity) throws ResourceException
     {
-        //even though this only does a page READ, we're checking authorization for CREATE since the page
-        //is for creating a new artifact via a file upload
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI>emptySet());
+        // even though this only does a page READ, we're checking authorization for CREATE since the
+        // page
+        // is for creating a new artifact via a file upload
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
         
         this.log.info("@Get UploadArtifactFile Page");
         
@@ -97,30 +98,31 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-
-
+    
     /**
-     * Handle http POST submitting a new artifact file
-     * Returns a text String containing the added artifact's Ontology IRI.
+     * Handle http POST submitting a new artifact file Returns a text String containing the added
+     * artifact's Ontology IRI.
      */
     @Post(":rdf|txt|rj|ttl")
     public Representation uploadArtifact(final Representation entity, final Variant variant) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI>emptySet());
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
         
-        this.log.info("@Post uploadArtifactFile ({})",variant.getMediaType().getName());
+        this.log.info("@Post uploadArtifactFile ({})", variant.getMediaType().getName());
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
         if(entity == null)
         {
+            log.error("Client did not submit anything");
             // POST request with no entity.
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
         }
         
         if(!MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
         {
+            log.error("Multi-part/form-data required");
             // format NOT multipart form data
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Multipart/form-data required");
         }
@@ -130,10 +132,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("Successfully loaded artifact {}", artifactMap.get("iri"));
         
-        
         return new StringRepresentation(artifactMap.get("iri"));
-    }    
-    
+    }
     
     /**
      * Handle http POST submitting a new artifact file
@@ -141,7 +141,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     @Post(":html")
     public Representation uploadArtifactFileHtml(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI>emptySet());
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
         
         this.log.info("@Post UploadArtifactFile Page");
         
