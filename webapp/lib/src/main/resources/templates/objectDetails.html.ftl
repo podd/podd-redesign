@@ -50,8 +50,8 @@
             <div about="${poddObject.uri!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
                     <li><span class="bold">ID (URI): </span>${poddObject.uri!""}</li>
-                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title}!""}</span></li>
-                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description}!""}</span></li>
+                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title!""}</span></li>
+                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
                     
                     <!-- data, object attributes -->
                     <#if elementList??>
