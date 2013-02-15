@@ -5,8 +5,8 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
-@prefix poddUser: <http://purl.org/podd/ns/poddUser#> .
 @prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
+@prefix poddUser: <http://purl.org/podd/ns/poddUser#> .
 @prefix poddScience: <http://purl.org/podd/ns/poddScience#> .
 @base <http://purl.org/podd/basic-2-20130206/artifact:1> .
 
@@ -17,9 +17,9 @@
                                                    owl:versionIRI <http://purl.org/podd/basic-2-20130206/artifact:version:1> ;
                                                    
                                                    owl:imports <http://purl.org/podd/ns/dcTerms> ,
-                                                   			   <http://purl.org/podd/ns/poddUser> ,
-                                                   			   <http://purl.org/podd/ns/poddBase> ,
-                                                               <http://purl.org/podd/ns/poddScience> .
+                                                               <http://purl.org/podd/ns/poddBase> ,
+                                                               <http://purl.org/podd/ns/poddScience> ,
+                                                               <http://purl.org/podd/ns/poddUser> .
 
 
 #################################################################
@@ -27,6 +27,7 @@
 #    Annotation properties
 #
 #################################################################
+
 
 
 
@@ -62,8 +63,6 @@
                                                     
                                                     rdfs:comment "Characterising normal and okra leaf shapes"^^xsd:string ;
                                                     
-                                                    dcterms:creator <mailto:helen.daily@csiro.au> ;
-                                                    
                                                     poddScience:hasAnalysis :Demo_Analysis ;
                                                     
                                                     poddScience:hasInvestigation :Demo_Investigation ;
@@ -73,11 +72,15 @@
                                                     poddScience:hasProcess :Demo_Process1 ,
                                                                            :Demo_Process2 ;
                                                     
+                                                    poddScience:hasPublication :publication45 ;
+                                                    
                                                     poddBase:hasTopObjectStatus poddBase:Active ;
                                                     
                                                     poddScience:hasANZSRC poddBase:NotApplicable ;
                                                     
                                                     poddBase:hasPublicationStatus poddBase:NotPublished ;
+                                                    
+                                                    dcterms:creator <mailto:helen.daily@csiro.au> ;
                                                     
                                                     poddBase:hasPrincipalInvestigator <mailto:xavier.sirault@csiro.au> .
 
@@ -215,31 +218,67 @@
 
 
 
+###  http://purl.org/podd/basic-2-20130206/artifact:1#publication45
+
+:publication45 rdf:type poddScience:Publication ,
+                        owl:NamedIndividual ;
+               
+               rdfs:label "PODD - Towards An Extensible, Domain-agnostic Scientific Data Management System" ;
+               
+               dcterms:created "2013-02-15"^^xsd:date ;
+               
+               poddBase:hasPURL "http://dx.doi.org/10.1109/eScience.2010.44"^^xsd:anyURI ;
+               
+               poddScience:hasAbstract " Data management has become a critical challenge faced by a wide array of scientiﬁc disciplines in which the provision of sound data management is pivotal to the achievements and impact of research projects. Massive and rapidly expanding amounts of data combined with data models that evolve over time contribute to making data management an increasingly challenging task that warrants a rethinking of its design. In this paper we present PODD, an ontology-centric architecture for data management systems that is extensible and domain independent. In this architecture, the behaviors of domain concepts and objects are captured entirely by ontological entities, around which all data management tasks are carried out. The open and semantic nature of ontology languages also makes PODD amenable to greater data reuse and interoperability. To evaluate the PODD architecture, we have applied it to the challenge of managing phenomics data." ;
+               
+               poddScience:publishedIn "Proceedings of the IEEE eScience 2010" ;
+               
+               rdfs:comment "Published in IEEE eScience 2010, Brisbane, Australia" ;
+               
+               poddScience:hasYear 2010 ;
+               
+               dcterms:creator <mailto:helen.daily@csiro.au> .
+
+
+
 ###  mailto:alyssa.weirman@csiro.au
 
-<mailto:alyssa.weirman@csiro.au> rdf:type owl:NamedIndividual ,
-                                                            poddUser:User .
+<mailto:alyssa.weirman@csiro.au> rdf:type poddUser:User ,
+                                          owl:NamedIndividual ;
+                                 
+                                 rdfs:label "A. Wierman" ;
+                                 
+                                 <http://xmlns.com/foaf/0.1/firstName> "Alyssa" ;
+                                 
+                                 <http://xmlns.com/foaf/0.1/lastName> "Weirman" .
 
 
 
 ###  mailto:helen.daily@csiro.au
 
-<mailto:helen.daily@csiro.au> rdf:type owl:NamedIndividual ,
-                                                            poddUser:User .
+<mailto:helen.daily@csiro.au> rdf:type poddUser:User ,
+                                       owl:NamedIndividual ;
+                              
+                              rdfs:label "H. Daily" ;
+                              
+                              <http://xmlns.com/foaf/0.1/lastName> "Daily" ;
+                              
+                              <http://xmlns.com/foaf/0.1/firstName> "Helen" .
 
 
 
 ###  mailto:xavier.sirault@csiro.au
 
-<mailto:xavier.sirault@csiro.au> rdf:type owl:NamedIndividual ,
-                                                            poddUser:User .
+<mailto:xavier.sirault@csiro.au> rdf:type poddUser:User ,
+                                          owl:NamedIndividual .
 
 
 
 ###  mailto:xueqin.wang@csiro.au
 
-<mailto:xueqin.wang@csiro.au> rdf:type owl:NamedIndividual ,
-                                                            poddUser:User .
+<mailto:xueqin.wang@csiro.au> rdf:type poddUser:User ,
+                                       owl:NamedIndividual .
+
 
 
 
