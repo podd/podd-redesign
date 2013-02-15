@@ -18,16 +18,16 @@ public interface PoddWebConstants
             .createURI("http://purl.org/podd/poddBase#PoddRepository"); 
 
     public static final URI PODD_ROLEMAPPEDOBJECT = PoddRdfConstants.VALUE_FACTORY
-            .createURI(PoddRdfConstants.PODD_USER_BASE, "roleMappedObject"); 
+            .createURI(PoddRdfConstants.PODD_USER, "roleMappedObject"); 
 
     public static final URI PODD_USER_ORGANIZATION = PoddRdfConstants.VALUE_FACTORY
-            .createURI(PoddRdfConstants.PODD_USER_BASE, "organization");
+            .createURI(PoddRdfConstants.PODD_USER, "organization");
 
     public static final URI PODD_USER_ORCID = PoddRdfConstants.VALUE_FACTORY
-            .createURI(PoddRdfConstants.PODD_USER_BASE, "orcid");
+            .createURI(PoddRdfConstants.PODD_USER, "orcid");
 
     public static final URI PODD_USER_HOMEPAGE = PoddRdfConstants.VALUE_FACTORY
-            .createURI(PoddRdfConstants.PODD_USER_BASE, "uri");
+            .createURI(PoddRdfConstants.PODD_USER, "uri");
 
     
     

@@ -40,7 +40,11 @@ public interface PoddRdfConstants
     public static final String PATH_PODD_ANIMAL = "/ontologies/poddAnimal.owl";
 
     
-    public static final String PODD_USER_BASE = "http://purl.org/podd/ns/poddUser#";
+    public static final String PODD_DCTERMS = "http://purl.org/podd/ns/dcTerms#";
+
+    public static final String PODD_FOAF = "http://purl.org/podd/ns/foaf#";
+
+    public static final String PODD_USER = "http://purl.org/podd/ns/poddUser#";
 
     public static final String PODD_BASE = "http://purl.org/podd/ns/poddBase#";
     
