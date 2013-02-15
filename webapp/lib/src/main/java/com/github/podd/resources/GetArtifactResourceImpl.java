@@ -6,14 +6,16 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
@@ -29,12 +31,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddArtifactManager;
+import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddObject;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 import com.github.podd.utils.SparqlQueryHelper;
@@ -84,13 +89,15 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
         
+        List<URI> schemaOntologyGraphs = new ArrayList<URI>(Arrays.asList(this.tempSchemaGraphs));//this.getSchemaOntologyGraphs();
+        
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
         dataModel.put("pageTitle", "View Artifact");
         
         try
         {
-            this.populateDataModelWithArtifactData(ontologyID, dataModel);
+            this.populateDataModelWithArtifactData(ontologyID, schemaOntologyGraphs, dataModel);
         }
         catch(OpenRDFException e)
         {
@@ -162,7 +169,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      * @param dataModel
      * @throws OpenRDFException 
      */
-    private void populateDataModelWithArtifactData(InferredOWLOntologyID ontologyID, Map<String, Object> dataModel) throws OpenRDFException
+    private void populateDataModelWithArtifactData(InferredOWLOntologyID ontologyID, List<URI> schemaOntologyGraphs,  
+            Map<String, Object> dataModel) throws OpenRDFException
     {
         
         RepositoryConnection conn = this.getPoddApplication().getPoddRepositoryManager().getRepository().getConnection();
@@ -173,19 +181,31 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             
             //FIXME: put in a Model to freemarker instead of Maps
             
-            Map<String, List<Value>> topObjectMap = spike.getTopObjectDetails(conn, 
+            List<PoddObject> topObjectList = spike.getTopObjects(conn, 
                     ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID.getInferredOntologyIRI().toOpenRDFURI());
-            
-            for (String key : topObjectMap.keySet())
+            if (topObjectList == null || topObjectList.size() != 1)
             {
-                List<Value> values = topObjectMap.get(key);
-                if (values.size() == 1)
-                {
-                    dataModel.put(key, values.get(0).stringValue());
-                    System.out.println("     " + key + "   =   " + values.get(0).stringValue());
-                }
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Found more than 1 top object");
             }
+            dataModel.put("poddObject", topObjectList.get(0));
             
+            
+            Map<String, String> m = spike.getTopObjectDetailsAsModel(conn, 
+                    ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID.getInferredOntologyIRI().toOpenRDFURI());            
+            
+            dataModel.put("topObject", m);
+
+            // hack together the list of contexts to query in
+            schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
+            schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+            
+            // object to display
+            URI objectUri = ontologyID.getOntologyIRI().toOpenRDFURI();
+            
+            Model model = spike.getPoddObjectDetails(objectUri, conn, schemaOntologyGraphs.toArray(new URI[0]));
+            dataModel.put("objectModel", model);
+            
+            //TODO: populate top object creator details
         }
         finally
         {
@@ -197,9 +217,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         // hard-code the required values first to display a valid html page
         //DEBUG
-        dataModel.put("forbidden", false);
         dataModel.put("canEditObject", true);
-        dataModel.put("pid", ontologyID.getOntologyIRI().toString());
+        dataModel.put("uri", ontologyID.getOntologyIRI().toString());
         dataModel.put("objectType", "artifact");
         dataModel.put("creationDate", "2013-01-01");
         dataModel.put("modifiedDate", "2013-01-31");
@@ -208,7 +227,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
 //        dataModel.put("elementList", Arrays.asList("element1", "element2")); - TODO
         
         final Map<String, Object> poddObject = new HashMap<String, Object>();
-        poddObject.put("pid", ontologyID.getOntologyIRI().toString());
+        poddObject.put("uri", ontologyID.getOntologyIRI().toString());
         poddObject.put("localName", "Hardcoded project title");
         poddObject.put("description", "Dummy project from the resource");
 
@@ -230,7 +249,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
 //        roleMap.put("description", "A dummy user account for testing");
 //        objectDetailsMap.put("repositoryRole", roleMap);
             
-        dataModel.put("poddObject", poddObject);
+//        dataModel.put("poddObject", poddObject);
         
         
         // -populate refers to list
@@ -261,7 +280,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             anObject.put("isSelected", true);
             anObject.put("state", "A");
             anObject.put("type", "IntrnalObject");
-            anObject.put("pid", "object:34343");
+            anObject.put("uri", "object:34343");
             anObject.put("title", "Object " + i);
             anObject.put("description", "This is a simple object within an artifact");
             
@@ -269,6 +288,52 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         return list;
+    }
+    
+    //FIXME: hard coded until Schema Manager is implemented
+    URI[] tempSchemaGraphs = {
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/dcTerms/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/dcTerms/1"),
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/foaf/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/foaf/1"),
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddUser/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddUser/1"),
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddBase/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddBase/1"),
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1"), };
+    
+    private List<URI> getSchemaOntologyGraphs()
+    {
+        List<URI> schemaOntologyGraphs = new ArrayList<URI>();
+        
+        final PoddSchemaManager schemaManager =
+                ((PoddWebServiceApplication)this.getApplication()).getPoddSchemaManager();
+        String[] schemaPaths = {PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF,
+                PoddRdfConstants.PATH_PODD_USER, PoddRdfConstants.PATH_PODD_BASE,
+                PoddRdfConstants.PATH_PODD_SCIENCE, PoddRdfConstants.PATH_PODD_PLANT};
+        
+        for(String schemaPath : schemaPaths)
+        {
+            try
+            {   
+                InferredOWLOntologyID inferredID = schemaManager.getCurrentSchemaOntologyVersion(IRI.create(schemaPath));
+                //add graph names
+                schemaOntologyGraphs.add(inferredID.getVersionIRI().toOpenRDFURI());
+                schemaOntologyGraphs.add(inferredID.getInferredOntologyIRI().toOpenRDFURI());
+            }
+            catch(UnmanagedSchemaIRIException e1)
+            {
+                log.error("Could not locate schema ontology {}", schemaPath);
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not locate schema ontology"); 
+            }
+        }
+        return schemaOntologyGraphs;
     }
     
 }

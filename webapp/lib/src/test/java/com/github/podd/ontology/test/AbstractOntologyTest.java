@@ -2,6 +2,8 @@ package com.github.podd.ontology.test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -66,6 +68,8 @@ public class AbstractOntologyTest
     protected URI schemaGraph = ValueFactoryImpl.getInstance().createURI("urn:SCHEMA:Mgt");
     
     protected URI artifactGraph = ValueFactoryImpl.getInstance().createURI("urn:ARTIFACT:Mgt");
+    
+    protected List<URI> schemaOntologyGraphs = new ArrayList<URI>();
     
     /**
      * @return an initialized RepositoryConnection
@@ -132,28 +136,32 @@ public class AbstractOntologyTest
         this.poddArtifactManager.setSchemaManager(this.poddSchemaManager);
         this.poddArtifactManager.setSesameManager(poddSesameManager);
         
+        
         /*
          * Since the schema ontology upload feature is not yet supported, necessary schemas are
          * uploaded here at application starts up.
          */
-        try
+        String[] schemaPaths = {PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF,
+                PoddRdfConstants.PATH_PODD_USER, PoddRdfConstants.PATH_PODD_BASE,
+                PoddRdfConstants.PATH_PODD_SCIENCE, PoddRdfConstants.PATH_PODD_PLANT};
+        
+        for(String schemaPath : schemaPaths)
         {
-            this.poddSchemaManager.uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS), RDFFormat.RDFXML);
-            this.poddSchemaManager.uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF), RDFFormat.RDFXML);
-            this.poddSchemaManager.uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_USER), RDFFormat.RDFXML);
-            this.poddSchemaManager.uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
-            this.poddSchemaManager.uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
-            this.poddSchemaManager.uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
-        }
-        catch(IOException | OpenRDFException | OWLException | PoddException e)
-        {
-            this.log.error("Fatal Error!!! Could not load schema ontologies", e);
+            try
+            {
+                //load a schema ontology
+                InferredOWLOntologyID ontologyID = this.poddSchemaManager.uploadSchemaOntology(
+                        this.getClass().getResourceAsStream(schemaPath),
+                        RDFFormat.RDFXML);
+                
+                //add graph names
+                schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
+                schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+            }
+            catch(IOException | OpenRDFException | OWLException | PoddException e)
+            {
+                this.log.error("Fatal Error!!! Could not load schema ontologies", e);
+            }
         }
     }
     
@@ -249,6 +257,11 @@ public class AbstractOntologyTest
         }
         this.testRepository = null;
         
+    }
+
+    public List<URI> getSchemaOntologyGraphs()
+    {
+        return this.schemaOntologyGraphs;
     }
     
 }

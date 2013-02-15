@@ -15,8 +15,8 @@ public class PoddObject
     /** URI to identify the object */
     private URI uri;
     
-    /** Label for this object */
-    private String label;
+    /** Title for this object */
+    private String title;
     
     /** The parent of this object */
     private URI directParent = null;
@@ -41,14 +41,14 @@ public class PoddObject
         return this.uri;
     }
     
-    public String getLabel()
+    public String getTitle()
     {
-        return this.label;
+        return this.title;
     }
     
-    public void setLabel(final String label)
+    public void setTitle(final String title)
     {
-        this.label = label;
+        this.title = title;
     }
     
     /**

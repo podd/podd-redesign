@@ -50,8 +50,8 @@
             <div about="${poddObject.uri!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
                     <li><span class="bold">ID (URI): </span>${poddObject.uri!""}</li>
-                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title!""}</span></li>
-                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
+                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title}!""}</span></li>
+                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description}!""}</span></li>
                     
                     <!-- data, object attributes -->
                     <#if elementList??>
@@ -62,13 +62,22 @@
                     
                     <#if objectType?? && objectType.contains("TopObject")>
 	                    <!-- creation infomation -->
-	                    <li><span class="bold">Creator: </span><span property="dcterms:creator" resource="${poddObject.creator.uri}">${poddObject.creator.firstName!""} ${poddObject.creator.lastName!""} (${poddObject.creator.email!""})</span></li>
+	                    <li><span class="bold">Creator: </span><span property="dcterms:creator" resource="${poddTopObjectCreator.uri}">${poddTopObjectCreator.firstName!""} ${poddTopObjectCreator.lastName!""} (${poddTopObjectCreator.email!""})</span></li>
 	                    <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
-	                    <li><span class="bold">Creation Date: </span><span property="dcterms:date" datatype="xsd:string">${creationDate!""}</span></li>
-	                    <li><span class="bold">Last modified by: </span><span property="dcterms:contributor" resource="${poddObject.lastModifier.uri}">${poddObject.lastModifier.firstName!""} ${poddObject.lastModifier.lastName!""}</span></li>
-	                    <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
-	                    <li><span class="bold">Last modification date: </span><span property="dcterms:modified" datatype="xsd:string">${modifiedDate!""}</span></li>
+	                    <li><span class="bold">Creation Date: </span><span property="dcterms:date" datatype="xsd:string">${topObject["http://purl.org/podd/ns/poddBase#createdAt"]!""}</span></li>
                     </#if>
+
+					                    
+                    <#if objectModel??>
+                       <#list objectModel  as statement>
+	                    <li>
+	                    	<span class="bold">${statement.getSubject()} </span>
+	                    	<span class="bold">${statement.getPredicate()} </span>
+	                    	<span property="${statement.getPredicate()}" datatype="xsd:string">${statement.getObject()}</span>
+	                    </li>
+                        </#list>
+                    </#if>
+                    
                 </ol>
             </div>
         </#if>
@@ -94,32 +103,32 @@
 <#include "attachedFilesDetails.html.ftl"/>
 
 <br />
-<#include "hierarchy.html.ftl"/>
+<!--#include "hierarchy.html.ftl"/-->
 
 <br />    
 <div id="buttonwrapper">
     <#if poddObject??>
 	    <#if  canEditObject?? && canEditObject>
-        <a href="${baseUrl}/artifact/edit/merge?artifacturi=${poddObject.pid!"unknown-pid"}/edit">Edit Object</a>
+        <a href="${baseUrl}/artifact/edit/merge?artifacturi=${poddObject.uri!"unknown-pid"}/edit">Edit Object</a>
         </#if>
         <#if  canAddChildren?? && canAddChildren>
-        <a href="${baseUrl}/object/${poddObject.pid!"unknown-pid"}/add">Add Child Object</a>
+        <a href="${baseUrl}/object/${poddObject.uri!"unknown-pid"}/add">Add Child Object</a>
         </#if>
         <#if  canPublish?? && canPublish>
-        <a href="${baseUrl}/artifact/publish?artifacturi=${poddObject.pid!"unknown-pid"}/publish?publish=true">Publish Project</a>
+        <a href="${baseUrl}/artifact/publish?artifacturi=${poddObject.uri!"unknown-pid"}/publish?publish=true">Publish Project</a>
         </#if>
         <#if  canUnpublish?? && canUnpublish>
-        <a href="${baseUrl}/artifact/updatepurls?artifacturi=${poddObject.pid!"unknown-pid"}">Update PURLs</a>
-        <a href="${baseUrl}/artifact/unpublish?artifacturi=${poddObject.pid!"unknown-pid"}">Unpublish Project</a>
+        <a href="${baseUrl}/artifact/updatepurls?artifacturi=${poddObject.uri!"unknown-pid"}">Update PURLs</a>
+        <a href="${baseUrl}/artifact/unpublish?artifacturi=${poddObject.uri!"unknown-pid"}">Unpublish Project</a>
         </#if>
         <#if objectType?? && objectType == 'Investigation'>
-        	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.pid!"unknown-pid"}">Download hierarchy attachments</a>
+        	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.uri!"unknown-pid"}">Download hierarchy attachments</a>
         </#if>        
         <#if canDelete?? && canDelete>
-        <a href="${baseUrl}/artifact/delete?artifacturi=${poddObject.pid!"unknown-pid"}">Delete</a>
+        <a href="${baseUrl}/artifact/delete?artifacturi=${poddObject.uri!"unknown-pid"}">Delete</a>
         </#if>
         <#if canUndelete?? && canUndelete>
-        <a href="${baseUrl}/artifact/undelete?artifacturi=${poddObject.pid!"unknown-pid"}">Undelete</a>
+        <a href="${baseUrl}/artifact/undelete?artifacturi=${poddObject.uri!"unknown-pid"}">Undelete</a>
         </#if>
     <#else>
     <!-- TODO: Remove me. -->
@@ -175,7 +184,7 @@
 			<#list element.availableObjects as object>
 			<tr>
 				<!-- TODO: Fix url and property -->
-                <td><a href="${baseUrl}/object/${object.pid}">${object.pid!""}</a>
+                <td><a href="${baseUrl}/object/${object.uri}">${object.uri!""}</a>
                 </td>
                 <td>${object.title!""}</td>
                 <td>
