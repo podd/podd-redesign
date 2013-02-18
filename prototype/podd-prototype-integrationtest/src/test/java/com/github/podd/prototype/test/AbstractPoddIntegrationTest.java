@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.After;
 import org.junit.Before;

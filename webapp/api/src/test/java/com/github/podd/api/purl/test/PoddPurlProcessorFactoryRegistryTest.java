@@ -5,7 +5,7 @@ package com.github.podd.api.purl.test;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.After;
 import org.junit.Before;
