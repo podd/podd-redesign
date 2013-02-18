@@ -70,12 +70,8 @@
 					                    
                     <#if objectModel??>
                        <#list objectModel  as statement>
-	                    <li>
-	                    	<span class="bold">${statement.getSubject()} </span>
-	                    	<span class="bold">${statement.getPredicate()} </span>
-	                    	<span property="${statement.getPredicate()}" datatype="xsd:string">${statement.getObject()}</span>
-	                    </li>
-                        </#list>
+                       	<@displayField statement=statement/>
+                       </#list>
                     </#if>
                     
                 </ol>
@@ -141,27 +137,41 @@
     <li><span class="bold">${anField.label}: </span>
     <#if anField.enteredValues?has_content>
         <#if anField.enteredValues[1]??>
-        <ol>
-        <#list anField.enteredValues as value>
-        	<#if value.isUri>
-        	<!-- TODO: Determine if this is a URI or a literal and render it as a link here if necessary -->
-            <li property="${value.propertyUri}" resource="${value.datatype}"><a href="${value.uri}>${value.label}</a></li>
-        	<#else>
-            <li property="${value.propertyUri}" datatype="${value.datatype}">${value.label}</li>
-            </#if>
-        </#list>
-        </ol>
+	        <ol>
+	        <#list anField.enteredValues as value>
+	        	<#if value.isUri>
+		        	<!-- TODO: Determine if this is a URI or a literal and render it as a link here if necessary -->
+		            <li property="${value.propertyUri}" resource="${value.datatype}"><a href="${value.uri}>${value.label}</a></li>
+	        	<#else>
+		            <li property="${value.propertyUri}" datatype="${value.datatype}">${value.label}</li>
+	            </#if>
+	        </#list>
+	        </ol>
         <#else>
-    	<#if anField.enteredValues[0].isUri>
-    	<!-- TODO: Determine if this is a URI or a literal and render it as a link here if necessary -->
-        <li property="${anField.enteredValues[0].propertyUri}" resource="${anField.enteredValues[0].datatype}"><a href="${anField.enteredValues[0].uri}>${anField.enteredValues[0].label}</a></li>
-    	<#else>
-        <!-- FIXME: Move these renderings into a macro -->
-        <li property="${anField.enteredValues[0].propertyUri}" datatype="${anField.enteredValues[0].datatype}">${anField.enteredValues[0].label}</li>
-        
-        </#if>
+	    	<#if anField.enteredValues[0].isUri>
+		    	<!-- TODO: Determine if this is a URI or a literal and render it as a link here if necessary -->
+		        <li property="${anField.enteredValues[0].propertyUri}" resource="${anField.enteredValues[0].datatype}"><a href="${anField.enteredValues[0].uri}>${anField.enteredValues[0].label}</a></li>
+	    	<#else>
+		        <!-- FIXME: Move these renderings into a macro -->
+		        <li property="${anField.enteredValues[0].propertyUri}" datatype="${anField.enteredValues[0].datatype}">${anField.enteredValues[0].label}</li>
+	        </#if>
+	    </#if>
     </#if>
-    </#if>
+    </li>
+</#macro>
+
+<#-- 
+Macro to display information contained in a statement
+Should eventually replace macro addField
+added [2013-02-18] 
+  -->
+<#macro displayField statement>
+    <li>
+    	<span class="bold">
+    		${completeModel.filter(statement.getPredicate(), rdfsLabelUri, null).objectString()}: </span>
+		<span property="${statement.getPredicate()}" datatype="xsd:string"> 
+			<span>${statement.getObject().stringValue()}</span>
+		</span>
     </li>
 </#macro>
 

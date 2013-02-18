@@ -16,6 +16,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
@@ -192,18 +193,27 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             
             Map<String, String> m = spike.getTopObjectDetailsAsModel(conn, 
                     ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID.getInferredOntologyIRI().toOpenRDFURI());            
-            
             dataModel.put("topObject", m);
 
+            dataModel.put("rdfsLabelUri", RDFS.LABEL);
+            
+            
             // hack together the list of contexts to query in
             schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
             schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
             
             // object to display
-            URI objectUri = ontologyID.getOntologyIRI().toOpenRDFURI();
+            URI objectUri = topObjectList.get(0).getUri();
             
             Model model = spike.getPoddObjectDetails(objectUri, conn, schemaOntologyGraphs.toArray(new URI[0]));
-            dataModel.put("objectModel", model);
+            
+            this.log.info("{} statements retrieved about {}", model.size(), objectUri);
+            
+            Model directStatements = model.filter(objectUri, null, null);
+            this.log.info("{} statements retrieved about {}", directStatements.size(), objectUri);
+            
+            dataModel.put("objectModel", directStatements);
+            dataModel.put("completeModel", model);
             
             //TODO: populate top object creator details
         }

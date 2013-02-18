@@ -100,15 +100,15 @@ public class SparqlQueryTest extends AbstractOntologyTest
         allContextsToQuery.add(nextOntologyID.getVersionIRI().toOpenRDFURI());
         allContextsToQuery.add(nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
 
-        this.printContexts(conn);
-        
         // invoke method under test
         final LinkedHashModel map =
                 this.sparqlHelper.getPoddObjectDetails(objectUri, this.conn, allContextsToQuery.toArray(new URI[0]));
         
+        
+        
         for (Statement stmt : map)
         {
-            System.out.println(stmt.getSubject() + "    [" + stmt.getPredicate() + "]    " + stmt.getObject());
+            System.out.println("  " + stmt.getSubject() + "    [" + stmt.getPredicate() + "]    " + stmt.getObject());
         }
         
         // TODO: verify 
