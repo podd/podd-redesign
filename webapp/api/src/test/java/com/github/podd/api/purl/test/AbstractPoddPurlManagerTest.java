@@ -6,7 +6,7 @@ package com.github.podd.api.purl.test;
 import java.io.InputStream;
 import java.util.Set;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.After;
 import org.junit.Before;

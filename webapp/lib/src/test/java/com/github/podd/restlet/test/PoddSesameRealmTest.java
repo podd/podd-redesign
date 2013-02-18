@@ -3,6 +3,8 @@
  */
 package com.github.podd.restlet.test;
 
+import info.aduna.iteration.Iterations;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,7 +80,8 @@ public class PoddSesameRealmTest
             conn = this.testRepository.getConnection();
             conn.begin();
             
-            return conn.getStatements(subject, predicate, object, true, PoddSesameRealmTest.userMgtContext).asList();
+            return Iterations.asList(conn.getStatements(subject, predicate, object, true,
+                    PoddSesameRealmTest.userMgtContext));
         }
         finally
         {

@@ -33,7 +33,6 @@ import org.restlet.data.Status;
 import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StreamRepresentation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.Get;

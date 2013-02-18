@@ -3,6 +3,8 @@
  */
 package com.github.podd.api.test;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.InputStream;
 import java.util.List;
 
@@ -165,7 +167,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
-       
+        
         // prepare: load, infer and store PODD-Base ontology
         final InferredOWLOntologyID inferredOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 289, 195);
@@ -201,7 +203,6 @@ public abstract class AbstractPoddOWLManagerTest
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
-
         
         // prepare: 1) load, infer, store PODD-Base ontology
         final InferredOWLOntologyID pbInferredOntologyID =
@@ -281,7 +282,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
-
+        
         // prepare: 1) load, infer, store PODD-Base ontology
         final InferredOWLOntologyID pbInferredOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 289, 195);
@@ -363,7 +364,7 @@ public abstract class AbstractPoddOWLManagerTest
         Assert.assertTrue("Ontology should be in memory",
                 this.testOWLManager.getOWLOntologyManager().contains(pbInferredOntologyID.getBaseOWLOntologyID()));
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddOWLManager#cacheSchemaOntology(com.github.podd.utils.InferredOWLOntologyID, org.openrdf.repository.RepositoryConnection)}
@@ -389,7 +390,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
-
+        
         // prepare: load, infer and store a schema ontology
         final InferredOWLOntologyID inferredOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 289, 195);
@@ -420,7 +421,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
-
+        
         // prepare: load and store a schema ontology
         final InputStream inputStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE);
         Assert.assertNotNull("Could not find resource", inputStream);
@@ -579,7 +580,8 @@ public abstract class AbstractPoddOWLManagerTest
     }
     
     protected OWLOntology independentlyLoadOntology(OWLOntologyManager testOWLOntologyManager, String resourcePath)
-    throws Exception {
+        throws Exception
+    {
         final InputStream inputStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE);
         Assert.assertNotNull("Could not find resource", inputStream);
         return testOWLOntologyManager.loadOntologyFromOntologyDocument(inputStream);
@@ -596,10 +598,13 @@ public abstract class AbstractPoddOWLManagerTest
     {
         // prepare: load, infer and store PODD:dcTerms, foaf and User ontologies to testOWLManager
         final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_USER));
-
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PoddRdfConstants.PATH_PODD_DCTERMS));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PoddRdfConstants.PATH_PODD_FOAF));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PoddRdfConstants.PATH_PODD_USER));
+        
         // prepare: load Podd-Base Ontology independently
         final InputStream inputStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE);
         Assert.assertNotNull("Could not find resource", inputStream);
@@ -649,10 +654,13 @@ public abstract class AbstractPoddOWLManagerTest
     {
         // prepare: load, infer and store PODD:dcTerms, foaf and User ontologies to testOWLManager
         final OWLOntologyManager testOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF));
-        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_USER));
-
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PoddRdfConstants.PATH_PODD_DCTERMS));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PoddRdfConstants.PATH_PODD_FOAF));
+        testOWLOntologyManager.loadOntologyFromOntologyDocument(this.getClass().getResourceAsStream(
+                PoddRdfConstants.PATH_PODD_USER));
+        
         // prepare: load an Ontology independently
         final InputStream inputStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE);
         Assert.assertNotNull("Could not find resource", inputStream);
@@ -864,7 +872,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
-        long repoSizeAfterPreparation =  this.testRepositoryConnection.size();
+        long repoSizeAfterPreparation = this.testRepositoryConnection.size();
         
         // prepare: load an ontology into a StreamDocumentSource
         final InputStream inputStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE);
@@ -990,7 +998,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
-       
+        
         // prepare: load an ontology into a RioMemoryTripleSource via the test repository
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:context:test");
         
@@ -999,7 +1007,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
         final List<Statement> statements =
-                this.testRepositoryConnection.getStatements(null, null, null, false, context).asList();
+                Iterations.asList(this.testRepositoryConnection.getStatements(null, null, null, false, context));
         Assert.assertEquals("Not the expected number of statements in Repository", 282, statements.size());
         
         final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
@@ -1160,7 +1168,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
         this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
-
+        
         // prepare: load an ontology into the OWLManager
         final InputStream inputStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE);
         Assert.assertNotNull("Could not find resource", inputStream);

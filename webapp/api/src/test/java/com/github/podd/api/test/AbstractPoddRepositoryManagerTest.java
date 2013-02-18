@@ -3,6 +3,8 @@
  */
 package com.github.podd.api.test;
 
+import info.aduna.iteration.Iterations;
+
 import java.util.List;
 
 import org.junit.After;
@@ -504,7 +506,7 @@ public abstract class AbstractPoddRepositoryManagerTest
             final RepositoryResult<Statement> statements =
                     repositoryConnection.getStatements(null, PoddRdfConstants.OMV_CURRENT_VERSION, null, false,
                             testGraph);
-            final List<Statement> stmtList = statements.asList();
+            final List<Statement> stmtList = Iterations.asList(statements);
             Assert.assertEquals("Graph should have one OMV_CURRENT_VERSION statement", 1, stmtList.size());
             Assert.assertEquals("Wrong ontology IRI", pOntologyIRI.toString(), stmtList.get(0).getSubject().toString());
             Assert.assertEquals("Wrong version IRI", pVersionIRI.toString(), stmtList.get(0).getObject().toString());
@@ -512,7 +514,7 @@ public abstract class AbstractPoddRepositoryManagerTest
             final RepositoryResult<Statement> inferredVersionStatements =
                     repositoryConnection.getStatements(null, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null,
                             false, testGraph);
-            final List<Statement> inferredVersionStatementList = inferredVersionStatements.asList();
+            final List<Statement> inferredVersionStatementList = Iterations.asList(inferredVersionStatements);
             Assert.assertEquals("Graph should have one CURRENT_INFERRED_VERSION statement", 1,
                     inferredVersionStatementList.size());
             Assert.assertEquals("Wrong ontology IRI", pOntologyIRI.toString(), inferredVersionStatementList.get(0)

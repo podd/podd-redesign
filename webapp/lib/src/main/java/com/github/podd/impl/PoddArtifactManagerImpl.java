@@ -3,6 +3,8 @@
  */
 package com.github.podd.impl;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -330,7 +332,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // Load the statements into an OWLAPI OWLOntology
             final List<Statement> statements =
-                    temporaryRepositoryConnection.getStatements(null, null, null, true, randomContext).asList();
+                    Iterations.asList(temporaryRepositoryConnection
+                            .getStatements(null, null, null, true, randomContext));
             
             final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
             

@@ -3,6 +3,8 @@
  */
 package com.github.podd.api.test;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.InputStream;
 import java.util.List;
 
@@ -277,9 +279,9 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
                 inferredDctermsOntologyID.getBaseOWLOntologyID(), inferredDctermsOntologyID.getInferredOWLOntologyID(),
                 false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredFoafOntologyID.getBaseOWLOntologyID(), inferredFoafOntologyID.getInferredOWLOntologyID(),
-                false);
+        this.testRepositoryManager
+                .updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID.getBaseOWLOntologyID(),
+                        inferredFoafOntologyID.getInferredOWLOntologyID(), false);
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
                 inferredPUserOntologyID.getBaseOWLOntologyID(), inferredPUserOntologyID.getInferredOWLOntologyID(),
                 false);
@@ -541,9 +543,9 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
                 inferredDctermsOntologyID.getBaseOWLOntologyID(), inferredDctermsOntologyID.getInferredOWLOntologyID(),
                 false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredFoafOntologyID.getBaseOWLOntologyID(), inferredFoafOntologyID.getInferredOWLOntologyID(),
-                false);
+        this.testRepositoryManager
+                .updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID.getBaseOWLOntologyID(),
+                        inferredFoafOntologyID.getInferredOWLOntologyID(), false);
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
                 inferredPUserOntologyID.getBaseOWLOntologyID(), inferredPUserOntologyID.getInferredOWLOntologyID(),
                 false);
@@ -657,12 +659,11 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertEquals("Both versions should have the same artifact ID", firstArtifactId.getOntologyIRI(),
                 secondArtifactId.getOntologyIRI());
         
-        Assert.assertFalse("Two versions should NOT have the same Version IRI", 
-                firstArtifactId.getVersionIRI().toString().equals(secondArtifactId.getVersionIRI().toString()));
+        Assert.assertFalse("Two versions should NOT have the same Version IRI", firstArtifactId.getVersionIRI()
+                .toString().equals(secondArtifactId.getVersionIRI().toString()));
         
         this.verifyLoadedArtifact(secondArtifactId, 6, 24, 462, false);
     }
-    
     
     /**
      * Test method for
@@ -673,7 +674,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      */
     @Test
-    public final void testLoadArtifactWithVersionIRIInSourceIgnored() throws Exception 
+    public final void testLoadArtifactWithVersionIRIInSourceIgnored() throws Exception
     {
         this.loadSchemaOntologies();
         
@@ -685,8 +686,10 @@ public abstract class AbstractPoddArtifactManagerTest
         
         this.verifyLoadedArtifact(artifactId, 6, 28, 474, true);
         
-        Assert.assertFalse("Version IRI in source should have been ignored", artifactId.getVersionIRI().toString().endsWith(":55"));
-        Assert.assertTrue("New generated Version IRI should start from 1", artifactId.getVersionIRI().toString().endsWith(":1"));
+        Assert.assertFalse("Version IRI in source should have been ignored", artifactId.getVersionIRI().toString()
+                .endsWith(":55"));
+        Assert.assertTrue("New generated Version IRI should start from 1", artifactId.getVersionIRI().toString()
+                .endsWith(":1"));
     }
     
     /**
@@ -698,7 +701,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testPublishArtifactBasicSuccess() throws Exception
     {
         this.loadSchemaOntologies();
-
+        
         final InputStream inputStream =
                 this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
         // MIME type should be either given by the user, detected from the content type on the
@@ -708,10 +711,10 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         this.verifyLoadedArtifact(unpublishedArtifactId, 6, 32, 479, false);
-
         
         // invoke method under test
-        final InferredOWLOntologyID publishedArtifactId = this.testArtifactManager.publishArtifact(unpublishedArtifactId);
+        final InferredOWLOntologyID publishedArtifactId =
+                this.testArtifactManager.publishArtifact(unpublishedArtifactId);
         
         // verify: publication status is correctly updated
         RepositoryConnection nextRepositoryConnection = null;
@@ -722,8 +725,9 @@ public abstract class AbstractPoddArtifactManagerTest
             
             // verify: a single PUBLICATION_STATUS in asserted ontology
             final List<Statement> publicationStatusStatementList =
-                    nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                            null, false, publishedArtifactId.getVersionIRI().toOpenRDFURI()).asList();
+                    Iterations.asList(nextRepositoryConnection.getStatements(null,
+                            PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS, null, false, publishedArtifactId
+                                    .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement.", 1,
                     publicationStatusStatementList.size());
             
@@ -784,16 +788,16 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify: OWL_VERSION
         final List<Statement> stmtList =
-                repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI, null,
-                        false, testGraph).asList();
+                Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
+                        PoddRdfConstants.OWL_VERSION_IRI, null, false, testGraph));
         Assert.assertEquals("Graph should have one OWL_VERSION statement", 1, stmtList.size());
         Assert.assertEquals("Wrong OWL_VERSION in Object", versionIRI.toString(), stmtList.get(0).getObject()
                 .toString());
         
         // verify: OMV_CURRENT_VERSION
         final List<Statement> currentVersionStatementList =
-                repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OMV_CURRENT_VERSION,
-                        null, false, testGraph).asList();
+                Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
+                        PoddRdfConstants.OMV_CURRENT_VERSION, null, false, testGraph));
         Assert.assertEquals("Graph should have one OMV_CURRENT_VERSION statement", 1,
                 currentVersionStatementList.size());
         Assert.assertEquals("Wrong OMV_CURRENT_VERSION in Object", versionIRI.toString(), currentVersionStatementList
@@ -801,16 +805,16 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify: INFERRED_VERSION
         final List<Statement> inferredVersionStatementList =
-                repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
-                        PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, false, testGraph).asList();
+                Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
+                        PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, false, testGraph));
         Assert.assertEquals("Graph should have one INFERRED_VERSION statement", 1, inferredVersionStatementList.size());
         Assert.assertEquals("Wrong INFERRED_VERSION in Object", inferredVersionIRI.toString(),
                 inferredVersionStatementList.get(0).getObject().toString());
         
         // verify: CURRENT_INFERRED_VERSION
         final List<Statement> currentInferredVersionStatementList =
-                repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
-                        PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, testGraph).asList();
+                Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
+                        PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null, false, testGraph));
         Assert.assertEquals("Graph should have one CURRENT_INFERRED_VERSION statement", 1,
                 currentInferredVersionStatementList.size());
         Assert.assertEquals("Wrong CURRENT_INFERRED_VERSION in Object", inferredVersionIRI.toString(),
@@ -864,8 +868,8 @@ public abstract class AbstractPoddArtifactManagerTest
             
             // verify: a single PUBLICATION_STATUS in asserted ontology
             final List<Statement> publicationStatusStatementList =
-                    nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                            null, false, inferredOntologyId.getVersionIRI().toOpenRDFURI()).asList();
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                            null, false, inferredOntologyId.getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
                     publicationStatusStatementList.size());
             
@@ -892,5 +896,4 @@ public abstract class AbstractPoddArtifactManagerTest
         }
     }
     
-
 }
