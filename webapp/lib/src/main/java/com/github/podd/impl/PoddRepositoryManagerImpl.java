@@ -3,6 +3,8 @@
  */
 package com.github.podd.impl;
 
+import info.aduna.iteration.Iterations;
+
 import java.util.List;
 
 import org.openrdf.OpenRDFException;
@@ -131,8 +133,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                     this.schemaGraph);
             
             final List<Statement> currentVersions =
-                    nextRepositoryConnection.getStatements(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
-                            false, this.schemaGraph).asList();
+                    Iterations.asList(nextRepositoryConnection.getStatements(nextOntologyUri,
+                            PoddRdfConstants.OMV_CURRENT_VERSION, null, false, this.schemaGraph));
             
             // If there are no current versions, or we must update the current version, then do it
             // here
@@ -204,8 +206,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             
             // remove the content of any contexts that are the object of versionIRI statements
             final List<Statement> contextsToRemove =
-                    nextRepositoryConnection.getStatements(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, null,
-                            true, this.artifactGraph).asList();
+                    Iterations.asList(nextRepositoryConnection.getStatements(nextOntologyUri,
+                            PoddRdfConstants.OWL_VERSION_IRI, null, true, this.artifactGraph));
             for(final Statement stmnt : contextsToRemove)
             {
                 final URI oldVersionIri = IRI.create(stmnt.getObject().stringValue()).toOpenRDFURI();
@@ -220,8 +222,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                     this.artifactGraph);
             
             final List<Statement> currentVersions =
-                    nextRepositoryConnection.getStatements(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
-                            false, this.artifactGraph).asList();
+                    Iterations.asList(nextRepositoryConnection.getStatements(nextOntologyUri,
+                            PoddRdfConstants.OMV_CURRENT_VERSION, null, false, this.artifactGraph));
             
             // If there are no current versions, or we must update the current version, then do it
             // here
