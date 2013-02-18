@@ -91,8 +91,9 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404", body.contains("404"));
         
-        // FIXME: We're displaying the Top Object URI but not the artifact/ontology URI anywhere at present
-        //Assert.assertTrue("Page does not have artifact URI", body.contains(artifactUri));
+        // FIXME: We're displaying the Top Object URI but not the artifact/ontology URI anywhere at
+        // present
+        // Assert.assertTrue("Page does not have artifact URI", body.contains(artifactUri));
         
         Assert.assertTrue("Page does not have artifact Details ", body.contains("artifact Details"));
         

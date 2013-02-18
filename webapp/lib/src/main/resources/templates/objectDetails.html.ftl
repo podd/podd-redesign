@@ -49,29 +49,22 @@
         <#if poddObject?? && poddObject.uri??>
             <div about="${poddObject.uri!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
-                    <li><span class="bold">ID (URI): </span>${poddObject.uri!""}</li>
+                	<#-- object URI, Title and description -->
+                    <li><span class="bold">URI: </span>${poddObject.uri!""}</li>
                     <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title!""}</span></li>
                     <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
                     
-                    <!-- data, object attributes -->
+                    <#-- all other attributes (data/object properties) -->
+                    <#if objectModel??>
+                       <#list objectModel  as field>
+                       	<@displayField statement=field/>
+                       </#list>
+                    </#if>
+                    
                     <#if elementList??>
                        <#list elementList  as field>
                         <@addField anField=field/>
                         </#list>
-                    </#if>
-                    
-                    <#if objectType?? && objectType.contains("TopObject")>
-	                    <!-- creation infomation -->
-	                    <li><span class="bold">Creator: </span><span property="dcterms:creator" resource="${poddTopObjectCreator.uri}">${poddTopObjectCreator.firstName!""} ${poddTopObjectCreator.lastName!""} (${poddTopObjectCreator.email!""})</span></li>
-	                    <!-- TODO: change to xsd:dateTime when the dates can be generated or converted to ISO8601 compliant dates -->
-	                    <li><span class="bold">Creation Date: </span><span property="dcterms:date" datatype="xsd:string">${topObject["http://purl.org/podd/ns/poddBase#createdAt"]!""}</span></li>
-                    </#if>
-
-					                    
-                    <#if objectModel??>
-                       <#list objectModel  as statement>
-                       	<@displayField statement=statement/>
-                       </#list>
                     </#if>
                     
                 </ol>
@@ -168,9 +161,20 @@ added [2013-02-18]
 <#macro displayField statement>
     <li>
     	<span class="bold">
-    		${completeModel.filter(statement.getPredicate(), rdfsLabelUri, null).objectString()}: </span>
-		<span property="${statement.getPredicate()}" datatype="xsd:string"> 
-			<span>${statement.getObject().stringValue()}</span>
+    		${completeModel.filter(statement.getPredicate(), rdfsLabelUri, null).objectString()}: 
+    	</span>
+		<span property="${statement.getPredicate()}" datatype="${completeModel.filter(statement.getPredicate(), rdfsRangeUri, null).objectString()}"> 
+			<#if util.isUri(statement.getObject())>
+				<#local tempUri = util.getUri(statement.getObject())>
+				<#if tempUri??>
+					<#local valueString = completeModel.filter(tempUri, rdfsLabelUri, null)>										
+					<span><a href="${statement.getObject()}">${completeModel.filter(tempUri, rdfsLabelUri, null).objectString()!statement.getObject()}</a></span>
+				<#else>
+					<span><a href="${statement.getObject()}">${statement.getObject().stringValue()}</a></span>	
+				</#if>
+			<#else>
+				<span>${statement.getObject().stringValue()}</span>
+			</#if>
 		</span>
     </li>
 </#macro>
