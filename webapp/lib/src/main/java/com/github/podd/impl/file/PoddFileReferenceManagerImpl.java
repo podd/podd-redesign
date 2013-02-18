@@ -3,16 +3,12 @@
  */
 package com.github.podd.impl.file;
 
-import info.aduna.iteration.Iterations;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.openrdf.model.Graph;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;

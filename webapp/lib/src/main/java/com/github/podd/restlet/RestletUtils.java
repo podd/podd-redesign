@@ -13,15 +13,12 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
-import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.ClientInfo;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
-import org.restlet.data.Status;
-import org.restlet.ext.freemarker.ContextTemplateLoader;
 import org.restlet.ext.freemarker.TemplateRepresentation;
 import org.restlet.representation.AppendableRepresentation;
 import org.restlet.representation.Representation;
@@ -31,9 +28,6 @@ import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.ansell.restletutils.RestletUtilRoles;
-
-import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 
 /**
