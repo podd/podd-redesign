@@ -269,7 +269,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID inferredPUserOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 289, 195);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 290, 195);
         final InferredOWLOntologyID inferredPScienceOntologyID =
                 this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1143, 444);
         final InferredOWLOntologyID inferredPPlantOntologyID =
@@ -535,7 +535,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID inferredPUserOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 289, 195);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 290, 195);
         final InferredOWLOntologyID inferredPScienceOntologyID =
                 this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1143, 444);
         

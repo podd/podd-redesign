@@ -58,6 +58,8 @@ import com.github.podd.utils.PoddRdfConstants;
  */
 public abstract class AbstractPoddOWLManagerTest
 {
+    /** Expected number of triples in PODD-Base schema ontology. */
+    protected static final int PODD_BASE_TRIPLE_COUNT = 283;
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -170,7 +172,8 @@ public abstract class AbstractPoddOWLManagerTest
         
         // prepare: load, infer and store PODD-Base ontology
         final InferredOWLOntologyID inferredOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 289, 195);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 
+                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7, 195);
         
         // prepare: remove from cache
         this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID());
@@ -206,7 +209,8 @@ public abstract class AbstractPoddOWLManagerTest
         
         // prepare: 1) load, infer, store PODD-Base ontology
         final InferredOWLOntologyID pbInferredOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 289, 195);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 
+                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7, 195);
         final URI pbBaseOntologyURI = pbInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pbVersionURI = pbInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
@@ -285,7 +289,8 @@ public abstract class AbstractPoddOWLManagerTest
         
         // prepare: 1) load, infer, store PODD-Base ontology
         final InferredOWLOntologyID pbInferredOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 289, 195);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 
+                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7, 195);
         final URI pbBaseOntologyURI = pbInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pbVersionURI = pbInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
@@ -393,7 +398,8 @@ public abstract class AbstractPoddOWLManagerTest
         
         // prepare: load, infer and store a schema ontology
         final InferredOWLOntologyID inferredOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 289, 195);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 
+                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7, 195);
         
         Assert.assertNotNull("Ontology should already be in memory", this.testOWLManager.getOWLOntologyManager()
                 .getOntology(inferredOntologyID));
@@ -615,7 +621,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection, context);
         
         // verify:
-        Assert.assertEquals("Dumped statement count not expected value", 289,
+        Assert.assertEquals("Dumped statement count not expected value", AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7,
                 this.testRepositoryConnection.size(context));
     }
     
@@ -670,7 +676,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         // verify:
         final URI context = nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        Assert.assertEquals("Dumped statement count not expected value", 289,
+        Assert.assertEquals("Dumped statement count not expected value", AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7,
                 this.testRepositoryConnection.size(context));
     }
     
@@ -1008,7 +1014,8 @@ public abstract class AbstractPoddOWLManagerTest
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
         final List<Statement> statements =
                 Iterations.asList(this.testRepositoryConnection.getStatements(null, null, null, false, context));
-        Assert.assertEquals("Not the expected number of statements in Repository", 282, statements.size());
+        Assert.assertEquals("Not the expected number of statements in Repository", AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT,
+                statements.size());
         
         final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
         
@@ -1089,7 +1096,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-        Assert.assertEquals("Not the expected number of statements in Repository", 282,
+        Assert.assertEquals("Not the expected number of statements in Repository", AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT,
                 this.testRepositoryConnection.size(context));
         
         final OWLOntologyID loadedOntologyID =
