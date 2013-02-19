@@ -61,12 +61,6 @@
                        </#list>
                     </#if>
                     
-                    <#if elementList??>
-                       <#list elementList  as field>
-                        <@addField anField=field/>
-                        </#list>
-                    </#if>
-                    
                 </ol>
             </div>
         </#if>
@@ -163,25 +157,52 @@ last updated [2013-02-19]
   -->
 <#macro displayField propertyUri>
     <li>
-		<#local thisObject = completeModel.filter(poddObject.uri, propertyUri, null).objectValue()>
 		<#local label = completeModel.filter(propertyUri, rdfsLabelUri, null).objectString()!"Missing Label">
-		<#local dataType = completeModel.filter(propertyUri, rdfsRangeUri, null).objectString()!"Missing Datatype">
-		<#local isValueAUri = util.isUri(thisObject)>
+		<#local objectList = completeModel.filter(poddObject.uri, propertyUri, null).objects()>
+
+		<#--local thisObject = completeModel.filter(poddObject.uri, propertyUri, null).objectValue()-->
+		<#local dataType = "TODO">
 		
     	<span class="bold">${label}:</span>
-		<span property="${propertyUri}" datatype="${dataType}"> 
-			<#if isValueAUri>
-				<#local tempUri = util.getUri(thisObject)>
-				<#if tempUri??>
-					<#local valueString = completeModel.filter(tempUri, rdfsLabelUri, null)>										
-					<span><a href="${thisObject}">${completeModel.filter(tempUri, rdfsLabelUri, null).objectString()!thisObject}</a></span>
-				<#else>
-					<span><a href="${thisObject}">${thisObject.stringValue()}</a></span>	
-				</#if>
-			<#else>
-				<span>${thisObject.stringValue()}</span>
-			</#if>
-		</span>
+		<#if (objectList.size() > 1)>
+			<#-- multiple values. create another HTML list -->
+			<ol>
+			<#list objectList as thisObject>
+				<li>
+					<span property="${propertyUri}" datatype="${dataType}"> 
+						<#if util.isUri(thisObject)>
+							<#local tempUri = util.getUri(thisObject)>
+							<#if tempUri??>
+								<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
+								<span><a href="${thisObject}">${valueLabel}</a></span>
+							<#else>
+								<span><a href="${thisObject}">${thisObject.stringValue()}</a></span>	
+							</#if>
+						<#else>
+							<span>${thisObject.stringValue()}</span>
+						</#if>
+					</span>
+				</li>
+			</#list>
+			</ol>
+		<#else>
+			<#-- single value. no need to create another HTML list -->
+			<#list objectList as thisObject>
+				<span property="${propertyUri}" datatype="${dataType}"> 
+					<#if util.isUri(thisObject)>
+						<#local tempUri = util.getUri(thisObject)>
+						<#if tempUri??>
+							<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
+							<span><a href="${thisObject}">${valueLabel}</a></span>
+						<#else>
+							<span><a href="${thisObject}">${thisObject.stringValue()}</a></span>	
+						</#if>
+					<#else>
+						<span>${thisObject.stringValue()}</span>
+					</#if>
+				</span>
+			</#list>
+		</#if>
     </li>
 </#macro>
 

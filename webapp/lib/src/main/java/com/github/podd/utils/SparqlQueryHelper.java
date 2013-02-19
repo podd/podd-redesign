@@ -239,8 +239,6 @@ public class SparqlQueryHelper
         
         sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
         
-        sb.append(" ?propertyUri <" + RDFS.RANGE.stringValue() + "> ?propertyDataType . ");
-        
         sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
         
         sb.append("} WHERE {");
@@ -303,8 +301,6 @@ public class SparqlQueryHelper
         sb.append("?poddObject ?propertyUri ?value . ");
         
         sb.append("?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
-        
-        sb.append("OPTIONAL { ?propertyUri <" + RDFS.RANGE.stringValue() + "> ?propertyDataType } . ");
         
         sb.append("OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         

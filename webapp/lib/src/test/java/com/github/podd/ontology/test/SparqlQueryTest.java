@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDFS;
@@ -101,7 +102,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 this.sparqlHelper.getPoddObjectDetails(objectUri, this.conn, allContextsToQuery.toArray(new URI[0]));
         
         // verify:
-        Assert.assertEquals("Incorrect number of statements about object", 49, model.size());
+        Assert.assertEquals("Incorrect number of statements about object", 37, model.size());
         
         final Model modelLabelHasLeadInstitution =
                 model.filter(
@@ -125,7 +126,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
     @Test
     public void testGetPropertiesOfAnObject() throws Exception
     {
-        final String testResourcePath = "/test/artifacts/basic-1.ttl";
+        final String testResourcePath = "/test/artifacts/basic-2.ttl";
         final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
         
         // create a list of contexts to query
@@ -140,12 +141,18 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final List<URI> orderedPropertyUris = this.sparqlHelper.getProperties(topObjectUri, this.conn, contexts);
         
         // verify:
-        Assert.assertEquals("Incorrect number of statements about Top Object", 8, orderedPropertyUris.size());
+        Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
         
         final String[] expectedUris =
-                { "http://purl.org/podd/ns/poddScience#hasANZSRC", "http://purl.org/podd/ns/poddBase#createdAt",
+                { "http://purl.org/podd/ns/poddScience#hasANZSRC", 
+                        "http://purl.org/podd/ns/poddBase#createdAt",
                         "http://purl.org/dc/terms/creator",
                         "http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator",
+                        "http://purl.org/podd/ns/poddScience#hasAnalysis",
+                        "http://purl.org/podd/ns/poddScience#hasInvestigation",
+                        "http://purl.org/podd/ns/poddScience#hasProcess",
+                        "http://purl.org/podd/ns/poddScience#hasProjectPlan",
+                        "http://purl.org/podd/ns/poddScience#hasPublication",
                         "http://purl.org/podd/ns/poddBase#hasPublicationStatus",
                         "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
                         "http://purl.org/podd/ns/poddBase#hasStartDate",
