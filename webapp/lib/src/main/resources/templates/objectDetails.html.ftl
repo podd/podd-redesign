@@ -55,9 +55,9 @@
                     <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
                     
                     <#-- all other attributes (data/object properties) -->
-                    <#if objectModel??>
-                       <#list objectModel  as field>
-                       	<@displayField statement=field/>
+                    <#if propertyList??>
+                       <#list propertyList  as propertyUri>
+                       	<@displayField propertyUri=propertyUri/>
                        </#list>
                     </#if>
                     
@@ -154,30 +154,37 @@
 </#macro>
 
 <#-- 
-Macro to display information contained in a statement
+Macro to display information about the Podd object being viewed
 Should eventually replace macro addField
-added [2013-02-18] 
+
+TODO: support multi-valued properties
+
+last updated [2013-02-19] 
   -->
-<#macro displayField statement>
+<#macro displayField propertyUri>
     <li>
-    	<span class="bold">
-    		${completeModel.filter(statement.getPredicate(), rdfsLabelUri, null).objectString()}: 
-    	</span>
-		<span property="${statement.getPredicate()}" datatype="${completeModel.filter(statement.getPredicate(), rdfsRangeUri, null).objectString()}"> 
-			<#if util.isUri(statement.getObject())>
-				<#local tempUri = util.getUri(statement.getObject())>
+		<#local thisObject = completeModel.filter(poddObject.uri, propertyUri, null).objectValue()>
+		<#local label = completeModel.filter(propertyUri, rdfsLabelUri, null).objectString()!"Missing Label">
+		<#local dataType = completeModel.filter(propertyUri, rdfsRangeUri, null).objectString()!"Missing Datatype">
+		<#local isValueAUri = util.isUri(thisObject)>
+		
+    	<span class="bold">${label}:</span>
+		<span property="${propertyUri}" datatype="${dataType}"> 
+			<#if isValueAUri>
+				<#local tempUri = util.getUri(thisObject)>
 				<#if tempUri??>
 					<#local valueString = completeModel.filter(tempUri, rdfsLabelUri, null)>										
-					<span><a href="${statement.getObject()}">${completeModel.filter(tempUri, rdfsLabelUri, null).objectString()!statement.getObject()}</a></span>
+					<span><a href="${thisObject}">${completeModel.filter(tempUri, rdfsLabelUri, null).objectString()!thisObject}</a></span>
 				<#else>
-					<span><a href="${statement.getObject()}">${statement.getObject().stringValue()}</a></span>	
+					<span><a href="${thisObject}">${thisObject.stringValue()}</a></span>	
 				</#if>
 			<#else>
-				<span>${statement.getObject().stringValue()}</span>
+				<span>${thisObject.stringValue()}</span>
 			</#if>
 		</span>
     </li>
 </#macro>
+
 
 
 <#macro refersToTable element>

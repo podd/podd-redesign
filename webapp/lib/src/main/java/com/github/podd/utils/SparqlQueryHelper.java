@@ -2,9 +2,7 @@ package com.github.podd.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,7 +11,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
-import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
@@ -27,8 +25,6 @@ import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.podd.exception.PoddRuntimeException;
 
 /**
  * This class contains code to retrieve artifacts/objects (via SPARQL) for display purposes in the
@@ -129,24 +125,27 @@ public class SparqlQueryHelper
     public List<PoddObject> getContainedObjects(final URI parentObject, final boolean recursive,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
+        final StringBuilder sb = new StringBuilder();
         
-        final String sparqlQuery =
+        sb.append("SELECT ?containsProperty ?containedObject ?containedObjectLabel ");
         
-        "SELECT ?containsProperty ?containedObject ?containedObjectLabel WHERE { \r\n"
+        sb.append(" WHERE { ");
         
-        + "  ?parent ?containsProperty ?containedObject . \r\n" + "   ?containsProperty <"
+        sb.append(" ?parent ?containsProperty ?containedObject . \n");
         
-        + RDFS.SUBPROPERTYOF + "> <" + PoddRdfConstants.PODDBASE_CONTAINS.stringValue() + "> . \r\n"
+        sb.append(" ?containsProperty <" + RDFS.SUBPROPERTYOF + "> <"
+                + PoddRdfConstants.PODDBASE_CONTAINS.stringValue() + "> . \n");
         
-        + "  OPTIONAL { ?containsProperty <" + PoddRdfConstants.PODDBASE_WEIGHT.stringValue() + "> ?weight . } \r\n"
+        sb.append(" OPTIONAL { ?containsProperty <" + PoddRdfConstants.PODDBASE_WEIGHT.stringValue()
+                + "> ?weight . } \n");
         
-        + "   ?containedObject <" + RDFS.LABEL.stringValue() + "> ?containedObjectLabel . \r\n"
+        sb.append(" ?containedObject <" + RDFS.LABEL.stringValue() + "> ?containedObjectLabel . \n");
         
-        + " } ORDER BY ASC(?weight) ASC(?containedObjectLabel) ";
+        sb.append(" } ORDER BY ASC(?weight) ASC(?containedObjectLabel) ");
         
-        this.log.info("Executing SPARQL: \r\n {}", sparqlQuery);
+        this.log.info("Executing SPARQL: \r\n {}", sb.toString());
         
-        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("parent", parentObject);
         
         final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
@@ -191,7 +190,10 @@ public class SparqlQueryHelper
      * Find OWL:imports statements in the given graph of the repository.
      * 
      * Copied from PoddSesameManagerImpl.java as a reference only.
+     * 
+     * @deprecated Not Used. Delete if unnecessary
      */
+    @Deprecated
     public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI... contexts)
         throws OpenRDFException
     {
@@ -217,130 +219,10 @@ public class SparqlQueryHelper
     }
     
     /**
-     * Retrieve statements about the "Top Object" (e.g. a PoddBase:Project).
+     * The result of this method is a Model containing all data required for displaying the details
+     * of the object in HTML+RDFa.
      * 
-     * This method expects that there is only one top object present in the given contexts.
-     * 
-     * @param repositoryConnection
-     * @param contexts
-     * @return A Map containing all statements about the Top Object.
-     * @throws OpenRDFException
-     */
-    public Map<String, List<Value>> getTopObjectDetails(final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
-    {
-        final List<PoddObject> topObject = this.getTopObjects(repositoryConnection, contexts);
-        if(topObject.size() != 1)
-        {
-            // this should never happen (unless PODD allows multiple top objects at some stage)
-            throw new PoddRuntimeException("More than 1 top object found. There should be only 1.");
-        }
-        
-        final Map<String, List<Value>> allStatements =
-                this.getAllDirectStatements(topObject.get(0).getUri(), repositoryConnection, contexts);
-        final List<Value> list = new ArrayList<Value>();
-        list.add(topObject.get(0).getUri());
-        allStatements.put("objecturi", list);
-        return allStatements;
-    }
-    
-    /**
-     * Retrieve all direct statements about the given object.
-     * 
-     * @param objectUri
-     * @param repositoryConnection
-     * @param contexts
-     * @return A Map containing all statements about the given object.
-     * @throws OpenRDFException
-     */
-    public Map<String, List<Value>> getAllDirectStatements(final URI objectUri,
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
-    {
-        final String sparqlQuery = "SELECT ?predicate ?value WHERE { ?poddObject ?predicate ?value .  }";
-        
-        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
-        tupleQuery.setBinding("poddObject", objectUri);
-        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
-        
-        final Map<String, List<Value>> resultMap = new ConcurrentHashMap<String, List<Value>>();
-        
-        try
-        {
-            while(queryResults.hasNext())
-            {
-                final BindingSet nextResult = queryResults.next();
-                final String pred = nextResult.getValue("predicate").stringValue();
-                if(!resultMap.containsKey(pred))
-                {
-                    final List<Value> list = new ArrayList<Value>();
-                    list.add(nextResult.getValue("value"));
-                    resultMap.put(pred, list);
-                }
-                else
-                {
-                    resultMap.get(pred).add(nextResult.getValue("value"));
-                }
-            }
-        }
-        finally
-        {
-            queryResults.close();
-        }
-        
-        return resultMap;
-    }
-    
-    /**
-     * 
-     * @param repositoryConnection
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    public Map<String, String> getTopObjectDetailsAsModel(final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
-    {
-        final List<PoddObject> topObject = this.getTopObjects(repositoryConnection, contexts);
-        if(topObject.size() != 1)
-        {
-            // this should never happen (unless PODD allows multiple top objects at some stage)
-            throw new PoddRuntimeException("More than 1 top object found. There should be only 1.");
-        }
-        final URI objectUri = topObject.get(0).getUri();
-        
-        final String sparqlQuery =
-                "CONSTRUCT { ?poddObject ?predicate ?value } WHERE { ?poddObject ?predicate ?value " +
-                
-                "FILTER (?value != <" + OWL.THING.stringValue() + ">) " +
-                
-                "FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) " +
-                
-                "FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) " +
-                
-                "FILTER (?value != <" + OWL.CLASS.stringValue() + ">) " +
-                
-                "}";
-        
-        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
-        graphQuery.setBinding("poddObject", objectUri);
-        
-        final GraphQueryResult queryResults = this.executeGraphQuery(graphQuery, contexts);
-        
-        final Map<String, String> map = new HashMap<String, String>();
-        final LinkedHashModel result = new LinkedHashModel();
-        while(queryResults.hasNext())
-        {
-            final Statement stmt = queryResults.next();
-            result.add(stmt);
-            map.put(stmt.getPredicate().stringValue(), stmt.getObject().stringValue());
-        }
-        
-        return map;
-    }
-    
-    /**
-     * 
-     * objectUri :propertyX value propertyX RDFS:Label "label" propertyX RDFS:Range "XSD:String"
+     * objectUri :propertyX value, propertyX RDFS:Label "label", propertyX RDFS:Range "XSD:String"
      * 
      * @param objectUri
      * @param repositoryConnection
@@ -351,48 +233,118 @@ public class SparqlQueryHelper
     public Model getPoddObjectDetails(final URI objectUri, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
-        // create this as a StringBuilder
-        final String sparqlQuery = "CONSTRUCT { ?poddObject ?propertyUri ?value . " +
+        final StringBuilder sb = new StringBuilder();
         
-        " ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . " +
+        sb.append("CONSTRUCT { ?poddObject ?propertyUri ?value . ");
         
-        " ?propertyUri <" + RDFS.RANGE.stringValue() + "> ?propertyDataType . " +
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
         
-        " ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . " +
+        sb.append(" ?propertyUri <" + RDFS.RANGE.stringValue() + "> ?propertyDataType . ");
         
-        "} WHERE { " +
+        sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
         
-        "?poddObject ?propertyUri ?value . " +
+        sb.append("} WHERE {");
         
-        "?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . " +
+        sb.append("?poddObject ?propertyUri ?value . ");
         
-        "?propertyUri <" + RDFS.RANGE.stringValue() + "> ?propertyDataType . " +
+        sb.append("?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
         
-        "OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . " +
+        // datatype may not be available directly as Range
+        sb.append("OPTIONAL {?propertyUri <" + RDFS.RANGE.stringValue() + "> ?propertyDataType } . ");
         
-        "FILTER (?value != <" + OWL.THING.stringValue() + ">) " +
+        // value may not have a Label
+        sb.append("OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
-        "FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) " +
+        sb.append("FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
         
-        "FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) " +
+        sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
         
-        "FILTER (?value != <" + OWL.CLASS.stringValue() + ">) " +
+        sb.append("FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
         
-        "}";
+        sb.append("FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
         
-        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sparqlQuery);
+        sb.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
         graphQuery.setBinding("poddObject", objectUri);
         
         final GraphQueryResult queryResults = this.executeGraphQuery(graphQuery, contexts);
         
-        final LinkedHashModel result = new LinkedHashModel();
+        final Model model = new TreeModel();
+        
         while(queryResults.hasNext())
         {
             final Statement stmt = queryResults.next();
-            result.add(stmt);
+            model.add(stmt);
         }
         
-        return result;
+        return model;
+    }
+    
+    /**
+     * Retrieve a list of properties about the given object. The list is ordered based on property
+     * weights.
+     * 
+     * @param objectUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return A Map containing all statements about the given object.
+     * @throws OpenRDFException
+     */
+    public List<URI> getProperties(final URI objectUri, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT DISTINCT ?propertyUri ");
+        
+        sb.append(" WHERE { ");
+        
+        sb.append("?poddObject ?propertyUri ?value . ");
+        
+        sb.append("?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        
+        sb.append("OPTIONAL { ?propertyUri <" + RDFS.RANGE.stringValue() + "> ?propertyDataType } . ");
+        
+        sb.append("OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        
+        // for ORDER BY
+        sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODDBASE_WEIGHT.stringValue() + "> ?weight } . ");
+        
+        sb.append("FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
+        
+        sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        
+        sb.append("FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        
+        sb.append("FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+        
+        sb.append(" } ");
+        
+        sb.append("  ORDER BY ASC(?weight) ASC(?propertyLabel) ");
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("poddObject", objectUri);
+        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        
+        final List<URI> resultList = new ArrayList<URI>();
+        try
+        {
+            while(queryResults.hasNext())
+            {
+                final Value property = queryResults.next().getValue("propertyUri");
+                if(property instanceof URI)
+                {
+                    resultList.add((URI)property);
+                }
+            }
+        }
+        finally
+        {
+            queryResults.close();
+        }
+        
+        return resultList;
     }
     
     /**
@@ -406,18 +358,23 @@ public class SparqlQueryHelper
     public List<PoddObject> getTopObjects(final RepositoryConnection repositoryConnection, final URI... contexts)
         throws OpenRDFException
     {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?topObjectUri ?topObjectLabel ?topObjectDescription ?artifactUri ");
+        
+        sb.append(" WHERE { ");
+        
+        sb.append(" ?artifactUri <" + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT.stringValue() + "> ?topObjectUri . \n");
+        
+        sb.append(" OPTIONAL {  ?topObjectUri <" + RDFS.LABEL.stringValue() + "> ?topObjectLabel . } \n");
+        
+        sb.append(" OPTIONAL {  ?topObjectUri <" + RDFS.COMMENT.stringValue() + "> ?topObjectDescription . } \n");
+        
+        sb.append(" }");
+        
+        final TupleQueryResult queryResults = this.executeSparqlQuery(sb.toString(), repositoryConnection, contexts);
+        
         final List<PoddObject> topObjectList = new ArrayList<PoddObject>();
-        final String sparqlQuery = "SELECT ?topObjectUri ?topObjectLabel ?topObjectDescription ?artifactUri WHERE {" +
-        
-        " ?artifactUri <" + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT.stringValue() + "> ?topObjectUri . \n"
-        
-        + " OPTIONAL {  ?topObjectUri <" + RDFS.LABEL.stringValue() + "> ?topObjectLabel . } \n"
-        
-        + " OPTIONAL {  ?topObjectUri <" + RDFS.COMMENT.stringValue() + "> ?topObjectDescription . } \n"
-        
-        + " }";
-        
-        final TupleQueryResult queryResults = this.executeSparqlQuery(sparqlQuery, repositoryConnection, contexts);
         try
         {
             while(queryResults.hasNext())

@@ -199,12 +199,13 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             // remaining info about object to display (i.e. the Top Object)
             final URI objectUri = topObjectList.get(0).getUri();
             
-            final Model allNeededStatements =
+            final List<URI> orderedProperties =
+                    sparql.getProperties(objectUri, conn, schemaOntologyGraphs.toArray(new URI[0]));
+            final Model allNeededStatementsForDisplay =
                     sparql.getPoddObjectDetails(objectUri, conn, schemaOntologyGraphs.toArray(new URI[0]));
-            final Model directStatements = allNeededStatements.filter(objectUri, null, null);
             
-            dataModel.put("objectModel", directStatements);
-            dataModel.put("completeModel", allNeededStatements);
+            dataModel.put("propertyList", orderedProperties);
+            dataModel.put("completeModel", allNeededStatementsForDisplay);
         }
         finally
         {
@@ -219,8 +220,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("canEditObject", true);
         dataModel.put("uri", ontologyID.getOntologyIRI().toString());
         dataModel.put("objectType", "artifact");
-        // dataModel.put("creationDate", "2013-01-01");
-        // dataModel.put("modifiedDate", "2013-01-31");
         
         // dataModel.put("elementList", Arrays.asList("element1", "element2")); - TODO
         

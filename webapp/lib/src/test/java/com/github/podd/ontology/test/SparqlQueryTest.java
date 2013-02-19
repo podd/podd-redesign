@@ -6,7 +6,6 @@ package com.github.podd.ontology.test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
@@ -14,12 +13,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
@@ -92,7 +89,6 @@ public class SparqlQueryTest extends AbstractOntologyTest
         this.conn = this.getConnection();
         
         final URI objectUri =
-        // ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
         
         // create a list of contexts to query
@@ -104,108 +100,61 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final Model model =
                 this.sparqlHelper.getPoddObjectDetails(objectUri, this.conn, allContextsToQuery.toArray(new URI[0]));
         
-        for(final Statement stmt : model)
+        // verify:
+        Assert.assertEquals("Incorrect number of statements about object", 49, model.size());
+        
+        final Model modelLabelHasLeadInstitution =
+                model.filter(
+                        ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution"),
+                        RDFS.LABEL, null);
+        Assert.assertEquals("Should be exactly 1 label for hasLeadInstution", 1, modelLabelHasLeadInstitution.size());
+        Assert.assertEquals("Not the expected label for hasLeadInstitution", "Lead Institution",
+                modelLabelHasLeadInstitution.objectString());
+        
+        final Model modelPropertyTriples =
+                model.filter(
+                        ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966"),
+                        null, null);
+        Assert.assertEquals("Incorrect number of statements with podd object as the subject.", 14,
+                modelPropertyTriples.size());
+    }
+    
+    /**
+     * Test retrieve properties about a given Object
+     */
+    @Test
+    public void testGetPropertiesOfAnObject() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/basic-1.ttl";
+        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
+        
+        // create a list of contexts to query
+        final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
+        allContextsToQuery.add(nextOntologyID.getVersionIRI().toOpenRDFURI());
+        allContextsToQuery.add(nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
+        final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
+        
+        this.conn = this.getConnection();
+        
+        final URI topObjectUri = this.sparqlHelper.getTopObjects(this.conn, contexts).get(0).getUri();
+        final List<URI> orderedPropertyUris = this.sparqlHelper.getProperties(topObjectUri, this.conn, contexts);
+        
+        // verify:
+        Assert.assertEquals("Incorrect number of statements about Top Object", 8, orderedPropertyUris.size());
+        
+        final String[] expectedUris =
+                { "http://purl.org/podd/ns/poddScience#hasANZSRC", "http://purl.org/podd/ns/poddBase#createdAt",
+                        "http://purl.org/dc/terms/creator",
+                        "http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator",
+                        "http://purl.org/podd/ns/poddBase#hasPublicationStatus",
+                        "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
+                        "http://purl.org/podd/ns/poddBase#hasStartDate",
+                        "http://purl.org/podd/ns/poddBase#hasTopObjectStatus" };
+        for(int i = 0; i < orderedPropertyUris.size(); i++)
         {
-            System.out.println("  " + stmt.getSubject() + "    [" + stmt.getPredicate() + "]    " + stmt.getObject());
+            Assert.assertEquals("Property URI not in expected position",
+                    ValueFactoryImpl.getInstance().createURI(expectedUris[i]), orderedPropertyUris.get(i));
         }
-        
-        // TODO: verify
-        /*
-         * Assert.assertEquals("Incorrect number of statements about object", 11, map.size());
-         * Assert.assertEquals("Lead institution not as expected", "CSIRO HRPPC",
-         * ((Literal)map.get("http://purl.org/podd/ns/poddBase#hasLeadInstitution"
-         * ).get(0)).stringValue()); Assert.assertEquals("Publication status not as expected",
-         * ValueFactoryImpl
-         * .getInstance().createURI("http://purl.org/podd/ns/poddBase#NotPublished"),
-         * map.get("http://purl.org/podd/ns/poddBase#hasPublicationStatus").get(0));
-         */
-        
-    }
-    
-    /**
-     * Test retrieve information about Top Object
-     */
-    @Test
-    public void testGetTopObjectDetails() throws Exception
-    {
-        final String testResourcePath = "/test/artifacts/basic-1.ttl";
-        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
-        final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
-        
-        this.conn = this.getConnection();
-        
-        final Map<String, List<Value>> map =
-                this.sparqlHelper.getTopObjectDetails(this.conn, contextUri, nextOntologyID.getInferredOntologyIRI()
-                        .toOpenRDFURI());
-        
-        Assert.assertEquals("Incorrect number of statements about Top Object", 12, map.size());
-        Assert.assertNotNull("Top Object's URI was null", map.get("objecturi"));
-        
-        Assert.assertEquals("Not the expected top object URI",
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966"),
-                map.get("objecturi").get(0));
-        Assert.assertEquals("Publication status not as expected",
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#NotPublished"),
-                map.get("http://purl.org/podd/ns/poddBase#hasPublicationStatus").get(0));
-    }
-    
-    /**
-     * Test retrieve information about Top Object
-     */
-    @Test
-    public void testGetTopObjectDetailsAsModel() throws Exception
-    {
-        final String testResourcePath = "/test/artifacts/basic-1.ttl";
-        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
-        final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
-        
-        this.conn = this.getConnection();
-        
-        final Map<String, String> model =
-                this.sparqlHelper.getTopObjectDetailsAsModel(this.conn, contextUri, nextOntologyID
-                        .getInferredOntologyIRI().toOpenRDFURI());
-        
-        final Set<String> keys = model.keySet();
-        for(final String key : keys)
-        {
-            System.out.println(key + " = " + model.get(key));
-        }
-        
-        // Iterator<Statement> iterator = model.iterator();
-        // while (iterator.hasNext())
-        // {
-        // Statement stmt = iterator.next();
-        // System.out.println(stmt.getSubject() + "  " + stmt.getPredicate() + "   " +
-        // stmt.getObject());
-        // }
-        Assert.assertEquals("Incorrect number of statements about Top Object", 11, model.size());
-    }
-    
-    /**
-     * Test retrieve all direct statements about a given object
-     */
-    @Test
-    public void testGetAllDirectStatements() throws Exception
-    {
-        final String testResourcePath = "/test/artifacts/basic-1.ttl";
-        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
-        final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
-        
-        this.conn = this.getConnection();
-        
-        final URI objectUri =
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
-        
-        final Map<String, List<Value>> map =
-                this.sparqlHelper.getAllDirectStatements(objectUri, this.conn, contextUri, nextOntologyID
-                        .getInferredOntologyIRI().toOpenRDFURI());
-        
-        Assert.assertEquals("Incorrect number of statements about object", 11, map.size());
-        Assert.assertEquals("Lead institution not as expected", "CSIRO HRPPC",
-                ((Literal)map.get("http://purl.org/podd/ns/poddBase#hasLeadInstitution").get(0)).stringValue());
-        Assert.assertEquals("Publication status not as expected",
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#NotPublished"),
-                map.get("http://purl.org/podd/ns/poddBase#hasPublicationStatus").get(0));
     }
     
     /**
