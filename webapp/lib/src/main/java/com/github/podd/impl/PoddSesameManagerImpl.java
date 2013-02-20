@@ -4,6 +4,7 @@
 package com.github.podd.impl;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,6 +37,14 @@ import com.github.podd.utils.PoddRdfConstants;
 public class PoddSesameManagerImpl implements PoddSesameManager
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    @Override
+    public List<OWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI, final RepositoryConnection connection,
+            final URI ontologyManagementGraph)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
     
     /*
      * (non-Javadoc)
@@ -97,6 +106,22 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @throws OpenRDFException
      */
     private InferredOWLOntologyID getCurrentVersionInternal(final IRI ontologyIRI,
+            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
+    {
+        // FIXME: TODO
+        return null;
+    }
+    
+    /**
+     * Inner helper method for getCurrentArtifactVersion() and getCurrentSchemaVersion().
+     * 
+     * @param ontologyIRI
+     * @param repositoryConnection
+     * @param managementGraph
+     * @return
+     * @throws OpenRDFException
+     */
+    private List<InferredOWLOntologyID> getAllVersionsInternal(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
