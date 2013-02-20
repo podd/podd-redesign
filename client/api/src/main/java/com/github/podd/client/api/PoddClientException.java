@@ -24,26 +24,26 @@ public class PoddClientException extends Exception
     /**
      * @param message
      */
-    public PoddClientException(String message)
+    public PoddClientException(final String message)
     {
         super(message);
-    }
-    
-    /**
-     * @param cause
-     */
-    public PoddClientException(Throwable cause)
-    {
-        super(cause);
     }
     
     /**
      * @param message
      * @param cause
      */
-    public PoddClientException(String message, Throwable cause)
+    public PoddClientException(final String message, final Throwable cause)
     {
         super(message, cause);
+    }
+    
+    /**
+     * @param cause
+     */
+    public PoddClientException(final Throwable cause)
+    {
+        super(cause);
     }
     
 }
