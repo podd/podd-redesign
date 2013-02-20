@@ -50,7 +50,7 @@
             <div about="${poddObject.uri!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
                 	<#-- object URI, Title and description -->
-                    <li><span class="bold">URI: </span>${poddObject.uri!""}</li>
+                    <li><span class="bold">URI: </span> <a href="${poddObject.uri}">${util.clipProtocol(poddObject.uri!"Unknown URI")}</a></li>
                     <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title!""}</span></li>
                     <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
                     
@@ -158,49 +158,42 @@ last updated [2013-02-19]
 <#macro displayField propertyUri>
     <li>
 		<#local label = completeModel.filter(propertyUri, rdfsLabelUri, null).objectString()!"Missing Label">
-		<#local objectList = completeModel.filter(poddObject.uri, propertyUri, null).objects()>
-
-		<#--local thisObject = completeModel.filter(poddObject.uri, propertyUri, null).objectValue()-->
-		<#local dataType = "TODO">
-		
     	<span class="bold">${label}:</span>
+
+		<#local objectList = completeModel.filter(poddObject.uri, propertyUri, null).objects()>
 		<#if (objectList.size() > 1)>
 			<#-- multiple values. create another HTML list -->
 			<ol>
 			<#list objectList as thisObject>
 				<li>
-					<span property="${propertyUri}" datatype="${dataType}"> 
-						<#if util.isUri(thisObject)>
-							<#local tempUri = util.getUri(thisObject)>
-							<#if tempUri??>
-								<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
-								<span><a href="${thisObject}">${valueLabel}</a></span>
-							<#else>
-								<span><a href="${thisObject}">${thisObject.stringValue()}</a></span>	
-							</#if>
+					<#if util.isUri(thisObject)>
+						<#local tempUri = util.getUri(thisObject)>
+						<#if tempUri??>
+							<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
+							<span><a href="${thisObject}">${util.clipProtocol(valueLabel)}</a></span>
 						<#else>
-							<span>${thisObject.stringValue()}</span>
+							<span><a href="${thisObject}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 						</#if>
-					</span>
+					<#else>
+						<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}">${thisObject.stringValue()}</span>
+					</#if>
 				</li>
 			</#list>
 			</ol>
 		<#else>
 			<#-- single value. no need to create another HTML list -->
 			<#list objectList as thisObject>
-				<span property="${propertyUri}" datatype="${dataType}"> 
-					<#if util.isUri(thisObject)>
-						<#local tempUri = util.getUri(thisObject)>
-						<#if tempUri??>
-							<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
-							<span><a href="${thisObject}">${valueLabel}</a></span>
-						<#else>
-							<span><a href="${thisObject}">${thisObject.stringValue()}</a></span>	
-						</#if>
+				<#if util.isUri(thisObject)>
+					<#local tempUri = util.getUri(thisObject)>
+					<#if tempUri??>
+						<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
+						<span><a href="${thisObject}">${util.clipProtocol(valueLabel)}</a></span>
 					<#else>
-						<span>${thisObject.stringValue()}</span>
+						<span><a href="${thisObject}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 					</#if>
-				</span>
+				<#else>
+					<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}">${thisObject.stringValue()}</span>
+				</#if>
 			</#list>
 		</#if>
     </li>

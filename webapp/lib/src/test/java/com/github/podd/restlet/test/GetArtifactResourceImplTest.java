@@ -89,15 +89,13 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         final String body = results.getText();
         
         // verify:
-        //System.out.println(body);
+        // System.out.println(body);
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404", body.contains("404"));
         
-        // FIXME: We're displaying the Top Object URI but not the artifact/ontology URI anywhere at
-        // present
-        // Assert.assertTrue("Page does not have artifact URI", body.contains(artifactUri));
-        
-        Assert.assertTrue("Page does not have artifact Details ", body.contains("artifact Details"));
+        Assert.assertTrue("Missing data on page", body.contains("artifact Details"));
+        Assert.assertTrue("Missng data on page", body.contains("ANZSRC FOR Code:"));
+        Assert.assertTrue("Missng data on page", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
         
         this.assertFreemarker(body);
     }

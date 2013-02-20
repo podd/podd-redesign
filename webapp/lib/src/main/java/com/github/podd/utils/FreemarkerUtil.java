@@ -3,6 +3,7 @@
  */
 package com.github.podd.utils;
 
+import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 
@@ -25,6 +26,70 @@ public class FreemarkerUtil
             return (URI)value;
         }
         return null;
+    }
+    
+    /**
+     * Rather hacky attempt to retrieve the datatype of a given Value object.
+     * TODO: Incomplete and needs to be fixed.
+     * 
+     * @param value
+     * @return
+     */
+    public String getDatatype(final Value value)
+    {
+        if (value instanceof Literal)
+        {
+            URI dataType = ((Literal)value).getDatatype();
+            if (dataType != null)
+            {
+                if (dataType.getNamespace().contains("http://www.w3.org/2001/XMLSchema#"))
+                {
+                    return "xsd:" + dataType.getLocalName();
+                }
+                
+                return dataType.stringValue();
+            }
+        }
+        return "TODO";
+    }
+    
+    
+    /**
+     * If the given object contains a URI with a protocol (scheme), clip it off.
+     * 
+     * @param object
+     * @return
+     */
+    public String clipProtocol(Object object)
+    {
+        if (object == null)
+        {
+            return null;
+        }
+        
+        // get String representation of input
+        String result;
+        if (object instanceof Value)
+        {
+            Value v = (Value)object;
+            result = v.stringValue();
+        }
+        else
+        {
+            result = object.toString();
+        }
+
+        // clip the protocol part
+        if(result.startsWith("mailto:") || result.startsWith("http://"))
+        {
+            return result.substring(7);
+        }
+        else if(result.startsWith("https://"))
+        {
+            return result.substring(8);
+        }
+        
+        return result;
     }
     
 }
