@@ -15,8 +15,8 @@
 ]>
 
 
-<rdf:RDF xmlns="http://purl.org/podd/basic-2-20130206/artifact:1#"
-     xml:base="http://purl.org/podd/basic-2-20130206/artifact:1"
+<rdf:RDF xmlns="urn:temp:uuid:artifact:1#"
+     xml:base="urn:temp:uuid:artifact:1"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:foaf="http://xmlns.com/foaf/0.1/"
      xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
@@ -27,9 +27,9 @@
      xmlns:poddUser="http://purl.org/podd/ns/poddUser#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:dcterms="http://purl.org/dc/terms/">
-    <owl:Ontology rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1">
-        <poddBase:artifactHasTopObject rdf:resource="http://purl.org/podd/basic-1-20130205/object:2966"/>
-        <owl:versionIRI rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:version:1"/>
+    <owl:Ontology rdf:about="urn:temp:uuid:artifact:1">
+        <poddBase:artifactHasTopObject rdf:resource="urn:temp:uuid:object:2966"/>
+        <owl:versionIRI rdf:resource="urn:temp:uuid:artifact:version:1"/>
         <owl:imports rdf:resource="http://purl.org/podd/ns/dcTerms"/>
         <owl:imports rdf:resource="http://purl.org/podd/ns/poddBase"/>
         <owl:imports rdf:resource="http://purl.org/podd/ns/poddScience"/>
@@ -71,9 +71,9 @@
     
 
 
-    <!-- http://purl.org/podd/basic-1-20130205/object:2966 -->
+    <!-- urn:temp:uuid:object:2966 -->
 
-    <owl:Thing rdf:about="http://purl.org/podd/basic-1-20130205/object:2966">
+    <owl:Thing rdf:about="urn:temp:uuid:object:2966">
         <rdf:type rdf:resource="&poddScience;Project"/>
         <rdf:type rdf:resource="&owl;NamedIndividual"/>
         <rdfs:label rdf:datatype="&xsd;string">Project#2012-0006_ Cotton Leaf Morphology</rdfs:label>
@@ -81,12 +81,12 @@
         <poddBase:createdAt rdf:datatype="&xsd;dateTime">2012-06-05T01:57:16.643Z</poddBase:createdAt>
         <poddBase:hasLeadInstitution rdf:datatype="&xsd;string">CSIRO HRPPC</poddBase:hasLeadInstitution>
         <rdfs:comment rdf:datatype="&xsd;string">Characterising normal and okra leaf shapes</rdfs:comment>
-        <poddScience:hasAnalysis rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis"/>
-        <poddScience:hasInvestigation rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation"/>
-        <poddScience:hasProjectPlan rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan"/>
-        <poddScience:hasProcess rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1"/>
-        <poddScience:hasProcess rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2"/>
-        <poddScience:hasPublication rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#publication45"/>
+        <poddScience:hasAnalysis rdf:resource="urn:temp:uuid:artifact:1#Demo_Analysis"/>
+        <poddScience:hasInvestigation rdf:resource="urn:temp:uuid:artifact:1#Demo_Investigation"/>
+        <poddScience:hasProjectPlan rdf:resource="urn:temp:uuid:artifact:1#Demo_Plan"/>
+        <poddScience:hasProcess rdf:resource="urn:temp:uuid:artifact:1#Demo_Process1"/>
+        <poddScience:hasProcess rdf:resource="urn:temp:uuid:artifact:1#Demo_Process2"/>
+        <poddScience:hasPublication rdf:resource="urn:temp:uuid:artifact:1#publication45"/>
         <poddBase:hasTopObjectStatus rdf:resource="&poddBase;Active"/>
         <poddScience:hasANZSRC rdf:resource="&poddBase;NotApplicable"/>
         <poddBase:hasPublicationStatus rdf:resource="&poddBase;NotPublished"/>
@@ -96,134 +96,134 @@
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype -->
+    <!-- urn:temp:uuid:artifact:1#Demo-Genotype -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo-Genotype">
         <rdf:type rdf:resource="&poddScience;Genotype"/>
         <rdfs:label>Demo genotype</rdfs:label>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis -->
+    <!-- urn:temp:uuid:artifact:1#Demo_Analysis -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_Analysis">
         <rdf:type rdf:resource="&poddScience;Analysis"/>
         <rdfs:label>Demo Analysis</rdfs:label>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation -->
+    <!-- urn:temp:uuid:artifact:1#Demo_Investigation -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_Investigation">
         <rdf:type rdf:resource="&poddScience;Investigation"/>
         <rdfs:label>Demo investigation</rdfs:label>
-        <poddScience:hasMaterial rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material"/>
-        <poddScience:hasTreatment rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1"/>
-        <poddScience:hasMaterial rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial"/>
+        <poddScience:hasMaterial rdf:resource="urn:temp:uuid:artifact:1#Demo_Material"/>
+        <poddScience:hasTreatment rdf:resource="urn:temp:uuid:artifact:1#My_Treatment1"/>
+        <poddScience:hasMaterial rdf:resource="urn:temp:uuid:artifact:1#SqueekeeMaterial"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material -->
+    <!-- urn:temp:uuid:artifact:1#Demo_Material -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_Material">
         <rdf:type rdf:resource="&poddScience;Material"/>
         <rdfs:label>Demo material</rdfs:label>
-        <poddScience:hasGenotype rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype"/>
-        <poddScience:hasGenotype rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2"/>
+        <poddScience:hasGenotype rdf:resource="urn:temp:uuid:artifact:1#Demo-Genotype"/>
+        <poddScience:hasGenotype rdf:resource="urn:temp:uuid:artifact:1#Demo_genotype_2"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan -->
+    <!-- urn:temp:uuid:artifact:1#Demo_Plan -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_Plan">
         <rdf:type rdf:resource="&poddScience;ProjectPlan"/>
         <rdfs:label>Demo Project Plan</rdfs:label>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1 -->
+    <!-- urn:temp:uuid:artifact:1#Demo_Process1 -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_Process1">
         <rdf:type rdf:resource="&poddScience;Process"/>
         <rdfs:label>Demo Process 1</rdfs:label>
-        <poddScience:hasPlatform rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1"/>
+        <poddScience:hasPlatform rdf:resource="urn:temp:uuid:artifact:1#Platform_1"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2 -->
+    <!-- urn:temp:uuid:artifact:1#Demo_Process2 -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_Process2">
         <rdf:type rdf:resource="&poddScience;Process"/>
         <rdfs:label>Demo Process 2</rdfs:label>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2 -->
+    <!-- urn:temp:uuid:artifact:1#Demo_genotype_2 -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_genotype_2">
         <rdf:type rdf:resource="&poddScience;Genotype"/>
         <rdfs:label>Genotype 2</rdfs:label>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3 -->
+    <!-- urn:temp:uuid:artifact:1#Demo_genotype_3 -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Demo_genotype_3">
         <rdf:type rdf:resource="&poddScience;Genotype"/>
         <rdfs:label>Genotype 3</rdfs:label>
-        <poddScience:hasSequence rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A"/>
+        <poddScience:hasSequence rdf:resource="urn:temp:uuid:artifact:1#Sequence_A"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1 -->
+    <!-- urn:temp:uuid:artifact:1#My_Treatment1 -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#My_Treatment1">
         <rdf:type rdf:resource="&poddScience;Treatment"/>
         <rdfs:label>my treatment 1</rdfs:label>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1 -->
+    <!-- urn:temp:uuid:artifact:1#Platform_1 -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Platform_1">
         <rdf:type rdf:resource="&poddScience;Platform"/>
         <rdfs:label>Platform 1</rdfs:label>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A -->
+    <!-- urn:temp:uuid:artifact:1#Sequence_A -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#Sequence_A">
         <rdf:type rdf:resource="&poddScience;Sequence"/>
         <rdfs:label>sequence a</rdfs:label>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial -->
+    <!-- urn:temp:uuid:artifact:1#SqueekeeMaterial -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#SqueekeeMaterial">
         <rdf:type rdf:resource="&poddScience;Material"/>
         <rdfs:label>Squeekee material</rdfs:label>
-        <poddScience:hasGenotype rdf:resource="http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3"/>
+        <poddScience:hasGenotype rdf:resource="urn:temp:uuid:artifact:1#Demo_genotype_3"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://purl.org/podd/basic-2-20130206/artifact:1#publication45 -->
+    <!-- urn:temp:uuid:artifact:1#publication45 -->
 
-    <owl:NamedIndividual rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#publication45">
+    <owl:NamedIndividual rdf:about="urn:temp:uuid:artifact:1#publication45">
         <rdf:type rdf:resource="&poddScience;Publication"/>
         <rdfs:label>PODD - Towards An Extensible, Domain-agnostic Scientific Data Management System</rdfs:label>
         <poddScience:hasYear rdf:datatype="&xsd;integer">2010</poddScience:hasYear>
