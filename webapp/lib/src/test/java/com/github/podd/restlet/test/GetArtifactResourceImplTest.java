@@ -91,7 +91,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         // verify:
         // System.out.println(body);
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
-        Assert.assertFalse("Page contained a 404", body.contains("404"));
+        Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
         
         Assert.assertTrue("Missing data on page", body.contains("artifact Details"));
         Assert.assertTrue("Missng data on page", body.contains("ANZSRC FOR Code:"));

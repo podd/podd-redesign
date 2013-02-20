@@ -161,13 +161,11 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
-     * FIXME: populate the data model with appropriate info as required by objectDetails.html.ftl
-     * 
-     * 1. get artifact via the PODD API (as an OWLOntology object?) 2. populate Map with required
-     * info to go into data model
-     * 
+     * This method retrieves necessary info about the object being viewed via SPARQL queries
+     * and populates the data model.
      * 
      * @param ontologyID
+     * @param schemaOntologyGraphs
      * @param dataModel
      * @throws OpenRDFException
      */
@@ -215,22 +213,16 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 conn.close();
             }
         }
-        // hard-code the required values first to display a valid html page
-        // DEBUG
-        dataModel.put("canEditObject", true);
-        dataModel.put("uri", ontologyID.getOntologyIRI().toString());
+        // add other required info to data model
+        dataModel.put("rdfsLabelUri", RDFS.LABEL);
+        dataModel.put("rdfsRangeUri", RDFS.RANGE);
+        dataModel.put("util", new FreemarkerUtil());
+        
+        // TODO: hard coded values
+        // dataModel.put("canEditObject", true);
         dataModel.put("objectType", "artifact");
         
-        // dataModel.put("elementList", Arrays.asList("element1", "element2")); - TODO
-        
-        final Map<String, Object> poddObject = new HashMap<String, Object>();
-        poddObject.put("uri", ontologyID.getOntologyIRI().toString());
-        poddObject.put("localName", "Hardcoded project title");
-        poddObject.put("description", "Dummy project from the resource");
-        
-        poddObject.put("members", new HashMap<String, String>());
-        
-        // -populate refers to list
+        // -TODO: populate refers to list
         final List<Object> refersToList = new ArrayList<Object>();
         
         final Map<String, Object> refersToElement = new HashMap<String, Object>();
@@ -238,7 +230,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // DESIGN FIXME: Figure out a way of doing this without removing characters. It is not an
         // option to remove characters or split URIs.
         refersToElement.put("propertyUriWithoutNamespace", "artifact89");
-        refersToElement.put("availableObjects", this.getAvailableObjects());
+        refersToElement.put("availableObjects", this.getDummyReferredObjects());
         refersToElement.put("areSelectedObjects", true);
         
         refersToList.add(refersToElement);
@@ -247,17 +239,12 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         dataModel.put("selectedObjectCount", 0);
         dataModel.put("childHierarchyList", Collections.emptyList());
-        
-        // add other required info to data model
-        dataModel.put("rdfsLabelUri", RDFS.LABEL);
-        dataModel.put("rdfsRangeUri", RDFS.RANGE);
-        dataModel.put("util", new FreemarkerUtil());
     }
     
-    private List<Object> getAvailableObjects()
+    private List<Object> getDummyReferredObjects()
     {
         final List<Object> list = new ArrayList<Object>();
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < 2; i++)
         {
             final Map<String, Object> anObject = new HashMap<String, Object>();
             anObject.put("isSelected", true);

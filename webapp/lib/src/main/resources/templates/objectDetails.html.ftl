@@ -120,40 +120,8 @@
 </div>
 </div>  <!-- content pane -->
 
-<#macro addField anField>
-    <li><span class="bold">${anField.label}: </span>
-    <#if anField.enteredValues?has_content>
-        <#if anField.enteredValues[1]??>
-	        <ol>
-	        <#list anField.enteredValues as value>
-	        	<#if value.isUri>
-		        	<!-- TODO: Determine if this is a URI or a literal and render it as a link here if necessary -->
-		            <li property="${value.propertyUri}" resource="${value.datatype}"><a href="${value.uri}>${value.label}</a></li>
-	        	<#else>
-		            <li property="${value.propertyUri}" datatype="${value.datatype}">${value.label}</li>
-	            </#if>
-	        </#list>
-	        </ol>
-        <#else>
-	    	<#if anField.enteredValues[0].isUri>
-		    	<!-- TODO: Determine if this is a URI or a literal and render it as a link here if necessary -->
-		        <li property="${anField.enteredValues[0].propertyUri}" resource="${anField.enteredValues[0].datatype}"><a href="${anField.enteredValues[0].uri}>${anField.enteredValues[0].label}</a></li>
-	    	<#else>
-		        <!-- FIXME: Move these renderings into a macro -->
-		        <li property="${anField.enteredValues[0].propertyUri}" datatype="${anField.enteredValues[0].datatype}">${anField.enteredValues[0].label}</li>
-	        </#if>
-	    </#if>
-    </#if>
-    </li>
-</#macro>
-
 <#-- 
-Macro to display information about the Podd object being viewed
-Should eventually replace macro addField
-
-TODO: support multi-valued properties
-
-last updated [2013-02-19] 
+Macro to display information about the PODD object being viewed
   -->
 <#macro displayField propertyUri>
     <li>
