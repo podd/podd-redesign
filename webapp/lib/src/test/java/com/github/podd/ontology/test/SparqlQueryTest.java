@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDFS;
@@ -144,8 +143,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
         
         final String[] expectedUris =
-                { "http://purl.org/podd/ns/poddScience#hasANZSRC", 
-                        "http://purl.org/podd/ns/poddBase#createdAt",
+                { "http://purl.org/podd/ns/poddScience#hasANZSRC", "http://purl.org/podd/ns/poddBase#createdAt",
                         "http://purl.org/dc/terms/creator",
                         "http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator",
                         "http://purl.org/podd/ns/poddScience#hasAnalysis",
@@ -190,7 +188,6 @@ public class SparqlQueryTest extends AbstractOntologyTest
         Assert.assertEquals("Incorrect number of direct child objects", 6, childObjectList.size());
         for(int i = 0; i < childObjectList.size(); i++)
         {
-            Assert.assertEquals("Incorrect direct parent", parentObjectURI, childObjectList.get(i).getDirectParent());
             Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getTitle());
         }
     }
@@ -220,7 +217,6 @@ public class SparqlQueryTest extends AbstractOntologyTest
         Assert.assertEquals("Incorrect number of direct child objects", 3, childObjectList.size());
         for(int i = 0; i < childObjectList.size(); i++)
         {
-            Assert.assertEquals("Incorrect direct parent", parentObjectURI, childObjectList.get(i).getDirectParent());
             Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getTitle());
         }
     }
@@ -256,6 +252,19 @@ public class SparqlQueryTest extends AbstractOntologyTest
             // Assert.assertEquals("Incorrect object at position", expectedLabels[i],
             // childObjectList.get(i).getLabel());
         }
+    }
+    
+    @Test
+    public void testGetPoddArtifactList() throws Exception
+    {
+        final InferredOWLOntologyID ontologyID1 = this.loadArtifact("/test/artifacts/basic-1.ttl", RDFFormat.TURTLE);
+        final InferredOWLOntologyID ontologyID2 = this.loadArtifact("/test/artifacts/basic-2.ttl", RDFFormat.TURTLE);
+        
+        this.conn = this.getConnection();
+        final List<URI> artifacts = this.sparqlHelper.getPoddArtifactList(this.conn, this.artifactGraph);
+        
+        Assert.assertTrue("artifact missing in list", artifacts.contains(ontologyID1.getOntologyIRI().toOpenRDFURI()));
+        Assert.assertTrue("artifact missing in list", artifacts.contains(ontologyID2.getOntologyIRI().toOpenRDFURI()));
     }
     
     /**

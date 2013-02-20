@@ -6,12 +6,12 @@ package com.github.podd.utils;
 import org.openrdf.model.URI;
 
 /**
- * Simple class to contain details about a Podd TopObject (i.e. Projects at present).
+ * Simple class to contain details about a Podd Artifact (i.e. Projects at present).
  * 
  * @author kutila
  *
  */
-public class PoddTopObject extends PoddObject
+public class PoddArtifact extends PoddObject
 {
     
     private String description;
@@ -22,7 +22,7 @@ public class PoddTopObject extends PoddObject
      * 
      * @param uri
      */
-    public PoddTopObject(URI uri)
+    public PoddArtifact(URI uri)
     {
         super(uri);
     }

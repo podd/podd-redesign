@@ -96,7 +96,10 @@ No projects found
 
 <#macro addProjectDetails aProject>
     <p>
-    <a href="${baseUrl}/object/${aProject.getProject().getPid()!"unknown-pid"}"> ${aProject.getProject().getLocalName()!" - "}</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aProject.getUri())!"unknown-pid"}"> ${aProject.getTitle()!" - "}</a>
+<#-- 
+	These should be uncommented and displayed.
+	
         <#if "D" == aProject.getProject().state>
             (<span class="descriptive">deleted</span>)
         <#elseif "I" == aProject.getProject().state>
@@ -107,13 +110,14 @@ No projects found
         <#else>
          .
         </#if>
-    Principal Investigator: ${(aProject.getProject().getPrincipalInvestigator().getFirstName())!" - "}
-        ${(aProject.getProject().getPrincipalInvestigator().getLastName())!" - "},
-    Lead Institution: ${(aProject.getProject().getLeadInstitution())!" - "} <br>
+    Principal Investigator: ${(aProject.getPrincipalInvestigator().getFirstName())!" - "}
+        ${(aProject.getPrincipalInvestigator().getLastName())!" - "},
+    Lead Institution: ${(aProject.getLeadInstitution())!" - "} <br>
+-->
     <script type="text/javascript">
-        writeAbstractWholeWords("${(aProject.getProject().labelWithoutLineReturn())!" - "}", 200);
+        writeAbstractWholeWords("${(aProject.getDescription())!" - "}", 200);
     </script>
-    <a href="${baseUrl}/browser/${(aProject.getProject().getPid())!"unknown-pid"}">Browse Project</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aProject.getUri())!"unknown-pid"}">Browse Project</a>
     </p>
 </#macro>
 

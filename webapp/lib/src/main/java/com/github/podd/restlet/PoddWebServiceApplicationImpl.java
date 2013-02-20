@@ -55,6 +55,7 @@ import com.github.podd.resources.FileReferenceAttachResourceImpl;
 import com.github.podd.resources.GetArtifactResourceImpl;
 import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
+import com.github.podd.resources.ListArtifactsResourceImpl;
 import com.github.podd.resources.TestResetResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
@@ -263,6 +264,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
                 "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
         this.log.info("attaching user details service to path={}", userDetailsPath);
         router.attach(userDetailsPath, UserDetailsResourceImpl.class);
+        
+        // Add a route for the List Artifacts page.
+        final String listArtifactsPath = PoddWebConstants.PATH_ARTIFACT_LIST;
+        this.log.info("attaching List Artifacts service to path={}", listArtifactsPath);
+        router.attach(listArtifactsPath, ListArtifactsResourceImpl.class);
         
         // Add a route for the Upload Artifact page.
         final String uploadArtifactPath = PoddWebConstants.PATH_ARTIFACT_UPLOAD;

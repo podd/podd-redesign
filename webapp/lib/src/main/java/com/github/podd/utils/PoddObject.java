@@ -18,11 +18,6 @@ public class PoddObject
     /** Title for this object */
     private String title;
     
-    /** The parent of this object */
-    private URI directParent = null;
-    
-    private String relationshipFromDirectParent = null;
-    
     /** An optional description about the object */
     private String description;
     
@@ -51,46 +46,6 @@ public class PoddObject
         this.title = title;
     }
     
-    /**
-     * @deprecated PoddObject should only have URI and optional label and description
-     */
-    public URI getDirectParent()
-    {
-        return this.directParent;
-    }
-    
-    /**
-     * @deprecated PoddObject should only have URI and optional label and description
-     */
-    public void setDirectParent(final URI container)
-    {
-        this.directParent = container;
-    }
-    
-    /**
-     * @deprecated PoddObject should only have URI and optional label and description
-     */
-    public boolean hasDirectParent()
-    {
-        return (this.directParent != null);
-    }
-    
-    /**
-     * @deprecated PoddObject should only have URI and optional label and description
-     */
-    public void setRelationshipFromDirectParent(final String relationshipFromDirectParent)
-    {
-        this.relationshipFromDirectParent = relationshipFromDirectParent;
-    }
-    
-    /**
-     * @deprecated PoddObject should only have URI and optional label and description
-     */
-    public String getRelationshipFromDirectParent()
-    {
-        return this.relationshipFromDirectParent;
-    }
-
     public String getDescription()
     {
         return description;

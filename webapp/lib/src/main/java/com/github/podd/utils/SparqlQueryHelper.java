@@ -13,6 +13,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
@@ -160,8 +161,6 @@ public class SparqlQueryHelper
                 
                 final PoddObject containedObject = new PoddObject((URI)nextResult.getValue("containedObject"));
                 containedObject.setTitle(nextResult.getValue("containedObjectLabel").stringValue());
-                containedObject.setDirectParent(parentObject);
-                containedObject.setRelationshipFromDirectParent(nextResult.getValue("containsProperty").stringValue());
                 
                 children.add(containedObject);
                 childURIs.add(containedObject.getUri());
@@ -216,6 +215,49 @@ public class SparqlQueryHelper
             queryResults.close();
         }
         return results;
+    }
+    
+    /**
+     * This method retrieves a list of URIs of the artifacts currently managed by PODD.
+     * 
+     * @param repositoryConnection
+     * @param artifactGraph
+     * @return
+     * @throws OpenRDFException
+     */
+    public List<URI> getPoddArtifactList(final RepositoryConnection repositoryConnection, final URI artifactGraph)
+        throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?artifactUri ");
+        sb.append(" WHERE { ");
+        sb.append(" ?artifactUri <" + RDF.TYPE + ">  <" + OWL.ONTOLOGY + "> . ");
+        sb.append(" ?artifactUri <" + PoddRdfConstants.PODD_BASE_INFERRED_VERSION + ">  ?infVersion . ");
+        
+        sb.append(" } ");
+        
+        this.log.info("Executing SPARQL: \r\n {}", sb.toString());
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        
+        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, artifactGraph);
+        
+        final List<URI> artifacts = new ArrayList<URI>();
+        try
+        {
+            while(queryResults.hasNext())
+            {
+                final BindingSet nextResult = queryResults.next();
+                artifacts.add((URI)nextResult.getValue("artifactUri"));
+            }
+        }
+        finally
+        {
+            queryResults.close();
+        }
+        
+        return artifacts;
     }
     
     /**
