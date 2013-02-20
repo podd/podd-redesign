@@ -43,8 +43,10 @@ public interface PoddArtifactManager
      * 
      * @param artifactId
      *            The {@link OWLOntologyID} containing the details of the artifact to delete.
+     * @throws PoddException
+     *             If an error occurred while deleting the artifact.
      */
-    boolean deleteArtifact(OWLOntologyID artifactId);
+    boolean deleteArtifact(OWLOntologyID artifactId) throws PoddException;
     
     /**
      * Exports the given artifact to the given output stream using an RDF format.

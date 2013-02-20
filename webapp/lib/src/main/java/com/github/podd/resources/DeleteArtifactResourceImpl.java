@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.PoddWebConstants;
@@ -61,16 +62,25 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
     @Delete
     public void deleteArtifact(final Representation entity) throws ResourceException
     {
-        boolean result = this.getPoddApplication().getPoddArtifactManager().deleteArtifact(new OWLOntologyID());
+        boolean result;
+        try
+        {
+            result = this.getPoddApplication().getPoddArtifactManager().deleteArtifact(new OWLOntologyID());
+            if(result)
+            {
+                this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+            }
+            else
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
+            }
+        }
+        catch(PoddException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                    "Could not delete artifact due to an internal error", e);
+        }
         
-        if(result)
-        {
-            this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
-        }
-        else
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
-        }
     }
     
     // FIXME: populating dummy info for test
