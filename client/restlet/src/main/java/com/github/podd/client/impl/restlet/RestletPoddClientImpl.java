@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Restlet based PODD Client implementation.
@@ -49,10 +50,6 @@ import com.github.podd.client.api.PoddClientException;
 public class RestletPoddClientImpl implements PoddClient
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
-    public static final String LOGIN = "login";
-    public static final String LOGOUT = "logout";
-    public static final String NEW_ARTIFACT = "artifact/new";
     
     private String serverUrl = null;
     
@@ -93,8 +90,34 @@ public class RestletPoddClientImpl implements PoddClient
     
     @Override
     public void downloadArtifact(final OWLOntologyID artifactId, final OutputStream outputStream, final RDFFormat format)
+        throws PoddClientException
     {
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        resource.getCookies().addAll(this.currentCookies);
         
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
+        
+        if(artifactId.getVersionIRI() != null)
+        {
+            // FIXME: Versions are not supported in general by PODD, but they are important for
+            // verifying the state of the client to allow for early failure in cases where the
+            // client is out of date.
+            resource.addQueryParameter("versionUri", artifactId.getVersionIRI().toString());
+        }
+        
+        // Pass the desired format to the get method of the ClientResource
+        final Representation get = resource.get(MediaType.valueOf(format.getDefaultMIMEType()));
+        
+        try
+        {
+            get.write(outputStream);
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Could not write downloaded artifact to output stream", e);
+        }
     }
     
     private OWLOntologyID getOntologyFromModel(final Model nextModel)
@@ -216,7 +239,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean login(final String username, final String password) throws PoddClientException
     {
-        final ClientResource resource = new ClientResource(this.getUrl(RestletPoddClientImpl.LOGIN));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGIN_SUBMIT));
         resource.getCookieSettings().addAll(this.currentCookies);
         
         // TODO: when Cookies natively supported by Client Resource, or another method remove this
@@ -275,7 +298,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean logout() throws PoddClientException
     {
-        final ClientResource resource = new ClientResource(this.getUrl(RestletPoddClientImpl.LOGOUT));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGOUT));
         // TODO: when Cookies natively supported by Client Resource, or another method remove this
         // Until then, this is necessary to manually attach the cookies after login to the
         // redirected address.
@@ -388,14 +411,15 @@ public class RestletPoddClientImpl implements PoddClient
     {
         final InputRepresentation rep = new InputRepresentation(input, MediaType.valueOf(format.getDefaultMIMEType()));
         
-        final ClientResource resource = new ClientResource(this.getUrl(RestletPoddClientImpl.NEW_ARTIFACT));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         resource.getCookies().addAll(this.currentCookies);
         
         this.log.info("cookies: {}", this.currentCookies);
         
-        resource.getQuery().add("format", format.getDefaultMIMEType());
+        resource.addQueryParameter("format", format.getDefaultMIMEType());
         
-        final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_XML);
+        // Request the results in Turtle to reduce the bandwidth
+        final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_TURTLE);
         
         try
         {

@@ -159,6 +159,21 @@
 			<groupId>com.github.ansell.property-util</groupId>
 			<artifactId>property-util</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.github.ansell.sesame-rio-extensions</groupId>
+			<artifactId>sesame-rio-extensions-rdfjson</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-ntriples</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-n3</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<testResources>

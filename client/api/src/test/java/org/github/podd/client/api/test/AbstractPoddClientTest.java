@@ -3,6 +3,8 @@
  */
 package org.github.podd.client.api.test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import org.junit.After;
@@ -10,7 +12,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openrdf.model.Model;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.client.api.PoddClient;
@@ -103,7 +110,63 @@ public abstract class AbstractPoddClientTest
      */
     @Ignore
     @Test
-    public final void testDownloadArtifact() throws Exception
+    public final void testDownloadArtifactCurrentVersion() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(OWLOntologyID, java.io.OutputStream, RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testDownloadArtifactDummyVersion() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(OWLOntologyID, java.io.OutputStream, RDFFormat)}
+     * .
+     */
+    @Test
+    public final void testDownloadArtifactNoVersion() throws Exception
+    {
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        final OWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        Assert.assertNotNull(newArtifact);
+        Assert.assertNotNull(newArtifact.getOntologyIRI());
+        Assert.assertNotNull(newArtifact.getVersionIRI());
+        
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
+        
+        this.testClient.downloadArtifact(new OWLOntologyID(newArtifact.getOntologyIRI()), outputStream,
+                RDFFormat.RDFJSON);
+        
+        final Model model = new LinkedHashModel();
+        
+        final RDFParser parser = Rio.createParser(RDFFormat.RDFJSON);
+        parser.setRDFHandler(new StatementCollector(model));
+        parser.parse(new ByteArrayInputStream(outputStream.toByteArray()), "");
+        
+        Assert.assertEquals(30, model.size());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(OWLOntologyID, java.io.OutputStream, RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testDownloadArtifactOldVersion() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }

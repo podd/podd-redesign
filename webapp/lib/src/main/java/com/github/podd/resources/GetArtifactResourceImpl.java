@@ -119,6 +119,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get("rdf|rj|ttl")
     public Representation getArtifactRdf(final Representation entity, final Variant variant) throws ResourceException
     {
+        this.log.info("getArtifactRdf");
+        
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
         
         try
@@ -127,6 +129,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             
             if(artifactUri == null)
             {
+                this.log.error("Artifact ID not submitted");
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
             }
             
