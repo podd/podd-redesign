@@ -30,6 +30,23 @@ import com.github.podd.utils.InferredOWLOntologyID;
 public interface PoddArtifactManager
 {
     /**
+     * Deletes the given artifact if and only if it is available and it is not currently published.
+     * <p>
+     * If the given artifactId contains a version IRI, then the specific version only must be
+     * deleted, as long as it is not currently published.
+     * <p>
+     * If the artifactId contains a version IRI which is the current version, then another available
+     * version may be substituted.
+     * <p>
+     * To ensure that all versions are deleted the user must ensure that the artifact is not
+     * currently published, and that there is no version IRI attached to the given artifactId.
+     * 
+     * @param artifactId
+     *            The {@link OWLOntologyID} containing the details of the artifact to delete.
+     */
+    boolean deleteArtifact(OWLOntologyID artifactId);
+    
+    /**
      * Exports the given artifact to the given output stream using an RDF format.
      * 
      * @param ontologyId
@@ -144,6 +161,13 @@ public interface PoddArtifactManager
     InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId) throws PublishArtifactException, OpenRDFException,
         UnmanagedArtifactIRIException;
     
+    /**
+     * Sets the {@link PoddFileReferenceManager} to use for verifying file references for PODD
+     * artifacts.
+     * 
+     * @param fileManager
+     *            The manager to use for verifying file references for PODD artifacts.
+     */
     void setFileReferenceManager(PoddFileReferenceManager fileManager);
     
     /**
@@ -159,12 +183,39 @@ public interface PoddArtifactManager
      */
     void setOwlManager(PoddOWLManager owlManager);
     
+    /**
+     * Sets the {@link PoddPurlManager} instance to use when processing temporary references into
+     * PURLs.
+     * 
+     * @param purlManager
+     *            The manager to use for processing PURLs.
+     */
     void setPurlManager(PoddPurlManager purlManager);
     
+    /**
+     * Sets the {@link PoddRepositoryManager} to use for managing OpenRDF Sesame Repositories used
+     * to access and update data for PODD.
+     * 
+     * @param repositoryManager
+     *            The manager to use for managing repositories.
+     */
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
     
+    /**
+     * Sets the {@link PoddSchemaManager} to use for managing the schemas used to validate artifacts
+     * for PODD.
+     * 
+     * @param schemaManager
+     *            The manager to use for managing schemas.
+     */
     void setSchemaManager(PoddSchemaManager schemaManager);
     
+    /**
+     * Sets the {@link PoddSesameManager} to use for managing queries to repositories.
+     * 
+     * @param sesameManager
+     *            The manager to use for managing queries to repositories.
+     */
     void setSesameManager(PoddSesameManager sesameManager);
     
     /**
