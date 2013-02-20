@@ -91,8 +91,11 @@ public interface PoddClient
      *            The {@link OutputStream} to download the artifact to.
      * @param format
      *            The format of the RDF information to be downloaded to the output stream.
+     * @throws PoddClientException
+     *             If the artifact could not be downloaded for any reason
      */
-    void downloadArtifact(OWLOntologyID artifactId, OutputStream outputStream, RDFFormat format);
+    void downloadArtifact(OWLOntologyID artifactId, OutputStream outputStream, RDFFormat format)
+        throws PoddClientException;
     
     /**
      * Gets the base server URL to use when submitting requests using this client.
