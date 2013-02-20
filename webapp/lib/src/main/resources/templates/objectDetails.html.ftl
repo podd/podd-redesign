@@ -50,7 +50,7 @@
             <div about="${poddObject.uri!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
                 	<#-- object URI, Title and description -->
-                    <li><span class="bold">URI: </span> <a href="${poddObject.uri}">${util.clipProtocol(poddObject.uri!"Unknown URI")}</a></li>
+                    <li><span class="bold">URI: </span> <a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${poddObject.uri?url}">${util.clipProtocol(poddObject.uri!"Unknown URI")}</a></li>
                     <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title!""}</span></li>
                     <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
                     
@@ -138,9 +138,9 @@ Macro to display information about the PODD object being viewed
 						<#local tempUri = util.getUri(thisObject)>
 						<#if tempUri??>
 							<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
-							<span><a href="${thisObject}">${util.clipProtocol(valueLabel)}</a></span>
+							<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
 						<#else>
-							<span><a href="${thisObject}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
+							<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 						</#if>
 					<#else>
 						<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}">${thisObject.stringValue()}</span>
@@ -155,9 +155,9 @@ Macro to display information about the PODD object being viewed
 					<#local tempUri = util.getUri(thisObject)>
 					<#if tempUri??>
 						<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
-						<span><a href="${thisObject}">${util.clipProtocol(valueLabel)}</a></span>
+						<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
 					<#else>
-						<span><a href="${thisObject}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
+						<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 					</#if>
 				<#else>
 					<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}">${thisObject.stringValue()}</span>

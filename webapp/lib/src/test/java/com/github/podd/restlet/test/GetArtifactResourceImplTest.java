@@ -75,7 +75,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     public void testGetArtifactBasicHtml() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact("/test/artifacts/basicProject-1-internal-object.rdf");
+        final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-2-internal-objects.rdf");
         
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));

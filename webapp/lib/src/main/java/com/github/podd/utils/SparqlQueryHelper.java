@@ -441,4 +441,55 @@ public class SparqlQueryHelper
         return topObjectList;
     }
     
+    /**
+     * Retrieve a <code>PoddObject</code> containing the "title" and "description" of the specified
+     * object if they exist.
+     * 
+     * If multiple titles/descriptions exist, the first pair of values returned by SPARQL will be
+     * used.
+     * 
+     * @param objectUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    public PoddObject getPoddObject(final URI objectUri, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ?label ?description ");
+        sb.append(" WHERE { ");
+        sb.append(" OPTIONAL { ?objectUri <" + RDFS.LABEL + "> ?label } . \n");
+        sb.append(" OPTIONAL { ?objectUri <" + RDFS.COMMENT + "> ?description . } \n");
+        sb.append(" }");
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("objectUri", objectUri);
+        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        
+        final PoddObject poddObject = new PoddObject(objectUri);
+        try
+        {
+            if(queryResults.hasNext())
+            {
+                final BindingSet next = queryResults.next();
+                
+                if(next.getValue("label") != null)
+                {
+                    poddObject.setTitle(next.getValue("label").stringValue());
+                }
+                
+                if(next.getValue("description") != null)
+                {
+                    poddObject.setDescription(next.getValue("description").stringValue());
+                }
+            }
+        }
+        finally
+        {
+            queryResults.close();
+        }
+        return poddObject;
+    }
 }

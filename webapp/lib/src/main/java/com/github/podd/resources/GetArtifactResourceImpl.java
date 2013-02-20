@@ -70,6 +70,12 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
         }
+        
+        final String objectToView = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
+        
+        // URI objectToView = topObject URI by default
+        // optional parameter for inner objects
+        
         this.log.info("requesting get artifact (HTML): {}", artifactUri);
         
         this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
@@ -99,7 +105,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
-            this.populateDataModelWithArtifactData(ontologyID, schemaOntologyGraphs, dataModel);
+            this.populateDataModelWithArtifactData(ontologyID, objectToView, schemaOntologyGraphs, dataModel);
         }
         catch(final OpenRDFException e)
         {
@@ -161,15 +167,18 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
-     * This method retrieves necessary info about the object being viewed via SPARQL queries
-     * and populates the data model.
+     * This method retrieves necessary info about the object being viewed via SPARQL queries and
+     * populates the data model.
      * 
      * @param ontologyID
+     *            The artifact to be viewed
+     * @param objectToView
+     *            An optional internal object to view
      * @param schemaOntologyGraphs
      * @param dataModel
      * @throws OpenRDFException
      */
-    private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID,
+    private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
             final List<URI> schemaOntologyGraphs, final Map<String, Object> dataModel) throws OpenRDFException
     {
         
@@ -180,7 +189,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             final SparqlQueryHelper sparql = new SparqlQueryHelper();
             
-            // populate data model with top-object specific info
+            // get top-object of this artifact
             final List<PoddObject> topObjectList =
                     sparql.getTopObjects(conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
                             .getInferredOntologyIRI().toOpenRDFURI());
@@ -188,20 +197,29 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
             }
-            dataModel.put("poddObject", topObjectList.get(0));
+            
+            // the object to display (default is Top Object)
+            URI objectUri = topObjectList.get(0).getUri();
+            
+            if(objectToView != null)
+            {
+                objectUri = ValueFactoryImpl.getInstance().createURI(objectToView);
+            }
+            final PoddObject theObject =
+                    sparql.getPoddObject(objectUri, conn, ontologyID.getVersionIRI().toOpenRDFURI());
+            
+            dataModel.put("poddObject", theObject);
             
             // hack together the list of contexts to query in
             schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
             schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
-            
-            // remaining info about object to display (i.e. the Top Object)
-            final URI objectUri = topObjectList.get(0).getUri();
             
             final List<URI> orderedProperties =
                     sparql.getProperties(objectUri, conn, schemaOntologyGraphs.toArray(new URI[0]));
             final Model allNeededStatementsForDisplay =
                     sparql.getPoddObjectDetails(objectUri, conn, schemaOntologyGraphs.toArray(new URI[0]));
             
+            dataModel.put("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
             dataModel.put("propertyList", orderedProperties);
             dataModel.put("completeModel", allNeededStatementsForDisplay);
         }

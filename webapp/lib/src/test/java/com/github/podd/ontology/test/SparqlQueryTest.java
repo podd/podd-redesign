@@ -267,6 +267,34 @@ public class SparqlQueryTest extends AbstractOntologyTest
         Assert.assertTrue("artifact missing in list", artifacts.contains(ontologyID2.getOntologyIRI().toOpenRDFURI()));
     }
     
+    @Test
+    public void testGetPoddObject() throws Exception
+    {
+        final InferredOWLOntologyID ontologyID1 = this.loadArtifact("/test/artifacts/basic-2.ttl", RDFFormat.TURTLE);
+        
+        this.conn = this.getConnection();
+        final String[] objectUris =
+                { "http://purl.org/podd/basic-1-20130205/object:2966",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial" };
+        
+        final String[] expectedTitles =
+                { "Project#2012-0006_ Cotton Leaf Morphology", "Demo genotype", "Squeekee material" };
+        final String[] expectedDescriptions = { "Characterising normal and okra leaf shapes", null, null };
+        
+        for(int i = 0; i < objectUris.length; i++)
+        {
+            final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
+            
+            final PoddObject poddObject =
+                    this.sparqlHelper.getPoddObject(objectUri, this.conn, ontologyID1.getVersionIRI().toOpenRDFURI());
+            
+            Assert.assertNotNull("Podd Object was null", poddObject);
+            Assert.assertEquals("Wrong title", expectedTitles[i], poddObject.getTitle());
+            Assert.assertEquals("Wrong description", expectedDescriptions[i], poddObject.getDescription());
+        }
+    }
+    
     /**
      * Test retrieving all Top Objects of an artifact when the artifact has one top object.
      */
