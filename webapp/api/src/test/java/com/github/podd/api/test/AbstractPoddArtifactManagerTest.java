@@ -381,6 +381,36 @@ public abstract class AbstractPoddArtifactManagerTest
         this.testArtifactManager = null;
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     * Tests that the artifact manager can delete an artifact when there was a single version
+     * loaded, and the version is given to the deleteArtifact method.
+     */
+    @Test
+    public final void testDeleteArtifactWithVersionSingle() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        // invoke test method
+        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        
+        // verify:
+        this.verifyLoadedArtifact(resultArtifactId, 6, 32, 479, false);
+        
+        Assert.assertTrue("Could not delete artifact", this.testArtifactManager.deleteArtifact(resultArtifactId));
+    }
+    
     @Test
     public final void testGetFileReferenceManager() throws Exception
     {
@@ -868,8 +898,9 @@ public abstract class AbstractPoddArtifactManagerTest
             
             // verify: a single PUBLICATION_STATUS in asserted ontology
             final List<Statement> publicationStatusStatementList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                            null, false, inferredOntologyId.getVersionIRI().toOpenRDFURI()));
+                    Iterations.asList(nextRepositoryConnection.getStatements(null,
+                            PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS, null, false, inferredOntologyId
+                                    .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
                     publicationStatusStatementList.size());
             
