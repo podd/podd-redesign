@@ -399,6 +399,13 @@
 				<artifactId>org.restlet.ext.fileupload</artifactId>
 				<version>${restlet.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>
+					com.github.ansell.sesame-rio-extensions
+				</groupId>
+				<artifactId>sesame-rio-extensions-rdfjson</artifactId>
+				<version>0.3</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
