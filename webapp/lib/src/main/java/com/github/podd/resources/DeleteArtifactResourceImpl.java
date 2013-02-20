@@ -7,10 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +25,7 @@ import com.github.podd.utils.PoddWebConstants;
  * 
  * TODO: Empty class with logic not implemented
  * 
- * Delete an artifact from PODD. 
+ * Delete an artifact from PODD.
  * 
  * @author kutila
  * 
@@ -55,6 +58,21 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
+    @Delete
+    public void deleteArtifact(final Representation entity) throws ResourceException
+    {
+        boolean result = this.getPoddApplication().getPoddArtifactManager().deleteArtifact(new OWLOntologyID());
+        
+        if(result)
+        {
+            this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+        }
+        else
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
+        }
+    }
+    
     // FIXME: populating dummy info for test
     private Map<String, Object> getRequestedArtifact()
     {
@@ -64,7 +82,7 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
         final Map<String, String> roleMap = new HashMap<String, String>();
         roleMap.put("description", "A dummy user account for testing");
         testArtifactMap.put("repositoryRole", roleMap);
-            
+        
         return testArtifactMap;
     }
     
