@@ -64,7 +64,7 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#appendArtifact(org.semanticweb.owlapi.model.IRI, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * {@link com.github.podd.client.api.PoddClient#appendArtifact(OWLOntologyID, InputStream, RDFFormat)}
      * .
      */
     @Ignore
@@ -76,7 +76,7 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#attachFileReference(org.semanticweb.owlapi.model.IRI, org.semanticweb.owlapi.model.IRI, java.lang.String, java.lang.String, java.lang.String)}
+     * {@link com.github.podd.client.api.PoddClient#attachFileReference(OWLOntologyID, org.semanticweb.owlapi.model.IRI, String, String, String)}
      * .
      */
     @Ignore
@@ -87,13 +87,23 @@ public abstract class AbstractPoddClientTest
     }
     
     /**
-     * Test method for
-     * {@link com.github.podd.client.api.PoddClient#deleteArtifact(org.semanticweb.owlapi.model.IRI)}
-     * .
+     * Test method for {@link com.github.podd.client.api.PoddClient#deleteArtifact(OWLOntologyID)} .
      */
     @Ignore
     @Test
     public final void testDeleteArtifact() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(OWLOntologyID, java.io.OutputStream, RDFFormat)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testDownloadArtifact() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }
@@ -178,8 +188,7 @@ public abstract class AbstractPoddClientTest
     }
     
     /**
-     * Test method for
-     * {@link com.github.podd.client.api.PoddClient#publishArtifact(org.semanticweb.owlapi.model.IRI)}
+     * Test method for {@link com.github.podd.client.api.PoddClient#publishArtifact(OWLOntologyID)}
      * .
      */
     @Ignore
@@ -205,8 +214,7 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#unpublishArtifact(org.semanticweb.owlapi.model.IRI)}
-     * .
+     * {@link com.github.podd.client.api.PoddClient#unpublishArtifact(OWLOntologyID)} .
      */
     @Ignore
     @Test
@@ -217,7 +225,7 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#updateArtifact(org.semanticweb.owlapi.model.IRI, java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * {@link com.github.podd.client.api.PoddClient#updateArtifact(OWLOntologyID, InputStream, RDFFormat)}
      * .
      */
     @Ignore
@@ -235,12 +243,12 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testUploadNewArtifact() throws Exception
     {
-        this.testClient.login(TEST_ADMIN_USER, TEST_ADMIN_PASSWORD);
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
         
-        OWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        final OWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());

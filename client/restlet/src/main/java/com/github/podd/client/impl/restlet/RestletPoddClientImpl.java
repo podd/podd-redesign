@@ -5,6 +5,7 @@ package com.github.podd.client.impl.restlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.openrdf.model.Model;
@@ -67,45 +68,33 @@ public class RestletPoddClientImpl implements PoddClient
         this.serverUrl = serverUrl;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.client.api.PoddClient#appendArtifact(org.semanticweb.owlapi.model.IRI,
-     * java.io.InputStream, org.openrdf.rio.RDFFormat)
-     */
     @Override
-    public OWLOntologyID appendArtifact(final IRI ontologyIRI, final InputStream partialInputStream,
+    public OWLOntologyID appendArtifact(final OWLOntologyID ontologyIRI, final InputStream partialInputStream,
             final RDFFormat format) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.github.podd.client.api.PoddClient#attachFileReference(org.semanticweb.owlapi.model.IRI,
-     * org.semanticweb.owlapi.model.IRI, java.lang.String, java.lang.String, java.lang.String)
-     */
     @Override
-    public OWLOntologyID attachFileReference(final IRI ontologyIRI, final IRI objectIRI, final String label,
+    public OWLOntologyID attachFileReference(final OWLOntologyID ontologyIRI, final IRI objectIRI, final String label,
             final String repositoryAlias, final String filePathInRepository) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.client.api.PoddClient#deleteArtifact(org.semanticweb.owlapi.model.IRI)
-     */
     @Override
-    public boolean deleteArtifact(final IRI ontologyIRI) throws PoddClientException
+    public boolean deleteArtifact(final OWLOntologyID ontologyIRI) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return false;
+    }
+    
+    @Override
+    public void downloadArtifact(final OWLOntologyID artifactId, final OutputStream outputStream, final RDFFormat format)
+    {
+        
     }
     
     private OWLOntologyID getOntologyFromModel(final Model nextModel)
@@ -332,9 +321,9 @@ public class RestletPoddClientImpl implements PoddClient
         RDFHandlerException, UnsupportedRDFormatException, IOException
     {
         final Model result = new LinkedHashModel();
-        StatementCollector handler = new StatementCollector(result);
+        final StatementCollector handler = new StatementCollector(result);
         
-        RDFParser parser = Rio.createParser(format);
+        final RDFParser parser = Rio.createParser(format);
         parser.setRDFHandler(handler);
         parser.parse(stream, this.getUrl(""));
         
@@ -361,13 +350,8 @@ public class RestletPoddClientImpl implements PoddClient
         }
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.client.api.PoddClient#publishArtifact(org.semanticweb.owlapi.model.IRI)
-     */
     @Override
-    public OWLOntologyID publishArtifact(final IRI ontologyIRI) throws PoddClientException
+    public OWLOntologyID publishArtifact(final OWLOntologyID ontologyIRI) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
@@ -384,39 +368,21 @@ public class RestletPoddClientImpl implements PoddClient
         this.serverUrl = serverUrl;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.github.podd.client.api.PoddClient#unpublishArtifact(org.semanticweb.owlapi.model.IRI)
-     */
     @Override
-    public OWLOntologyID unpublishArtifact(final IRI ontologyIRI) throws PoddClientException
+    public OWLOntologyID unpublishArtifact(final OWLOntologyID ontologyIRI) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.client.api.PoddClient#updateArtifact(org.semanticweb.owlapi.model.IRI,
-     * java.io.InputStream, org.openrdf.rio.RDFFormat)
-     */
     @Override
-    public OWLOntologyID updateArtifact(final IRI ontologyIRI, final InputStream fullInputStream, final RDFFormat format)
-        throws PoddClientException
+    public OWLOntologyID updateArtifact(final OWLOntologyID ontologyIRI, final InputStream fullInputStream,
+            final RDFFormat format) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.client.api.PoddClient#uploadNewArtifact(java.io.InputStream,
-     * org.openrdf.rio.RDFFormat)
-     */
     @Override
     public OWLOntologyID uploadNewArtifact(final InputStream input, final RDFFormat format) throws PoddClientException
     {
@@ -433,7 +399,6 @@ public class RestletPoddClientImpl implements PoddClient
         
         try
         {
-            // TODO: Even if you ask for RDF, you get back a string
             final Model parsedStatements = this.parseRdf(post);
             
             final OWLOntologyID result = this.getOntologyFromModel(parsedStatements);

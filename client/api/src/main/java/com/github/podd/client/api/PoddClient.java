@@ -4,6 +4,7 @@
 package com.github.podd.client.api;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.openrdf.rio.RDFFormat;
@@ -20,6 +21,11 @@ public interface PoddClient
     /**
      * Submits a request to the PODD Edit Artifact service to append to the artifact using the RDF
      * triples that are contained in the given {@link InputStream}.
+     * <p>
+     * If the given ontologyId contains a version IRI and the version is out of date, a
+     * PoddClientException may be thrown if the server refuses to complete the operation due to the
+     * version being out of date. In these cases the ontology would need to be manually merged, and
+     * the update would need to be attempted again.
      * 
      * @param ontologyIRI
      *            The IRI of the Artifact to update.
@@ -30,15 +36,20 @@ public interface PoddClient
      *            that will be appended to the given artifact.
      * @return An {@link OWLOntologyID} object containing the details of the updated artifact.
      */
-    OWLOntologyID appendArtifact(IRI ontologyIRI, InputStream partialInputStream, RDFFormat format)
+    OWLOntologyID appendArtifact(OWLOntologyID ontologyId, InputStream partialInputStream, RDFFormat format)
         throws PoddClientException;
     
     /**
      * Submits a request to the PODD File Reference Attachment service to attach a file reference
      * from a registered repository into the artifact as a child of the given object IRI.
+     * <p>
+     * If the given ontologyId contains a version IRI and the version is out of date, a
+     * PoddClientException may be thrown if the server refuses to complete the operation due to the
+     * version being out of date. In these cases the ontology would need to be manually merged, and
+     * the update would need to be attempted again.
      * 
-     * @param ontologyIRI
-     *            The IRI of the artifact to attach the file reference to.
+     * @param ontologyId
+     *            The OWLOntologyID of the artifact to attach the file reference to.
      * @param objectIRI
      *            The IRI of the object to attach the file reference to.
      * @param label
@@ -49,18 +60,39 @@ public interface PoddClient
      *            The path inside of the repository that can be used to locate the file.
      * @return An {@link OWLOntologyID} object containing the details of the updated artifact.
      */
-    OWLOntologyID attachFileReference(IRI ontologyIRI, IRI objectIRI, String label, String repositoryAlias,
+    OWLOntologyID attachFileReference(OWLOntologyID ontologyId, IRI objectIRI, String label, String repositoryAlias,
             String filePathInRepository) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Delete Artifact service to delete the artifact identified by
      * the given IRI.
+     * <p>
+     * If the given ontologyId contains a version IRI and the version is out of date, a
+     * PoddClientException may be thrown if the server refuses to complete the operation due to the
+     * version being out of date. In these cases the ontology deletion would need to be attempted
+     * again using the up to date version, or alternatively, by omitting the version IRI.
      * 
-     * @param ontologyIRI
-     *            The IRI of the artifact to delete.
+     * @param ontologyId
+     *            The OWLOntologyID of the artifact to delete.
      * @return True if the artifact was deleted and false otherwise.
      */
-    boolean deleteArtifact(IRI ontologyIRI) throws PoddClientException;
+    boolean deleteArtifact(OWLOntologyID ontologyId) throws PoddClientException;
+    
+    /**
+     * Submits a request to the PODD Get Artifact service to download the artifact identified by the
+     * given {@link OWLOntologyID}, optionally including a version IRI if it is specifically known.
+     * <p>
+     * If the version is not currently available, the latest version will be returned.
+     * 
+     * @param artifactId
+     *            The OWLOntologyID of the artifact to be downloaded, including version as necessary
+     *            to fetch old versions.
+     * @param outputStream
+     *            The {@link OutputStream} to download the artifact to.
+     * @param format
+     *            The format of the RDF information to be downloaded to the output stream.
+     */
+    void downloadArtifact(OWLOntologyID artifactId, OutputStream outputStream, RDFFormat format);
     
     /**
      * Gets the base server URL to use when submitting requests using this client.
@@ -69,6 +101,13 @@ public interface PoddClient
      *         hosted locally. Returns null if a server URL has not been set.
      */
     String getPoddServerUrl();
+    
+    /**
+     * Returns the current login status.
+     * 
+     * @return True if the client was logged in after the last request, and false otherwise.
+     */
+    boolean isLoggedIn();
     
     /**
      * 
@@ -111,13 +150,6 @@ public interface PoddClient
     boolean login(String username, String password) throws PoddClientException;
     
     /**
-     * Returns the current login status.
-     * 
-     * @return True if the client was logged in after the last request, and false otherwise.
-     */
-    boolean isLoggedIn();
-    
-    /**
      * Submits a request to the PODD Logout service to logout the user and close the session.
      * 
      * @return True if the user was successfully logged out and false otherwise.
@@ -127,14 +159,19 @@ public interface PoddClient
     /**
      * Submits a request to the PODD Publish Artifact service to publish an artifact that was
      * previously unpublished.
+     * <p>
+     * If the given ontologyId contains a version IRI and the version is out of date, a
+     * PoddClientException may be thrown if the server refuses to complete the operation due to the
+     * version being out of date. In these cases the ontology would need to be manually merged, and
+     * the publish would need to be attempted again.
      * 
-     * @param ontologyIRI
-     *            The {@link IRI} of the unpublished artifact that is to be published.
+     * @param ontologyId
+     *            The {@link OWLOntologyID} of the unpublished artifact that is to be published.
      * @return The {@link OWLOntologyID} of the artifact that was published. Artifacts may be given
      *         a different IRI after they are published, to distinguish them from the previously
      *         unpublished artifact.
      */
-    OWLOntologyID publishArtifact(IRI ontologyIRI) throws PoddClientException;
+    OWLOntologyID publishArtifact(OWLOntologyID ontologyId) throws PoddClientException;
     
     /**
      * Sets the base server URL to use when submitting requests using this client.
@@ -148,20 +185,30 @@ public interface PoddClient
     /**
      * Submits a request to the PODD Unpublish Artifact service to unpublish an artifact that was
      * previously published.
+     * <p>
+     * If the given ontologyId contains a version IRI and the version is out of date, a
+     * PoddClientException will be thrown, as the published artifact must have an accurate version
+     * to ensure consistency. To avoid this, the operation may be attempted omitting the version
+     * IRI.
      * 
-     * @param ontologyIRI
+     * @param ontologyId
      * @return The {@link OWLOntologyID} of the artifact after it has been unpublished. Artifacts
      *         may be given a different IRI after they unpublished, to distinguish them from the
      *         previously available artifact.
      */
-    OWLOntologyID unpublishArtifact(IRI ontologyIRI) throws PoddClientException;
+    OWLOntologyID unpublishArtifact(OWLOntologyID ontologyId) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Edit Artifact service to update the entire artifact, replacing
      * the existing content with the content in the given {@link InputStream}.
+     * <p>
+     * If the given ontologyId contains a version IRI and the version is out of date, a
+     * PoddClientException may be thrown if the server refuses to complete the operation due to the
+     * version being out of date. In these cases the ontology would need to be manually merged, and
+     * the update would need to be attempted again.
      * 
-     * @param ontologyIRI
-     *            The IRI of the Artifact to update.
+     * @param ontologyId
+     *            The OWLOntologyID of the Artifact to update.
      * @param format
      *            The format of the RDF triples in the given InputStream.
      * @param fullInputStream
@@ -169,7 +216,7 @@ public interface PoddClient
      *            that will be used to update the given artifact.
      * @return An {@link OWLOntologyID} object containing the details of the updated artifact.
      */
-    OWLOntologyID updateArtifact(IRI ontologyIRI, InputStream fullInputStream, RDFFormat format)
+    OWLOntologyID updateArtifact(OWLOntologyID ontologyId, InputStream fullInputStream, RDFFormat format)
         throws PoddClientException;
     
     /**
