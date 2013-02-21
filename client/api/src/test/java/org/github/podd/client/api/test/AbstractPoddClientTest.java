@@ -156,7 +156,7 @@ public abstract class AbstractPoddClientTest
         parser.setRDFHandler(new StatementCollector(model));
         parser.parse(new ByteArrayInputStream(outputStream.toByteArray()), "");
         
-        Assert.assertEquals(30, model.size());
+        Assert.assertEquals(31, model.size());
     }
     
     /**

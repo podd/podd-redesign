@@ -59,7 +59,7 @@ import com.github.podd.utils.PoddRdfConstants;
 public abstract class AbstractPoddOWLManagerTest
 {
     /** Expected number of triples in PODD-Base schema ontology. */
-    protected static final int PODD_BASE_TRIPLE_COUNT = 283;
+    protected static final int PODD_BASE_TRIPLE_COUNT = 257;
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -173,7 +173,7 @@ public abstract class AbstractPoddOWLManagerTest
         // prepare: load, infer and store PODD-Base ontology
         final InferredOWLOntologyID inferredOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 
-                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7, 195);
+                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 3, 183);
         
         // prepare: remove from cache
         this.testOWLManager.removeCache(inferredOntologyID.getBaseOWLOntologyID());
@@ -210,13 +210,13 @@ public abstract class AbstractPoddOWLManagerTest
         // prepare: 1) load, infer, store PODD-Base ontology
         final InferredOWLOntologyID pbInferredOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 
-                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7, 195);
+                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 3, 183);
         final URI pbBaseOntologyURI = pbInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pbVersionURI = pbInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
         // prepare: 2) load, infer, store PODD-Science ontology
         final InferredOWLOntologyID pScienceInferredOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML, 1143, 444);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML, 1265, 472);
         final URI pScienceBaseOntologyURI = pScienceInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pScienceVersionURI = pScienceInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
@@ -290,19 +290,19 @@ public abstract class AbstractPoddOWLManagerTest
         // prepare: 1) load, infer, store PODD-Base ontology
         final InferredOWLOntologyID pbInferredOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 
-                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7, 195);
+                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 3, 183);
         final URI pbBaseOntologyURI = pbInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pbVersionURI = pbInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
         // prepare: 2) load, infer, store PODD-Science ontology
         final InferredOWLOntologyID pScienceInferredOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML, 1143, 444);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML, 1265, 472);
         final URI pScienceBaseOntologyURI = pScienceInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pScienceVersionURI = pScienceInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
         // prepare: 3) load, infer, store PODD-Plant ontology
         final InferredOWLOntologyID pPlantInferredOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_PLANT, RDFFormat.RDFXML, 83, 467);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_PLANT, RDFFormat.RDFXML, 83, 495);
         final URI pPlantBaseOntologyURI = pPlantInferredOntologyID.getOntologyIRI().toOpenRDFURI();
         final URI pPlantVersionURI = pPlantInferredOntologyID.getVersionIRI().toOpenRDFURI();
         
@@ -399,7 +399,7 @@ public abstract class AbstractPoddOWLManagerTest
         // prepare: load, infer and store a schema ontology
         final InferredOWLOntologyID inferredOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 
-                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7, 195);
+                        AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 3, 183);
         
         Assert.assertNotNull("Ontology should already be in memory", this.testOWLManager.getOWLOntologyManager()
                 .getOntology(inferredOntologyID));
@@ -621,7 +621,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.testOWLManager.dumpOntologyToRepository(nextOntology, this.testRepositoryConnection, context);
         
         // verify:
-        Assert.assertEquals("Dumped statement count not expected value", AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7,
+        Assert.assertEquals("Dumped statement count not expected value", AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 3,
                 this.testRepositoryConnection.size(context));
     }
     
@@ -676,7 +676,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         // verify:
         final URI context = nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-        Assert.assertEquals("Dumped statement count not expected value", AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 7,
+        Assert.assertEquals("Dumped statement count not expected value", AbstractPoddOWLManagerTest.PODD_BASE_TRIPLE_COUNT + 3,
                 this.testRepositoryConnection.size(context));
     }
     
@@ -897,7 +897,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         Assert.assertNotNull("Inferred Ontology ID was null", inferredOntologyID);
         Assert.assertNotNull("Inferred Ontology Version IRI was null", inferredOntologyID.getVersionIRI());
-        Assert.assertEquals("Incorrect no. of inferred statements", 195,
+        Assert.assertEquals("Incorrect no. of inferred statements", 183,
                 this.testRepositoryConnection.size(inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI()));
         
         // try to infer same ontology again

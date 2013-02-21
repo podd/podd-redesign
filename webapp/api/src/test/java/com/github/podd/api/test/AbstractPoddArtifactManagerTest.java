@@ -269,11 +269,11 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID inferredPUserOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 290, 195);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 260, 183);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1143, 444);
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1265, 472);
         final InferredOWLOntologyID inferredPPlantOntologyID =
-                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 83, 467);
+                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 83, 495);
         
         // prepare: update schema management graph
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
@@ -433,7 +433,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
         // verify:
-        this.verifyLoadedArtifact(resultArtifactId, 6, 32, 479, false);
+        this.verifyLoadedArtifact(resultArtifactId, 6, 32, 530, false);
     }
     
     /**
@@ -535,9 +535,9 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID inferredPUserOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 290, 195);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 260, 183);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1143, 444);
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1265, 472);
         
         // prepare: update schema management graph
         this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
@@ -591,7 +591,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
         // verify
-        this.verifyLoadedArtifact(firstArtifactId, 6, 32, 479, false);
+        this.verifyLoadedArtifact(firstArtifactId, 6, 33, 532, false);
         Assert.assertEquals("Version IRI of loaded ontology not expected value", firstArtifactId.getOntologyIRI()
                 .toString().concat(":version:1"), firstArtifactId.getVersionIRI().toString());
     }
@@ -615,7 +615,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 6, 32, 479, false);
+        this.verifyLoadedArtifact(firstArtifactId, 6, 32, 530, false);
         
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
@@ -623,8 +623,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID secondArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 12, 32, 479, false);
-        this.verifyLoadedArtifact(secondArtifactId, 12, 28, 474, true);
+        this.verifyLoadedArtifact(firstArtifactId, 12, 32, 530, false);
+        this.verifyLoadedArtifact(secondArtifactId, 12, 29, 523, true);
     }
     
     /**
@@ -648,7 +648,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 6, 28, 474, false);
+        this.verifyLoadedArtifact(firstArtifactId, 6, 29, 523, false);
         
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
@@ -662,7 +662,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertFalse("Two versions should NOT have the same Version IRI", firstArtifactId.getVersionIRI()
                 .toString().equals(secondArtifactId.getVersionIRI().toString()));
         
-        this.verifyLoadedArtifact(secondArtifactId, 6, 24, 462, false);
+        this.verifyLoadedArtifact(secondArtifactId, 6, 25, 511, false);
     }
     
     /**
@@ -684,7 +684,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID artifactId =
                 this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(artifactId, 6, 28, 474, true);
+        this.verifyLoadedArtifact(artifactId, 6, 29, 523, true);
         
         Assert.assertFalse("Version IRI in source should have been ignored", artifactId.getVersionIRI().toString()
                 .endsWith(":55"));
@@ -710,7 +710,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
         final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
-        this.verifyLoadedArtifact(unpublishedArtifactId, 6, 32, 479, false);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 6, 32, 530, false);
         
         // invoke method under test
         final InferredOWLOntologyID publishedArtifactId =
