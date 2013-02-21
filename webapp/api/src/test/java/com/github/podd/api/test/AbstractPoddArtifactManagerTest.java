@@ -47,6 +47,7 @@ import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
@@ -379,6 +380,51 @@ public abstract class AbstractPoddArtifactManagerTest
     public void tearDown() throws Exception
     {
         this.testArtifactManager = null;
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     * Tests that the artifact manager can delete an artifact when there was a single version
+     * loaded, and the version is given to the deleteArtifact method.
+     */
+    @Test
+    public final void testDeleteArtifactWithVersionSingle() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        // invoke test method
+        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        
+        // verify:
+        this.verifyLoadedArtifact(resultArtifactId, 6, 32, 479, false);
+        
+        Assert.assertTrue("Could not delete artifact", this.testArtifactManager.deleteArtifact(resultArtifactId));
+        
+        try
+        {
+            this.testArtifactManager.getArtifactByIRI(resultArtifactId.getOntologyIRI());
+            
+            Assert.fail("Current contract is to throw an exception when someone tries to get an artifact that does not exist");
+        }
+        catch(UnmanagedArtifactIRIException e)
+        {
+            Assert.assertNotNull("Exception did not contain the requested artifact IRI", e.getOntologyID());
+            
+            Assert.assertEquals("IRI on the exception did not match our expected IRI",
+                    resultArtifactId.getOntologyIRI(), e.getOntologyID());
+        }
+        
     }
     
     @Test
@@ -868,8 +914,9 @@ public abstract class AbstractPoddArtifactManagerTest
             
             // verify: a single PUBLICATION_STATUS in asserted ontology
             final List<Statement> publicationStatusStatementList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                            null, false, inferredOntologyId.getVersionIRI().toOpenRDFURI()));
+                    Iterations.asList(nextRepositoryConnection.getStatements(null,
+                            PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS, null, false, inferredOntologyId
+                                    .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
                     publicationStatusStatementList.size());
             
