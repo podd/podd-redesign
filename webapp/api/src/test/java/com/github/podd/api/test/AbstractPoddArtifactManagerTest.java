@@ -47,6 +47,7 @@ import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
@@ -409,6 +410,21 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(resultArtifactId, 6, 32, 479, false);
         
         Assert.assertTrue("Could not delete artifact", this.testArtifactManager.deleteArtifact(resultArtifactId));
+        
+        try
+        {
+            this.testArtifactManager.getArtifactByIRI(resultArtifactId.getOntologyIRI());
+            
+            Assert.fail("Current contract is to throw an exception when someone tries to get an artifact that does not exist");
+        }
+        catch(UnmanagedArtifactIRIException e)
+        {
+            Assert.assertNotNull("Exception did not contain the requested artifact IRI", e.getOntologyID());
+            
+            Assert.assertEquals("IRI on the exception did not match our expected IRI",
+                    resultArtifactId.getOntologyIRI(), e.getOntologyID());
+        }
+        
     }
     
     @Test

@@ -3,13 +3,17 @@
  */
 package com.github.podd.impl;
 
+import info.aduna.iteration.Iterations;
+
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -40,11 +44,84 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     @Override
-    public List<OWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI, final RepositoryConnection connection,
-            final URI ontologyManagementGraph)
+    public void deleteOntologies(Collection<InferredOWLOntologyID> givenOntologies,
+            RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
     {
-        // TODO Auto-generated method stub
-        return null;
+        for(InferredOWLOntologyID nextOntologyID : givenOntologies)
+        {
+            List<InferredOWLOntologyID> versionInternal =
+                    this.getAllVersionsInternal(nextOntologyID.getOntologyIRI(), repositoryConnection, managementGraph);
+            boolean updateCurrentVersion = false;
+            InferredOWLOntologyID newCurrentVersion = null;
+            
+            // If there were managed versions, and the head of the list, which is the current
+            // version by convention, is the same as out version, then we need to update it,
+            // otherwise we don't need to update it.
+            if(!versionInternal.isEmpty()
+                    && versionInternal.get(0).getVersionIRI().equals(nextOntologyID.getVersionIRI()))
+            {
+                updateCurrentVersion = true;
+                if(versionInternal.size() > 1)
+                {
+                    // FIXME: Improve this version detection...
+                    newCurrentVersion = versionInternal.get(1);
+                }
+            }
+            
+            // clear out the direct and inferred ontology graphs
+            repositoryConnection.remove((URI)null, null, null, nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
+            repositoryConnection.remove((URI)null, null, null, nextOntologyID.getVersionIRI().toOpenRDFURI());
+            
+            // clear out references attached to the version and inferred IRIs in the management
+            // graph
+            repositoryConnection.remove(nextOntologyID.getVersionIRI().toOpenRDFURI(), null, null, managementGraph);
+            repositoryConnection.remove(nextOntologyID.getInferredOntologyIRI().toOpenRDFURI(), null, null,
+                    managementGraph);
+            
+            // clear out references linked to the version and inferred IRIs in the management graph
+            repositoryConnection
+                    .remove((URI)null, null, nextOntologyID.getVersionIRI().toOpenRDFURI(), managementGraph);
+            repositoryConnection.remove((URI)null, null, nextOntologyID.getInferredOntologyIRI().toOpenRDFURI(),
+                    managementGraph);
+            
+            if(updateCurrentVersion)
+            {
+                List<Statement> asList =
+                        Iterations.asList(repositoryConnection.getStatements(nextOntologyID.getOntologyIRI()
+                                .toOpenRDFURI(), PoddRdfConstants.OMV_CURRENT_VERSION, null, false, managementGraph));
+                
+                if(asList.size() != 1)
+                {
+                    log.error("Did not find a unique managed current version for ontology with ID: {} List was: {}",
+                            nextOntologyID, asList);
+                }
+                
+                // remove the current versions from the management graph
+                repositoryConnection.remove(asList, managementGraph);
+                
+                // If there is no replacement available, then wipe the slate clean in the management
+                // graph
+                if(newCurrentVersion == null)
+                {
+                    repositoryConnection.remove(nextOntologyID.getOntologyIRI().toOpenRDFURI(), null, null,
+                            managementGraph);
+                }
+                else
+                {
+                    // Push the next current version into the management graph
+                    repositoryConnection.add(nextOntologyID.getOntologyIRI().toOpenRDFURI(),
+                            PoddRdfConstants.OMV_CURRENT_VERSION, newCurrentVersion.getVersionIRI().toOpenRDFURI(),
+                            managementGraph);
+                }
+            }
+        }
+    }
+    
+    @Override
+    public List<InferredOWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI,
+            final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
+    {
+        return getAllVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
     }
     
     /*
@@ -109,8 +186,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     private InferredOWLOntologyID getCurrentVersionInternal(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
     {
-        // FIXME: TODO
-        return null;
+        List<InferredOWLOntologyID> list = getAllVersionsInternal(ontologyIRI, repositoryConnection, managementGraph);
+        
+        if(list.isEmpty())
+        {
+            return null;
+        }
+        else
+        {
+            return list.get(0);
+        }
     }
     
     /**

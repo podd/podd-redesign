@@ -3,6 +3,7 @@
  */
 package com.github.podd.api;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -38,9 +39,10 @@ public interface PoddSesameManager
      *            The repository connection to use when querying for ontology versions.
      * @param ontologyManagementGraph
      *            The URI identifying the context in which the ontologies are managed.
+     * @throws OpenRDFException
      */
-    List<OWLOntologyID> getAllOntologyVersions(IRI ontologyIRI, RepositoryConnection connection,
-            URI ontologyManagementGraph);
+    List<InferredOWLOntologyID> getAllOntologyVersions(IRI ontologyIRI, RepositoryConnection connection,
+            URI ontologyManagementGraph) throws OpenRDFException;
     
     /**
      * Returns current version details of an artifact ontology which has the given IRI as the
@@ -132,5 +134,22 @@ public interface PoddSesameManager
      */
     void setPublished(IRI ontologyIRI, RepositoryConnection repositoryConnection, URI context) throws OpenRDFException,
         UnmanagedArtifactIRIException;
+    
+    /**
+     * Deletes the given ontologies, including removing and rearranging their links in the ontology
+     * management graph as necessary.
+     * 
+     * @param requestedArtifactIds
+     *            A collection of InferredOWLOntologyID objects containing the ontologies to be
+     *            deleted, including the inferred ontology IRIs.
+     * @param repositoryConnection
+     *            The connection to the repository to use.
+     * @param ontologyManagementGraph
+     *            The URI of the context in the repository containing the management information for
+     *            the ontologies.
+     * @throws OpenRDFException
+     */
+    void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
+            RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
     
 }

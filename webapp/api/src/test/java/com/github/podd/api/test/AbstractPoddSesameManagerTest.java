@@ -9,6 +9,7 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -79,8 +80,8 @@ public abstract class AbstractPoddSesameManagerTest
      * {@link com.github.podd.api.PoddSesameManager#isPublished(OWLOntologyID, RepositoryConnection)}
      * 
      */
-    private boolean internalTestIsPublished(final String testResourcePath, final int expectedSize, final URI contextCumVersionIRI)
-        throws Exception
+    private boolean internalTestIsPublished(final String testResourcePath, final int expectedSize,
+            final URI contextCumVersionIRI) throws Exception
     {
         // prepare: load the ontology into the test repository
         final InputStream inputStream = this.getClass().getResourceAsStream(testResourcePath);
@@ -183,6 +184,13 @@ public abstract class AbstractPoddSesameManagerTest
                 pPlantInferredURI, schemaGraph);
         
         return schemaGraph;
+    }
+    
+    @Ignore
+    @Test
+    public void testDeleteOntologies() throws Exception
+    {
+        Assert.fail("TODO: Implement me");
     }
     
     /**

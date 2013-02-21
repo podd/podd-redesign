@@ -8,7 +8,9 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -81,38 +83,70 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public boolean deleteArtifact(final OWLOntologyID artifactId) throws PoddException
     {
-        OWLOntologyID realArtifactId = artifactId;
-        
-        if(realArtifactId.getOntologyIRI() == null)
+        if(artifactId.getOntologyIRI() == null)
         {
             throw new PoddRuntimeException("Ontology IRI cannot be null");
         }
         
+        RepositoryConnection connection = null;
+        
         try
         {
-            final RepositoryConnection connection = this.getRepositoryManager().getRepository().getConnection();
+            connection = this.getRepositoryManager().getRepository().getConnection();
             
-            if(realArtifactId.getVersionIRI() != null)
+            List<InferredOWLOntologyID> requestedArtifactIds =
+                    this.getSesameManager().getAllOntologyVersions(artifactId.getOntologyIRI(), connection,
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            if(artifactId.getVersionIRI() != null)
             {
-                this.getSesameManager().getAllOntologyVersions(realArtifactId.getOntologyIRI(), connection,
-                        this.getRepositoryManager().getArtifactManagementGraph());
+                IRI requestedVersionIRI = artifactId.getVersionIRI();
                 
-                realArtifactId =
-                        this.getSesameManager().getCurrentArtifactVersion(realArtifactId.getOntologyIRI(), connection,
-                                this.getRepositoryManager().getArtifactManagementGraph());
-            }
-            else
-            {
-                // check if the version is valid, if not
+                for(InferredOWLOntologyID nextVersion : new ArrayList<InferredOWLOntologyID>(requestedArtifactIds))
+                {
+                    if(requestedVersionIRI.equals(nextVersion.getVersionIRI()))
+                    {
+                        requestedArtifactIds = Arrays.asList(nextVersion);
+                    }
+                }
             }
             
+            connection.begin();
+            this.getSesameManager().deleteOntologies(requestedArtifactIds, connection,
+                    this.getRepositoryManager().getArtifactManagementGraph());
+            connection.commit();
+            
+            return !requestedArtifactIds.isEmpty();
         }
         catch(final OpenRDFException e)
         {
-            throw new DeleteArtifactException("Repository exception occurred", e, realArtifactId);
+            try
+            {
+                if(connection != null && connection.isActive())
+                {
+                    connection.rollback();
+                }
+            }
+            catch(RepositoryException e1)
+            {
+            }
+            
+            throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
         }
-        
-        return false;
+        finally
+        {
+            try
+            {
+                if(connection != null && connection.isOpen())
+                {
+                    connection.close();
+                }
+            }
+            catch(RepositoryException e)
+            {
+                throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
+            }
+        }
     }
     
     @Override
