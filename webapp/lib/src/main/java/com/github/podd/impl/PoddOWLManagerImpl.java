@@ -311,8 +311,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         axiomGenerators.add(new InferredObjectPropertyCharacteristicAxiomGenerator());
         
         // NOTE: InferredPropertyAssertionGenerator significantly slows down inference computation
-        // axiomGenerators.add(new
-        // org.semanticweb.owlapi.util.InferredPropertyAssertionGenerator());
+        axiomGenerators.add(new org.semanticweb.owlapi.util.InferredPropertyAssertionGenerator());
         
         axiomGenerators.add(new InferredSubClassAxiomGenerator());
         axiomGenerators.add(new InferredSubDataPropertyAxiomGenerator());
