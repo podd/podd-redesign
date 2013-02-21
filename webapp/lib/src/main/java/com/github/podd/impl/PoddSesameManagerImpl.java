@@ -3,6 +3,7 @@
  */
 package com.github.podd.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -149,7 +150,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final String nextVersionIRI = nextResult.getValue("cv").stringValue();
             final String nextInferredIRI = nextResult.getValue("civ").stringValue();
             
-            return new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), IRI.create(nextInferredIRI));
+            return Arrays.asList(new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), IRI
+                    .create(nextInferredIRI)));
         }
         
         // 2: see if the given IRI exists as a version IRI
@@ -172,9 +174,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final String nextOntologyIRI = nextResult.getValue("x").stringValue();
             final String nextInferredIRI = nextResult.getValue("civ").stringValue();
             
-            return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI.create(nextInferredIRI));
+            return Arrays.asList(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI
+                    .create(nextInferredIRI)));
         }
-        return null;
+        return Collections.emptyList();
     }
     
     /*
