@@ -263,8 +263,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("rdfsRangeUri", RDFS.RANGE);
         dataModel.put("util", new FreemarkerUtil());
         
-        // TODO: hard coded values
-        // dataModel.put("canEditObject", true);
+        // FIXME: determine based on project status and user authorization
+        dataModel.put("canEditObject", true);
         
         // -TODO: populate refers to list
         final List<Object> refersToList = new ArrayList<Object>();

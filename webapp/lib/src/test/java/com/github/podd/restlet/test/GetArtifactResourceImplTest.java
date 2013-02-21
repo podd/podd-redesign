@@ -89,7 +89,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         final String body = results.getText();
         
         // verify:
-        // System.out.println(body);
+         System.out.println(body);
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
         
