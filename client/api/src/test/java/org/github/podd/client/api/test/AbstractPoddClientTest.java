@@ -96,11 +96,33 @@ public abstract class AbstractPoddClientTest
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#deleteArtifact(OWLOntologyID)} .
      */
-    @Ignore
     @Test
     public final void testDeleteArtifact() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        final OWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        Assert.assertNotNull(newArtifact);
+        Assert.assertNotNull(newArtifact.getOntologyIRI());
+        Assert.assertNotNull(newArtifact.getVersionIRI());
+        
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
+        
+        this.testClient.downloadArtifact(new OWLOntologyID(newArtifact.getOntologyIRI()), outputStream,
+                RDFFormat.RDFJSON);
+        
+        final Model model = new LinkedHashModel();
+        
+        final RDFParser parser = Rio.createParser(RDFFormat.RDFJSON);
+        parser.setRDFHandler(new StatementCollector(model));
+        parser.parse(new ByteArrayInputStream(outputStream.toByteArray()), "");
+        
+        Assert.assertEquals(31, model.size());
+        
+        Assert.assertTrue(this.testClient.deleteArtifact(new OWLOntologyID(newArtifact.getOntologyIRI())));
     }
     
     /**

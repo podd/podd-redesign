@@ -13,6 +13,7 @@ import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,17 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
         boolean result;
         try
         {
-            result = this.getPoddApplication().getPoddArtifactManager().deleteArtifact(new OWLOntologyID());
+            String artifactId = this.getQueryValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+            
+            if(artifactId == null)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                        "Did not find an artifacturi parameter in the request");
+            }
+            
+            result =
+                    this.getPoddApplication().getPoddArtifactManager()
+                            .deleteArtifact(new OWLOntologyID(IRI.create(artifactId)));
             if(result)
             {
                 this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
