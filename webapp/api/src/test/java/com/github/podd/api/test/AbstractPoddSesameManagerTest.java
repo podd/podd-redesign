@@ -4,12 +4,12 @@
 package com.github.podd.api.test;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -45,35 +45,6 @@ public abstract class AbstractPoddSesameManagerTest
     private RepositoryConnection testRepositoryConnection;
     
     public abstract PoddSesameManager getNewPoddSesameManagerInstance();
-    
-    /**
-     * @throws java.lang.Exception
-     */
-    @Before
-    public void setUp() throws Exception
-    {
-        this.testPoddSesameManager = this.getNewPoddSesameManagerInstance();
-        Assert.assertNotNull("Null implementation of test OWLManager", this.testPoddSesameManager);
-        
-        // create a memory Repository for tests
-        this.testRepository = new SailRepository(new MemoryStore());
-        this.testRepository.initialize();
-        this.testRepositoryConnection = this.testRepository.getConnection();
-        this.testRepositoryConnection.begin();
-    }
-    
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception
-    {
-        this.testRepositoryConnection.rollback();
-        this.testRepositoryConnection.close();
-        this.testRepository.shutDown();
-        
-        this.testPoddSesameManager = null;
-    }
     
     /**
      * Helper method for testing
@@ -186,11 +157,71 @@ public abstract class AbstractPoddSesameManagerTest
         return schemaGraph;
     }
     
-    @Ignore
-    @Test
-    public void testDeleteOntologies() throws Exception
+    /**
+     * @throws java.lang.Exception
+     */
+    @Before
+    public void setUp() throws Exception
     {
-        Assert.fail("TODO: Implement me");
+        this.testPoddSesameManager = this.getNewPoddSesameManagerInstance();
+        Assert.assertNotNull("Null implementation of test OWLManager", this.testPoddSesameManager);
+        
+        // create a memory Repository for tests
+        this.testRepository = new SailRepository(new MemoryStore());
+        this.testRepository.initialize();
+        this.testRepositoryConnection = this.testRepository.getConnection();
+        this.testRepositoryConnection.begin();
+    }
+    
+    /**
+     * @throws java.lang.Exception
+     */
+    @After
+    public void tearDown() throws Exception
+    {
+        this.testRepositoryConnection.rollback();
+        this.testRepositoryConnection.close();
+        this.testRepository.shutDown();
+        
+        this.testPoddSesameManager = null;
+    }
+    
+    @Test
+    public void testDeleteOntologiesSingleValid() throws Exception
+    {
+        // prepare: create artifact management graph
+        final URI artifactGraph = this.populateArtifactManagementGraph();
+        
+        // invoke test method:
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testPoddSesameManager.getCurrentArtifactVersion(
+                        IRI.create("http://purl.org/podd//99-99/version:1"), this.testRepositoryConnection,
+                        artifactGraph);
+        
+        // verify:
+        Assert.assertNotNull("Returned NULL inferredOntologyID", inferredOntologyID);
+        Assert.assertEquals("Not the expected current version", IRI.create("http://purl.org/podd//99-99/version:1"),
+                inferredOntologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected current inferred version",
+                IRI.create("urn:inferred:http://purl.org/podd/99-99/version:1"),
+                inferredOntologyID.getInferredOntologyIRI());
+        
+        this.testPoddSesameManager.deleteOntologies(Arrays.asList(inferredOntologyID), this.testRepositoryConnection,
+                artifactGraph);
+        
+        try
+        {
+            this.testPoddSesameManager.getCurrentArtifactVersion(inferredOntologyID.getOntologyIRI(),
+                    this.testRepositoryConnection, artifactGraph);
+            Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
+                    e.getMessage());
+            Assert.assertEquals(inferredOntologyID.getOntologyIRI(), e.getOntologyID());
+        }
+        
     }
     
     /**
@@ -223,33 +254,6 @@ public abstract class AbstractPoddSesameManagerTest
      * 
      */
     @Test
-    public void testGetCurrentArtifactVersionWithUnmanagedOntologyIRI() throws Exception
-    {
-        // prepare: create artifact management graph
-        final URI artifactGraph = this.populateArtifactManagementGraph();
-        
-        final IRI ontologyIRI = IRI.create("http://purl.org/podd/no-such-artifact:999");
-        try
-        {
-            this.testPoddSesameManager.getCurrentArtifactVersion(ontologyIRI, this.testRepositoryConnection,
-                    artifactGraph);
-            Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
-        }
-        catch(final UnmanagedArtifactIRIException e)
-        {
-            Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
-                    e.getMessage());
-            Assert.assertEquals(ontologyIRI, e.getOntologyID());
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getCurrentArtifactVersion(org.semanticweb.owlapi.model.IRI, org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)}
-     * .
-     * 
-     */
-    @Test
     public void testGetCurrentArtifactVersionWithOntologyIRI() throws Exception
     {
         // prepare: create artifact management graph
@@ -268,6 +272,33 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Not the expected current inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/99-99/version:1"),
                 inferredOntologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getCurrentArtifactVersion(org.semanticweb.owlapi.model.IRI, org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)}
+     * .
+     * 
+     */
+    @Test
+    public void testGetCurrentArtifactVersionWithUnmanagedOntologyIRI() throws Exception
+    {
+        // prepare: create artifact management graph
+        final URI artifactGraph = this.populateArtifactManagementGraph();
+        
+        final IRI ontologyIRI = IRI.create("http://purl.org/podd/no-such-artifact:999");
+        try
+        {
+            this.testPoddSesameManager.getCurrentArtifactVersion(ontologyIRI, this.testRepositoryConnection,
+                    artifactGraph);
+            Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
+                    e.getMessage());
+            Assert.assertEquals(ontologyIRI, e.getOntologyID());
+        }
     }
     
     /**
@@ -327,32 +358,6 @@ public abstract class AbstractPoddSesameManagerTest
      * 
      */
     @Test
-    public void testGetCurrentSchemaVersionWithUnmanagedOntologyIRI() throws Exception
-    {
-        // prepare: create schema management graph
-        final URI schemaGraph = this.populateSchemaManagementGraph();
-        
-        final IRI ontologyIRI = IRI.create("http://purl.org/podd/ns/version/poddBase/999");
-        try
-        {
-            this.testPoddSesameManager.getCurrentSchemaVersion(ontologyIRI, this.testRepositoryConnection, schemaGraph);
-            Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
-        }
-        catch(final UnmanagedSchemaIRIException e)
-        {
-            Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
-                    e.getMessage());
-            Assert.assertEquals(ontologyIRI, e.getOntologyID());
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model.IRI)}
-     * .
-     * 
-     */
-    @Test
     public void testGetCurrentSchemaVersionWithOntologyIRI() throws Exception
     {
         // prepare: create schema management graph
@@ -370,6 +375,32 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Not the expected current inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddBase/1"),
                 inferredOntologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model.IRI)}
+     * .
+     * 
+     */
+    @Test
+    public void testGetCurrentSchemaVersionWithUnmanagedOntologyIRI() throws Exception
+    {
+        // prepare: create schema management graph
+        final URI schemaGraph = this.populateSchemaManagementGraph();
+        
+        final IRI ontologyIRI = IRI.create("http://purl.org/podd/ns/version/poddBase/999");
+        try
+        {
+            this.testPoddSesameManager.getCurrentSchemaVersion(ontologyIRI, this.testRepositoryConnection, schemaGraph);
+            Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
+        }
+        catch(final UnmanagedSchemaIRIException e)
+        {
+            Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
+                    e.getMessage());
+            Assert.assertEquals(ontologyIRI, e.getOntologyID());
+        }
     }
     
     /**
