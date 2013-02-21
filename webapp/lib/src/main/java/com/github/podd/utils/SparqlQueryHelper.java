@@ -485,4 +485,66 @@ public class SparqlQueryHelper
         }
         return poddObject;
     }
+    
+    /**
+     * Retrieves the most specific type of the given object. The "type" itself is returned as a
+     * PoddObject containing its URI, title and description.
+     * 
+     * Note: If multiple types are found, one is randomly returned. Including inferred statements is
+     * likely to lead to multiple types being allocated.
+     * 
+     * @param objectUri
+     *            The object whose type is to be determined
+     * @param repositoryConnection
+     * @param contexts
+     *            The graphs in which to search for the object type.
+     * @return
+     * @throws OpenRDFException
+     */
+    public PoddObject getObjectType(final URI objectUri, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ?poddTypeUri ?label ?description ");
+        sb.append(" WHERE { ");
+        sb.append(" ?objectUri <" + RDF.TYPE + "> ?poddTypeUri . ");
+        sb.append(" OPTIONAL { ?poddTypeUri <" + RDFS.LABEL + "> ?label } . \n");
+        sb.append(" OPTIONAL { ?poddTypeUri <" + RDFS.COMMENT + "> ?description . } \n");
+        sb.append(" }");
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("objectUri", objectUri);
+        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        
+        PoddObject poddObject = new PoddObject(objectUri);
+        try
+        {
+            if(queryResults.hasNext())
+            {
+                final BindingSet next = queryResults.next();
+                
+                poddObject = new PoddObject((URI)next.getValue("poddTypeUri"));
+                
+                if(next.getValue("label") != null)
+                {
+                    poddObject.setTitle(next.getValue("label").stringValue());
+                }
+                else
+                {
+                    poddObject.setTitle(poddObject.getUri().getLocalName());
+                }
+                
+                if(next.getValue("description") != null)
+                {
+                    poddObject.setDescription(next.getValue("description").stringValue());
+                }
+            }
+        }
+        finally
+        {
+            queryResults.close();
+        }
+        return poddObject;
+    }
+    
 }

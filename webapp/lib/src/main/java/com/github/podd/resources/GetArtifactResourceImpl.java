@@ -203,6 +203,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
             }
             
+            
             // the object to display (default is Top Object)
             URI objectUri = topObjectList.get(0).getUri();
             
@@ -211,16 +212,36 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToView);
             }
             
+            
             // hack together the list of contexts to query in
             ontologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
-            final List<URI> orderedProperties =
-                    sparql.getDirectProperties(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
             // ontologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+            
             
             // first get the title & description encapsulated in a PoddObject
             final PoddObject theObject = sparql.getPoddObject(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
-            
             dataModel.put("poddObject", theObject);
+            
+            
+            // find the object's type
+            final PoddObject theObjectType = sparql.getObjectType(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
+            if(theObjectType == null)
+            {
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
+            }
+            if (theObjectType.getTitle() != null)
+            {
+                dataModel.put("objectType", theObjectType.getTitle());
+            }
+            else
+            {
+                dataModel.put("objectType", theObjectType.getUri());
+            }
+
+            
+            // populate the properties of the object
+            final List<URI> orderedProperties =
+                    sparql.getDirectProperties(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
             
             final Model allNeededStatementsForDisplay =
                     sparql.getPoddObjectDetails(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
@@ -244,7 +265,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         // TODO: hard coded values
         // dataModel.put("canEditObject", true);
-        dataModel.put("objectType", "artifact");
         
         // -TODO: populate refers to list
         final List<Object> refersToList = new ArrayList<Object>();

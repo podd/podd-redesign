@@ -297,6 +297,46 @@ public class SparqlQueryTest extends AbstractOntologyTest
         }
     }
     
+    /**
+     * Test retrieve the type of a given object URI.
+     */
+    @Test
+    public void testGetObjectType() throws Exception
+    {
+        final InferredOWLOntologyID ontologyID1 = this.loadArtifact("/test/artifacts/basic-2.ttl", RDFFormat.TURTLE);
+        
+        final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
+        allContextsToQuery.add(ontologyID1.getVersionIRI().toOpenRDFURI());
+        final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
+        
+        this.conn = this.getConnection();
+        final String[] objectUris =
+                { "http://purl.org/podd/basic-1-20130205/object:2966",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                        "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", };
+        
+        final String[] expectedTypes =
+                { "http://purl.org/podd/ns/poddScience#Project", "http://purl.org/podd/ns/poddScience#Genotype",
+                        "http://purl.org/podd/ns/poddScience#Material",
+                        "http://purl.org/podd/ns/poddScience#ANZSRCAssertion", };
+        final String[] expectedLabels = { "Project", "Genotype", "Material", "ANZSRCAssertion", };
+        
+        // test in a loop for multiple podd objects
+        for(int i = 0; i < objectUris.length; i++)
+        {
+            final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
+            
+            final PoddObject poddObject = this.sparqlHelper.getObjectType(objectUri, this.conn, contexts);
+            
+            // verify:
+            Assert.assertNotNull("Type was null", poddObject);
+            Assert.assertEquals("Wrong type", ValueFactoryImpl.getInstance().createURI(expectedTypes[i]),
+                    poddObject.getUri());
+            Assert.assertEquals("Wrong label", expectedLabels[i], poddObject.getTitle());
+        }
+    }
+    
     @Test
     public void testGetPoddArtifactList() throws Exception
     {
@@ -330,12 +370,14 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 { "Project#2012-0006_ Cotton Leaf Morphology", "Demo genotype", "Squeekee material", "Not Applicable" };
         final String[] expectedDescriptions = { "Characterising normal and okra leaf shapes", null, null, null };
         
+        // test in a loop for multiple podd objects
         for(int i = 0; i < objectUris.length; i++)
         {
             final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
             
             final PoddObject poddObject = this.sparqlHelper.getPoddObject(objectUri, this.conn, contexts);
             
+            // verify:
             Assert.assertNotNull("Podd Object was null", poddObject);
             Assert.assertEquals("Wrong title", expectedTitles[i], poddObject.getTitle());
             Assert.assertEquals("Wrong description", expectedDescriptions[i], poddObject.getDescription());
