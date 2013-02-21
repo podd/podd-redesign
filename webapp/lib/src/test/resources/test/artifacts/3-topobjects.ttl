@@ -70,7 +70,7 @@
                                                     
                                                     poddBase:hasTopObjectStatus poddBase:Active ;
                                                     
-                                                    poddScience:hasANZSRC poddBase:NotApplicable ;
+                                                    poddScience:hasANZSRC poddScience:ANZSRC_NotApplicable ;
                                                     
                                                     poddBase:hasPublicationStatus poddBase:NotPublished ;
                                                     

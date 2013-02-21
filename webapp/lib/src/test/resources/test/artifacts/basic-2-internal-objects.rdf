@@ -54,7 +54,7 @@
 	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Characterising normal and okra leaf shapes</rdfs:comment>
 	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CSIRO HRPPC</poddBase:hasLeadInstitution>
 	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-05-22</poddBase:hasStartDate>
-	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddBase#NotApplicable"/>
+	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable"/>
 	<poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
 
 	<!-- To be added by PODD, not to be submitted by user -->

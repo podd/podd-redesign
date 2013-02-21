@@ -88,7 +88,7 @@
         <poddScience:hasProcess rdf:resource="urn:temp:uuid:artifact:1#Demo_Process2"/>
         <poddScience:hasPublication rdf:resource="urn:temp:uuid:artifact:1#publication45"/>
         <poddBase:hasTopObjectStatus rdf:resource="&poddBase;Active"/>
-        <poddScience:hasANZSRC rdf:resource="&poddBase;NotApplicable"/>
+        <poddScience:hasANZSRC rdf:resource="&poddScience;ANZSRC_NotApplicable"/>
         <poddBase:hasPublicationStatus rdf:resource="&poddBase;NotPublished"/>
         <dcterms:creator rdf:resource="mailto:helen.daily@csiro.au"/>
         <poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
