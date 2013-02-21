@@ -175,7 +175,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                         RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final String body = results.getText();
-        System.out.println(body);
+        // System.out.println(body);
         
         // verify: received contents are in RDF/JSON
         // Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));

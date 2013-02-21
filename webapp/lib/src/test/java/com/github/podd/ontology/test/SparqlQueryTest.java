@@ -80,7 +80,48 @@ public class SparqlQueryTest extends AbstractOntologyTest
     }
     
     @Test
-    public void testGetPoddObjectDetails() throws Exception
+    public void testGetPoddObjectDetailsWithInternalObject() throws Exception
+    {
+        // prepare: load test artifact
+        final String testResourcePath = "/test/artifacts/basic-2.ttl";
+        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
+        
+        this.conn = this.getConnection();
+        
+        final URI objectUri =
+                ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation");
+        
+        // Create a list of contexts made up of the schema ontologies and the asserted artifact.
+        // The inferred artifact graph is not included as we're only interested in asserted
+        // properties for display purposes.
+        final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
+        allContextsToQuery.add(nextOntologyID.getVersionIRI().toOpenRDFURI());
+        
+        // invoke method under test
+        final Model model =
+                this.sparqlHelper.getPoddObjectDetails(objectUri, this.conn, allContextsToQuery.toArray(new URI[0]));
+        
+        // verify:
+        Assert.assertEquals("Incorrect number of statements about object", 8, model.size());
+        
+        final Model modelLabelHasMaterial =
+                model.filter(ValueFactoryImpl.getInstance()
+                        .createURI("http://purl.org/podd/ns/poddScience#hasMaterial"), RDFS.LABEL, null);
+        Assert.assertEquals("Should be exactly 1 label for hasMaterial", 1, modelLabelHasMaterial.size());
+        Assert.assertEquals("Not the expected label for hasMaterial", "has Material",
+                modelLabelHasMaterial.objectString());
+        
+        final Model modelPropertyTriples =
+                model.filter(
+                        ValueFactoryImpl.getInstance().createURI(
+                                "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation"), null, null);
+        Assert.assertEquals("Incorrect number of statements with podd object as the subject.", 3,
+                modelPropertyTriples.size());
+    }
+    
+    @Test
+    public void testGetPoddObjectDetailsWithTopObject() throws Exception
     {
         // prepare: load test artifact
         final String testResourcePath = "/test/artifacts/basic-2.ttl";
@@ -91,10 +132,11 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI objectUri =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
         
-        // create a list of contexts to query
+        // Create a list of contexts made up of the schema ontologies and the asserted artifact.
+        // The inferred artifact graph is not included as we're only interested in asserted
+        // properties for display purposes.
         final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
         allContextsToQuery.add(nextOntologyID.getVersionIRI().toOpenRDFURI());
-        allContextsToQuery.add(nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
         
         // invoke method under test
         final Model model =
@@ -123,21 +165,22 @@ public class SparqlQueryTest extends AbstractOntologyTest
      * Test retrieve properties about a given Object
      */
     @Test
-    public void testGetPropertiesOfAnObject() throws Exception
+    public void testGetDirectPropertiesOfAnObject() throws Exception
     {
         final String testResourcePath = "/test/artifacts/basic-2.ttl";
         final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
         
-        // create a list of contexts to query
+        // Create a list of contexts made up of the schema ontologies and the asserted artifact.
+        // The inferred artifact graph is not included as we're only interested in asserted
+        // properties for display purposes.
         final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
         allContextsToQuery.add(nextOntologyID.getVersionIRI().toOpenRDFURI());
-        allContextsToQuery.add(nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
         final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
         
         this.conn = this.getConnection();
         
         final URI topObjectUri = this.sparqlHelper.getTopObjects(this.conn, contexts).get(0).getUri();
-        final List<URI> orderedPropertyUris = this.sparqlHelper.getProperties(topObjectUri, this.conn, contexts);
+        final List<URI> orderedPropertyUris = this.sparqlHelper.getDirectProperties(topObjectUri, this.conn, contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
@@ -272,22 +315,26 @@ public class SparqlQueryTest extends AbstractOntologyTest
     {
         final InferredOWLOntologyID ontologyID1 = this.loadArtifact("/test/artifacts/basic-2.ttl", RDFFormat.TURTLE);
         
+        final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
+        allContextsToQuery.add(ontologyID1.getVersionIRI().toOpenRDFURI());
+        final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
+        
         this.conn = this.getConnection();
         final String[] objectUris =
                 { "http://purl.org/podd/basic-1-20130205/object:2966",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial" };
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                        "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", };
         
         final String[] expectedTitles =
-                { "Project#2012-0006_ Cotton Leaf Morphology", "Demo genotype", "Squeekee material" };
-        final String[] expectedDescriptions = { "Characterising normal and okra leaf shapes", null, null };
+                { "Project#2012-0006_ Cotton Leaf Morphology", "Demo genotype", "Squeekee material", "Not Applicable" };
+        final String[] expectedDescriptions = { "Characterising normal and okra leaf shapes", null, null, null };
         
         for(int i = 0; i < objectUris.length; i++)
         {
             final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
             
-            final PoddObject poddObject =
-                    this.sparqlHelper.getPoddObject(objectUri, this.conn, ontologyID1.getVersionIRI().toOpenRDFURI());
+            final PoddObject poddObject = this.sparqlHelper.getPoddObject(objectUri, this.conn, contexts);
             
             Assert.assertNotNull("Podd Object was null", poddObject);
             Assert.assertEquals("Wrong title", expectedTitles[i], poddObject.getTitle());

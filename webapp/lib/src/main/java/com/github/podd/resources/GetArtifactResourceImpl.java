@@ -177,12 +177,14 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      *            The artifact to be viewed
      * @param objectToView
      *            An optional internal object to view
-     * @param schemaOntologyGraphs
+     * @param ontologyGraphs
+     *            The schema ontology graphs that should be part of the context for SPARQL
      * @param dataModel
+     *            Freemarker data model to be populated
      * @throws OpenRDFException
      */
     private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
-            final List<URI> schemaOntologyGraphs, final Map<String, Object> dataModel) throws OpenRDFException
+            final List<URI> ontologyGraphs, final Map<String, Object> dataModel) throws OpenRDFException
     {
         
         final RepositoryConnection conn =
@@ -208,19 +210,20 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToView);
             }
-            final PoddObject theObject =
-                    sparql.getPoddObject(objectUri, conn, ontologyID.getVersionIRI().toOpenRDFURI());
+            
+            // hack together the list of contexts to query in
+            ontologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
+            final List<URI> orderedProperties =
+                    sparql.getDirectProperties(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
+            // ontologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+            
+            // first get the title & description encapsulated in a PoddObject
+            final PoddObject theObject = sparql.getPoddObject(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
             
             dataModel.put("poddObject", theObject);
             
-            // hack together the list of contexts to query in
-            schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
-            schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
-            
-            final List<URI> orderedProperties =
-                    sparql.getProperties(objectUri, conn, schemaOntologyGraphs.toArray(new URI[0]));
             final Model allNeededStatementsForDisplay =
-                    sparql.getPoddObjectDetails(objectUri, conn, schemaOntologyGraphs.toArray(new URI[0]));
+                    sparql.getPoddObjectDetails(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
             
             dataModel.put("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
             dataModel.put("propertyList", orderedProperties);

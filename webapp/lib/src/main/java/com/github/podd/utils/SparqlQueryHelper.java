@@ -128,7 +128,7 @@ public class SparqlQueryHelper
     {
         final StringBuilder sb = new StringBuilder();
         
-        sb.append("SELECT ?containsProperty ?containedObject ?containedObjectLabel ");
+        sb.append("SELECT DISTINCT ?containsProperty ?containedObject ?containedObjectLabel ");
         
         sb.append(" WHERE { ");
         
@@ -264,7 +264,13 @@ public class SparqlQueryHelper
      * The result of this method is a Model containing all data required for displaying the details
      * of the object in HTML+RDFa.
      * 
-     * objectUri :propertyX value, propertyX RDFS:Label "label", propertyX RDFS:Range "XSD:String"
+     * The returned graph has the following structure.
+     * 
+     *       poddObject     :propertyUri    :value
+     *       
+     *       propertyUri    RDFS:Label      "property label"
+     *       
+     *       value          RDFS:Label      "value label"
      * 
      * @param objectUri
      * @param repositoryConnection
@@ -277,31 +283,22 @@ public class SparqlQueryHelper
     {
         final StringBuilder sb = new StringBuilder();
         
-        sb.append("CONSTRUCT { ?poddObject ?propertyUri ?value . ");
-        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
         sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
-        
         sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
         
         sb.append("} WHERE {");
         
-        sb.append("?poddObject ?propertyUri ?value . ");
-        
-        sb.append("?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
-        
-        // datatype may not be available directly as Range
-        sb.append("OPTIONAL {?propertyUri <" + RDFS.RANGE.stringValue() + "> ?propertyDataType } . ");
-        
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
         // value may not have a Label
-        sb.append("OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
-        sb.append("FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
-        
-        sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
-        
-        sb.append("FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
-        
-        sb.append("FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        sb.append(" FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
         
         sb.append("}");
         
@@ -325,40 +322,36 @@ public class SparqlQueryHelper
      * Retrieve a list of properties about the given object. The list is ordered based on property
      * weights.
      * 
+     * Note: If only asserted properties are required, the inferred ontology graph should not be
+     * included in the <i>contexts</i> passed into this method.
+     * 
      * @param objectUri
      * @param repositoryConnection
      * @param contexts
      * @return A Map containing all statements about the given object.
      * @throws OpenRDFException
      */
-    public List<URI> getProperties(final URI objectUri, final RepositoryConnection repositoryConnection,
+    public List<URI> getDirectProperties(final URI objectUri, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         
         sb.append("SELECT DISTINCT ?propertyUri ");
-        
         sb.append(" WHERE { ");
         
-        sb.append("?poddObject ?propertyUri ?value . ");
-        
-        sb.append("?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
-        
-        sb.append("OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        // value may not have a Label
+        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
         // for ORDER BY
         sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODDBASE_WEIGHT.stringValue() + "> ?weight } . ");
         
         sb.append("FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
-        
         sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
-        
         sb.append("FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
-        
         sb.append("FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
-        
         sb.append(" } ");
-        
         sb.append("  ORDER BY ASC(?weight) ASC(?propertyLabel) ");
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
