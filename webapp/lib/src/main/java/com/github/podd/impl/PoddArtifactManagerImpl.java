@@ -8,7 +8,9 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -42,6 +44,7 @@ import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlReference;
+import com.github.podd.exception.DeleteArtifactException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -78,6 +81,75 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
+    public boolean deleteArtifact(final OWLOntologyID artifactId) throws PoddException
+    {
+        if(artifactId.getOntologyIRI() == null)
+        {
+            throw new PoddRuntimeException("Ontology IRI cannot be null");
+        }
+        
+        RepositoryConnection connection = null;
+        
+        try
+        {
+            connection = this.getRepositoryManager().getRepository().getConnection();
+            
+            List<InferredOWLOntologyID> requestedArtifactIds =
+                    this.getSesameManager().getAllOntologyVersions(artifactId.getOntologyIRI(), connection,
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            if(artifactId.getVersionIRI() != null)
+            {
+                IRI requestedVersionIRI = artifactId.getVersionIRI();
+                
+                for(InferredOWLOntologyID nextVersion : new ArrayList<InferredOWLOntologyID>(requestedArtifactIds))
+                {
+                    if(requestedVersionIRI.equals(nextVersion.getVersionIRI()))
+                    {
+                        requestedArtifactIds = Arrays.asList(nextVersion);
+                    }
+                }
+            }
+            
+            connection.begin();
+            this.getSesameManager().deleteOntologies(requestedArtifactIds, connection,
+                    this.getRepositoryManager().getArtifactManagementGraph());
+            connection.commit();
+            
+            return !requestedArtifactIds.isEmpty();
+        }
+        catch(final OpenRDFException e)
+        {
+            try
+            {
+                if(connection != null && connection.isActive())
+                {
+                    connection.rollback();
+                }
+            }
+            catch(RepositoryException e1)
+            {
+            }
+            
+            throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
+        }
+        finally
+        {
+            try
+            {
+                if(connection != null && connection.isOpen())
+                {
+                    connection.close();
+                }
+            }
+            catch(RepositoryException e)
+            {
+                throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
+            }
+        }
+    }
+    
+    @Override
     public void exportArtifact(final InferredOWLOntologyID ontologyId, final OutputStream outputStream,
             final RDFFormat format, final boolean includeInferred) throws OpenRDFException, PoddException, IOException
     {
@@ -90,8 +162,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             throw new PoddRuntimeException("Inferred Ontology IRI cannot be null");
         }
-        
-        RepositoryConnection connection = this.getRepositoryManager().getRepository().getConnection();
         
         List<URI> contexts;
         
@@ -106,13 +176,20 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             contexts = Arrays.asList(ontologyId.getVersionIRI().toOpenRDFURI());
         }
         
+        RepositoryConnection connection = null;
+        
         try
         {
+            connection = this.getRepositoryManager().getRepository().getConnection();
+            
             connection.export(Rio.createWriter(format, outputStream), contexts.toArray(new Resource[] {}));
         }
         finally
         {
-            connection.close();
+            if(connection != null)
+            {
+                connection.close();
+            }
         }
     }
     
@@ -128,7 +205,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             return this.getSesameManager().getCurrentArtifactVersion(artifactIRI, repositoryConnection,
                     this.getRepositoryManager().getArtifactManagementGraph());
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new UnmanagedArtifactIRIException(artifactIRI, e);
         }
@@ -140,7 +217,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 {
                     repositoryConnection.close();
                 }
-                catch(RepositoryException e)
+                catch(final RepositoryException e)
                 {
                     this.log.error("Failed to close repository connection", e);
                 }
@@ -197,6 +274,42 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public PoddSesameManager getSesameManager()
     {
         return this.sesameManager;
+    }
+    
+    /**
+     * This is not an API method. QUESTION: Should this be moved to a separate utility class?
+     * 
+     * This method takes a String terminating with a colon (":") followed by an integer and
+     * increments this integer by one. If the input String is not of the expected format, appends
+     * "1" to the end of the String.
+     * 
+     * E.g.: "http://purl.org/ab/artifact:55" is converted to "http://purl.org/ab/artifact:56"
+     * "http://purl.org/ab/artifact:5A" is converted to "http://purl.org/ab/artifact:5A1"
+     * 
+     * @param oldVersion
+     * @return
+     */
+    public String incrementVersion(final String oldVersion)
+    {
+        final char versionSeparatorChar = ':';
+        
+        final int positionVersionSeparator = oldVersion.lastIndexOf(versionSeparatorChar);
+        if(positionVersionSeparator > 1)
+        {
+            final String prefix = oldVersion.substring(0, positionVersionSeparator);
+            final String version = oldVersion.substring(positionVersionSeparator + 1);
+            try
+            {
+                int versionInt = Integer.parseInt(version);
+                versionInt++;
+                return prefix + versionSeparatorChar + versionInt;
+            }
+            catch(final NumberFormatException e)
+            {
+                return oldVersion.concat("1");
+            }
+        }
+        return oldVersion.concat("1");
     }
     
     /*
@@ -434,42 +547,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
             }
         }
-    }
-    
-    /**
-     * This is not an API method. QUESTION: Should this be moved to a separate utility class?
-     * 
-     * This method takes a String terminating with a colon (":") followed by an integer and
-     * increments this integer by one. If the input String is not of the expected format, appends
-     * "1" to the end of the String.
-     * 
-     * E.g.: "http://purl.org/ab/artifact:55" is converted to "http://purl.org/ab/artifact:56"
-     * "http://purl.org/ab/artifact:5A" is converted to "http://purl.org/ab/artifact:5A1"
-     * 
-     * @param oldVersion
-     * @return
-     */
-    public String incrementVersion(final String oldVersion)
-    {
-        final char versionSeparatorChar = ':';
-        
-        final int positionVersionSeparator = oldVersion.lastIndexOf(versionSeparatorChar);
-        if(positionVersionSeparator > 1)
-        {
-            final String prefix = oldVersion.substring(0, positionVersionSeparator);
-            final String version = oldVersion.substring(positionVersionSeparator + 1);
-            try
-            {
-                int versionInt = Integer.parseInt(version);
-                versionInt++;
-                return prefix + versionSeparatorChar + versionInt;
-            }
-            catch(final NumberFormatException e)
-            {
-                return oldVersion.concat("1");
-            }
-        }
-        return oldVersion.concat("1");
     }
     
     /*

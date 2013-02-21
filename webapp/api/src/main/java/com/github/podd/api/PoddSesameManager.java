@@ -3,6 +3,8 @@
  */
 package com.github.podd.api;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -19,31 +21,28 @@ import com.github.podd.utils.InferredOWLOntologyID;
  * Manages interactions with Sesame Repositories for PODD.
  * 
  * @author kutila
- * @since 07/01/2013
+ * @author Peter Ansell p_ansell@yahoo.com
  */
 public interface PoddSesameManager
 {
     
     /**
-     * Returns current version details of an ontology which has the given IRI as the Ontology IRI or
-     * Version IRI.
+     * Get all versions of the ontology with the given IRI that are managed in the given context in
+     * the given repository connection.
+     * <p>
+     * If there are multiple versions available, then the most current version must be first in the
+     * list.
      * 
      * @param ontologyIRI
-     *            The IRI of the ontology to get current version info.
-     * @param repositoryConnection
-     * @param managementGraph
-     *            The context of the Schema Management Graph
-     * @return An InferredOWLOntologyID containing details of the current managed version of the
-     *         ontology.
+     *            The Ontology IRI identifying the ontology for which versions must be accessed.
+     * @param connection
+     *            The repository connection to use when querying for ontology versions.
+     * @param ontologyManagementGraph
+     *            The URI identifying the context in which the ontologies are managed.
      * @throws OpenRDFException
-     * @throws UnmanagedSchemaIRIException
-     *             If the given IRI does not refer to a managed schema ontology
-     * 
-     * @since 18/12/2012
      */
-    InferredOWLOntologyID getCurrentSchemaVersion(final IRI ontologyIRI,
-            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
-        UnmanagedSchemaIRIException;
+    List<InferredOWLOntologyID> getAllOntologyVersions(IRI ontologyIRI, RepositoryConnection connection,
+            URI ontologyManagementGraph) throws OpenRDFException;
     
     /**
      * Returns current version details of an artifact ontology which has the given IRI as the
@@ -67,6 +66,27 @@ public interface PoddSesameManager
         UnmanagedArtifactIRIException;
     
     /**
+     * Returns current version details of an ontology which has the given IRI as the Ontology IRI or
+     * Version IRI.
+     * 
+     * @param ontologyIRI
+     *            The IRI of the ontology to get current version info.
+     * @param repositoryConnection
+     * @param managementGraph
+     *            The context of the Schema Management Graph
+     * @return An InferredOWLOntologyID containing details of the current managed version of the
+     *         ontology.
+     * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
+     *             If the given IRI does not refer to a managed schema ontology
+     * 
+     * @since 18/12/2012
+     */
+    InferredOWLOntologyID getCurrentSchemaVersion(final IRI ontologyIRI,
+            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
+        UnmanagedSchemaIRIException;
+    
+    /**
      * Retrieves the ontology IRIs for all import statements found in the given Repository
      * Connection.
      * 
@@ -87,8 +107,7 @@ public interface PoddSesameManager
      *         representing an ontology.
      * @throws OpenRDFException
      */
-    public abstract IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException;
+    IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context) throws OpenRDFException;
     
     /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
@@ -115,5 +134,22 @@ public interface PoddSesameManager
      */
     void setPublished(IRI ontologyIRI, RepositoryConnection repositoryConnection, URI context) throws OpenRDFException,
         UnmanagedArtifactIRIException;
+    
+    /**
+     * Deletes the given ontologies, including removing and rearranging their links in the ontology
+     * management graph as necessary.
+     * 
+     * @param requestedArtifactIds
+     *            A collection of InferredOWLOntologyID objects containing the ontologies to be
+     *            deleted, including the inferred ontology IRIs.
+     * @param repositoryConnection
+     *            The connection to the repository to use.
+     * @param ontologyManagementGraph
+     *            The URI of the context in the repository containing the management information for
+     *            the ontologies.
+     * @throws OpenRDFException
+     */
+    void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
+            RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
     
 }

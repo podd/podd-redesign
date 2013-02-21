@@ -82,10 +82,34 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public boolean deleteArtifact(final OWLOntologyID ontologyIRI) throws PoddClientException
+    public boolean deleteArtifact(final OWLOntologyID artifactId) throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return false;
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_DELETE));
+        resource.getCookies().addAll(this.currentCookies);
+        
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
+        
+        if(artifactId.getVersionIRI() != null)
+        {
+            // FIXME: Versions are not supported in general by PODD, but they are important for
+            // verifying the state of the client to allow for early failure in cases where the
+            // client is out of date.
+            resource.addQueryParameter("versionUri", artifactId.getVersionIRI().toString());
+        }
+        
+        resource.delete();
+        
+        if(resource.getStatus().isSuccess())
+        {
+            return true;
+        }
+        else
+        {
+            throw new PoddClientException("Failed to successfully delete artifact: "
+                    + artifactId.getOntologyIRI().toString());
+        }
     }
     
     @Override

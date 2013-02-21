@@ -1,8 +1,8 @@
 package com.github.podd.exception;
 
 /**
- * This class extends <code>java.lang.Exception</code> to provide a PODD specific exception base
- * class.
+ * This class extends <code>java.lang.Exception</code> to provide a PODD specific checked exception
+ * base class.
  * 
  * This exception class is abstract and cannot be directly instantiated.
  * 
