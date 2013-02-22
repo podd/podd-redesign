@@ -57,14 +57,25 @@ public class PoddStatusService extends StatusService
     {
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(request);
         
-        dataModel.put("contentTemplate",
-                "error.html.ftl");
+        dataModel.put("contentTemplate", "error.html.ftl");
         dataModel.put("pageTitle", "An error occurred : HTTP " + status.getCode());
         dataModel.put("error_code", Integer.toString(status.getCode()));
         
+        final StringBuilder message = new StringBuilder();
+        if(status.getDescription() != null)
+        {
+            message.append(status.getDescription());
+            message.append(" (");
+        }
+        if(status.getThrowable() != null && status.getThrowable().getMessage() != null)
+        {
+            message.append(status.getThrowable().getMessage());
+            message.append(")");
+        }
+        dataModel.put("message", message.toString());
+        
         // TODO: Support non-HTML error representations
-        return RestletUtils.getHtmlRepresentation(
-                "poddBase.html.ftl",
-                dataModel, MediaType.TEXT_HTML, this.freemarkerConfiguration);
+        return RestletUtils.getHtmlRepresentation("poddBase.html.ftl", dataModel, MediaType.TEXT_HTML,
+                this.freemarkerConfiguration);
     }
 }
