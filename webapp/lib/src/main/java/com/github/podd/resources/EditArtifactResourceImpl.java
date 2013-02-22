@@ -3,76 +3,111 @@
  */
 package com.github.podd.resources;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
-import org.openrdf.model.URI;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
+import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.PoddArtifactManager;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
+import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
  * 
- * TODO: Empty class with logic not implemented
- * 
- * Edit an artifact from PODD. 
- * This resource handles requests for edit with merge and replacement policies.
+ * Edit an artifact from PODD.
  * 
  * @author kutila
  * 
  */
 public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
 {
-    
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    @Get
-    public Representation editArtifactPageHtml(final Representation entity) throws ResourceException
+    /**
+     * View the edit artifact page in HTML
+     */
+    @Get("html")
+    public Representation getEditArtifactHtml(final Representation entity) throws ResourceException
     {
-        //TODO: obtain URI of artifact being edited
-        Collection<URI> objectUris = Collections.<URI>emptySet();
-
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, objectUris);
+        this.log.info("getEditArtifactHtml");
         
-        this.log.info("editArtifactHtml");
+        // the artifact in which editing is requested
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        if(artifactUri == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
+        }
+        
+        // Podd object to be edited. NULL indicates top object is to be edited.
+        final String objectUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
+        
+        this.log.info("requesting to edit artifact (HTML): {}, {}", artifactUri, objectUri);
+        
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
+                Collections.singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+        
         final User user = this.getRequest().getClientInfo().getUser();
-        
         this.log.info("authenticated user: {}", user);
         
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "index.html.ftl");
-        dataModel.put("pageTitle", "TODO: Edit Artifact");
+        // validate artifact exists
+        InferredOWLOntologyID ontologyID;
+        try
+        {
+            final PoddArtifactManager artifactManager =
+                    ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
+            ontologyID = artifactManager.getArtifactByIRI(IRI.create(artifactUri));
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
+        }
         
-        final Map<String, Object> artifactDataMap = this.getRequestedArtifact();
-        dataModel.put("requestedArtifact", artifactDataMap);
+        final Map<String, Object> dataModel = this.populateDataModelForGet(ontologyID, objectUri);
         
-        // Output the base template, with contentTemplate from the dataModel defining the
-        // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    // FIXME: populating dummy info for test
-    private Map<String, Object> getRequestedArtifact()
+    /**
+     * Internal method to populate the Freemarker Data Model for Get request
+     * 
+     * @param ontologyID
+     *            The Artifact to be edited
+     * @param objectToEdit
+     *            The specific PODD object to edit.
+     * @return The populated data model
+     */
+    private Map<String, Object> populateDataModelForGet(final InferredOWLOntologyID ontologyID,
+            final String objectToEdit)
     {
-        final Map<String, Object> testArtifactMap = new HashMap<String, Object>();
-        testArtifactMap.put("TODO: ", "Implement EditArtifactResourceImpl");
-        
-        final Map<String, String> roleMap = new HashMap<String, String>();
-        roleMap.put("description", "A dummy user account for testing");
-        testArtifactMap.put("repositoryRole", roleMap);
+        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
+        dataModel.put("contentTemplate", "editObject.html.ftl");
+        dataModel.put("pageTitle", "Edit Artifact");
+        try
+        {
+            // TODO
+            dataModel.put("initialized", true);
             
-        return testArtifactMap;
+        }
+        catch(final Exception e) // should be OpenRDFException
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
+        }
+        
+        return dataModel;
     }
     
 }

@@ -12,11 +12,6 @@
 <#-- @ftlvariable name="elementList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" -->
 <#-- @ftlvariable name="refersList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" -->
 <#-- @ftlvariable name="fileList" type="java.util.ArrayList<podd.resources.util.view.FileElement>" -->
-<#-- @ftlvariable name="createdDate" type="java.lang.String" -->
-<#-- @ftlvariable name="createdBy" type="java.lang.String" -->
-<#-- @ftlvariable name="createdDate" type="java.lang.String" -->
-<#-- @ftlvariable name="modifiedBy" type="java.lang.String" -->
-<#-- @ftlvariable name="modifiedDate" type="java.lang.String" -->
 <#-- @ftlvariable name="canComplete" type="boolean" -->
 <#-- @ftlvariable name="aHREF" type="java.lang.String" -->
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
@@ -65,7 +60,8 @@
 
 <br>
 <#include "parent_details.html.ftl"/>
-<form name="create_project" enctype="multipart/form-data" action="${postUrl}" method="POST" onsubmit="">
+<form name="create_project" enctype="multipart/form-data" action="${baseUrl}/artifact/edit/merge" method="POST" onsubmit="">
+<#-- hidden inputs for artifact & object URIs ??-->
 <#if initialized>
     <div id="buttonwrapper">
         <button type="submit" name="reinitialize" value="reinitialize">ReInitialize</button>
@@ -105,19 +101,6 @@
 	            </#list>
                 </#if>
 
-                <!-- creation infomation -->
-                <#if  createdBy??>
-                <li><span class="bold">Creator: </span>${createdBy}</li>
-                </#if>
-                <#if  createdDate??>
-                <li><span class="bold">Creation date: </span>${createdDate!""}</li>
-                </#if>
-                <#if  modifiedBy??>
-                <li><span class="bold">Last modified by: </span>${modifiedBy}</li>
-                </#if>
-                <#if  modifiedDate??>
-                <li><span class="bold">Last modification date: </span>${modifiedDate!""}</li>
-                </#if>
             </ol>
         </div>
     </div>  <!-- details - Collapsible div -->
