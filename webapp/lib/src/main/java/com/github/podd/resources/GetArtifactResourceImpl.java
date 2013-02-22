@@ -6,7 +6,6 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddArtifactManager;
-import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -97,7 +95,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
         
-        final List<URI> schemaOntologyGraphs = new ArrayList<URI>(Arrays.asList(this.tempSchemaGraphs));// this.getSchemaOntologyGraphs();
+        final List<URI> schemaOntologyGraphs = new ArrayList<URI>(SparqlQueryHelper.getSchemaOntologyGraphs());
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
@@ -304,52 +302,24 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         return list;
     }
     
-    // FIXME: hard coded until Schema Manager is implemented
-    URI[] tempSchemaGraphs = {
-            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/dcTerms/1"),
-            ValueFactoryImpl.getInstance().createURI(
-                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/dcTerms/1"),
-            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/foaf/1"),
-            ValueFactoryImpl.getInstance().createURI(
-                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/foaf/1"),
-            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddUser/1"),
-            ValueFactoryImpl.getInstance().createURI(
-                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddUser/1"),
-            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddBase/1"),
-            ValueFactoryImpl.getInstance().createURI(
-                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddBase/1"),
-            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/1"),
-            ValueFactoryImpl.getInstance().createURI(
-                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1"), };
-    
-    private List<URI> getSchemaOntologyGraphs()
+    // FIXME: cannot work until Schema Manager is implemented
+    protected List<URI> getSchemaOntologyGraphs() throws UnmanagedSchemaIRIException
     {
+        String[] schemaOntologies =
+                { PoddRdfConstants.PODD_DCTERMS, PoddRdfConstants.PODD_FOAF, PoddRdfConstants.PODD_USER,
+                        PoddRdfConstants.PODD_BASE, PoddRdfConstants.PODD_SCIENCE, PoddRdfConstants.PODD_PLANT };
+        
         final List<URI> schemaOntologyGraphs = new ArrayList<URI>();
         
-        final PoddSchemaManager schemaManager =
-                ((PoddWebServiceApplication)this.getApplication()).getPoddSchemaManager();
-        final String[] schemaPaths =
-                { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
-                        PoddRdfConstants.PATH_PODD_BASE, PoddRdfConstants.PATH_PODD_SCIENCE,
-                        PoddRdfConstants.PATH_PODD_PLANT };
-        
-        for(final String schemaPath : schemaPaths)
+        for(String schema : schemaOntologies)
         {
-            try
-            {
-                final InferredOWLOntologyID inferredID =
-                        schemaManager.getCurrentSchemaOntologyVersion(IRI.create(schemaPath));
-                // add graph names
-                schemaOntologyGraphs.add(inferredID.getVersionIRI().toOpenRDFURI());
-                schemaOntologyGraphs.add(inferredID.getInferredOntologyIRI().toOpenRDFURI());
-            }
-            catch(final UnmanagedSchemaIRIException e1)
-            {
-                this.log.error("Could not locate schema ontology {}", schemaPath);
-                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not locate schema ontology");
-            }
+            InferredOWLOntologyID ontologyID =
+                    this.getPoddApplication().getPoddSchemaManager()
+                            .getCurrentSchemaOntologyVersion(IRI.create(schema));
+            schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
+            schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
         }
         return schemaOntologyGraphs;
     }
-    
+
 }

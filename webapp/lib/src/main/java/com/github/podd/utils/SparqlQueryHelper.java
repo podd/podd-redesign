@@ -1,6 +1,7 @@
 package com.github.podd.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.TreeModel;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -546,5 +548,34 @@ public class SparqlQueryHelper
         }
         return poddObject;
     }
+
+    /**
+     * Retrieves the list of contexts in which all PODD schema ontologies are stored.
+     * 
+     */
+    public static List<URI> getSchemaOntologyGraphs()
+    {
+        return Arrays.asList(tempSchemaGraphs);
+    }
+    
+    
+    
+    private static URI[] tempSchemaGraphs = {
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/dcTerms/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/dcTerms/1"),
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/foaf/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/foaf/1"),
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddUser/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddUser/1"),
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddBase/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddBase/1"),
+            ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/1"),
+            ValueFactoryImpl.getInstance().createURI(
+                    "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1"), };
+    
     
 }
