@@ -6,6 +6,7 @@ package com.github.podd.client.impl.restlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.List;
 
 import org.openrdf.model.Model;
@@ -239,8 +240,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public List<OWLOntologyID> listPublishedArtifacts() throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return null;
+        return listArtifactsInternal(true, false);
     }
     
     /*
@@ -251,8 +251,28 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public List<OWLOntologyID> listUnpublishedArtifacts() throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return null;
+        return listArtifactsInternal(false, true);
+    }
+    
+    private List<OWLOntologyID> listArtifactsInternal(boolean published, boolean unpublished)
+        throws PoddClientException
+    {
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
+        resource.getCookieSettings().addAll(this.currentCookies);
+        
+        resource.addQueryParameter("published", Boolean.toString(published));
+        resource.addQueryParameter("unpublished", Boolean.toString(unpublished));
+        
+        Representation get = resource.get();
+        
+        Model results = new LinkedHashModel();
+        
+        RDFParser parser = Rio.createParser(Rio.getParserFormatForMIMEType(get.getMediaType().getName(), RDFFormat.RDFXML));
+        parser.setRDFHandler(new StatementCollector(results));
+        
+        
+        
+        return Collections.emptyList();
     }
     
     /*
