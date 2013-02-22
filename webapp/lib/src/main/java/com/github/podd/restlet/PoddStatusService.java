@@ -65,10 +65,10 @@ public class PoddStatusService extends StatusService
         if(status.getDescription() != null)
         {
             message.append(status.getDescription());
-            message.append(" (");
         }
         if(status.getThrowable() != null && status.getThrowable().getMessage() != null)
         {
+            message.append(" (");
             message.append(status.getThrowable().getMessage());
             message.append(")");
         }
