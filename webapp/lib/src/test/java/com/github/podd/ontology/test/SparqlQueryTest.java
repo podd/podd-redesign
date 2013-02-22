@@ -283,17 +283,17 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 this.sparqlHelper.getContainedObjects(parentObjectURI, true, this.conn, contextUri, nextOntologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         
-        // String[] expectedLabels = {"Demo Analysis", "Demo Process 1", "Demo Process 2",
-        // "Demo Project Plan", "Demo investigation"};
+        final String[] expectedLabels =
+                { "Demo Analysis", "Demo Process 1", "Demo Process 2", "Demo Project Plan", "Demo investigation",
+                        "PODD - Towards An Extensible, Domain-agnostic Scientific Data Management System",
+                        "Platform 1", "Demo material", "Squeekee material", "my treatment 1", "Demo genotype",
+                        "Genotype 2", "Genotype 3", "sequence a", };
         
         Assert.assertEquals("Incorrect number of direct child objects", 14, childObjectList.size());
         for(int i = 0; i < childObjectList.size(); i++)
         {
             System.out.println(childObjectList.get(i).getTitle());
-            // Assert.assertEquals("Incorrect direct parent", parentObjectURI,
-            // childObjectList.get(i).getDirectParent());
-            // Assert.assertEquals("Incorrect object at position", expectedLabels[i],
-            // childObjectList.get(i).getLabel());
+            Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getTitle());
         }
     }
     
