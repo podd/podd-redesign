@@ -5,7 +5,7 @@
 <#-- @ftlvariable name="postUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="title" type="java.lang.String" -->
 <#-- @ftlvariable name="objectPID" type="java.lang.String" -->
-<#-- @ftlvariable name="typeName" type="java.lang.String" -->
+<#-- @ftlvariable name="objectType" type="java.lang.String" -->
 <#-- @ftlvariable name="isProject" type="boolean" -->
 <#-- @ftlvariable name="objectName" type="java.lang.String" -->
 <#-- @ftlvariable name="objectDescription" type="java.lang.String" -->
@@ -68,7 +68,7 @@
     </div>
 <#else>
 
-	<h3 class="underlined_heading">${typeName!""} Details
+	<h3 class="underlined_heading">${objectType!""} Details
 		<a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 	</h3>
 	<div id="details">  <!-- Collapsible div -->
