@@ -44,13 +44,10 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private SparqlQueryHelper sparql;
-
     /** Constructor */
     public EditArtifactResourceImpl()
     {
         super();
-        this.sparql = new SparqlQueryHelper();
     }
     
     /**
@@ -130,7 +127,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             List<URI> contexts = new ArrayList<URI>(SparqlQueryHelper.getSchemaOntologyGraphs());
             contexts.add(ontologyID.getVersionIRI().toOpenRDFURI());
             
-            PoddObject objectType = this.sparql.getObjectType(objectUri, conn, contexts.toArray(new URI[0]));
+            PoddObject objectType = SparqlQueryHelper.getObjectType(objectUri, conn, contexts.toArray(new URI[0]));
             
             dataModel.put("objectType", objectType.getTitle());
             
@@ -207,7 +204,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     {
         // get top-object of this artifact
         final List<PoddObject> topObjectList =
-                sparql.getTopObjects(conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
+                SparqlQueryHelper.getTopObjects(conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         if(topObjectList == null || topObjectList.size() != 1)
         {

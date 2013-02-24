@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class SparqlQueryHelper
 {
     
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private static Logger log = LoggerFactory.getLogger(SparqlQueryHelper.class.getName());
     
     /**
      * Helper method to execute a given SPARQL SELECT query.
@@ -54,14 +54,14 @@ public class SparqlQueryHelper
      * @return The
      * @throws OpenRDFException
      */
-    protected TupleQueryResult executeSparqlQuery(final String sparqlQuery,
+    protected static TupleQueryResult executeSparqlQuery(final String sparqlQuery,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
-        this.log.info("Executing SPARQL: \r\n {}", sparqlQuery);
+        SparqlQueryHelper.log.info("Executing SPARQL: \r\n {}", sparqlQuery);
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         
-        return this.executeSparqlQuery(query, contexts);
+        return SparqlQueryHelper.executeSparqlQuery(query, contexts);
     }
     
     /**
@@ -72,7 +72,7 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    protected TupleQueryResult executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
+    protected static TupleQueryResult executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
         throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
@@ -93,7 +93,7 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    protected GraphQueryResult executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts)
+    protected static GraphQueryResult executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts)
         throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
@@ -125,7 +125,7 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public List<PoddObject> getContainedObjects(final URI parentObject, final boolean recursive,
+    public static List<PoddObject> getContainedObjects(final URI parentObject, final boolean recursive,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
@@ -146,12 +146,12 @@ public class SparqlQueryHelper
         
         sb.append(" } ORDER BY ASC(?weight) ASC(?containedObjectLabel) ");
         
-        this.log.info("Executing SPARQL: \r\n {}", sb.toString());
+        SparqlQueryHelper.log.info("Executing SPARQL: \r\n {}", sb.toString());
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("parent", parentObject);
         
-        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
         final List<PoddObject> children = new ArrayList<PoddObject>();
         final List<URI> childURIs = new ArrayList<URI>();
@@ -179,7 +179,7 @@ public class SparqlQueryHelper
             for(final URI childUri : childURIs)
             {
                 final List<PoddObject> descendantList =
-                        this.getContainedObjects(childUri, true, repositoryConnection, contexts);
+                        SparqlQueryHelper.getContainedObjects(childUri, true, repositoryConnection, contexts);
                 children.addAll(descendantList);
             }
         }
@@ -195,11 +195,12 @@ public class SparqlQueryHelper
      * @deprecated Not Used. Delete if unnecessary
      */
     @Deprecated
-    public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI... contexts)
+    public static Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI... contexts)
         throws OpenRDFException
     {
         final String sparqlQuery = "SELECT ?x WHERE { ?y <" + OWL.IMPORTS.stringValue() + "> ?x ." + " }";
-        final TupleQueryResult queryResults = this.executeSparqlQuery(sparqlQuery, repositoryConnection, contexts);
+        final TupleQueryResult queryResults =
+                SparqlQueryHelper.executeSparqlQuery(sparqlQuery, repositoryConnection, contexts);
         
         final Set<IRI> results = Collections.newSetFromMap(new ConcurrentHashMap<IRI, Boolean>());
         try
@@ -227,7 +228,7 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public List<URI> getPoddArtifactList(final RepositoryConnection repositoryConnection, final URI artifactGraph)
+    public static List<URI> getPoddArtifactList(final RepositoryConnection repositoryConnection, final URI artifactGraph)
         throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
@@ -239,11 +240,11 @@ public class SparqlQueryHelper
         
         sb.append(" } ");
         
-        this.log.info("Executing SPARQL: \r\n {}", sb.toString());
+        SparqlQueryHelper.log.info("Executing SPARQL: \r\n {}", sb.toString());
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         
-        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, artifactGraph);
+        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, artifactGraph);
         
         final List<URI> artifacts = new ArrayList<URI>();
         try
@@ -268,11 +269,11 @@ public class SparqlQueryHelper
      * 
      * The returned graph has the following structure.
      * 
-     *       poddObject     :propertyUri    :value
-     *       
-     *       propertyUri    RDFS:Label      "property label"
-     *       
-     *       value          RDFS:Label      "value label"
+     * poddObject :propertyUri :value
+     * 
+     * propertyUri RDFS:Label "property label"
+     * 
+     * value RDFS:Label "value label"
      * 
      * @param objectUri
      * @param repositoryConnection
@@ -280,7 +281,7 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public Model getPoddObjectDetails(final URI objectUri, final RepositoryConnection repositoryConnection,
+    public static Model getPoddObjectDetails(final URI objectUri, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
@@ -307,7 +308,7 @@ public class SparqlQueryHelper
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
         graphQuery.setBinding("poddObject", objectUri);
         
-        final GraphQueryResult queryResults = this.executeGraphQuery(graphQuery, contexts);
+        final GraphQueryResult queryResults = SparqlQueryHelper.executeGraphQuery(graphQuery, contexts);
         
         final Model model = new TreeModel();
         
@@ -333,7 +334,7 @@ public class SparqlQueryHelper
      * @return A Map containing all statements about the given object.
      * @throws OpenRDFException
      */
-    public List<URI> getDirectProperties(final URI objectUri, final RepositoryConnection repositoryConnection,
+    public static List<URI> getDirectProperties(final URI objectUri, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
@@ -358,7 +359,7 @@ public class SparqlQueryHelper
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddObject", objectUri);
-        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
         final List<URI> resultList = new ArrayList<URI>();
         try
@@ -388,7 +389,7 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public List<PoddObject> getTopObjects(final RepositoryConnection repositoryConnection, final URI... contexts)
+    public static List<PoddObject> getTopObjects(final RepositoryConnection repositoryConnection, final URI... contexts)
         throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
@@ -405,7 +406,8 @@ public class SparqlQueryHelper
         
         sb.append(" }");
         
-        final TupleQueryResult queryResults = this.executeSparqlQuery(sb.toString(), repositoryConnection, contexts);
+        final TupleQueryResult queryResults =
+                SparqlQueryHelper.executeSparqlQuery(sb.toString(), repositoryConnection, contexts);
         
         final List<PoddObject> topObjectList = new ArrayList<PoddObject>();
         try
@@ -449,7 +451,7 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public PoddObject getPoddObject(final URI objectUri, final RepositoryConnection repositoryConnection,
+    public static PoddObject getPoddObject(final URI objectUri, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
@@ -461,7 +463,7 @@ public class SparqlQueryHelper
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
-        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
         final PoddObject poddObject = new PoddObject(objectUri);
         try
@@ -503,7 +505,7 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public PoddObject getObjectType(final URI objectUri, final RepositoryConnection repositoryConnection,
+    public static PoddObject getObjectType(final URI objectUri, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
@@ -516,7 +518,7 @@ public class SparqlQueryHelper
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
-        final TupleQueryResult queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
         PoddObject poddObject = new PoddObject(objectUri);
         try
@@ -548,17 +550,15 @@ public class SparqlQueryHelper
         }
         return poddObject;
     }
-
+    
     /**
      * Retrieves the list of contexts in which all PODD schema ontologies are stored.
      * 
      */
     public static List<URI> getSchemaOntologyGraphs()
     {
-        return Arrays.asList(tempSchemaGraphs);
+        return Arrays.asList(SparqlQueryHelper.tempSchemaGraphs);
     }
-    
-    
     
     private static URI[] tempSchemaGraphs = {
             ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/dcTerms/1"),
@@ -576,6 +576,5 @@ public class SparqlQueryHelper
             ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/1"),
             ValueFactoryImpl.getInstance().createURI(
                     "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1"), };
-    
     
 }

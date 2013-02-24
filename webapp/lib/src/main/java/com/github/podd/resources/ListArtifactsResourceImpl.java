@@ -81,8 +81,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         {
             final URI artifactMgtGraph =
                     this.getPoddApplication().getPoddRepositoryManager().getArtifactManagementGraph();
-            final SparqlQueryHelper sparql = new SparqlQueryHelper();
-            final List<URI> uris = sparql.getPoddArtifactList(conn, artifactMgtGraph);
+            final List<URI> uris = SparqlQueryHelper.getPoddArtifactList(conn, artifactMgtGraph);
             
             final List<PoddArtifact> artifacts = new ArrayList<PoddArtifact>();
             for(final URI artifactUri : uris)
