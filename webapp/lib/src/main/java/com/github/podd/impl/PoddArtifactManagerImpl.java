@@ -369,7 +369,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 conn.close();
             }
         }
-        return Collections.emptyList();
+        return results;
     }
     
     /*

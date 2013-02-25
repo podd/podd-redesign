@@ -254,9 +254,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             // remove the content for all previous inferred versions
             // NOTE: This list should not ever be very large, as we perform this step every time
             // this method is called to update the version
+            // FIXME: This needs to be a more complex query written in SPARQL, as the previous
+            // versions are not all easy to find using getStatements
             final RepositoryResult<Statement> repoResults =
-                    nextRepositoryConnection.getStatements(nextOntologyUri,
-                            PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, false, this.artifactGraph);
+                    nextRepositoryConnection.getStatements(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                            null, false, this.artifactGraph);
             while(repoResults.hasNext())
             {
                 final URI inferredVersionUri = IRI.create(repoResults.next().getObject().stringValue()).toOpenRDFURI();
@@ -268,11 +270,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 nextRepositoryConnection.remove(inferredVersionUri, null, null, this.artifactGraph);
             }
             
-            nextRepositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null,
+            nextRepositoryConnection.remove(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null,
                     this.artifactGraph);
             
             // link from the ontology version IRI to the matching inferred axioms ontology version
-            nextRepositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+            nextRepositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
                     nextInferredOntologyUri, this.artifactGraph);
             
             nextRepositoryConnection.commit();

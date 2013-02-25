@@ -488,8 +488,10 @@ public abstract class AbstractPoddArtifactManagerTest
         this.log.info("published artifacts: {}", listPublishedArtifacts);
         
         Assert.assertNotNull(listPublishedArtifacts);
-        Assert.assertTrue(listPublishedArtifacts.contains(publishedArtifactId));
         Assert.assertEquals(1, listPublishedArtifacts.size());
+        
+        InferredOWLOntologyID nextArtifact = listPublishedArtifacts.iterator().next();
+        Assert.assertEquals(unpublishedArtifactId.getOntologyIRI(), nextArtifact.getOntologyIRI());
         
         final Collection<InferredOWLOntologyID> listUnpublishedArtifacts =
                 this.testArtifactManager.listUnpublishedArtifacts();
@@ -526,8 +528,11 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.listUnpublishedArtifacts();
         
         Assert.assertNotNull(listUnpublishedArtifacts);
-        Assert.assertTrue(listUnpublishedArtifacts.contains(unpublishedArtifactId));
         Assert.assertEquals(1, listUnpublishedArtifacts.size());
+        
+        InferredOWLOntologyID nextArtifact = listUnpublishedArtifacts.iterator().next();
+        Assert.assertEquals(unpublishedArtifactId.getOntologyIRI(), nextArtifact.getOntologyIRI());
+        Assert.assertEquals(unpublishedArtifactId, nextArtifact);
     }
     
     /**
@@ -924,7 +929,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify: INFERRED_VERSION
         final List<Statement> inferredVersionStatementList =
-                Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
+                Iterations.asList(repositoryConnection.getStatements(versionIRI.toOpenRDFURI(),
                         PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, false, testGraph));
         Assert.assertEquals("Graph should have one INFERRED_VERSION statement", 1, inferredVersionStatementList.size());
         Assert.assertEquals("Wrong INFERRED_VERSION in Object", inferredVersionIRI.toString(),
