@@ -5,6 +5,7 @@ package com.github.podd.impl;
 
 import info.aduna.iteration.Iterations;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,9 +21,11 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.QueryResults;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
+import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -44,13 +47,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     @Override
-    public void deleteOntologies(Collection<InferredOWLOntologyID> givenOntologies,
-            RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
+    public void deleteOntologies(final Collection<InferredOWLOntologyID> givenOntologies,
+            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
     {
-        for(InferredOWLOntologyID nextOntologyID : givenOntologies)
+        for(final InferredOWLOntologyID nextOntologyID : givenOntologies)
         {
-            List<InferredOWLOntologyID> versionInternal =
-                    this.getAllVersionsInternal(nextOntologyID.getOntologyIRI(), repositoryConnection, managementGraph);
+            final List<InferredOWLOntologyID> versionInternal =
+                    this.getCurrentVersionsInternal(nextOntologyID.getOntologyIRI(), repositoryConnection, managementGraph);
             boolean updateCurrentVersion = false;
             InferredOWLOntologyID newCurrentVersion = null;
             
@@ -86,13 +89,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             if(updateCurrentVersion)
             {
-                List<Statement> asList =
+                final List<Statement> asList =
                         Iterations.asList(repositoryConnection.getStatements(nextOntologyID.getOntologyIRI()
                                 .toOpenRDFURI(), PoddRdfConstants.OMV_CURRENT_VERSION, null, false, managementGraph));
                 
                 if(asList.size() != 1)
                 {
-                    log.error("Did not find a unique managed current version for ontology with ID: {} List was: {}",
+                    this.log.error(
+                            "Did not find a unique managed current version for ontology with ID: {} List was: {}",
                             nextOntologyID, asList);
                 }
                 
@@ -121,7 +125,83 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public List<InferredOWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
     {
-        return getAllVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
+        return this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
+    }
+    
+    /**
+     * Inner helper method for getCurrentArtifactVersion() and getCurrentSchemaVersion().
+     * 
+     * @param ontologyIRI
+     * @param repositoryConnection
+     * @param managementGraph
+     * @return
+     * @throws OpenRDFException
+     */
+    private List<InferredOWLOntologyID> getCurrentVersionsInternal(final IRI ontologyIRI,
+            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
+    {
+        List<InferredOWLOntologyID> returnList = new ArrayList<InferredOWLOntologyID>();
+        
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(managementGraph);
+        dataset.addNamedGraph(managementGraph);
+        
+        // 1: see if the given IRI exists as an ontology IRI
+        final String sparqlQuery1 =
+                "SELECT ?cv ?civ WHERE { " + ontologyIRI.toQuotedString() + " <" + RDF.TYPE.stringValue() + "> <"
+                        + OWL.ONTOLOGY.stringValue() + "> . " + ontologyIRI.toQuotedString() + " <"
+                        + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . "
+                        + ontologyIRI.toQuotedString() + " <"
+                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . " + " }";
+        // SELECT ?cv ?civ WHERE { <iri> :type owl:ontology . <iri> omv:current-version ?cv . <iri>
+        // :current-inferred-version ?civ . }
+        this.log.info("Generated SPARQL {}", sparqlQuery1);
+        
+        final TupleQuery query1 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery1);
+        query1.setDataset(dataset);
+        
+        final TupleQueryResult query1Results = query1.evaluate();
+        
+        QueryResultCollector nextResults1 = new QueryResultCollector();
+        QueryResults.report(query1Results, nextResults1);
+        
+        for(BindingSet nextResult : nextResults1.getBindingSets())
+        {
+            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
+            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
+            
+            returnList.add(new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), IRI
+                    .create(nextInferredIRI)));
+        }
+        
+        // 2: see if the given IRI exists as a version IRI
+        final String sparqlQuery2 =
+                "SELECT ?x ?civ WHERE { " + " ?x <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> "
+                        + ontologyIRI.toQuotedString() + " . " + " ?x <" + RDF.TYPE.stringValue() + "> <"
+                        + OWL.ONTOLOGY.stringValue() + "> . " + " ?x <"
+                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . " + " }";
+        // SELECT ?x ?civ WHERE { ?x omv:current-version <iri> . ?x :type owl:ontology . ?x
+        // :current-inferred-version ?civ . }
+        this.log.info("Generated SPARQL {}", sparqlQuery2);
+        
+        final TupleQuery query2 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery2);
+        query2.setDataset(dataset);
+        
+        final TupleQueryResult queryResults2 = query2.evaluate();
+        
+        QueryResultCollector nextResults2 = new QueryResultCollector();
+        QueryResults.report(queryResults2, nextResults2);
+        
+        for(BindingSet nextResult : nextResults2.getBindingSets())
+        {
+            final String nextOntologyIRI = nextResult.getValue("x").stringValue();
+            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
+            
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI
+                    .create(nextInferredIRI)));
+        }
+        
+        return returnList;
     }
     
     /*
@@ -186,7 +266,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     private InferredOWLOntologyID getCurrentVersionInternal(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
     {
-        List<InferredOWLOntologyID> list = getAllVersionsInternal(ontologyIRI, repositoryConnection, managementGraph);
+        final List<InferredOWLOntologyID> list =
+                this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, managementGraph);
         
         if(list.isEmpty())
         {
@@ -196,73 +277,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             return list.get(0);
         }
-    }
-    
-    /**
-     * Inner helper method for getCurrentArtifactVersion() and getCurrentSchemaVersion().
-     * 
-     * @param ontologyIRI
-     * @param repositoryConnection
-     * @param managementGraph
-     * @return
-     * @throws OpenRDFException
-     */
-    private List<InferredOWLOntologyID> getAllVersionsInternal(final IRI ontologyIRI,
-            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
-    {
-        final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(managementGraph);
-        dataset.addNamedGraph(managementGraph);
-        
-        // 1: see if the given IRI exists as an ontology IRI
-        final String sparqlQuery1 =
-                "SELECT ?cv ?civ WHERE { " + ontologyIRI.toQuotedString() + " <" + RDF.TYPE.stringValue() + "> <"
-                        + OWL.ONTOLOGY.stringValue() + "> . " + ontologyIRI.toQuotedString() + " <"
-                        + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . "
-                        + ontologyIRI.toQuotedString() + " <"
-                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . " + " }";
-        // SELECT ?cv ?civ WHERE { <iri> :type owl:ontology . <iri> omv:current-version ?cv . <iri>
-        // :current-inferred-version ?civ . }
-        this.log.info("Generated SPARQL {}", sparqlQuery1);
-        
-        final TupleQuery query1 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery1);
-        query1.setDataset(dataset);
-        
-        final TupleQueryResult query1Results = query1.evaluate();
-        if(query1Results.hasNext())
-        {
-            final BindingSet nextResult = query1Results.next();
-            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
-            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
-            
-            return Arrays.asList(new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), IRI
-                    .create(nextInferredIRI)));
-        }
-        
-        // 2: see if the given IRI exists as a version IRI
-        final String sparqlQuery2 =
-                "SELECT ?x ?civ WHERE { " + " ?x <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> "
-                        + ontologyIRI.toQuotedString() + " . " + " ?x <" + RDF.TYPE.stringValue() + "> <"
-                        + OWL.ONTOLOGY.stringValue() + "> . " + " ?x <"
-                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . " + " }";
-        // SELECT ?x ?civ WHERE { ?x omv:current-version <iri> . ?x :type owl:ontology . ?x
-        // :current-inferred-version ?civ . }
-        this.log.info("Generated SPARQL {}", sparqlQuery2);
-        
-        final TupleQuery query2 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery2);
-        query2.setDataset(dataset);
-        
-        final TupleQueryResult queryResults2 = query2.evaluate();
-        if(queryResults2.hasNext())
-        {
-            final BindingSet nextResult = queryResults2.next();
-            final String nextOntologyIRI = nextResult.getValue("x").stringValue();
-            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
-            
-            return Arrays.asList(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI
-                    .create(nextInferredIRI)));
-        }
-        return Collections.emptyList();
     }
     
     /*
@@ -295,6 +309,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
         }
         return results;
+    }
+    
+    @Override
+    public Collection<InferredOWLOntologyID> getOntologies(final boolean onlyCurrentVersions,
+            final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
     
     /*
