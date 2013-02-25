@@ -6,6 +6,7 @@ package com.github.podd.api.test;
 import info.aduna.iteration.Iterations;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.After;
@@ -417,7 +418,7 @@ public abstract class AbstractPoddArtifactManagerTest
             
             Assert.fail("Current contract is to throw an exception when someone tries to get an artifact that does not exist");
         }
-        catch(UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException e)
         {
             Assert.assertNotNull("Exception did not contain the requested artifact IRI", e.getOntologyID());
             
@@ -455,6 +456,76 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testGetSchemaManager() throws Exception
     {
         Assert.assertNotNull("Schema Manager was null", this.testArtifactManager.getSchemaManager());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddArtifactManager#listPublishedArtifacts()}. .
+     */
+    @Test
+    public final void testListPublishedArtifacts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 6, 32, 530, false);
+        
+        // invoke method under test
+        final InferredOWLOntologyID publishedArtifactId =
+                this.testArtifactManager.publishArtifact(unpublishedArtifactId);
+        
+        Assert.assertNotNull(publishedArtifactId);
+        
+        final Collection<InferredOWLOntologyID> listPublishedArtifacts =
+                this.testArtifactManager.listPublishedArtifacts();
+        
+        Assert.assertNotNull(listPublishedArtifacts);
+        Assert.assertTrue(listPublishedArtifacts.contains(publishedArtifactId));
+        Assert.assertEquals(1, listPublishedArtifacts.size());
+        
+        final Collection<InferredOWLOntologyID> listUnpublishedArtifacts =
+                this.testArtifactManager.listUnpublishedArtifacts();
+        
+        Assert.assertNotNull(listUnpublishedArtifacts);
+        Assert.assertTrue(listUnpublishedArtifacts.isEmpty());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddArtifactManager#listPublishedArtifacts()}. .
+     */
+    @Test
+    public final void testListUnpublishedArtifacts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 6, 32, 530, false);
+        
+        final Collection<InferredOWLOntologyID> listPublishedArtifacts =
+                this.testArtifactManager.listPublishedArtifacts();
+        
+        Assert.assertNotNull(listPublishedArtifacts);
+        Assert.assertTrue(listPublishedArtifacts.isEmpty());
+        
+        final Collection<InferredOWLOntologyID> listUnpublishedArtifacts =
+                this.testArtifactManager.listUnpublishedArtifacts();
+        
+        Assert.assertNotNull(listUnpublishedArtifacts);
+        Assert.assertTrue(listUnpublishedArtifacts.contains(unpublishedArtifactId));
+        Assert.assertEquals(1, listUnpublishedArtifacts.size());
     }
     
     /**
