@@ -100,36 +100,43 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             unpublished = false;
         }
         
-        if(published)
+        try
         {
-            final Collection<InferredOWLOntologyID> publishedArtifacts =
-                    this.getPoddApplication().getPoddArtifactManager().listPublishedArtifacts();
-            
-            for(final InferredOWLOntologyID nextPublishedArtifact : publishedArtifacts)
+            if(published)
             {
-                try
+                final Collection<InferredOWLOntologyID> publishedArtifacts =
+                        this.getPoddApplication().getPoddArtifactManager().listPublishedArtifacts();
+                
+                for(final InferredOWLOntologyID nextPublishedArtifact : publishedArtifacts)
                 {
-                    this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ,
-                            Arrays.asList(nextPublishedArtifact.getOntologyIRI().toOpenRDFURI()));
-                }
-                catch(final ResourceException e)
-                {
-                    if(!e.getStatus().equals(Status.CLIENT_ERROR_FORBIDDEN))
+                    try
                     {
-                        throw e;
+                        this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ,
+                                Arrays.asList(nextPublishedArtifact.getOntologyIRI().toOpenRDFURI()));
                     }
-                    else
+                    catch(final ResourceException e)
                     {
-                        this.log.warn("Could not access published artifact: {}", nextPublishedArtifact);
+                        if(!e.getStatus().equals(Status.CLIENT_ERROR_FORBIDDEN))
+                        {
+                            throw e;
+                        }
+                        else
+                        {
+                            this.log.warn("Could not access published artifact: {}", nextPublishedArtifact);
+                        }
                     }
                 }
             }
+            
+            if(unpublished)
+            {
+                final Collection<InferredOWLOntologyID> unpublishedArtifacts =
+                        this.getPoddApplication().getPoddArtifactManager().listUnpublishedArtifacts();
+            }
         }
-        
-        if(unpublished)
+        catch(OpenRDFException e)
         {
-            final Collection<InferredOWLOntologyID> unpublishedArtifacts =
-                    this.getPoddApplication().getPoddArtifactManager().listUnpublishedArtifacts();
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Database exception", e);
         }
         
         throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED, "TODO: Implement listing of artifacts");

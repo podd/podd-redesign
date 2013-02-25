@@ -485,6 +485,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final Collection<InferredOWLOntologyID> listPublishedArtifacts =
                 this.testArtifactManager.listPublishedArtifacts();
         
+        this.log.info("published artifacts: {}", listPublishedArtifacts);
+        
         Assert.assertNotNull(listPublishedArtifacts);
         Assert.assertTrue(listPublishedArtifacts.contains(publishedArtifactId));
         Assert.assertEquals(1, listPublishedArtifacts.size());

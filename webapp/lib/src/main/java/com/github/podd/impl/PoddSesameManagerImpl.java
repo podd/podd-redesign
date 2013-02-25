@@ -53,7 +53,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         for(final InferredOWLOntologyID nextOntologyID : givenOntologies)
         {
             final List<InferredOWLOntologyID> versionInternal =
-                    this.getCurrentVersionsInternal(nextOntologyID.getOntologyIRI(), repositoryConnection, managementGraph);
+                    this.getCurrentVersionsInternal(nextOntologyID.getOntologyIRI(), repositoryConnection,
+                            managementGraph);
             boolean updateCurrentVersion = false;
             InferredOWLOntologyID newCurrentVersion = null;
             
@@ -315,8 +316,68 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public Collection<InferredOWLOntologyID> getOntologies(final boolean onlyCurrentVersions,
             final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
     {
-        // TODO Auto-generated method stub
-        return null;
+        List<InferredOWLOntologyID> returnList = new ArrayList<InferredOWLOntologyID>();
+        
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(ontologyManagementGraph);
+        dataset.addNamedGraph(ontologyManagementGraph);
+        
+        // 1: see if the given IRI exists as an ontology IRI
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?ontology ?version ?inferredVersion WHERE { ?ontology <");
+        sb.append(RDF.TYPE.stringValue());
+        sb.append("> <");
+        sb.append(OWL.ONTOLOGY.stringValue());
+        sb.append("> . ");
+        if(onlyCurrentVersions)
+        {
+            sb.append(" ?ontology <");
+            sb.append(PoddRdfConstants.OMV_CURRENT_VERSION.stringValue());
+            sb.append("> ?version . ");
+        }
+        else
+        {
+            sb.append(" ?ontology <");
+            sb.append(OWL.VERSIONIRI.stringValue());
+            sb.append("> ?version . ");
+        }
+        sb.append("OPTIONAL{ ?version <");
+        sb.append(PoddRdfConstants.PODD_BASE_INFERRED_VERSION.stringValue());
+        sb.append("> ?inferredVersion . ");
+        sb.append(" }");
+        sb.append("}");
+        
+        this.log.info("Generated SPARQL {}", sb);
+        
+        final TupleQuery query1 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        query1.setDataset(dataset);
+        
+        final TupleQueryResult query1Results = query1.evaluate();
+        
+        QueryResultCollector nextResults1 = new QueryResultCollector();
+        QueryResults.report(query1Results, nextResults1);
+        
+        for(BindingSet nextResult : nextResults1.getBindingSets())
+        {
+            final String nextOntologyIRI = nextResult.getValue("ontology").stringValue();
+            final String nextVersionIRI = nextResult.getValue("version").stringValue();
+            String nextInferredIRI = null;
+            
+            if(nextResult.hasBinding("inferredVersion"))
+            {
+                nextInferredIRI = nextResult.getValue("inferredVersion").stringValue();
+                returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), IRI
+                        .create(nextInferredIRI)));
+            }
+            else
+            {
+                returnList
+                        .add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), null));
+            }
+        }
+        
+        return returnList;
     }
     
     /*

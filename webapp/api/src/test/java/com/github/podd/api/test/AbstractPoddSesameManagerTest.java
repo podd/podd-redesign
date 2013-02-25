@@ -5,6 +5,7 @@ package com.github.podd.api.test;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 
 import org.junit.After;
@@ -85,8 +86,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         this.testRepositoryConnection.add(testOntologyURI, RDF.TYPE, OWL.ONTOLOGY, artifactGraph);
         this.testRepositoryConnection.add(testInferredURI, RDF.TYPE, OWL.ONTOLOGY, artifactGraph);
-        this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, testVersionURI,
-                artifactGraph);
+        this.testRepositoryConnection.add(testOntologyURI, OWL.VERSIONIRI, testVersionURI, artifactGraph);
         this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, testVersionURI,
                 artifactGraph);
         this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
@@ -459,7 +459,41 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getOntologyIRI(RepositoryConnection, URI).
+     * {@link com.github.podd.api.PoddSesameManager#getOntologies(boolean, RepositoryConnection, URI)}
+     * .
+     */
+    @Test
+    public void testGetOntologiesEmptyOnlyCurrentVersions() throws Exception
+    {
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
+        
+        Collection<InferredOWLOntologyID> ontologies =
+                this.testPoddSesameManager.getOntologies(true, this.testRepositoryConnection, context);
+        
+        Assert.assertNotNull(ontologies);
+        Assert.assertTrue(ontologies.isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getOntologies(boolean, RepositoryConnection, URI)}
+     * .
+     */
+    @Test
+    public void testGetOntologiesEmptyAllVersions() throws Exception
+    {
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
+        
+        Collection<InferredOWLOntologyID> ontologies =
+                this.testPoddSesameManager.getOntologies(true, this.testRepositoryConnection, context);
+        
+        Assert.assertNotNull(ontologies);
+        Assert.assertTrue(ontologies.isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getOntologyIRI(RepositoryConnection, URI)}.
      */
     @Test
     public void testGetOntologyIRI() throws Exception

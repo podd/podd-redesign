@@ -10,7 +10,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -100,9 +102,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             if(artifactId.getVersionIRI() != null)
             {
-                IRI requestedVersionIRI = artifactId.getVersionIRI();
+                final IRI requestedVersionIRI = artifactId.getVersionIRI();
                 
-                for(InferredOWLOntologyID nextVersion : new ArrayList<InferredOWLOntologyID>(requestedArtifactIds))
+                for(final InferredOWLOntologyID nextVersion : new ArrayList<InferredOWLOntologyID>(requestedArtifactIds))
                 {
                     if(requestedVersionIRI.equals(nextVersion.getVersionIRI()))
                     {
@@ -127,7 +129,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     connection.rollback();
                 }
             }
-            catch(RepositoryException e1)
+            catch(final RepositoryException e1)
             {
             }
             
@@ -142,7 +144,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     connection.close();
                 }
             }
-            catch(RepositoryException e)
+            catch(final RepositoryException e)
             {
                 throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
             }
@@ -310,6 +312,64 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
         return oldVersion.concat("1");
+    }
+    
+    @Override
+    public Collection<InferredOWLOntologyID> listPublishedArtifacts() throws OpenRDFException
+    {
+        return listArtifacts(true, false);
+    }
+    
+    @Override
+    public Collection<InferredOWLOntologyID> listUnpublishedArtifacts() throws OpenRDFException
+    {
+        return listArtifacts(false, true);
+    }
+    
+    private Collection<InferredOWLOntologyID> listArtifacts(boolean published, boolean unpublished)
+        throws OpenRDFException
+    {
+        if(!published && !unpublished)
+        {
+            throw new IllegalArgumentException("Cannot choose to exclude both published and unpublished artifacts");
+        }
+        
+        Set<InferredOWLOntologyID> results = new HashSet<InferredOWLOntologyID>();
+        
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            Collection<InferredOWLOntologyID> ontologies =
+                    this.getSesameManager().getOntologies(true, conn,
+                            this.getRepositoryManager().getArtifactManagementGraph());
+            
+            for(InferredOWLOntologyID nextOntology : ontologies)
+            {
+                boolean isPublished = this.getSesameManager().isPublished(nextOntology, conn);
+                
+                if(isPublished)
+                {
+                    if(published)
+                    {
+                        results.add(nextOntology);
+                    }
+                }
+                else if(unpublished)
+                {
+                    results.add(nextOntology);
+                }
+            }
+        }
+        finally
+        {
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
+        return Collections.emptyList();
     }
     
     /*

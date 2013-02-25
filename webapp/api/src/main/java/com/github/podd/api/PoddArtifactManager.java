@@ -129,14 +129,16 @@ public interface PoddArtifactManager
     /**
      * 
      * @return The list of artifacts that have been published.
+     * @throws OpenRDFException
      */
-    Collection<InferredOWLOntologyID> listPublishedArtifacts();
+    Collection<InferredOWLOntologyID> listPublishedArtifacts() throws OpenRDFException;
     
     /**
      * 
      * @return The list of artifacts that have not been published.
+     * @throws OpenRDFException
      */
-    Collection<InferredOWLOntologyID> listUnpublishedArtifacts();
+    Collection<InferredOWLOntologyID> listUnpublishedArtifacts() throws OpenRDFException;
     
     /**
      * Loads an artifact into the manager.
