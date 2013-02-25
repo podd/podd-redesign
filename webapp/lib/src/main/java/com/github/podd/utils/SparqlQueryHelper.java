@@ -514,6 +514,13 @@ public class SparqlQueryHelper
         sb.append(" ?objectUri <" + RDF.TYPE + "> ?poddTypeUri . ");
         sb.append(" OPTIONAL { ?poddTypeUri <" + RDFS.LABEL + "> ?label } . \n");
         sb.append(" OPTIONAL { ?poddTypeUri <" + RDFS.COMMENT + "> ?description . } \n");
+        
+        // filter out TYPE statements for OWL:Thing, OWL:Individual, OWL:NamedIndividual & OWL:Class
+        sb.append("FILTER (?poddTypeUri != <" + OWL.THING.stringValue() + ">) ");
+        sb.append("FILTER (?poddTypeUri != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        sb.append("FILTER (?poddTypeUri != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        sb.append("FILTER (?poddTypeUri != <" + OWL.CLASS.stringValue() + ">) ");
+        
         sb.append(" }");
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
