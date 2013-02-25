@@ -152,4 +152,18 @@ public interface PoddSesameManager
     void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
             RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
     
+    /**
+     * Returns a collection of ontologies managed in the given graph, optionally only returning the
+     * current version.
+     * 
+     * @param onlyCurrentVersions
+     *            If true, only the current version for each of the managed ontologies are returned.
+     * @param ontologyManagementGraph
+     *            The URI of the context in the repository containing the management information for
+     *            the ontologies.
+     * @return The collection of ontologies represented in the given management graph.
+     */
+    Collection<InferredOWLOntologyID> getOntologies(boolean onlyCurrentVersions,
+            RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
+    
 }
