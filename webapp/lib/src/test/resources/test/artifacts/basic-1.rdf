@@ -39,7 +39,7 @@
 <rdf:Description rdf:about="urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0">
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
 	<rdfs:label>poddScience#Analysis 0</rdfs:label>
-	<poddBase:containedBy rdf:resource="http://purl.org/podd/basic-1-20130205/object:2966"/>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Small description of Analysis 0.</rdfs:comment>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/basic-1-20130205/object:2966">
@@ -52,6 +52,8 @@
 	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-05-22</poddBase:hasStartDate>
 	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable"/>
 	<poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
+
+    <poddScience:hasAnalysis rdf:resource="urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0"/>
 
 	<!-- To be added by PODD, not to be submitted by user -->
 	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-06-05T01:57:16.643Z</poddBase:createdAt>
