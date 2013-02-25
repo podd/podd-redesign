@@ -80,7 +80,7 @@ public abstract class AbstractPoddSesameManagerTest
         final URI artifactGraph = ValueFactoryImpl.getInstance().createURI("urn:test:artifact-mgt-graph:");
         
         final URI testOntologyURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/99-99/artifact:99");
-        final URI testVersionURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd//99-99/version:1");
+        final URI testVersionURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/99-99/version:1");
         final URI testInferredURI =
                 ValueFactoryImpl.getInstance().createURI("urn:inferred:http://purl.org/podd/99-99/version:1");
         
@@ -126,15 +126,19 @@ public abstract class AbstractPoddSesameManagerTest
         
         // Podd-Base
         this.testRepositoryConnection.add(pbBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
+        this.testRepositoryConnection.add(pbInferredURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
         this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pbVersionURI,
                 schemaGraph);
         this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, pbVersionURI,
                 schemaGraph);
         this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
                 pbInferredURI, schemaGraph);
+        this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                pbInferredURI, schemaGraph);
         
         // Podd-Science
         this.testRepositoryConnection.add(pScienceOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
+        this.testRepositoryConnection.add(pScienceInferredURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
         this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pScienceVersionURI,
                 schemaGraph);
         this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION,
@@ -142,9 +146,12 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pScienceOntologyURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
         this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
                 pScienceInferredURI, schemaGraph);
+        this.testRepositoryConnection.add(pScienceOntologyURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                pScienceInferredURI, schemaGraph);
         
         // Podd-Plant
         this.testRepositoryConnection.add(pPlantOntologyURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
+        this.testRepositoryConnection.add(pPlantInferredURI, RDF.TYPE, OWL.ONTOLOGY, schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pPlantVersionURI,
                 schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, pPlantVersionURI,
@@ -152,6 +159,8 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pScienceVersionURI, schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, OWL.IMPORTS, pbVersionURI, schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+                pPlantInferredURI, schemaGraph);
+        this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
                 pPlantInferredURI, schemaGraph);
         
         return schemaGraph;
@@ -195,12 +204,12 @@ public abstract class AbstractPoddSesameManagerTest
         // invoke test method:
         final InferredOWLOntologyID inferredOntologyID =
                 this.testPoddSesameManager.getCurrentArtifactVersion(
-                        IRI.create("http://purl.org/podd//99-99/version:1"), this.testRepositoryConnection,
+                        IRI.create("http://purl.org/podd/99-99/version:1"), this.testRepositoryConnection,
                         artifactGraph);
         
         // verify:
         Assert.assertNotNull("Returned NULL inferredOntologyID", inferredOntologyID);
-        Assert.assertEquals("Not the expected current version", IRI.create("http://purl.org/podd//99-99/version:1"),
+        Assert.assertEquals("Not the expected current version", IRI.create("http://purl.org/podd/99-99/version:1"),
                 inferredOntologyID.getVersionIRI());
         Assert.assertEquals("Not the expected current inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/99-99/version:1"),
@@ -262,12 +271,12 @@ public abstract class AbstractPoddSesameManagerTest
         // invoke test method:
         final InferredOWLOntologyID inferredOntologyID =
                 this.testPoddSesameManager.getCurrentArtifactVersion(
-                        IRI.create("http://purl.org/podd//99-99/version:1"), this.testRepositoryConnection,
+                        IRI.create("http://purl.org/podd/99-99/version:1"), this.testRepositoryConnection,
                         artifactGraph);
         
         // verify:
         Assert.assertNotNull("Returned NULL inferredOntologyID", inferredOntologyID);
-        Assert.assertEquals("Not the expected current version", IRI.create("http://purl.org/podd//99-99/version:1"),
+        Assert.assertEquals("Not the expected current version", IRI.create("http://purl.org/podd/99-99/version:1"),
                 inferredOntologyID.getVersionIRI());
         Assert.assertEquals("Not the expected current inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/99-99/version:1"),
@@ -316,12 +325,12 @@ public abstract class AbstractPoddSesameManagerTest
         // invoke test method:
         final InferredOWLOntologyID inferredOntologyID =
                 this.testPoddSesameManager.getCurrentArtifactVersion(
-                        IRI.create("http://purl.org/podd//99-99/version:1"), this.testRepositoryConnection,
+                        IRI.create("http://purl.org/podd/99-99/version:1"), this.testRepositoryConnection,
                         artifactGraph);
         
         // verify:
         Assert.assertNotNull("Returned NULL inferredOntologyID", inferredOntologyID);
-        Assert.assertEquals("Not the expected current version", IRI.create("http://purl.org/podd//99-99/version:1"),
+        Assert.assertEquals("Not the expected current version", IRI.create("http://purl.org/podd/99-99/version:1"),
                 inferredOntologyID.getVersionIRI());
         Assert.assertEquals("Not the expected current inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/99-99/version:1"),
@@ -463,11 +472,11 @@ public abstract class AbstractPoddSesameManagerTest
      * .
      */
     @Test
-    public void testGetOntologiesEmptyOnlyCurrentVersions() throws Exception
+    public void testGetOntologiesEmptyAllVersions() throws Exception
     {
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         
-        Collection<InferredOWLOntologyID> ontologies =
+        final Collection<InferredOWLOntologyID> ontologies =
                 this.testPoddSesameManager.getOntologies(true, this.testRepositoryConnection, context);
         
         Assert.assertNotNull(ontologies);
@@ -480,15 +489,49 @@ public abstract class AbstractPoddSesameManagerTest
      * .
      */
     @Test
-    public void testGetOntologiesEmptyAllVersions() throws Exception
+    public void testGetOntologiesEmptyOnlyCurrentVersions() throws Exception
     {
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         
-        Collection<InferredOWLOntologyID> ontologies =
+        final Collection<InferredOWLOntologyID> ontologies =
                 this.testPoddSesameManager.getOntologies(true, this.testRepositoryConnection, context);
         
         Assert.assertNotNull(ontologies);
         Assert.assertTrue(ontologies.isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getOntologies(boolean, RepositoryConnection, URI)}
+     * .
+     */
+    @Test
+    public void testGetOntologiesSingleAllVersions() throws Exception
+    {
+        final URI context = this.populateArtifactManagementGraph();
+        
+        final Collection<InferredOWLOntologyID> ontologies =
+                this.testPoddSesameManager.getOntologies(false, this.testRepositoryConnection, context);
+        
+        Assert.assertNotNull(ontologies);
+        Assert.assertEquals(1, ontologies.size());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getOntologies(boolean, RepositoryConnection, URI)}
+     * .
+     */
+    @Test
+    public void testGetOntologiesSingleOnlyCurrentVersions() throws Exception
+    {
+        final URI context = this.populateArtifactManagementGraph();
+        
+        final Collection<InferredOWLOntologyID> ontologies =
+                this.testPoddSesameManager.getOntologies(true, this.testRepositoryConnection, context);
+        
+        Assert.assertNotNull(ontologies);
+        Assert.assertEquals(1, ontologies.size());
     }
     
     /**
