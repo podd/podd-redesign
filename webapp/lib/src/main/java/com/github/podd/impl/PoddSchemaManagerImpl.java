@@ -155,13 +155,12 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             conn.commit();
             
             // update the link in the schema ontology management graph
-            this.sesameManager.updateCurrentManagedSchemaOntologyVersion(ontology.getOntologyID(),
-                    nextInferredOntology, true, conn, this.repositoryManager.getSchemaManagementGraph());
+            this.sesameManager.updateCurrentManagedSchemaOntologyVersion(nextInferredOntology, true, conn,
+                    this.repositoryManager.getSchemaManagementGraph());
             
             // update the link in the schema ontology management graph
             // TODO: This is probably not the right method for this purpose
-            this.sesameManager.updateCurrentManagedSchemaOntologyVersion(nextInferredOntology.getBaseOWLOntologyID(),
-                    nextInferredOntology.getInferredOWLOntologyID(), true, conn,
+            this.sesameManager.updateCurrentManagedSchemaOntologyVersion(nextInferredOntology, true, conn,
                     this.repositoryManager.getSchemaManagementGraph());
             
             return new InferredOWLOntologyID(ontology.getOntologyID().getOntologyIRI(), ontology.getOntologyID()

@@ -555,9 +555,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // in the InferredOWLOntologyID object
             inferredOWLOntologyID = this.getOWLManager().inferStatements(nextOntology, permanentRepositoryConnection);
             
-            this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID.getBaseOWLOntologyID(),
-                    inferredOWLOntologyID.getInferredOWLOntologyID(), true, permanentRepositoryConnection,
-                    this.getRepositoryManager().getArtifactManagementGraph());
+            this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true,
+                    permanentRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
             
             permanentRepositoryConnection.commit();
             

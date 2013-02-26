@@ -172,9 +172,8 @@ public interface PoddSesameManager
      * for the current version for both the ontology and the inferred ontology.
      * 
      * @param nextOntologyID
-     *            The ontology ID that contains the information about the original ontology.
-     * @param nextInferredOntologyID
-     *            The ontology ID that contains the information about the inferred ontology.
+     *            The ontology ID that contains the information about the ontology, including the
+     *            inferred ontology IRI.
      * @param updateCurrent
      *            If true, will update the current version if it exists. If false it will only add
      *            the current version if it does not exist. Set this to false when only inferred
@@ -183,17 +182,16 @@ public interface PoddSesameManager
      * @param context
      * @throws OpenRDFException
      */
-    void updateCurrentManagedSchemaOntologyVersion(OWLOntologyID nextOntologyID, OWLOntologyID nextInferredOntologyID,
-            boolean updateCurrent, RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
+    void updateCurrentManagedSchemaOntologyVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrent,
+            RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
     
     /**
      * This method adds information to the PODD artifact management graph, and updates the links for
      * the current version for both the ontology and the inferred ontology.
      * 
      * @param nextOntologyID
-     *            The ontology ID that contains the information about the original ontology.
-     * @param nextInferredOntologyID
-     *            The ontology ID that contains the information about the inferred ontology.
+     *            The ontology ID that contains the information about the ontology, including the
+     *            inferred ontology IRI.
      * @param updateCurrent
      *            If true, will update the current version if it exists. If false it will only add
      *            the current version if it does not exist.
@@ -201,7 +199,7 @@ public interface PoddSesameManager
      * @param context
      * @throws OpenRDFException
      */
-    void updateManagedPoddArtifactVersion(OWLOntologyID nextOntologyID, OWLOntologyID nextInferredOntologyID,
-            boolean updateCurrent, RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
+    void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrent,
+            RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
     
 }

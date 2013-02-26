@@ -270,25 +270,18 @@ public abstract class AbstractPoddArtifactManagerTest
                         this.testRepositoryConnection);
         
         // prepare: update schema management graph
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredDctermsOntologyID.getBaseOWLOntologyID(), inferredDctermsOntologyID.getInferredOWLOntologyID(),
-                false, this.testRepositoryConnection, this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID.getBaseOWLOntologyID(),
-                inferredFoafOntologyID.getInferredOWLOntologyID(), false, this.testRepositoryConnection,
-                this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPUserOntologyID.getBaseOWLOntologyID(), inferredPUserOntologyID.getInferredOWLOntologyID(),
-                false, this.testRepositoryConnection, this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
-                false, this.testRepositoryConnection, this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPScienceOntologyID.getBaseOWLOntologyID(),
-                inferredPScienceOntologyID.getInferredOWLOntologyID(), false, this.testRepositoryConnection,
-                this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPPlantOntologyID.getBaseOWLOntologyID(), inferredPPlantOntologyID.getInferredOWLOntologyID(),
-                false, this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPPlantOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
     }
     
     /**
@@ -680,18 +673,14 @@ public abstract class AbstractPoddArtifactManagerTest
                         this.testRepositoryConnection);
         
         // prepare: update schema management graph
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredDctermsOntologyID.getBaseOWLOntologyID(), inferredDctermsOntologyID.getInferredOWLOntologyID(),
-                false, this.testRepositoryConnection, this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID.getBaseOWLOntologyID(),
-                inferredFoafOntologyID.getInferredOWLOntologyID(), false, this.testRepositoryConnection,
-                this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPUserOntologyID.getBaseOWLOntologyID(), inferredPUserOntologyID.getInferredOWLOntologyID(),
-                false, this.testRepositoryConnection, this.schemaGraph);
-        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
-                false, this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
         // PODD-Science ontology is not added to schema management graph
         
         final InputStream inputStream =

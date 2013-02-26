@@ -661,8 +661,8 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pOntologyIRI, pVersionIRI, pInferredVersionIRI);
         
         // invoke method under test
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID.getBaseOWLOntologyID(),
-                nextOntologyID.getInferredOWLOntologyID(), false, this.testRepositoryConnection, this.schemaGraph);
+        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
         
         this.verifyManagementGraphContents(6, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRI);
     }
@@ -682,8 +682,8 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pOntologyIRI, pVersionIRI, pInferredVersionIRI);
         
         // first setting of schema versions in mgt graph
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID.getBaseOWLOntologyID(),
-                nextOntologyID.getInferredOWLOntologyID(), false, this.testRepositoryConnection, this.schemaGraph);
+        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
         this.verifyManagementGraphContents(6, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRI);
         
         final IRI pVersionIRIUpdated = IRI.create("http://purl.org/podd/ns/version/poddBase/4");
@@ -692,16 +692,14 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pOntologyIRI, pVersionIRIUpdated, pInferredVersionIRIUpdated);
         
         // invoke with "updateCurrent" disallowed
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                nextOntologyIDUpdated.getBaseOWLOntologyID(), nextOntologyIDUpdated.getInferredOWLOntologyID(), false,
+        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyIDUpdated, false,
                 this.testRepositoryConnection, this.schemaGraph);
         
         // verify only inferred ontology version is updated
         this.verifyManagementGraphContents(9, this.schemaGraph, pOntologyIRI, pVersionIRI, pInferredVersionIRIUpdated);
         
         // invoke with "updateCurrent" allowed
-        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(
-                nextOntologyIDUpdated.getBaseOWLOntologyID(), nextOntologyIDUpdated.getInferredOWLOntologyID(), true,
+        this.testPoddSesameManager.updateCurrentManagedSchemaOntologyVersion(nextOntologyIDUpdated, true,
                 this.testRepositoryConnection, this.schemaGraph);
         
         // verify both ontology current version and inferred ontology version haven been updated
@@ -747,8 +745,8 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testRepositoryConnection.size(pInferredVersionIRIv1.toOpenRDFURI()));
         
         // invoke method under test
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1.getBaseOWLOntologyID(),
-                nextOntologyIDv1.getInferredOWLOntologyID(), false, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1, false,
+                this.testRepositoryConnection, this.artifactGraph);
         
         this.testRepositoryConnection.commit();
         
@@ -779,8 +777,8 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testRepositoryConnection.size(pInferredVersionIRIv2.toOpenRDFURI()));
         
         // invoke method under test
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2.getBaseOWLOntologyID(),
-                nextOntologyIDv2.getInferredOWLOntologyID(), true, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2, true,
+                this.testRepositoryConnection, this.artifactGraph);
         
         this.testRepositoryConnection.commit();
         // verify:
@@ -811,8 +809,8 @@ public abstract class AbstractPoddSesameManagerTest
         final InferredOWLOntologyID nextOntologyIDv1 =
                 new InferredOWLOntologyID(pArtifactIRI, pVersion1IRIv1, pInferredVersionIRIv1);
         
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1.getBaseOWLOntologyID(),
-                nextOntologyIDv1.getInferredOWLOntologyID(), false, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1, false,
+                this.testRepositoryConnection, this.artifactGraph);
         this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersion1IRIv1, pInferredVersionIRIv1);
         
         // prepare: update artifact version
@@ -822,8 +820,8 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
         
         // invoke method under test
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2.getBaseOWLOntologyID(),
-                nextOntologyIDv2.getInferredOWLOntologyID(), true, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2, true,
+                this.testRepositoryConnection, this.artifactGraph);
         
         // verify:
         this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
@@ -847,8 +845,8 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pArtifactIRI, pVersionIRI, pInferredVersionIRI);
         
         // invoke method under test
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyID.getBaseOWLOntologyID(),
-                nextOntologyID.getInferredOWLOntologyID(), false, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyID, false,
+                this.testRepositoryConnection, this.artifactGraph);
         
         // verify:
         this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRI, pInferredVersionIRI);
@@ -873,8 +871,8 @@ public abstract class AbstractPoddSesameManagerTest
         final InferredOWLOntologyID nextOntologyIDv1 =
                 new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
         
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1.getBaseOWLOntologyID(),
-                nextOntologyIDv1.getInferredOWLOntologyID(), false, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1, false,
+                this.testRepositoryConnection, this.artifactGraph);
         this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
         
         // prepare: version 2
@@ -884,8 +882,8 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
         
         // invoke with "updateCurrent" disallowed
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2.getBaseOWLOntologyID(),
-                nextOntologyIDv2.getInferredOWLOntologyID(), false, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2, false,
+                this.testRepositoryConnection, this.artifactGraph);
         
         // verify: only inferred version is updated
         this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv2);
@@ -906,8 +904,8 @@ public abstract class AbstractPoddSesameManagerTest
         final InferredOWLOntologyID nextOntologyIDv1 =
                 new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
         
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1.getBaseOWLOntologyID(),
-                nextOntologyIDv1.getInferredOWLOntologyID(), false, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv1, false,
+                this.testRepositoryConnection, this.artifactGraph);
         this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv1);
         
         // prepare: version 2
@@ -917,8 +915,8 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
         
         // invoke with "updateCurrent" disallowed
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2.getBaseOWLOntologyID(),
-                nextOntologyIDv2.getInferredOWLOntologyID(), false, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2, false,
+                this.testRepositoryConnection, this.artifactGraph);
         
         // verify: only inferred version is updated
         this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv1, pInferredVersionIRIv2);
@@ -930,8 +928,8 @@ public abstract class AbstractPoddSesameManagerTest
                 new InferredOWLOntologyID(pArtifactIRI, pVersionIRIv3, pInferredVersionIRIv3);
         
         // invoke with "updateCurrent" allowed
-        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv3.getBaseOWLOntologyID(),
-                nextOntologyIDv3.getInferredOWLOntologyID(), true, this.testRepositoryConnection, this.artifactGraph);
+        this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv3, true,
+                this.testRepositoryConnection, this.artifactGraph);
         
         this.verifyManagementGraphContents(6, this.artifactGraph, pArtifactIRI, pVersionIRIv3, pInferredVersionIRIv3);
     }
