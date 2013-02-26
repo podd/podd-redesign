@@ -646,10 +646,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     nextInferredOntologyUri, context);
             
             // remove the content for all previous inferred versions
-            // NOTE: This list should not ever be very large, as we perform this step every time
-            // this method is called to update the version
-            // FIXME: This needs to be a more complex query written in SPARQL, as the previous
-            // versions are not all easy to find using getStatements
             for(Statement nextExistingVersion : existingVersions)
             {
                 List<Statement> existingInferredVersions =
