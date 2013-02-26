@@ -12,6 +12,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
@@ -119,6 +120,9 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("RDFS_LABEL", RDFS.LABEL);
         dataModel.put("RDFS_RANGE", RDFS.RANGE);
         dataModel.put("RDF_TYPE", RDF.TYPE);
+        dataModel.put("OWL_OBJECT_PROPERTY", OWL.OBJECTPROPERTY);
+        dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
+        dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
         dataModel.put("util", new FreemarkerUtil());
 
         
@@ -177,8 +181,6 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             /*            // *** editObject.html.ftl ***
             
             <#-- @ftlvariable name="isAdmin" type="boolean" -->
-            <#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
-            <#-- @ftlvariable name="title" type="java.lang.String" -->
             
             <#-- @ftlvariable name="canViewProjectParticipants" type="boolean" -->
             <#-- @ftlvariable name="initialized" type="boolean" -->

@@ -261,7 +261,9 @@
 </#macro>
 
 <#-- 
-Macro to display information about the PODD object being edited
+Macro to display a single property about the PODD object being edited
+Input is the property URI.
+
 [25/02/2013]
   -->
 <#macro displayField propertyUri>
@@ -270,6 +272,7 @@ Macro to display information about the PODD object being edited
 		<#local label = completeModel.filter(propertyUri, RDFS_LABEL, null).objectString()!"Missing Label">
     	<span class="bold">${label}:</span>
 
+		<#-- get statement object(s) for this property. could be one or several. -->
 		<#local objectList = completeModel.filter(poddObject.uri, propertyUri, null).objects()>
 
 		<#-- multiple values. create another HTML list -->
@@ -279,7 +282,16 @@ Macro to display information about the PODD object being edited
 		
 		<#list objectList as thisObject>
 			<li>
-	        	<textarea id="${propertyUri}" name="${propertyUri}" cols="30" rows="2">${thisObject.stringValue()}</textarea>
+				<#if propertyType == OWL_OBJECT_PROPERTY>
+					<!-- Object Property. is a FieldSet -->
+		        	<textarea id="${propertyUri}" name="${propertyUri}" cols="30" rows="2">${thisObject.stringValue()}</textarea>
+				<#elseif propertyType == OWL_DATA_PROPERTY>
+					<!-- Datatype Property -->
+		        	<textarea id="${propertyUri}" name="${propertyUri}" cols="30" rows="2">${thisObject.stringValue()}</textarea>
+				<#elseif propertyType == OWL_ANNOTATION_PROPERTY >
+					<!-- Annotation Property -->
+		        	<textarea id="${propertyUri}" name="${propertyUri}" cols="30" rows="2">${thisObject.stringValue()}</textarea>
+				</#if>
 			</li>
 		</#list>
 		
