@@ -3,7 +3,6 @@
  */
 package com.github.podd.ontology.test;
 
-import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
 
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObject;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.SparqlQueryHelper;
 
 /**
@@ -205,7 +205,6 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 modelPropertyTriples.size());
     }
     
-    
     /**
      * Test retrieve properties about a given Object
      */
@@ -295,6 +294,8 @@ public class SparqlQueryTest extends AbstractOntologyTest
             Assert.assertEquals("Property URI not in expected position",
                     ValueFactoryImpl.getInstance().createURI(expectedUris[i]), orderedPropertyUris.get(i));
         }
+        
+        this.printContents(conn, super.getSchemaOntologyGraphs().get(8));
     }
 
     
@@ -526,6 +527,34 @@ public class SparqlQueryTest extends AbstractOntologyTest
         {
             Assert.assertTrue("Unexpected top object", expectedUriList.contains(topObject.getUri().toString()));
         }
+    }
+
+    @Test
+    public void testSpikeGetCardinality() throws Exception
+    {
+        // Create a list of contexts made up of the schema ontologies and the asserted artifact.
+        final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
+        final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
+        
+        this.conn = this.getConnection();
+
+       // this.printContents(conn, contexts[8]);
+        
+        
+        URI publicationUri = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Publication");
+        URI propertyUri = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "publishedIn");
+        
+        int[] cardinalities = SparqlQueryHelper.spikeGetCardinality(publicationUri, propertyUri, conn, contexts);
+
+        // verify:
+        System.out.println(cardinalities[0] + " " + cardinalities[1] + " " + cardinalities[2]);
+    }
+
+    @Ignore
+    @Test
+    public void testSpikeGetPossibleValues() throws Exception
+    {
+        
     }
     
     /**

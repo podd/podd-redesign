@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -26,6 +27,7 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -358,6 +360,8 @@ public class SparqlQueryHelper
         
         sb.append("}");
         
+        SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
+        
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
         graphQuery.setBinding("poddObject", objectUri);
         
@@ -650,5 +654,120 @@ public class SparqlQueryHelper
             ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/1"),
             ValueFactoryImpl.getInstance().createURI(
                     "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1"), };
+    
+    
+    /**
+     * Spike method only. 
+     * 
+     * Retrieves the cardinalities from the schema ontologies, for the given concept and property. 
+     * 
+     * @param conceptUri
+     * @param propertyUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return an integer array of size 3. 
+     * @throws OpenRDFException
+     */
+    public static int[] spikeGetCardinality(final URI conceptUri, final URI propertyUri, 
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
+    {
+        final int[] cardinalities = {-1, -1, -1};
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?maxCardinality ?minCardinality ?qualifiedCardinality ");
+        sb.append(" WHERE { ");
+        
+        sb.append(" ?poddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
+        sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality } . ");
+        
+        sb.append(" } ");
+        
+        SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("poddConcept", conceptUri);
+        tupleQuery.setBinding("propertyUri", propertyUri);
+        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
+        
+        try
+        {
+            if(queryResults.hasNext())
+            {
+                final BindingSet binding = queryResults.next();
+                
+                Value minCardinality = binding.getValue("minCardinality");
+                if (minCardinality != null && minCardinality instanceof Literal)
+                {
+                    cardinalities[0] = ((Literal)minCardinality).intValue();
+                }
+
+                Value qualifiedCardinality = binding.getValue("qualifiedCardinality");
+                if (qualifiedCardinality != null && qualifiedCardinality instanceof Literal)
+                {
+                    cardinalities[1] = ((Literal)qualifiedCardinality).intValue();
+                }
+
+                Value maxCardinality = binding.getValue("maxCardinality");
+                if (maxCardinality != null && maxCardinality instanceof Literal)
+                {
+                    cardinalities[2] = ((Literal)maxCardinality).intValue();
+                }
+            }
+        }
+        finally
+        {
+            queryResults.close();
+        }
+        
+        return cardinalities;
+    }
+    
+    /*
+     FIXME: Spike method. Initial code being checked in end of day. 
+
+   {http://purl.org/podd/ns/poddScience#PlatformType}   <http://www.w3.org/2002/07/owl#equivalentClass>  {_:genid1636663090}
+   {_:genid1636663090}   <http://www.w3.org/2002/07/owl#oneOf>  {_:genid72508669}
+   
+   {_:genid72508669}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>  {http://purl.org/podd/ns/poddScience#Software}
+   {_:genid72508669}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>  {_:genid953844943}
+ 
+   {_:genid953844943}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>  {http://purl.org/podd/ns/poddScience#HardwareSoftware}
+   {_:genid953844943}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>  {_:genid278519207}
+   
+   {_:genid278519207}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>  {http://purl.org/podd/ns/poddScience#Hardware}
+   {_:genid278519207}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>  {http://www.w3.org/1999/02/22-rdf-syntax-ns#nil}
+ 
+     */
+    public static List<PoddObject> spikeGetPossibleValues(final URI conceptUri,  
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
+    {
+        List<PoddObject> results = new ArrayList<PoddObject>();
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ? ");
+        sb.append(" WHERE { ");
+        
+        sb.append(" ?poddConcept <" + OWL.EQUIVALENTCLASS.stringValue() + "> ?x . ");
+        sb.append(" ?x <" + OWL.ONEOF.stringValue() + "> ?y . ");
+        sb.append(" ?y <" + RDF.FIRST.stringValue() + "> ?firstElement . ");
+        sb.append(" ?y <" + RDF.REST.stringValue() + "> ?z . ");
+        
+        sb.append(" } ");
+        
+        SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("", conceptUri);
+        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
+        
+        
+        return results;
+    }
+    
     
 }
