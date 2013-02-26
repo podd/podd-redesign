@@ -21,6 +21,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedSchemaException;
@@ -36,6 +37,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
 {
     
     private PoddRepositoryManager repositoryManager;
+    private PoddSesameManager sesameManager;
     private PoddOWLManager owlManager;
     private URI schemaManagementContext;
     
@@ -58,7 +60,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public InferredOWLOntologyID getCurrentSchemaOntologyVersion(final IRI schemaOntologyIRI)
         throws UnmanagedSchemaIRIException
     {
-        if (schemaOntologyIRI == null)
+        if(schemaOntologyIRI == null)
         {
             throw new UnmanagedSchemaIRIException(schemaOntologyIRI, "NULL is not a managed schema ontology");
         }
@@ -95,6 +97,12 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public void setRepositoryManager(final PoddRepositoryManager repositoryManager)
     {
         this.repositoryManager = repositoryManager;
+    }
+    
+    @Override
+    public void setSesameManager(final PoddSesameManager sesameManager)
+    {
+        this.sesameManager = sesameManager;
     }
     
     @Override
@@ -147,13 +155,14 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             conn.commit();
             
             // update the link in the schema ontology management graph
-            this.repositoryManager.updateCurrentManagedSchemaOntologyVersion(ontology.getOntologyID(),
-                    nextInferredOntology, true);
+            this.sesameManager.updateCurrentManagedSchemaOntologyVersion(ontology.getOntologyID(),
+                    nextInferredOntology, true, conn, this.repositoryManager.getSchemaManagementGraph());
             
             // update the link in the schema ontology management graph
             // TODO: This is probably not the right method for this purpose
-            this.repositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                    nextInferredOntology.getBaseOWLOntologyID(), nextInferredOntology.getInferredOWLOntologyID(), true);
+            this.sesameManager.updateCurrentManagedSchemaOntologyVersion(nextInferredOntology.getBaseOWLOntologyID(),
+                    nextInferredOntology.getInferredOWLOntologyID(), true, conn,
+                    this.repositoryManager.getSchemaManagementGraph());
             
             return new InferredOWLOntologyID(ontology.getOntologyID().getOntologyIRI(), ontology.getOntologyID()
                     .getVersionIRI(), nextInferredOntology.getOntologyIRI());

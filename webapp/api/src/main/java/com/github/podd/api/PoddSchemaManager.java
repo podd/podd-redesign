@@ -139,6 +139,13 @@ public interface PoddSchemaManager
     void setSchemaManagementContext(URI context);
     
     /**
+     * 
+     * @param sesameManager
+     *            The PoddSesameManager
+     */
+    void setSesameManager(PoddSesameManager sesameManager);
+    
+    /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
      * ontology, and stores the original schema ontology and the inferences in separate RDF Graphs
      * inside of the internal repository.

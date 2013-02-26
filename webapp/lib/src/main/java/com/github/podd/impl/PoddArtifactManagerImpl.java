@@ -347,7 +347,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             for(InferredOWLOntologyID nextOntology : ontologies)
             {
-                boolean isPublished = this.getSesameManager().isPublished(nextOntology, conn);
+                boolean isPublished =
+                        this.getSesameManager().isPublished(nextOntology, conn,
+                                this.getRepositoryManager().getArtifactManagementGraph());
                 
                 if(isPublished)
                 {
@@ -553,10 +555,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // in the InferredOWLOntologyID object
             inferredOWLOntologyID = this.getOWLManager().inferStatements(nextOntology, permanentRepositoryConnection);
             
-            permanentRepositoryConnection.commit();
+            this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID.getBaseOWLOntologyID(),
+                    inferredOWLOntologyID.getInferredOWLOntologyID(), true, permanentRepositoryConnection,
+                    this.getRepositoryManager().getArtifactManagementGraph());
             
-            this.getRepositoryManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID.getBaseOWLOntologyID(),
-                    inferredOWLOntologyID.getInferredOWLOntologyID(), true);
+            permanentRepositoryConnection.commit();
             
             return inferredOWLOntologyID;
         }
@@ -635,7 +638,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             repositoryConnection = repository.getConnection();
             repositoryConnection.begin();
             
-            if(this.getSesameManager().isPublished(ontologyId, repositoryConnection))
+            if(this.getSesameManager().isPublished(ontologyId, repositoryConnection,
+                    this.getRepositoryManager().getArtifactManagementGraph()))
             {
                 // Cannot publish multiple versions of a single artifact
                 throw new PublishArtifactException("Could not publish artifact as a version was already published",
