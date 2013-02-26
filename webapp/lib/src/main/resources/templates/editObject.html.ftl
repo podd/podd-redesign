@@ -82,25 +82,30 @@
 				</label>
                 </li>
                 <li>
-                <input id="object_name" name="object_name" type="text" value="${objectName!""}">
+                <input id="object_name" name="object_name" type="text" value="${poddObject.title!""}">
                 <h6 class="errorMsg">${objectNameError!""}</h6>
 	            </li>
 	            <li>
 	            <label for="object_description" class="bold">Description:</label>
                 </li>
                 <li>
-				<textarea id="object_description" name="object_description" cols="30" rows="2">${objectDescription!""}</textarea>
+				<textarea id="object_description" name="object_description" cols="30" rows="2">${poddObject.description!""}</textarea>
                 <span id="object_desc_text_limit"></span>
                 <h6 class="errorMsg">${objectDescriptionError!""}</h6>
 				</li>
+				<#list orderedPropertyList as propertyUri>
+					<@displayField propertyUri=propertyUri/>
+				</#list>
+
 
 	            <!-- ontology attributes: data, object and field set properties -->
+<#--
                 <#if elementList?? && elementList?has_content>
 	            <#list elementList as element>
                     <@displayItem element=element/>
 	            </#list>
                 </#if>
-
+-->
             </ol>
         </div>
     </div>  <!-- details - Collapsible div -->
@@ -255,25 +260,54 @@
     </script>
 </#macro>
 
+<#-- 
+Macro to display information about the PODD object being edited
+[25/02/2013]
+  -->
+<#macro displayField propertyUri>
+    <li>
+		<#local propertyType = completeModel.filter(propertyUri, RDF_TYPE, null).objectString()!"TYPE">
+		<#local label = completeModel.filter(propertyUri, RDFS_LABEL, null).objectString()!"Missing Label">
+    	<span class="bold">${label}:</span>
+
+		<#local objectList = completeModel.filter(poddObject.uri, propertyUri, null).objects()>
+
+		<#-- multiple values. create another HTML list -->
+		<#if (objectList.size() > 1)>
+			<ol>
+		</#if>
+		
+		<#list objectList as thisObject>
+			<li>
+	        	<textarea id="${propertyUri}" name="${propertyUri}" cols="30" rows="2">${thisObject.stringValue()}</textarea>
+			</li>
+		</#list>
+		
+		<#if (objectList.size() > 1)>
+			</ol>
+		</#if>
+    </li>
+</#macro>
+
 <#macro addFieldset element>
     <div id="${element.getPropertyURI()}_fieldset" class="fieldset inner">
         <div class="legend"><a name="${element.getGroupId()}">${element.getLabel()}</a>
             <#if element.isRequired()>
-            <span icon="required"></span>
+            	<span icon="required"></span>
             </#if>
             <#if !element.getCard()?? && !element.getMaxCard()??>
-            <button type="submit" icon="addField" name="addFieldset" value="${element.getId()!""}"></button>
+            	<button type="submit" icon="addField" name="addFieldset" value="${element.getId()!""}"></button>
             </#if>
         </div>
         <#if element.getFieldsetElementList()?? && element.getFieldsetElementList()?has_content>
              <!-- add the items fron each of the lists (data, object, fieldset and refersTo properties) to the field set -->
              <#list element.getFieldsetElementList() as elementList>
                 <#if elementList?? && elementList?has_content>
-                <ol>
-                <#list elementList as element>
-                    <@displayItem element=element/>
-                </#list>
-                </ol>
+	                <ol>
+	                <#list elementList as element>
+	                    <@displayItem element=element/>
+	                </#list>
+	                </ol>
                 </#if>
             </#list>
          </#if>
@@ -282,15 +316,15 @@
 
 <#macro displayItem element>
     <#if element.getType() == enums["podd.template.content.HTMLElementType"].FIELD_SET>
-    <@addFieldset element=element/>
+    	<@addFieldset element=element/>
     <#else>
         <!-- work around as only some users have access to change project status -->
         <#if element.getPropertyURI() == "http://www.podd.org/poddModel#hasProjectStatus">
             <#if canComplete>
-            <@addItem element=element/>
+            	<@addItem element=element/>
             </#if>
         <#else>
-        <@addItem element=element/>
+        	<@addItem element=element/>
         </#if>
     </#if>
 </#macro>
@@ -299,15 +333,15 @@
     <li>
     <label for="${element.getId()}" class="bold">${element.getLabel()}:
         <#if element.isRequired()>
-        <span icon="required"></span>
+        	<span icon="required"></span>
         </#if>
         <#-- add button to add extra input fields if it is required -->
         <#if !element.getCard()?? && !element.getMaxCard()??>
             <#assign type="unknown">
             <#if element.getType() == enums["podd.template.content.HTMLElementType"].TEXT_AREA>
-            <#assign type="textarea">
+            	<#assign type="textarea">
             <#elseif element.getType() == enums["podd.template.content.HTMLElementType"].INPUT>
-            <#assign type="input">
+            	<#assign type="input">
             </#if>
             <a href="javascript:addField('${element.getId()}', '${type}')" icon="addField" title="add ${element.getLabel()}"></a>
         </#if>
@@ -333,70 +367,70 @@
 <#macro addField element>
     <#assign count=1>
     <#if element.getCard()??>
-    <#assign count=element.getCard()>
+    	<#assign count=element.getCard()>
     </#if>
     <#if element.getMaxCard()??>
-    <#assign count=element.getMaxCard()>
+    	<#assign count=element.getMaxCard()>
     </#if>
 
     <#if element.getEnteredValues()?has_content>
-    <#list element.getEnteredValues() as value>
-        <#if element.getType() == enums["podd.template.content.HTMLElementType"].TEXT_AREA>
-        <li><textarea id="${element.getId()}" name="${element.getId()}" cols="30" rows="2"
-        <#if !element.isEditable()> disabled="true"</#if>
-        >${value}</textarea></li>
-        <#else>
-        <li><input id="${element.getId()}" name="${element.getId()}" type="text" value="${value}"
-        <#if !element.isEditable()> disabled="true"</#if>
-        ></li>
-        </#if>
-    </#list>
+	    <#list element.getEnteredValues() as value>
+	        <#if element.getType() == enums["podd.template.content.HTMLElementType"].TEXT_AREA>
+	        	<li><textarea id="${element.getId()}" name="${element.getId()}" cols="30" rows="2"
+	        	<#if !element.isEditable()> disabled="true"</#if>
+	        	>${value}</textarea></li>
+	        <#else>
+	        	<li><input id="${element.getId()}" name="${element.getId()}" type="text" value="${value}"
+	        	<#if !element.isEditable()> disabled="true"</#if>
+	        	></li>
+	        </#if>
+	    </#list>
     <#else>
-    <#list 1..count as x>
-        <#if element.getType() == enums["podd.template.content.HTMLElementType"].TEXT_AREA>
-        <li><textarea id="${element.getId()}" name="${element.getId()}" cols="30" rows="2"
-        <#if !element.isEditable()> disabled="true"</#if>
-        >${element.getDefaultValue()}</textarea></li>
-        <#else>
-        <li><input id="${element.getId()}" name="${element.getId()}" type="text" value="${element.getDefaultValue()}"
-        <#if !element.isEditable()> disabled="true"</#if>
-        ></li>
-        </#if>
-    </#list>
+	    <#list 1..count as x>
+	        <#if element.getType() == enums["podd.template.content.HTMLElementType"].TEXT_AREA>
+		        <li><textarea id="${element.getId()}" name="${element.getId()}" cols="30" rows="2"
+		        <#if !element.isEditable()> disabled="true"</#if>
+		        >${element.getDefaultValue()}</textarea></li>
+	        <#else>
+		        <li><input id="${element.getId()}" name="${element.getId()}" type="text" value="${element.getDefaultValue()}"
+		        <#if !element.isEditable()> disabled="true"</#if>
+		        ></li>
+	        </#if>
+	    </#list>
     </#if>
     <!-- holder for additional fields -->
     <#if !element.getCard()?? && !element.getMaxCard()??>
-    <span id="add_${element.getId()}"></span>
+	    <span id="add_${element.getId()}"></span>
     </#if>
 </#macro>
 
 <#macro addDropDown element>
     <#if element.getEnteredValues()?has_content>
-    <#list element.getEnteredValues() as selectedValue>
-    <li>
-    <select id="${element.getId()}" name="${element.getId()}"
-    <#if !element.isEditable()> disabled="true"</#if>
-    >
-        <#list element.getPossibleValues() as value>
-        <#if value == selectedValue>
-        <option value="${value}" selected>${value}</option>
-        <#else>
-        <option value="${value}">${value}</option>
-        </#if>
-        </#list>
-    </select>
-    </li>
-    </#list>
+	    <#list element.getEnteredValues() as selectedValue>
+	    <li>
+		    <select id="${element.getId()}" name="${element.getId()}"
+		    <#if !element.isEditable()> disabled="true"</#if>
+		    >
+		        <#list element.getPossibleValues() as value>
+			        <#if value == selectedValue>
+			        	<option value="${value}" selected>${value}</option>
+			        <#else>
+			        	<option value="${value}">${value}</option>
+			        </#if>
+		        </#list>
+		    </select>
+	    </li>
+	    </#list>
     <#else>
-    <li>
-    <select id="${element.getId()}" name="${element.getId()}"
-    <#if !element.isEditable()> disabled="true"</#if>
-    >
-        <#list element.getPossibleValues() as value>
-        <option value="${value}">${value}</option>
-        </#list>
-    </select>
-    </li>
+	    <li>
+	    <select id="${element.getId()}" name="${element.getId()}"
+	    <#if !element.isEditable()> disabled="true"</#if>
+	    >
+	        <#list element.getPossibleValues() as value>
+	        <option value="${value}">${value}</option>
+	        </#list>
+	    </select>
+	    </li>
     </#if>
 </#macro>
 

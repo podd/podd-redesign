@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -27,6 +30,7 @@ import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObject;
 import com.github.podd.utils.PoddRdfConstants;
@@ -111,6 +115,14 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("contentTemplate", "editObject.html.ftl");
         dataModel.put("pageTitle", "Edit Artifact");
 
+        // add required constants and methods to data model
+        dataModel.put("RDFS_LABEL", RDFS.LABEL);
+        dataModel.put("RDFS_RANGE", RDFS.RANGE);
+        dataModel.put("RDF_TYPE", RDF.TYPE);
+        dataModel.put("util", new FreemarkerUtil());
+
+        
+        
         RepositoryConnection conn = null;
         try
         {
@@ -126,10 +138,38 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             
             List<URI> contexts = new ArrayList<URI>(SparqlQueryHelper.getSchemaOntologyGraphs());
             contexts.add(ontologyID.getVersionIRI().toOpenRDFURI());
+            URI[] assertedContexts = contexts.toArray(new URI[0]);
             
-            PoddObject objectType = SparqlQueryHelper.getObjectType(objectUri, conn, contexts.toArray(new URI[0]));
+            PoddObject objectType = SparqlQueryHelper.getObjectType(objectUri, conn, assertedContexts);
+            if(objectType == null)
+            {
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
+            }
+            if (objectType.getTitle() != null)
+            {
+                dataModel.put("objectType", objectType.getTitle());
+            }
+            else
+            {
+                dataModel.put("objectType", objectType.getUri());
+            }
+
+            PoddObject theObject = SparqlQueryHelper.getPoddObject(objectUri, conn, assertedContexts);
+            dataModel.put("poddObject", theObject);
+            dataModel.put("objectName", theObject.getTitle());
+            dataModel.put("objectDescription", theObject.getDescription());
             
-            dataModel.put("objectType", objectType.getTitle());
+            // an ordered-list of the properties about the object
+            final List<URI> orderedProperties =
+                    SparqlQueryHelper.getDirectProperties(objectUri, conn, assertedContexts);
+            this.log.info("Found {} properties about object {}", orderedProperties.size(), objectUri);
+            dataModel.put("orderedPropertyList", orderedProperties);
+
+            // all statements which are needed to display these properties in HTML
+            final Model allNeededStatementsForDisplay =
+                    SparqlQueryHelper.getPoddObjectDetailsForEdit(objectUri, conn, assertedContexts);
+            dataModel.put("completeModel", allNeededStatementsForDisplay);
+            
             
             // TODO
             dataModel.put("initialized", false);
@@ -146,8 +186,6 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             <#-- @ftlvariable name="objectPID" type="java.lang.String" -->
             <#-- @ftlvariable name="objectType" type="java.lang.String" -->
             <#-- @ftlvariable name="isProject" type="boolean" -->
-            <#-- @ftlvariable name="objectName" type="java.lang.String" -->
-            <#-- @ftlvariable name="objectDescription" type="java.lang.String" -->
             <#-- @ftlvariable name="elementList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" -->
             <#-- @ftlvariable name="refersList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" -->
             <#-- @ftlvariable name="fileList" type="java.util.ArrayList<podd.resources.util.view.FileElement>" -->

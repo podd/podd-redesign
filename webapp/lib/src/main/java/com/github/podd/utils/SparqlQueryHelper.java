@@ -320,10 +320,67 @@ public class SparqlQueryHelper
         
         return model;
     }
+
+    /**
+     * Work in progress [25/02/2013]
+     * 
+     * Attempting to retrieve sufficient triples to display the object_edit page
+     * 
+     * @param objectUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    public static Model getPoddObjectDetailsForEdit(final URI objectUri, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
+        
+        sb.append("} WHERE {");
+        
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        // value may not have a Label
+        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        
+        sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        sb.append(" FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+        
+        sb.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectUri);
+        
+        final GraphQueryResult queryResults = SparqlQueryHelper.executeGraphQuery(graphQuery, contexts);
+        
+        final Model model = new TreeModel();
+        
+        while(queryResults.hasNext())
+        {
+            final Statement stmt = queryResults.next();
+            model.add(stmt);
+            System.out.println(stmt.getSubject() + "   [" + stmt.getPredicate() + "]   " + stmt.getObject());
+        }
+        
+        return model;
+    }
+    
     
     /**
      * Retrieve a list of properties about the given object. The list is ordered based on property
      * weights.
+     * 
+     * RDF:TYPE, RDFS:COMMENT and RDFS:LABEL statements are omitted from the results. 
      * 
      * Note: If only asserted properties are required, the inferred ontology graph should not be
      * included in the <i>contexts</i> passed into this method.
@@ -341,9 +398,11 @@ public class SparqlQueryHelper
         
         sb.append("SELECT DISTINCT ?propertyUri ");
         sb.append(" WHERE { ");
-        
         sb.append(" ?poddObject ?propertyUri ?value . ");
+        
+        // for ORDER BY
         sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        
         // value may not have a Label
         sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
@@ -354,8 +413,16 @@ public class SparqlQueryHelper
         sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
         sb.append("FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
         sb.append("FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+
+        // Exclude as TYPE, Label (title) and Comment (description) are displayed separately
+        sb.append("FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
+        sb.append("FILTER (?propertyUri != <" + RDFS.LABEL.stringValue() + ">) ");
+        sb.append("FILTER (?propertyUri != <" + RDFS.COMMENT.stringValue() + ">) ");
+        
         sb.append(" } ");
         sb.append("  ORDER BY ASC(?weight) ASC(?propertyLabel) ");
+        
+        SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddObject", objectUri);

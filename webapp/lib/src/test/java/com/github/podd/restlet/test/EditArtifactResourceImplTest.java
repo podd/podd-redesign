@@ -50,9 +50,9 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     public void testGetEditArtifactInternalObjectHtml() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-1.rdf");
+        final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-2.rdf");
         
-        final String objectUri = "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0";
+        final String objectUri = "urn:hardcoded:purl:artifact:1#publication45";
         
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
