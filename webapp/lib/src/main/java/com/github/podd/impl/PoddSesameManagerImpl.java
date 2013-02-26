@@ -594,12 +594,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         else
         {
-            // do find and replace to add the version into the system
+            // else, do find and replace to add the version into the system
             
             // type the ontology
             repositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
             // type the version of the ontology
             repositoryConnection.add(nextVersionUri, RDF.TYPE, OWL.ONTOLOGY, context);
+            // type the inferred ontology
+            repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
             
             // remove the content of any contexts that are the object of versionIRI statements
             final List<Statement> contextsToRemove =
@@ -630,20 +632,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 // then insert the new current version marker
                 repositoryConnection
                         .add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri, context);
+                
+                // remove whatever was previously there for the current inferred version marker
+                repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null,
+                        context);
+                
+                // link from the ontology IRI to the current inferred axioms ontology version
+                repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+                        nextInferredOntologyUri, context);
             }
             
             // then do a similar process with the inferred axioms ontology
-            
-            // type the inferred ontology
-            repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
-            
-            // remove whatever was previously there for the current inferred version marker
-            repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null,
-                    context);
-            
-            // link from the ontology IRI to the current inferred axioms ontology version
-            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
-                    nextInferredOntologyUri, context);
             
             // remove the content for all previous inferred versions
             for(Statement nextExistingVersion : existingVersions)
