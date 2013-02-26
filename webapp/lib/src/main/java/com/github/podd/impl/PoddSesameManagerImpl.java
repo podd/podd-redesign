@@ -570,15 +570,36 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         List<InferredOWLOntologyID> allOntologyVersions =
                 getAllOntologyVersions(nextOntologyID.getOntologyIRI(), repositoryConnection, context);
         
+        // If there are no current versions then the steps are relatively simple
         if(allOntologyVersions.isEmpty())
         {
+            // type the ontology
+            repositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
+            // type the version of the ontology
+            repositoryConnection.add(nextVersionUri, RDF.TYPE, OWL.ONTOLOGY, context);
+            // type the inferred ontology
+            repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
             
+            // then insert the new current version marker
+            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri, context);
+            
+            // setup a version number link for this version
+            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri, context);
+            // link from the ontology IRI to the current inferred axioms ontology version
+            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+                    nextInferredOntologyUri, context);
+            // link from the ontology version IRI to the matching inferred axioms ontology version
+            repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                    nextInferredOntologyUri, context);
         }
         else
         {
+            // do find and replace to add the version into the system
             
             // type the ontology
             repositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
+            // type the version of the ontology
+            repositoryConnection.add(nextVersionUri, RDF.TYPE, OWL.ONTOLOGY, context);
             
             // remove the content of any contexts that are the object of versionIRI statements
             final List<Statement> contextsToRemove =
@@ -595,13 +616,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // setup a version number link for this version
             repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri, context);
             
-            final List<Statement> currentVersions =
+            final List<Statement> existingVersions =
                     Iterations.asList(repositoryConnection.getStatements(nextOntologyUri,
                             PoddRdfConstants.OMV_CURRENT_VERSION, null, false, context));
             
             // If there are no current versions, or we must update the current version, then do it
             // here
-            if(currentVersions.isEmpty() || updateCurrent)
+            if(existingVersions.isEmpty() || updateCurrent)
             {
                 // remove whatever was previously there for the current version marker
                 repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null, context);
@@ -629,21 +650,23 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // this method is called to update the version
             // FIXME: This needs to be a more complex query written in SPARQL, as the previous
             // versions are not all easy to find using getStatements
-            final RepositoryResult<Statement> repoResults =
-                    repositoryConnection.getStatements(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                            null, false, context);
-            while(repoResults.hasNext())
+            for(Statement nextExistingVersion : existingVersions)
             {
-                final URI inferredVersionUri = IRI.create(repoResults.next().getObject().stringValue()).toOpenRDFURI();
+                List<Statement> existingInferredVersions =
+                        Iterations.asList(repositoryConnection.getStatements(nextExistingVersion.getSubject(),
+                                PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, false, context));
+                for(Statement nextInferredVersion : existingInferredVersions)
+                {
+                    // clear inferred statements for previous inferred version
+                    repositoryConnection.clear(nextInferredVersion.getSubject());
+                    
+                    // remove all references from artifact graph
+                    repositoryConnection.remove(nextInferredVersion.getSubject(), null, null, context);
+                }
                 
-                // clear inferred statements for previous inferred version
-                repositoryConnection.clear(inferredVersionUri);
-                
-                // remove all references from artifact graph
-                repositoryConnection.remove(inferredVersionUri, null, null, context);
+                repositoryConnection.remove(nextExistingVersion, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null,
+                        context);
             }
-            
-            repositoryConnection.remove(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, context);
             
             // link from the ontology version IRI to the matching inferred axioms ontology version
             repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
