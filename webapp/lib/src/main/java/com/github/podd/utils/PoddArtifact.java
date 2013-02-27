@@ -3,7 +3,6 @@
  */
 package com.github.podd.utils;
 
-import org.openrdf.model.URI;
 import org.semanticweb.owlapi.model.IRI;
 
 /**
@@ -21,15 +20,17 @@ public class PoddArtifact extends PoddObject
 {
     
     private String leadInstitution;
+    private InferredOWLOntologyID artifactID;
     
     /**
      * Constructor
      * 
      * @param uri
      */
-    public PoddArtifact(URI uri)
+    public PoddArtifact(InferredOWLOntologyID artifactID)
     {
-        super(uri);
+        super(((IRI)artifactID.getOntologyIRI()).toOpenRDFURI());
+        this.artifactID = artifactID;
     }
     
     public String getLeadInstitution()
@@ -42,4 +43,8 @@ public class PoddArtifact extends PoddObject
         this.leadInstitution = leadInstitution;
     }
     
+    public InferredOWLOntologyID getArtifactID()
+    {
+        return this.artifactID;
+    }
 }
