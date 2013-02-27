@@ -550,11 +550,91 @@ public class SparqlQueryTest extends AbstractOntologyTest
         System.out.println(cardinalities[0] + " " + cardinalities[1] + " " + cardinalities[2]);
     }
 
-    @Ignore
+    /**
+     * Tests retrieving all possible values for Collection types
+     */
     @Test
     public void testSpikeGetPossibleValues() throws Exception
     {
+        // Create a list of contexts made up of the schema ontologies and the asserted artifact.
+        final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
+        final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
         
+        this.conn = this.getConnection();
+        
+        // types of Collections to test
+        URI[] collectionURIsToTest =
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Software"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "PublicationStatus"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "HasControlAssertion"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildTypeAssertion"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"), };
+        
+        URI[][] expectedMembers =
+                {
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Software"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Hardware"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "HardwareSoftware") },
+                        
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "Sex_NotApplicable"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Unknown"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "Sex_Hermaphrodite"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Female"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Male") },
+                        
+                        {}, //poddScience:Software is not a Collection
+                        
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "Published"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "NotPublished"), },
+                        
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "HasControl_Yes"),
+                                ValueFactoryImpl.getInstance()
+                                        .createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_No"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "HasControl_NotApplicable"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "HasControl_Unknown") },
+                        
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_Yes"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_No"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "WildType_NotApplicable"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "WildType_Unknown") },
+                        
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC_Yes"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC_No"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "ANZSRC_NotApplicable"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "ANZSRC_Unknown") },
+                
+                };
+        
+        // iterate through test data
+        for(int i = 0; i < collectionURIsToTest.length; i++)
+        {
+            List<PoddObject> members =
+                    SparqlQueryHelper.spikeGetPossibleValues(collectionURIsToTest[i], conn, contexts);
+            Assert.assertEquals("Not the expected number of members", expectedMembers[i].length, members.size());
+            
+            List<URI> expectedMembersList = Arrays.asList(expectedMembers[i]);
+            for(PoddObject resultObject : members)
+            {
+                Assert.assertTrue("Unexpected member found", expectedMembersList.contains(resultObject.getUri()));
+            }
+        }
     }
     
     /**
