@@ -12,6 +12,10 @@ import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.PoddArtifactManager;
+import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddWebServiceApplication;
 
@@ -106,6 +110,26 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
         final PoddWebServiceApplication application = (PoddWebServiceApplication)super.getApplication();
         
         return application;
+    }
+    
+    public PoddArtifactManager getPoddArtifactManager()
+    {
+        return this.getPoddApplication().getPoddArtifactManager();
+    }
+    
+    public PoddRepositoryManager getPoddRepositoryManager()
+    {
+        return this.getPoddApplication().getPoddRepositoryManager();
+    }
+
+    public PoddSchemaManager getPoddSchemaManager()
+    {
+        return this.getPoddApplication().getPoddSchemaManager();
+    }
+    
+    public PoddSesameManager getPoddSesameManager()
+    {
+        return this.getPoddApplication().getPoddArtifactManager().getSesameManager();
     }
     
     /**
