@@ -242,6 +242,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     
     protected PoddObject getTopObject(RepositoryConnection conn, InferredOWLOntologyID ontologyID) throws OpenRDFException
     {
+        // FIXME: Use PoddArtifactManager or PoddSesameManager here
         // get top-object of this artifact
         final List<PoddObject> topObjectList =
                 SparqlQueryHelper.getTopObjects(conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID

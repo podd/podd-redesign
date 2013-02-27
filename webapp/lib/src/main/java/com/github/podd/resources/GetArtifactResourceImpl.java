@@ -191,6 +191,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             // get top-object of this artifact
+            // FIXME: Use PoddArtifactManager or PoddSesameManager here
             final List<PoddObject> topObjectList =
                     SparqlQueryHelper.getTopObjects(conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
                             .getInferredOntologyIRI().toOpenRDFURI());

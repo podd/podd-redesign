@@ -31,6 +31,8 @@ import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.PoddSesameManager;
+
 /**
  * This class contains code to retrieve artifacts/objects (via SPARQL) for display purposes in the
  * HTML interface.
@@ -229,7 +231,9 @@ public class SparqlQueryHelper
      * @param artifactGraph
      * @return
      * @throws OpenRDFException
+     * @deprecated Use {@link PoddSesameManager#getOntologies(boolean, RepositoryConnection, URI)} instead.
      */
+    @Deprecated
     public static List<URI> getPoddArtifactList(final RepositoryConnection repositoryConnection, final URI artifactGraph)
         throws OpenRDFException
     {
