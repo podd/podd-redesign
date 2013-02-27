@@ -31,6 +31,8 @@ import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.PoddSesameManager;
+
 /**
  * This class contains code to retrieve artifacts/objects (via SPARQL) for display purposes in the
  * HTML interface.
@@ -127,8 +129,9 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public static List<PoddObject> getContainedObjects(final URI parentObject, final boolean recursive,
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
+    public static List<PoddObjectLabel> getContainedObjects(final InferredOWLOntologyID artifactID,
+            final URI parentObject, final boolean recursive, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         
@@ -155,7 +158,7 @@ public class SparqlQueryHelper
         
         final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
-        final List<PoddObject> children = new ArrayList<PoddObject>();
+        final List<PoddObjectLabel> children = new ArrayList<PoddObjectLabel>();
         final List<URI> childURIs = new ArrayList<URI>();
         try
         {
@@ -163,11 +166,12 @@ public class SparqlQueryHelper
             {
                 final BindingSet nextResult = queryResults.next();
                 
-                final PoddObject containedObject = new PoddObject((URI)nextResult.getValue("containedObject"));
-                containedObject.setTitle(nextResult.getValue("containedObjectLabel").stringValue());
+                final PoddObjectLabel containedObject =
+                        new PoddObjectLabelImpl(artifactID, (URI)nextResult.getValue("containedObject"), nextResult
+                                .getValue("containedObjectLabel").stringValue());
                 
                 children.add(containedObject);
-                childURIs.add(containedObject.getUri());
+                childURIs.add(containedObject.getObjectURI());
             }
         }
         finally
@@ -180,8 +184,9 @@ public class SparqlQueryHelper
         {
             for(final URI childUri : childURIs)
             {
-                final List<PoddObject> descendantList =
-                        SparqlQueryHelper.getContainedObjects(childUri, true, repositoryConnection, contexts);
+                final List<PoddObjectLabel> descendantList =
+                        SparqlQueryHelper.getContainedObjects(artifactID, childUri, true, repositoryConnection,
+                                contexts);
                 children.addAll(descendantList);
             }
         }
@@ -229,7 +234,10 @@ public class SparqlQueryHelper
      * @param artifactGraph
      * @return
      * @throws OpenRDFException
+     * @deprecated Use {@link PoddSesameManager#getOntologies(boolean, RepositoryConnection, URI)}
+     *             instead.
      */
+    @Deprecated
     public static List<URI> getPoddArtifactList(final RepositoryConnection repositoryConnection, final URI artifactGraph)
         throws OpenRDFException
     {
@@ -324,7 +332,7 @@ public class SparqlQueryHelper
         
         return model;
     }
-
+    
     /**
      * Work in progress [25/02/2013]
      * 
@@ -336,8 +344,8 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public static Model getPoddObjectDetailsForEdit(final URI objectUri, final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
+    public static Model getPoddObjectDetailsForEdit(final URI objectUri,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         
@@ -381,12 +389,11 @@ public class SparqlQueryHelper
         return model;
     }
     
-    
     /**
      * Retrieve a list of properties about the given object. The list is ordered based on property
      * weights.
      * 
-     * RDF:TYPE, RDFS:COMMENT and RDFS:LABEL statements are omitted from the results. 
+     * RDF:TYPE, RDFS:COMMENT and RDFS:LABEL statements are omitted from the results.
      * 
      * Note: If only asserted properties are required, the inferred ontology graph should not be
      * included in the <i>contexts</i> passed into this method.
@@ -419,7 +426,7 @@ public class SparqlQueryHelper
         sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
         sb.append("FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
         sb.append("FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
-
+        
         // Exclude as TYPE, Label (title) and Comment (description) are displayed separately
         sb.append("FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
         sb.append("FILTER (?propertyUri != <" + RDFS.LABEL.stringValue() + ">) ");
@@ -462,8 +469,8 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public static List<PoddObject> getTopObjects(final RepositoryConnection repositoryConnection, final URI... contexts)
-        throws OpenRDFException
+    public static List<PoddObjectLabel> getTopObjects(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         
@@ -482,24 +489,27 @@ public class SparqlQueryHelper
         final TupleQueryResult queryResults =
                 SparqlQueryHelper.executeSparqlQuery(sb.toString(), repositoryConnection, contexts);
         
-        final List<PoddObject> topObjectList = new ArrayList<PoddObject>();
+        final List<PoddObjectLabel> topObjectList = new ArrayList<PoddObjectLabel>();
         try
         {
             while(queryResults.hasNext())
             {
                 final BindingSet next = queryResults.next();
                 final URI pred = (URI)next.getValue("topObjectUri");
-                final PoddObject poddObject = new PoddObject(pred);
+                String label = null;
+                String description = null;
                 
                 if(next.getValue("topObjectLabel") != null)
                 {
-                    poddObject.setTitle(next.getValue("topObjectLabel").stringValue());
+                    label = next.getValue("topObjectLabel").stringValue();
                 }
                 
                 if(next.getValue("topObjectDescription") != null)
                 {
-                    poddObject.setDescription(next.getValue("topObjectDescription").stringValue());
+                    description = next.getValue("topObjectDescription").stringValue();
                 }
+                
+                final PoddObjectLabel poddObject = new PoddObjectLabelImpl(ontologyID, pred, label, description);
                 
                 topObjectList.add(poddObject);
             }
@@ -524,8 +534,8 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public static PoddObject getPoddObject(final URI objectUri, final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
+    public static PoddObjectLabel getPoddObject(final InferredOWLOntologyID ontologyID, final URI objectUri,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         sb.append("SELECT ?label ?description ");
@@ -538,29 +548,35 @@ public class SparqlQueryHelper
         tupleQuery.setBinding("objectUri", objectUri);
         final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
-        final PoddObject poddObject = new PoddObject(objectUri);
         try
         {
             if(queryResults.hasNext())
             {
                 final BindingSet next = queryResults.next();
                 
-                if(next.getValue("label") != null)
+                String label = null;
+                String description = null;
+                
+                if(next.getValue("topObjectLabel") != null)
                 {
-                    poddObject.setTitle(next.getValue("label").stringValue());
+                    label = next.getValue("topObjectLabel").stringValue();
                 }
                 
-                if(next.getValue("description") != null)
+                if(next.getValue("topObjectDescription") != null)
                 {
-                    poddObject.setDescription(next.getValue("description").stringValue());
+                    description = next.getValue("topObjectDescription").stringValue();
                 }
+                
+                final PoddObjectLabel poddObject = new PoddObjectLabelImpl(ontologyID, objectUri, label, description);
+                
+                return poddObject;
             }
         }
         finally
         {
             queryResults.close();
         }
-        return poddObject;
+        return null;
     }
     
     /**
@@ -578,8 +594,8 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public static PoddObject getObjectType(final URI objectUri, final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
+    public static PoddObjectLabel getObjectType(final InferredOWLOntologyID ontologyID, final URI objectUri,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         sb.append("SELECT ?poddTypeUri ?label ?description ");
@@ -600,35 +616,35 @@ public class SparqlQueryHelper
         tupleQuery.setBinding("objectUri", objectUri);
         final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
-        PoddObject poddObject = new PoddObject(objectUri);
         try
         {
             if(queryResults.hasNext())
             {
                 final BindingSet next = queryResults.next();
                 
-                poddObject = new PoddObject((URI)next.getValue("poddTypeUri"));
+                String label = null;
+                String description = null;
                 
-                if(next.getValue("label") != null)
+                if(next.getValue("topObjectLabel") != null)
                 {
-                    poddObject.setTitle(next.getValue("label").stringValue());
-                }
-                else
-                {
-                    poddObject.setTitle(poddObject.getUri().getLocalName());
+                    label = next.getValue("topObjectLabel").stringValue();
                 }
                 
-                if(next.getValue("description") != null)
+                if(next.getValue("topObjectDescription") != null)
                 {
-                    poddObject.setDescription(next.getValue("description").stringValue());
+                    description = next.getValue("topObjectDescription").stringValue();
                 }
+                
+                final PoddObjectLabel poddObject = new PoddObjectLabelImpl(ontologyID, objectUri, label, description);
+                
+                return poddObject;
             }
         }
         finally
         {
             queryResults.close();
         }
-        return poddObject;
+        return null;
     }
     
     /**
@@ -657,11 +673,10 @@ public class SparqlQueryHelper
             ValueFactoryImpl.getInstance().createURI(
                     "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1"), };
     
-    
     /**
-     * Spike method only. 
+     * Spike method only.
      * 
-     * Retrieves the cardinalities from the schema ontologies, for the given concept and property. 
+     * Retrieves the cardinalities from the schema ontologies, for the given concept and property.
      * 
      * NOTE: does not work on "unqualified" cardinality statements yet.
      * 
@@ -669,13 +684,13 @@ public class SparqlQueryHelper
      * @param propertyUri
      * @param repositoryConnection
      * @param contexts
-     * @return an integer array of size 3. 
+     * @return an integer array of size 3.
      * @throws OpenRDFException
      */
     public static int[] spikeGetCardinality(final URI objectUri, final URI propertyUri, 
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
-        final int[] cardinalities = {-1, -1, -1};
+        final int[] cardinalities = { -1, -1, -1 };
         
         final StringBuilder sb = new StringBuilder();
         
@@ -705,19 +720,19 @@ public class SparqlQueryHelper
                 final BindingSet binding = queryResults.next();
                 
                 Value minCardinality = binding.getValue("minCardinality");
-                if (minCardinality != null && minCardinality instanceof Literal)
+                if(minCardinality != null && minCardinality instanceof Literal)
                 {
                     cardinalities[0] = ((Literal)minCardinality).intValue();
                 }
-
+                
                 Value qualifiedCardinality = binding.getValue("qualifiedCardinality");
-                if (qualifiedCardinality != null && qualifiedCardinality instanceof Literal)
+                if(qualifiedCardinality != null && qualifiedCardinality instanceof Literal)
                 {
                     cardinalities[1] = ((Literal)qualifiedCardinality).intValue();
                 }
-
+                
                 Value maxCardinality = binding.getValue("maxCardinality");
-                if (maxCardinality != null && maxCardinality instanceof Literal)
+                if(maxCardinality != null && maxCardinality instanceof Literal)
                 {
                     cardinalities[2] = ((Literal)maxCardinality).intValue();
                 }
@@ -732,31 +747,32 @@ public class SparqlQueryHelper
     }
     
     /*
-     Spike method.  
-
-   {http://purl.org/podd/ns/poddScience#PlatformType}   <http://www.w3.org/2002/07/owl#equivalentClass>  {_:genid1636663090}
-   {_:genid1636663090}   <http://www.w3.org/2002/07/owl#oneOf>  {_:genid72508669}
-   
-   {_:genid72508669}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>  {http://purl.org/podd/ns/poddScience#Software}
-   {_:genid72508669}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>  {_:genid953844943}
- 
-   {_:genid953844943}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>  {http://purl.org/podd/ns/poddScience#HardwareSoftware}
-   {_:genid953844943}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>  {_:genid278519207}
-   
-   {_:genid278519207}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>  {http://purl.org/podd/ns/poddScience#Hardware}
-   {_:genid278519207}   <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>  {http://www.w3.org/1999/02/22-rdf-syntax-ns#nil}
- 
- SELECT ?member WHERE
- {
-     ?conceptUri :equivalentClass ?b0 .
-     ?b0         :oneOf             ?b1 .
-     ?b1    rdf:rest * / rdf:first ?member .     
- }
+     * Spike method.
+     * 
+     * {http://purl.org/podd/ns/poddScience#PlatformType}
+     * <http://www.w3.org/2002/07/owl#equivalentClass> {_:genid1636663090} {_:genid1636663090}
+     * <http://www.w3.org/2002/07/owl#oneOf> {_:genid72508669}
+     * 
+     * {_:genid72508669} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+     * {http://purl.org/podd/ns/poddScience#Software} {_:genid72508669}
+     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> {_:genid953844943}
+     * 
+     * {_:genid953844943} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+     * {http://purl.org/podd/ns/poddScience#HardwareSoftware} {_:genid953844943}
+     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> {_:genid278519207}
+     * 
+     * {_:genid278519207} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+     * {http://purl.org/podd/ns/poddScience#Hardware} {_:genid278519207}
+     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+     * {http://www.w3.org/1999/02/22-rdf-syntax-ns#nil}
+     * 
+     * SELECT ?member WHERE { ?conceptUri :equivalentClass ?b0 . ?b0 :oneOf ?b1 . ?b1 rdf:rest * /
+     * rdf:first ?member . }
      */
-    public static List<PoddObject> spikeGetPossibleValues(final URI conceptUri,  
+    public static List<PoddObjectLabel> spikeGetPossibleValues(final URI conceptUri,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
-        List<PoddObject> results = new ArrayList<PoddObject>();
+        List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         
         final StringBuilder sb = new StringBuilder();
         
@@ -775,7 +791,7 @@ public class SparqlQueryHelper
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddConcept", conceptUri);
         final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
-
+        
         try
         {
             while(queryResults.hasNext())
@@ -786,15 +802,19 @@ public class SparqlQueryHelper
                 Value memberLabel = binding.getValue("memberLabel");
                 Value memberDescription = binding.getValue("memberDescription");
                 
-                PoddObject memberObject = new PoddObject((URI)member);
-                if (memberLabel != null)
+                String label = null;
+                String description = null;
+                
+                if(memberLabel != null)
                 {
-                    memberObject.setTitle(memberLabel.stringValue());
+                    label = memberLabel.stringValue();
                 }
-                if (memberDescription != null)
+                if(memberDescription != null)
                 {
-                    memberObject.setDescription(memberDescription.stringValue());
+                    description = memberDescription.stringValue();
                 }
+                
+                PoddObjectLabel memberObject = new PoddObjectLabelImpl(null, (URI)member, label, description);
                 results.add(memberObject);
             }
         }
@@ -805,6 +825,5 @@ public class SparqlQueryHelper
         
         return results;
     }
-    
     
 }

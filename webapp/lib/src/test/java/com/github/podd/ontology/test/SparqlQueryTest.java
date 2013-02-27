@@ -26,7 +26,7 @@ import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddObject;
+import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.SparqlQueryHelper;
 
@@ -162,7 +162,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         Assert.assertEquals("Incorrect number of statements with podd object as the subject.", 14,
                 modelPropertyTriples.size());
     }
-
+    
     @Ignore
     @Test
     public void testGetPoddObjectDetailsForEditWithInternalObject() throws Exception
@@ -185,7 +185,8 @@ public class SparqlQueryTest extends AbstractOntologyTest
         
         // invoke method under test
         final Model model =
-                SparqlQueryHelper.getPoddObjectDetailsForEdit(objectUri, this.conn, allContextsToQuery.toArray(new URI[0]));
+                SparqlQueryHelper.getPoddObjectDetailsForEdit(objectUri, this.conn,
+                        allContextsToQuery.toArray(new URI[0]));
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about object", 8, model.size());
@@ -223,7 +224,11 @@ public class SparqlQueryTest extends AbstractOntologyTest
         
         this.conn = this.getConnection();
         
-        final URI topObjectUri = SparqlQueryHelper.getTopObjects(this.conn, contexts).get(0).getUri();
+        // FIXME: Something is broken if we are getting a set of labels just to get the object URI.
+        // Have you looked at the PoddSesameManager/PoddArtifactManager/PoddSchemaManager interfaces
+        // to work on this in a cleaner manner?
+        final URI topObjectUri =
+                SparqlQueryHelper.getTopObjects(nextOntologyID, this.conn, contexts).get(0).getObjectURI();
         final List<URI> orderedPropertyUris = SparqlQueryHelper.getDirectProperties(topObjectUri, this.conn, contexts);
         
         // verify:
@@ -266,29 +271,27 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
         
         this.conn = this.getConnection();
-
+        
         // get URI for the internal Publication object
-        RepositoryResult<Statement> repoResults = conn.getStatements(null, 
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddScience#hasPublication")
-                , null, false, contexts);
+        RepositoryResult<Statement> repoResults =
+                conn.getStatements(null,
+                        ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddScience#hasPublication"),
+                        null, false, contexts);
         List<Statement> list = Iterations.asList(repoResults);
         Assert.assertEquals("List should have 1 record", 1, list.size());
         URI publicationObjectUri = (URI)list.get(0).getObject();
         
-        final List<URI> orderedPropertyUris = SparqlQueryHelper.getDirectProperties(publicationObjectUri, this.conn, contexts);
+        final List<URI> orderedPropertyUris =
+                SparqlQueryHelper.getDirectProperties(publicationObjectUri, this.conn, contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 6, orderedPropertyUris.size());
         
         final String[] expectedUris =
-                { 
-                        "http://purl.org/dc/terms/creator",
-                        "http://purl.org/dc/terms/created",
-                        "http://purl.org/podd/ns/poddBase#hasPURL",
-                        "http://purl.org/podd/ns/poddScience#hasAbstract",
+                { "http://purl.org/dc/terms/creator", "http://purl.org/dc/terms/created",
+                        "http://purl.org/podd/ns/poddBase#hasPURL", "http://purl.org/podd/ns/poddScience#hasAbstract",
                         "http://purl.org/podd/ns/poddScience#publishedIn",
-                        "http://purl.org/podd/ns/poddScience#hasYear",
-                        };
+                        "http://purl.org/podd/ns/poddScience#hasYear", };
         for(int i = 0; i < orderedPropertyUris.size(); i++)
         {
             Assert.assertEquals("Property URI not in expected position",
@@ -297,7 +300,6 @@ public class SparqlQueryTest extends AbstractOntologyTest
         
         this.printContents(conn, super.getSchemaOntologyGraphs().get(8));
     }
-
     
     /**
      * Test retrieve list of direct children of the Top Object
@@ -314,9 +316,9 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI parentObjectURI =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
         
-        final List<PoddObject> childObjectList =
-                SparqlQueryHelper.getContainedObjects(parentObjectURI, false, this.conn, contextUri, nextOntologyID
-                        .getInferredOntologyIRI().toOpenRDFURI());
+        final List<PoddObjectLabel> childObjectList =
+                SparqlQueryHelper.getContainedObjects(nextOntologyID, parentObjectURI, false, this.conn, contextUri,
+                        nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
         
         final String[] expectedLabels =
                 { "Demo Analysis", "Demo Process 1", "Demo Process 2", "Demo Project Plan", "Demo investigation",
@@ -325,7 +327,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         Assert.assertEquals("Incorrect number of direct child objects", 6, childObjectList.size());
         for(int i = 0; i < childObjectList.size(); i++)
         {
-            Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getTitle());
+            Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getLabel());
         }
     }
     
@@ -345,16 +347,16 @@ public class SparqlQueryTest extends AbstractOntologyTest
                 ValueFactoryImpl.getInstance().createURI(
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation");
         
-        final List<PoddObject> childObjectList =
-                SparqlQueryHelper.getContainedObjects(parentObjectURI, false, this.conn, contextUri, nextOntologyID
-                        .getInferredOntologyIRI().toOpenRDFURI());
+        final List<PoddObjectLabel> childObjectList =
+                SparqlQueryHelper.getContainedObjects(nextOntologyID, parentObjectURI, false, this.conn, contextUri,
+                        nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
         
         final String[] expectedLabels = { "Demo material", "Squeekee material", "my treatment 1" };
         
         Assert.assertEquals("Incorrect number of direct child objects", 3, childObjectList.size());
         for(int i = 0; i < childObjectList.size(); i++)
         {
-            Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getTitle());
+            Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getLabel());
         }
     }
     
@@ -373,9 +375,9 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI parentObjectURI =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966");
         
-        final List<PoddObject> childObjectList =
-                SparqlQueryHelper.getContainedObjects(parentObjectURI, true, this.conn, contextUri, nextOntologyID
-                        .getInferredOntologyIRI().toOpenRDFURI());
+        final List<PoddObjectLabel> childObjectList =
+                SparqlQueryHelper.getContainedObjects(nextOntologyID, parentObjectURI, true, this.conn, contextUri,
+                        nextOntologyID.getInferredOntologyIRI().toOpenRDFURI());
         
         final String[] expectedLabels =
                 { "Demo Analysis", "Demo Process 1", "Demo Process 2", "Demo Project Plan", "Demo investigation",
@@ -386,8 +388,8 @@ public class SparqlQueryTest extends AbstractOntologyTest
         Assert.assertEquals("Incorrect number of direct child objects", 14, childObjectList.size());
         for(int i = 0; i < childObjectList.size(); i++)
         {
-            System.out.println(childObjectList.get(i).getTitle());
-            Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getTitle());
+            System.out.println(childObjectList.get(i).getLabel());
+            Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getLabel());
         }
     }
     
@@ -421,13 +423,14 @@ public class SparqlQueryTest extends AbstractOntologyTest
         {
             final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
             
-            final PoddObject poddObject = SparqlQueryHelper.getObjectType(objectUri, this.conn, contexts);
+            final PoddObjectLabel poddObject =
+                    SparqlQueryHelper.getObjectType(ontologyID1, objectUri, this.conn, contexts);
             
             // verify:
             Assert.assertNotNull("Type was null", poddObject);
             Assert.assertEquals("Wrong type", ValueFactoryImpl.getInstance().createURI(expectedTypes[i]),
-                    poddObject.getUri());
-            Assert.assertEquals("Wrong label", expectedLabels[i], poddObject.getTitle());
+                    poddObject.getObjectURI());
+            Assert.assertEquals("Wrong label", expectedLabels[i], poddObject.getLabel());
         }
     }
     
@@ -469,11 +472,12 @@ public class SparqlQueryTest extends AbstractOntologyTest
         {
             final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
             
-            final PoddObject poddObject = SparqlQueryHelper.getPoddObject(objectUri, this.conn, contexts);
+            final PoddObjectLabel poddObject =
+                    SparqlQueryHelper.getPoddObject(ontologyID1, objectUri, this.conn, contexts);
             
             // verify:
             Assert.assertNotNull("Podd Object was null", poddObject);
-            Assert.assertEquals("Wrong title", expectedTitles[i], poddObject.getTitle());
+            Assert.assertEquals("Wrong title", expectedTitles[i], poddObject.getLabel());
             Assert.assertEquals("Wrong description", expectedDescriptions[i], poddObject.getDescription());
         }
     }
@@ -489,14 +493,14 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
         
         this.conn = this.getConnection();
-        final List<PoddObject> topObjects = SparqlQueryHelper.getTopObjects(this.conn, contextUri);
+        final List<PoddObjectLabel> topObjects = SparqlQueryHelper.getTopObjects(nextOntologyID, this.conn, contextUri);
         
         Assert.assertEquals("Expected 1 top object", 1, topObjects.size());
         Assert.assertEquals("Not the expected top object URI",
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130205/object:2966"),
-                topObjects.get(0).getUri());
+                topObjects.get(0).getObjectURI());
         Assert.assertEquals("Not the expected top object Label/title", "Project#2012-0006_ Cotton Leaf Morphology",
-                topObjects.get(0).getTitle());
+                topObjects.get(0).getLabel());
         Assert.assertEquals("Not the expected top object description", "Characterising normal and okra leaf shapes",
                 topObjects.get(0).getDescription());
     }
@@ -514,7 +518,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI contextUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
         
         this.conn = this.getConnection();
-        final List<PoddObject> topObjects = SparqlQueryHelper.getTopObjects(this.conn, contextUri);
+        final List<PoddObjectLabel> topObjects = SparqlQueryHelper.getTopObjects(nextOntologyID, this.conn, contextUri);
         
         Assert.assertEquals("Expected 3 top objects", 3, topObjects.size());
         
@@ -523,12 +527,12 @@ public class SparqlQueryTest extends AbstractOntologyTest
                         "http://purl.org/podd/basic-1-20130205/object:2977",
                         "http://purl.org/podd/basic-1-20130205/object:2988" });
         
-        for(final PoddObject topObject : topObjects)
+        for(final PoddObjectLabel topObject : topObjects)
         {
-            Assert.assertTrue("Unexpected top object", expectedUriList.contains(topObject.getUri().toString()));
+            Assert.assertTrue("Unexpected top object", expectedUriList.contains(topObject.getObjectURI().toString()));
         }
     }
-
+    
     @Test
     public void testSpikeGetCardinality() throws Exception
     {
@@ -541,22 +545,22 @@ public class SparqlQueryTest extends AbstractOntologyTest
         final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
         
         this.conn = this.getConnection();
-
-       // this.printContents(conn, contexts[8]);
         
+        // this.printContents(conn, contexts[8]);
         
         URI publicationObjectUri = ValueFactoryImpl.getInstance().createURI("urn:hardcoded:purl:artifact:1#publication45");
         URI propertyUri = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "publishedIn");
         
         int[] cardinalities = SparqlQueryHelper.spikeGetCardinality(publicationObjectUri, propertyUri, conn, contexts);
-
+        
         // verify:
         System.out.println(cardinalities[0] + " " + cardinalities[1] + " " + cardinalities[2]);
     }
-
+    
     /**
      * Tests retrieving all possible values for Collection types
      */
+    @Ignore
     @Test
     public void testSpikeGetPossibleValues() throws Exception
     {
@@ -593,7 +597,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Female"),
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Male") },
                         
-                        {}, //poddScience:Software is not a Collection
+                        {}, // poddScience:Software is not a Collection
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "Published"),
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "NotPublished"), },
@@ -629,14 +633,14 @@ public class SparqlQueryTest extends AbstractOntologyTest
         // iterate through test data
         for(int i = 0; i < collectionURIsToTest.length; i++)
         {
-            List<PoddObject> members =
+            List<PoddObjectLabel> members =
                     SparqlQueryHelper.spikeGetPossibleValues(collectionURIsToTest[i], conn, contexts);
             Assert.assertEquals("Not the expected number of members", expectedMembers[i].length, members.size());
             
             List<URI> expectedMembersList = Arrays.asList(expectedMembers[i]);
-            for(PoddObject resultObject : members)
+            for(PoddObjectLabel resultObject : members)
             {
-                Assert.assertTrue("Unexpected member found", expectedMembersList.contains(resultObject.getUri()));
+                Assert.assertTrue("Unexpected member found", expectedMembersList.contains(resultObject.getObjectURI()));
             }
         }
     }

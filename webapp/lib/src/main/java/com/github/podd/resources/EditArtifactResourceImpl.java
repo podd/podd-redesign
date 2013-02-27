@@ -33,7 +33,7 @@ import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddObject;
+import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 import com.github.podd.utils.SparqlQueryHelper;
@@ -48,7 +48,7 @@ import com.github.podd.utils.SparqlQueryHelper;
 public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     /** Constructor */
     public EditArtifactResourceImpl()
     {
@@ -109,13 +109,12 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
      *            The specific PODD object to edit.
      * @return The populated data model
      */
-    private Map<String, Object> populateDataModelForGet(final InferredOWLOntologyID ontologyID,
-            String objectToEdit)
+    private Map<String, Object> populateDataModelForGet(final InferredOWLOntologyID ontologyID, String objectToEdit)
     {
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "editObject.html.ftl");
         dataModel.put("pageTitle", "Edit Artifact");
-
+        
         // add required constants and methods to data model
         dataModel.put("RDFS_LABEL", RDFS.LABEL);
         dataModel.put("RDFS_RANGE", RDFS.RANGE);
@@ -124,94 +123,102 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
         dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
         dataModel.put("util", new FreemarkerUtil());
-
-        
         
         RepositoryConnection conn = null;
         try
         {
             conn = this.getPoddApplication().getPoddRepositoryManager().getRepository().getConnection();
             conn.begin();
-
             
-            if (objectToEdit == null)
+            URI objectUri;
+            
+            if(objectToEdit == null)
             {
-                objectToEdit = this.getTopObject(conn, ontologyID).getUri().stringValue();
+                // FIXME: Should not be working with the PoddObjectLabel interface here. Hint: There
+                // may be hints as to a better solution in one of the predesigned manager
+                // interfaces!
+                objectUri = this.getTopObject(conn, ontologyID).getObjectURI();
             }
-            URI objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
+            else
+            {
+                objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
+            }
             
             List<URI> contexts = new ArrayList<URI>(SparqlQueryHelper.getSchemaOntologyGraphs());
             contexts.add(ontologyID.getVersionIRI().toOpenRDFURI());
             URI[] assertedContexts = contexts.toArray(new URI[0]);
             
-            PoddObject objectType = SparqlQueryHelper.getObjectType(objectUri, conn, assertedContexts);
+            PoddObjectLabel objectType = SparqlQueryHelper.getObjectType(ontologyID, objectUri, conn, assertedContexts);
             if(objectType == null)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
-            if (objectType.getTitle() != null)
+            if(objectType.getLabel() != null)
             {
-                dataModel.put("objectType", objectType.getTitle());
+                dataModel.put("objectType", objectType.getLabel());
             }
             else
             {
-                dataModel.put("objectType", objectType.getUri());
+                dataModel.put("objectType", objectType.getObjectURI());
             }
-
-            PoddObject theObject = SparqlQueryHelper.getPoddObject(objectUri, conn, assertedContexts);
+            
+            PoddObjectLabel theObject = SparqlQueryHelper.getPoddObject(ontologyID, objectUri, conn, assertedContexts);
             dataModel.put("poddObject", theObject);
-            dataModel.put("objectName", theObject.getTitle());
-            dataModel.put("objectDescription", theObject.getDescription());
             
             // an ordered-list of the properties about the object
             final List<URI> orderedProperties =
                     SparqlQueryHelper.getDirectProperties(objectUri, conn, assertedContexts);
             this.log.info("Found {} properties about object {}", orderedProperties.size(), objectUri);
             dataModel.put("orderedPropertyList", orderedProperties);
-
+            
             // all statements which are needed to display these properties in HTML
             final Model allNeededStatementsForDisplay =
                     SparqlQueryHelper.getPoddObjectDetailsForEdit(objectUri, conn, assertedContexts);
             dataModel.put("completeModel", allNeededStatementsForDisplay);
             
-            
             // TODO
             dataModel.put("initialized", false);
             
-            /*            // *** editObject.html.ftl ***
-            
-            <#-- @ftlvariable name="isAdmin" type="boolean" -->
-            
-            <#-- @ftlvariable name="canViewProjectParticipants" type="boolean" -->
-            <#-- @ftlvariable name="initialized" type="boolean" -->
-            <#-- @ftlvariable name="postUrl" type="java.lang.String" -->
-            <#-- @ftlvariable name="objectPID" type="java.lang.String" -->
-            <#-- @ftlvariable name="objectType" type="java.lang.String" -->
-            <#-- @ftlvariable name="isProject" type="boolean" -->
-            <#-- @ftlvariable name="elementList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" -->
-            <#-- @ftlvariable name="refersList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" -->
-            <#-- @ftlvariable name="fileList" type="java.util.ArrayList<podd.resources.util.view.FileElement>" -->
-            <#-- @ftlvariable name="canComplete" type="boolean" -->
-            <#-- @ftlvariable name="aHREF" type="java.lang.String" -->
-            
-            <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
-            <#-- @ftlvariable name="objectNameError" type="java.lang.String" -->
-            <#-- @ftlvariable name="objectDescriptionError" type="java.lang.String" -->
-            <#-- @ftlvariable name="generalErrorList" type="java.util.ArrayList<java.lang.String>" -->
-            <#-- @ftlvariable name="objectErrorList" type="java.util.ArrayList<java.lang.String>" -->
-             */            
-            
+            /*
+             * // *** editObject.html.ftl ***
+             * 
+             * <#-- @ftlvariable name="isAdmin" type="boolean" -->
+             * 
+             * <#-- @ftlvariable name="canViewProjectParticipants" type="boolean" --> <#--
+             * 
+             * @ftlvariable name="initialized" type="boolean" --> <#-- @ftlvariable name="postUrl"
+             * type="java.lang.String" --> <#-- @ftlvariable name="objectPID"
+             * type="java.lang.String" --> <#-- @ftlvariable name="objectType"
+             * type="java.lang.String" --> <#-- @ftlvariable name="isProject" type="boolean" -->
+             * <#-- @ftlvariable name="elementList"
+             * type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" --> <#--
+             * 
+             * @ftlvariable name="refersList"
+             * type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" --> <#--
+             * 
+             * @ftlvariable name="fileList"
+             * type="java.util.ArrayList<podd.resources.util.view.FileElement>" --> <#--
+             * 
+             * @ftlvariable name="canComplete" type="boolean" --> <#-- @ftlvariable name="aHREF"
+             * type="java.lang.String" -->
+             * 
+             * <#-- @ftlvariable name="errorMessage" type="java.lang.String" --> <#-- @ftlvariable
+             * name="objectNameError" type="java.lang.String" --> <#-- @ftlvariable
+             * name="objectDescriptionError" type="java.lang.String" --> <#-- @ftlvariable
+             * name="generalErrorList" type="java.util.ArrayList<java.lang.String>" --> <#--
+             * 
+             * @ftlvariable name="objectErrorList" type="java.util.ArrayList<java.lang.String>" -->
+             */
             
             // *** attachFile.html.ftl ***
-            
             
             // *** attachFile.html.ftl ***
             // stopRefreshKey - String
             // - values that don't have to be set
-            //      fileDescription type="java.lang.String" -->
-            //      fileErrorMessage" type="java.lang.String" -->
-            //      fileDescriptionError" type="java.lang.String" -->
-            //      attachedFileList" type="java.util.List<String>" -->
+            // fileDescription type="java.lang.String" -->
+            // fileErrorMessage" type="java.lang.String" -->
+            // fileDescriptionError" type="java.lang.String" -->
+            // attachedFileList" type="java.util.List<String>" -->
             dataModel.put("stopRefreshKey", "Stop Refresh Key");
             
         }
@@ -226,13 +233,13 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                 try
                 {
                     // This is a Get request, therefore nothing to commit
-                    conn.rollback(); 
+                    conn.rollback();
                     conn.close();
                 }
-                catch (OpenRDFException e)
+                catch(OpenRDFException e)
                 {
                     this.log.error("Failed to close RepositoryConnection", e);
-                    //Should we do anything other than log an error?
+                    // Should we do anything other than log an error?
                 }
             }
         }
@@ -240,11 +247,13 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         return dataModel;
     }
     
-    protected PoddObject getTopObject(RepositoryConnection conn, InferredOWLOntologyID ontologyID) throws OpenRDFException
+    protected PoddObjectLabel getTopObject(RepositoryConnection conn, InferredOWLOntologyID ontologyID)
+        throws OpenRDFException
     {
+        // FIXME: Use PoddArtifactManager or PoddSesameManager here
         // get top-object of this artifact
-        final List<PoddObject> topObjectList =
-                SparqlQueryHelper.getTopObjects(conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
+        final List<PoddObjectLabel> topObjectList =
+                SparqlQueryHelper.getTopObjects(ontologyID, conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         if(topObjectList == null || topObjectList.size() != 1)
         {
