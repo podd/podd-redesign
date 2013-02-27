@@ -85,7 +85,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
      */
     private volatile Configuration freemarkerConfiguration;
     private volatile ChallengeAuthenticator auth;
-    private volatile PoddSesameRealm realm;
+    private volatile PoddSesameRealmImpl realm;
     
     private Repository nextRepository;
     
@@ -359,7 +359,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public PoddSesameRealm getRealm()
+    public PoddSesameRealmImpl getRealm()
     {
         return this.realm;
     }
@@ -391,7 +391,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     {
         if(nextRealm instanceof PoddSesameRealm)
         {
-            this.realm = (PoddSesameRealm)nextRealm;
+            this.realm = (PoddSesameRealmImpl)nextRealm;
         }
         else
         {

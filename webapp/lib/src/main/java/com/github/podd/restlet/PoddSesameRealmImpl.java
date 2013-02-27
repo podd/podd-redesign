@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
-import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
@@ -47,7 +46,7 @@ import com.github.podd.utils.PoddWebConstants;
  * @author kutila
  * 
  */
-public class PoddSesameRealm extends RestletUtilSesameRealm
+public class PoddSesameRealmImpl extends PoddSesameRealm
 {
     // ======================= begin inner classes ==========================
     
@@ -63,15 +62,15 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         public void enrole(final ClientInfo clientInfo)
         {
             // casting is safe here as buildRestletUserFromSparqlResult() creates a PoddUser
-            final PoddUser user = (PoddUser)PoddSesameRealm.this.findUser(clientInfo.getUser().getIdentifier());
+            final PoddUser user = (PoddUser)PoddSesameRealmImpl.this.findUser(clientInfo.getUser().getIdentifier());
             
             if(user != null)
             {
                 // Find all the inherited groups of this user
-                final Set<Group> userGroups = PoddSesameRealm.this.findGroups(user);
+                final Set<Group> userGroups = PoddSesameRealmImpl.this.findGroups(user);
                 
                 // Add roles specific to this user
-                final Set<Role> userRoles = PoddSesameRealm.this.findRoles(user);
+                final Set<Role> userRoles = PoddSesameRealmImpl.this.findRoles(user);
                 
                 for(final Role role : userRoles)
                 {
@@ -84,7 +83,7 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
                 }
                 
                 // Add roles common to group members
-                final Set<Role> groupRoles = PoddSesameRealm.this.findRoles(userGroups);
+                final Set<Role> groupRoles = PoddSesameRealmImpl.this.findRoles(userGroups);
                 
                 for(final Role role : groupRoles)
                 {
@@ -106,11 +105,11 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         protected User createUser(final String identifier, final Request request, final Response response)
         {
             // casting is safe here as buildRestletUserFromSparqlResult() creates a PoddUser
-            final PoddUser checkUser = (PoddUser)PoddSesameRealm.this.findUser(identifier);
+            final PoddUser checkUser = (PoddUser)PoddSesameRealmImpl.this.findUser(identifier);
             
             if(checkUser == null)
             {
-                PoddSesameRealm.this.log.error("Cannot create a user for the given identifier: {}", identifier);
+                PoddSesameRealmImpl.this.log.error("Cannot create a user for the given identifier: {}", identifier);
                 throw new IllegalArgumentException("Cannot create a user for the given identifier");
             }
             
@@ -125,7 +124,7 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         public char[] getLocalSecret(final String identifier)
         {
             char[] result = null;
-            final User user = PoddSesameRealm.this.findUser(identifier);
+            final User user = PoddSesameRealmImpl.this.findUser(identifier);
             
             if(user != null)
             {
@@ -138,20 +137,6 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
     
     // ======================= end inner classes ==========================
     
-    protected static final String PARAM_USER_IDENTIFIER = "userIdentifier";
-    protected static final String PARAM_USER_URI = "userUri";
-    protected static final String PARAM_USER_SECRET = "userSecret";
-    protected static final String PARAM_USER_FIRSTNAME = "userFirstName";
-    protected static final String PARAM_USER_LASTNAME = "userLastName";
-    protected static final String PARAM_USER_EMAIL = "userEmail";
-    protected static final String PARAM_USER_STATUS = "userStatus";
-    protected static final String PARAM_USER_HOMEPAGE = "userHomePage";
-    
-    protected static final String PARAM_USER_ORCID = "userOrcid";
-    protected static final String PARAM_USER_ORGANIZATION = "userOrganization";
-    
-    protected static final String PARAM_ROLE = "role";
-    
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private final ValueFactory vf = PoddRdfConstants.VALUE_FACTORY;
@@ -162,7 +147,7 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
      * @param repository
      * @param contexts
      */
-    public PoddSesameRealm(Repository repository, URI... contexts)
+    public PoddSesameRealmImpl(Repository repository, URI... contexts)
     {
         super(repository, contexts);
         
@@ -172,12 +157,13 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
     }
     
     /**
-     * This method adds a User entry to the Realm and underlying Sesame Repository
-     * including PODD-specific user parameters.
-     *  
+     * This method adds a User entry to the Realm and underlying Sesame Repository including
+     * PODD-specific user parameters.
+     * 
      * @param nextUser
      * @return
      */
+    @Override
     public URI addUser(final PoddUser nextUser)
     {
         URI nextUserUUID = super.addUser(nextUser);
@@ -198,14 +184,13 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
             
             if(nextUser.getOrcid() != null)
             {
-                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_ORCID,
-                        this.vf.createLiteral(nextUser.getOrcid()), this.getContexts());
+                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_ORCID, this.vf.createLiteral(nextUser.getOrcid()),
+                        this.getContexts());
             }
             
             if(nextUser.getHomePage() != null)
             {
-                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_HOMEPAGE, nextUser.getHomePage(),
-                        this.getContexts());
+                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_HOMEPAGE, nextUser.getHomePage(), this.getContexts());
             }
             
             conn.commit();
@@ -240,8 +225,6 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         return nextUserUUID;
     }
     
-    
-    
     /**
      * Overridden to build a PoddUser from the data retrieved in a SPARQL result.
      * 
@@ -258,33 +241,31 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         this.log.info("Building RestletUtilUser from SPARQL results");
         
         final PoddUser result =
-                new PoddUser(userIdentifier, 
-                        bindingSet.getValue(PARAM_USER_SECRET).stringValue().toCharArray(),
-                        bindingSet.getValue(PARAM_USER_FIRSTNAME).stringValue(), 
-                        bindingSet.getValue(PARAM_USER_LASTNAME).stringValue(),
-                        bindingSet.getValue(PARAM_USER_EMAIL).stringValue(),
-                        PoddUserStatus.ACTIVE);
+                new PoddUser(userIdentifier, bindingSet.getValue(PARAM_USER_SECRET).stringValue().toCharArray(),
+                        bindingSet.getValue(PARAM_USER_FIRSTNAME).stringValue(), bindingSet.getValue(
+                                PARAM_USER_LASTNAME).stringValue(),
+                        bindingSet.getValue(PARAM_USER_EMAIL).stringValue(), PoddUserStatus.ACTIVE);
         
         Value organizationVal = bindingSet.getValue(PARAM_USER_ORGANIZATION);
-        if (organizationVal != null)
+        if(organizationVal != null)
         {
             result.setOrganization(organizationVal.stringValue());
         }
         
         Value orcidVal = bindingSet.getValue(PARAM_USER_ORCID);
-        if (orcidVal != null)
+        if(orcidVal != null)
         {
             result.setOrcid(orcidVal.stringValue());
         }
         
         Value homePageVal = bindingSet.getValue(PARAM_USER_HOMEPAGE);
-        if (homePageVal != null)
+        if(homePageVal != null)
         {
             result.setHomePage(PoddRdfConstants.VALUE_FACTORY.createURI(homePageVal.stringValue()));
         }
-
+        
         Value uriVal = bindingSet.getValue(PARAM_USER_URI);
-        if (uriVal != null)
+        if(uriVal != null)
         {
             result.setUri(PoddRdfConstants.VALUE_FACTORY.createURI(uriVal.stringValue()));
         }
@@ -298,9 +279,10 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
      * @param bindingSet
      * @return
      */
+    @Override
     protected Role buildRoleFromSparqlResult(final BindingSet bindingSet)
     {
-        final URI roleUri = this.vf.createURI(bindingSet.getValue(PoddSesameRealm.PARAM_ROLE).stringValue());
+        final URI roleUri = this.vf.createURI(bindingSet.getValue(PoddSesameRealmImpl.PARAM_ROLE).stringValue());
         return PoddRoles.getRoleByUri(roleUri).getRole();
     }
     
@@ -311,34 +293,32 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
      * @param objectUris
      * @return
      */
+    @Override
     protected String buildSparqlQueryForCommonObjectRoles(final String userIdentifier, final Collection<URI> objectUris)
     {
         this.log.info("Building SPARQL query for common Roles across Objects");
         
         final StringBuilder query = new StringBuilder();
-
-/*        
-             SELECT ?role WHERE {
-             
-              ?_anyMapping0 <roleMappedUser> :userIdentifier .
-              ?_anyMapping0 <roleMappedRole> ?role .
-              ?_anyMapping0 <roleMappedObject> <objectUri_0> .
-
-              ?_anyMapping1 <roleMappedUser> :userIdentifier .
-              ?_anyMapping1 <roleMappedRole> ?role .
-              ?_anyMapping1 <roleMappedObject> <objectUri_1> .
-          
-              ...
-          } 
-*/
+        
+        /*
+         * SELECT ?role WHERE {
+         * 
+         * ?_anyMapping0 <roleMappedUser> :userIdentifier . ?_anyMapping0 <roleMappedRole> ?role .
+         * ?_anyMapping0 <roleMappedObject> <objectUri_0> .
+         * 
+         * ?_anyMapping1 <roleMappedUser> :userIdentifier . ?_anyMapping1 <roleMappedRole> ?role .
+         * ?_anyMapping1 <roleMappedObject> <objectUri_1> .
+         * 
+         * ... }
+         */
         
         query.append(" SELECT ?");
-        query.append(PoddSesameRealm.PARAM_ROLE);
+        query.append(PoddSesameRealmImpl.PARAM_ROLE);
         query.append(" WHERE ");
         query.append(" { ");
-
+        
         int i = 0;
-        for (URI objectUri : objectUris)
+        for(URI objectUri : objectUris)
         {
             String roleMappingVar = " ?_anyMapping" + i;
             i++;
@@ -348,11 +328,11 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
             query.append(" \"");
             query.append(NTriplesUtil.escapeString(userIdentifier));
             query.append("\" . ");
-
+            
             query.append(roleMappingVar);
             query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ");
             query.append(" ?");
-            query.append(PoddSesameRealm.PARAM_ROLE);
+            query.append(PoddSesameRealmImpl.PARAM_ROLE);
             query.append(" . ");
             
             query.append(roleMappingVar);
@@ -379,91 +359,91 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         this.log.info("Building SPARQL query");
         
         final StringBuilder query = new StringBuilder();
-
+        
         query.append(" SELECT ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_SECRET);
+        query.append(PoddSesameRealmImpl.PARAM_USER_SECRET);
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_FIRSTNAME);
+        query.append(PoddSesameRealmImpl.PARAM_USER_FIRSTNAME);
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_LASTNAME);
+        query.append(PoddSesameRealmImpl.PARAM_USER_LASTNAME);
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_EMAIL);
+        query.append(PoddSesameRealmImpl.PARAM_USER_EMAIL);
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_STATUS);
+        query.append(PoddSesameRealmImpl.PARAM_USER_STATUS);
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
+        query.append(PoddSesameRealmImpl.PARAM_USER_ORGANIZATION);
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_ORCID);
-        query.append(" ?"); 
-        query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
+        query.append(PoddSesameRealmImpl.PARAM_USER_ORCID);
+        query.append(" ?");
+        query.append(PoddSesameRealmImpl.PARAM_USER_HOMEPAGE);
         
         query.append(" WHERE ");
         query.append(" { ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" a <" + SesameRealmConstants.OAS_USER + "> . ");
-
+        
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USERIDENTIFIER + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
+        query.append(PoddSesameRealmImpl.PARAM_USER_IDENTIFIER);
         query.append(" . ");
-
         
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" <" + PoddWebConstants.PODD_USER_ORCID + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_ORCID);
+        query.append(PoddSesameRealmImpl.PARAM_USER_ORCID);
         query.append(" . ");
-       
+        
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USERSECRET + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_SECRET);
+        query.append(PoddSesameRealmImpl.PARAM_USER_SECRET);
         query.append(" . ");
-
+        
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" <" + PoddWebConstants.PODD_USER_HOMEPAGE + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
+        query.append(PoddSesameRealmImpl.PARAM_USER_HOMEPAGE);
         query.append(" . ");
-
+        
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" <" + PoddWebConstants.PODD_USER_ORGANIZATION + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
+        query.append(PoddSesameRealmImpl.PARAM_USER_ORGANIZATION);
         query.append(" . ");
-
+        
         query.append(" OPTIONAL{ ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_FIRSTNAME);
+        query.append(PoddSesameRealmImpl.PARAM_USER_FIRSTNAME);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USERLASTNAME + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_LASTNAME);
+        query.append(PoddSesameRealmImpl.PARAM_USER_LASTNAME);
         query.append(" . } ");
-
+        
         query.append(" OPTIONAL{ ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USEREMAIL + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_EMAIL);
+        query.append(PoddSesameRealmImpl.PARAM_USER_EMAIL);
         query.append(" . } ");
-
-        //TODO: firstname, lastname, email are mandatory. add optional parameters: ORCID, Organization
+        
+        // TODO: firstname, lastname, email are mandatory. add optional parameters: ORCID,
+        // Organization
         if(!findAllUsers)
         {
             query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
@@ -472,7 +452,7 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
         query.append(" } ");
         return query.toString();
     }
-
+    
     /**
      * @param role
      * @return
@@ -506,6 +486,7 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
      * @param role
      * @param optionalObjectUri
      */
+    @Override
     public void map(User user, Role role, URI optionalObjectUri)
     {
         RepositoryConnection conn = null;
@@ -574,6 +555,7 @@ public class PoddSesameRealm extends RestletUtilSesameRealm
      * @param objectUris
      * @return A Collection of Roles that are common for ALL given object URIs
      */
+    @Override
     public Collection<Role> getCommonRolesForObjects(User user, Collection<URI> objectUris)
     {
         if(user == null)

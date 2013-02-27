@@ -27,7 +27,7 @@ import org.restlet.security.Role;
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddRoles;
-import com.github.podd.restlet.PoddSesameRealm;
+import com.github.podd.restlet.PoddSesameRealmImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -43,7 +43,7 @@ public class PoddSesameRealmTest
             .createURI("urn:context:usermanagement:graph");
     
     private Repository testRepository;
-    private PoddSesameRealm testRealm;
+    private PoddSesameRealmImpl testRealm;
     
     /**
      * Helper method to create a test User and add it to the SesameRealm.
@@ -99,7 +99,7 @@ public class PoddSesameRealmTest
         this.testRepository = new SailRepository(new MemoryStore());
         this.testRepository.initialize();
         
-        this.testRealm = new PoddSesameRealm(this.testRepository, PoddSesameRealmTest.userMgtContext);
+        this.testRealm = new PoddSesameRealmImpl(this.testRepository, PoddSesameRealmTest.userMgtContext);
     }
     
     @After
