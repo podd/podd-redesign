@@ -11,10 +11,12 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.test.AbstractPoddSchemaManagerTest;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
+import com.github.podd.impl.PoddSesameManagerImpl;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -26,6 +28,12 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     protected PoddSchemaManager getNewPoddSchemaManagerInstance()
     {
         return new PoddSchemaManagerImpl();
+    }
+    
+    @Override
+    protected PoddSesameManager getNewPoddSesameManagerInstance()
+    {
+        return new PoddSesameManagerImpl();
     }
     
     @Override
