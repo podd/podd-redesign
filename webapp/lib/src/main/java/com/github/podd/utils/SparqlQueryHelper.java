@@ -238,7 +238,9 @@ public class SparqlQueryHelper
         sb.append("SELECT ?artifactUri ");
         sb.append(" WHERE { ");
         sb.append(" ?artifactUri <" + RDF.TYPE + ">  <" + OWL.ONTOLOGY + "> . ");
-        sb.append(" ?artifactUri <" + PoddRdfConstants.PODD_BASE_INFERRED_VERSION + ">  ?infVersion . ");
+        sb.append(" ?versionUri <" + RDF.TYPE + ">  <" + OWL.ONTOLOGY + "> . ");
+        sb.append(" ?artifactUri <" + OWL.VERSIONIRI + ">  ?versionUri . ");
+        sb.append(" ?versionUri <" + PoddRdfConstants.PODD_BASE_INFERRED_VERSION + ">  ?infVersion . ");
         
         sb.append(" } ");
         

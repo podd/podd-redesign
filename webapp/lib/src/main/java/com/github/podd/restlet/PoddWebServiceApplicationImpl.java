@@ -85,7 +85,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
      */
     private volatile Configuration freemarkerConfiguration;
     private volatile ChallengeAuthenticator auth;
-    private volatile PoddSesameRealm realm;
+    private volatile PoddSesameRealmImpl realm;
     
     private Repository nextRepository;
     
@@ -102,11 +102,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     {
         super();
         
-        this.log.info("\r\n" +
-        		"============================== \r\n" +
-        		"PODD Web Application \r\n" +
-        		"starting... \r\n" +
-        		"==============================");
+        this.log.info("\r\n" + "============================== \r\n" + "PODD Web Application \r\n" + "starting... \r\n"
+                + "==============================");
         
         // List of protocols required by the application
         this.getConnectorService().getClientProtocols().add(Protocol.HTTP);
@@ -164,7 +161,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             // response
             return false;
         }
-        else if (!action.isRoleRequired())
+        else if(!action.isRoleRequired())
         {
             return true;
         }
@@ -196,8 +193,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             
             if(!action.matchesForRoles(rolesCommonAcrossGivenObjects))
             {
-                this.log.error("Authenticated user does not have enough privileges to execute the given action: {}" +
-                		" on the given objects: {}", action, optionalObjectUris);
+                this.log.error("Authenticated user does not have enough privileges to execute the given action: {}"
+                        + " on the given objects: {}", action, optionalObjectUris);
                 return false;
             }
         }
@@ -249,19 +246,18 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String helpOverviewPath = PoddWebConstants.PATH_HELP;
         this.log.info("attaching about service to path={}", helpOverviewPath);
         router.attach(helpOverviewPath, HelpResourceImpl.class);
-        final String helpPagePath = PoddWebConstants.PATH_HELP +
-                "/{" + PoddWebConstants.KEY_HELP_PAGE_IDENTIFIER + "}";
+        final String helpPagePath = PoddWebConstants.PATH_HELP + "/{" + PoddWebConstants.KEY_HELP_PAGE_IDENTIFIER + "}";
         this.log.info("attaching about service to path={}", helpPagePath);
         router.attach(helpPagePath, HelpResourceImpl.class);
-
+        
         // Add a route for the Index page.
         final String indexPagePath = PoddWebConstants.PATH_INDEX;
         this.log.info("attaching index service to path={}", indexPagePath);
         router.attach(indexPagePath, IndexResourceImpl.class);
         
         // Add a route for the User Details page.
-        final String userDetailsPath = PoddWebConstants.PATH_USER_DETAILS + 
-                "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
+        final String userDetailsPath =
+                PoddWebConstants.PATH_USER_DETAILS + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
         this.log.info("attaching user details service to path={}", userDetailsPath);
         router.attach(userDetailsPath, UserDetailsResourceImpl.class);
         
@@ -359,7 +355,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public PoddSesameRealm getRealm()
+    public PoddSesameRealmImpl getRealm()
     {
         return this.realm;
     }
@@ -391,7 +387,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     {
         if(nextRealm instanceof PoddSesameRealm)
         {
-            this.realm = (PoddSesameRealm)nextRealm;
+            this.realm = (PoddSesameRealmImpl)nextRealm;
         }
         else
         {
@@ -440,11 +436,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.poddRepositoryManager.setSchemaManagementGraph(PoddWebServiceApplicationImpl.SCHEMA_MGT_GRAPH);
         this.poddRepositoryManager.setArtifactManagementGraph(PoddWebServiceApplicationImpl.ARTIFACT_MGT_GRAPH);
         
+        final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
+        
         this.poddSchemaManager = new PoddSchemaManagerImpl();
         this.poddSchemaManager.setOwlManager(nextOWLManager);
         this.poddSchemaManager.setRepositoryManager(this.poddRepositoryManager);
-        
-        final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
+        this.poddSchemaManager.setSesameManager(poddSesameManager);
         
         this.poddArtifactManager = new PoddArtifactManagerImpl();
         this.poddArtifactManager.setRepositoryManager(this.poddRepositoryManager);

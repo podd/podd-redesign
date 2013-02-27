@@ -303,7 +303,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
      * Test retrieve list of direct children of the Top Object
      */
     @Test
-    public void testgetContainedObjectsFromTopObject() throws Exception
+    public void testGetContainedObjectsFromTopObject() throws Exception
     {
         final String testResourcePath = "/test/artifacts/basic-2.ttl";
         final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
@@ -333,7 +333,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
      * Test retrieve list of direct children of an inner object
      */
     @Test
-    public void testgetContainedObjectsFromInnerObject() throws Exception
+    public void testGetContainedObjectsFromInnerObject() throws Exception
     {
         final String testResourcePath = "/test/artifacts/basic-2.ttl";
         final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);
@@ -362,7 +362,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
      * Test retrieve list of direct children of the Top Object FIXME
      */
     @Test
-    public void testgetContainedObjectsFromTopObjectWithRecursion() throws Exception
+    public void testGetContainedObjectsFromTopObjectWithRecursion() throws Exception
     {
         final String testResourcePath = "/test/artifacts/basic-2.ttl";
         final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.TURTLE);

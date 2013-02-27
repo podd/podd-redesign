@@ -40,13 +40,13 @@ public abstract class PoddWebServiceApplication extends Application
      * @param request
      * @param response
      * @param optionalObjectUris
-     *            Optional set of Object URIs on which the action is to be performed. If present, 
+     *            Optional set of Object URIs on which the action is to be performed. If present,
      *            these should be used to check client authority.
      * @return True if the request is authenticated, and false otherwise.
      */
     public abstract boolean authenticate(PoddAction action, Request request, Response response,
             Collection<URI> optionalObjectUris);
-
+    
     /**
      * 
      * @return The ChallengeAuthenticator which is currently being used to respond to queries that

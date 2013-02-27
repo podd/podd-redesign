@@ -41,5 +41,10 @@
 			<artifactId>sesame-sail-memory</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.19</version>
+		</dependency>
 	</dependencies>
 </project>

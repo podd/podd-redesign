@@ -5,7 +5,7 @@ package com.github.podd.impl;
 
 import info.aduna.iteration.Iterations;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -20,9 +20,11 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.QueryResults;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
+import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -41,16 +43,21 @@ import com.github.podd.utils.PoddRdfConstants;
  */
 public class PoddSesameManagerImpl implements PoddSesameManager
 {
+    public PoddSesameManagerImpl()
+    {
+    }
+    
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     @Override
-    public void deleteOntologies(Collection<InferredOWLOntologyID> givenOntologies,
-            RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
+    public void deleteOntologies(final Collection<InferredOWLOntologyID> givenOntologies,
+            final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
     {
-        for(InferredOWLOntologyID nextOntologyID : givenOntologies)
+        for(final InferredOWLOntologyID nextOntologyID : givenOntologies)
         {
-            List<InferredOWLOntologyID> versionInternal =
-                    this.getAllVersionsInternal(nextOntologyID.getOntologyIRI(), repositoryConnection, managementGraph);
+            final List<InferredOWLOntologyID> versionInternal =
+                    this.getCurrentVersionsInternal(nextOntologyID.getOntologyIRI(), repositoryConnection,
+                            managementGraph);
             boolean updateCurrentVersion = false;
             InferredOWLOntologyID newCurrentVersion = null;
             
@@ -86,13 +93,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             if(updateCurrentVersion)
             {
-                List<Statement> asList =
+                final List<Statement> asList =
                         Iterations.asList(repositoryConnection.getStatements(nextOntologyID.getOntologyIRI()
                                 .toOpenRDFURI(), PoddRdfConstants.OMV_CURRENT_VERSION, null, false, managementGraph));
                 
                 if(asList.size() != 1)
                 {
-                    log.error("Did not find a unique managed current version for ontology with ID: {} List was: {}",
+                    this.log.error(
+                            "Did not find a unique managed current version for ontology with ID: {} List was: {}",
                             nextOntologyID, asList);
                 }
                 
@@ -121,7 +129,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public List<InferredOWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
     {
-        return getAllVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
+        return this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
     }
     
     /*
@@ -186,7 +194,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     private InferredOWLOntologyID getCurrentVersionInternal(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
     {
-        List<InferredOWLOntologyID> list = getAllVersionsInternal(ontologyIRI, repositoryConnection, managementGraph);
+        final List<InferredOWLOntologyID> list =
+                this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, managementGraph);
         
         if(list.isEmpty())
         {
@@ -207,9 +216,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @return
      * @throws OpenRDFException
      */
-    private List<InferredOWLOntologyID> getAllVersionsInternal(final IRI ontologyIRI,
+    private List<InferredOWLOntologyID> getCurrentVersionsInternal(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException
     {
+        final List<InferredOWLOntologyID> returnList = new ArrayList<InferredOWLOntologyID>();
+        
         final DatasetImpl dataset = new DatasetImpl();
         dataset.addDefaultGraph(managementGraph);
         dataset.addNamedGraph(managementGraph);
@@ -229,13 +240,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         query1.setDataset(dataset);
         
         final TupleQueryResult query1Results = query1.evaluate();
-        if(query1Results.hasNext())
+        
+        final QueryResultCollector nextResults1 = new QueryResultCollector();
+        QueryResults.report(query1Results, nextResults1);
+        
+        for(final BindingSet nextResult : nextResults1.getBindingSets())
         {
-            final BindingSet nextResult = query1Results.next();
             final String nextVersionIRI = nextResult.getValue("cv").stringValue();
             final String nextInferredIRI = nextResult.getValue("civ").stringValue();
             
-            return Arrays.asList(new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), IRI
+            returnList.add(new InferredOWLOntologyID(ontologyIRI, IRI.create(nextVersionIRI), IRI
                     .create(nextInferredIRI)));
         }
         
@@ -253,16 +267,20 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         query2.setDataset(dataset);
         
         final TupleQueryResult queryResults2 = query2.evaluate();
-        if(queryResults2.hasNext())
+        
+        final QueryResultCollector nextResults2 = new QueryResultCollector();
+        QueryResults.report(queryResults2, nextResults2);
+        
+        for(final BindingSet nextResult : nextResults2.getBindingSets())
         {
-            final BindingSet nextResult = queryResults2.next();
             final String nextOntologyIRI = nextResult.getValue("x").stringValue();
             final String nextInferredIRI = nextResult.getValue("civ").stringValue();
             
-            return Arrays.asList(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI
                     .create(nextInferredIRI)));
         }
-        return Collections.emptyList();
+        
+        return returnList;
     }
     
     /*
@@ -295,6 +313,74 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
         }
         return results;
+    }
+    
+    @Override
+    public Collection<InferredOWLOntologyID> getOntologies(final boolean onlyCurrentVersions,
+            final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
+    {
+        final List<InferredOWLOntologyID> returnList = new ArrayList<InferredOWLOntologyID>();
+        
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(ontologyManagementGraph);
+        dataset.addNamedGraph(ontologyManagementGraph);
+        
+        // 1: see if the given IRI exists as an ontology IRI
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?ontology ?version ?inferredVersion WHERE { ?ontology <");
+        sb.append(RDF.TYPE.stringValue());
+        sb.append("> <");
+        sb.append(OWL.ONTOLOGY.stringValue());
+        sb.append("> . ");
+        if(onlyCurrentVersions)
+        {
+            sb.append(" ?ontology <");
+            sb.append(PoddRdfConstants.OMV_CURRENT_VERSION.stringValue());
+            sb.append("> ?version . ");
+        }
+        else
+        {
+            sb.append(" ?ontology <");
+            sb.append(OWL.VERSIONIRI.stringValue());
+            sb.append("> ?version . ");
+        }
+        sb.append("OPTIONAL{ ?version <");
+        sb.append(PoddRdfConstants.PODD_BASE_INFERRED_VERSION.stringValue());
+        sb.append("> ?inferredVersion . ");
+        sb.append(" }");
+        sb.append("}");
+        
+        this.log.info("Generated SPARQL {}", sb);
+        
+        final TupleQuery query1 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        query1.setDataset(dataset);
+        
+        final TupleQueryResult query1Results = query1.evaluate();
+        
+        final QueryResultCollector nextResults1 = new QueryResultCollector();
+        QueryResults.report(query1Results, nextResults1);
+        
+        for(final BindingSet nextResult : nextResults1.getBindingSets())
+        {
+            final String nextOntologyIRI = nextResult.getValue("ontology").stringValue();
+            final String nextVersionIRI = nextResult.getValue("version").stringValue();
+            String nextInferredIRI = null;
+            
+            if(nextResult.hasBinding("inferredVersion"))
+            {
+                nextInferredIRI = nextResult.getValue("inferredVersion").stringValue();
+                returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), IRI
+                        .create(nextInferredIRI)));
+            }
+            else
+            {
+                returnList
+                        .add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), null));
+            }
+        }
+        
+        return returnList;
     }
     
     /*
@@ -363,8 +449,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public boolean isPublished(final OWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
-        throws OpenRDFException
+    public boolean isPublished(final OWLOntologyID ontologyID, final RepositoryConnection repositoryConnection,
+            final URI managementGraph) throws OpenRDFException
     {
         if(ontologyID == null || ontologyID.getOntologyIRI() == null || ontologyID.getVersionIRI() == null)
         {
@@ -419,6 +505,181 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 PoddRdfConstants.PODDBASE_PUBLISHED, context);
         
         this.log.info("{} was set as Published", topObjectIRI);
+    }
+    
+    @Override
+    public void updateCurrentManagedSchemaOntologyVersion(final InferredOWLOntologyID nextOntologyID,
+            final boolean updateCurrent, final RepositoryConnection repositoryConnection, final URI context)
+        throws OpenRDFException
+    {
+        final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
+        final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
+        // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must
+        // be generated for each new inferred ontology generation. For reference though, the
+        // version is equal to the ontology IRI in the prototype code. See
+        // generateInferredOntologyID method for the corresponding code.
+        final URI nextInferredOntologyUri = nextOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+        
+        // type the ontology
+        repositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
+        // setup a version number link for this version
+        repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri, context);
+        
+        final List<Statement> currentVersions =
+                Iterations.asList(repositoryConnection.getStatements(nextOntologyUri,
+                        PoddRdfConstants.OMV_CURRENT_VERSION, null, false, context));
+        
+        // If there are no current versions, or we must update the current version, then do it
+        // here
+        if(currentVersions.isEmpty() || updateCurrent)
+        {
+            // remove whatever was previously there for the current version marker
+            repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null, context);
+            
+            // then insert the new current version marker
+            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri, context);
+        }
+        
+        // then do a similar process with the inferred axioms ontology
+        repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, context);
+        
+        // remove whatever was previously there for the current inferred version marker
+        repositoryConnection
+                .remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null, context);
+        
+        // link from the ontology IRI to the current inferred axioms ontology version
+        repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+                nextInferredOntologyUri, context);
+        
+        // link from the ontology version IRI to the matching inferred axioms ontology version
+        repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, nextInferredOntologyUri,
+                context);
+        
+    }
+    
+    @Override
+    public void updateManagedPoddArtifactVersion(final InferredOWLOntologyID nextOntologyID,
+            final boolean updateCurrentAndDeletePrevious, final RepositoryConnection repositoryConnection,
+            final URI managementGraph) throws OpenRDFException
+    {
+        final URI nextOntologyUri = nextOntologyID.getOntologyIRI().toOpenRDFURI();
+        final URI nextVersionUri = nextOntologyID.getVersionIRI().toOpenRDFURI();
+        // NOTE: The version is not used for the inferred ontology ID. A new ontology URI must
+        // be generated for each new inferred ontology generation. For reference though, the
+        // version is equal to the ontology IRI in the prototype code. See
+        // generateInferredOntologyID method for the corresponding code.
+        final URI nextInferredOntologyUri = nextOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+        
+        List<InferredOWLOntologyID> allOntologyVersions =
+                getAllOntologyVersions(nextOntologyID.getOntologyIRI(), repositoryConnection, managementGraph);
+        
+        // If there are no current versions then the steps are relatively simple
+        if(allOntologyVersions.isEmpty())
+        {
+            // type the ontology
+            repositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, managementGraph);
+            // type the version of the ontology
+            repositoryConnection.add(nextVersionUri, RDF.TYPE, OWL.ONTOLOGY, managementGraph);
+            // type the inferred ontology
+            repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, managementGraph);
+            
+            // then insert the new current version marker
+            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri,
+                    managementGraph);
+            // link from the ontology IRI to the current inferred axioms ontology version
+            repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+                    nextInferredOntologyUri, managementGraph);
+            
+            // setup a version number link for this version
+            repositoryConnection
+                    .add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri, managementGraph);
+            // link from the ontology version IRI to the matching inferred axioms ontology version
+            repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                    nextInferredOntologyUri, managementGraph);
+        }
+        else
+        {
+            // else, do find and replace to add the version into the system
+            
+            // type the ontology
+            repositoryConnection.add(nextOntologyUri, RDF.TYPE, OWL.ONTOLOGY, managementGraph);
+            // type the version of the ontology
+            repositoryConnection.add(nextVersionUri, RDF.TYPE, OWL.ONTOLOGY, managementGraph);
+            // type the inferred ontology
+            repositoryConnection.add(nextInferredOntologyUri, RDF.TYPE, OWL.ONTOLOGY, managementGraph);
+            
+            // Update the current version and cleanup previous versions
+            if(updateCurrentAndDeletePrevious)
+            {
+                // remove the content of any contexts that are the object of versionIRI statements
+                final List<Statement> previousVersions =
+                        Iterations.asList(repositoryConnection.getStatements(nextOntologyUri,
+                                PoddRdfConstants.OWL_VERSION_IRI, null, true, managementGraph));
+                
+                for(final Statement nextPreviousVersion : previousVersions)
+                {
+                    if(nextPreviousVersion.getObject() instanceof URI)
+                    {
+                        List<Statement> previousInferredVersions =
+                                Iterations.asList(repositoryConnection.getStatements(
+                                        (URI)nextPreviousVersion.getObject(),
+                                        PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, false, managementGraph));
+                        
+                        for(Statement nextInferredVersion : previousInferredVersions)
+                        {
+                            if(nextInferredVersion.getObject() instanceof URI)
+                            {
+                                // clear inferred statements for previous inferred version
+                                repositoryConnection.clear((URI)nextInferredVersion.getObject());
+                                
+                                // remove all references from artifact management graph
+                                repositoryConnection.remove((URI)nextInferredVersion.getObject(), null, null,
+                                        managementGraph);
+                            }
+                            else
+                            {
+                                log.error("Found inferred version IRI that was not a URI: {}", nextInferredVersion);
+                            }
+                        }
+                        
+                        repositoryConnection.clear((URI)nextPreviousVersion.getObject());
+                        repositoryConnection.remove((URI)nextPreviousVersion.getObject(), null, null, managementGraph);
+                    }
+                    else
+                    {
+                        log.error("Found version IRI that was not a URI: {}", nextPreviousVersion);
+                    }
+                }
+                
+                // remove whatever was previously there for the current version marker
+                repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null,
+                        managementGraph);
+                
+                // then insert the new current version marker
+                repositoryConnection.add(nextOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, nextVersionUri,
+                        managementGraph);
+                
+                // remove whatever was previously there for the current inferred version marker
+                repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION, null,
+                        managementGraph);
+                
+                // link from the ontology IRI to the current inferred axioms ontology version
+                repositoryConnection.add(nextOntologyUri, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
+                        nextInferredOntologyUri, managementGraph);
+                
+                // remove previous versionIRI statements if they are no longer needed, before adding
+                // the new version below
+                repositoryConnection.remove(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, null, managementGraph);
+            }
+            
+            // always setup a version number link for this version
+            repositoryConnection
+                    .add(nextOntologyUri, PoddRdfConstants.OWL_VERSION_IRI, nextVersionUri, managementGraph);
+            
+            // always setup an inferred axioms ontology version for this version
+            repositoryConnection.add(nextVersionUri, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                    nextInferredOntologyUri, managementGraph);
+        }
     }
     
 }

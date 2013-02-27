@@ -20,6 +20,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 
@@ -35,36 +36,43 @@ public abstract class AbstractPoddSchemaManagerTest
     private PoddOWLManager testOwlManager;
     private PoddRepositoryManager testRepositoryManager;
     private OWLOntologyManager owlapiManager;
+    private PoddSesameManager testSesameManager;
     
     /**
      * 
-     * @return A new instance of PoddOWLManager, for each call to this method.
+     * @return A new instance of {@link PoddOWLManager}, for each call to this method.
      */
     protected abstract PoddOWLManager getNewPoddOwlManagerInstance();
     
     /**
      * 
-     * @return A new empty instance of an implementation of OWLReasonerFactory.
+     * @return A new empty instance of an implementation of {@link OWLReasonerFactory}.
      */
     protected abstract OWLReasonerFactory getNewReasonerFactory();
     
     /**
      * 
-     * @return A new instance of OWLOntologyManager, for each call to this method.
+     * @return A new instance of {@link OWLOntologyManager}, for each call to this method.
      */
     protected abstract OWLOntologyManager getNewOwlOntologyManagerInstance();
     
     /**
      * 
-     * @return A new instance of PoddRepositoryManager, for each call to this method.
+     * @return A new instance of {@link PoddRepositoryManager}, for each call to this method.
      */
     protected abstract PoddRepositoryManager getNewPoddRepositoryManagerInstance();
     
     /**
      * 
-     * @return A new instance of PoddSchemaManager, for each call to this method.
+     * @return A new instance of {@link PoddSchemaManager}, for each call to this method.
      */
     protected abstract PoddSchemaManager getNewPoddSchemaManagerInstance();
+    
+    /**
+     * 
+     * @return A new instance of {@link PoddSesameManager}, for each call to this method.
+     */
+    protected abstract PoddSesameManager getNewPoddSesameManagerInstance();
     
     /**
      * @throws java.lang.Exception
@@ -76,6 +84,9 @@ public abstract class AbstractPoddSchemaManagerTest
         
         this.testRepositoryManager = this.getNewPoddRepositoryManagerInstance();
         this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
+        
+        this.testSesameManager = this.getNewPoddSesameManagerInstance();
+        this.testSchemaManager.setSesameManager(this.testSesameManager);
         
         this.testOwlManager = this.getNewPoddOwlManagerInstance();
         this.testOwlManager.setReasonerFactory(this.getNewReasonerFactory());
@@ -748,20 +759,18 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testUploadSchemaOntologyWithOntologyIRIAndVersionIRI() throws Exception
     {
-        String[] resourcePaths = {"/ontologies/dcTerms.owl",
-                "/ontologies/foaf.owl",
-                "/ontologies/poddUser.owl",
-                "/ontologies/poddBase.owl",
-        };
+        String[] resourcePaths =
+                { "/ontologies/dcTerms.owl", "/ontologies/foaf.owl", "/ontologies/poddUser.owl",
+                        "/ontologies/poddBase.owl", };
         
-        for (String path : resourcePaths)
+        for(String path : resourcePaths)
         {
             InputStream testInputStream = this.getClass().getResourceAsStream(path);
             
             this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
         }
         
-        //TODO: verify
+        // TODO: verify
     }
     
 }

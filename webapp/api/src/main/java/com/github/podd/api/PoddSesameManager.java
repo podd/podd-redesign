@@ -27,6 +27,23 @@ public interface PoddSesameManager
 {
     
     /**
+     * Deletes the given ontologies, including removing and rearranging their links in the ontology
+     * management graph as necessary.
+     * 
+     * @param requestedArtifactIds
+     *            A collection of InferredOWLOntologyID objects containing the ontologies to be
+     *            deleted, including the inferred ontology IRIs.
+     * @param repositoryConnection
+     *            The connection to the repository to use.
+     * @param ontologyManagementGraph
+     *            The URI of the context in the repository containing the management information for
+     *            the ontologies.
+     * @throws OpenRDFException
+     */
+    void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
+            RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
+    
+    /**
      * Get all versions of the ontology with the given IRI that are managed in the given context in
      * the given repository connection.
      * <p>
@@ -99,6 +116,20 @@ public interface PoddSesameManager
         throws OpenRDFException;
     
     /**
+     * Returns a collection of ontologies managed in the given graph, optionally only returning the
+     * current version.
+     * 
+     * @param onlyCurrentVersions
+     *            If true, only the current version for each of the managed ontologies are returned.
+     * @param ontologyManagementGraph
+     *            The URI of the context in the repository containing the management information for
+     *            the ontologies.
+     * @return The collection of ontologies represented in the given management graph.
+     */
+    Collection<InferredOWLOntologyID> getOntologies(boolean onlyCurrentVersions,
+            RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
+    
+    /**
      * Retrieves from the given Repository Connection, an Ontology IRI which identifies an artifact.
      * 
      * @param repositoryConnection
@@ -118,7 +149,8 @@ public interface PoddSesameManager
      * @return
      * @throws OpenRDFException
      */
-    boolean isPublished(OWLOntologyID ontologyID, RepositoryConnection repositoryConnection) throws OpenRDFException;
+    boolean isPublished(OWLOntologyID ontologyID, RepositoryConnection repositoryConnection, final URI context)
+        throws OpenRDFException;
     
     /**
      * Sets the given Ontology IRI to be published. This restricts the ability to publish the
@@ -136,20 +168,40 @@ public interface PoddSesameManager
         UnmanagedArtifactIRIException;
     
     /**
-     * Deletes the given ontologies, including removing and rearranging their links in the ontology
-     * management graph as necessary.
+     * This method adds information to the Schema Ontology management graph, and updates the links
+     * for the current version for both the ontology and the inferred ontology.
      * 
-     * @param requestedArtifactIds
-     *            A collection of InferredOWLOntologyID objects containing the ontologies to be
-     *            deleted, including the inferred ontology IRIs.
+     * @param nextOntologyID
+     *            The ontology ID that contains the information about the ontology, including the
+     *            inferred ontology IRI.
+     * @param updateCurrent
+     *            If true, will update the current version if it exists. If false it will only add
+     *            the current version if it does not exist. Set this to false when only inferred
+     *            ontology information needs to be added. This will never remove statements related
+     *            to previous versions of schema ontologies.
      * @param repositoryConnection
-     *            The connection to the repository to use.
-     * @param ontologyManagementGraph
-     *            The URI of the context in the repository containing the management information for
-     *            the ontologies.
+     * @param context
      * @throws OpenRDFException
      */
-    void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
-            RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
+    void updateCurrentManagedSchemaOntologyVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrent,
+            RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
+    
+    /**
+     * This method adds information to the PODD artifact management graph, and updates the links for
+     * the current version for both the ontology and the inferred ontology.
+     * 
+     * @param nextOntologyID
+     *            The ontology ID that contains the information about the ontology, including the
+     *            inferred ontology IRI.
+     * @param updateCurrentAndRemovePrevious
+     *            If true, will update the current version if it exists, and remove all statements
+     *            relating to previous versions. If false it will only add the current version if it
+     *            does not exist.
+     * @param repositoryConnection
+     * @param context
+     * @throws OpenRDFException
+     */
+    void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrentAndRemovePrevious,
+            RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
     
 }

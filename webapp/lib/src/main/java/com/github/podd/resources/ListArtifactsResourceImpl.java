@@ -4,6 +4,8 @@
 package com.github.podd.resources;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddArtifact;
 import com.github.podd.utils.PoddWebConstants;
 import com.github.podd.utils.SparqlQueryHelper;
@@ -29,8 +32,8 @@ import com.github.podd.utils.SparqlQueryHelper;
  * 
  * Resource which allows listing artifacts in PODD.
  * 
- * This is only a simple implementation which lists all project URIs
- * TODO: list based on authorization, group projects. list project title, description, PI and lead institution
+ * This is only a simple implementation which lists all project URIs TODO: list based on
+ * authorization, group projects. list project title, description, PI and lead institution
  * 
  * @author kutila
  * 
@@ -46,7 +49,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
      * Handle http GET request to serve the list artifacts page.
      */
     @Get("html")
-    public Representation getlistArtifactsPage(final Representation entity) throws ResourceException
+    public Representation getListArtifactsPage(final Representation entity) throws ResourceException
     {
         this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, Collections.<URI> emptySet());
         
@@ -69,6 +72,74 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+    }
+    
+    @Get("rdf|rj|ttl")
+    public Representation getListArtifactsRdf(final Representation entity) throws ResourceException
+    {
+        final String publishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_PUBLISHED);
+        final String unpublishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_UNPUBLISHED);
+        
+        // default to both published and unpublished to start with
+        boolean published = true;
+        boolean unpublished = true;
+        
+        if(publishedString != null)
+        {
+            published = Boolean.parseBoolean(publishedString);
+        }
+        
+        if(unpublishedString != null)
+        {
+            unpublished = Boolean.parseBoolean(unpublishedString);
+        }
+        
+        // If they are not authenticated always set unpublished to false
+        if(!this.getClientInfo().isAuthenticated())
+        {
+            unpublished = false;
+        }
+        
+        try
+        {
+            if(published)
+            {
+                final Collection<InferredOWLOntologyID> publishedArtifacts =
+                        this.getPoddApplication().getPoddArtifactManager().listPublishedArtifacts();
+                
+                for(final InferredOWLOntologyID nextPublishedArtifact : publishedArtifacts)
+                {
+                    try
+                    {
+                        this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ,
+                                Arrays.asList(nextPublishedArtifact.getOntologyIRI().toOpenRDFURI()));
+                    }
+                    catch(final ResourceException e)
+                    {
+                        if(!e.getStatus().equals(Status.CLIENT_ERROR_FORBIDDEN))
+                        {
+                            throw e;
+                        }
+                        else
+                        {
+                            this.log.warn("Could not access published artifact: {}", nextPublishedArtifact);
+                        }
+                    }
+                }
+            }
+            
+            if(unpublished)
+            {
+                final Collection<InferredOWLOntologyID> unpublishedArtifacts =
+                        this.getPoddApplication().getPoddArtifactManager().listUnpublishedArtifacts();
+            }
+        }
+        catch(OpenRDFException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Database exception", e);
+        }
+        
+        throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED, "TODO: Implement listing of artifacts");
     }
     
     private void populateDataModelWithArtifactLists(final Map<String, Object> dataModel) throws OpenRDFException

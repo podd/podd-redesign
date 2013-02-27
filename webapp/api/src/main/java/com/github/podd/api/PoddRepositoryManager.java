@@ -57,39 +57,6 @@ public interface PoddRepositoryManager
     void setSchemaManagementGraph(URI schemaManagementGraph);
     
     /**
-     * This method adds information to the Schema Ontology management graph, and updates the links
-     * for the current version for both the ontology and the inferred ontology.
-     * 
-     * @param nextOntologyID
-     *            The ontology ID that contains the information about the original ontology.
-     * @param nextInferredOntologyID
-     *            The ontology ID that contains the information about the inferred ontology.
-     * @param updateCurrent
-     *            If true, will update the current version if it exists. If false it will only add
-     *            the current version if it does not exist. Set this to false when only inferred
-     *            ontology information needs to be added.
-     * @throws OpenRDFException
-     */
-    void updateCurrentManagedSchemaOntologyVersion(OWLOntologyID nextOntologyID, OWLOntologyID nextInferredOntologyID,
-            boolean updateCurrent) throws OpenRDFException;
-    
-    /**
-     * This method adds information to the PODD artifact management graph, and updates the links for
-     * the current version for both the ontology and the inferred ontology.
-     * 
-     * @param nextOntologyID
-     *            The ontology ID that contains the information about the original ontology.
-     * @param nextInferredOntologyID
-     *            The ontology ID that contains the information about the inferred ontology.
-     * @param updateCurrent
-     *            If true, will update the current version if it exists. If false it will only add
-     *            the current version if it does not exist.
-     * @throws OpenRDFException
-     */
-    void updateManagedPoddArtifactVersion(OWLOntologyID nextOntologyID, OWLOntologyID nextInferredOntologyID,
-            boolean updateCurrent) throws OpenRDFException;
-    
-    /**
      * 
      * @return The schema management graph URI for this repository manager.
      */

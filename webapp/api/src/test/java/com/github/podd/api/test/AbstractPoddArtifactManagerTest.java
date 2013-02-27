@@ -6,6 +6,7 @@ package com.github.podd.api.test;
 import info.aduna.iteration.Iterations;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.After;
@@ -71,6 +72,12 @@ public abstract class AbstractPoddArtifactManagerTest
     private PoddRepositoryManager testRepositoryManager;
     private PoddSchemaManager testSchemaManager;
     private PoddSesameManager testSesameManager;
+    
+    private RepositoryConnection testRepositoryConnection;
+    
+    private URI schemaGraph;
+    
+    private URI artifactGraph;
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of PoddArtifactManager
@@ -192,11 +199,14 @@ public abstract class AbstractPoddArtifactManagerTest
      * @param format
      * @param assertedStatementCount
      * @param inferredStatementCount
+     * @param repositoryConnection
+     *            TODO
      * @return
      * @throws Exception
      */
     private InferredOWLOntologyID loadInferStoreOntology(final String resourcePath, final RDFFormat format,
-            final long assertedStatementCount, final long inferredStatementCount) throws Exception
+            final long assertedStatementCount, final long inferredStatementCount,
+            final RepositoryConnection repositoryConnection) throws Exception
     {
         // load ontology to OWLManager
         final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
@@ -207,48 +217,25 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final OWLOntology loadedBaseOntology = this.testArtifactManager.getOWLManager().loadOntology(owlSource);
         
-        RepositoryConnection nextRepositoryConnection = null;
-        try
-        {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
-            nextRepositoryConnection.begin();
-            
-            this.testArtifactManager.getOWLManager().dumpOntologyToRepository(loadedBaseOntology,
-                    nextRepositoryConnection);
-            
-            // infer statements and dump to repository
-            final InferredOWLOntologyID inferredOntologyID =
-                    this.testArtifactManager.getOWLManager().inferStatements(loadedBaseOntology,
-                            nextRepositoryConnection);
-            
-            // verify statement counts
-            final URI versionURI = loadedBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
-            Assert.assertEquals("Wrong statement count", assertedStatementCount,
-                    nextRepositoryConnection.size(versionURI));
-            
-            final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
-            Assert.assertEquals("Wrong inferred statement count", inferredStatementCount,
-                    nextRepositoryConnection.size(inferredOntologyURI));
-            
-            nextRepositoryConnection.commit();
-            
-            return inferredOntologyID;
-        }
-        catch(final Exception e)
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
-            {
-                nextRepositoryConnection.rollback();
-            }
-            throw e;
-        }
-        finally
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
-            {
-                nextRepositoryConnection.close();
-            }
-        }
+        repositoryConnection.begin();
+        
+        this.testArtifactManager.getOWLManager().dumpOntologyToRepository(loadedBaseOntology, repositoryConnection);
+        
+        // infer statements and dump to repository
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testArtifactManager.getOWLManager().inferStatements(loadedBaseOntology, repositoryConnection);
+        
+        // verify statement counts
+        final URI versionURI = loadedBaseOntology.getOntologyID().getVersionIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong statement count", assertedStatementCount, repositoryConnection.size(versionURI));
+        
+        final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
+        Assert.assertEquals("Wrong inferred statement count", inferredStatementCount,
+                repositoryConnection.size(inferredOntologyURI));
+        
+        repositoryConnection.commit();
+        
+        return inferredOntologyID;
     }
     
     /**
@@ -264,37 +251,37 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16,
+                        this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37,
+                        this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87,
+                        this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 260, 183);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 260, 183,
+                        this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1265, 472);
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1265, 472,
+                        this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPPlantOntologyID =
-                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 83, 495);
+                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 83, 495,
+                        this.testRepositoryConnection);
         
         // prepare: update schema management graph
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredDctermsOntologyID.getBaseOWLOntologyID(), inferredDctermsOntologyID.getInferredOWLOntologyID(),
-                false);
-        this.testRepositoryManager
-                .updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID.getBaseOWLOntologyID(),
-                        inferredFoafOntologyID.getInferredOWLOntologyID(), false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPUserOntologyID.getBaseOWLOntologyID(), inferredPUserOntologyID.getInferredOWLOntologyID(),
-                false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
-                false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPScienceOntologyID.getBaseOWLOntologyID(),
-                inferredPScienceOntologyID.getInferredOWLOntologyID(), false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPPlantOntologyID.getBaseOWLOntologyID(), inferredPPlantOntologyID.getInferredOWLOntologyID(),
-                false);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPPlantOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
     }
     
     /**
@@ -303,6 +290,15 @@ public abstract class AbstractPoddArtifactManagerTest
     @Before
     public void setUp() throws Exception
     {
+        this.schemaGraph = ValueFactoryImpl.getInstance().createURI("urn:test:schema-graph");
+        this.artifactGraph = ValueFactoryImpl.getInstance().createURI("urn:test:artifact-graph");
+        
+        this.testRepositoryManager = this.getNewRepositoryManager();
+        this.testRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
+        this.testRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
+        
+        this.testRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+        
         final PoddFileReferenceProcessorFactoryRegistry testFileRegistry =
                 new PoddFileReferenceProcessorFactoryRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
@@ -351,12 +347,6 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
         testOWLManager.setOWLOntologyManager(manager);
         
-        this.testRepositoryManager = this.getNewRepositoryManager();
-        this.testRepositoryManager.setSchemaManagementGraph(ValueFactoryImpl.getInstance().createURI(
-                "urn:test:schema-graph"));
-        this.testRepositoryManager.setArtifactManagementGraph(ValueFactoryImpl.getInstance().createURI(
-                "urn:test:artifact-graph"));
-        
         this.testSchemaManager = this.getNewSchemaManager();
         this.testSchemaManager.setOwlManager(testOWLManager);
         this.testSchemaManager.setRepositoryManager(this.testRepositoryManager);
@@ -380,6 +370,21 @@ public abstract class AbstractPoddArtifactManagerTest
     public void tearDown() throws Exception
     {
         this.testArtifactManager = null;
+        
+        try
+        {
+            if(this.testRepositoryConnection.isActive())
+            {
+                this.testRepositoryConnection.rollback();
+            }
+        }
+        finally
+        {
+            if(this.testRepositoryConnection.isOpen())
+            {
+                this.testRepositoryConnection.close();
+            }
+        }
     }
     
     /**
@@ -407,7 +412,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
         // verify:
-        this.verifyLoadedArtifact(resultArtifactId, 6, 32, 530, false);
+        this.verifyLoadedArtifact(resultArtifactId, 7, 32, 530, false);
         
         Assert.assertTrue("Could not delete artifact", this.testArtifactManager.deleteArtifact(resultArtifactId));
         
@@ -417,7 +422,7 @@ public abstract class AbstractPoddArtifactManagerTest
             
             Assert.fail("Current contract is to throw an exception when someone tries to get an artifact that does not exist");
         }
-        catch(UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException e)
         {
             Assert.assertNotNull("Exception did not contain the requested artifact IRI", e.getOntologyID());
             
@@ -458,6 +463,83 @@ public abstract class AbstractPoddArtifactManagerTest
     }
     
     /**
+     * Test method for {@link com.github.podd.api.PoddArtifactManager#listPublishedArtifacts()}. .
+     */
+    @Test
+    public final void testListPublishedArtifacts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 7, 32, 530, false);
+        
+        // invoke method under test
+        final InferredOWLOntologyID publishedArtifactId =
+                this.testArtifactManager.publishArtifact(unpublishedArtifactId);
+        
+        Assert.assertNotNull(publishedArtifactId);
+        
+        final Collection<InferredOWLOntologyID> listPublishedArtifacts =
+                this.testArtifactManager.listPublishedArtifacts();
+        
+        this.log.info("published artifacts: {}", listPublishedArtifacts);
+        
+        Assert.assertNotNull(listPublishedArtifacts);
+        Assert.assertEquals(1, listPublishedArtifacts.size());
+        
+        final InferredOWLOntologyID nextArtifact = listPublishedArtifacts.iterator().next();
+        Assert.assertEquals(unpublishedArtifactId.getOntologyIRI(), nextArtifact.getOntologyIRI());
+        
+        final Collection<InferredOWLOntologyID> listUnpublishedArtifacts =
+                this.testArtifactManager.listUnpublishedArtifacts();
+        
+        Assert.assertNotNull(listUnpublishedArtifacts);
+        Assert.assertTrue(listUnpublishedArtifacts.isEmpty());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddArtifactManager#listPublishedArtifacts()}. .
+     */
+    @Test
+    public final void testListUnpublishedArtifacts() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+        // MIME type should be either given by the user, detected from the content type on the
+        // request, or autodetected using the Any23 Mime Detector
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 7, 32, 530, false);
+        
+        final Collection<InferredOWLOntologyID> listPublishedArtifacts =
+                this.testArtifactManager.listPublishedArtifacts();
+        
+        Assert.assertNotNull(listPublishedArtifacts);
+        Assert.assertTrue(listPublishedArtifacts.isEmpty());
+        
+        final Collection<InferredOWLOntologyID> listUnpublishedArtifacts =
+                this.testArtifactManager.listUnpublishedArtifacts();
+        
+        Assert.assertNotNull(listUnpublishedArtifacts);
+        Assert.assertEquals(1, listUnpublishedArtifacts.size());
+        
+        final InferredOWLOntologyID nextArtifact = listUnpublishedArtifacts.iterator().next();
+        Assert.assertEquals(unpublishedArtifactId.getOntologyIRI(), nextArtifact.getOntologyIRI());
+        Assert.assertEquals(unpublishedArtifactId, nextArtifact);
+    }
+    
+    /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
@@ -479,7 +561,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
         // verify:
-        this.verifyLoadedArtifact(resultArtifactId, 6, 32, 530, false);
+        this.verifyLoadedArtifact(resultArtifactId, 7, 32, 530, false);
     }
     
     /**
@@ -575,29 +657,30 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 16,
+                        this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 37,
+                        this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87,
+                        this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 260, 183);
+                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 260, 183,
+                        this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1265, 472);
+                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1265, 472,
+                        this.testRepositoryConnection);
         
         // prepare: update schema management graph
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredDctermsOntologyID.getBaseOWLOntologyID(), inferredDctermsOntologyID.getInferredOWLOntologyID(),
-                false);
-        this.testRepositoryManager
-                .updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID.getBaseOWLOntologyID(),
-                        inferredFoafOntologyID.getInferredOWLOntologyID(), false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPUserOntologyID.getBaseOWLOntologyID(), inferredPUserOntologyID.getInferredOWLOntologyID(),
-                false);
-        this.testRepositoryManager.updateCurrentManagedSchemaOntologyVersion(
-                inferredPBaseOntologyID.getBaseOWLOntologyID(), inferredPBaseOntologyID.getInferredOWLOntologyID(),
-                false);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredFoafOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPUserOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPBaseOntologyID, false,
+                this.testRepositoryConnection, this.schemaGraph);
         // PODD-Science ontology is not added to schema management graph
         
         final InputStream inputStream =
@@ -637,7 +720,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
         // verify
-        this.verifyLoadedArtifact(firstArtifactId, 6, 33, 532, false);
+        this.verifyLoadedArtifact(firstArtifactId, 7, 33, 532, false);
         Assert.assertEquals("Version IRI of loaded ontology not expected value", firstArtifactId.getOntologyIRI()
                 .toString().concat(":version:1"), firstArtifactId.getVersionIRI().toString());
     }
@@ -661,7 +744,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 6, 32, 530, false);
+        this.verifyLoadedArtifact(firstArtifactId, 7, 32, 530, false);
         
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
@@ -669,8 +752,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID secondArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 12, 32, 530, false);
-        this.verifyLoadedArtifact(secondArtifactId, 12, 29, 523, true);
+        this.verifyLoadedArtifact(firstArtifactId, 14, 32, 530, false);
+        this.verifyLoadedArtifact(secondArtifactId, 14, 29, 523, true);
     }
     
     /**
@@ -694,7 +777,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 6, 29, 523, false);
+        this.verifyLoadedArtifact(firstArtifactId, 7, 29, 523, false);
         
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
@@ -708,7 +791,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertFalse("Two versions should NOT have the same Version IRI", firstArtifactId.getVersionIRI()
                 .toString().equals(secondArtifactId.getVersionIRI().toString()));
         
-        this.verifyLoadedArtifact(secondArtifactId, 6, 25, 511, false);
+        this.verifyLoadedArtifact(secondArtifactId, 7, 25, 511, false);
     }
     
     /**
@@ -730,7 +813,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID artifactId =
                 this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(artifactId, 6, 29, 523, true);
+        this.verifyLoadedArtifact(artifactId, 7, 29, 523, true);
         
         Assert.assertFalse("Version IRI in source should have been ignored", artifactId.getVersionIRI().toString()
                 .endsWith(":55"));
@@ -756,7 +839,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
         final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
-        this.verifyLoadedArtifact(unpublishedArtifactId, 6, 32, 530, false);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 7, 32, 530, false);
         
         // invoke method under test
         final InferredOWLOntologyID publishedArtifactId =
@@ -851,7 +934,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify: INFERRED_VERSION
         final List<Statement> inferredVersionStatementList =
-                Iterations.asList(repositoryConnection.getStatements(ontologyIRI.toOpenRDFURI(),
+                Iterations.asList(repositoryConnection.getStatements(versionIRI.toOpenRDFURI(),
                         PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null, false, testGraph));
         Assert.assertEquals("Graph should have one INFERRED_VERSION statement", 1, inferredVersionStatementList.size());
         Assert.assertEquals("Wrong INFERRED_VERSION in Object", inferredVersionIRI.toString(),

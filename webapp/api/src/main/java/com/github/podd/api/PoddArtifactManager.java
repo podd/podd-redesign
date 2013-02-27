@@ -6,6 +6,7 @@ package com.github.podd.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.Repository;
@@ -124,6 +125,20 @@ public interface PoddArtifactManager
      * @return The {@link PoddSesameManager} used to perform operations on a Sesame Repository
      */
     PoddSesameManager getSesameManager();
+    
+    /**
+     * 
+     * @return The list of artifacts that have been published.
+     * @throws OpenRDFException
+     */
+    Collection<InferredOWLOntologyID> listPublishedArtifacts() throws OpenRDFException;
+    
+    /**
+     * 
+     * @return The list of artifacts that have not been published.
+     * @throws OpenRDFException
+     */
+    Collection<InferredOWLOntologyID> listUnpublishedArtifacts() throws OpenRDFException;
     
     /**
      * Loads an artifact into the manager.
