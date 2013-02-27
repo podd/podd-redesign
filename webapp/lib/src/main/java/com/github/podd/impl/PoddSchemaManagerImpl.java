@@ -45,7 +45,6 @@ import com.github.podd.exception.UnmanagedSchemaOntologyIDException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
-import com.github.podd.utils.SparqlQueryHelper;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com

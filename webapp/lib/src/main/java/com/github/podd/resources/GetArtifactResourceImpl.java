@@ -42,7 +42,6 @@ import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
-import com.github.podd.utils.SparqlQueryHelper;
 
 /**
  * 
@@ -95,15 +94,13 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
         
-        final List<URI> schemaOntologyGraphs = new ArrayList<URI>(SparqlQueryHelper.getSchemaOntologyGraphs());
-        
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
         dataModel.put("pageTitle", "View Artifact");
         
         try
         {
-            this.populateDataModelWithArtifactData(ontologyID, objectToView, schemaOntologyGraphs, dataModel);
+            this.populateDataModelWithArtifactData(ontologyID, objectToView, dataModel);
         }
         catch(final OpenRDFException e)
         {
@@ -182,7 +179,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      * @throws OpenRDFException
      */
     private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
-            final List<URI> ontologyGraphs, final Map<String, Object> dataModel) throws OpenRDFException
+            final Map<String, Object> dataModel) throws OpenRDFException
     {
         
         final RepositoryConnection conn =
@@ -192,16 +189,16 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             // get top-object of this artifact
             // FIXME: Use PoddArtifactManager or PoddSesameManager here
-            final List<PoddObjectLabel> topObjectList =
-                    SparqlQueryHelper.getTopObjects(ontologyID, conn, ontologyID.getVersionIRI().toOpenRDFURI(),
-                            ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+            final List<URI> topObjectList =
+                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
+                            .getTopObjects(ontologyID, conn);
             if(topObjectList == null || topObjectList.size() != 1)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
             }
             
             // the object to display (default is Top Object)
-            URI objectUri = topObjectList.get(0).getObjectURI();
+            URI objectUri = topObjectList.get(0);
             
             if(objectToView != null)
             {
@@ -210,36 +207,45 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             
             // FIXME: HACK: together the list of contexts to query in
             // Hint: This handling should be done in a manager, not in the resource implementation!
-            ontologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
+            // ontologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
             // ontologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
             
             // first get the title & description encapsulated in a PoddObject
-            final PoddObjectLabel theObject =
-                    SparqlQueryHelper.getPoddObject(ontologyID, objectUri, conn, ontologyGraphs.toArray(new URI[0]));
+            final PoddObjectLabel theObject = null;
+            
+            // FIXME: TODO:
+            // SparqlQueryHelper.getPoddObject(ontologyID, objectUri, conn,
+            // ontologyGraphs.toArray(new URI[0]));
             dataModel.put("poddObject", theObject);
             
             // find the object's type
-            final PoddObjectLabel theObjectType =
-                    SparqlQueryHelper.getObjectType(ontologyID, objectUri, conn, ontologyGraphs.toArray(new URI[0]));
-            if(theObjectType == null)
+            List<URI> objectTypes =
+                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
+                            .getObjectTypes(ontologyID, objectUri, conn);
+            if(objectTypes == null || objectTypes.isEmpty())
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
-            if(theObjectType.getLabel() != null)
-            {
-                dataModel.put("objectType", theObjectType.getLabel());
-            }
-            else
-            {
-                dataModel.put("objectType", theObjectType.getObjectURI().stringValue());
-            }
+            
+            // TODO: Get label for the object type
+            URI objectType = objectTypes.get(0);
+            // if(theObjectType.getLabel() != null)
+            // {
+            // dataModel.put("objectType", theObjectType.getLabel());
+            // }
+            // else
+            // {
+            // dataModel.put("objectType", theObjectType.getObjectURI().stringValue());
+            // }
             
             // populate the properties of the object
             final List<URI> orderedProperties =
-                    this.getPoddApplication().getPoddArtifactManager().getSesameManager().getWeightedProperties(ontologyID, objectUri, conn);
+                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
+                            .getWeightedProperties(ontologyID, objectUri, conn);
             
             final Model allNeededStatementsForDisplay =
-                    this.getPoddApplication().getPoddArtifactManager().getSesameManager().getObjectDetailsForDisplay(ontologyID, objectUri, conn);
+                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
+                            .getObjectDetailsForDisplay(ontologyID, objectUri, conn);
             
             dataModel.put("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
             dataModel.put("propertyList", orderedProperties);

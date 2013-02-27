@@ -36,7 +36,6 @@ import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
-import com.github.podd.utils.SparqlQueryHelper;
 
 /**
  * 
@@ -137,47 +136,51 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                 // FIXME: Should not be working with the PoddObjectLabel interface here. Hint: There
                 // may be hints as to a better solution in one of the predesigned manager
                 // interfaces!
-                objectUri = this.getTopObject(conn, ontologyID).getObjectURI();
+                objectUri =
+                        this.getPoddApplication().getPoddArtifactManager().getSesameManager()
+                                .getTopObjectIRI(ontologyID, conn);
             }
             else
             {
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
             }
             
-            List<URI> contexts = new ArrayList<URI>(SparqlQueryHelper.getSchemaOntologyGraphs());
-            contexts.add(ontologyID.getVersionIRI().toOpenRDFURI());
-            URI[] assertedContexts = contexts.toArray(new URI[0]);
-            
-            PoddObjectLabel objectType = SparqlQueryHelper.getObjectType(ontologyID, objectUri, conn, assertedContexts);
-            if(objectType == null)
+            List<URI> objectTypes =
+                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
+                            .getObjectTypes(ontologyID, objectUri, conn);
+            if(objectTypes == null || objectTypes.isEmpty())
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
-            if(objectType.getLabel() != null)
-            {
-                dataModel.put("objectType", objectType.getLabel());
-            }
-            else
-            {
-                dataModel.put("objectType", objectType.getObjectURI());
-            }
             
-            PoddObjectLabel theObject = SparqlQueryHelper.getPoddObject(ontologyID, objectUri, conn, assertedContexts);
-            dataModel.put("poddObject", theObject);
+            // TODO: Get label for the object type
+            URI objectType = objectTypes.get(0);
+            // if(objectType.getLabel() != null)
+            // {
+            // dataModel.put("objectType", objectType.getLabel());
+            // }
+            // else
+            // {
+            // dataModel.put("objectType", objectType.getObjectURI());
+            // }
             
-            // an ordered-list of the properties about the object
-            final List<URI> orderedProperties =
-                    SparqlQueryHelper.getWeightedProperties(objectUri, conn, assertedContexts);
-            this.log.info("Found {} properties about object {}", orderedProperties.size(), objectUri);
-            dataModel.put("orderedPropertyList", orderedProperties);
-            
-            // all statements which are needed to display these properties in HTML
-            final Model allNeededStatementsForDisplay =
-                    SparqlQueryHelper.getPoddObjectDetailsForEdit(objectUri, conn, assertedContexts);
-            dataModel.put("completeModel", allNeededStatementsForDisplay);
-            
-            // TODO
-            dataModel.put("initialized", false);
+            /**
+             * PoddObjectLabel theObject = SparqlQueryHelper.getPoddObject(ontologyID, objectUri,
+             * conn, assertedContexts); dataModel.put("poddObject", theObject);
+             * 
+             * // an ordered-list of the properties about the object final List<URI>
+             * orderedProperties = SparqlQueryHelper.getWeightedProperties(objectUri, conn,
+             * assertedContexts); this.log.info("Found {} properties about object {}",
+             * orderedProperties.size(), objectUri); dataModel.put("orderedPropertyList",
+             * orderedProperties);
+             * 
+             * // all statements which are needed to display these properties in HTML final Model
+             * allNeededStatementsForDisplay =
+             * SparqlQueryHelper.getPoddObjectDetailsForEdit(objectUri, conn, assertedContexts);
+             * dataModel.put("completeModel", allNeededStatementsForDisplay);
+             * 
+             * // TODO dataModel.put("initialized", false);
+             **/
             
             /*
              * // *** editObject.html.ftl ***
@@ -246,21 +249,4 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         return dataModel;
     }
-    
-    protected PoddObjectLabel getTopObject(RepositoryConnection conn, InferredOWLOntologyID ontologyID)
-        throws OpenRDFException
-    {
-        // FIXME: Use PoddArtifactManager or PoddSesameManager here
-        // get top-object of this artifact
-        final List<PoddObjectLabel> topObjectList =
-                SparqlQueryHelper.getTopObjects(ontologyID, conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
-                        .getInferredOntologyIRI().toOpenRDFURI());
-        if(topObjectList == null || topObjectList.size() != 1)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
-        }
-        
-        return topObjectList.get(0);
-    }
-    
 }
