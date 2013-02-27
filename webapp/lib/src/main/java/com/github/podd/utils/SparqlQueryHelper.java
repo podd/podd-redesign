@@ -129,8 +129,9 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public static List<PoddObjectLabel> getContainedObjects(final URI parentObject, final boolean recursive,
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
+    public static List<PoddObjectLabel> getContainedObjects(final InferredOWLOntologyID artifactID,
+            final URI parentObject, final boolean recursive, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         
@@ -166,11 +167,11 @@ public class SparqlQueryHelper
                 final BindingSet nextResult = queryResults.next();
                 
                 final PoddObjectLabel containedObject =
-                        new PoddObjectLabelImpl((URI)nextResult.getValue("containedObject"));
-                containedObject.setTitle(nextResult.getValue("containedObjectLabel").stringValue());
+                        new PoddObjectLabelImpl(artifactID, (URI)nextResult.getValue("containedObject"), nextResult
+                                .getValue("containedObjectLabel").stringValue());
                 
                 children.add(containedObject);
-                childURIs.add(containedObject.getUri());
+                childURIs.add(containedObject.getObjectURI());
             }
         }
         finally
@@ -184,7 +185,8 @@ public class SparqlQueryHelper
             for(final URI childUri : childURIs)
             {
                 final List<PoddObjectLabel> descendantList =
-                        SparqlQueryHelper.getContainedObjects(childUri, true, repositoryConnection, contexts);
+                        SparqlQueryHelper.getContainedObjects(artifactID, childUri, true, repositoryConnection,
+                                contexts);
                 children.addAll(descendantList);
             }
         }
@@ -467,8 +469,8 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public static List<PoddObjectLabel> getTopObjects(final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
+    public static List<PoddObjectLabel> getTopObjects(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         
@@ -494,17 +496,20 @@ public class SparqlQueryHelper
             {
                 final BindingSet next = queryResults.next();
                 final URI pred = (URI)next.getValue("topObjectUri");
-                final PoddObjectLabel poddObject = new PoddObjectLabelImpl(pred);
+                String label = null;
+                String description = null;
                 
                 if(next.getValue("topObjectLabel") != null)
                 {
-                    poddObject.setTitle(next.getValue("topObjectLabel").stringValue());
+                    label = next.getValue("topObjectLabel").stringValue();
                 }
                 
                 if(next.getValue("topObjectDescription") != null)
                 {
-                    poddObject.setDescription(next.getValue("topObjectDescription").stringValue());
+                    description = next.getValue("topObjectDescription").stringValue();
                 }
+                
+                final PoddObjectLabel poddObject = new PoddObjectLabelImpl(ontologyID, pred, label, description);
                 
                 topObjectList.add(poddObject);
             }
@@ -529,8 +534,8 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public static PoddObjectLabel getPoddObject(final URI objectUri, final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
+    public static PoddObjectLabel getPoddObject(final InferredOWLOntologyID ontologyID, final URI objectUri,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         sb.append("SELECT ?label ?description ");
@@ -543,29 +548,35 @@ public class SparqlQueryHelper
         tupleQuery.setBinding("objectUri", objectUri);
         final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
-        final PoddObjectLabel poddObject = new PoddObjectLabelImpl(objectUri);
         try
         {
             if(queryResults.hasNext())
             {
                 final BindingSet next = queryResults.next();
                 
-                if(next.getValue("label") != null)
+                String label = null;
+                String description = null;
+                
+                if(next.getValue("topObjectLabel") != null)
                 {
-                    poddObject.setTitle(next.getValue("label").stringValue());
+                    label = next.getValue("topObjectLabel").stringValue();
                 }
                 
-                if(next.getValue("description") != null)
+                if(next.getValue("topObjectDescription") != null)
                 {
-                    poddObject.setDescription(next.getValue("description").stringValue());
+                    description = next.getValue("topObjectDescription").stringValue();
                 }
+                
+                final PoddObjectLabel poddObject = new PoddObjectLabelImpl(ontologyID, objectUri, label, description);
+                
+                return poddObject;
             }
         }
         finally
         {
             queryResults.close();
         }
-        return poddObject;
+        return null;
     }
     
     /**
@@ -583,8 +594,8 @@ public class SparqlQueryHelper
      * @return
      * @throws OpenRDFException
      */
-    public static PoddObjectLabel getObjectType(final URI objectUri, final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
+    public static PoddObjectLabel getObjectType(final InferredOWLOntologyID ontologyID, final URI objectUri,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         sb.append("SELECT ?poddTypeUri ?label ?description ");
@@ -605,35 +616,35 @@ public class SparqlQueryHelper
         tupleQuery.setBinding("objectUri", objectUri);
         final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
-        PoddObjectLabel poddObject = new PoddObjectLabelImpl(objectUri);
         try
         {
             if(queryResults.hasNext())
             {
                 final BindingSet next = queryResults.next();
                 
-                poddObject = new PoddObjectLabelImpl((URI)next.getValue("poddTypeUri"));
+                String label = null;
+                String description = null;
                 
-                if(next.getValue("label") != null)
+                if(next.getValue("topObjectLabel") != null)
                 {
-                    poddObject.setTitle(next.getValue("label").stringValue());
-                }
-                else
-                {
-                    poddObject.setTitle(poddObject.getUri().getLocalName());
+                    label = next.getValue("topObjectLabel").stringValue();
                 }
                 
-                if(next.getValue("description") != null)
+                if(next.getValue("topObjectDescription") != null)
                 {
-                    poddObject.setDescription(next.getValue("description").stringValue());
+                    description = next.getValue("topObjectDescription").stringValue();
                 }
+                
+                final PoddObjectLabel poddObject = new PoddObjectLabelImpl(ontologyID, objectUri, label, description);
+                
+                return poddObject;
             }
         }
         finally
         {
             queryResults.close();
         }
-        return poddObject;
+        return null;
     }
     
     /**

@@ -130,35 +130,40 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             conn = this.getPoddApplication().getPoddRepositoryManager().getRepository().getConnection();
             conn.begin();
             
+            URI objectUri;
+            
             if(objectToEdit == null)
             {
-                objectToEdit = this.getTopObject(conn, ontologyID).getUri().stringValue();
+                // FIXME: Should not be working with the PoddObjectLabel interface here. Hint: There
+                // may be hints as to a better solution in one of the predesigned manager
+                // interfaces!
+                objectUri = this.getTopObject(conn, ontologyID).getObjectURI();
             }
-            // FIXME: Why convert a URI to a string and then convert it back to a URI again???????
-            URI objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
+            else
+            {
+                objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
+            }
             
             List<URI> contexts = new ArrayList<URI>(SparqlQueryHelper.getSchemaOntologyGraphs());
             contexts.add(ontologyID.getVersionIRI().toOpenRDFURI());
             URI[] assertedContexts = contexts.toArray(new URI[0]);
             
-            PoddObjectLabel objectType = SparqlQueryHelper.getObjectType(objectUri, conn, assertedContexts);
+            PoddObjectLabel objectType = SparqlQueryHelper.getObjectType(ontologyID, objectUri, conn, assertedContexts);
             if(objectType == null)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
-            if(objectType.getTitle() != null)
+            if(objectType.getLabel() != null)
             {
-                dataModel.put("objectType", objectType.getTitle());
+                dataModel.put("objectType", objectType.getLabel());
             }
             else
             {
-                dataModel.put("objectType", objectType.getUri());
+                dataModel.put("objectType", objectType.getObjectURI());
             }
             
-            PoddObjectLabel theObject = SparqlQueryHelper.getPoddObject(objectUri, conn, assertedContexts);
+            PoddObjectLabel theObject = SparqlQueryHelper.getPoddObject(ontologyID, objectUri, conn, assertedContexts);
             dataModel.put("poddObject", theObject);
-            dataModel.put("objectName", theObject.getTitle());
-            dataModel.put("objectDescription", theObject.getDescription());
             
             // an ordered-list of the properties about the object
             final List<URI> orderedProperties =
@@ -180,16 +185,20 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
              * <#-- @ftlvariable name="isAdmin" type="boolean" -->
              * 
              * <#-- @ftlvariable name="canViewProjectParticipants" type="boolean" --> <#--
+             * 
              * @ftlvariable name="initialized" type="boolean" --> <#-- @ftlvariable name="postUrl"
              * type="java.lang.String" --> <#-- @ftlvariable name="objectPID"
              * type="java.lang.String" --> <#-- @ftlvariable name="objectType"
              * type="java.lang.String" --> <#-- @ftlvariable name="isProject" type="boolean" -->
              * <#-- @ftlvariable name="elementList"
              * type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" --> <#--
+             * 
              * @ftlvariable name="refersList"
              * type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" --> <#--
+             * 
              * @ftlvariable name="fileList"
              * type="java.util.ArrayList<podd.resources.util.view.FileElement>" --> <#--
+             * 
              * @ftlvariable name="canComplete" type="boolean" --> <#-- @ftlvariable name="aHREF"
              * type="java.lang.String" -->
              * 
@@ -197,6 +206,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
              * name="objectNameError" type="java.lang.String" --> <#-- @ftlvariable
              * name="objectDescriptionError" type="java.lang.String" --> <#-- @ftlvariable
              * name="generalErrorList" type="java.util.ArrayList<java.lang.String>" --> <#--
+             * 
              * @ftlvariable name="objectErrorList" type="java.util.ArrayList<java.lang.String>" -->
              */
             
@@ -243,7 +253,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         // FIXME: Use PoddArtifactManager or PoddSesameManager here
         // get top-object of this artifact
         final List<PoddObjectLabel> topObjectList =
-                SparqlQueryHelper.getTopObjects(conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
+                SparqlQueryHelper.getTopObjects(ontologyID, conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
                         .getInferredOntologyIRI().toOpenRDFURI());
         if(topObjectList == null || topObjectList.size() != 1)
         {

@@ -144,7 +144,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     {
         Collection<InferredOWLOntologyID> artifactsInternal = getArtifactsInternal();
         
-        throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED, "TODO: Implement listing of artifacts");
+        throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED, "TODO: Implement listing of artifacts in RDF");
     }
     
     private void populateDataModelWithArtifactLists(final Map<String, Object> dataModel,
@@ -153,10 +153,10 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         for(final InferredOWLOntologyID artifactUri : artifacts)
         {
-            final PoddObjectLabel artifact = new PoddObjectLabelImpl(artifactUri);
-            artifact.setTitle("The title " + artifactUri);
-            artifact.setDescription("The Project is really exciting. It could lead to unbelievable productivity"
-                    + " in agriculture");
+            // FIXME: This does not actually find the real labels
+            final PoddObjectLabel artifact =
+                    new PoddObjectLabelImpl(artifactUri, "The title " + artifactUri,
+                            "The Project is really exciting. It could lead to unbelievable productivity in agriculture");
             results.add(artifact);
         }
         dataModel.put("allProjectsList", artifacts);
