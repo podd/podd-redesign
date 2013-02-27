@@ -25,28 +25,67 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
     }
     
     /**
-     * Checks the ability of the currently authenticated user to perform the given action.
+     * Checks the ability of the currently authenticated user to perform the given action and throws
+     * an exception if the current user is not authorised for the given action.
      * 
      * @param action
      *            The PoddAction that is to be performed.
-     * @param optionalObjectUris 
-     *            Collection of object URIs to be used for authorization, or an empty Collection
-     *            if none are needed for authorization.
+     * @param optionalObjectUris
+     *            Collection of object URIs to be used for authorization, or an empty Collection if
+     *            none are needed for authorization.
      * @throws ResourceException
      *             with Status.CLIENT_ERROR_UNAUTHORIZED (HTTP 401) if the user is not authorised to
      *             perform the given action
      */
-    protected void checkAuthentication(final PoddAction action, Collection<URI> optionalObjectUris) throws ResourceException
+    protected boolean checkAuthentication(final PoddAction action, Collection<URI> optionalObjectUris)
+        throws ResourceException
     {
-        if (optionalObjectUris == null)
+        // throws an error on failure
+        return checkAuthentication(action, optionalObjectUris, true);
+    }
+    
+    /**
+     * Checks the ability of the currently authenticated user to perform the given action,
+     * optionally throwing an exception instead of returning false in the case that the check fails.
+     * 
+     * @param action
+     *            The PoddAction that is to be performed.
+     * @param optionalObjectUris
+     *            Collection of object URIs to be used for authorization, or an empty Collection if
+     *            none are needed for authorization.
+     * @param throwExceptionOnFailure
+     *            If true, this method throws a ResourceException on failure instead of returning
+     *            false
+     * @return Returns true if the user is able to perform the given action on the given objects,
+     *         and either throws an exception or returns false if they are not able to perform the
+     *         given action, depending on the value of the throwExceptionOnFailure parameter.
+     * @throws ResourceException
+     *             with Status.CLIENT_ERROR_UNAUTHORIZED (HTTP 401) if the user is not authorised to
+     *             perform the given action
+     */
+    protected boolean checkAuthentication(final PoddAction action, Collection<URI> optionalObjectUris,
+            boolean throwExceptionOnFailure) throws ResourceException
+    {
+        if(optionalObjectUris == null)
         {
-            throw new RuntimeException("NULL received for Object URI Collection. Resource should pass an empty Collection at least.");
+            throw new RuntimeException(
+                    "NULL received for Object URI Collection. Resource should pass an empty Collection at least.");
         }
         
-        if(!this.getPoddApplication().authenticate(action, this.getRequest(), this.getResponse(), optionalObjectUris))
+        if(this.getPoddApplication().authenticate(action, this.getRequest(), this.getResponse(), optionalObjectUris))
+        {
+            return true;
+        }
+        else if(throwExceptionOnFailure)
         {
             this.log.warn("Client unauthorized. Throwing a ResourceException");
             throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, action.getErrorMessage());
+        }
+        else
+        {
+            // do not log this, as it is a normal part of an operation, as evidenced by not wanting
+            // to throw an exception
+            return false;
         }
     }
     
@@ -62,10 +101,9 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
         super.doInit();
     }
     
-    
     public PoddWebServiceApplication getPoddApplication()
     {
-        final PoddWebServiceApplication application = (PoddWebServiceApplication) super.getApplication();
+        final PoddWebServiceApplication application = (PoddWebServiceApplication)super.getApplication();
         
         return application;
     }
