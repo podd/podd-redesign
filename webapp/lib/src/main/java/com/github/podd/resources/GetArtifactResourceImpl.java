@@ -30,12 +30,10 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
-import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -85,9 +83,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         InferredOWLOntologyID ontologyID;
         try
         {
-            final PoddArtifactManager artifactManager =
-                    ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
-            ontologyID = artifactManager.getArtifactByIRI(IRI.create(artifactUri));
+            ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
         }
         catch(final UnmanagedArtifactIRIException e)
         {
@@ -182,16 +178,12 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             final Map<String, Object> dataModel) throws OpenRDFException
     {
         
-        final RepositoryConnection conn =
-                this.getPoddApplication().getPoddRepositoryManager().getRepository().getConnection();
+        final RepositoryConnection conn = this.getPoddRepositoryManager().getRepository().getConnection();
         conn.begin();
         try
         {
             // get top-object of this artifact
-            // FIXME: Use PoddArtifactManager or PoddSesameManager here
-            final List<URI> topObjectList =
-                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
-                            .getTopObjects(ontologyID, conn);
+            final List<URI> topObjectList = this.getPoddSesameManager().getTopObjects(ontologyID, conn);
             if(topObjectList == null || topObjectList.size() != 1)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
@@ -216,17 +208,16 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             // FIXME: TODO:
             // SparqlQueryHelper.getPoddObject(ontologyID, objectUri, conn,
             // ontologyGraphs.toArray(new URI[0]));
+            
             dataModel.put("poddObject", theObject);
             
             // find the object's type
-            List<URI> objectTypes =
-                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
-                            .getObjectTypes(ontologyID, objectUri, conn);
+            List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
             if(objectTypes == null || objectTypes.isEmpty())
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
-            
+
             // TODO: Get label for the object type
             URI objectType = objectTypes.get(0);
             // if(theObjectType.getLabel() != null)
