@@ -20,7 +20,6 @@ import org.semanticweb.owlapi.model.IRI;
 public class PoddArtifact extends PoddObject
 {
     
-    private String description;
     private String leadInstitution;
     
     /**
@@ -31,16 +30,6 @@ public class PoddArtifact extends PoddObject
     public PoddArtifact(URI uri)
     {
         super(uri);
-    }
-    
-    public String getDescription()
-    {
-        return description;
-    }
-    
-    public void setDescription(String description)
-    {
-        this.description = description;
     }
     
     public String getLeadInstitution()
