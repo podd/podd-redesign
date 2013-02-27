@@ -532,8 +532,12 @@ public class SparqlQueryTest extends AbstractOntologyTest
     @Test
     public void testSpikeGetCardinality() throws Exception
     {
+        final String testResourcePath = "/test/artifacts/basic-2.rdf";
+        final InferredOWLOntologyID nextOntologyID = this.loadArtifact(testResourcePath, RDFFormat.RDFXML);
+        
         // Create a list of contexts made up of the schema ontologies and the asserted artifact.
         final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
+        allContextsToQuery.add(nextOntologyID.getVersionIRI().toOpenRDFURI());
         final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
         
         this.conn = this.getConnection();
@@ -541,10 +545,10 @@ public class SparqlQueryTest extends AbstractOntologyTest
        // this.printContents(conn, contexts[8]);
         
         
-        URI publicationUri = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Publication");
+        URI publicationObjectUri = ValueFactoryImpl.getInstance().createURI("urn:hardcoded:purl:artifact:1#publication45");
         URI propertyUri = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "publishedIn");
         
-        int[] cardinalities = SparqlQueryHelper.spikeGetCardinality(publicationUri, propertyUri, conn, contexts);
+        int[] cardinalities = SparqlQueryHelper.spikeGetCardinality(publicationObjectUri, propertyUri, conn, contexts);
 
         // verify:
         System.out.println(cardinalities[0] + " " + cardinalities[1] + " " + cardinalities[2]);

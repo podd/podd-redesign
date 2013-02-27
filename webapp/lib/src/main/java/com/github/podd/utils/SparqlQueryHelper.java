@@ -665,14 +665,14 @@ public class SparqlQueryHelper
      * 
      * NOTE: does not work on "unqualified" cardinality statements yet.
      * 
-     * @param conceptUri
+     * @param objectUri
      * @param propertyUri
      * @param repositoryConnection
      * @param contexts
      * @return an integer array of size 3. 
      * @throws OpenRDFException
      */
-    public static int[] spikeGetCardinality(final URI conceptUri, final URI propertyUri, 
+    public static int[] spikeGetCardinality(final URI objectUri, final URI propertyUri, 
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final int[] cardinalities = {-1, -1, -1};
@@ -682,6 +682,7 @@ public class SparqlQueryHelper
         sb.append("SELECT ?maxCardinality ?minCardinality ?qualifiedCardinality ");
         sb.append(" WHERE { ");
         
+        sb.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> ?poddConcept . ");
         sb.append(" ?poddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
         sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
         sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxCardinality } . ");
@@ -693,7 +694,7 @@ public class SparqlQueryHelper
         SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        tupleQuery.setBinding("poddConcept", conceptUri);
+        tupleQuery.setBinding("poddConcept", objectUri);
         tupleQuery.setBinding("propertyUri", propertyUri);
         final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
         
