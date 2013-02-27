@@ -2,51 +2,31 @@ package com.github.podd.utils;
 
 import org.openrdf.model.URI;
 
+/**
+ * An immutable object designed solely to provide a wrapper for labels and descriptions that are
+ * going to be immediately displayed.
+ * 
+ * @author Peter Ansell p_ansell@yahoo.com
+ */
 public interface PoddObjectLabel
 {
-    
     /**
      * @return the parentArtifactID
      */
-    public abstract InferredOWLOntologyID getParentArtifactID();
-    
-    /**
-     * @param parentArtifactID
-     *            the parentArtifactID to set
-     */
-    public abstract void setParentArtifactID(InferredOWLOntologyID parentArtifactID);
+    InferredOWLOntologyID getOntologyID();
     
     /**
      * @return the objectID
      */
-    public abstract URI getObjectID();
-    
-    /**
-     * @param objectID
-     *            the objectID to set
-     */
-    public abstract void setObjectID(URI objectID);
+    URI getObjectURI();
     
     /**
      * @return the label
      */
-    public abstract String getLabel();
-    
-    /**
-     * @param label
-     *            the label to set
-     */
-    public abstract void setLabel(String label);
+    String getLabel();
     
     /**
      * @return the description
      */
-    public abstract String getDescription();
-    
-    /**
-     * @param description
-     *            the description to set
-     */
-    public abstract void setDescription(String description);
-    
+    String getDescription();
 }

@@ -17,13 +17,43 @@ import org.semanticweb.owlapi.model.IRI;
  */
 public class PoddObjectLabelImpl implements PoddObjectLabel
 {
-    private InferredOWLOntologyID parentArtifactID;
+    private InferredOWLOntologyID ontologyID;
     
     private URI objectID;
     
     private String label;
     
     private String description;
+    
+    /**
+     * Creates a label object without a description, and without an object, meaning that the label
+     * applies to the ontology itself.
+     * 
+     * @param ontologyID
+     *            The base artifact that this label is applied to.
+     * @param label
+     *            The label for this ontology.
+     */
+    public PoddObjectLabelImpl(InferredOWLOntologyID ontologyID, String label)
+    {
+        this.ontologyID = ontologyID;
+        this.label = label;
+    }
+    
+    /**
+     * Creates a label object without a description, and without an object, meaning that the label
+     * applies to the ontology itself.
+     * 
+     * @param ontologyID
+     *            The base artifact that this label is applied to.
+     * @param label
+     *            The label for this ontology.
+     */
+    public PoddObjectLabelImpl(InferredOWLOntologyID ontologyID, String label, String description)
+    {
+        this(ontologyID, label);
+        this.description = description;
+    }
     
     /**
      * Creates a label object without a description
@@ -35,11 +65,10 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
      * @param label
      *            The label for this object.
      */
-    public PoddObjectLabelImpl(InferredOWLOntologyID parent, URI object, String label)
+    public PoddObjectLabelImpl(InferredOWLOntologyID ontologyID, URI object, String label)
     {
-        this.setParentArtifactID(parent);
-        this.setObjectID(object);
-        this.setLabel(label);
+        this(ontologyID, label);
+        this.objectID = object;
     }
     
     /**
@@ -57,7 +86,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     public PoddObjectLabelImpl(InferredOWLOntologyID parent, URI object, String label, String description)
     {
         this(parent, object, label);
-        this.setDescription(description);
+        this.description = description;
     }
     
     /*
@@ -66,21 +95,9 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
      * @see com.github.podd.utils.PoddObjectLabel#getParentArtifactID()
      */
     @Override
-    public InferredOWLOntologyID getParentArtifactID()
+    public InferredOWLOntologyID getOntologyID()
     {
-        return parentArtifactID;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.utils.PoddObjectLabel#setParentArtifactID(com.github.podd.utils.
-     * InferredOWLOntologyID)
-     */
-    @Override
-    public void setParentArtifactID(InferredOWLOntologyID parentArtifactID)
-    {
-        this.parentArtifactID = parentArtifactID;
+        return ontologyID;
     }
     
     /*
@@ -89,20 +106,9 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
      * @see com.github.podd.utils.PoddObjectLabel#getObjectID()
      */
     @Override
-    public URI getObjectID()
+    public URI getObjectURI()
     {
         return objectID;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.utils.PoddObjectLabel#setObjectID(org.openrdf.model.URI)
-     */
-    @Override
-    public void setObjectID(URI objectID)
-    {
-        this.objectID = objectID;
     }
     
     /*
@@ -119,17 +125,6 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.utils.PoddObjectLabel#setLabel(java.lang.String)
-     */
-    @Override
-    public void setLabel(String label)
-    {
-        this.label = label;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
      * @see com.github.podd.utils.PoddObjectLabel#getDescription()
      */
     @Override
@@ -137,16 +132,4 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return description;
     }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.utils.PoddObjectLabel#setDescription(java.lang.String)
-     */
-    @Override
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
-    
 }
