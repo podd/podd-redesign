@@ -678,6 +678,8 @@ public class SparqlQueryHelper
      * 
      * Retrieves the cardinalities from the schema ontologies, for the given concept and property.
      * 
+     * NOTE: does not work on "unqualified" cardinality statements yet.
+     * 
      * @param conceptUri
      * @param propertyUri
      * @param repositoryConnection
@@ -744,7 +746,7 @@ public class SparqlQueryHelper
     }
     
     /*
-     * FIXME: Spike method. Initial code being checked in end of day.
+     * Spike method.
      * 
      * {http://purl.org/podd/ns/poddScience#PlatformType}
      * <http://www.w3.org/2002/07/owl#equivalentClass> {_:genid1636663090} {_:genid1636663090}
@@ -762,6 +764,9 @@ public class SparqlQueryHelper
      * {http://purl.org/podd/ns/poddScience#Hardware} {_:genid278519207}
      * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
      * {http://www.w3.org/1999/02/22-rdf-syntax-ns#nil}
+     * 
+     * SELECT ?member WHERE { ?conceptUri :equivalentClass ?b0 . ?b0 :oneOf ?b1 . ?b1 rdf:rest * /
+     * rdf:first ?member . }
      */
     public static List<PoddObjectLabel> spikeGetPossibleValues(final URI conceptUri,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
@@ -770,21 +775,52 @@ public class SparqlQueryHelper
         
         final StringBuilder sb = new StringBuilder();
         
-        sb.append("SELECT ? ");
+        sb.append("SELECT ?member ?memberLabel ?memberDescription ");
         sb.append(" WHERE { ");
         
         sb.append(" ?poddConcept <" + OWL.EQUIVALENTCLASS.stringValue() + "> ?x . ");
-        sb.append(" ?x <" + OWL.ONEOF.stringValue() + "> ?y . ");
-        sb.append(" ?y <" + RDF.FIRST.stringValue() + "> ?firstElement . ");
-        sb.append(" ?y <" + RDF.REST.stringValue() + "> ?z . ");
-        
+        sb.append(" ?x <" + OWL.ONEOF.stringValue() + "> ?list . ");
+        sb.append(" ?list <" + RDF.REST.stringValue() + ">*/<" + RDF.FIRST.stringValue() + "> ?member . ");
+        sb.append(" OPTIONAL { ?member <" + RDFS.LABEL.stringValue() + "> ?memberLabel } . ");
+        sb.append(" OPTIONAL { ?member <" + RDFS.COMMENT.stringValue() + "> ?memberDescription } . ");
         sb.append(" } ");
         
         SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        tupleQuery.setBinding("", conceptUri);
+        tupleQuery.setBinding("poddConcept", conceptUri);
         final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
+        
+        try
+        {
+            while(queryResults.hasNext())
+            {
+                final BindingSet binding = queryResults.next();
+                
+                Value member = binding.getValue("member");
+                Value memberLabel = binding.getValue("memberLabel");
+                Value memberDescription = binding.getValue("memberDescription");
+                
+                String label = null;
+                String description = null;
+                
+                if(memberLabel != null)
+                {
+                    label = memberLabel.stringValue();
+                }
+                if(memberDescription != null)
+                {
+                    description = memberDescription.stringValue();
+                }
+                
+                PoddObjectLabel memberObject = new PoddObjectLabelImpl(null, (URI)member, label, description);
+                results.add(memberObject);
+            }
+        }
+        finally
+        {
+            queryResults.close();
+        }
         
         return results;
     }
