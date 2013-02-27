@@ -177,7 +177,8 @@ public interface PoddSesameManager
      * @param updateCurrent
      *            If true, will update the current version if it exists. If false it will only add
      *            the current version if it does not exist. Set this to false when only inferred
-     *            ontology information needs to be added.
+     *            ontology information needs to be added. This will never remove statements related
+     *            to previous versions of schema ontologies.
      * @param repositoryConnection
      * @param context
      * @throws OpenRDFException
@@ -192,14 +193,15 @@ public interface PoddSesameManager
      * @param nextOntologyID
      *            The ontology ID that contains the information about the ontology, including the
      *            inferred ontology IRI.
-     * @param updateCurrent
-     *            If true, will update the current version if it exists. If false it will only add
-     *            the current version if it does not exist.
+     * @param updateCurrentAndRemovePrevious
+     *            If true, will update the current version if it exists, and remove all statements
+     *            relating to previous versions. If false it will only add the current version if it
+     *            does not exist.
      * @param repositoryConnection
      * @param context
      * @throws OpenRDFException
      */
-    void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrent,
+    void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrentAndRemovePrevious,
             RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
     
 }
