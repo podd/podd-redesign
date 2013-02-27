@@ -24,7 +24,8 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddArtifact;
+import com.github.podd.utils.PoddObjectLabel;
+import com.github.podd.utils.PoddObjectLabelImpl;
 import com.github.podd.utils.PoddWebConstants;
 import com.github.podd.utils.SparqlQueryHelper;
 
@@ -51,22 +52,15 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     @Get("html")
     public Representation getListArtifactsPage(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, Collections.<URI> emptySet());
-        
         this.log.info("@Get listArtifacts Page");
+        
+        Collection<InferredOWLOntologyID> artifacts = getArtifactsInternal();
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "projects.html.ftl");
         dataModel.put("pageTitle", ListArtifactsResourceImpl.LIST_PAGE_TITLE_TEXT);
         
-        try
-        {
-            this.populateDataModelWithArtifactLists(dataModel);
-        }
-        catch(final OpenRDFException e)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
-        }
+        this.populateDataModelWithArtifactLists(dataModel, artifacts);
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page
@@ -74,9 +68,10 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    @Get("rdf|rj|ttl")
-    public Representation getListArtifactsRdf(final Representation entity) throws ResourceException
+    private Collection<InferredOWLOntologyID> getArtifactsInternal() throws ResourceException
     {
+        Collection<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
+        
         final String publishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_PUBLISHED);
         final String unpublishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_UNPUBLISHED);
         
@@ -94,7 +89,9 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             unpublished = Boolean.parseBoolean(unpublishedString);
         }
         
-        // If they are not authenticated always set unpublished to false
+        // If they are not authenticated always set unpublished to false to avoid listing
+        // unpublished artifacts to them, even if the public has access to specific unpublished
+        // artifacts using direct links
         if(!this.getClientInfo().isAuthenticated())
         {
             unpublished = false;
@@ -109,21 +106,11 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 
                 for(final InferredOWLOntologyID nextPublishedArtifact : publishedArtifacts)
                 {
-                    try
+                    if(this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ,
+                            Arrays.asList(nextPublishedArtifact.getOntologyIRI().toOpenRDFURI()), false))
                     {
-                        this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ,
-                                Arrays.asList(nextPublishedArtifact.getOntologyIRI().toOpenRDFURI()));
-                    }
-                    catch(final ResourceException e)
-                    {
-                        if(!e.getStatus().equals(Status.CLIENT_ERROR_FORBIDDEN))
-                        {
-                            throw e;
-                        }
-                        else
-                        {
-                            this.log.warn("Could not access published artifact: {}", nextPublishedArtifact);
-                        }
+                        // If the authentication succeeded add the artifact
+                        results.add(nextPublishedArtifact);
                     }
                 }
             }
@@ -132,6 +119,16 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             {
                 final Collection<InferredOWLOntologyID> unpublishedArtifacts =
                         this.getPoddApplication().getPoddArtifactManager().listUnpublishedArtifacts();
+                
+                for(final InferredOWLOntologyID nextUnpublishedArtifact : unpublishedArtifacts)
+                {
+                    if(this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
+                            Arrays.asList(nextUnpublishedArtifact.getOntologyIRI().toOpenRDFURI()), false))
+                    {
+                        // If the authentication succeeded add the artifact
+                        results.add(nextUnpublishedArtifact);
+                    }
+                }
             }
         }
         catch(OpenRDFException e)
@@ -139,41 +136,30 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Database exception", e);
         }
         
+        return results;
+    }
+    
+    @Get("rdf|rj|ttl")
+    public Representation getListArtifactsRdf(final Representation entity) throws ResourceException
+    {
+        Collection<InferredOWLOntologyID> artifactsInternal = getArtifactsInternal();
+        
         throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED, "TODO: Implement listing of artifacts");
     }
     
-    private void populateDataModelWithArtifactLists(final Map<String, Object> dataModel) throws OpenRDFException
+    private void populateDataModelWithArtifactLists(final Map<String, Object> dataModel,
+            Collection<InferredOWLOntologyID> artifacts)
     {
-        final RepositoryConnection conn =
-                this.getPoddApplication().getPoddRepositoryManager().getRepository().getConnection();
-        conn.begin();
-        
-        try
+        final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
+        for(final InferredOWLOntologyID artifactUri : artifacts)
         {
-            final URI artifactMgtGraph =
-                    this.getPoddApplication().getPoddRepositoryManager().getArtifactManagementGraph();
-            final List<URI> uris = SparqlQueryHelper.getPoddArtifactList(conn, artifactMgtGraph);
-            
-            final List<PoddArtifact> artifacts = new ArrayList<PoddArtifact>();
-            for(final URI artifactUri : uris)
-            {
-                final PoddArtifact artifact = new PoddArtifact(artifactUri);
-                artifact.setTitle("The title " + artifactUri);
-                artifact.setDescription("The Project is really exciting. It could lead to unbelievable productivity"
-                        + " in agriculture");
-                artifacts.add(artifact);
-            }
-            dataModel.put("allProjectsList", artifacts);
-            
+            final PoddObjectLabel artifact = new PoddObjectLabelImpl(artifactUri);
+            artifact.setTitle("The title " + artifactUri);
+            artifact.setDescription("The Project is really exciting. It could lead to unbelievable productivity"
+                    + " in agriculture");
+            results.add(artifact);
         }
-        finally
-        {
-            if(conn != null)
-            {
-                conn.rollback(); // read only, nothing to commit
-                conn.close();
-            }
-        }
+        dataModel.put("allProjectsList", artifacts);
         
     }
     

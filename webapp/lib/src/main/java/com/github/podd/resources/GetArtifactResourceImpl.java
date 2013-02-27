@@ -39,7 +39,7 @@ import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddObject;
+import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 import com.github.podd.utils.SparqlQueryHelper;
@@ -192,14 +192,13 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             // get top-object of this artifact
             // FIXME: Use PoddArtifactManager or PoddSesameManager here
-            final List<PoddObject> topObjectList =
+            final List<PoddObjectLabel> topObjectList =
                     SparqlQueryHelper.getTopObjects(conn, ontologyID.getVersionIRI().toOpenRDFURI(), ontologyID
                             .getInferredOntologyIRI().toOpenRDFURI());
             if(topObjectList == null || topObjectList.size() != 1)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
             }
-            
             
             // the object to display (default is Top Object)
             URI objectUri = topObjectList.get(0).getUri();
@@ -209,24 +208,23 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToView);
             }
             
-            
             // hack together the list of contexts to query in
             ontologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
             // ontologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
             
-            
             // first get the title & description encapsulated in a PoddObject
-            final PoddObject theObject = SparqlQueryHelper.getPoddObject(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
+            final PoddObjectLabel theObject =
+                    SparqlQueryHelper.getPoddObject(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
             dataModel.put("poddObject", theObject);
             
-            
             // find the object's type
-            final PoddObject theObjectType = SparqlQueryHelper.getObjectType(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
+            final PoddObjectLabel theObjectType =
+                    SparqlQueryHelper.getObjectType(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
             if(theObjectType == null)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
-            if (theObjectType.getTitle() != null)
+            if(theObjectType.getTitle() != null)
             {
                 dataModel.put("objectType", theObjectType.getTitle());
             }
@@ -234,7 +232,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 dataModel.put("objectType", theObjectType.getUri());
             }
-
             
             // populate the properties of the object
             final List<URI> orderedProperties =
@@ -320,5 +317,5 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         return schemaOntologyGraphs;
     }
-
+    
 }
