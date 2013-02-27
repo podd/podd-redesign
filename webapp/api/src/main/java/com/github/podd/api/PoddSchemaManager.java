@@ -131,14 +131,6 @@ public interface PoddSchemaManager
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
     
     /**
-     * Sets the URI context to use for the Schema Ontology Management.
-     * 
-     * @param context
-     *            The context to use for managing the schema ontologies.
-     */
-    void setSchemaManagementContext(URI context);
-    
-    /**
      * 
      * @param sesameManager
      *            The PoddSesameManager

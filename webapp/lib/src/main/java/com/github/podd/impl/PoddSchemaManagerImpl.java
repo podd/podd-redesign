@@ -39,7 +39,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     private PoddRepositoryManager repositoryManager;
     private PoddSesameManager sesameManager;
     private PoddOWLManager owlManager;
-    private URI schemaManagementContext;
     
     /**
      * 
@@ -103,12 +102,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public void setSesameManager(final PoddSesameManager sesameManager)
     {
         this.sesameManager = sesameManager;
-    }
-    
-    @Override
-    public void setSchemaManagementContext(final URI context)
-    {
-        this.schemaManagementContext = context;
     }
     
     @Override
