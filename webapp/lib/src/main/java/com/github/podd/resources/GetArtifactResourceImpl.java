@@ -236,10 +236,10 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             
             // populate the properties of the object
             final List<URI> orderedProperties =
-                    SparqlQueryHelper.getDirectProperties(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
+                    SparqlQueryHelper.getWeightedProperties(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
             
             final Model allNeededStatementsForDisplay =
-                    SparqlQueryHelper.getPoddObjectDetails(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
+                    SparqlQueryHelper.getPoddObjectForDisplay(objectUri, conn, ontologyGraphs.toArray(new URI[0]));
             
             dataModel.put("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
             dataModel.put("propertyList", orderedProperties);

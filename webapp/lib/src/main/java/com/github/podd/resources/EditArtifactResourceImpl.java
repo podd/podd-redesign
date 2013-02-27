@@ -167,7 +167,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             
             // an ordered-list of the properties about the object
             final List<URI> orderedProperties =
-                    SparqlQueryHelper.getDirectProperties(objectUri, conn, assertedContexts);
+                    SparqlQueryHelper.getWeightedProperties(objectUri, conn, assertedContexts);
             this.log.info("Found {} properties about object {}", orderedProperties.size(), objectUri);
             dataModel.put("orderedPropertyList", orderedProperties);
             

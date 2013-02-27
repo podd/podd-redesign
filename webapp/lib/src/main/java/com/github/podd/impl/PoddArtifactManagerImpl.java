@@ -18,10 +18,22 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.GraphQueryResult;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -54,7 +66,10 @@ import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddObjectLabel;
+import com.github.podd.utils.PoddObjectLabelImpl;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.SparqlQueryHelper;
 
 /**
  * Implementation of the PODD Artifact Manager API, to manage the lifecycle for PODD Artifacts.
@@ -225,6 +240,195 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
             }
         }
+    }
+    
+    /**
+     * The result of this method is a Model containing all data required for displaying the details
+     * of the object in HTML+RDFa.
+     * 
+     * The returned graph has the following structure.
+     * 
+     * poddObject :propertyUri :value
+     * 
+     * propertyUri RDFS:Label "property label"
+     * 
+     * value RDFS:Label "value label"
+     * 
+     * @param objectUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    @Override
+    public Model getObjectDetailsForDisplay(final InferredOWLOntologyID artifactID, final URI objectUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
+        
+        sb.append("} WHERE {");
+        
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        // value may not have a Label
+        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        
+        sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        sb.append(" FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+        
+        sb.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectUri);
+        
+        final GraphQueryResult queryResults = SparqlQueryHelper.executeGraphQuery(graphQuery, contexts);
+        
+        final Model model = new TreeModel();
+        
+        while(queryResults.hasNext())
+        {
+            final Statement stmt = queryResults.next();
+            model.add(stmt);
+        }
+        
+        return model;
+    }
+    
+    /**
+     * Work in progress [25/02/2013]
+     * 
+     * Attempting to retrieve sufficient triples to display the object_edit page
+     * 
+     * @param objectUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    @Override
+    public Model getObjectDetailsForEdit(final InferredOWLOntologyID artifactID, final URI objectUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
+        
+        sb.append("} WHERE {");
+        
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        // value may not have a Label
+        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        
+        sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        sb.append(" FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+        
+        sb.append("}");
+        
+        SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectUri);
+        
+        final GraphQueryResult queryResults = SparqlQueryHelper.executeGraphQuery(graphQuery, contexts);
+        
+        final Model model = new TreeModel();
+        
+        while(queryResults.hasNext())
+        {
+            final Statement stmt = queryResults.next();
+            model.add(stmt);
+            System.out.println(stmt.getSubject() + "   [" + stmt.getPredicate() + "]   " + stmt.getObject());
+        }
+        
+        return model;
+    }
+    
+    /**
+     * Retrieve a list of properties about the given object. The list is ordered based on property
+     * weights.
+     * 
+     * RDF:TYPE, RDFS:COMMENT and RDFS:LABEL statements are omitted from the results.
+     * 
+     * Note: If only asserted properties are required, the inferred ontology graph should not be
+     * included in the <i>contexts</i> passed into this method.
+     * 
+     * @param objectUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return A Map containing all statements about the given object.
+     * @throws OpenRDFException
+     */
+    @Override
+    public List<URI> getWeightedProperties(final InferredOWLOntologyID artifactID, final URI objectUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT DISTINCT ?propertyUri ");
+        sb.append(" WHERE { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        
+        // for ORDER BY
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        
+        // value may not have a Label
+        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        
+        // for ORDER BY
+        sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODDBASE_WEIGHT.stringValue() + "> ?weight } . ");
+        
+        sb.append("FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
+        sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        sb.append("FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        sb.append("FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+        
+        // Exclude as TYPE, Label (title) and Comment (description) are displayed separately
+        sb.append("FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
+        sb.append("FILTER (?propertyUri != <" + RDFS.LABEL.stringValue() + ">) ");
+        sb.append("FILTER (?propertyUri != <" + RDFS.COMMENT.stringValue() + ">) ");
+        
+        sb.append(" } ");
+        sb.append("  ORDER BY ASC(?weight) ASC(?propertyLabel) ");
+        
+        SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("poddObject", objectUri);
+        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
+        
+        final List<URI> resultList = new ArrayList<URI>();
+        try
+        {
+            while(queryResults.hasNext())
+            {
+                final Value property = queryResults.next().getValue("propertyUri");
+                if(property instanceof URI)
+                {
+                    resultList.add((URI)property);
+                }
+            }
+        }
+        finally
+        {
+            queryResults.close();
+        }
+        
+        return resultList;
     }
     
     /*

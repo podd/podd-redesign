@@ -50,8 +50,9 @@ import com.github.podd.utils.PoddRdfConstants;
 /**
  * Abstract test class for testing PODD artifacts and schema ontologies in a Sesame repository.
  * 
- * @author kutila
+ * TODO: Integrate this with other tests, either as a super class for tests or as a helper utility.
  * 
+ * @author kutila
  */
 public class AbstractOntologyTest
 {

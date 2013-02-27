@@ -229,7 +229,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         // to work on this in a cleaner manner?
         final URI topObjectUri =
                 SparqlQueryHelper.getTopObjects(nextOntologyID, this.conn, contexts).get(0).getObjectURI();
-        final List<URI> orderedPropertyUris = SparqlQueryHelper.getDirectProperties(topObjectUri, this.conn, contexts);
+        final List<URI> orderedPropertyUris = SparqlQueryHelper.getWeightedProperties(topObjectUri, this.conn, contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
@@ -282,7 +282,7 @@ public class SparqlQueryTest extends AbstractOntologyTest
         URI publicationObjectUri = (URI)list.get(0).getObject();
         
         final List<URI> orderedPropertyUris =
-                SparqlQueryHelper.getDirectProperties(publicationObjectUri, this.conn, contexts);
+                SparqlQueryHelper.getWeightedProperties(publicationObjectUri, this.conn, contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 6, orderedPropertyUris.size());
