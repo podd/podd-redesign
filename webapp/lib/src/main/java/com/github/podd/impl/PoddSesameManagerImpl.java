@@ -371,12 +371,19 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public Set<IRI> getDirectImports(final InferredOWLOntologyID ontologyID,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
+        return getDirectImports(repositoryConnection, versionAndInferredContexts(ontologyID));
+    }
+    
+    @Override
+    public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI... contexts)
+        throws OpenRDFException
+    {
         final String sparqlQuery = "SELECT ?x WHERE { ?y <" + OWL.IMPORTS.stringValue() + "> ?x ." + " }";
         this.log.info("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         
         final DatasetImpl dataset = new DatasetImpl();
-        for(URI nextContext : versionAndInferredContexts(ontologyID))
+        for(URI nextContext : contexts)
         {
             dataset.addDefaultGraph(nextContext);
         }

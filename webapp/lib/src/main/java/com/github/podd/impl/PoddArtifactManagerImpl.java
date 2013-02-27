@@ -242,7 +242,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
     }
     
-    
     /*
      * (non-Javadoc)
      * 
@@ -661,7 +660,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         ontologyId);
             }
             
-            final OWLOntologyID currentVersion =
+            final InferredOWLOntologyID currentVersion =
                     this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, repositoryConnection,
                             this.getRepositoryManager().getArtifactManagementGraph());
             
@@ -673,7 +672,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         "Could not publish artifact as it was not the most current version.", ontologyId);
             }
             
-            this.getSesameManager().setPublished(ontologyIRI, repositoryConnection, versionIRI.toOpenRDFURI());
+            this.getSesameManager().setPublished(currentVersion, repositoryConnection,
+                    this.getRepositoryManager().getArtifactManagementGraph());
             
             final InferredOWLOntologyID published =
                     this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, repositoryConnection,

@@ -205,29 +205,31 @@ public interface PoddSesameManager
      */
     void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrentAndRemovePrevious,
             RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
-
+    
     List<URI> getObjectTypes(InferredOWLOntologyID ontologyID, URI objectUri, RepositoryConnection repositoryConnection)
         throws OpenRDFException;
-
+    
     URI getTopObjectIRI(InferredOWLOntologyID ontologyIRI, RepositoryConnection repositoryConnection)
         throws OpenRDFException;
-
+    
     List<URI> getTopObjects(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection)
         throws OpenRDFException;
-
+    
     List<URI> getAllValidMembers(InferredOWLOntologyID artifactID, URI conceptUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
-
+    
     Model getCardinality(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
-
+    
     Model getObjectDetailsForDisplay(InferredOWLOntologyID artifactID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
-
+    
     Model getObjectDetailsForEdit(InferredOWLOntologyID artifactID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
-
+    
     List<URI> getWeightedProperties(InferredOWLOntologyID artifactID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
+    
+    Set<IRI> getDirectImports(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
 }
