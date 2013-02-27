@@ -122,11 +122,12 @@ public class AbstractOntologyTest
         this.poddRepositoryManager.setSchemaManagementGraph(this.schemaGraph);
         this.poddRepositoryManager.setArtifactManagementGraph(this.artifactGraph);
         
+        final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
+        
         this.poddSchemaManager = new PoddSchemaManagerImpl();
         this.poddSchemaManager.setOwlManager(nextOWLManager);
         this.poddSchemaManager.setRepositoryManager(this.poddRepositoryManager);
-        
-        final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
+        this.poddSchemaManager.setSesameManager(poddSesameManager);
         
         this.poddArtifactManager = new PoddArtifactManagerImpl();
         this.poddArtifactManager.setRepositoryManager(this.poddRepositoryManager);
@@ -136,25 +137,25 @@ public class AbstractOntologyTest
         this.poddArtifactManager.setSchemaManager(this.poddSchemaManager);
         this.poddArtifactManager.setSesameManager(poddSesameManager);
         
-        
         /*
          * Since the schema ontology upload feature is not yet supported, necessary schemas are
          * uploaded here at application starts up.
          */
-        String[] schemaPaths = {PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF,
-                PoddRdfConstants.PATH_PODD_USER, PoddRdfConstants.PATH_PODD_BASE,
-                PoddRdfConstants.PATH_PODD_SCIENCE, PoddRdfConstants.PATH_PODD_PLANT};
+        String[] schemaPaths =
+                { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
+                        PoddRdfConstants.PATH_PODD_BASE, PoddRdfConstants.PATH_PODD_SCIENCE,
+                        PoddRdfConstants.PATH_PODD_PLANT };
         
         for(String schemaPath : schemaPaths)
         {
             try
             {
-                //load a schema ontology
-                InferredOWLOntologyID ontologyID = this.poddSchemaManager.uploadSchemaOntology(
-                        this.getClass().getResourceAsStream(schemaPath),
-                        RDFFormat.RDFXML);
+                // load a schema ontology
+                InferredOWLOntologyID ontologyID =
+                        this.poddSchemaManager.uploadSchemaOntology(this.getClass().getResourceAsStream(schemaPath),
+                                RDFFormat.RDFXML);
                 
-                //add graph names
+                // add graph names
                 schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
                 schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
             }
@@ -258,7 +259,7 @@ public class AbstractOntologyTest
         this.testRepository = null;
         
     }
-
+    
     public List<URI> getSchemaOntologyGraphs()
     {
         return this.schemaOntologyGraphs;
