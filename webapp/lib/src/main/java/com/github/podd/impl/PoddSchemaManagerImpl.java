@@ -14,6 +14,7 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -29,6 +30,8 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
@@ -50,7 +53,7 @@ import com.github.podd.utils.SparqlQueryHelper;
  */
 public class PoddSchemaManagerImpl implements PoddSchemaManager
 {
-    
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     private PoddRepositoryManager repositoryManager;
     private PoddSesameManager sesameManager;
     private PoddOWLManager owlManager;
@@ -193,159 +196,5 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
     }
     
-    /**
-     * Spike method only.
-     * 
-     * Retrieves the cardinalities from the schema ontologies, for the given concept and property.
-     * 
-     * NOTE: does not work on "unqualified" cardinality statements yet.
-     * 
-     * @param objectUri
-     * @param propertyUri
-     * @param repositoryConnection
-     * @param contexts
-     * @return an integer array of size 3.
-     * @throws OpenRDFException
-     */
-    @Override
-    public Model getCardinality(final URI objectUri, final URI propertyUri, 
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
-    {
-        final int[] cardinalities = { -1, -1, -1 };
-        
-        final StringBuilder sb = new StringBuilder();
-        
-        sb.append("SELECT ?maxCardinality ?minCardinality ?qualifiedCardinality ");
-        sb.append(" WHERE { ");
-        
-        sb.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> ?poddConcept . ");
-        sb.append(" ?poddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
-        sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
-        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxCardinality } . ");
-        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minCardinality } . ");
-        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality } . ");
-        
-        sb.append(" } ");
-        
-        SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
-        
-        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        tupleQuery.setBinding("poddConcept", objectUri);
-        tupleQuery.setBinding("propertyUri", propertyUri);
-        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
-        
-        try
-        {
-            if(queryResults.hasNext())
-            {
-                final BindingSet binding = queryResults.next();
-                
-                Value minCardinality = binding.getValue("minCardinality");
-                if(minCardinality != null && minCardinality instanceof Literal)
-                {
-                    cardinalities[0] = ((Literal)minCardinality).intValue();
-                }
-                
-                Value qualifiedCardinality = binding.getValue("qualifiedCardinality");
-                if(qualifiedCardinality != null && qualifiedCardinality instanceof Literal)
-                {
-                    cardinalities[1] = ((Literal)qualifiedCardinality).intValue();
-                }
-                
-                Value maxCardinality = binding.getValue("maxCardinality");
-                if(maxCardinality != null && maxCardinality instanceof Literal)
-                {
-                    cardinalities[2] = ((Literal)maxCardinality).intValue();
-                }
-            }
-        }
-        finally
-        {
-            queryResults.close();
-        }
-        
-        return cardinalities;
-    }
-    
-    /*
-     * Spike method.
-     * 
-     * {http://purl.org/podd/ns/poddScience#PlatformType}
-     * <http://www.w3.org/2002/07/owl#equivalentClass> {_:genid1636663090} {_:genid1636663090}
-     * <http://www.w3.org/2002/07/owl#oneOf> {_:genid72508669}
-     * 
-     * {_:genid72508669} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
-     * {http://purl.org/podd/ns/poddScience#Software} {_:genid72508669}
-     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> {_:genid953844943}
-     * 
-     * {_:genid953844943} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
-     * {http://purl.org/podd/ns/poddScience#HardwareSoftware} {_:genid953844943}
-     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> {_:genid278519207}
-     * 
-     * {_:genid278519207} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
-     * {http://purl.org/podd/ns/poddScience#Hardware} {_:genid278519207}
-     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
-     * {http://www.w3.org/1999/02/22-rdf-syntax-ns#nil}
-     * 
-     * SELECT ?member WHERE { ?conceptUri :equivalentClass ?b0 . ?b0 :oneOf ?b1 . ?b1 rdf:rest * /
-     * rdf:first ?member . }
-     */
-    @Override
-    public List<URI> getAllValidMembers(final URI conceptUri,
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
-    {
-        List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
-        
-        final StringBuilder sb = new StringBuilder();
-        
-        sb.append("SELECT ?member ?memberLabel ?memberDescription ");
-        sb.append(" WHERE { ");
-        
-        sb.append(" ?poddConcept <" + OWL.EQUIVALENTCLASS.stringValue() + "> ?x . ");
-        sb.append(" ?x <" + OWL.ONEOF.stringValue() + "> ?list . ");
-        sb.append(" ?list <" + RDF.REST.stringValue() + ">*/<" + RDF.FIRST.stringValue() + "> ?member . ");
-        sb.append(" OPTIONAL { ?member <" + RDFS.LABEL.stringValue() + "> ?memberLabel } . ");
-        sb.append(" OPTIONAL { ?member <" + RDFS.COMMENT.stringValue() + "> ?memberDescription } . ");
-        sb.append(" } ");
-        
-        SparqlQueryHelper.log.info("Created SPARQL {}", sb.toString());
-        
-        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        tupleQuery.setBinding("poddConcept", conceptUri);
-        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
-        
-        try
-        {
-            while(queryResults.hasNext())
-            {
-                final BindingSet binding = queryResults.next();
-                
-                Value member = binding.getValue("member");
-                Value memberLabel = binding.getValue("memberLabel");
-                Value memberDescription = binding.getValue("memberDescription");
-                
-                String label = null;
-                String description = null;
-                
-                if(memberLabel != null)
-                {
-                    label = memberLabel.stringValue();
-                }
-                if(memberDescription != null)
-                {
-                    description = memberDescription.stringValue();
-                }
-                
-                PoddObjectLabel memberObject = new PoddObjectLabelImpl(null, (URI)member, label, description);
-                results.add(memberObject);
-            }
-        }
-        finally
-        {
-            queryResults.close();
-        }
-        
-        return results;
-    }
      
 }

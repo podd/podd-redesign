@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
 import org.semanticweb.owlapi.model.IRI;
@@ -107,12 +108,12 @@ public interface PoddSesameManager
      * Retrieves the ontology IRIs for all import statements found in the given Repository
      * Connection.
      * 
+     * @param ontologyID
      * @param repositoryConnection
-     * @param context
      * @return A Set containing ontology IRIs for all import statements.
      * @throws OpenRDFException
      */
-    Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI context)
+    Set<IRI> getDirectImports(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
         throws OpenRDFException;
     
     /**
@@ -156,16 +157,17 @@ public interface PoddSesameManager
      * Sets the given Ontology IRI to be published. This restricts the ability to publish the
      * ontology again.
      * 
-     * @param ontologyIRI
-     *            The Ontology IRI identifying the ontology that needs to be published
+     * @param ontologyID
+     *            The {@link InferredOWLOntologyID} identifying the ontology that needs to be
+     *            published
      * @param repositoryConnection
-     * @param context
+     * @param artifactManagementGraph
      * @throws OpenRDFException
      * @throws UnmanagedArtifactIRIException
      *             If this is not a managed ontology
      */
-    void setPublished(IRI ontologyIRI, RepositoryConnection repositoryConnection, URI context) throws OpenRDFException,
-        UnmanagedArtifactIRIException;
+    void setPublished(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection,
+            final URI artifactManagementGraph) throws OpenRDFException, UnmanagedArtifactIRIException;
     
     /**
      * This method adds information to the Schema Ontology management graph, and updates the links
@@ -203,5 +205,29 @@ public interface PoddSesameManager
      */
     void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrentAndRemovePrevious,
             RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
+
+    List<URI> getObjectTypes(InferredOWLOntologyID ontologyID, URI objectUri, RepositoryConnection repositoryConnection)
+        throws OpenRDFException;
+
+    URI getTopObjectIRI(InferredOWLOntologyID ontologyIRI, RepositoryConnection repositoryConnection)
+        throws OpenRDFException;
+
+    List<URI> getTopObjects(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection)
+        throws OpenRDFException;
+
+    List<URI> getAllValidMembers(InferredOWLOntologyID artifactID, URI conceptUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+
+    Model getCardinality(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+
+    Model getObjectDetailsForDisplay(InferredOWLOntologyID artifactID, URI objectUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+
+    Model getObjectDetailsForEdit(InferredOWLOntologyID artifactID, URI objectUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+
+    List<URI> getWeightedProperties(InferredOWLOntologyID artifactID, URI objectUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
     
 }

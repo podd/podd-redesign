@@ -6,6 +6,7 @@ package com.github.podd.impl;
 import info.aduna.iteration.Iterations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -13,8 +14,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Literal;
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -29,6 +35,7 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
@@ -64,7 +71,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @return The
      * @throws OpenRDFException
      */
-    private TupleQueryResult executeSparqlQuery(final String sparqlQuery,
+    private QueryResultCollector executeSparqlQuery(final String sparqlQuery,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         this.log.info("Executing SPARQL: \r\n {}", sparqlQuery);
@@ -75,14 +82,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     /**
-     * Helper method to execute a given SPARQL Tuple query.
+     * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
      * 
      * @param sparqlQuery
      * @param contexts
      * @return
      * @throws OpenRDFException
      */
-    private TupleQueryResult executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
+    private QueryResultCollector executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
         throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
@@ -92,7 +99,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         sparqlQuery.setDataset(dataset);
         
-        return sparqlQuery.evaluate();
+        QueryResultCollector results = new QueryResultCollector();
+        QueryResults.report(sparqlQuery.evaluate(), results);
+        
+        return results;
     }
     
     /**
@@ -103,8 +113,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @return
      * @throws OpenRDFException
      */
-    private GraphQueryResult executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts)
-        throws OpenRDFException
+    private Model executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts) throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
         for(final URI uri : contexts)
@@ -112,7 +121,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             dataset.addDefaultGraph(uri);
         }
         sparqlQuery.setDataset(dataset);
-        return sparqlQuery.evaluate();
+        Model results = new LinkedHashModel();
+        sparqlQuery.evaluate(new StatementCollector(results));
+        
+        return results;
     }
     
     @Override
@@ -356,16 +368,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * RepositoryConnection, org.openrdf.model.URI)
      */
     @Override
-    public Set<IRI> getDirectImports(final RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException
+    public Set<IRI> getDirectImports(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
         final String sparqlQuery = "SELECT ?x WHERE { ?y <" + OWL.IMPORTS.stringValue() + "> ?x ." + " }";
         this.log.info("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         
         final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(context);
-        dataset.addNamedGraph(context);
+        for(URI nextContext : versionAndInferredContexts(ontologyID))
+        {
+            dataset.addDefaultGraph(nextContext);
+        }
         query.setDataset(dataset);
         
         final Set<IRI> results = Collections.newSetFromMap(new ConcurrentHashMap<IRI, Boolean>());
@@ -492,8 +506,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @throws OpenRDFException
      */
     @Override
-    public List<PoddObjectLabel> getTopObjects(final InferredOWLOntologyID ontologyID,
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
+    public List<URI> getTopObjects(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         
@@ -509,38 +523,19 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" }");
         
-        final TupleQueryResult queryResults =
-                SparqlQueryHelper.executeSparqlQuery(sb.toString(), repositoryConnection, contexts);
+        final QueryResultCollector queryResults =
+                this.executeSparqlQuery(sb.toString(), repositoryConnection, ontologyID.getVersionIRI().toOpenRDFURI(),
+                        ontologyID.getInferredOntologyIRI().toOpenRDFURI());
         
-        final List<PoddObjectLabel> topObjectList = new ArrayList<PoddObjectLabel>();
-        try
+        final List<URI> topObjectList = new ArrayList<URI>();
+        
+        for(BindingSet next : queryResults.getBindingSets())
         {
-            while(queryResults.hasNext())
-            {
-                final BindingSet next = queryResults.next();
-                final URI pred = (URI)next.getValue("topObjectUri");
-                String label = null;
-                String description = null;
-                
-                if(next.getValue("topObjectLabel") != null)
-                {
-                    label = next.getValue("topObjectLabel").stringValue();
-                }
-                
-                if(next.getValue("topObjectDescription") != null)
-                {
-                    description = next.getValue("topObjectDescription").stringValue();
-                }
-                
-                final PoddObjectLabel poddObject = new PoddObjectLabelImpl(ontologyID, pred, label, description);
-                
-                topObjectList.add(poddObject);
-            }
+            final URI pred = (URI)next.getValue("topObjectUri");
+            
+            topObjectList.add(pred);
         }
-        finally
-        {
-            queryResults.close();
-        }
+        
         return topObjectList;
     }
     
@@ -549,30 +544,24 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * 
      */
     @Override
-    public IRI getTopObjectIRI(final InferredOWLOntologyID ontologyIRI,
-            final RepositoryConnection repositoryConnection, final URI context) throws OpenRDFException
+    public URI getTopObjectIRI(final InferredOWLOntologyID ontologyIRI, final RepositoryConnection repositoryConnection)
+        throws OpenRDFException
     {
-        // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
-        final String sparqlQuery =
-                "SELECT ?y WHERE { " + ontologyIRI.toQuotedString() + " <" + RDF.TYPE + "> <"
-                        + OWL.ONTOLOGY.stringValue() + ">  . " + ontologyIRI.toQuotedString() + " <"
-                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT + "> ?y " + " }";
-        this.log.info("Generated SPARQL {}", sparqlQuery);
-        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        List<URI> results = getTopObjects(ontologyIRI, repositoryConnection);
         
-        final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(context);
-        query.setDataset(dataset);
-        
-        IRI topObjectIRI = null;
-        
-        final TupleQueryResult queryResults = query.evaluate();
-        if(queryResults.hasNext())
+        if(results.isEmpty())
         {
-            final BindingSet nextResult = queryResults.next();
-            topObjectIRI = IRI.create(nextResult.getValue("y").stringValue());
+            return null;
         }
-        return topObjectIRI;
+        else if(results.size() == 1)
+        {
+            return results.get(0);
+        }
+        else
+        {
+            log.warn("More than one top object found");
+            return results.get(0);
+        }
     }
     
     /**
@@ -591,6 +580,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @throws OpenRDFException
      */
     @Override
+    // FIXME: Fix the algorithm for this to return only the most specific types
     public List<URI> getObjectTypes(final InferredOWLOntologyID ontologyID, final URI objectUri,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
@@ -611,37 +601,41 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
-        final TupleQueryResult queryResults = SparqlQueryHelper.executeSparqlQuery(tupleQuery, contexts);
+        final QueryResultCollector queryResults =
+                this.executeSparqlQuery(tupleQuery,
+                        versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
         
-        try
+        List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
+        
+        for(BindingSet next : queryResults.getBindingSets())
         {
-            if(queryResults.hasNext())
-            {
-                final BindingSet next = queryResults.next();
-                
-                String label = null;
-                String description = null;
-                
-                if(next.getValue("topObjectLabel") != null)
-                {
-                    label = next.getValue("topObjectLabel").stringValue();
-                }
-                
-                if(next.getValue("topObjectDescription") != null)
-                {
-                    description = next.getValue("topObjectDescription").stringValue();
-                }
-                
-                final PoddObjectLabel poddObject = new PoddObjectLabelImpl(ontologyID, objectUri, label, description);
-                
-                return poddObject;
-            }
+            results.add((URI)next.getValue("poddTypeUri"));
         }
-        finally
+        
+        return results;
+    }
+    
+    private URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID)
+    {
+        return new URI[] { ontologyID.getVersionIRI().toOpenRDFURI(),
+                ontologyID.getInferredOntologyIRI().toOpenRDFURI() };
+    }
+    
+    private URI[] versionAndInferredAndSchemaContexts(InferredOWLOntologyID ontologyID,
+            RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        Set<IRI> directImports = getDirectImports(ontologyID, repositoryConnection);
+        
+        List<URI> results = new ArrayList<URI>(directImports.size() + 2);
+        
+        results.addAll(Arrays.asList(versionAndInferredContexts(ontologyID)));
+        
+        for(IRI nextDirectImport : directImports)
         {
-            queryResults.close();
+            results.add(nextDirectImport.toOpenRDFURI());
         }
-        return null;
+        
+        return results.toArray(new URI[0]);
     }
     
     @Override
@@ -687,18 +681,21 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public void setPublished(final IRI ontologyIRI, final RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException
+    public void setPublished(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection,
+            final URI artifactManagementGraph) throws OpenRDFException
     {
-        final IRI topObjectIRI = this.getTopObjectIRI(ontologyIRI, repositoryConnection, context);
+        final URI topObjectIRI = this.getTopObjectIRI(ontologyID, repositoryConnection);
+        
+        // TODO: Manage the publication status in the artifact management graph if that is going to
+        // be easier
         
         // remove previous value for publication status
-        repositoryConnection.remove(topObjectIRI.toOpenRDFURI(), PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                null, context);
+        repositoryConnection.remove(topObjectIRI, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS, null, ontologyID
+                .getVersionIRI().toOpenRDFURI());
         
         // then insert the publication status as #Published
-        repositoryConnection.add(topObjectIRI.toOpenRDFURI(), PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODDBASE_PUBLISHED, context);
+        repositoryConnection.add(topObjectIRI, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
+                PoddRdfConstants.PODDBASE_PUBLISHED, ontologyID.getVersionIRI().toOpenRDFURI());
         
         this.log.info("{} was set as Published", topObjectIRI);
     }
@@ -878,4 +875,300 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
     }
     
+    /**
+     * Spike method only.
+     * 
+     * Retrieves the cardinalities from the schema ontologies, for the given concept and property.
+     * 
+     * NOTE: does not work on "unqualified" cardinality statements yet.
+     * 
+     * @param objectUri
+     * @param propertyUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return an integer array of size 3.
+     * @throws OpenRDFException
+     */
+    @Override
+    public Model getCardinality(final InferredOWLOntologyID artifactID, final URI objectUri, final URI propertyUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        final int[] cardinalities = { -1, -1, -1 };
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?maxCardinality ?minCardinality ?qualifiedCardinality ");
+        sb.append(" WHERE { ");
+        
+        sb.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> ?poddConcept . ");
+        sb.append(" ?poddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
+        sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality } . ");
+        
+        sb.append(" } ");
+        
+        this.log.info("Created SPARQL {}", sb.toString());
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("poddConcept", objectUri);
+        tupleQuery.setBinding("propertyUri", propertyUri);
+        final QueryResultCollector queryResults =
+                this.executeSparqlQuery(tupleQuery,
+                        versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+        
+        for(BindingSet binding : queryResults.getBindingSets())
+        {
+            Value minCardinality = binding.getValue("minCardinality");
+            if(minCardinality != null && minCardinality instanceof Literal)
+            {
+                cardinalities[0] = ((Literal)minCardinality).intValue();
+            }
+            
+            Value qualifiedCardinality = binding.getValue("qualifiedCardinality");
+            if(qualifiedCardinality != null && qualifiedCardinality instanceof Literal)
+            {
+                cardinalities[1] = ((Literal)qualifiedCardinality).intValue();
+            }
+            
+            Value maxCardinality = binding.getValue("maxCardinality");
+            if(maxCardinality != null && maxCardinality instanceof Literal)
+            {
+                cardinalities[2] = ((Literal)maxCardinality).intValue();
+            }
+        }
+        
+        // return cardinalities;
+        // FIXME: TODO: Implement me
+        return new LinkedHashModel();
+    }
+    
+    /*
+     * Spike method.
+     * 
+     * {http://purl.org/podd/ns/poddScience#PlatformType}
+     * <http://www.w3.org/2002/07/owl#equivalentClass> {_:genid1636663090} {_:genid1636663090}
+     * <http://www.w3.org/2002/07/owl#oneOf> {_:genid72508669}
+     * 
+     * {_:genid72508669} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+     * {http://purl.org/podd/ns/poddScience#Software} {_:genid72508669}
+     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> {_:genid953844943}
+     * 
+     * {_:genid953844943} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+     * {http://purl.org/podd/ns/poddScience#HardwareSoftware} {_:genid953844943}
+     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> {_:genid278519207}
+     * 
+     * {_:genid278519207} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+     * {http://purl.org/podd/ns/poddScience#Hardware} {_:genid278519207}
+     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+     * {http://www.w3.org/1999/02/22-rdf-syntax-ns#nil}
+     * 
+     * SELECT ?member WHERE { ?conceptUri :equivalentClass ?b0 . ?b0 :oneOf ?b1 . ?b1 rdf:rest * /
+     * rdf:first ?member . }
+     */
+    @Override
+    public List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI conceptUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        List<URI> results = new ArrayList<URI>();
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?member ?memberLabel ?memberDescription ");
+        sb.append(" WHERE { ");
+        
+        sb.append(" ?poddConcept <" + OWL.EQUIVALENTCLASS.stringValue() + "> ?x . ");
+        sb.append(" ?x <" + OWL.ONEOF.stringValue() + "> ?list . ");
+        sb.append(" ?list <" + RDF.REST.stringValue() + ">*/<" + RDF.FIRST.stringValue() + "> ?member . ");
+        sb.append(" OPTIONAL { ?member <" + RDFS.LABEL.stringValue() + "> ?memberLabel } . ");
+        sb.append(" OPTIONAL { ?member <" + RDFS.COMMENT.stringValue() + "> ?memberDescription } . ");
+        sb.append(" } ");
+        
+        this.log.info("Created SPARQL {}", sb.toString());
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("poddConcept", conceptUri);
+        final QueryResultCollector queryResults =
+                this.executeSparqlQuery(tupleQuery,
+                        versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+        
+        for(BindingSet binding : queryResults.getBindingSets())
+        {
+            Value member = binding.getValue("member");
+            results.add((URI)member);
+        }
+        return results;
+    }
+    
+    /**
+     * The result of this method is a Model containing all data required for displaying the details
+     * of the object in HTML+RDFa.
+     * 
+     * The returned graph has the following structure.
+     * 
+     * poddObject :propertyUri :value
+     * 
+     * propertyUri RDFS:Label "property label"
+     * 
+     * value RDFS:Label "value label"
+     * 
+     * @param objectUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    @Override
+    public Model getObjectDetailsForDisplay(final InferredOWLOntologyID artifactID, final URI objectUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
+        
+        sb.append("} WHERE {");
+        
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        // value may not have a Label
+        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        
+        sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        sb.append(" FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+        
+        sb.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectUri);
+        
+        final Model queryResults =
+                this.executeGraphQuery(graphQuery,
+                        versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+        
+        return queryResults;
+    }
+    
+    /**
+     * Work in progress [25/02/2013]
+     * 
+     * Attempting to retrieve sufficient triples to display the object_edit page
+     * 
+     * @param objectUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    @Override
+    public Model getObjectDetailsForEdit(final InferredOWLOntologyID artifactID, final URI objectUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
+        
+        sb.append("} WHERE {");
+        
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        // value may not have a Label
+        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        
+        sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        sb.append(" FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        sb.append(" FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+        
+        sb.append("}");
+        
+        this.log.info("Created SPARQL {}", sb.toString());
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectUri);
+        
+        final Model queryResults =
+                this.executeGraphQuery(graphQuery,
+                        versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+        
+        return queryResults;
+    }
+    
+    /**
+     * Retrieve a list of properties about the given object. The list is ordered based on property
+     * weights.
+     * 
+     * RDF:TYPE, RDFS:COMMENT and RDFS:LABEL statements are omitted from the results.
+     * 
+     * Note: If only asserted properties are required, the inferred ontology graph should not be
+     * included in the <i>contexts</i> passed into this method.
+     * 
+     * @param objectUri
+     * @param repositoryConnection
+     * @param contexts
+     * @return A Map containing all statements about the given object.
+     * @throws OpenRDFException
+     */
+    @Override
+    public List<URI> getWeightedProperties(final InferredOWLOntologyID artifactID, final URI objectUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT DISTINCT ?propertyUri ");
+        sb.append(" WHERE { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        
+        // for ORDER BY
+        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        
+        // value may not have a Label
+        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        
+        // for ORDER BY
+        sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODDBASE_WEIGHT.stringValue() + "> ?weight } . ");
+        
+        sb.append("FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
+        sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
+        sb.append("FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");
+        sb.append("FILTER (?value != <" + OWL.CLASS.stringValue() + ">) ");
+        
+        // Exclude as TYPE, Label (title) and Comment (description) are displayed separately
+        sb.append("FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
+        sb.append("FILTER (?propertyUri != <" + RDFS.LABEL.stringValue() + ">) ");
+        sb.append("FILTER (?propertyUri != <" + RDFS.COMMENT.stringValue() + ">) ");
+        
+        sb.append(" } ");
+        sb.append("  ORDER BY ASC(?weight) ASC(?propertyLabel) ");
+        
+        this.log.info("Created SPARQL {}", sb.toString());
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("poddObject", objectUri);
+        final QueryResultCollector queryResults =
+                this.executeSparqlQuery(tupleQuery,
+                        versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+        
+        final List<URI> resultList = new ArrayList<URI>();
+        for(BindingSet next : queryResults.getBindingSets())
+        {
+            final Value property = next.getValue("propertyUri");
+            if(property instanceof URI)
+            {
+                resultList.add((URI)property);
+            }
+        }
+        
+        return resultList;
+    }
 }

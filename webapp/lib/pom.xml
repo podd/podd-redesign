@@ -126,6 +126,7 @@
 			<groupId>com.github.ansell.pellet</groupId>
 			<artifactId>pellet-owlapiv3</artifactId>
 			<scope>runtime</scope>
+            <optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.kohsuke.metainf-services</groupId>
