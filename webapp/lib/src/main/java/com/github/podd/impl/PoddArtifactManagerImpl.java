@@ -314,26 +314,25 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public Collection<InferredOWLOntologyID> listPublishedArtifacts() throws OpenRDFException
+    public List<InferredOWLOntologyID> listPublishedArtifacts() throws OpenRDFException
     {
         return listArtifacts(true, false);
     }
     
     @Override
-    public Collection<InferredOWLOntologyID> listUnpublishedArtifacts() throws OpenRDFException
+    public List<InferredOWLOntologyID> listUnpublishedArtifacts() throws OpenRDFException
     {
         return listArtifacts(false, true);
     }
     
-    private Collection<InferredOWLOntologyID> listArtifacts(boolean published, boolean unpublished)
-        throws OpenRDFException
+    private List<InferredOWLOntologyID> listArtifacts(boolean published, boolean unpublished) throws OpenRDFException
     {
         if(!published && !unpublished)
         {
             throw new IllegalArgumentException("Cannot choose to exclude both published and unpublished artifacts");
         }
         
-        Set<InferredOWLOntologyID> results = new HashSet<InferredOWLOntologyID>();
+        List<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
         
         RepositoryConnection conn = null;
         

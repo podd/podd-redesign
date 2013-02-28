@@ -1,6 +1,7 @@
 package com.github.podd.resources;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.openrdf.model.URI;
@@ -26,6 +27,22 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
     public AbstractPoddResourceImpl()
     {
         super();
+    }
+    
+    /**
+     * Checks the ability of the currently authenticated user to perform the given action and throws
+     * an exception if the current user is not authorised for the given action.
+     * 
+     * @param action
+     *            The PoddAction that is to be performed.
+     * @throws ResourceException
+     *             with Status.CLIENT_ERROR_UNAUTHORIZED (HTTP 401) if the user is not authorised to
+     *             perform the given action
+     */
+    protected boolean checkAuthentication(final PoddAction action) throws ResourceException
+    {
+        // throws an error on failure
+        return checkAuthentication(action, Collections.<URI> emptyList(), true);
     }
     
     /**
@@ -121,7 +138,7 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
     {
         return this.getPoddApplication().getPoddRepositoryManager();
     }
-
+    
     public PoddSchemaManager getPoddSchemaManager()
     {
         return this.getPoddApplication().getPoddSchemaManager();

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.List;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.Repository;
@@ -131,14 +132,14 @@ public interface PoddArtifactManager
      * @return The list of artifacts that have been published.
      * @throws OpenRDFException
      */
-    Collection<InferredOWLOntologyID> listPublishedArtifacts() throws OpenRDFException;
+    List<InferredOWLOntologyID> listPublishedArtifacts() throws OpenRDFException;
     
     /**
      * 
      * @return The list of artifacts that have not been published.
      * @throws OpenRDFException
      */
-    Collection<InferredOWLOntologyID> listUnpublishedArtifacts() throws OpenRDFException;
+    List<InferredOWLOntologyID> listUnpublishedArtifacts() throws OpenRDFException;
     
     /**
      * Loads an artifact into the manager.
