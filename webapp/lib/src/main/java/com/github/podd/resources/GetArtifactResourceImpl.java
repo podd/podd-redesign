@@ -200,11 +200,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToView);
             }
             
-            // FIXME: HACK: together the list of contexts to query in
-            // Hint: This handling should be done in a manager, not in the resource implementation!
-            // ontologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
-            // ontologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
-            
             // first get the title & description encapsulated in a PoddObject
             final PoddObjectLabel theObject = null;
             

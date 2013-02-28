@@ -125,7 +125,7 @@ Macro to display information about the PODD object being viewed
   -->
 <#macro displayField propertyUri>
     <li>
-		<#local label = completeModel.filter(propertyUri, rdfsLabelUri, null).objectString()!"Missing Label">
+		<#local label = completeModel.filter(propertyUri, RDFS_LABEL, null).objectString()!"Missing Label">
     	<span class="bold">${label}:</span>
 
 		<#local objectList = completeModel.filter(poddObject.uri, propertyUri, null).objects()>
@@ -137,7 +137,7 @@ Macro to display information about the PODD object being viewed
 					<#if util.isUri(thisObject)>
 						<#local tempUri = util.getUri(thisObject)>
 						<#if tempUri??>
-							<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
+							<#local valueLabel = completeModel.filter(thisObject, RDFS_LABEL, null).objectString()!thisObject.stringValue()>
 							<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
 						<#else>
 							<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
@@ -154,7 +154,7 @@ Macro to display information about the PODD object being viewed
 				<#if util.isUri(thisObject)>
 					<#local tempUri = util.getUri(thisObject)>
 					<#if tempUri??>
-						<#local valueLabel = completeModel.filter(thisObject, rdfsLabelUri, null).objectString()!thisObject.stringValue()>
+						<#local valueLabel = completeModel.filter(thisObject, RDFS_LABEL, null).objectString()!thisObject.stringValue()>
 						<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
 					<#else>
 						<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
