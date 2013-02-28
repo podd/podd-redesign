@@ -4,10 +4,10 @@
 <#-- @ftlvariable name="maxResults" type="int" -->
 <#-- @ftlvariable name="myFirstRecord" type="int" -->
 <#-- @ftlvariable name="myArtifactCount" type="int" -->
-<#-- @ftlvariable name="myArtifactsList" type="java.util.List<com.github.podd.utils.PoddObjectLabel>" -->
+<#-- @ftlvariable name="unpublishedArtifactsList" type="java.util.List<com.github.podd.utils.PoddObjectLabel>" -->
 <#-- @ftlvariable name="publicFirstRecord" type="int" -->
 <#-- @ftlvariable name="publicArtifactCount" type="int" -->
-<#-- @ftlvariable name="publicArtifactsList" type="java.util.List<com.github.podd.utils.PoddObjectLabel>" -->
+<#-- @ftlvariable name="publishedArtifactsList" type="java.util.List<com.github.podd.utils.PoddObjectLabel>" -->
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
 
 <div id="title_pane">

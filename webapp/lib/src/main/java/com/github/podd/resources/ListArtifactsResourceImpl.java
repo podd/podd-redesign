@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("@Get listArtifacts Page");
         
-        Collection<InferredOWLOntologyID> artifacts = getArtifactsInternal();
+        Map<String, List<InferredOWLOntologyID>> artifactsInternal = getArtifactsInternal();
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "projects.html.ftl");
@@ -71,9 +72,13 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("hasFilter", Boolean.FALSE);
         dataModel.put("userCanCreate", Boolean.FALSE);
         
-        this.log.info("artifacts: {}", artifacts);
+        this.log.info("artifacts: {}", artifactsInternal);
         
-        this.populateDataModelWithArtifactLists(dataModel, artifacts);
+        for(String nextKey : artifactsInternal.keySet())
+        {
+            this.populateDataModelWithArtifactLists(dataModel, nextKey + "ArtifactsList",
+                    artifactsInternal.get(nextKey));
+        }
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page
@@ -81,9 +86,9 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    private Collection<InferredOWLOntologyID> getArtifactsInternal() throws ResourceException
+    private Map<String, List<InferredOWLOntologyID>> getArtifactsInternal() throws ResourceException
     {
-        Collection<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
+        Map<String, List<InferredOWLOntologyID>> results = new HashMap<String, List<InferredOWLOntologyID>>();
         
         final String publishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_PUBLISHED);
         final String unpublishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_UNPUBLISHED);
@@ -130,7 +135,9 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         {
             if(published)
             {
-                final Collection<InferredOWLOntologyID> publishedArtifacts =
+                List<InferredOWLOntologyID> publishedResults = new ArrayList<InferredOWLOntologyID>();
+                
+                final List<InferredOWLOntologyID> publishedArtifacts =
                         this.getPoddArtifactManager().listPublishedArtifacts();
                 
                 for(final InferredOWLOntologyID nextPublishedArtifact : publishedArtifacts)
@@ -139,15 +146,20 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                             Arrays.asList(nextPublishedArtifact.getOntologyIRI().toOpenRDFURI()), false))
                     {
                         // If the authentication succeeded add the artifact
-                        results.add(nextPublishedArtifact);
+                        publishedResults.add(nextPublishedArtifact);
                     }
                 }
+                
+                results.put(PoddWebConstants.KEY_PUBLISHED, publishedArtifacts);
             }
             
             if(unpublished)
             {
                 this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST);
-                final Collection<InferredOWLOntologyID> unpublishedArtifacts =
+                
+                List<InferredOWLOntologyID> unpublishedResults = new ArrayList<InferredOWLOntologyID>();
+                
+                final List<InferredOWLOntologyID> unpublishedArtifacts =
                         this.getPoddArtifactManager().listUnpublishedArtifacts();
                 
                 for(final InferredOWLOntologyID nextUnpublishedArtifact : unpublishedArtifacts)
@@ -156,9 +168,10 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                             Arrays.asList(nextUnpublishedArtifact.getOntologyIRI().toOpenRDFURI()), false))
                     {
                         // If the authentication succeeded add the artifact
-                        results.add(nextUnpublishedArtifact);
+                        unpublishedResults.add(nextUnpublishedArtifact);
                     }
                 }
+                results.put(PoddWebConstants.KEY_UNPUBLISHED, unpublishedResults);
             }
         }
         catch(OpenRDFException e)
@@ -173,7 +186,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     public Representation getListArtifactsRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
-        Collection<InferredOWLOntologyID> artifactsInternal = getArtifactsInternal();
+        Map<String, List<InferredOWLOntologyID>> artifactsInternal = getArtifactsInternal();
         
         RDFFormat resultFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName());
         
@@ -191,20 +204,23 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
-            for(InferredOWLOntologyID nextArtifact : artifactsInternal)
+            for(String nextKey : artifactsInternal.keySet())
             {
-                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                        nextArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                        nextArtifact.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                        nextArtifact.getInferredOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                        nextArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
-                        nextArtifact.getVersionIRI().toOpenRDFURI()));
-                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                        nextArtifact.getVersionIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                        nextArtifact.getInferredOntologyIRI().toOpenRDFURI()));
+                for(InferredOWLOntologyID nextArtifact : artifactsInternal.get(nextKey))
+                {
+                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                            nextArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                            nextArtifact.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                            nextArtifact.getInferredOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                            nextArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
+                            nextArtifact.getVersionIRI().toOpenRDFURI()));
+                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                            nextArtifact.getVersionIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                            nextArtifact.getInferredOntologyIRI().toOpenRDFURI()));
+                }
             }
         }
         catch(RDFHandlerException e)
@@ -218,8 +234,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         return result;
     }
     
-    private void populateDataModelWithArtifactLists(final Map<String, Object> dataModel,
-            Collection<InferredOWLOntologyID> artifacts)
+    private void populateDataModelWithArtifactLists(final Map<String, Object> dataModel, final String key,
+            List<InferredOWLOntologyID> artifacts)
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         for(final InferredOWLOntologyID artifactUri : artifacts)
@@ -227,10 +243,10 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             // FIXME: This does not actually find the real labels
             final PoddObjectLabel artifact =
                     new PoddObjectLabelImpl(artifactUri, "The title " + artifactUri,
-                            "The Project is really exciting. It could lead to unbelievable productivity in agriculture");
+                            "The Artifact is really exciting. It could lead to unbelievable productivity in agriculture");
             results.add(artifact);
         }
-        dataModel.put("allProjectsList", results);
+        dataModel.put(key, results);
         
     }
     
