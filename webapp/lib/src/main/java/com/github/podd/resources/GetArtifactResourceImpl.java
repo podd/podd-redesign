@@ -15,6 +15,8 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -93,6 +95,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
         dataModel.put("pageTitle", "View Artifact");
+        this.loadConstantsAndUtilsToDataModel(dataModel);
         
         try
         {
@@ -250,10 +253,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 conn.close();
             }
         }
-        // add other required info to data model
-        dataModel.put("rdfsLabelUri", RDFS.LABEL);
-        dataModel.put("rdfsRangeUri", RDFS.RANGE);
-        dataModel.put("util", new FreemarkerUtil());
         
         // FIXME: determine based on project status and user authorization
         dataModel.put("canEditObject", true);
@@ -314,6 +313,26 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
         }
         return schemaOntologyGraphs;
+    }
+    
+    /**
+     * Populates the data model with necessary constant values and Utility classes.
+     * 
+     * NOTE: If these are common across multiple ResourceImpls, this method could be
+     * moved to the parent.
+     * 
+     * @param dataModel
+     */
+    protected void loadConstantsAndUtilsToDataModel(final Map<String, Object> dataModel)
+    {
+        dataModel.put("RDFS_LABEL", RDFS.LABEL);
+        dataModel.put("RDFS_RANGE", RDFS.RANGE);
+        dataModel.put("RDF_TYPE", RDF.TYPE);
+        dataModel.put("OWL_OBJECT_PROPERTY", OWL.OBJECTPROPERTY);
+        dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
+        dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
+        
+        dataModel.put("util", new FreemarkerUtil());
     }
     
 }
