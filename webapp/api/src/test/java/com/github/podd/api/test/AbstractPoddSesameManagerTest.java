@@ -16,6 +16,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -493,20 +494,24 @@ public abstract class AbstractPoddSesameManagerTest
     public void testGetObjectTypes() throws Exception
     {
         // prepare: load test artifact
-        final InferredOWLOntologyID ontologyID1 = this.loadArtifact("/test/artifacts/basic-2.ttl", RDFFormat.TURTLE);
+        final InferredOWLOntologyID ontologyID1 =
+                this.loadArtifact("/test/artifacts/basic-2.ttl", "/test/artifacts/basic-2-inferred.ttl",
+                        RDFFormat.TURTLE);
+        
+        System.out.println(ontologyID1);
         
         final String[] objectUris =
                 { "http://purl.org/podd/basic-1-20130205/object:2966",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
-                        //"http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable",
-                        };
+                        // "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable",
+                };
         
         final String[] expectedTypes =
                 { "http://purl.org/podd/ns/poddScience#Project", "http://purl.org/podd/ns/poddScience#Genotype",
                         "http://purl.org/podd/ns/poddScience#Material",
-                        //"http://purl.org/podd/ns/poddScience#ANZSRCAssertion",
-                        };
+                        // "http://purl.org/podd/ns/poddScience#ANZSRCAssertion",
+                };
         
         // test in a loop these PODD objects for their types
         for(int i = 0; i < objectUris.length; i++)
@@ -523,13 +528,31 @@ public abstract class AbstractPoddSesameManagerTest
                     objectTypes.get(0));
         }
     }
-    
-    
-    private InferredOWLOntologyID loadArtifact(String resourcePath, RDFFormat format) throws Exception
+
+    /**
+     * This is an internal test load method.
+     * 
+     * Loads the statements in the specified resource paths as the asserted and inferred statements
+     * of an artifact. The contexts to load them are identified from the OWL:VersionIRI values in
+     * both files.
+     * 
+     * The artifact management graph is NOT updated.
+     * 
+     * @param resourcePath
+     *            Points to a resource containing asserted statements
+     * @param inferredResourcePath
+     *            Points to a resource containing the inferred statements
+     * @param format
+     *            The Format of both resources
+     * @return An InferredOWLOntologyID for the loaded artifact
+     * @throws Exception
+     */
+    private InferredOWLOntologyID loadArtifact(String resourcePath, String inferredResourcePath, RDFFormat format)
+        throws Exception
     {
         final InputStream resourceStream = this.getClass().getResourceAsStream(resourcePath);
         Assert.assertNotNull("Resource was null", resourceStream);
-
+        
         // load statements into a Model
         Model model = new LinkedHashModel();
         RDFParser parser = Rio.createParser(format);
@@ -541,17 +564,34 @@ public abstract class AbstractPoddSesameManagerTest
         
         URI versionUri = filter.objectURI();
         
-        //URI ontologyIR = filter.subjects();
+        Resource[] subjects = filter.subjects().toArray(new Resource[0]);
+        Assert.assertNotNull(subjects);
+        Assert.assertEquals(1, subjects.length);
         
         // dump the statements into the correct context of the Repository
         this.testRepositoryConnection.add(model, versionUri);
         
-        
-        System.out.println(versionUri + " " + this.testRepositoryConnection.size());
-        
-        IRI ontologyIRI = IRI.create("urn:hardcoded:ontology:iri");
         IRI inferredIRI = IRI.create("urn:hardcoded:inferred:ontology:iri");
-        InferredOWLOntologyID ontologyID = new InferredOWLOntologyID(ontologyIRI, IRI.create(versionUri), inferredIRI);
+        
+        if(inferredResourcePath != null)
+        {
+            final InputStream inferredResourceStream = this.getClass().getResourceAsStream(inferredResourcePath);
+            Assert.assertNotNull("Inferred resource was null", inferredResourceStream);
+            
+            // load inferred statements into a Model
+            Model inferredModel = new LinkedHashModel();
+            RDFParser inferredParser = Rio.createParser(format);
+            inferredParser.setRDFHandler(new StatementCollector(inferredModel));
+            inferredParser.parse(inferredResourceStream, "");
+            
+            // extract version IRI which is also the inferred IRI
+            Model inferredFilter = inferredModel.filter(null, PoddRdfConstants.OWL_VERSION_IRI, null);
+            inferredIRI = IRI.create(inferredFilter.objectURI());
+        }
+        
+        IRI ontologyIRI = IRI.create(subjects[0].stringValue());
+        IRI versionIRI = IRI.create(versionUri);
+        InferredOWLOntologyID ontologyID = new InferredOWLOntologyID(ontologyIRI, versionIRI, inferredIRI);
         
         return ontologyID;
     }
