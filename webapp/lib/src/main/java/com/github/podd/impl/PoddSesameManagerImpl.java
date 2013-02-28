@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
@@ -504,7 +505,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     /**
-     * Retrieve a list of Top Objects that are contained in the given graphs.
+     * Retrieve a list of Top Objects that are contained in the given ontology.
      * 
      * @param repositoryConnection
      * @param contexts
@@ -571,31 +572,32 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     /**
-     * Retrieves the most specific type of the given object. The "type" itself is returned as a
-     * PoddObject containing its URI, title and description.
+     * Retrieves the most specific types of the given object as a List of URIs.
      * 
-     * Note: If multiple types are found, one is randomly returned. Including inferred statements is
-     * likely to lead to multiple types being allocated.
+     * NOTE: Only the asserted and inferred graphs of the artifact to which the given object
+     * belongs to are searched for TYPE statements.
      * 
+     * If an object from an imported ontology is referred, this method will fail to find 
+     * anything as the imported ontologies are not searched.
+     * 
+     * FIXME: Fix the algorithm for this to return only the most specific types
+     * 
+     * @param ontologyID
+     *            The artifact to which the object belongs
      * @param objectUri
      *            The object whose type is to be determined
      * @param repositoryConnection
-     * @param contexts
-     *            The graphs in which to search for the object type.
-     * @return
+     * @return A list of URIs for the identified object Types
      * @throws OpenRDFException
      */
     @Override
-    // FIXME: Fix the algorithm for this to return only the most specific types
     public List<URI> getObjectTypes(final InferredOWLOntologyID ontologyID, final URI objectUri,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
-        sb.append("SELECT ?poddTypeUri ?label ?description ");
+        sb.append("SELECT ?poddTypeUri ");
         sb.append(" WHERE { ");
         sb.append(" ?objectUri <" + RDF.TYPE + "> ?poddTypeUri . ");
-        sb.append(" OPTIONAL { ?poddTypeUri <" + RDFS.LABEL + "> ?label } . \n");
-        sb.append(" OPTIONAL { ?poddTypeUri <" + RDFS.COMMENT + "> ?description . } \n");
         
         // filter out TYPE statements for OWL:Thing, OWL:Individual, OWL:NamedIndividual & OWL:Class
         sb.append("FILTER (?poddTypeUri != <" + OWL.THING.stringValue() + ">) ");
@@ -605,12 +607,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" }");
         
+        this.log.info("Created SPARQL {} with objectUri bound to {}", sb.toString(), objectUri);
+        
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery,
-                        versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
-        
+                this.executeSparqlQuery(tupleQuery, versionAndInferredContexts(ontologyID));
+
         List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
         
         for(BindingSet next : queryResults.getBindingSets())

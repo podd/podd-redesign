@@ -8,6 +8,7 @@ import info.aduna.iteration.Iterations;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -24,12 +25,16 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -45,6 +50,8 @@ public abstract class AbstractPoddSesameManagerTest
 {
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
+    private PoddOWLManager testPoddOWLManager;
+    
     private PoddSesameManager testPoddSesameManager;
     
     private Repository testRepository;
@@ -55,6 +62,8 @@ public abstract class AbstractPoddSesameManagerTest
     private URI schemaGraph;
     
     public abstract PoddSesameManager getNewPoddSesameManagerInstance();
+    
+    //public abstract PoddOWLManager getNewPoddOWLManagerInstance();
     
     /**
      * Helper method for testing
@@ -474,6 +483,79 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Incorrect number of imports found", 4, importedOntologyIRIs.size());
     }
     
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getObjectTypes(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
+     */
+    @Test
+    public void testGetObjectTypes() throws Exception
+    {
+        // prepare: load test artifact
+        final InferredOWLOntologyID ontologyID1 = this.loadArtifact("/test/artifacts/basic-2.ttl", RDFFormat.TURTLE);
+        
+        final String[] objectUris =
+                { "http://purl.org/podd/basic-1-20130205/object:2966",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                        //"http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable",
+                        };
+        
+        final String[] expectedTypes =
+                { "http://purl.org/podd/ns/poddScience#Project", "http://purl.org/podd/ns/poddScience#Genotype",
+                        "http://purl.org/podd/ns/poddScience#Material",
+                        //"http://purl.org/podd/ns/poddScience#ANZSRCAssertion",
+                        };
+        
+        // test in a loop these PODD objects for their types
+        for(int i = 0; i < objectUris.length; i++)
+        {
+            final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
+            
+            final List<URI> objectTypes =
+                    this.testPoddSesameManager.getObjectTypes(ontologyID1, objectUri, this.testRepositoryConnection);
+            
+            // verify:
+            Assert.assertNotNull("Type was null", objectTypes);
+            Assert.assertFalse("No Type found", objectTypes.isEmpty());
+            Assert.assertEquals("Wrong type", ValueFactoryImpl.getInstance().createURI(expectedTypes[i]),
+                    objectTypes.get(0));
+        }
+    }
+    
+    
+    private InferredOWLOntologyID loadArtifact(String resourcePath, RDFFormat format) throws Exception
+    {
+        final InputStream resourceStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Resource was null", resourceStream);
+
+        // load statements into a Model
+        Model model = new LinkedHashModel();
+        RDFParser parser = Rio.createParser(format);
+        parser.setRDFHandler(new StatementCollector(model));
+        parser.parse(resourceStream, "");
+        
+        // extract version IRI
+        Model filter = model.filter(null, PoddRdfConstants.OWL_VERSION_IRI, null);
+        
+        URI versionUri = filter.objectURI();
+        
+        //URI ontologyIR = filter.subjects();
+        
+        // dump the statements into the correct context of the Repository
+        this.testRepositoryConnection.add(model, versionUri);
+        
+        
+        System.out.println(versionUri + " " + this.testRepositoryConnection.size());
+        
+        IRI ontologyIRI = IRI.create("urn:hardcoded:ontology:iri");
+        IRI inferredIRI = IRI.create("urn:hardcoded:inferred:ontology:iri");
+        InferredOWLOntologyID ontologyID = new InferredOWLOntologyID(ontologyIRI, IRI.create(versionUri), inferredIRI);
+        
+        return ontologyID;
+    }
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getOntologies(boolean, RepositoryConnection, URI)}
