@@ -3,19 +3,26 @@
  */
 package com.github.podd.resources;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.URI;
-import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.slf4j.Logger;
@@ -26,22 +33,22 @@ import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
- * 
- * Resource which allows listing artifacts in PODD.
- * 
- * This is only a simple implementation which lists all project URIs TODO: list based on
- * authorization, group projects. list project title, description, PI and lead institution
+ * Resource which lists the existing artifacts in PODD.
+ * <p>
+ * TODO: list based on authorization, group projects. list project title, description, PI and lead
+ * institution
  * 
  * @author kutila
+ * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
 public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private static final String LIST_PAGE_TITLE_TEXT = "PODD Project Listing";
+    public static final String LIST_PAGE_TITLE_TEXT = "PODD Artifact Listing";
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -58,6 +65,13 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "projects.html.ftl");
         dataModel.put("pageTitle", ListArtifactsResourceImpl.LIST_PAGE_TITLE_TEXT);
+        
+        // Disable currently unimplemented features
+        dataModel.put("canFilter", Boolean.FALSE);
+        dataModel.put("hasFilter", Boolean.FALSE);
+        dataModel.put("userCanCreate", Boolean.FALSE);
+        
+        this.log.info("artifacts: {}", artifacts);
         
         this.populateDataModelWithArtifactLists(dataModel, artifacts);
         
@@ -76,11 +90,18 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         // default to both published and unpublished to start with
         boolean published = true;
-        boolean unpublished = true;
+        boolean unpublished = false;
         
         if(publishedString != null)
         {
             published = Boolean.parseBoolean(publishedString);
+        }
+        
+        // If the user is authenticated, set unpublished to true before checking the query
+        // parameters
+        if(this.getClientInfo().isAuthenticated())
+        {
+            unpublished = true;
         }
         
         if(unpublishedString != null)
@@ -88,12 +109,21 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             unpublished = Boolean.parseBoolean(unpublishedString);
         }
         
-        // If they are not authenticated always set unpublished to false to avoid listing
-        // unpublished artifacts to them, even if the public has access to specific unpublished
-        // artifacts using direct links
-        if(!this.getClientInfo().isAuthenticated())
+        if(published)
         {
-            unpublished = false;
+            this.log.info("Including published artifacts");
+        }
+        
+        if(unpublished)
+        {
+            this.log.info("Including unpublished artifacts");
+        }
+        
+        if(!published && !unpublished)
+        {
+            this.log.error("Both published and unpublished artifacts were disabled in query");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Both published and unpublished artifacts were disabled in query");
         }
         
         try
@@ -101,7 +131,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             if(published)
             {
                 final Collection<InferredOWLOntologyID> publishedArtifacts =
-                        this.getPoddApplication().getPoddArtifactManager().listPublishedArtifacts();
+                        this.getPoddArtifactManager().listPublishedArtifacts();
                 
                 for(final InferredOWLOntologyID nextPublishedArtifact : publishedArtifacts)
                 {
@@ -116,8 +146,9 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             
             if(unpublished)
             {
+                this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST);
                 final Collection<InferredOWLOntologyID> unpublishedArtifacts =
-                        this.getPoddApplication().getPoddArtifactManager().listUnpublishedArtifacts();
+                        this.getPoddArtifactManager().listUnpublishedArtifacts();
                 
                 for(final InferredOWLOntologyID nextUnpublishedArtifact : unpublishedArtifacts)
                 {
@@ -139,11 +170,52 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     }
     
     @Get("rdf|rj|ttl")
-    public Representation getListArtifactsRdf(final Representation entity) throws ResourceException
+    public Representation getListArtifactsRdf(final Representation entity, final Variant variant)
+        throws ResourceException
     {
         Collection<InferredOWLOntologyID> artifactsInternal = getArtifactsInternal();
         
-        throw new ResourceException(Status.SERVER_ERROR_NOT_IMPLEMENTED, "TODO: Implement listing of artifacts in RDF");
+        RDFFormat resultFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName());
+        
+        if(resultFormat == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_ACCEPTABLE,
+                    "Could not find an RDF serialiser matching the requested mime-type: "
+                            + variant.getMediaType().getName());
+        }
+        
+        MediaType resultMediaType = MediaType.valueOf(resultFormat.getDefaultMIMEType());
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream(8096);
+        RDFWriter writer = Rio.createWriter(resultFormat, out);
+        
+        try
+        {
+            for(InferredOWLOntologyID nextArtifact : artifactsInternal)
+            {
+                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                        nextArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                        nextArtifact.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                        nextArtifact.getInferredOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                        nextArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
+                        nextArtifact.getVersionIRI().toOpenRDFURI()));
+                writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
+                        nextArtifact.getVersionIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                        nextArtifact.getInferredOntologyIRI().toOpenRDFURI()));
+            }
+        }
+        catch(RDFHandlerException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                    "Could not generate RDF output due to an exception in the writer", e);
+        }
+        
+        ByteArrayRepresentation result = new ByteArrayRepresentation(out.toByteArray(), resultMediaType);
+        
+        return result;
     }
     
     private void populateDataModelWithArtifactLists(final Map<String, Object> dataModel,
@@ -158,7 +230,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                             "The Project is really exciting. It could lead to unbelievable productivity in agriculture");
             results.add(artifact);
         }
-        dataModel.put("allProjectsList", artifacts);
+        dataModel.put("allProjectsList", results);
         
     }
     
