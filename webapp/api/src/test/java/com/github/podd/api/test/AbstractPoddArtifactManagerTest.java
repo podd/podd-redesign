@@ -62,12 +62,6 @@ public abstract class AbstractPoddArtifactManagerTest
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private String poddBaseResourcePath = "/ontologies/poddBase.owl";
-    
-    private String poddPlantResourcePath = "/ontologies/poddPlant.owl";
-    
-    private String poddScienceResourcePath = "/ontologies/poddScience.owl";
-    
     private PoddArtifactManager testArtifactManager;
     private PoddRepositoryManager testRepositoryManager;
     private PoddSchemaManager testSchemaManager;
@@ -260,13 +254,13 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 260, 183,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 260, 183,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1265, 472,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML, 1265, 472,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPPlantOntologyID =
-                this.loadInferStoreOntology(this.poddPlantResourcePath, RDFFormat.RDFXML, 83, 495,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_PLANT, RDFFormat.RDFXML, 83, 495,
                         this.testRepositoryConnection);
         
         // prepare: update schema management graph
@@ -666,10 +660,10 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 87,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(this.poddBaseResourcePath, RDFFormat.RDFXML, 260, 183,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 260, 183,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(this.poddScienceResourcePath, RDFFormat.RDFXML, 1265, 472,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML, 1265, 472,
                         this.testRepositoryConnection);
         
         // prepare: update schema management graph
