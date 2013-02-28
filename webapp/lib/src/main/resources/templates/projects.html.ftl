@@ -1,21 +1,17 @@
-<#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="canFilter" type="boolean" -->
 <#-- @ftlvariable name="hasFilter" type="boolean" -->
 <#-- @ftlvariable name="userCanCreate" type="boolean" -->
 <#-- @ftlvariable name="maxResults" type="int" -->
 <#-- @ftlvariable name="myFirstRecord" type="int" -->
-<#-- @ftlvariable name="myProjectCount" type="int" -->
-<#-- @ftlvariable name="myProjectsList" type="java.util.ArrayList<podd.resources.util.view.ProjectListPopulator.FreemarkerProjectHelper>" -->
+<#-- @ftlvariable name="myArtifactCount" type="int" -->
+<#-- @ftlvariable name="myArtifactsList" type="java.util.List<com.github.podd.utils.PoddObjectLabel>" -->
 <#-- @ftlvariable name="publicFirstRecord" type="int" -->
-<#-- @ftlvariable name="publicProjectCount" type="int" -->
-<#-- @ftlvariable name="publicProjectsList" type="java.util.ArrayList<podd.resources.util.view.ProjectListPopulator.FreemarkerProjectHelper>" -->
-<#-- @ftlvariable name="allFirstRecord" type="int" -->
-<#-- @ftlvariable name="allProjectsCount" type="int" -->
-<#-- @ftlvariable name="allProjectsList" type="java.util.ArrayList<podd.resources.util.view.ProjectListPopulator.FreemarkerProjectHelper>" -->
+<#-- @ftlvariable name="publicArtifactCount" type="int" -->
+<#-- @ftlvariable name="publicArtifactsList" type="java.util.List<com.github.podd.utils.PoddObjectLabel>" -->
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
 
 <div id="title_pane">
-    <h3>Projects Listing</h3>
+    <h3>Artifacts Listing</h3>
 </div>
 
 <div id="content_pane">
@@ -26,98 +22,82 @@
 
 <div id="buttonwrapper_right">
 	<#if userCanCreate?? && userCanCreate>
-		<a href="${baseUrl}/object/new?type=Project">Create Project</a>
+		<a href="${baseUrl}/artifact/new">Upload a new Artifact</a>
 	</#if>
-	<form id="removeFilterForm" method="POST" action="/podd/removeprojectsfilter" style="display:none">		
+	<form id="removeFilterForm" method="POST" action="/podd/removeartifactsfilter" style="display:none">		
 	</form>
 	<#if hasFilter?? && hasFilter>
 	<a href="javascript:void(0);" onclick="removeFilter()">Remove Filter</a>
     </#if>
     <#if canFilter?? && canFilter>
-    <a href="${baseUrl}/projectsfilter/">Filter Projects</a>
+    <a href="${baseUrl}/artifactsfilter/">Filter Artifacts</a>
     </#if>
 </div>
 
 <p><br></p>
 
-<#if myProjectsList??>
-	<#-- if the user is authenicated show the list of projects they have access to -->
-	<h3 class="underlined_heading">My Projects 
-		<a href="javascript:animatedcollapse.toggle('myProjects')" icon="toggle" title="View My Projects"></a>
+<#if myArtifactsList??>
+	<#-- if the user is authenticated show the list of artifacts they have access to -->
+	<h3 class="underlined_heading">My Artifacts 
+		<a href="javascript:animatedcollapse.toggle('myArtifacts')" icon="toggle" title="View My Artifacts"></a>
 	</h3>
-    <div id="myProjects">
-        <#list myProjectsList as project>
-		    <@addProjectDetails aProject=project/>
+    <div id="myArtifacts">
+        <#list myArtifactsList as artifact>
+		    <@addArtifactDetails aArtifact=artifact/>
 		</#list>
-        <#if myProjectCount?? && myFirstRecord?? && maxResults??>
-        <@addPaging firstLabel="myFirst" firstRecord=myFirstRecord recordCount=myProjectCount otherRecords="&publicFirst=${publicFirstRecord!0}"/>
+        <#if myArtifactCount?? && myFirstRecord?? && maxResults??>
+        <@addPaging firstLabel="myFirst" firstRecord=myFirstRecord recordCount=myArtifactCount otherRecords="&publicFirst=${publicFirstRecord!0}"/>
         </#if>
 	</div>
 	<p></p>
 </#if>
 
-<#if publicProjectsList??>
-<h3 class="underlined_heading">Public Projects
-	<a href="javascript:animatedcollapse.toggle('publicProjects')" icon="toggle" title="View Public Projects"></a>
+<#if publicArtifactsList??>
+<h3 class="underlined_heading">Public Artifacts
+	<a href="javascript:animatedcollapse.toggle('publicArtifacts')" icon="toggle" title="View Public Artifacts"></a>
 </h3>
-<div id="publicProjects">
-	<#list publicProjectsList as project>
-        <@addProjectDetails aProject=project/>
+<div id="publicArtifacts">
+	<#list publicArtifactsList as artifact>
+        <@addArtifactDetails aArtifact=artifact/>
 	</#list>
-    <#if publicProjectCount?? && publicFirstRecord?? && maxResults??>
-    <@addPaging firstLabel="publicFirst" firstRecord=publicFirstRecord recordCount=publicProjectCount otherRecords="&myFirst=${myFirstRecord!0}"/>
+    <#if publicArtifactCount?? && publicFirstRecord?? && maxResults??>
+    <@addPaging firstLabel="publicFirst" firstRecord=publicFirstRecord recordCount=publicArtifactCount otherRecords="&myFirst=${myFirstRecord!0}"/>
     </#if>
 </div>
 <p></p>
 </#if>
 
-<#if allProjectsList??>
-<h3 class="underlined_heading">All Projects
-	<a href="javascript:animatedcollapse.toggle('allProjects')" icon="toggle" title="View All Projects"></a>
-</h3>
-<div id="allProjects">
-	<#list allProjectsList as project>
-        <@addProjectDetails aProject=project/>
-	</#list>
-    <#if allProjectsCount?? && allFirstRecord?? && maxResults??>
-    <@addPaging firstLabel="first" firstRecord=allFirstRecord recordCount=allProjectsCount otherRecords=""/>
-    </#if>
-</div>
-<p></p>
-</#if>
-
-
-<#if ! (allProjectsList)?? && ! (publicProjectsList)?? && ! myProjectsList??>
-No projects found
+<#if ! (allArtifactsList)?? && ! (publicArtifactsList)?? && ! myArtifactsList??>
+No artifacts found
 </#if>
 
 </div>  <!-- content pane -->
 
 
-<#macro addProjectDetails aProject>
+<#macro addArtifactDetails aArtifact>
     <p>
-    <a href="${baseUrl}/artifact/base?artifacturi=${(aProject.getUri())!"unknown-pid"}"> ${aProject.getTitle()!" - "}</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getUri())!"unknown-pid"}"> ${aArtifact.getTitle()!" - "}</a>
 <#-- 
 	These should be uncommented and displayed.
 	
-        <#if "D" == aProject.getProject().state>
+        <#if "D" == aArtifact.getArtifact().state>
             (<span class="descriptive">deleted</span>)
-        <#elseif "I" == aProject.getProject().state>
+        <#elseif "I" == aArtifact.getArtifact().state>
             (<span class="descriptive">inactive</span>)
         </#if>
-        <#if aProject.authenticatedUserRole != "">
-         (${aProject.authenticatedUserRole}).
+        <#if aArtifact.authenticatedUserRole != "">
+         (${aArtifact.authenticatedUserRole}).
         <#else>
          .
         </#if>
-    Principal Investigator: ${(aProject.getPrincipalInvestigator().getFirstName())!" - "}
-        ${(aProject.getPrincipalInvestigator().getLastName())!" - "},
-    Lead Institution: ${(aProject.getLeadInstitution())!" - "} <br>
+    Principal Investigator: ${(aArtifact.getPrincipalInvestigator().getFirstName())!" - "}
+        ${(aArtifact.getPrincipalInvestigator().getLastName())!" - "},
+    Lead Institution: ${(aArtifact.getLeadInstitution())!" - "} <br>
 -->
     <script type="text/javascript">
-        writeAbstractWholeWords("${(aProject.getDescription())!" - "}", 200);
+        writeAbstractWholeWords("${(aArtifact.getDescription())!" - "}", 200);
     </script>
-    <a href="${baseUrl}/artifact/base?artifacturi=${(aProject.getUri())!"unknown-pid"}">Browse Project</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getUri())!"unknown-pid"}">Browse Artifact</a>
     </p>
 </#macro>
 
@@ -132,12 +112,12 @@ No projects found
     </#if>
     <#if recordCount != 0>
     <br>
-    Showing project ${firstRecord + 1} to ${lastRecord} of ${recordCount} records.&nbsp;&nbsp;&nbsp;&nbsp;
+    Showing artifact ${firstRecord + 1} to ${lastRecord} of ${recordCount} records.&nbsp;&nbsp;&nbsp;&nbsp;
     <#if firstRecord != 0>
-    <a href="${baseUrl}/projects?${firstLabel}=${prevRecord}${otherRecords!""}">Prev</a>&nbsp;&nbsp;
+    <a href="${baseUrl}/artifacts?${firstLabel}=${prevRecord}${otherRecords!""}">Prev</a>&nbsp;&nbsp;
     </#if>
     <#if lastRecord < recordCount>
-    <a href="${baseUrl}/projects?${firstLabel}=${lastRecord}${otherRecords!""}">Next</a>
+    <a href="${baseUrl}/artifacts?${firstLabel}=${lastRecord}${otherRecords!""}">Next</a>
     </#if>
     </#if>
 </#macro>
@@ -152,9 +132,9 @@ No projects found
 </script>
 
 <script type="text/javascript">
-	animatedcollapse.addDiv('myProjects', 'fade=1,hide=0')
-	animatedcollapse.addDiv('publicProjects', 'fade=1,hide=0')
-    animatedcollapse.addDiv('allProjects', 'fade=1,hide=0')
+	animatedcollapse.addDiv('myArtifacts', 'fade=1,hide=0')
+	animatedcollapse.addDiv('publicArtifacts', 'fade=1,hide=0')
+    animatedcollapse.addDiv('allArtifacts', 'fade=1,hide=0')
 
 	animatedcollapse.ontoggle=function($, divobj, state){ 
 		//fires each time a DIV is expanded/contracted
