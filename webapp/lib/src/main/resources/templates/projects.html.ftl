@@ -4,9 +4,11 @@
 <#-- @ftlvariable name="maxResults" type="int" -->
 <#-- @ftlvariable name="myFirstRecord" type="int" -->
 <#-- @ftlvariable name="myArtifactCount" type="int" -->
+<#-- @ftlvariable name="unpublishedParameter" type="java.lang.String" -->
 <#-- @ftlvariable name="unpublishedArtifactsList" type="java.util.List<com.github.podd.utils.PoddObjectLabel>" -->
 <#-- @ftlvariable name="publicFirstRecord" type="int" -->
 <#-- @ftlvariable name="publicArtifactCount" type="int" -->
+<#-- @ftlvariable name="publishedParameter" type="java.lang.String" -->
 <#-- @ftlvariable name="publishedArtifactsList" type="java.util.List<com.github.podd.utils.PoddObjectLabel>" -->
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
 
@@ -36,7 +38,7 @@
 
 <p><br></p>
 
-<#if unpublishedArtifactsList??>
+<#if unpublishedArtifactsList?? && unpublishedArtifactsList?has_content>
 	<#-- if the user is authenticated show the list of artifacts they have access to -->
 	<h3 class="underlined_heading">Unpublished Artifacts 
 		<a href="javascript:animatedcollapse.toggle('unpublishedArtifacts')" icon="toggle" title="View Unpublished Artifacts"></a>
@@ -52,7 +54,7 @@
 	<p></p>
 </#if>
 
-<#if publishedArtifactsList??>
+<#if publishedArtifactsList?? && publishedArtifactsList?has_content>
 <h3 class="underlined_heading">Published Artifacts
 	<a href="javascript:animatedcollapse.toggle('publishedArtifacts')" icon="toggle" title="View Published Artifacts"></a>
 </h3>
@@ -67,7 +69,7 @@
 <p></p>
 </#if>
 
-<#if !publishedArtifactsList?? && ! unpublishedArtifactsList??>
+<#if (!publishedArtifactsList?? || !publishedArtifactsList?has_content) && (!unpublishedArtifactsList?? || !unpublishedArtifactsList?has_content) >
 No artifacts found
 </#if>
 
@@ -114,10 +116,10 @@ No artifacts found
     <br>
     Showing artifact ${firstRecord + 1} to ${lastRecord} of ${recordCount} records.&nbsp;&nbsp;&nbsp;&nbsp;
     <#if firstRecord != 0>
-    <a href="${baseUrl}/artifacts?${firstLabel}=${prevRecord}${otherRecords!""}">Prev</a>&nbsp;&nbsp;
+    <a href="${baseUrl}/artifacts?published=${publishedParameter}&unpublished=${unpublishedParameter}&${firstLabel}=${prevRecord}${otherRecords!""}">Prev</a>&nbsp;&nbsp;
     </#if>
     <#if lastRecord < recordCount>
-    <a href="${baseUrl}/artifacts?${firstLabel}=${lastRecord}${otherRecords!""}">Next</a>
+    <a href="${baseUrl}/artifacts?published=${publishedParameter}&unpublished=${unpublishedParameter}${firstLabel}=${lastRecord}${otherRecords!""}">Next</a>
     </#if>
     </#if>
 </#macro>

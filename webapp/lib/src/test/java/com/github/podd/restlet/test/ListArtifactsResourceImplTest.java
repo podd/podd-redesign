@@ -22,10 +22,11 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
 {
     
     /**
-     * Test authenticated access to list Artifacts in HTML
+     * Test authenticated access to list Artifacts in HTML with multiple loaded artifacts where all
+     * of the artifacts are unpublished, but also asking for published artifacts.
      */
     @Test
-    public void testListArtifactsBasicHtml() throws Exception
+    public void testListArtifactsHtmlMultipleAllUnpublishedWithPublished() throws Exception
     {
         // prepare: add two artifacts
         final String artifactUri1 = this.loadTestArtifact("/test/artifacts/basicProject-1-internal-object.rdf");
@@ -53,7 +54,36 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Missng artifact 1 URI on page", body.contains(artifactUri1));
         Assert.assertTrue("Missng artifact 2 URI on page", body.contains(artifactUri2));
         
-        Assert.assertFalse("Page contained no artifacts error message", body.contains("No artifacts found"));
+        Assert.assertFalse("Page contained no artifacts message", body.contains("No artifacts found"));
+        this.assertFreemarker(body);
+    }
+    
+    /**
+     * Test authenticated access to list Artifacts in HTML with multiple loaded artifacts where all
+     * of the artifacts are unpublished, but also asking for published artifacts.
+     */
+    @Test
+    public void testListArtifactsHtmlEmptyAllUnpublishedWithPublished() throws Exception
+    {
+        final ClientResource listArtifactsClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
+        
+        listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, "true");
+        listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, "true");
+        
+        // Representation results = listArtifactsClientResource.get(MediaType.TEXT_HTML);
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify:
+        System.out.println("results:" + body);
+        Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
+        Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
+        
+        Assert.assertTrue("Page did not contain no artifacts message", body.contains("No artifacts found"));
         this.assertFreemarker(body);
     }
     
