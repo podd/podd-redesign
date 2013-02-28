@@ -5,11 +5,12 @@ package com.github.podd.client.api;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
+import java.util.Collection;
 
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
+
+import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
  * An interface defining the operations that are currently implemented by the PODD Web Services.
@@ -34,10 +35,11 @@ public interface PoddClient
      * @param partialInputStream
      *            The partial set of RDF triples serialised into an InputStream in the given format
      *            that will be appended to the given artifact.
-     * @return An {@link OWLOntologyID} object containing the details of the updated artifact.
+     * @return An {@link InferredOWLOntologyID} object containing the details of the updated
+     *         artifact.
      */
-    OWLOntologyID appendArtifact(OWLOntologyID ontologyId, InputStream partialInputStream, RDFFormat format)
-        throws PoddClientException;
+    InferredOWLOntologyID appendArtifact(InferredOWLOntologyID ontologyId, InputStream partialInputStream,
+            RDFFormat format) throws PoddClientException;
     
     /**
      * Submits a request to the PODD File Reference Attachment service to attach a file reference
@@ -49,7 +51,7 @@ public interface PoddClient
      * the update would need to be attempted again.
      * 
      * @param ontologyId
-     *            The OWLOntologyID of the artifact to attach the file reference to.
+     *            The {@link InferredOWLOntologyID} of the artifact to attach the file reference to.
      * @param objectIRI
      *            The IRI of the object to attach the file reference to.
      * @param label
@@ -58,10 +60,11 @@ public interface PoddClient
      *            The alias of the repository that the file is located in.
      * @param filePathInRepository
      *            The path inside of the repository that can be used to locate the file.
-     * @return An {@link OWLOntologyID} object containing the details of the updated artifact.
+     * @return An {@link InferredOWLOntologyID} object containing the details of the updated
+     *         artifact.
      */
-    OWLOntologyID attachFileReference(OWLOntologyID ontologyId, IRI objectIRI, String label, String repositoryAlias,
-            String filePathInRepository) throws PoddClientException;
+    InferredOWLOntologyID attachFileReference(InferredOWLOntologyID ontologyId, IRI objectIRI, String label,
+            String repositoryAlias, String filePathInRepository) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Delete Artifact service to delete the artifact identified by
@@ -76,17 +79,18 @@ public interface PoddClient
      *            The OWLOntologyID of the artifact to delete.
      * @return True if the artifact was deleted and false otherwise.
      */
-    boolean deleteArtifact(OWLOntologyID ontologyId) throws PoddClientException;
+    boolean deleteArtifact(InferredOWLOntologyID ontologyId) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Get Artifact service to download the artifact identified by the
-     * given {@link OWLOntologyID}, optionally including a version IRI if it is specifically known.
+     * given {@link InferredOWLOntologyID}, optionally including a version IRI if it is specifically
+     * known.
      * <p>
      * If the version is not currently available, the latest version will be returned.
      * 
      * @param artifactId
-     *            The OWLOntologyID of the artifact to be downloaded, including version as necessary
-     *            to fetch old versions.
+     *            The {@link InferredOWLOntologyID} of the artifact to be downloaded, including
+     *            version as necessary to fetch old versions.
      * @param outputStream
      *            The {@link OutputStream} to download the artifact to.
      * @param format
@@ -94,7 +98,7 @@ public interface PoddClient
      * @throws PoddClientException
      *             If the artifact could not be downloaded for any reason
      */
-    void downloadArtifact(OWLOntologyID artifactId, OutputStream outputStream, RDFFormat format)
+    void downloadArtifact(InferredOWLOntologyID artifactId, OutputStream outputStream, RDFFormat format)
         throws PoddClientException;
     
     /**
@@ -117,22 +121,22 @@ public interface PoddClient
      * @return A list of Strings identifying the possible values for the repository alias in calls
      *         to {@link #attachFileReference(IRI, String, String)}.
      */
-    List<String> listFileReferenceRepositories() throws PoddClientException;
+    Collection<String> listFileReferenceRepositories() throws PoddClientException;
     
     /**
      * 
-     * @return A list of {@link OWLOntologyID}s identifying the artifacts that the user has access
-     *         to which are published. This may include artifacts that the user cannot modify or
-     *         fork.
+     * @return A list of {@link InferredOWLOntologyID}s identifying the artifacts that the user has
+     *         access to which are published. This may include artifacts that the user cannot modify
+     *         or fork.
      */
-    List<OWLOntologyID> listPublishedArtifacts() throws PoddClientException;
+    Collection<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException;
     
     /**
      * 
-     * @return A list of {@link OWLOntologyID}s identifying the artifacts that the user has access
-     *         to which are unpublished.
+     * @return A list of {@link InferredOWLOntologyID}s identifying the artifacts that the user has
+     *         access to which are unpublished.
      */
-    List<OWLOntologyID> listUnpublishedArtifacts() throws PoddClientException;
+    Collection<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException;
     
     /**
      * Submits a request to the PODD Login service to login the user with the given username and
@@ -169,12 +173,13 @@ public interface PoddClient
      * the publish would need to be attempted again.
      * 
      * @param ontologyId
-     *            The {@link OWLOntologyID} of the unpublished artifact that is to be published.
-     * @return The {@link OWLOntologyID} of the artifact that was published. Artifacts may be given
-     *         a different IRI after they are published, to distinguish them from the previously
-     *         unpublished artifact.
+     *            The {@link InferredOWLOntologyID} of the unpublished artifact that is to be
+     *            published.
+     * @return The {@link InferredOWLOntologyID} of the artifact that was published. Artifacts may
+     *         be given a different IRI after they are published, to distinguish them from the
+     *         previously unpublished artifact.
      */
-    OWLOntologyID publishArtifact(OWLOntologyID ontologyId) throws PoddClientException;
+    InferredOWLOntologyID publishArtifact(InferredOWLOntologyID ontologyId) throws PoddClientException;
     
     /**
      * Sets the base server URL to use when submitting requests using this client.
@@ -195,11 +200,11 @@ public interface PoddClient
      * IRI.
      * 
      * @param ontologyId
-     * @return The {@link OWLOntologyID} of the artifact after it has been unpublished. Artifacts
-     *         may be given a different IRI after they unpublished, to distinguish them from the
-     *         previously available artifact.
+     * @return The {@link InferredOWLOntologyID} of the artifact after it has been unpublished.
+     *         Artifacts may be given a different IRI after they unpublished, to distinguish them
+     *         from the previously available artifact.
      */
-    OWLOntologyID unpublishArtifact(OWLOntologyID ontologyId) throws PoddClientException;
+    InferredOWLOntologyID unpublishArtifact(InferredOWLOntologyID ontologyId) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Edit Artifact service to update the entire artifact, replacing
@@ -217,9 +222,10 @@ public interface PoddClient
      * @param fullInputStream
      *            The full set of RDF triples serialised into the InputStream in the given format
      *            that will be used to update the given artifact.
-     * @return An {@link OWLOntologyID} object containing the details of the updated artifact.
+     * @return An {@link InferredOWLOntologyID} object containing the details of the updated
+     *         artifact.
      */
-    OWLOntologyID updateArtifact(OWLOntologyID ontologyId, InputStream fullInputStream, RDFFormat format)
+    InferredOWLOntologyID updateArtifact(InferredOWLOntologyID ontologyId, InputStream fullInputStream, RDFFormat format)
         throws PoddClientException;
     
     /**
@@ -229,11 +235,11 @@ public interface PoddClient
      *            The {@link InputStream} containing the artifact to load.
      * @param format
      *            The format of the RDF triples in the given InputStream.
-     * @return An {@link OWLOntologyID} object containing the details of the loaded artifact. The
-     *         {@link OWLOntologyID#getOntologyIRI()} method can be used to get the artifact IRI for
-     *         future requests, while the {@link OWLOntologyID#getVersionIRI()} method can be used
-     *         to get the version IRI to determine if there have been changes to the ontology in
-     *         future.
+     * @return An {@link InferredOWLOntologyID} object containing the details of the loaded
+     *         artifact. The {@link InferredOWLOntologyID#getOntologyIRI()} method can be used to
+     *         get the artifact IRI for future requests, while the
+     *         {@link InferredOWLOntologyID#getVersionIRI()} method can be used to get the version
+     *         IRI to determine if there have been changes to the ontology in future.
      */
-    OWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format) throws PoddClientException;
+    InferredOWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format) throws PoddClientException;
 }

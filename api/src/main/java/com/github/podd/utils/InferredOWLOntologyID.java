@@ -3,6 +3,13 @@
  */
 package com.github.podd.utils;
 
+import org.openrdf.model.Model;
+import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -23,10 +30,10 @@ public class InferredOWLOntologyID extends OWLOntologyID
 {
     private static final long serialVersionUID = 30402L;
     
-    private IRI inferredOntologyIRI;
+    private final IRI inferredOntologyIRI;
     
     /**
-     * 
+     * Creates an {@link InferredOWLOntologyID} using three OWLAPI {@link IRI}s.
      */
     public InferredOWLOntologyID(final IRI baseOntologyIRI, final IRI baseOntologyVersionIRI,
             final IRI inferredOntologyIRI)
@@ -41,6 +48,24 @@ public class InferredOWLOntologyID extends OWLOntologyID
         {
             // super uses 37, so to be distinct we need to use a different prime number here, ie, 41
             this.hashCode += 41 * inferredOntologyIRI.hashCode();
+        }
+    }
+    
+    /**
+     * Creates an {@link InferredOWLOntologyID} using three OpenRDF {@link URI}s.
+     */
+    public InferredOWLOntologyID(final URI baseOntologyIRI, final URI baseOntologyVersionIRI,
+            final URI inferredOntologyIRI)
+    {
+        super(IRI.create(baseOntologyIRI), IRI.create(baseOntologyVersionIRI));
+        
+        if(inferredOntologyIRI != null)
+        {
+            this.inferredOntologyIRI = IRI.create(inferredOntologyIRI);
+        }
+        else
+        {
+            this.inferredOntologyIRI = null;
         }
     }
     
@@ -133,4 +158,21 @@ public class InferredOWLOntologyID extends OWLOntologyID
         }
     }
     
+    public Model toRDF()
+    {
+        Model result = new LinkedHashModel();
+        ValueFactory vf = ValueFactoryImpl.getInstance();
+        result.add(vf.createStatement(this.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+        result.add(vf.createStatement(this.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+        result.add(vf.createStatement(this.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, this.getVersionIRI()
+                .toOpenRDFURI()));
+        if(this.getInferredOntologyIRI() != null)
+        {
+            result.add(vf.createStatement(this.getInferredOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+            result.add(vf.createStatement(this.getVersionIRI().toOpenRDFURI(),
+                    PoddRdfConstants.PODD_BASE_INFERRED_VERSION, this.getInferredOntologyIRI().toOpenRDFURI()));
+        }
+        
+        return result;
+    }
 }

@@ -51,8 +51,8 @@ public class InferredOWLOntologyIDTest
     @Test
     public void testEqualAnonymous() throws Exception
     {
-        final InferredOWLOntologyID onto1 = new InferredOWLOntologyID(null, null, null);
-        final InferredOWLOntologyID onto2 = new InferredOWLOntologyID(null, null, null);
+        final InferredOWLOntologyID onto1 = new InferredOWLOntologyID((IRI)null, null, null);
+        final InferredOWLOntologyID onto2 = new InferredOWLOntologyID((IRI)null, null, null);
         
         Assert.assertTrue(onto1.isAnonymous());
         Assert.assertTrue(onto2.isAnonymous());

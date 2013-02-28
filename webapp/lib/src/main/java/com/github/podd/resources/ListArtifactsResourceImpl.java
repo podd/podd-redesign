@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Statement;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
 import com.github.podd.utils.PoddRdfConstants;
@@ -206,21 +208,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         {
             for(String nextKey : artifactsInternal.keySet())
             {
-                for(InferredOWLOntologyID nextArtifact : artifactsInternal.get(nextKey))
-                {
-                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                            nextArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                            nextArtifact.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                            nextArtifact.getInferredOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                            nextArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
-                            nextArtifact.getVersionIRI().toOpenRDFURI()));
-                    writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                            nextArtifact.getVersionIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                            nextArtifact.getInferredOntologyIRI().toOpenRDFURI()));
-                }
+                OntologyUtils.ontologyIDsToHandler(artifactsInternal.get(nextKey), writer);
             }
         }
         catch(RDFHandlerException e)
