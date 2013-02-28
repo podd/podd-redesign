@@ -111,12 +111,20 @@ public class OntologyUtils
                                 input.filter((URI)nextVersion.getObject(), PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
                                         null);
                         
-                        for(Statement nextInferredOntology : inferredOntologies)
+                        if(inferredOntologies.isEmpty())
                         {
-                            if(nextInferredOntology instanceof URI)
+                            results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
+                                    (URI)nextTypeStatement.getObject(), null));
+                        }
+                        else
+                        {
+                            for(Statement nextInferredOntology : inferredOntologies)
                             {
-                                results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
-                                        (URI)nextTypeStatement.getObject(), (URI)nextInferredOntology.getObject()));
+                                if(nextInferredOntology instanceof URI)
+                                {
+                                    results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
+                                            (URI)nextTypeStatement.getObject(), (URI)nextInferredOntology.getObject()));
+                                }
                             }
                         }
                     }
