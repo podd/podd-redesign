@@ -53,6 +53,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Missng artifact 1 URI on page", body.contains(artifactUri1));
         Assert.assertTrue("Missng artifact 2 URI on page", body.contains(artifactUri2));
         
+        Assert.assertFalse("Page contained no artifacts error message", body.contains("No artifacts found"));
         this.assertFreemarker(body);
     }
     

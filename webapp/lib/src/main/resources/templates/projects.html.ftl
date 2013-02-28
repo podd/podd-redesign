@@ -36,13 +36,13 @@
 
 <p><br></p>
 
-<#if myArtifactsList??>
+<#if unpublishedArtifactsList??>
 	<#-- if the user is authenticated show the list of artifacts they have access to -->
-	<h3 class="underlined_heading">My Artifacts 
-		<a href="javascript:animatedcollapse.toggle('myArtifacts')" icon="toggle" title="View My Artifacts"></a>
+	<h3 class="underlined_heading">Unpublished Artifacts 
+		<a href="javascript:animatedcollapse.toggle('unpublishedArtifacts')" icon="toggle" title="View Unpublished Artifacts"></a>
 	</h3>
-    <div id="myArtifacts">
-        <#list myArtifactsList as artifact>
+    <div id="unpublishedArtifacts">
+        <#list unpublishedArtifactsList as artifact>
 		    <@addArtifactDetails aArtifact=artifact/>
 		</#list>
         <#if myArtifactCount?? && myFirstRecord?? && maxResults??>
@@ -52,12 +52,12 @@
 	<p></p>
 </#if>
 
-<#if publicArtifactsList??>
-<h3 class="underlined_heading">Public Artifacts
-	<a href="javascript:animatedcollapse.toggle('publicArtifacts')" icon="toggle" title="View Public Artifacts"></a>
+<#if publishedArtifactsList??>
+<h3 class="underlined_heading">Published Artifacts
+	<a href="javascript:animatedcollapse.toggle('publishedArtifacts')" icon="toggle" title="View Published Artifacts"></a>
 </h3>
-<div id="publicArtifacts">
-	<#list publicArtifactsList as artifact>
+<div id="publishedArtifacts">
+	<#list publishedArtifactsList as artifact>
         <@addArtifactDetails aArtifact=artifact/>
 	</#list>
     <#if publicArtifactCount?? && publicFirstRecord?? && maxResults??>
@@ -67,7 +67,7 @@
 <p></p>
 </#if>
 
-<#if ! (allArtifactsList)?? && ! (publicArtifactsList)?? && ! myArtifactsList??>
+<#if !publishedArtifactsList?? && ! unpublishedArtifactsList??>
 No artifacts found
 </#if>
 
@@ -76,7 +76,7 @@ No artifacts found
 
 <#macro addArtifactDetails aArtifact>
     <p>
-    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getUri())!"unknown-pid"}"> ${aArtifact.getTitle()!" - "}</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getObjectURI())!"unknown-pid"}"> ${aArtifact.getLabel()!" - "}</a>
 <#-- 
 	These should be uncommented and displayed.
 	
@@ -97,7 +97,7 @@ No artifacts found
     <script type="text/javascript">
         writeAbstractWholeWords("${(aArtifact.getDescription())!" - "}", 200);
     </script>
-    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getUri())!"unknown-pid"}">Browse Artifact</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getObjectURI())!"unknown-pid"}">Browse Artifact</a>
     </p>
 </#macro>
 
