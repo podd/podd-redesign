@@ -16,7 +16,7 @@ import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author kutila
- * 
+ * @author Peter Ansell p_ansell@yahoo.com
  */
 public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
 {
