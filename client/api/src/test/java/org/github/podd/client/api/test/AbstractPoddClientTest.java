@@ -21,6 +21,7 @@ import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.client.api.PoddClient;
+import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
  * Abstract tests for {@link PoddClient}.
@@ -104,15 +105,14 @@ public abstract class AbstractPoddClientTest
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
         
-        final OWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         
-        this.testClient.downloadArtifact(new OWLOntologyID(newArtifact.getOntologyIRI()), outputStream,
-                RDFFormat.RDFJSON);
+        this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
         
         final Model model = new LinkedHashModel();
         
@@ -122,12 +122,12 @@ public abstract class AbstractPoddClientTest
         
         Assert.assertEquals(31, model.size());
         
-        Assert.assertTrue(this.testClient.deleteArtifact(new OWLOntologyID(newArtifact.getOntologyIRI())));
+        Assert.assertTrue(this.testClient.deleteArtifact(newArtifact));
     }
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(OWLOntologyID, java.io.OutputStream, RDFFormat)}
+     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(InferredOWLOntologyID, java.io.OutputStream, RDFFormat)}
      * .
      */
     @Ignore
@@ -139,7 +139,7 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(OWLOntologyID, java.io.OutputStream, RDFFormat)}
+     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(InferredOWLOntologyID, java.io.OutputStream, RDFFormat)}
      * .
      */
     @Ignore
@@ -151,7 +151,7 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(OWLOntologyID, java.io.OutputStream, RDFFormat)}
+     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(InferredOWLOntologyID, java.io.OutputStream, RDFFormat)}
      * .
      */
     @Test
@@ -162,15 +162,14 @@ public abstract class AbstractPoddClientTest
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
         
-        final OWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         
-        this.testClient.downloadArtifact(new OWLOntologyID(newArtifact.getOntologyIRI()), outputStream,
-                RDFFormat.RDFJSON);
+        this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
         
         final Model model = new LinkedHashModel();
         
@@ -183,7 +182,7 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(OWLOntologyID, java.io.OutputStream, RDFFormat)}
+     * {@link com.github.podd.client.api.PoddClient#downloadArtifact(InferredOWLOntologyID, java.io.OutputStream, RDFFormat)}
      * .
      */
     @Ignore
@@ -299,7 +298,7 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#unpublishArtifact(OWLOntologyID)} .
+     * {@link com.github.podd.client.api.PoddClient#unpublishArtifact(InferredOWLOntologyID)} .
      */
     @Ignore
     @Test
@@ -310,7 +309,7 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Test method for
-     * {@link com.github.podd.client.api.PoddClient#updateArtifact(OWLOntologyID, InputStream, RDFFormat)}
+     * {@link com.github.podd.client.api.PoddClient#updateArtifact(InferredOWLOntologyID, InputStream, RDFFormat)}
      * .
      */
     @Ignore
@@ -333,7 +332,7 @@ public abstract class AbstractPoddClientTest
         final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
         Assert.assertNotNull("Test resource missing", input);
         
-        final OWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
         Assert.assertNotNull(newArtifact);
         Assert.assertNotNull(newArtifact.getOntologyIRI());
         Assert.assertNotNull(newArtifact.getVersionIRI());

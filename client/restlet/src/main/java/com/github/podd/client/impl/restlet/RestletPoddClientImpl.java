@@ -6,17 +6,11 @@ package com.github.podd.client.impl.restlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
 import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
@@ -35,12 +29,13 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
+import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -67,23 +62,24 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public OWLOntologyID appendArtifact(final OWLOntologyID ontologyIRI, final InputStream partialInputStream,
-            final RDFFormat format) throws PoddClientException
+    public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID ontologyIRI,
+            final InputStream partialInputStream, final RDFFormat format) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
     }
     
     @Override
-    public OWLOntologyID attachFileReference(final OWLOntologyID ontologyIRI, final IRI objectIRI, final String label,
-            final String repositoryAlias, final String filePathInRepository) throws PoddClientException
+    public InferredOWLOntologyID attachFileReference(final InferredOWLOntologyID ontologyIRI, final IRI objectIRI,
+            final String label, final String repositoryAlias, final String filePathInRepository)
+        throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
     }
     
     @Override
-    public boolean deleteArtifact(final OWLOntologyID artifactId) throws PoddClientException
+    public boolean deleteArtifact(final InferredOWLOntologyID artifactId) throws PoddClientException
     {
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_DELETE));
         resource.getCookies().addAll(this.currentCookies);
@@ -114,8 +110,8 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public void downloadArtifact(final OWLOntologyID artifactId, final OutputStream outputStream, final RDFFormat format)
-        throws PoddClientException
+    public void downloadArtifact(final InferredOWLOntologyID artifactId, final OutputStream outputStream,
+            final RDFFormat format) throws PoddClientException
     {
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         resource.getCookies().addAll(this.currentCookies);
@@ -143,31 +139,6 @@ public class RestletPoddClientImpl implements PoddClient
         {
             throw new PoddClientException("Could not write downloaded artifact to output stream", e);
         }
-    }
-    
-    private OWLOntologyID getOntologyFromModel(final Model nextModel)
-    {
-        if(nextModel.contains(null, RDF.TYPE, OWL.ONTOLOGY))
-        {
-            for(final Resource nextOntology : nextModel.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects())
-            {
-                if(nextOntology instanceof URI)
-                {
-                    final URI nextOntologyURI = (URI)nextOntology;
-                    
-                    for(final Value nextVersion : nextModel.filter(nextOntologyURI,
-                            ValueFactoryImpl.getInstance().createURI(OWL.NAMESPACE, "versionIRI"), null).objects())
-                    {
-                        if(nextVersion instanceof URI)
-                        {
-                            return new OWLOntologyID(nextOntologyURI, (URI)nextVersion);
-                        }
-                    }
-                }
-            }
-        }
-        
-        return null;
     }
     
     /*
@@ -220,6 +191,43 @@ public class RestletPoddClientImpl implements PoddClient
         return !this.currentCookies.isEmpty();
     }
     
+    private Collection<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
+        throws PoddClientException
+    {
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
+        resource.getCookieSettings().addAll(this.currentCookies);
+        
+        resource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, Boolean.toString(published));
+        resource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, Boolean.toString(unpublished));
+        
+        final Representation get = resource.get();
+        
+        final Model results = new LinkedHashModel();
+        
+        final RDFParser parser =
+                Rio.createParser(Rio.getParserFormatForMIMEType(get.getMediaType().getName(), RDFFormat.RDFXML));
+        parser.setRDFHandler(new StatementCollector(results));
+        
+        try
+        {
+            parser.parse(get.getStream(), resource.getRootRef().toString());
+        }
+        catch(final RDFParseException e)
+        {
+            throw new PoddClientException("Failed to parse RDF", e);
+        }
+        catch(final RDFHandlerException e)
+        {
+            throw new PoddClientException("Failed to process RDF", e);
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Input output exception while parsing RDF", e);
+        }
+        
+        return OntologyUtils.modelToOntologyIDs(results);
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -238,9 +246,9 @@ public class RestletPoddClientImpl implements PoddClient
      * @see com.github.podd.client.api.PoddClient#listPublishedArtifacts()
      */
     @Override
-    public List<OWLOntologyID> listPublishedArtifacts() throws PoddClientException
+    public Collection<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException
     {
-        return listArtifactsInternal(true, false);
+        return this.listArtifactsInternal(true, false);
     }
     
     /*
@@ -249,30 +257,9 @@ public class RestletPoddClientImpl implements PoddClient
      * @see com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()
      */
     @Override
-    public List<OWLOntologyID> listUnpublishedArtifacts() throws PoddClientException
+    public Collection<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException
     {
-        return listArtifactsInternal(false, true);
-    }
-    
-    private List<OWLOntologyID> listArtifactsInternal(boolean published, boolean unpublished)
-        throws PoddClientException
-    {
-        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
-        resource.getCookieSettings().addAll(this.currentCookies);
-        
-        resource.addQueryParameter("published", Boolean.toString(published));
-        resource.addQueryParameter("unpublished", Boolean.toString(unpublished));
-        
-        Representation get = resource.get();
-        
-        Model results = new LinkedHashModel();
-        
-        RDFParser parser = Rio.createParser(Rio.getParserFormatForMIMEType(get.getMediaType().getName(), RDFFormat.RDFXML));
-        parser.setRDFHandler(new StatementCollector(results));
-        
-        
-        
-        return Collections.emptyList();
+        return this.listArtifactsInternal(false, true);
     }
     
     /*
@@ -418,7 +405,7 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public OWLOntologyID publishArtifact(final OWLOntologyID ontologyIRI) throws PoddClientException
+    public InferredOWLOntologyID publishArtifact(final InferredOWLOntologyID ontologyIRI) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
@@ -436,22 +423,23 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public OWLOntologyID unpublishArtifact(final OWLOntologyID ontologyIRI) throws PoddClientException
+    public InferredOWLOntologyID unpublishArtifact(final InferredOWLOntologyID ontologyIRI) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
     }
     
     @Override
-    public OWLOntologyID updateArtifact(final OWLOntologyID ontologyIRI, final InputStream fullInputStream,
-            final RDFFormat format) throws PoddClientException
+    public InferredOWLOntologyID updateArtifact(final InferredOWLOntologyID ontologyIRI,
+            final InputStream fullInputStream, final RDFFormat format) throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
     }
     
     @Override
-    public OWLOntologyID uploadNewArtifact(final InputStream input, final RDFFormat format) throws PoddClientException
+    public InferredOWLOntologyID uploadNewArtifact(final InputStream input, final RDFFormat format)
+        throws PoddClientException
     {
         final InputRepresentation rep = new InputRepresentation(input, MediaType.valueOf(format.getDefaultMIMEType()));
         
@@ -469,11 +457,11 @@ public class RestletPoddClientImpl implements PoddClient
         {
             final Model parsedStatements = this.parseRdf(post);
             
-            final OWLOntologyID result = this.getOntologyFromModel(parsedStatements);
+            final Collection<InferredOWLOntologyID> result = OntologyUtils.modelToOntologyIDs(parsedStatements);
             
-            if(result != null)
+            if(!result.isEmpty())
             {
-                return result;
+                return result.iterator().next();
             }
             
             throw new PoddClientException("Failed to verify that the artifact was uploaded correctly.");
