@@ -74,12 +74,21 @@ public enum PoddAction
      */
     UNPUBLISHED_ARTIFACT_READ(
             true, 
-            "Failed to read artifact", 
+            "Failed to read unpublished artifact", 
             new HashSet<Role>(Arrays.asList(
                     PoddRoles.PROJECT_ADMIN.getRole(),
                     PoddRoles.PROJECT_MEMBER.getRole(),
                     PoddRoles.ADMIN.getRole())),
             true
+            ),
+            
+    UNPUBLISHED_ARTIFACT_LIST(
+            true, 
+            "Failed to list unpublished artifacts", 
+            new HashSet<Role>(Arrays.asList(
+                    PoddRoles.AUTHENTICATED.getRole(),
+                    PoddRoles.ADMIN.getRole())),
+            false
             ),
             
     /**
@@ -89,7 +98,7 @@ public enum PoddAction
      */
     PUBLISHED_ARTIFACT_READ(
             false, 
-            "Failed to read artifact", 
+            "Failed to read published artifact", 
             Collections.<Role> emptySet(),
             true
             ),
@@ -155,8 +164,9 @@ public enum PoddAction
             "Could not retrieve other user details", 
             Collections.singleton(PoddRoles.ADMIN.getRole()),
             false
-            ),
-    
+            ), 
+            
+            
             
     ;
     
