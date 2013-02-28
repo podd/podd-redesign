@@ -30,7 +30,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
 {
     private static final long serialVersionUID = 30402L;
     
-    private IRI inferredOntologyIRI;
+    private final IRI inferredOntologyIRI;
     
     /**
      * Creates an {@link InferredOWLOntologyID} using three OWLAPI {@link IRI}s.
@@ -57,7 +57,16 @@ public class InferredOWLOntologyID extends OWLOntologyID
     public InferredOWLOntologyID(final URI baseOntologyIRI, final URI baseOntologyVersionIRI,
             final URI inferredOntologyIRI)
     {
-        this(IRI.create(baseOntologyIRI), IRI.create(baseOntologyVersionIRI), IRI.create(inferredOntologyIRI));
+        super(IRI.create(baseOntologyIRI), IRI.create(baseOntologyVersionIRI));
+        
+        if(inferredOntologyIRI != null)
+        {
+            this.inferredOntologyIRI = IRI.create(inferredOntologyIRI);
+        }
+        else
+        {
+            this.inferredOntologyIRI = null;
+        }
     }
     
     @Override
