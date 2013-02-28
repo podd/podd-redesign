@@ -3,23 +3,12 @@
  */
 package com.github.podd.impl;
 
-import info.aduna.iteration.Iterations;
-
-import java.util.List;
-
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.utils.PoddRdfConstants;
