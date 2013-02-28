@@ -34,6 +34,10 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         final ClientResource listArtifactsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
         
+        listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, "true");
+        listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, "true");
+        
+        // Representation results = listArtifactsClientResource.get(MediaType.TEXT_HTML);
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
@@ -41,11 +45,11 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         final String body = results.getText();
         
         // verify:
-        System.out.println(body);
+        System.out.println("results:" + body);
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
         
-        Assert.assertTrue("Missing heading on page - Project Listing", body.contains("Projects Listing"));
+        Assert.assertTrue("Missing heading on page - Artifacts Listing", body.contains("Artifacts Listing"));
         Assert.assertTrue("Missng artifact 1 URI on page", body.contains(artifactUri1));
         Assert.assertTrue("Missng artifact 2 URI on page", body.contains(artifactUri2));
         
