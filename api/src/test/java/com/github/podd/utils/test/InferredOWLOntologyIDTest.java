@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.URI;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -53,7 +52,7 @@ public class InferredOWLOntologyIDTest
     public void testEqualAnonymous() throws Exception
     {
         final InferredOWLOntologyID onto1 = new InferredOWLOntologyID((IRI)null, null, null);
-        final InferredOWLOntologyID onto2 = new InferredOWLOntologyID((URI)null, null, null);
+        final InferredOWLOntologyID onto2 = new InferredOWLOntologyID((IRI)null, null, null);
         
         Assert.assertTrue(onto1.isAnonymous());
         Assert.assertTrue(onto2.isAnonymous());
