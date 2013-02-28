@@ -188,7 +188,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         final DatasetImpl dataset = new DatasetImpl();
         dataset.addDefaultGraph(context);
-        dataset.addNamedGraph(context);
         query.setDataset(dataset);
         
         final TupleQueryResult queryResults = query.evaluate();
