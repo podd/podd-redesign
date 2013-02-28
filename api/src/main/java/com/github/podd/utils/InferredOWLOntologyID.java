@@ -4,6 +4,7 @@
 package com.github.podd.utils;
 
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -32,7 +33,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
     private IRI inferredOntologyIRI;
     
     /**
-     * 
+     * Creates an {@link InferredOWLOntologyID} using three OWLAPI {@link IRI}s.
      */
     public InferredOWLOntologyID(final IRI baseOntologyIRI, final IRI baseOntologyVersionIRI,
             final IRI inferredOntologyIRI)
@@ -48,6 +49,15 @@ public class InferredOWLOntologyID extends OWLOntologyID
             // super uses 37, so to be distinct we need to use a different prime number here, ie, 41
             this.hashCode += 41 * inferredOntologyIRI.hashCode();
         }
+    }
+    
+    /**
+     * Creates an {@link InferredOWLOntologyID} using three OpenRDF {@link URI}s.
+     */
+    public InferredOWLOntologyID(final URI baseOntologyIRI, final URI baseOntologyVersionIRI,
+            final URI inferredOntologyIRI)
+    {
+        this(IRI.create(baseOntologyIRI), IRI.create(baseOntologyVersionIRI), IRI.create(inferredOntologyIRI));
     }
     
     @Override
