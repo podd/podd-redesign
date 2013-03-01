@@ -87,6 +87,23 @@ public class OntologyUtilsTest
     
     /**
      * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#modelToOntologyIDs(org.openrdf.model.Model)}.
+     */
+    @Test
+    public final void testModelToOntologyIDsOneVersion()
+    {
+        final Model input = new LinkedHashModel();
+        input.add(this.vf.createStatement(this.testOntologyUri1, RDF.TYPE, OWL.ONTOLOGY));
+        input.add(this.vf.createStatement(this.testVersionUri1, RDF.TYPE, OWL.ONTOLOGY));
+        input.add(this.vf.createStatement(this.testOntologyUri1, OWL.VERSIONIRI, this.testVersionUri1));
+        final Collection<InferredOWLOntologyID> modelToOntologyIDs = OntologyUtils.modelToOntologyIDs(input);
+        
+        // 1 ontology returned
+        Assert.assertEquals(1, modelToOntologyIDs.size());
+    }
+    
+    /**
+     * Test method for
      * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToHandler(java.util.Collection, org.openrdf.rio.RDFHandler)}
      * .
      */
