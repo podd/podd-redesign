@@ -375,10 +375,8 @@ public class RestletPoddClientImpl implements PoddClient
         RDFHandlerException, UnsupportedRDFormatException, IOException
     {
         final Model result = new LinkedHashModel();
-        final StatementCollector handler = new StatementCollector(result);
-        
         final RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(handler);
+        parser.setRDFHandler(new StatementCollector(result));
         parser.parse(stream, this.getUrl(""));
         
         return result;
