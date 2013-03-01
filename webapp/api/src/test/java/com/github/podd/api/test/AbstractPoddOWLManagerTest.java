@@ -644,8 +644,7 @@ public abstract class AbstractPoddOWLManagerTest
         }
         catch(final IllegalArgumentException e)
         {
-            Assert.assertEquals("Cannot dump an ontology to repository if it does not have a version IRI",
-                    e.getMessage());
+            Assert.assertEquals("Cannot dump anonymous ontologies to repository", e.getMessage());
         }
     }
     

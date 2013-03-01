@@ -336,7 +336,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 this.computeInferences(nextReasoner, inferredOntologyID.getInferredOWLOntologyID());
         
         this.dumpOntologyToRepository(nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology
-                .getOntologyID().getVersionIRI().toOpenRDFURI());
+                .getOntologyID().getOntologyIRI().toOpenRDFURI());
         
         return inferredOntologyID;
     }
@@ -447,11 +447,19 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final RepositoryConnection nextRepositoryConnection, final URI... contexts) throws IOException,
         RepositoryException
     {
-        if(nextOntology.getOntologyID().getVersionIRI() == null)
+        IRI contextIRI = nextOntology.getOntologyID().getVersionIRI();
+        
+        if(contextIRI == null)
         {
-            throw new IllegalArgumentException(
-                    "Cannot dump an ontology to repository if it does not have a version IRI");
+            contextIRI = nextOntology.getOntologyID().getOntologyIRI();
         }
+        
+        if(contextIRI == null)
+        {
+            throw new IllegalArgumentException("Cannot dump anonymous ontologies to repository");
+        }
+        
+        URI context = contextIRI.toOpenRDFURI();
         
         // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
         // into a specific context in the Sesame Repository
@@ -460,11 +468,11 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         if(contexts == null || contexts.length == 0)
         {
-            repositoryHandler.enforceContext(nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
+            repositoryHandler.enforceContext(context);
             // Render the triples out from OWLAPI into a Sesame Repository
             renderer =
                     new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
-                            nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
+                            context);
         }
         else
         {
