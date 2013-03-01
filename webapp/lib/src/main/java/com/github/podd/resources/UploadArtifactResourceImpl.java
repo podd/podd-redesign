@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -150,14 +152,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             writer.startRDF();
-            writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                    artifactMap.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-            writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                    artifactMap.getOntologyIRI().toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
-                    artifactMap.getVersionIRI().toOpenRDFURI()));
-            writer.handleStatement(ValueFactoryImpl.getInstance().createStatement(
-                    artifactMap.getVersionIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                    artifactMap.getInferredOntologyIRI().toOpenRDFURI()));
+            OntologyUtils.ontologyIDsToHandler(Arrays.asList(artifactMap), writer);
             writer.endRDF();
         }
         catch(RDFHandlerException e)
