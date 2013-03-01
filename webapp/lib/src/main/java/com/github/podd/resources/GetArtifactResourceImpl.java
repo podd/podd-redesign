@@ -200,11 +200,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             
             // first get the title & description encapsulated in a PoddObject
-            final PoddObjectLabel theObject = null; 
-            
-            // FIXME: TODO:
-            // SparqlQueryHelper.getPoddObject(ontologyID, objectUri, conn, ontologyGraphs.toArray(new URI[0]));
-            
+            final PoddObjectLabel theObject = this.getPoddSesameManager().getObjectLabel(ontologyID, objectUri, conn);
             dataModel.put("poddObject", theObject);
             
             // find the object's type

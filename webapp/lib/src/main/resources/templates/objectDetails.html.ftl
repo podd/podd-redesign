@@ -46,12 +46,12 @@
     <a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 </h3>
     <div id="details">  <!-- Collapsible div -->
-        <#if poddObject?? && poddObject.uri??>
-            <div about="${poddObject.uri!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
+        <#if poddObject?? && poddObject.objectURI??>
+            <div about="${poddObject.objectURI!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
                 	<#-- object URI, Title and description -->
-                    <li><span class="bold">URI: </span> <a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${poddObject.uri?url}">${util.clipProtocol(poddObject.uri!"Unknown URI")}</a></li>
-                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.title!""}</span></li>
+                    <li><span class="bold">URI: </span> <a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${poddObject.objectURI?url}">${util.clipProtocol(poddObject.objectURI!"Unknown URI")}</a></li>
+                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.label!""}</span></li>
                     <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
                     
                     <#-- all other attributes (data/object properties) -->
@@ -92,26 +92,26 @@
 <div id="buttonwrapper">
     <#if poddObject??>
 	    <#if  canEditObject?? && canEditObject>
-        <a href="${baseUrl}/artifact/edit/merge?artifacturi=${artifactUri?url!"unknown-artifacturi"}&objecturi=${poddObject.uri?url!"unknown-objecturi"}">Edit Object</a>
+        <a href="${baseUrl}/artifact/edit/merge?artifacturi=${artifactUri?url!"unknown-artifacturi"}&objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Edit Object</a>
         </#if>
         <#if  canAddChildren?? && canAddChildren>
-        <a href="${baseUrl}/object/${poddObject.uri!"unknown-pid"}/add">Add Child Object</a>
+        <a href="${baseUrl}/object/${poddObject.objectURI!"unknown-pid"}/add">Add Child Object</a>
         </#if>
         <#if  canPublish?? && canPublish>
-        <a href="${baseUrl}/artifact/publish?artifacturi=${poddObject.uri!"unknown-pid"}/publish?publish=true">Publish Project</a>
+        <a href="${baseUrl}/artifact/publish?artifacturi=${poddObject.objectURI!"unknown-pid"}/publish?publish=true">Publish Project</a>
         </#if>
         <#if  canUnpublish?? && canUnpublish>
-        <a href="${baseUrl}/artifact/updatepurls?artifacturi=${poddObject.uri!"unknown-pid"}">Update PURLs</a>
-        <a href="${baseUrl}/artifact/unpublish?artifacturi=${poddObject.uri!"unknown-pid"}">Unpublish Project</a>
+        <a href="${baseUrl}/artifact/updatepurls?artifacturi=${poddObject.objectURI!"unknown-pid"}">Update PURLs</a>
+        <a href="${baseUrl}/artifact/unpublish?artifacturi=${poddObject.objectURI!"unknown-pid"}">Unpublish Project</a>
         </#if>
         <#if objectType?? && objectType == 'Investigation'>
-        	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.uri!"unknown-pid"}">Download hierarchy attachments</a>
+        	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.objectURI!"unknown-pid"}">Download hierarchy attachments</a>
         </#if>        
         <#if canDelete?? && canDelete>
-        <a href="${baseUrl}/artifact/delete?artifacturi=${poddObject.uri!"unknown-pid"}">Delete</a>
+        <a href="${baseUrl}/artifact/delete?artifacturi=${poddObject.objectURI!"unknown-pid"}">Delete</a>
         </#if>
         <#if canUndelete?? && canUndelete>
-        <a href="${baseUrl}/artifact/undelete?artifacturi=${poddObject.uri!"unknown-pid"}">Undelete</a>
+        <a href="${baseUrl}/artifact/undelete?artifacturi=${poddObject.objectURI!"unknown-pid"}">Undelete</a>
         </#if>
     <#else>
     <!-- TODO: Remove me. -->
@@ -128,7 +128,7 @@ Macro to display information about the PODD object being viewed
 		<#local label = completeModel.filter(propertyUri, RDFS_LABEL, null).objectString()!"Missing Label">
     	<span class="bold">${label}:</span>
 
-		<#local objectList = completeModel.filter(poddObject.uri, propertyUri, null).objects()>
+		<#local objectList = completeModel.filter(poddObject.objectURI, propertyUri, null).objects()>
 		<#if (objectList.size() > 1)>
 			<#-- multiple values. create another HTML list -->
 			<ol>
