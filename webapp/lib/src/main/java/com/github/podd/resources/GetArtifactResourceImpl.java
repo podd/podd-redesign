@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
-import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.FreemarkerUtil;
@@ -201,11 +200,10 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             
             // first get the title & description encapsulated in a PoddObject
-            final PoddObjectLabel theObject = null;
+            final PoddObjectLabel theObject = null; 
             
             // FIXME: TODO:
-            // SparqlQueryHelper.getPoddObject(ontologyID, objectUri, conn,
-            // ontologyGraphs.toArray(new URI[0]));
+            // SparqlQueryHelper.getPoddObject(ontologyID, objectUri, conn, ontologyGraphs.toArray(new URI[0]));
             
             dataModel.put("poddObject", theObject);
             
@@ -216,16 +214,10 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
 
-            // TODO: Get label for the object type
+            // Get label for the object type
             URI objectType = objectTypes.get(0);
-            // if(theObjectType.getLabel() != null)
-            // {
-            // dataModel.put("objectType", theObjectType.getLabel());
-            // }
-            // else
-            // {
-            // dataModel.put("objectType", theObjectType.getObjectURI().stringValue());
-            // }
+            PoddObjectLabel label = this.getPoddSesameManager().getObjectLabel(ontologyID, objectType, conn);
+            dataModel.put("objectType", label.getLabel());
             
             // populate the properties of the object
             final List<URI> orderedProperties =
@@ -260,7 +252,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // DESIGN FIXME: Figure out a way of doing this without removing characters. It is not an
         // option to remove characters or split URIs.
         refersToElement.put("propertyUriWithoutNamespace", "artifact89");
-        refersToElement.put("availableObjects", this.getDummyReferredObjects());
+        refersToElement.put("availableObjects", Collections.EMPTY_LIST);
         refersToElement.put("areSelectedObjects", true);
         
         refersToList.add(refersToElement);
@@ -271,7 +263,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("childHierarchyList", Collections.emptyList());
     }
     
-    private List<Object> getDummyReferredObjects()
+/*    private List<Object> getDummyReferredObjects()
     {
         final List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < 2; i++)
@@ -309,7 +301,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         return schemaOntologyGraphs;
     }
-    
+*/    
     /**
      * Populates the data model with necessary constant values and Utility classes.
      * 
