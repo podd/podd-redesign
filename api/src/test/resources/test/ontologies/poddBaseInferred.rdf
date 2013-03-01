@@ -9,7 +9,7 @@
 
 <rdf:Description rdf:about="urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddBase/1">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
-	<owl:versionIRI rdf:resource="urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddBase/1"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/version/poddBase/1" />
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/contributor">

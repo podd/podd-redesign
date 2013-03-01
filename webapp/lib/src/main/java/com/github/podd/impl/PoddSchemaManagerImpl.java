@@ -112,6 +112,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         return this.uploadSchemaOntology(null, inputStream, fileFormat);
     }
     
+    /*
+     * FIXME: check if the version exists in the repository before upload
+     */
     @Override
     public InferredOWLOntologyID uploadSchemaOntology(final OWLOntologyID schemaOntologyID,
             final InputStream inputStream, final RDFFormat fileFormat) throws OpenRDFException, IOException,

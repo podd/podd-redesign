@@ -6,7 +6,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 
 <urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/basic-2-20130206/artifact:1:version:1> a owl:Ontology ;
-	owl:versionIRI <urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/basic-2-20130206/artifact:1:version:1> .
+	owl:imports <http://purl.org/podd/basic-2-20130206/artifact:version:1> .
 
 xsd:date a rdfs:Datatype .
 

@@ -11,6 +11,8 @@ import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for working with {@link InferredOWLOntologyID}
@@ -19,7 +21,7 @@ import org.openrdf.rio.RDFHandlerException;
  */
 public class OntologyUtils
 {
-    
+    private static final Logger log = LoggerFactory.getLogger(OntologyUtils.class);
     private OntologyUtils()
     {
     }
@@ -113,17 +115,38 @@ public class OntologyUtils
                         
                         if(inferredOntologies.isEmpty())
                         {
-                            results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
-                                    (URI)nextTypeStatement.getObject(), null));
+                            Model importsOntologies = input.filter(null, OWL.IMPORTS, (URI)nextVersion.getObject());
+                            
+                            if(importsOntologies.isEmpty())
+                            {
+                                results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
+                                        (URI)nextVersion.getObject(), null));
+                            }
+                            else
+                            {
+                                for(Statement nextImportOntology : importsOntologies)
+                                {
+                                    if(nextImportOntology.getSubject() instanceof URI)
+                                    {
+                                        results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
+                                                (URI)nextVersion.getObject(), (URI)nextImportOntology.getSubject()));
+                                    }
+                                    else
+                                    {
+                                        log.error("Found a non-URI import statement: {}", nextImportOntology);
+                                    }
+                                        
+                                }
+                            }
                         }
                         else
                         {
                             for(Statement nextInferredOntology : inferredOntologies)
                             {
-                                if(nextInferredOntology instanceof URI)
+                                if(nextInferredOntology.getObject() instanceof URI)
                                 {
                                     results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
-                                            (URI)nextTypeStatement.getObject(), (URI)nextInferredOntology.getObject()));
+                                            (URI)nextVersion.getObject(), (URI)nextInferredOntology.getObject()));
                                 }
                             }
                         }

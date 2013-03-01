@@ -528,8 +528,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" }");
         
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(sb.toString(), repositoryConnection, ontologyID.getVersionIRI().toOpenRDFURI(),
-                        ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+                this.executeSparqlQuery(sb.toString(), repositoryConnection, versionAndInferredContexts(ontologyID));
         
         final List<URI> topObjectList = new ArrayList<URI>();
         
@@ -676,8 +675,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return new PoddObjectLabelImpl(null, objectUri, label, description);
     }
     
+    /**
+     * Intentionally not include the inferred ontology IRI here so that we can search for concrete
+     * triples specifically.
+     * 
+     * @param ontologyID
+     * @param repositoryConnection
+     * @return
+     * @throws OpenRDFException
+     */
     private URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection)
-    throws OpenRDFException
+        throws OpenRDFException
     {
         
         Set<IRI> directImports = getDirectImports(ontologyID, repositoryConnection);
@@ -691,15 +699,21 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             results.add(nextDirectImport.toOpenRDFURI());
         }
         
-        
         return results.toArray(new URI[0]);
-
-    }    
+        
+    }
     
     private URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID)
     {
-        return new URI[] { ontologyID.getVersionIRI().toOpenRDFURI(),
-                ontologyID.getInferredOntologyIRI().toOpenRDFURI() };
+        if(ontologyID.getInferredOntologyIRI() != null)
+        {
+            return new URI[] { ontologyID.getVersionIRI().toOpenRDFURI(),
+                    ontologyID.getInferredOntologyIRI().toOpenRDFURI() };
+        }
+        else
+        {
+            return new URI[] { ontologyID.getVersionIRI().toOpenRDFURI() };
+        }
     }
     
     private URI[] versionAndInferredAndSchemaContexts(InferredOWLOntologyID ontologyID,
@@ -715,7 +729,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             results.add(nextDirectImport.toOpenRDFURI());
         }
-        
         
         return results.toArray(new URI[0]);
     }
@@ -1191,8 +1204,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * based on property weights and secondarily based on property labels.
      * 
      * Properties RDF:Type, RDFS:Comment and RDFS:Label as well as properties whose values are
-     * generic OWL concepts (i.e. OWL:Thing, OWL:Individial, OWL:NamedIndividual, OWL:Class)
-     * are not included in the results.
+     * generic OWL concepts (i.e. OWL:Thing, OWL:Individial, OWL:NamedIndividual, OWL:Class) are not
+     * included in the results.
      * 
      * @param artifactID
      *            The artifact to which this object belongs

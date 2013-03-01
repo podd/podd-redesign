@@ -20,6 +20,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
@@ -40,6 +41,7 @@ import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -61,7 +63,6 @@ public abstract class AbstractPoddSesameManagerTest
     private URI schemaGraph;
     
     public abstract PoddSesameManager getNewPoddSesameManagerInstance();
-    
     
     /**
      * Helper method for testing
@@ -108,45 +109,42 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertNotNull("Resource was null", resourceStream);
         
         // load statements into a Model
-        Model model = new LinkedHashModel();
+        Model concreteModel = new LinkedHashModel();
         RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(model));
+        parser.setRDFHandler(new StatementCollector(concreteModel));
         parser.parse(resourceStream, "");
         
-        // extract ontology IRI and version IRI from loaded statements
-        Model filter = model.filter(null, PoddRdfConstants.OWL_VERSION_IRI, null);
-        Resource[] subjects = filter.subjects().toArray(new Resource[0]);
-        Assert.assertNotNull(subjects);
-        Assert.assertEquals(1, subjects.length);
-        IRI ontologyIRI = IRI.create(subjects[0].stringValue());
-        URI versionUri = filter.objectURI();
-        IRI versionIRI = IRI.create(versionUri);
-        
-        // create a dummy inferred IRI
-        IRI inferredIRI = IRI.create("urn:HARD-CODED:inferred:ontology:iri");
-        
-        // dump the statements into the correct context of the Repository
-        this.testRepositoryConnection.add(model, versionUri);
-        
+        Model inferredModel = new LinkedHashModel();
         if(inferredResourcePath != null)
         {
             final InputStream inferredResourceStream = this.getClass().getResourceAsStream(inferredResourcePath);
             Assert.assertNotNull("Inferred resource was null", inferredResourceStream);
             
             // load inferred statements into a Model
-            Model inferredModel = new LinkedHashModel();
             RDFParser inferredParser = Rio.createParser(format);
             inferredParser.setRDFHandler(new StatementCollector(inferredModel));
             inferredParser.parse(inferredResourceStream, "");
             
             // extract version IRI which is also the inferred IRI
-            Model inferredFilter = inferredModel.filter(null, PoddRdfConstants.OWL_VERSION_IRI, null);
-            inferredIRI = IRI.create(inferredFilter.objectURI());
-            
-            this.testRepositoryConnection.add(inferredModel, inferredFilter.objectURI());
+            this.testRepositoryConnection.add(inferredModel,
+                    GraphUtil.getUniqueSubjectURI(inferredModel, RDF.TYPE, OWL.ONTOLOGY));
         }
         
-        return new InferredOWLOntologyID(ontologyIRI, versionIRI, inferredIRI);
+        concreteModel.filter(null, OWL.VERSIONIRI, null);
+        
+        // dump the statements into the correct context of the Repository
+        this.testRepositoryConnection.add(concreteModel,
+                GraphUtil.getUniqueSubjectURI(concreteModel, OWL.VERSIONIRI, null));
+        
+        Model totalModel = new LinkedHashModel(concreteModel);
+        totalModel.addAll(inferredModel);
+        
+        Collection<InferredOWLOntologyID> results = OntologyUtils.modelToOntologyIDs(totalModel);
+        
+        log.info("results={} ", results);
+        Assert.assertEquals(1, results.size());
+        
+        return results.iterator().next();
     }
     
     /**
@@ -168,6 +166,7 @@ public abstract class AbstractPoddSesameManagerTest
                         "/test/ontologies/poddScienceInferred.rdf", "/test/ontologies/poddPlantInferred.rdf", };
         for(int i = 0; i < schemaResourcePaths.length; i++)
         {
+            log.info("Next paths: {} {}", schemaResourcePaths[i], schemaInferredResourcePaths[i]);
             this.loadOntologyFromResource(schemaResourcePaths[i], schemaInferredResourcePaths[i], RDFFormat.RDFXML);
         }
     }
@@ -739,12 +738,11 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertNotNull("Ontology IRI was null", ontologyIRI);
         Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyIRI.toString());
     }
-   
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getTopObjects(InferredOWLOntologyID, RepositoryConnection)}
-     * .
-     * Test retrieving Top Objects from an artifact with exactly one top object.
+     * . Test retrieving Top Objects from an artifact with exactly one top object.
      */
     @Test
     public void testGetTopObjectsFromArtifactWithOneTopObject() throws Exception
@@ -766,8 +764,7 @@ public abstract class AbstractPoddSesameManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getTopObjects(InferredOWLOntologyID, RepositoryConnection)}
-     * .
-     * Test retrieving Top Objects from an artifact which has more than one top object. A PODD
+     * . Test retrieving Top Objects from an artifact which has more than one top object. A PODD
      * artifact should currently have only 1 top object.
      */
     @Test
@@ -791,13 +788,12 @@ public abstract class AbstractPoddSesameManagerTest
         {
             Assert.assertTrue("Unexpected top object", expectedUriList.contains(topObjectUri.stringValue()));
         }
-    }    
+    }
     
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getWeightedProperties(InferredOWLOntologyID, URI, RepositoryConnection)}
-     * .
-     * getWeightedProperties() is invoked for an internal object of an artifact.
+     * . getWeightedProperties() is invoked for an internal object of an artifact.
      */
     @Test
     public void testGetWeightedPropertiesOfAnInternalObject() throws Exception
@@ -807,6 +803,16 @@ public abstract class AbstractPoddSesameManagerTest
         InferredOWLOntologyID nextOntologyID =
                 this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
                         "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+        
+        Assert.assertEquals(
+                "http://purl.org/podd/basic-2-20130206/artifact:1",
+                nextOntologyID.getOntologyIRI().toString());
+        Assert.assertEquals(
+                "http://purl.org/podd/basic-2-20130206/artifact:version:1",
+                nextOntologyID.getVersionIRI().toString());
+        Assert.assertEquals(
+                "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/basic-2-20130206/artifact:1:version:1",
+                nextOntologyID.getInferredOntologyIRI().toString());
         
         URI internalObjectUri =
                 ValueFactoryImpl.getInstance().createURI(
@@ -820,10 +826,8 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Incorrect number of statements about Internal Object", 6, orderedPropertyUris.size());
         
         final String[] expectedUris =
-                { "http://purl.org/dc/terms/creator",
-                        "http://purl.org/dc/terms/created",
-                        "http://purl.org/podd/ns/poddBase#hasPURL",
-                        "http://purl.org/podd/ns/poddScience#hasAbstract",
+                { "http://purl.org/dc/terms/creator", "http://purl.org/dc/terms/created",
+                        "http://purl.org/podd/ns/poddBase#hasPURL", "http://purl.org/podd/ns/poddScience#hasAbstract",
                         "http://purl.org/podd/ns/poddScience#publishedIn",
                         "http://purl.org/podd/ns/poddScience#hasYear", };
         for(int i = 0; i < orderedPropertyUris.size(); i++)
@@ -831,11 +835,12 @@ public abstract class AbstractPoddSesameManagerTest
             Assert.assertEquals("Property URI not in expected position",
                     ValueFactoryImpl.getInstance().createURI(expectedUris[i]), orderedPropertyUris.get(i));
         }
-    }    
+    }
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getWeightedProperties(InferredOWLOntologyID, URI, RepositoryConnection)}.
+     * {@link com.github.podd.api.PoddSesameManager#getWeightedProperties(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
      * 
      * getWeightedProperties() is invoked for the top object of an artifact.
      */
@@ -848,19 +853,17 @@ public abstract class AbstractPoddSesameManagerTest
                 this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
                         "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
         
-        final URI topObjectUri =
-                this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
+        final URI topObjectUri = this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
         
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager
                         .getWeightedProperties(nextOntologyID, topObjectUri, testRepositoryConnection);
-
+        
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
         
         final String[] expectedUris =
-                { "http://purl.org/podd/ns/poddScience#hasANZSRC",
-                        "http://purl.org/podd/ns/poddBase#createdAt",
+                { "http://purl.org/podd/ns/poddScience#hasANZSRC", "http://purl.org/podd/ns/poddBase#createdAt",
                         "http://purl.org/dc/terms/creator",
                         "http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator",
                         "http://purl.org/podd/ns/poddScience#hasAnalysis",
@@ -878,7 +881,6 @@ public abstract class AbstractPoddSesameManagerTest
                     ValueFactoryImpl.getInstance().createURI(expectedUris[i]), orderedPropertyUris.get(i));
         }
     }
-    
     
     /**
      * Test method for
