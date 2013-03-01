@@ -231,8 +231,6 @@ public class InferredOWLOntologyIDTest
         // are the same)
         Assert.assertEquals(this.testInferredOntologyIRI, inferredOwlOntologyID.getInferredOWLOntologyID()
                 .getOntologyIRI());
-        Assert.assertEquals(this.testInferredOntologyIRI, inferredOwlOntologyID.getInferredOWLOntologyID()
-                .getVersionIRI());
     }
     
     @Test
