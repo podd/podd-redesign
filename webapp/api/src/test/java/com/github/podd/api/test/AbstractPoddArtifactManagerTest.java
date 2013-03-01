@@ -245,22 +245,34 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 9,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 21,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 53,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 260, 104,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML, 1265, 260,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPPlantOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_PLANT, RDFFormat.RDFXML, 83, 273,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_PLANT, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED,
                         this.testRepositoryConnection);
         
         // prepare: update schema management graph
@@ -651,19 +663,29 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 39, 9,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML, 38, 21,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 217, 53,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML, 260, 104,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED,
                         this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML, 1265, 260,
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE, 
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED,
                         this.testRepositoryConnection);
         
         // prepare: update schema management graph
