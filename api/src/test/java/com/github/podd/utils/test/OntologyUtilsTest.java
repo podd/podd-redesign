@@ -99,4 +99,24 @@ public class OntologyUtilsTest
         Assert.assertTrue(ontologyIDsToModel.isEmpty());
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToModel(java.util.Collection, org.openrdf.model.Model)}
+     * .
+     */
+    @Test
+    public final void testOntologyIDsToModelNoVersionIRI()
+    {
+        final Model input = new LinkedHashModel();
+        
+        final Model ontologyIDsToModel =
+                OntologyUtils.ontologyIDsToModel(
+                        Arrays.asList(new InferredOWLOntologyID(IRI.create("urn:test:ontology:iri:abc"), null, null)),
+                        input);
+        
+        Assert.assertNotNull(ontologyIDsToModel);
+        Assert.assertEquals(input, ontologyIDsToModel);
+        Assert.assertEquals(1, ontologyIDsToModel.size());
+    }
+    
 }
