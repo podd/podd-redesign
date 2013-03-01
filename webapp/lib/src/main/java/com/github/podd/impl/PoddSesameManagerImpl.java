@@ -694,7 +694,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         for(IRI nextDirectImport : directImports)
         {
             results.add(nextDirectImport.toOpenRDFURI());
-            System.out.println("  added Context " + nextDirectImport.toOpenRDFURI());
         }
         
         
