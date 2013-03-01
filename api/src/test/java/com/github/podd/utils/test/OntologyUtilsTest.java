@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.impl.LinkedHashModel;
 
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -56,6 +57,24 @@ public class OntologyUtilsTest
                 OntologyUtils.ontologyIDsToModel(Collections.<InferredOWLOntologyID> emptyList(), (Model)null);
         
         Assert.assertNotNull(ontologyIDsToModel);
+        Assert.assertTrue(ontologyIDsToModel.isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToModel(java.util.Collection, org.openrdf.model.Model)}
+     * .
+     */
+    @Test
+    public final void testOntologyIDsToModelEmptyNotNull()
+    {
+        final Model input = new LinkedHashModel();
+        
+        final Model ontologyIDsToModel =
+                OntologyUtils.ontologyIDsToModel(Collections.<InferredOWLOntologyID> emptyList(), input);
+        
+        Assert.assertNotNull(ontologyIDsToModel);
+        Assert.assertEquals(input, ontologyIDsToModel);
         Assert.assertTrue(ontologyIDsToModel.isEmpty());
     }
     
