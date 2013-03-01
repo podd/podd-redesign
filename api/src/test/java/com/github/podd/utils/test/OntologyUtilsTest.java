@@ -11,6 +11,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -53,12 +55,16 @@ public class OntologyUtilsTest
      * .
      */
     @Test
-    public final void testOntologyIDsToModelEmptyNull()
+    public final void testOntologyIDsToModelAnonymousOntology()
     {
+        final Model input = new LinkedHashModel();
+        
         final Model ontologyIDsToModel =
-                OntologyUtils.ontologyIDsToModel(Collections.<InferredOWLOntologyID> emptyList(), (Model)null);
+                OntologyUtils
+                        .ontologyIDsToModel(Arrays.asList(new InferredOWLOntologyID((IRI)null, null, null)), input);
         
         Assert.assertNotNull(ontologyIDsToModel);
+        Assert.assertEquals(input, ontologyIDsToModel);
         Assert.assertTrue(ontologyIDsToModel.isEmpty());
     }
     
@@ -86,17 +92,36 @@ public class OntologyUtilsTest
      * .
      */
     @Test
-    public final void testOntologyIDsToModelAnonymousOntology()
+    public final void testOntologyIDsToModelEmptyNull()
+    {
+        final Model ontologyIDsToModel =
+                OntologyUtils.ontologyIDsToModel(Collections.<InferredOWLOntologyID> emptyList(), (Model)null);
+        
+        Assert.assertNotNull(ontologyIDsToModel);
+        Assert.assertTrue(ontologyIDsToModel.isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToModel(java.util.Collection, org.openrdf.model.Model)}
+     * .
+     */
+    @Test
+    public final void testOntologyIDsToModelNoInferredIRI()
     {
         final Model input = new LinkedHashModel();
         
         final Model ontologyIDsToModel =
-                OntologyUtils
-                        .ontologyIDsToModel(Arrays.asList(new InferredOWLOntologyID((IRI)null, null, null)), input);
+                OntologyUtils.ontologyIDsToModel(
+                        Arrays.asList(new InferredOWLOntologyID(IRI.create("urn:test:ontology:iri:abc"), IRI
+                                .create("urn:test:ontology:iri:abc:version:1"), null)), input);
         
         Assert.assertNotNull(ontologyIDsToModel);
         Assert.assertEquals(input, ontologyIDsToModel);
-        Assert.assertTrue(ontologyIDsToModel.isEmpty());
+        Assert.assertEquals(3, ontologyIDsToModel.size());
+        Assert.assertTrue(ontologyIDsToModel.contains(null, RDF.TYPE, OWL.ONTOLOGY));
+        Assert.assertTrue(ontologyIDsToModel.contains(null, OWL.VERSIONIRI, null));
+        Assert.assertEquals(2, ontologyIDsToModel.filter(null, RDF.TYPE, OWL.ONTOLOGY).size());
     }
     
     /**
@@ -117,6 +142,7 @@ public class OntologyUtilsTest
         Assert.assertNotNull(ontologyIDsToModel);
         Assert.assertEquals(input, ontologyIDsToModel);
         Assert.assertEquals(1, ontologyIDsToModel.size());
+        Assert.assertTrue(ontologyIDsToModel.contains(null, RDF.TYPE, OWL.ONTOLOGY));
     }
     
 }
