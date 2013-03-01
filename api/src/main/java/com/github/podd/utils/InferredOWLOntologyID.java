@@ -160,7 +160,11 @@ public class InferredOWLOntologyID extends OWLOntologyID
     
     public Model toRDF()
     {
-        Model result = new LinkedHashModel();
+        return toRDF(new LinkedHashModel());
+    }
+    
+    public Model toRDF(Model result)
+    {
         ValueFactory vf = ValueFactoryImpl.getInstance();
         result.add(vf.createStatement(this.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
         result.add(vf.createStatement(this.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
