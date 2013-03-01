@@ -60,25 +60,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     /**
-     * Helper method to execute a given SPARQL SELECT query.
-     * 
-     * @param sparqlQuery
-     * @param repositoryConnection
-     * @param contexts
-     * @return The
-     * @throws OpenRDFException
-     */
-    private QueryResultCollector executeSparqlQuery(final String sparqlQuery,
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
-    {
-        this.log.info("Executing SPARQL: \r\n {}", sparqlQuery);
-        
-        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
-        
-        return this.executeSparqlQuery(query, contexts);
-    }
-    
-    /**
      * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
      * 
      * @param sparqlQuery
