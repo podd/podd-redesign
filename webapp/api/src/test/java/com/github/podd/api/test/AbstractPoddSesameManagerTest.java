@@ -740,6 +740,58 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyIRI.toString());
     }
    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getTopObjects(InferredOWLOntologyID, RepositoryConnection)}
+     * .
+     * Test retrieving Top Objects from an artifact with exactly one top object.
+     */
+    @Test
+    public void testGetTopObjectsFromArtifactWithOneTopObject() throws Exception
+    {
+        // prepare: load test artifact
+        InferredOWLOntologyID nextOntologyID =
+                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
+                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+        
+        final List<URI> topObjectList =
+                this.testPoddSesameManager.getTopObjects(nextOntologyID, testRepositoryConnection);
+        
+        Assert.assertEquals("Expected 1 top object", 1, topObjectList.size());
+        Assert.assertEquals("Not the expected top object URI",
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966"),
+                topObjectList.get(0));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getTopObjects(InferredOWLOntologyID, RepositoryConnection)}
+     * .
+     * Test retrieving Top Objects from an artifact which has more than one top object. A PODD
+     * artifact should currently have only 1 top object.
+     */
+    @Test
+    public void testGetTopObjectsFromArtifactWithSeveralTopObjects() throws Exception
+    {
+        final String testResourcePath = "/test/artifacts/3-topobjects.ttl";
+        // prepare: load test artifact
+        InferredOWLOntologyID nextOntologyID = this.loadOntologyFromResource(testResourcePath, null, RDFFormat.TURTLE);
+        
+        final List<URI> topObjectList =
+                this.testPoddSesameManager.getTopObjects(nextOntologyID, testRepositoryConnection);
+        
+        Assert.assertEquals("Expected 3 top objects", 3, topObjectList.size());
+        
+        final List<String> expectedUriList =
+                Arrays.asList(new String[] { "http://purl.org/podd/basic-1-20130205/object:2966",
+                        "http://purl.org/podd/basic-1-20130205/object:2977",
+                        "http://purl.org/podd/basic-1-20130205/object:2988" });
+        
+        for(final URI topObjectUri : topObjectList)
+        {
+            Assert.assertTrue("Unexpected top object", expectedUriList.contains(topObjectUri.stringValue()));
+        }
+    }    
     
     /**
      * Test method for
