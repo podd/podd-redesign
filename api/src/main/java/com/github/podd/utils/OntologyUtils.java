@@ -120,7 +120,7 @@ public class OntologyUtils
                         {
                             for(Statement nextInferredOntology : inferredOntologies)
                             {
-                                if(nextInferredOntology instanceof URI)
+                                if(nextInferredOntology.getObject() instanceof URI)
                                 {
                                     results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
                                             (URI)nextTypeStatement.getObject(), (URI)nextInferredOntology.getObject()));
