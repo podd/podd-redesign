@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Test for OntologyUtils class that translates between RDF and InferredOWLOntologyID instances.
@@ -143,6 +144,30 @@ public class OntologyUtilsTest
         Assert.assertEquals(input, ontologyIDsToModel);
         Assert.assertEquals(1, ontologyIDsToModel.size());
         Assert.assertTrue(ontologyIDsToModel.contains(null, RDF.TYPE, OWL.ONTOLOGY));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToModel(java.util.Collection, org.openrdf.model.Model)}
+     * .
+     */
+    @Test
+    public final void testOntologyIDsToModelWithInferredIRI()
+    {
+        final Model input = new LinkedHashModel();
+        
+        final Model ontologyIDsToModel =
+                OntologyUtils.ontologyIDsToModel(Arrays.asList(new InferredOWLOntologyID(IRI
+                        .create("urn:test:ontology:iri:abc"), IRI.create("urn:test:ontology:iri:abc:version:1"), IRI
+                        .create("urn:inferred:test:ontology:iri:abc:version:1:1"))), input);
+        
+        Assert.assertNotNull(ontologyIDsToModel);
+        Assert.assertEquals(input, ontologyIDsToModel);
+        Assert.assertEquals(5, ontologyIDsToModel.size());
+        Assert.assertTrue(ontologyIDsToModel.contains(null, RDF.TYPE, OWL.ONTOLOGY));
+        Assert.assertTrue(ontologyIDsToModel.contains(null, OWL.VERSIONIRI, null));
+        Assert.assertTrue(ontologyIDsToModel.contains(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
+        Assert.assertEquals(3, ontologyIDsToModel.filter(null, RDF.TYPE, OWL.ONTOLOGY).size());
     }
     
 }
