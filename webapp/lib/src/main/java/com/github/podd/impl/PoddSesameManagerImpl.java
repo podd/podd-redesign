@@ -676,6 +676,26 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return new PoddObjectLabelImpl(null, objectUri, label, description);
     }
     
+    private URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection)
+    throws OpenRDFException
+    {
+        
+        Set<IRI> directImports = getDirectImports(ontologyID, repositoryConnection);
+        
+        List<URI> results = new ArrayList<URI>(directImports.size() + 2);
+        
+        results.add(ontologyID.getVersionIRI().toOpenRDFURI());
+        
+        for(IRI nextDirectImport : directImports)
+        {
+            results.add(nextDirectImport.toOpenRDFURI());
+        }
+        
+        
+        return results.toArray(new URI[0]);
+
+    }    
+    
     private URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID)
     {
         return new URI[] { ontologyID.getVersionIRI().toOpenRDFURI(),
@@ -1167,18 +1187,20 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     /**
-     * Retrieve a list of properties about the given object. The list is ordered based on property
-     * weights.
+     * Retrieve a list of <b>asserted</b> properties about the given object. The list is ordered
+     * based on property weights and secondarily based on property labels.
      * 
-     * RDF:TYPE, RDFS:COMMENT and RDFS:LABEL statements are omitted from the results.
+     * Properties RDF:Type, RDFS:Comment and RDFS:Label as well as properties whose values are
+     * generic OWL concepts (i.e. OWL:Thing, OWL:Individial, OWL:NamedIndividual, OWL:Class)
+     * are not included in the results.
      * 
-     * Note: If only asserted properties are required, the inferred ontology graph should not be
-     * included in the <i>contexts</i> passed into this method.
-     * 
+     * @param artifactID
+     *            The artifact to which this object belongs
      * @param objectUri
+     *            The object whose properties are sought
      * @param repositoryConnection
-     * @param contexts
-     * @return A Map containing all statements about the given object.
+     * @return A List containing URIs of sorted properties about the object
+     * 
      * @throws OpenRDFException
      */
     @Override
@@ -1192,10 +1214,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" ?poddObject ?propertyUri ?value . ");
         
         // for ORDER BY
-        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        sb.append(" OPTIONAL { ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
         
         // value may not have a Label
-        sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        sb.append(" OPTIONAL { ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
         // for ORDER BY
         sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODDBASE_WEIGHT.stringValue() + "> ?weight } . ");
@@ -1213,13 +1235,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" } ");
         sb.append("  ORDER BY ASC(?weight) ASC(?propertyLabel) ");
         
-        this.log.info("Created SPARQL {}", sb.toString());
+        this.log.info("Created SPARQL {} with poddObject bound to {}", sb.toString(), objectUri);
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddObject", objectUri);
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery,
-                        versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+                this.executeSparqlQuery(tupleQuery, this.versionAndSchemaContexts(artifactID, repositoryConnection));
         
         final List<URI> resultList = new ArrayList<URI>();
         for(BindingSet next : queryResults.getBindingSets())

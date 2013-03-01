@@ -739,6 +739,94 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertNotNull("Ontology IRI was null", ontologyIRI);
         Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyIRI.toString());
     }
+   
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getWeightedProperties(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
+     * getWeightedProperties() is invoked for an internal object of an artifact.
+     */
+    @Test
+    public void testGetWeightedPropertiesOfAnInternalObject() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID nextOntologyID =
+                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
+                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+        
+        URI internalObjectUri =
+                ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
+        
+        final List<URI> orderedPropertyUris =
+                this.testPoddSesameManager.getWeightedProperties(nextOntologyID, internalObjectUri,
+                        testRepositoryConnection);
+        
+        // verify:
+        Assert.assertEquals("Incorrect number of statements about Internal Object", 6, orderedPropertyUris.size());
+        
+        final String[] expectedUris =
+                { "http://purl.org/dc/terms/creator",
+                        "http://purl.org/dc/terms/created",
+                        "http://purl.org/podd/ns/poddBase#hasPURL",
+                        "http://purl.org/podd/ns/poddScience#hasAbstract",
+                        "http://purl.org/podd/ns/poddScience#publishedIn",
+                        "http://purl.org/podd/ns/poddScience#hasYear", };
+        for(int i = 0; i < orderedPropertyUris.size(); i++)
+        {
+            Assert.assertEquals("Property URI not in expected position",
+                    ValueFactoryImpl.getInstance().createURI(expectedUris[i]), orderedPropertyUris.get(i));
+        }
+    }    
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getWeightedProperties(InferredOWLOntologyID, URI, RepositoryConnection)}.
+     * 
+     * getWeightedProperties() is invoked for the top object of an artifact.
+     */
+    @Test
+    public void testGetWeightedPropertiesOfATopObject() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID nextOntologyID =
+                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
+                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+        
+        final URI topObjectUri =
+                this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
+        
+        final List<URI> orderedPropertyUris =
+                this.testPoddSesameManager
+                        .getWeightedProperties(nextOntologyID, topObjectUri, testRepositoryConnection);
+
+        // verify:
+        Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
+        
+        final String[] expectedUris =
+                { "http://purl.org/podd/ns/poddScience#hasANZSRC",
+                        "http://purl.org/podd/ns/poddBase#createdAt",
+                        "http://purl.org/dc/terms/creator",
+                        "http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator",
+                        "http://purl.org/podd/ns/poddScience#hasAnalysis",
+                        "http://purl.org/podd/ns/poddScience#hasInvestigation",
+                        "http://purl.org/podd/ns/poddScience#hasProcess",
+                        "http://purl.org/podd/ns/poddScience#hasProjectPlan",
+                        "http://purl.org/podd/ns/poddScience#hasPublication",
+                        "http://purl.org/podd/ns/poddBase#hasPublicationStatus",
+                        "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
+                        "http://purl.org/podd/ns/poddBase#hasStartDate",
+                        "http://purl.org/podd/ns/poddBase#hasTopObjectStatus" };
+        for(int i = 0; i < orderedPropertyUris.size(); i++)
+        {
+            Assert.assertEquals("Property URI not in expected position",
+                    ValueFactoryImpl.getInstance().createURI(expectedUris[i]), orderedPropertyUris.get(i));
+        }
+    }
+    
     
     /**
      * Test method for
