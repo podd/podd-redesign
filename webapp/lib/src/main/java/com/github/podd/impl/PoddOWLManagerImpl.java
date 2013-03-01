@@ -24,9 +24,11 @@ import org.openrdf.repository.util.RDFInserter;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
+import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLImportsDeclaration;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -56,6 +58,8 @@ import org.semanticweb.owlapi.util.InferredSubDataPropertyAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredSubObjectPropertyAxiomGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.manchester.cs.owl.owlapi.OWLImportsDeclarationImpl;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.EmptyOntologyException;
@@ -294,8 +298,9 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      * @throws OWLOntologyCreationException
      * @throws OWLOntologyChangeException
      */
-    private OWLOntology computeInferences(final OWLReasoner nextReasoner, final OWLOntologyID inferredOntologyID)
-        throws ReasonerInterruptedException, TimeOutException, OWLOntologyCreationException, OWLOntologyChangeException
+    private OWLOntology computeInferences(final OWLReasoner nextReasoner, final OWLOntologyID concreteOntologyID,
+            final OWLOntologyID inferredOntologyID) throws ReasonerInterruptedException, TimeOutException,
+        OWLOntologyCreationException, OWLOntologyChangeException
     {
         nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
         
@@ -316,9 +321,12 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         axiomGenerators.add(new InferredSubDataPropertyAxiomGenerator());
         axiomGenerators.add(new InferredSubObjectPropertyAxiomGenerator());
         
-        final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
         final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID);
         
+        this.owlOntologyManager.applyChange(new AddImport(nextInferredAxiomsOntology, new OWLImportsDeclarationImpl(
+                concreteOntologyID.getOntologyIRI())));
+        
+        final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
         iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
         
         return nextInferredAxiomsOntology;
@@ -333,7 +341,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final OWLReasoner nextReasoner = this.createReasoner(nextOntology);
         
         final OWLOntology nextInferredAxiomsOntology =
-                this.computeInferences(nextReasoner, inferredOntologyID.getInferredOWLOntologyID());
+                this.computeInferences(nextReasoner, nextOntology.getOntologyID(),
+                        inferredOntologyID.getInferredOWLOntologyID());
         
         this.dumpOntologyToRepository(nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology
                 .getOntologyID().getOntologyIRI().toOpenRDFURI());
