@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddObjectLabel;
 
 /**
  * Manages interactions with Sesame Repositories for PODD.
@@ -231,5 +232,8 @@ public interface PoddSesameManager
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     Set<IRI> getDirectImports(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
+
+    PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
     
 }

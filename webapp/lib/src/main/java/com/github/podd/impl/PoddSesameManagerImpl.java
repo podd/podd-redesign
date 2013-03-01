@@ -20,14 +20,12 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResults;
 import org.openrdf.query.TupleQuery;
@@ -44,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
@@ -574,11 +571,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /**
      * Retrieves the most specific types of the given object as a List of URIs.
      * 
-     * NOTE: Only the asserted and inferred graphs of the artifact to which the given object
-     * belongs to are searched for TYPE statements.
-     * 
-     * If an object from an imported ontology is referred, this method will fail to find 
-     * anything as the imported ontologies are not searched.
+     * The contexts searched in are, the given ongology's asserted and inferred graphs as well as
+     * their imported schema ontology graphs.
      * 
      * FIXME: Fix the algorithm for this to return only the most specific types
      * 
@@ -612,8 +606,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery, versionAndInferredContexts(ontologyID));
-
+                this.executeSparqlQuery(tupleQuery,
+                        this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
+        
         List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
         
         for(BindingSet next : queryResults.getBindingSets())
@@ -622,6 +617,63 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         
         return results;
+    }
+    
+    /**
+     * Given an object URI, this method attempts to retrieve its label (rdfs:label) and description
+     * (rdfs:comment) encapsulated in a <code>PoddObjectLabel</code> instance.
+     * 
+     * If a label is not found, the local name from the Object URI is used as the label.
+     * 
+     * @param ontologyID
+     *            Is used to decide on the graphs in which to search for a label. This includes the
+     *            given ontology as well as its imports.
+     * @param objectUri
+     *            The object whose label and description are sought.
+     * @param repositoryConnection
+     * @return
+     * @throws OpenRDFException
+     */
+    @Override
+    public PoddObjectLabel getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ?label ?description ");
+        sb.append(" WHERE { ");
+        sb.append(" OPTIONAL { ?objectUri <" + RDFS.LABEL + "> ?label . } ");
+        sb.append(" OPTIONAL { ?objectUri <" + RDFS.COMMENT + "> ?description . } ");
+        sb.append(" }");
+        
+        this.log.info("Created SPARQL {} with objectUri bound to {}", sb.toString(), objectUri);
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("objectUri", objectUri);
+        final QueryResultCollector queryResults =
+                this.executeSparqlQuery(tupleQuery,
+                        this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
+        
+        String label = null;
+        String description = null;
+        
+        for(BindingSet next : queryResults.getBindingSets())
+        {
+            if(next.getValue("label") != null)
+            {
+                label = next.getValue("label").stringValue();
+            }
+            else
+            {
+                label = objectUri.getLocalName();
+            }
+            
+            if(next.getValue("description") != null)
+            {
+                description = next.getValue("description").stringValue();
+            }
+        }
+        
+        return new PoddObjectLabelImpl(null, objectUri, label, description);
     }
     
     private URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID)
@@ -642,7 +694,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         for(IRI nextDirectImport : directImports)
         {
             results.add(nextDirectImport.toOpenRDFURI());
+            System.out.println("  added Context " + nextDirectImport.toOpenRDFURI());
         }
+        
         
         return results.toArray(new URI[0]);
     }
