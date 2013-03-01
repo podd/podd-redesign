@@ -585,8 +585,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery,
-                        this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
+                this.executeSparqlQuery(tupleQuery, this.versionAndSchemaContexts(ontologyID, repositoryConnection));
         
         List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
         
