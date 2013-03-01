@@ -113,7 +113,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         final URI inferredOntologyURI = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
         
-        DebugUtils.printContents(testRepositoryConnection, inferredOntologyURI);
+        //DebugUtils.printContents(testRepositoryConnection, inferredOntologyURI);
         Assert.assertEquals("Wrong inferred statement count", inferredStatements,
                 this.testRepositoryConnection.size(inferredOntologyURI));
         
