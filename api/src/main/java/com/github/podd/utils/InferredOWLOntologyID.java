@@ -166,15 +166,22 @@ public class InferredOWLOntologyID extends OWLOntologyID
     public Model toRDF(Model result)
     {
         ValueFactory vf = ValueFactoryImpl.getInstance();
-        result.add(vf.createStatement(this.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-        result.add(vf.createStatement(this.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-        result.add(vf.createStatement(this.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, this.getVersionIRI()
-                .toOpenRDFURI()));
-        if(this.getInferredOntologyIRI() != null)
+        
+        if(this.getOntologyIRI() != null)
         {
-            result.add(vf.createStatement(this.getInferredOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-            result.add(vf.createStatement(this.getVersionIRI().toOpenRDFURI(),
-                    PoddRdfConstants.PODD_BASE_INFERRED_VERSION, this.getInferredOntologyIRI().toOpenRDFURI()));
+            result.add(vf.createStatement(this.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+            if(this.getVersionIRI() != null)
+            {
+                result.add(vf.createStatement(this.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+                result.add(vf.createStatement(this.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, this
+                        .getVersionIRI().toOpenRDFURI()));
+                if(this.getInferredOntologyIRI() != null)
+                {
+                    result.add(vf.createStatement(this.getInferredOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+                    result.add(vf.createStatement(this.getVersionIRI().toOpenRDFURI(),
+                            PoddRdfConstants.PODD_BASE_INFERRED_VERSION, this.getInferredOntologyIRI().toOpenRDFURI()));
+                }
+            }
         }
         
         return result;
