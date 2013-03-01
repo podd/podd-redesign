@@ -4,13 +4,19 @@
 package com.github.podd.utils.test;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.semanticweb.owlapi.model.IRI;
@@ -26,16 +32,57 @@ import com.github.podd.utils.PoddRdfConstants;
  */
 public class OntologyUtilsTest
 {
+    private URI testOntologyUri1;
+    private URI testVersionUri1;
+    private URI testInferredUri1;
+    private ValueFactory vf;
+    
+    @Before
+    public void setUp() throws Exception
+    {
+        this.vf = ValueFactoryImpl.getInstance();
+        this.testOntologyUri1 = this.vf.createURI("urn:test:ontology:uri:1");
+        this.testVersionUri1 = this.vf.createURI("urn:test:ontology:uri:1:version:1");
+        this.testInferredUri1 = this.vf.createURI("urn:inferred:test:ontology:uri:1:version:1");
+        
+    }
+    
+    @After
+    public void tearDown() throws Exception
+    {
+        this.vf = null;
+        this.testOntologyUri1 = null;
+        this.testVersionUri1 = null;
+        this.testInferredUri1 = null;
+    }
     
     /**
      * Test method for
      * {@link com.github.podd.utils.OntologyUtils#modelToOntologyIDs(org.openrdf.model.Model)}.
      */
-    @Ignore
     @Test
-    public final void testModelToOntologyIDs()
+    public final void testModelToOntologyIDsEmpty()
     {
-        Assert.fail("Not yet implemented"); // TODO
+        final Model input = new LinkedHashModel();
+        final Collection<InferredOWLOntologyID> modelToOntologyIDs = OntologyUtils.modelToOntologyIDs(input);
+        
+        // No statements, should return an empty collection
+        Assert.assertEquals(0, modelToOntologyIDs.size());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#modelToOntologyIDs(org.openrdf.model.Model)}.
+     */
+    @Test
+    public final void testModelToOntologyIDsNoVersion()
+    {
+        final Model input = new LinkedHashModel();
+        input.add(this.vf.createStatement(this.testOntologyUri1, RDF.TYPE, OWL.ONTOLOGY));
+        final Collection<InferredOWLOntologyID> modelToOntologyIDs = OntologyUtils.modelToOntologyIDs(input);
+        
+        // Must have a version to be returned
+        Assert.assertEquals(0, modelToOntologyIDs.size());
     }
     
     /**
