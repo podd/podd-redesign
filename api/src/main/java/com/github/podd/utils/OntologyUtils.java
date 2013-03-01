@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 public class OntologyUtils
 {
     private static final Logger log = LoggerFactory.getLogger(OntologyUtils.class);
+    
     private OntologyUtils()
     {
     }
@@ -115,6 +116,8 @@ public class OntologyUtils
                         
                         if(inferredOntologies.isEmpty())
                         {
+                            // If there were no poddBase#inferredVersion statements, backup by
+                            // trying to infer the versions using owl:imports
                             Model importsOntologies = input.filter(null, OWL.IMPORTS, (URI)nextVersion.getObject());
                             
                             if(importsOntologies.isEmpty())
@@ -135,7 +138,7 @@ public class OntologyUtils
                                     {
                                         log.error("Found a non-URI import statement: {}", nextImportOntology);
                                     }
-                                        
+                                    
                                 }
                             }
                         }
