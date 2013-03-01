@@ -515,20 +515,19 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     {
         final StringBuilder sb = new StringBuilder();
         
-        sb.append("SELECT ?topObjectUri ?topObjectLabel ?topObjectDescription ?artifactUri ");
+        sb.append("SELECT ?topObjectUri ?artifactUri ");
         
         sb.append(" WHERE { ");
         
         sb.append(" ?artifactUri <" + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT.stringValue() + "> ?topObjectUri . \n");
         
-        sb.append(" OPTIONAL {  ?topObjectUri <" + RDFS.LABEL.stringValue() + "> ?topObjectLabel . } \n");
-        
-        sb.append(" OPTIONAL {  ?topObjectUri <" + RDFS.COMMENT.stringValue() + "> ?topObjectDescription . } \n");
-        
         sb.append(" }");
         
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        query.setBinding("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
+        
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(sb.toString(), repositoryConnection, versionAndInferredContexts(ontologyID));
+                this.executeSparqlQuery(query, versionAndInferredContexts(ontologyID));
         
         final List<URI> topObjectList = new ArrayList<URI>();
         

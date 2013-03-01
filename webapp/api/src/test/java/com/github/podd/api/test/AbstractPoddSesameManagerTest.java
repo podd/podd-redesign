@@ -130,11 +130,11 @@ public abstract class AbstractPoddSesameManagerTest
                     GraphUtil.getUniqueSubjectURI(inferredModel, RDF.TYPE, OWL.ONTOLOGY));
         }
         
-        concreteModel.filter(null, OWL.VERSIONIRI, null);
-        
+        URI ontologyURI = GraphUtil.getUniqueSubjectURI(concreteModel, RDF.TYPE, OWL.ONTOLOGY);
+        log.info("ontology URI: {}", ontologyURI);
         // dump the statements into the correct context of the Repository
         this.testRepositoryConnection.add(concreteModel,
-                GraphUtil.getUniqueSubjectURI(concreteModel, OWL.VERSIONIRI, null));
+                GraphUtil.getUniqueObjectURI(concreteModel, ontologyURI, OWL.VERSIONIRI));
         
         Model totalModel = new LinkedHashModel(concreteModel);
         totalModel.addAll(inferredModel);
@@ -752,6 +752,10 @@ public abstract class AbstractPoddSesameManagerTest
                 this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
                         "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
         
+        // DebugUtils.printContexts(testRepositoryConnection);
+        // DebugUtils.printContents(testRepositoryConnection,
+        // nextOntologyID.getVersionIRI().toOpenRDFURI());
+        
         final List<URI> topObjectList =
                 this.testPoddSesameManager.getTopObjects(nextOntologyID, testRepositoryConnection);
         
@@ -804,12 +808,10 @@ public abstract class AbstractPoddSesameManagerTest
                 this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
                         "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
         
-        Assert.assertEquals(
-                "http://purl.org/podd/basic-2-20130206/artifact:1",
-                nextOntologyID.getOntologyIRI().toString());
-        Assert.assertEquals(
-                "http://purl.org/podd/basic-2-20130206/artifact:version:1",
-                nextOntologyID.getVersionIRI().toString());
+        Assert.assertEquals("http://purl.org/podd/basic-2-20130206/artifact:1", nextOntologyID.getOntologyIRI()
+                .toString());
+        Assert.assertEquals("http://purl.org/podd/basic-2-20130206/artifact:version:1", nextOntologyID.getVersionIRI()
+                .toString());
         Assert.assertEquals(
                 "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/basic-2-20130206/artifact:1:version:1",
                 nextOntologyID.getInferredOntologyIRI().toString());
