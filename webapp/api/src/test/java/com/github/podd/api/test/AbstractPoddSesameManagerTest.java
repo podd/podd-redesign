@@ -839,11 +839,115 @@ public abstract class AbstractPoddSesameManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getSchemaVersion(IRI, RepositoryConnection, URI)}
-     * .
-     * A non-current version IRI is passed in to sesameManager.getSchemaVersion() with the
-     * aim of getting the Ontology ID of that version in return.
+     * . Null is passed in to sesameManager.getSchemaVersion() and a NullPointerException is
+     * expected.
+     * 
      */
-    @Ignore
+    @Test
+    public void testGetSchemaVersionWithNullOntologyIRI() throws Exception
+    {
+        // prepare: create schema management graph
+        final URI schemaGraph = this.populateSchemaManagementGraph();
+        
+        // invoke test method:
+        try
+        {
+            this.testPoddSesameManager.getSchemaVersion(null, this.testRepositoryConnection, schemaGraph);
+            Assert.fail("Should have thrown a RuntimeException");
+            
+        }
+        catch(final RuntimeException e)
+        {
+            Assert.assertTrue("Not a NullPointerException as expected", e instanceof NullPointerException);
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getSchemaVersion(IRI, RepositoryConnection, URI)}
+     * . An unknown IRI is passed in to sesameManager.getSchemaVersion() and an
+     * UnmanagedSchemaIRIException is expected.
+     */
+    @Test
+    public void testGetSchemaVersionWithUnmanagedVersionIRI() throws Exception
+    {
+        // prepare: create schema management graph
+        final URI schemaGraph = this.populateSchemaManagementGraph();
+        
+        IRI unmanagedSchemaVersionIri = IRI.create("http://purl.org/podd/ns/version/poddPlant/9999");
+        
+        try
+        {
+            this.testPoddSesameManager.getSchemaVersion(unmanagedSchemaVersionIri, this.testRepositoryConnection,
+                    schemaGraph);
+            Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
+        }
+        catch(final UnmanagedSchemaIRIException e)
+        {
+            Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
+                    e.getMessage());
+            Assert.assertEquals(unmanagedSchemaVersionIri, e.getOntologyID());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getSchemaVersion(IRI, RepositoryConnection, URI)}
+     * . An ontology IRI is passed in to sesameManager.getSchemaVersion(). The current version's
+     * Ontology ID should be returned.
+     */
+    @Test
+    public void testGetSchemaVersionWithOntologyIRI() throws Exception
+    {
+        // prepare: create schema management graph
+        final URI schemaGraph = this.populateSchemaManagementGraph();
+        
+        // invoke test method:
+        final InferredOWLOntologyID ontologyID =
+                this.testPoddSesameManager.getSchemaVersion(IRI.create("http://purl.org/podd/ns/poddPlant"),
+                        this.testRepositoryConnection, schemaGraph);
+        
+        // verify:
+        Assert.assertNotNull("Returned NULL OntologyID", ontologyID);
+        Assert.assertEquals("Not the expected version",
+                IRI.create("http://purl.org/podd/ns/version/poddPlant/2"), ontologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected inferred version",
+                IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2"),
+                ontologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getSchemaVersion(IRI, RepositoryConnection, URI)}
+     * . The current version IRI is passed in to sesameManager.getSchemaVersion() with the aim of
+     * getting the Ontology ID of that version in return.
+     */
+    @Test
+    public void testGetSchemaVersionWithVersionIRICurrent() throws Exception
+    {
+        // prepare: create schema management graph
+        final URI schemaGraph = this.populateSchemaManagementGraph();
+        
+        // invoke test method:
+        final InferredOWLOntologyID ontologyID =
+                this.testPoddSesameManager.getSchemaVersion(IRI.create("http://purl.org/podd/ns/version/poddPlant/2"),
+                        this.testRepositoryConnection, schemaGraph);
+        
+        // verify:
+        Assert.assertNotNull("Returned NULL ontologyID", ontologyID);
+        Assert.assertEquals("Not the expected version",
+                IRI.create("http://purl.org/podd/ns/version/poddPlant/2"), ontologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected inferred version",
+                IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2"),
+                ontologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getSchemaVersion(IRI, RepositoryConnection, URI)}
+     * . A non-current version IRI is passed in to sesameManager.getSchemaVersion() with the aim of
+     * getting the Ontology ID of that version in return.
+     */
     @Test
     public void testGetSchemaVersionWithVersionIRINotCurrent() throws Exception
     {
@@ -851,20 +955,19 @@ public abstract class AbstractPoddSesameManagerTest
         final URI schemaGraph = this.populateSchemaManagementGraph();
         
         // invoke test method:
-        final InferredOWLOntologyID inferredOntologyID =
-                this.testPoddSesameManager.getSchemaVersion(
-                        IRI.create("http://purl.org/podd/ns/version/poddPlant/1"), this.testRepositoryConnection,
-                        schemaGraph);
+        final InferredOWLOntologyID ontologyID =
+                this.testPoddSesameManager.getSchemaVersion(IRI.create("http://purl.org/podd/ns/version/poddPlant/1"),
+                        this.testRepositoryConnection, schemaGraph);
         
         // verify:
-        Assert.assertNotNull("Returned NULL inferredOntologyID", inferredOntologyID);
-        Assert.assertEquals("Not the expected current version",
-                IRI.create("http://purl.org/podd/ns/version/poddPlant/1"), inferredOntologyID.getVersionIRI());
-        Assert.assertEquals("Not the expected current inferred version",
+        Assert.assertNotNull("Returned NULL ontologyID", ontologyID);
+        Assert.assertEquals("Not the expected version",
+                IRI.create("http://purl.org/podd/ns/version/poddPlant/1"), ontologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/1"),
-                inferredOntologyID.getInferredOntologyIRI());
+                ontologyID.getInferredOntologyIRI());
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getTopObjects(InferredOWLOntologyID, RepositoryConnection)}

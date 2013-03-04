@@ -494,11 +494,42 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection conn,
-            URI schemaManagementGraph)
+    public InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection repositoryConnection,
+            URI schemaManagementGraph) throws OpenRDFException, UnmanagedSchemaIRIException
     {
-        // TODO Auto-generated method stub
-        return null;
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(schemaManagementGraph);
+        
+        // 1: see if the given IRI exists as a version IRI
+        final StringBuilder sb2 = new StringBuilder();
+        sb2.append("SELECT ?ontologyIri ?inferredIri WHERE { ");
+        sb2.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
+        sb2.append(" ?ontologyIri <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
+        sb2.append(" ?versionIri <" + PoddRdfConstants.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredIri . ");
+        sb2.append(" }");
+        
+        this.log.info("Generated SPARQL {} with versionIri bound to <{}>", sb2.toString(), schemaVersionIRI.toString());
+        
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb2.toString());
+        query.setBinding("versionIri", schemaVersionIRI.toOpenRDFURI());
+        query.setDataset(dataset);
+        
+        final TupleQueryResult queryResults = query.evaluate();
+        
+        final QueryResultCollector resultsCollector = new QueryResultCollector();
+        QueryResults.report(queryResults, resultsCollector);
+        
+        for(final BindingSet nextResult : resultsCollector.getBindingSets())
+        {
+            final String nextOntologyIRI = nextResult.getValue("ontologyIri").stringValue();
+            final String nextInferredIRI = nextResult.getValue("inferredIri").stringValue();
+            
+            // return the first solution since there should only be only one result
+            return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), schemaVersionIRI, IRI.create(nextInferredIRI));
+        }
+        
+        // not a version IRI, return the current schema version
+        return this.getCurrentSchemaVersion(schemaVersionIRI, repositoryConnection, schemaManagementGraph);
     }
     
     /**
