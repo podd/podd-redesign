@@ -185,6 +185,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public List<InferredOWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
     {
+        //FIXME: This implementation doesn't seem correct. Verify with tests.
         return this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
     }
     
