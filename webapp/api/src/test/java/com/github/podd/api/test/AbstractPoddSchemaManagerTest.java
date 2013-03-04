@@ -343,12 +343,6 @@ public abstract class AbstractPoddSchemaManagerTest
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantV2.owl");
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
         
-        RepositoryConnection conn = this.testRepositoryManager.getRepository().getConnection();
-        DebugUtils.printContexts(conn);
-        DebugUtils.printContents(conn, ValueFactoryImpl.getInstance().createURI("urn:podd:default:schemamanagementgraph"));
-        conn.rollback();
-        conn.close();
-        
         String[] testIRIs = {
                 "http://purl.org/podd/ns/version/poddUser/1", 
                 "http://purl.org/podd/ns/version/poddBase/1", 
