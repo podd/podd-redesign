@@ -266,10 +266,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     /**
      * Inner helper method for getCurrentArtifactVersion() and getCurrentSchemaVersion().
      * 
+     * If the input ontologyIRI is either an Ontology IRI or Version IRI for a managed ontology, the
+     * ID of the current version of this ontology is returned.
+     * 
      * @param ontologyIRI
+     *         Either an Ontology IRI or Version IRI for which the current version is requested. 
      * @param repositoryConnection
      * @param managementGraph
-     * @return
+     * @return A List of InferredOWLOntologyIDs. If the ontology is managed, the list will contain
+     *         one entry for its current version. Otherwise the list will be empty.
      * @throws OpenRDFException
      */
     private List<InferredOWLOntologyID> getCurrentVersionsInternal(final IRI ontologyIRI,
@@ -312,9 +317,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         // 2: see if the given IRI exists as a version IRI
         final StringBuilder sb2 = new StringBuilder();
-        sb2.append("SELECT ?x ?civ WHERE { ");
-        sb2.append(" ?x <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?versionIri . ");
+        sb2.append("SELECT ?x ?cv ?civ WHERE { ");
         sb2.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
+        sb2.append(" ?x <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
+        sb2.append(" ?x <" + OWL.VERSIONIRI.stringValue() + "> ?cv . ");
+        sb2.append(" ?x <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
         sb2.append(" ?x <" + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
         sb2.append(" }");
         
@@ -332,9 +339,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         for(final BindingSet nextResult : nextResults2.getBindingSets())
         {
             final String nextOntologyIRI = nextResult.getValue("x").stringValue();
+            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
             final String nextInferredIRI = nextResult.getValue("civ").stringValue();
             
-            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), ontologyIRI, IRI
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), IRI
                     .create(nextInferredIRI)));
         }
         
