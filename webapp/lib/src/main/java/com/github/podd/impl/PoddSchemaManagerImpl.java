@@ -58,13 +58,33 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     
     @Override
     public InferredOWLOntologyID getCurrentSchemaOntologyVersion(final IRI schemaOntologyIRI)
-        throws UnmanagedSchemaIRIException
+        throws UnmanagedSchemaIRIException, OpenRDFException
     {
         if(schemaOntologyIRI == null)
         {
             throw new UnmanagedSchemaIRIException(schemaOntologyIRI, "NULL is not a managed schema ontology");
         }
-        throw new RuntimeException("TODO: Implement getCurrentSchemaOntologyVersion(IRI)");
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repositoryManager.getRepository().getConnection();
+            conn.begin();
+            
+            return this.sesameManager.getCurrentSchemaVersion(schemaOntologyIRI, conn,
+                    this.repositoryManager.getSchemaManagementGraph());
+        }
+        finally
+        {
+            if(conn != null && conn.isActive())
+            {
+                conn.rollback();
+            }
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
     }
     
     @Override
