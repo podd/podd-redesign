@@ -397,6 +397,20 @@ public abstract class AbstractPoddSchemaManagerTest
         }
     }
     
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testGetSchemaOntologyVersion() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.IRI)}

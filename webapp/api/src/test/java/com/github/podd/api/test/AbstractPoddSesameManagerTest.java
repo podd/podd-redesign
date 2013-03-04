@@ -14,6 +14,7 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -833,6 +834,35 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Ontology IRI was null", ontologyIRI);
         Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyIRI.toString());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getSchemaVersion(IRI, RepositoryConnection, URI)}
+     * .
+     * A non-current version IRI is passed in to sesameManager.getSchemaVersion() with the
+     * aim of getting the Ontology ID of that version in return.
+     */
+    @Ignore
+    @Test
+    public void testGetSchemaVersionWithVersionIRINotCurrent() throws Exception
+    {
+        // prepare: create schema management graph
+        final URI schemaGraph = this.populateSchemaManagementGraph();
+        
+        // invoke test method:
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testPoddSesameManager.getSchemaVersion(
+                        IRI.create("http://purl.org/podd/ns/version/poddPlant/1"), this.testRepositoryConnection,
+                        schemaGraph);
+        
+        // verify:
+        Assert.assertNotNull("Returned NULL inferredOntologyID", inferredOntologyID);
+        Assert.assertEquals("Not the expected current version",
+                IRI.create("http://purl.org/podd/ns/version/poddPlant/1"), inferredOntologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected current inferred version",
+                IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/1"),
+                inferredOntologyID.getInferredOntologyIRI());
     }
     
     /**
