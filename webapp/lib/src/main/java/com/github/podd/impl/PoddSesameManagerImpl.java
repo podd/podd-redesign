@@ -282,17 +282,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         dataset.addNamedGraph(managementGraph);
         
         // 1: see if the given IRI exists as an ontology IRI
-        final String sparqlQuery1 =
-                "SELECT ?cv ?civ WHERE { " + ontologyIRI.toQuotedString() + " <" + RDF.TYPE.stringValue() + "> <"
-                        + OWL.ONTOLOGY.stringValue() + "> . " + ontologyIRI.toQuotedString() + " <"
-                        + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . "
-                        + ontologyIRI.toQuotedString() + " <"
-                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . " + " }";
-        // SELECT ?cv ?civ WHERE { <iri> :type owl:ontology . <iri> omv:current-version ?cv . <iri>
-        // :current-inferred-version ?civ . }
-        this.log.info("Generated SPARQL {}", sparqlQuery1);
+        final StringBuilder sb1 = new StringBuilder();
+        sb1.append("SELECT ?cv ?civ WHERE { ");
+        sb1.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
+        sb1.append(" ?ontologyIri <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
+        sb1.append(" ?ontologyIri <" + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+
+        sb1.append(" }");
         
-        final TupleQuery query1 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery1);
+        this.log.info("Generated SPARQL {} with ontologyIri bound to {}", sb1.toString(), ontologyIRI.toString());
+        
+        final TupleQuery query1 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb1.toString());
+        query1.setBinding("ontologyIri", ontologyIRI.toOpenRDFURI());
         query1.setDataset(dataset);
         
         final TupleQueryResult query1Results = query1.evaluate();
@@ -310,16 +311,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         
         // 2: see if the given IRI exists as a version IRI
-        final String sparqlQuery2 =
-                "SELECT ?x ?civ WHERE { " + " ?x <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> "
-                        + ontologyIRI.toQuotedString() + " . " + " ?x <" + RDF.TYPE.stringValue() + "> <"
-                        + OWL.ONTOLOGY.stringValue() + "> . " + " ?x <"
-                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . " + " }";
-        // SELECT ?x ?civ WHERE { ?x omv:current-version <iri> . ?x :type owl:ontology . ?x
-        // :current-inferred-version ?civ . }
-        this.log.info("Generated SPARQL {}", sparqlQuery2);
+        final StringBuilder sb2 = new StringBuilder();
+        sb2.append("SELECT ?x ?civ WHERE { ");
+        sb2.append(" ?x <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?versionIri . ");
+        sb2.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
+        sb2.append(" ?x <" + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+        sb2.append(" }");
         
-        final TupleQuery query2 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery2);
+        this.log.info("Generated SPARQL {} with versionIri bound to {}", sb2.toString(), ontologyIRI.toString());
+        
+        final TupleQuery query2 = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb2.toString());
+        query2.setBinding("versionIri", ontologyIRI.toOpenRDFURI());
         query2.setDataset(dataset);
         
         final TupleQueryResult queryResults2 = query2.evaluate();
