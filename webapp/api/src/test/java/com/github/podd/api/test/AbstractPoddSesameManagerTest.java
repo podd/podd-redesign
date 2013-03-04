@@ -16,7 +16,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -645,6 +644,43 @@ public abstract class AbstractPoddSesameManagerTest
             Assert.assertEquals("Incorrect Object URI", objectUri, objectLabel.getObjectURI());
             Assert.assertEquals("Wrong Label", expectedLabels[i], objectLabel.getLabel());
             Assert.assertEquals("Wrong Description", expectedDescriptions[i], objectLabel.getDescription());
+        }
+    }
+    
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getObjectDetailsForDisplay(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
+     */
+    @Test
+    public void testGetObjectDetailsForDisplay() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
+                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+        
+        final String[] objectUris =
+                { "http://purl.org/podd/basic-1-20130206/object:2966",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                // "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable",
+                };
+        
+        // test in a loop these PODD objects for their display Models
+        for(int i = 0; i < objectUris.length; i++)
+        {
+            final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
+            
+            Model displayModel =
+                    this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
+                            this.testRepositoryConnection);
+            
+            // verify:
+            Assert.assertNotNull("Display Model is null", displayModel);
+            Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
         }
     }
     
