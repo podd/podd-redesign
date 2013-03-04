@@ -86,6 +86,13 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
     }
+
+    @Override
+    public InferredOWLOntologyID getSchemaOntologyVersion(final IRI schemaVersionIRI)
+        throws UnmanagedSchemaIRIException, OpenRDFException
+    {
+        throw new RuntimeException("TODO: Implement getSchemaOntology(IRI)");
+    }        
     
     @Override
     public OWLOntology getSchemaOntology(final IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException
