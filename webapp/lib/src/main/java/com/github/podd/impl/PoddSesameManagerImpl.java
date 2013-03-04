@@ -493,6 +493,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return ontologyIRI;
     }
     
+    @Override
+    public InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection conn,
+            URI schemaManagementGraph)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
     /**
      * Retrieve a list of Top Objects that are contained in the given ontology.
      * 
@@ -1257,4 +1265,5 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         return resultList;
     }
+
 }

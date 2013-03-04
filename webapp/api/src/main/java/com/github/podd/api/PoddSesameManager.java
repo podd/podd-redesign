@@ -143,6 +143,27 @@ public interface PoddSesameManager
     IRI getOntologyIRI(final RepositoryConnection repositoryConnection, final URI context) throws OpenRDFException;
     
     /**
+     * If the given IRI represents a version IRI of a schema ontology, the Ontology ID for this
+     * schema version is returned. If the given IRI represents an ontology IR of a schema ontology,
+     * the Ontology ID for the most current version of this schema ontology is returned.
+     * 
+     * 
+     * @param schemaVersionIRI
+     *            The IRI of the ontology to get current version info.
+     * @param conn
+     * @param schemaManagementGraph
+     *            The context of the Schema Management Graph
+     * @return An InferredOWLOntologyID containing details of the ontology.
+     * @throws OpenRDFException
+     * @throws UnmanagedSchemaIRIException
+     *             If the given IRI does not refer to a managed schema ontology
+     * 
+     * @since 04/03/2013
+     */
+    InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection conn, URI schemaManagementGraph)
+        throws OpenRDFException, UnmanagedSchemaIRIException;
+    
+    /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
      * ontologyID were previously published.
      * 
@@ -235,5 +256,5 @@ public interface PoddSesameManager
 
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
-    
+
 }
