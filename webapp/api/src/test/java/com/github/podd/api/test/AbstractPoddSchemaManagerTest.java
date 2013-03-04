@@ -10,8 +10,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.io.UnparsableOntologyException;
 import org.semanticweb.owlapi.model.IRI;
@@ -25,7 +23,6 @@ import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -371,11 +368,20 @@ public abstract class AbstractPoddSchemaManagerTest
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
      * .
      */
-    @Ignore
     @Test
     public final void testGetCurrentSchemaOntologyVersionNoMatches() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        IRI testInputIri = IRI.create("http://purl.org/podd/noSuchSchema");
+        try
+        {
+            this.testSchemaManager.getCurrentSchemaOntologyVersion(testInputIri);
+            Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
+        }
+        catch(UnmanagedSchemaIRIException e)
+        {
+            Assert.assertEquals("This IRI does not refer to a managed ontology", e.getMessage());
+            Assert.assertEquals(testInputIri, e.getOntologyID());
+        }
     }
     
     /**
@@ -396,21 +402,7 @@ public abstract class AbstractPoddSchemaManagerTest
             Assert.assertEquals("NULL is not a managed schema ontology", e.getMessage());
         }
     }
-    
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testGetSchemaOntologyVersion() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
-    
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.IRI)}
@@ -520,6 +512,111 @@ public abstract class AbstractPoddSchemaManagerTest
     public final void testGetSchemaOntologyOWLOntologyIDOntologyVersionDoesNotExist() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)} .
+     * Passes in a version IRI (of the current version) and retrieves the same version of the
+     * Ontology.
+     */
+    @Test
+    public final void testGetSchemaOntologyVersionMatchesOntologyIRI() throws Exception
+    {
+        this.internalTestGetSchemaOntologyVersion("http://purl.org/podd/ns/poddPlant",
+                "http://purl.org/podd/ns/poddPlant", "http://purl.org/podd/ns/version/poddPlant/2");
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)} .
+     * Passes in a version IRI (of the current version) and retrieves the same version of the
+     * Ontology.
+     */
+    @Test
+    public final void testGetSchemaOntologyVersionMatchesOntologyVersionIRICurrent() throws Exception
+    {
+        this.internalTestGetSchemaOntologyVersion("http://purl.org/podd/ns/version/poddPlant/2",
+                "http://purl.org/podd/ns/poddPlant", "http://purl.org/podd/ns/version/poddPlant/2");
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)} .
+     * Passes in a version IRI (of an older version) and retrieves that version of the Ontology.
+     */
+    @Test
+    public final void testGetSchemaOntologyVersionMatchesOntologyVersionIRINotCurrent() throws Exception
+    {
+        this.internalTestGetSchemaOntologyVersion("http://purl.org/podd/ns/version/poddPlant/1",
+                "http://purl.org/podd/ns/poddPlant", "http://purl.org/podd/ns/version/poddPlant/1");
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)} .
+     */
+    @Test
+    public final void testGetSchemaOntologyVersionNoMatches() throws Exception
+    {
+        IRI inputVersionIri = IRI.create("http://purl.org/podd/ns/version/poddPlant/999");
+        
+        // prepare: load schema ontologies into PODD
+        this.loadSchemaOntologies();
+        final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantV2.owl");
+        this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
+        
+        try
+        {
+            this.testSchemaManager.getSchemaOntologyVersion(inputVersionIri);
+            Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
+        }
+        catch(UnmanagedSchemaIRIException e)
+        {
+            Assert.assertEquals("This IRI does not refer to a managed ontology", e.getMessage());
+            Assert.assertEquals(inputVersionIri, e.getOntologyID());
+        }
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)} .
+     * Passes in null as the version IRI.
+     */
+    @Test
+    public final void testGetSchemaOntologyVersionNull() throws Exception
+    {
+        try
+        {
+            this.testSchemaManager.getSchemaOntologyVersion(null);
+            Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
+        }
+        catch(UnmanagedSchemaIRIException e)
+        {
+            Assert.assertEquals("NULL is not a managed schema ontology", e.getMessage());
+        }
+    }
+    
+    /**
+     * Internal helper test method for
+     * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)}
+     * 
+     * @param inputVersionIri
+     *            The test input
+     * @param expectedOntologyIri
+     *            Ontology IRI of expected result
+     * @param expectedVersionIri
+     *            Version IRI of expected result
+     * @throws Exception
+     */
+    private final void internalTestGetSchemaOntologyVersion(String inputVersionIri, String expectedOntologyIri,
+            String expectedVersionIri) throws Exception
+    {
+        // prepare: load schema ontologies into PODD
+        this.loadSchemaOntologies();
+        final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantV2.owl");
+        this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
+        
+        InferredOWLOntologyID ontologyID = this.testSchemaManager.getSchemaOntologyVersion(IRI.create(inputVersionIri));
+        Assert.assertEquals("Expected version IRI does not match received value", IRI.create(expectedVersionIri),
+                ontologyID.getVersionIRI());
+        Assert.assertEquals("Expected ontology IRI does not match received value", IRI.create(expectedOntologyIri),
+                ontologyID.getOntologyIRI());
     }
     
     /**

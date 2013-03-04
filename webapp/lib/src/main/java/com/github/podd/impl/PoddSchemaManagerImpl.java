@@ -91,8 +91,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public InferredOWLOntologyID getSchemaOntologyVersion(final IRI schemaVersionIRI)
         throws UnmanagedSchemaIRIException, OpenRDFException
     {
-        // FIXME: to be verified with unit tests
-        
         if(schemaVersionIRI == null)
         {
             throw new UnmanagedSchemaIRIException(schemaVersionIRI, "NULL is not a managed schema ontology");
