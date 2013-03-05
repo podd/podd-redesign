@@ -61,6 +61,10 @@ import com.github.podd.utils.PoddRdfConstants;
 public abstract class AbstractPoddArtifactManagerTest
 {
     
+    private static final int EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE = 32;
+
+    private static final int EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED = 295;
+
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private PoddArtifactManager testArtifactManager;
@@ -419,7 +423,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
         // verify:
-        this.verifyLoadedArtifact(resultArtifactId, 7, 32, 311, false);
+        this.verifyLoadedArtifact(resultArtifactId, 7, EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE,
+                EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED, false);
         
         Assert.assertTrue("Could not delete artifact", this.testArtifactManager.deleteArtifact(resultArtifactId));
         
@@ -485,7 +490,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
         final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
-        this.verifyLoadedArtifact(unpublishedArtifactId, 7, 32, 311, false);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 7, EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE,
+                EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED, false);
         
         // invoke method under test
         final InferredOWLOntologyID publishedArtifactId =
@@ -527,7 +533,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
         final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
-        this.verifyLoadedArtifact(unpublishedArtifactId, 7, 32, 311, false);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 7, EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE,
+                EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED, false);
         
         final Collection<InferredOWLOntologyID> listPublishedArtifacts =
                 this.testArtifactManager.listPublishedArtifacts();
@@ -568,7 +575,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
         
         // verify:
-        this.verifyLoadedArtifact(resultArtifactId, 7, 32, 311, false);
+        this.verifyLoadedArtifact(resultArtifactId, 7, 32, 295, false);
     }
     
     /**
@@ -737,7 +744,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
         // verify
-        this.verifyLoadedArtifact(firstArtifactId, 7, 33, 312, false);
+        this.verifyLoadedArtifact(firstArtifactId, 7, 33, 296, false);
         Assert.assertEquals("Version IRI of loaded ontology not expected value", firstArtifactId.getOntologyIRI()
                 .toString().concat(":version:1"), firstArtifactId.getVersionIRI().toString());
     }
@@ -769,7 +776,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID artifactId =
                 this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(artifactId, 7, 33, 312, false);
+        this.verifyLoadedArtifact(artifactId, 7, 33, 296, false);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -835,7 +842,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 7, 32, 311, false);
+        this.verifyLoadedArtifact(firstArtifactId, 7, EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE,
+                EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED, false);
         
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
@@ -843,8 +851,9 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID secondArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 14, 32, 311, false);
-        this.verifyLoadedArtifact(secondArtifactId, 14, 29, 304, true);
+        this.verifyLoadedArtifact(firstArtifactId, 14, 
+                EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE, EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED, false);
+        this.verifyLoadedArtifact(secondArtifactId, 14, 29, 290, true);
     }
     
     /**
@@ -868,7 +877,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 7, 29, 304, false);
+        this.verifyLoadedArtifact(firstArtifactId, 7, 29, 290, false);
         
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
@@ -882,7 +891,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertFalse("Two versions should NOT have the same Version IRI", firstArtifactId.getVersionIRI()
                 .toString().equals(secondArtifactId.getVersionIRI().toString()));
         
-        this.verifyLoadedArtifact(secondArtifactId, 7, 25, 294, false);
+        this.verifyLoadedArtifact(secondArtifactId, 7, 25, 282, false);
     }
     
     /**
@@ -904,7 +913,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID artifactId =
                 this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(artifactId, 7, 29, 304, true);
+        this.verifyLoadedArtifact(artifactId, 7, 29, 290, true);
         
         Assert.assertFalse("Version IRI in source should have been ignored", artifactId.getVersionIRI().toString()
                 .endsWith(":55"));
@@ -930,7 +939,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
         final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
-        this.verifyLoadedArtifact(unpublishedArtifactId, 7, 32, 311, false);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 7, EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE,
+                EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED, false);
         
         // invoke method under test
         final InferredOWLOntologyID publishedArtifactId =
