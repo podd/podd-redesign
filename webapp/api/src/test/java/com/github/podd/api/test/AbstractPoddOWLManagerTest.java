@@ -858,13 +858,16 @@ public abstract class AbstractPoddOWLManagerTest
         Assert.assertEquals("Nothing should be in the Repository at this stage", 0,
                 this.testRepositoryConnection.size());
         
+        this.testOWLManager.dumpOntologyToRepository(loadedOntology, testRepositoryConnection);
+        
         final InferredOWLOntologyID inferredOntologyID =
                 this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
         
         // verify:
         Assert.assertNotNull("Inferred Ontology ID was null", inferredOntologyID);
         Assert.assertNotNull("Inferred Ontology Version IRI was null", inferredOntologyID.getVersionIRI());
-        Assert.assertEquals("Incorrect no. of inferred statements", 9,
+        Assert.assertEquals("Incorrect no. of inferred statements", 
+                TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED,
                 this.testRepositoryConnection.size(inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI()));
     }
     
@@ -892,6 +895,8 @@ public abstract class AbstractPoddOWLManagerTest
         final OWLOntology loadedOntology = this.testOWLManager.loadOntology(owlSource);
         Assert.assertEquals("Repository should not have changed at this stage", repoSizeAfterPreparation,
                 this.testRepositoryConnection.size());
+        
+        this.testOWLManager.dumpOntologyToRepository(loadedOntology, testRepositoryConnection);
         
         final InferredOWLOntologyID inferredOntologyID =
                 this.testOWLManager.inferStatements(loadedOntology, this.testRepositoryConnection);
