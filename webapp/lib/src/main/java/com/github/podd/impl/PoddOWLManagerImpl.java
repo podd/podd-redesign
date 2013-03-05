@@ -64,6 +64,7 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.utils.DeduplicatingRDFInserter;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -343,7 +344,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 this.computeInferences(nextReasoner, nextOntology.getOntologyID(),
                         inferredOntologyID.getInferredOWLOntologyID());
         
-        this.dumpOntologyToRepository(nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology
+        this.dumpOntologyToRepositoryWithoutDuplication(inferredOntologyID.getVersionIRI().toOpenRDFURI(),
+                nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology
                 .getOntologyID().getOntologyIRI().toOpenRDFURI());
         
         return inferredOntologyID;
@@ -439,6 +441,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     {
         this.reasonerFactory = reasonerFactory;
     }
+
+    
     
     /**
      * Dump the triples representing a given ontology into a Sesame Repository.
@@ -452,6 +456,17 @@ public class PoddOWLManagerImpl implements PoddOWLManager
      */
     @Override
     public void dumpOntologyToRepository(final OWLOntology nextOntology,
+            final RepositoryConnection nextRepositoryConnection, final URI... contexts) throws IOException,
+        RepositoryException
+    {
+        this.dumpOntologyToRepositoryWithoutDuplication(null, nextOntology, nextRepositoryConnection, contexts);
+    }
+     
+    /*
+     * @since 05/03/2013
+     */
+    @Override
+    public void dumpOntologyToRepositoryWithoutDuplication(final URI contextToCompareWith, final OWLOntology nextOntology,
             final RepositoryConnection nextRepositoryConnection, final URI... contexts) throws IOException,
         RepositoryException
     {
@@ -471,7 +486,12 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
         // into a specific context in the Sesame Repository
-        final RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
+        RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
+        if (contextToCompareWith != null)
+        {
+            repositoryHandler = new DeduplicatingRDFInserter(contextToCompareWith, nextRepositoryConnection);
+        }
+        
         RioRenderer renderer;
         
         if(contexts == null || contexts.length == 0)
