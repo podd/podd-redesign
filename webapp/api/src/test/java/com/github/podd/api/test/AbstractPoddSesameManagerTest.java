@@ -140,8 +140,6 @@ public abstract class AbstractPoddSesameManagerTest
         totalModel.addAll(inferredModel);
         
         Collection<InferredOWLOntologyID> results = OntologyUtils.modelToOntologyIDs(totalModel);
-        
-        log.info("results={} ", results);
         Assert.assertEquals(1, results.size());
         
         return results.iterator().next();
@@ -727,9 +725,17 @@ public abstract class AbstractPoddSesameManagerTest
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#publication45",
                 // "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable",
                 };
         
+        final String[] expectedContent = { 
+                "CSIRO HRPPC",
+                "Demo material",
+                "Demo investigation",
+                "Proceedings of the IEEE eScience 2010",
+                //"",
+                };
         // test in a loop these PODD objects for their display Models
         for(int i = 0; i < objectUris.length; i++)
         {
@@ -742,6 +748,9 @@ public abstract class AbstractPoddSesameManagerTest
             // verify:
             Assert.assertNotNull("Display Model is null", displayModel);
             Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
+            Assert.assertTrue("Expected content missing in display model", displayModel.toString().contains(expectedContent[i]));
+            
+            System.out.println(displayModel.toString());
         }
     }
     
