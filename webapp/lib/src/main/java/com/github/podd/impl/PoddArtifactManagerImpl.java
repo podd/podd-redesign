@@ -21,6 +21,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -485,6 +486,26 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         null, randomContext);
                 temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
                         newVersionIRI.toOpenRDFURI(), randomContext);
+            }
+            
+            // Check and ensure schema ontology imports are for version IRIs
+            final Set<IRI> importedSchemas =
+                    this.getSesameManager().getDirectImports(temporaryRepositoryConnection, randomContext);
+            for(final IRI importedSchemaIRI : importedSchemas)
+            {
+                final InferredOWLOntologyID schemaOntologyID =
+                        this.getSesameManager().getSchemaVersion(importedSchemaIRI, permanentRepositoryConnection,
+                                this.getRepositoryManager().getSchemaManagementGraph());
+                
+                if(!importedSchemaIRI.equals(schemaOntologyID.getVersionIRI()))
+                {
+                    // modify import to be a specific version of the schema
+                    this.log.info("Updating import to version <{}>", schemaOntologyID.getVersionIRI());
+                    temporaryRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), OWL.IMPORTS,
+                            importedSchemaIRI.toOpenRDFURI(), randomContext);
+                    temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.IMPORTS, schemaOntologyID
+                            .getVersionIRI().toOpenRDFURI(), randomContext);
+                }
             }
             
             // Before loading the statements into OWLAPI, ensure that the schema ontologies are

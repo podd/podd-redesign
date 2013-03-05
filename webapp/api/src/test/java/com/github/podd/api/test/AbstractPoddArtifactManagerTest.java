@@ -18,6 +18,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -741,6 +742,80 @@ public abstract class AbstractPoddArtifactManagerTest
                 .toString().concat(":version:1"), firstArtifactId.getVersionIRI().toString());
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     * 
+     * Tests loading an artifact which imports a previous version of a schema ontology (i.e. poddScience v1)
+     */
+    @Test
+    public final void testLoadArtifactWithNonCurrentSchemaVersionImport() throws Exception
+    {
+        // prepare:
+        this.loadSchemaOntologies();
+        
+        // prepare: load poddScience v2
+        final InferredOWLOntologyID inferredPScienceOntologyID =
+                this.loadInferStoreOntology("/test/ontologies/poddScienceV2.owl", RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
+        this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, true,
+                this.testRepositoryConnection, this.schemaGraph);
+        
+        // load test artifact
+        final InputStream inputStream4Artifact =
+                this.getClass().getResourceAsStream("/test/artifacts/project-imports-sciencev1-version.rdf");
+        final InferredOWLOntologyID artifactId =
+                this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
+        
+        this.verifyLoadedArtifact(artifactId, 7, 33, 312, false);
+        
+        // verify:
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            String[] expectedImports = { 
+                    "http://purl.org/podd/ns/version/dcTerms/1", 
+                    "http://purl.org/podd/ns/version/poddUser/1",
+                    "http://purl.org/podd/ns/version/poddBase/1",
+                    "http://purl.org/podd/ns/version/poddScience/1", // an older version 
+                    };
+
+            // verify: no. of import statements
+            final int importStatementCount =
+                    Iterations.asList(
+                            nextRepositoryConnection.getStatements(null, OWL.IMPORTS, null, false, artifactId
+                                    .getVersionIRI().toOpenRDFURI())).size();
+            Assert.assertEquals("Graph should have 4 import statements", 4, importStatementCount);
+            
+            for(int i = 0; i < expectedImports.length; i++)
+            {
+                final List<Statement> importStatements =
+                        Iterations.asList(nextRepositoryConnection.getStatements(null, OWL.IMPORTS, ValueFactoryImpl
+                                .getInstance().createURI(expectedImports[i]), false, artifactId.getVersionIRI()
+                                .toOpenRDFURI()));
+                
+                Assert.assertEquals("Expected 1 import statement per schema", 1, importStatements.size());
+            }
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+    }
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
