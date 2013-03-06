@@ -1161,6 +1161,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // value may not have a Label
         sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
+        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
+        
         sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
         sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
         sb.append(" FILTER (?value != <http://www.w3.org/2002/07/owl#NamedIndividual>) ");

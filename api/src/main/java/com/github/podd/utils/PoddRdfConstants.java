@@ -86,6 +86,10 @@ public interface PoddRdfConstants
     public static final URI PODDBASE_WEIGHT = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "weight");
 
+    public static final URI PODD_BASE_DO_NOT_DISPLAY = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "doNotDisplay");
+    
+    
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are
      * reusing it here.
@@ -118,5 +122,5 @@ public interface PoddRdfConstants
     /** Default value is urn:podd:default:usermanagementgraph:  */
     public static final URI DEF_USER_MANAGEMENT_GRAPH = VALUE_FACTORY
             .createURI("urn:podd:default:usermanagementgraph:");
-    
+
 }
