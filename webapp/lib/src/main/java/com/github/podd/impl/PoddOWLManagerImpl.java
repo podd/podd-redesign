@@ -323,8 +323,13 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID);
         
+        IRI importIRI = concreteOntologyID.getVersionIRI();
+        if (importIRI == null)
+        {
+            importIRI = concreteOntologyID.getOntologyIRI();
+        }
         this.owlOntologyManager.applyChange(new AddImport(nextInferredAxiomsOntology, new OWLImportsDeclarationImpl(
-                concreteOntologyID.getOntologyIRI())));
+                importIRI)));
         
         final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
         iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
