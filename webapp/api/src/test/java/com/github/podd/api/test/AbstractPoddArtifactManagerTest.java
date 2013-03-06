@@ -1007,8 +1007,8 @@ public abstract class AbstractPoddArtifactManagerTest
      * NOTE 1: This test is to be regularly ignored as it does not test any functionality.
      * 
      * NOTE 2: Schemas and artifacts are loaded through the standard PODD manager API classes. One
-     * effect of this is that any existing version IRI in the source file is ignored. Therefore, the
-     * inferred triples will import the internally generated version.
+     * effect of this is that any existing version IRI in the source file of an artifact is ignored.
+     * Therefore, the inferred triples will import the internally generated version.
      * 
      * @since 06/03/2013
      */
