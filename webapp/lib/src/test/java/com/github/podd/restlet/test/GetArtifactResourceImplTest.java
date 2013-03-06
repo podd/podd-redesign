@@ -155,13 +155,14 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final String body = results.getText();
-        
+        System.out.println(body);
         // verify:
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
         
-//        Assert.assertTrue("Missing: Analysis Details", body.contains("Analysis Details"));
-//        Assert.assertTrue("Missng title: poddScience#Analysis 0", body.contains("poddScience#Analysis 0"));
+        Assert.assertTrue("Publication title is missing", body.contains("Towards An Extensible, Domain-agnostic Scientific Data Management System"));
+        Assert.assertTrue("#publishedIn value is missing", body.contains("Proceedings of the IEEE eScience 2010"));
+        Assert.assertTrue("Publicatin's PURL value is missing", body.contains("http://dx.doi.org/10.1109/eScience.2010.44"));
         
         this.assertFreemarker(body);
     }
