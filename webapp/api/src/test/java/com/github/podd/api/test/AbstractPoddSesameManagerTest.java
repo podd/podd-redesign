@@ -16,7 +16,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -746,7 +745,7 @@ public abstract class AbstractPoddSesameManagerTest
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).objectString());
 
         Assert.assertTrue("Expected content missing in display model",
-                displayModel.toString().contains("Proceedings of the IEEE eScience 2010"));
+                displayModel.toString().contains("PODD - Towards An Extensible, Domain-agnostic Scientific Data Management System"));
     }
 
     
