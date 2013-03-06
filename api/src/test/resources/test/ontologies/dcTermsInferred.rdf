@@ -1,49 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
-	xmlns="http://purl.org/podd/ns/dcTerms#"
 	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
 	xmlns:owl="http://www.w3.org/2002/07/owl#"
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:xml="http://www.w3.org/XML/1998/namespace">
+	xmlns:xml="http://www.w3.org/XML/1998/namespace"
+	xmlns:dc="http://purl.org/podd/ns/dcTerms#">
 
 <rdf:Description rdf:about="urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/dcTerms/1">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
-	<owl:imports rdf:resource="http://purl.org/podd/ns/version/dcTerms/1" />
+	<owl:imports rdf:resource="http://purl.org/podd/ns/version/dcTerms/1"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/contributor">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/creator">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/publisher">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
-<rdf:Description rdf:about="http://purl.org/dc/terms/created">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-	<rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/date"/>
-</rdf:Description>
-
 <rdf:Description rdf:about="http://purl.org/dc/terms/date">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
 </rdf:Description>
 
-<rdf:Description rdf:about="http://purl.org/dc/terms/modified">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
-	<rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/date"/>
-</rdf:Description>
-
 <rdf:Description rdf:about="http://purl.org/dc/terms/Agent">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
 	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 

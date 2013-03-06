@@ -1,57 +1,38 @@
-@prefix : <http://purl.org/podd/ns/dcTerms#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix dc: <http://purl.org/podd/ns/dcTerms#> .
+
 
 <urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/basic-2-20130206/artifact:1:version:1> a owl:Ontology ;
 	owl:imports <http://purl.org/podd/basic-2-20130206/artifact:version:1> .
 
-xsd:date a rdfs:Datatype .
+<http://purl.org/dc/terms/contributor> rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/dc/terms/contributor> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/dc/terms/creator> rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/dc/terms/creator> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/dc/terms/publisher> rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/dc/terms/publisher> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/podd/ns/poddBase#containedBy> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
 
-<http://purl.org/podd/ns/poddBase#containedBy> a owl:ObjectProperty ;
+<http://purl.org/podd/ns/poddBase#contains> owl:inverseOf <http://purl.org/podd/ns/poddBase#containedBy> ;
 	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
 
-<http://purl.org/podd/ns/poddBase#poddObjectProperty> a owl:ObjectProperty .
+<http://purl.org/podd/ns/poddBase#hasFileReference> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
 
-<http://purl.org/podd/ns/poddBase#contains> a owl:ObjectProperty ;
-	owl:inverseOf <http://purl.org/podd/ns/poddBase#containedBy> ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
+<http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasUser> .
 
-<http://purl.org/podd/ns/poddBase#hasFileReference> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
+<http://purl.org/podd/ns/poddBase#hasPublicationStatus> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddTopObjectProperty> .
 
-<http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasUser> .
+<http://purl.org/podd/ns/poddBase#hasTopObjectAdministrator> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasUser> .
 
-<http://purl.org/podd/ns/poddBase#hasUser> a owl:ObjectProperty .
+<http://purl.org/podd/ns/poddBase#hasTopObjectMember> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasUser> .
 
-<http://purl.org/podd/ns/poddBase#hasPublicationStatus> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddTopObjectProperty> .
+<http://purl.org/podd/ns/poddBase#hasTopObjectObserver> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasUser> .
 
-<http://purl.org/podd/ns/poddBase#poddTopObjectProperty> a owl:ObjectProperty .
-
-<http://purl.org/podd/ns/poddBase#hasTopObjectAdministrator> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasUser> .
-
-<http://purl.org/podd/ns/poddBase#hasTopObjectMember> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasUser> .
-
-<http://purl.org/podd/ns/poddBase#hasTopObjectObserver> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasUser> .
-
-<http://purl.org/podd/ns/poddBase#hasTopObjectStatus> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddTopObjectProperty> .
+<http://purl.org/podd/ns/poddBase#hasTopObjectStatus> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddTopObjectProperty> .
 
 <http://purl.org/podd/ns/poddBase#hasUser> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddTopObjectProperty> .
 
@@ -59,751 +40,508 @@ xsd:date a rdfs:Datatype .
 
 <http://purl.org/podd/ns/poddBase#poddTopObjectProperty> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
 
-<http://purl.org/podd/ns/poddBase#refersTo> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
+<http://purl.org/podd/ns/poddBase#refersTo> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
 
-<http://purl.org/podd/ns/poddScience#hasANZSRC> a owl:ObjectProperty ;
+<http://purl.org/podd/ns/poddScience#hasANZSRC> rdfs:subPropertyOf owl:topObjectProperty .
+
+<http://purl.org/podd/ns/poddScience#hasAccession> rdfs:subPropertyOf owl:topObjectProperty .
+
+<http://purl.org/podd/ns/poddScience#hasAllele> rdfs:subPropertyOf owl:topObjectProperty .
+
+<http://purl.org/podd/ns/poddScience#hasAnalysis> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasContainer> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasControl> a owl:FunctionalProperty ;
 	rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/podd/ns/poddScience#hasAccession> a owl:ObjectProperty ;
+<http://purl.org/podd/ns/poddScience#hasData> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasDesign> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasEnvironment> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasEvent> rdfs:subPropertyOf owl:topObjectProperty .
+
+<http://purl.org/podd/ns/poddScience#hasGene> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasGenotype> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasInvestigation> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasMarker> rdfs:subPropertyOf owl:topObjectProperty .
+
+<http://purl.org/podd/ns/poddScience#hasMaterial> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasMeasurement> rdfs:subPropertyOf owl:topObjectProperty .
+
+<http://purl.org/podd/ns/poddScience#hasMeasurementParameter> rdfs:subPropertyOf owl:topObjectProperty .
+
+<http://purl.org/podd/ns/poddScience#hasObservation> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasPhenotype> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasPlatform> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasPlatformType> a owl:FunctionalProperty ;
 	rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/podd/ns/poddScience#hasAllele> a owl:ObjectProperty ;
+<http://purl.org/podd/ns/poddScience#hasProcess> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasProjectPlan> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasProtocol> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasPublication> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasSequence> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasSex> rdfs:subPropertyOf owl:topObjectProperty .
+
+<http://purl.org/podd/ns/poddScience#hasSoftware> rdfs:subPropertyOf owl:topObjectProperty .
+
+<http://purl.org/podd/ns/poddScience#hasTreatment> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+
+<http://purl.org/podd/ns/poddScience#hasWildType> a owl:FunctionalProperty ;
 	rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/podd/ns/poddScience#hasAnalysis> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddScience#refersToAnalysis> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasContainer> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddScience#refersToContainer> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasControl> a owl:FunctionalProperty , owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/podd/ns/poddScience#refersToData> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasData> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddScience#refersToEnvironment> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasDesign> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddScience#refersToGenotype> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasEnvironment> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddScience#refersToMaterial> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasEvent> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/podd/ns/poddScience#refersToPlatform> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasGene> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddScience#refersToProcess> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasGenotype> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddScience#refersToProtocol> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasInvestigation> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddScience#refersToTreatmentMaterial> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
 
-<http://purl.org/podd/ns/poddScience#hasMarker> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/podd/ns/poddUser#hasAffiliation> rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/podd/ns/poddScience#hasMaterial> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddUser#hasPoddRole> rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/podd/ns/poddScience#hasMeasurement> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://xmlns.com/foaf/0.1/homepage> rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/podd/ns/poddScience#hasMeasurementParameter> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://xmlns.com/foaf/0.1/mbox> rdfs:subPropertyOf owl:topObjectProperty .
 
-<http://purl.org/podd/ns/poddScience#hasObservation> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/dc/terms/created> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
 
-<http://purl.org/podd/ns/poddScience#hasPhenotype> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/dc/terms/date> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasPlatform> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/dc/terms/modified> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
 
-<http://purl.org/podd/ns/poddScience#hasPlatformType> a owl:FunctionalProperty , owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/podd/ns/poddBase#createdAt> rdfs:subPropertyOf <http://purl.org/dc/terms/created> .
 
-<http://purl.org/podd/ns/poddScience#hasProcess> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddBase#hasAlias> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasProjectPlan> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddBase#hasCompletionDate> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
 
-<http://purl.org/podd/ns/poddScience#hasProtocol> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddBase#hasDescription> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasPublication> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddBase#hasDuration> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasSequence> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddBase#hasEndDateTime> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
 
-<http://purl.org/podd/ns/poddScience#hasSex> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/podd/ns/poddBase#hasFileName> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasSoftware> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/podd/ns/poddBase#hasFileReferenceType> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasTreatment> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddBase#hasIssue> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasTreatmentMaterial> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#contains> .
+<http://purl.org/podd/ns/poddBase#hasLeadInstitution> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasWildType> a owl:FunctionalProperty , owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
+<http://purl.org/podd/ns/poddBase#hasNotes> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#refersToAnalysis> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
+<http://purl.org/podd/ns/poddBase#hasPURL> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasURL> .
 
-<http://purl.org/podd/ns/poddScience#refersToContainer> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
+<http://purl.org/podd/ns/poddBase#hasPath> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#refersToData> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
+<http://purl.org/podd/ns/poddBase#hasPublicationDate> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
 
-<http://purl.org/podd/ns/poddScience#refersToEnvironment> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
+<http://purl.org/podd/ns/poddBase#hasStartDate> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
 
-<http://purl.org/podd/ns/poddScience#refersToGenotype> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
+<http://purl.org/podd/ns/poddBase#hasStartDateTime> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
 
-<http://purl.org/podd/ns/poddScience#refersToMaterial> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
+<http://purl.org/podd/ns/poddBase#hasTimePoint> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
 
-<http://purl.org/podd/ns/poddScience#refersToPlatform> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
+<http://purl.org/podd/ns/poddBase#hasTimestamp> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
 
-<http://purl.org/podd/ns/poddScience#refersToProcess> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
-
-<http://purl.org/podd/ns/poddScience#refersToProtocol> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
-
-<http://purl.org/podd/ns/poddScience#refersToTreatmentMaterial> a owl:ObjectProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#refersTo> .
-
-<http://purl.org/podd/ns/poddUser#hasAffiliation> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
-
-<http://purl.org/podd/ns/poddUser#hasPoddRole> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
-
-<http://xmlns.com/foaf/0.1/homepage> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
-
-<http://xmlns.com/foaf/0.1/mbox> a owl:ObjectProperty ;
-	rdfs:subPropertyOf owl:topObjectProperty .
-
-<http://purl.org/dc/terms/created> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
-
-<http://purl.org/dc/terms/date> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/dc/terms/modified> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
-
-<http://purl.org/podd/ns/poddBase#createdAt> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/created> .
-
-<http://purl.org/podd/ns/poddBase#hasAlias> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/podd/ns/poddBase#hasCompletionDate> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
-
-<http://purl.org/podd/ns/poddBase#hasDescription> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/podd/ns/poddBase#hasDuration> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/podd/ns/poddBase#hasEndDateTime> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
-
-<http://purl.org/podd/ns/poddBase#hasFileName> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/podd/ns/poddBase#hasFileReferenceType> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/podd/ns/poddBase#hasIssue> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/podd/ns/poddBase#hasLeadInstitution> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/podd/ns/poddBase#hasNotes> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/podd/ns/poddBase#hasPURL> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasURL> .
-
-<http://purl.org/podd/ns/poddBase#hasURL> a owl:DatatypeProperty .
-
-<http://purl.org/podd/ns/poddBase#hasPath> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
-
-<http://purl.org/podd/ns/poddBase#hasPublicationDate> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
-
-<http://purl.org/podd/ns/poddBase#hasStartDate> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
-
-<http://purl.org/podd/ns/poddBase#hasStartDateTime> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
-
-<http://purl.org/podd/ns/poddBase#hasTimePoint> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
-
-<http://purl.org/podd/ns/poddBase#hasTimestamp> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/date> .
-
-<http://purl.org/podd/ns/poddBase#hasType> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddBase#hasType> rdfs:subPropertyOf owl:topDataProperty .
 
 <http://purl.org/podd/ns/poddBase#hasURL> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddBase#lastModified> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf <http://purl.org/dc/terms/modified> .
+<http://purl.org/podd/ns/poddBase#lastModified> rdfs:subPropertyOf <http://purl.org/dc/terms/modified> .
 
-<http://purl.org/podd/ns/poddScience#hasAbstract> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasAbstract> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasAccessionSource> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasAccessionSource> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasAge> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasAge> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasAlias> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasAlias> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasAlleleSymbol> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasAlleleSymbol> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasAnatomicalPart> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasAnatomicalPart> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasAuthors> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasAuthors> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasBarcode> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasBarcode> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasChromosome> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasChromosome> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasChromosomeLocation> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasChromosomeLocation> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasDOB> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasDOB> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasDesignType> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasDesignType> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasEventDescription> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasEventDescription> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasGenusSpecies> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasGenusSpecies> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasIssue> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasIssue> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasLine> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasLine> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasMarkerDirection> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasMarkerDirection> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasMarkerType> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasMarkerType> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasMaterialStatus> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasMaterialStatus> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasMutation> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasMutation> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasName> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasName> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasNickname> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasNickname> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasNotes> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasNotes> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasPages> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasPages> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasProcessVariation> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasProcessVariation> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasProtocolVariation> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasProtocolVariation> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasReferenceID> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasReferenceID> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasReplicate> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasReplicate> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasSequenceString> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasSequenceString> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasSoftwareVersion> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasSoftwareVersion> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasSpeciesCommonName> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasSpeciesCommonName> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasSubspecies> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasSubspecies> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasSystem> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasSystem> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasUnit> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasUnit> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasValue> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasValue> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasVariationType> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasVariationType> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasVolume> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasVolume> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#hasYear> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#hasYear> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddScience#publishedIn> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddScience#publishedIn> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddUser#lastLoginTime> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddUser#lastLoginTime> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddUser#phoneNumber> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddUser#phoneNumber> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddUser#postalAddress> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddUser#postalAddress> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://xmlns.com/foaf/0.1/firstName> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://xmlns.com/foaf/0.1/firstName> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://xmlns.com/foaf/0.1/lastName> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://xmlns.com/foaf/0.1/lastName> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://xmlns.com/foaf/0.1/name> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://xmlns.com/foaf/0.1/name> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://xmlns.com/foaf/0.1/title> a owl:DatatypeProperty ;
-	rdfs:subPropertyOf owl:topDataProperty .
+<http://xmlns.com/foaf/0.1/title> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/dc/terms/Agent> a owl:Class ;
-	owl:equivalentClass <http://purl.org/podd/ns/foaf#Agent> .
-
-<http://purl.org/podd/ns/foaf#Agent> a owl:Class .
-
-<http://purl.org/dc/terms/Agent> rdfs:subClassOf owl:Thing .
+<http://purl.org/dc/terms/Agent> owl:equivalentClass <http://purl.org/podd/ns/foaf#Agent> ;
+	rdfs:subClassOf owl:Thing .
 
 <http://purl.org/podd/ns/foaf#Agent> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddBase#FileReference> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddBase#FileReference> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddBase#PoddInternalObject> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddObject> .
+<http://purl.org/podd/ns/poddBase#PoddInternalObject> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddObject> .
 
-<http://purl.org/podd/ns/poddBase#PoddObject> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddBase#PoddObject> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddBase#PoddTopObject> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddObject> .
+<http://purl.org/podd/ns/poddBase#PoddTopObject> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddObject> .
 
-<http://purl.org/podd/ns/poddBase#PublicationStatus> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddBase#PublicationStatus> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddBase#TopObjectStatus> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddBase#TopObjectStatus> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#ANZSRC> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#ANZSRC> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#ANZSRCAssertion> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#ANZSRCAssertion> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Accession> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#Accession> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Allele> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#Allele> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Analysis> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Analysis> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Container> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Container> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Data> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddTopObject> .
+<http://purl.org/podd/ns/poddScience#Data> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddTopObject> .
 
-<http://purl.org/podd/ns/poddScience#Design> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Design> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Environment> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Environment> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Event> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#Event> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Gene> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Gene> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Genotype> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Genotype> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#HasControlAssertion> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#HasControlAssertion> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Investigation> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Investigation> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Marker> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#Marker> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Material> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Material> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Measurement> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#Measurement> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#MeasurementParameter> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#MeasurementParameter> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Observation> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Observation> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Phenotype> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddScience#Observation> .
+<http://purl.org/podd/ns/poddScience#Phenotype> rdfs:subClassOf <http://purl.org/podd/ns/poddScience#Observation> .
 
-<http://purl.org/podd/ns/poddScience#Platform> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Platform> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#PlatformType> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#PlatformType> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Process> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Process> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Project> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddTopObject> .
+<http://purl.org/podd/ns/poddScience#Project> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddTopObject> .
 
-<http://purl.org/podd/ns/poddScience#ProjectPlan> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#ProjectPlan> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Protocol> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Protocol> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Publication> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Publication> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Sequence> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Sequence> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#Sex> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#Sex> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Software> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#Software> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Treatment> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#Treatment> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#TreatmentMaterial> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
+<http://purl.org/podd/ns/poddScience#TreatmentMaterial> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddInternalObject> .
 
-<http://purl.org/podd/ns/poddScience#WildTypeAssertion> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddScience#WildTypeAssertion> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#PoddRole> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddUser#PoddRole> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#RepositoryRole> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddUser#PoddRole> .
+<http://purl.org/podd/ns/poddUser#RepositoryRole> rdfs:subClassOf <http://purl.org/podd/ns/poddUser#PoddRole> .
 
-<http://purl.org/podd/ns/poddUser#TopObjectRole> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/podd/ns/poddUser#PoddRole> .
+<http://purl.org/podd/ns/poddUser#TopObjectRole> rdfs:subClassOf <http://purl.org/podd/ns/poddUser#PoddRole> .
 
-<http://purl.org/podd/ns/poddUser#User> a owl:Class ;
-	rdfs:subClassOf <http://xmlns.com/foaf/0.1/Person> .
+<http://purl.org/podd/ns/poddUser#User> rdfs:subClassOf <http://xmlns.com/foaf/0.1/Person> .
 
-<http://xmlns.com/foaf/0.1/Person> a owl:Class .
+<http://purl.org/podd/ns/poddUser#UserStatus> rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#UserStatus> a owl:Class ;
-	rdfs:subClassOf owl:Thing .
-
-<http://xmlns.com/foaf/0.1/Organization> a owl:Class ;
-	rdfs:subClassOf <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> .
+<http://xmlns.com/foaf/0.1/Organization> rdfs:subClassOf <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> .
 
 <http://xmlns.com/foaf/0.1/Person> rdfs:subClassOf <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> .
 
-<http://purl.org/podd/basic-1-20130206/object:2966> a <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddBase#PoddTopObject> , <http://purl.org/podd/ns/poddScience#Project> , owl:NamedIndividual , owl:Thing ;
-	<http://purl.org/podd/ns/poddBase#hasStartDate> "2012-05-22"^^xsd:date ;
+<http://purl.org/podd/basic-1-20130206/object:2966> a <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddBase#PoddTopObject> ;
 	<http://purl.org/dc/terms/date> "2012-05-22"^^xsd:date ;
 	<http://purl.org/dc/terms/created> "2012-06-05T01:57:16.643Z"^^xsd:dateTime ;
-	<http://purl.org/podd/ns/poddBase#createdAt> "2012-06-05T01:57:16.643Z"^^xsd:dateTime ;
 	<http://purl.org/dc/terms/date> "2012-06-05T01:57:16.643Z"^^xsd:dateTime ;
-	<http://purl.org/podd/ns/poddBase#hasLeadInstitution> "CSIRO HRPPC"^^xsd:string ;
-	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddScience#hasAnalysis> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis> ;
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis> ;
 	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis> ;
-	<http://purl.org/podd/ns/poddScience#hasInvestigation> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> ;
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> ;
 	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> ;
-	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddScience#hasProjectPlan> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan> ;
-	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan> , <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddScience#hasProcess> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> ;
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan> ;
+	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> ;
-	<http://purl.org/podd/ns/poddScience#hasProcess> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2> ;
+	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> , <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2> ;
-	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#publication45> .
+	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#publication45> ;
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#publication45> ;
+	<http://purl.org/podd/ns/poddBase#poddTopObjectProperty> <http://purl.org/podd/ns/poddBase#Active> ;
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/ns/poddBase#Active> , <http://purl.org/podd/ns/poddBase#NotPublished> ;
+	<http://purl.org/podd/ns/poddBase#poddTopObjectProperty> <http://purl.org/podd/ns/poddBase#NotPublished> , <mailto:xavier.sirault@csiro.au> ;
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <mailto:xavier.sirault@csiro.au> ;
+	<http://purl.org/podd/ns/poddBase#hasUser> <mailto:xavier.sirault@csiro.au> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#publication45> a owl:NamedIndividual .
+<http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> ;
+	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> .
 
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddScience#hasPublication> <http://purl.org/podd/basic-2-20130206/artifact:1#publication45> ;
-	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#publication45> , <http://purl.org/podd/ns/poddBase#Active> .
-
-<http://purl.org/podd/ns/poddBase#Active> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddBase#poddTopObjectProperty> <http://purl.org/podd/ns/poddBase#Active> ;
-	<http://purl.org/podd/ns/poddBase#hasTopObjectStatus> <http://purl.org/podd/ns/poddBase#Active> ;
-	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/ns/poddBase#NotPublished> .
-
-<http://purl.org/podd/ns/poddBase#NotPublished> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddBase#hasPublicationStatus> <http://purl.org/podd/ns/poddBase#NotPublished> ;
-	<http://purl.org/podd/ns/poddBase#poddTopObjectProperty> <http://purl.org/podd/ns/poddBase#NotPublished> ;
-	<http://purl.org/podd/ns/poddScience#hasANZSRC> <http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable> .
-
-<http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/dc/terms/creator> <mailto:helen.daily@csiro.au> .
-
-<mailto:helen.daily@csiro.au> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddBase#poddTopObjectProperty> <mailto:xavier.sirault@csiro.au> .
-
-<mailto:xavier.sirault@csiro.au> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-1-20130206/object:2966> <http://purl.org/podd/ns/poddBase#hasUser> <mailto:xavier.sirault@csiro.au> ;
-	<http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator> <mailto:xavier.sirault@csiro.au> ;
-	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <mailto:xavier.sirault@csiro.au> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Genotype> , owl:NamedIndividual , owl:Thing ;
-	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype> <http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Analysis> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Analysis> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-1-20130206/object:2966> ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-1-20130206/object:2966> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Investigation> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-1-20130206/object:2966> ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-1-20130206/object:2966> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> ;
 	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> ;
-	<http://purl.org/podd/ns/poddScience#hasMaterial> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> ;
-	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> <http://purl.org/podd/ns/poddScience#hasTreatment> <http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1> ;
-	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1> , <http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> <http://purl.org/podd/ns/poddScience#hasMaterial> <http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial> ;
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1> ;
+	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1> , <http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Material> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype> ;
 	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype> ;
-	<http://purl.org/podd/ns/poddScience#hasGenotype> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> ;
-	<http://purl.org/podd/ns/poddScience#hasGenotype> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> <http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2> ;
+	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#ProjectPlan> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Plan> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-1-20130206/object:2966> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-1-20130206/object:2966> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Process> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-1-20130206/object:2966> ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-1-20130206/object:2966> ;
-	<http://purl.org/podd/ns/poddScience#hasPlatform> <http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> <http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1> ;
+	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Process> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process2> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-1-20130206/object:2966> ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-1-20130206/object:2966> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Genotype> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_2> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Genotype> , owl:NamedIndividual , owl:Thing ;
-	<http://purl.org/podd/ns/poddScience#hasSequence> <http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A> .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A> a owl:NamedIndividual .
-
-<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> <http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A> ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A> ;
 	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial> ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Treatment> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Platform> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Platform_1> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Process1> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Sequence> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Material> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation> ;
 	<http://purl.org/podd/ns/poddBase#contains> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> ;
-	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> ;
-	<http://purl.org/podd/ns/poddScience#hasGenotype> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> .
+	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> .
 
-<http://purl.org/podd/basic-2-20130206/artifact:1#publication45> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , <http://purl.org/podd/ns/poddScience#Publication> , owl:Thing ;
+<http://purl.org/podd/basic-2-20130206/artifact:1#publication45> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
 	<http://purl.org/podd/ns/poddScience#hasAbstract> " Data management has become a critical challenge faced by a wide array of scientiﬁc disciplines in which the provision of sound data management is pivotal to the achievements and impact of research projects. Massive and rapidly expanding amounts of data combined with data models that evolve over time contribute to making data management an increasingly challenging task that warrants a rethinking of its design. In this paper we present PODD, an ontology-centric architecture for data management systems that is extensible and domain independent. In this architecture, the behaviors of domain concepts and objects are captured entirely by ontological entities, around which all data management tasks are carried out. The open and semantic nature of ontology languages also makes PODD amenable to greater data reuse and interoperability. To evaluate the PODD architecture, we have applied it to the challenge of managing phenomics data."^^xsd:string ;
-	<http://purl.org/podd/ns/poddScience#hasYear> "2010"^^xsd:integer ;
-	<http://purl.org/dc/terms/created> "2013-02-15"^^xsd:date ;
 	<http://purl.org/dc/terms/date> "2013-02-15"^^xsd:date ;
 	<http://purl.org/podd/ns/poddScience#publishedIn> "Proceedings of the IEEE eScience 2010"^^xsd:string ;
 	<http://purl.org/podd/ns/poddBase#hasURL> "http://dx.doi.org/10.1109/eScience.2010.44"^^xsd:anyURI ;
-	<http://purl.org/podd/ns/poddBase#hasPURL> "http://dx.doi.org/10.1109/eScience.2010.44"^^xsd:anyURI ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-1-20130206/object:2966> ;
-	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-1-20130206/object:2966> ;
-	<http://purl.org/dc/terms/creator> <mailto:helen.daily@csiro.au> .
+	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-1-20130206/object:2966> .
 
 <http://purl.org/podd/ns/poddBase#Active> a <http://purl.org/podd/ns/poddBase#TopObjectStatus> , owl:Thing .
 
-<http://purl.org/podd/ns/poddBase#Completed> a <http://purl.org/podd/ns/poddBase#TopObjectStatus> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddBase#Completed> a <http://purl.org/podd/ns/poddBase#TopObjectStatus> , owl:Thing .
 
-<http://purl.org/podd/ns/poddBase#Inactive> a <http://purl.org/podd/ns/poddBase#TopObjectStatus> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddBase#Inactive> a <http://purl.org/podd/ns/poddBase#TopObjectStatus> , owl:Thing .
 
 <http://purl.org/podd/ns/poddBase#NotPublished> a <http://purl.org/podd/ns/poddBase#PublicationStatus> , owl:Thing .
 
-<http://purl.org/podd/ns/poddBase#Published> a <http://purl.org/podd/ns/poddBase#PublicationStatus> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddBase#Published> a <http://purl.org/podd/ns/poddBase#PublicationStatus> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#ANZSRC_No> a <http://purl.org/podd/ns/poddScience#ANZSRCAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#ANZSRC_No> a <http://purl.org/podd/ns/poddScience#ANZSRCAssertion> , owl:Thing .
 
 <http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable> a <http://purl.org/podd/ns/poddScience#ANZSRC> , <http://purl.org/podd/ns/poddScience#ANZSRCAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#ANZSRC_Unknown> a <http://purl.org/podd/ns/poddScience#ANZSRCAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#ANZSRC_Unknown> a <http://purl.org/podd/ns/poddScience#ANZSRCAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#ANZSRC_Yes> a <http://purl.org/podd/ns/poddScience#ANZSRCAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#ANZSRC_Yes> a <http://purl.org/podd/ns/poddScience#ANZSRCAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Hardware> a <http://purl.org/podd/ns/poddScience#PlatformType> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#Hardware> a <http://purl.org/podd/ns/poddScience#PlatformType> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#HardwareSoftware> a <http://purl.org/podd/ns/poddScience#PlatformType> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#HardwareSoftware> a <http://purl.org/podd/ns/poddScience#PlatformType> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#HasControl_No> a <http://purl.org/podd/ns/poddScience#HasControlAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#HasControl_No> a <http://purl.org/podd/ns/poddScience#HasControlAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#HasControl_NotApplicable> a <http://purl.org/podd/ns/poddScience#HasControlAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#HasControl_NotApplicable> a <http://purl.org/podd/ns/poddScience#HasControlAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#HasControl_Unknown> a <http://purl.org/podd/ns/poddScience#HasControlAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#HasControl_Unknown> a <http://purl.org/podd/ns/poddScience#HasControlAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#HasControl_Yes> a <http://purl.org/podd/ns/poddScience#HasControlAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#HasControl_Yes> a <http://purl.org/podd/ns/poddScience#HasControlAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Sex_Female> a <http://purl.org/podd/ns/poddScience#Sex> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#Sex_Female> a <http://purl.org/podd/ns/poddScience#Sex> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Sex_Hermaphrodite> a <http://purl.org/podd/ns/poddScience#Sex> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#Sex_Hermaphrodite> a <http://purl.org/podd/ns/poddScience#Sex> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Sex_Male> a <http://purl.org/podd/ns/poddScience#Sex> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#Sex_Male> a <http://purl.org/podd/ns/poddScience#Sex> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Sex_NotApplicable> a <http://purl.org/podd/ns/poddScience#Sex> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#Sex_NotApplicable> a <http://purl.org/podd/ns/poddScience#Sex> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Sex_Unknown> a <http://purl.org/podd/ns/poddScience#Sex> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#Sex_Unknown> a <http://purl.org/podd/ns/poddScience#Sex> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#Software> a <http://purl.org/podd/ns/poddScience#PlatformType> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#Software> a <http://purl.org/podd/ns/poddScience#PlatformType> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#WildType_No> a <http://purl.org/podd/ns/poddScience#WildTypeAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#WildType_No> a <http://purl.org/podd/ns/poddScience#WildTypeAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#WildType_NotApplicable> a <http://purl.org/podd/ns/poddScience#WildTypeAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#WildType_NotApplicable> a <http://purl.org/podd/ns/poddScience#WildTypeAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#WildType_Unknown> a <http://purl.org/podd/ns/poddScience#WildTypeAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#WildType_Unknown> a <http://purl.org/podd/ns/poddScience#WildTypeAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddScience#WildType_Yes> a <http://purl.org/podd/ns/poddScience#WildTypeAssertion> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddScience#WildType_Yes> a <http://purl.org/podd/ns/poddScience#WildTypeAssertion> , owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#RoleAdministrator> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#RepositoryRole> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddUser#RoleAdministrator> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#RepositoryRole> , owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#RoleAuthenticated> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#RepositoryRole> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddUser#RoleAuthenticated> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#RepositoryRole> , owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#RolePublic> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#RepositoryRole> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddUser#RolePublic> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#RepositoryRole> , owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#TopObjectRole> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#TopObjectRole> , owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#RoleTopObjectMember> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#TopObjectRole> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddUser#RoleTopObjectMember> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#TopObjectRole> , owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#RoleTopObjectObserver> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#TopObjectRole> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddUser#RoleTopObjectObserver> a <http://purl.org/podd/ns/poddUser#PoddRole> , <http://purl.org/podd/ns/poddUser#TopObjectRole> , owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#StatusActive> a <http://purl.org/podd/ns/poddUser#UserStatus> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddUser#StatusActive> a <http://purl.org/podd/ns/poddUser#UserStatus> , owl:Thing .
 
-<http://purl.org/podd/ns/poddUser#StatusInactive> a <http://purl.org/podd/ns/poddUser#UserStatus> , owl:NamedIndividual , owl:Thing .
+<http://purl.org/podd/ns/poddUser#StatusInactive> a <http://purl.org/podd/ns/poddUser#UserStatus> , owl:Thing .
 
-<mailto:alyssa.weirman@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> , <http://purl.org/podd/ns/poddUser#User> , owl:NamedIndividual , owl:Thing , <http://xmlns.com/foaf/0.1/Person> ;
+<mailto:alyssa.weirman@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> ;
 	<http://xmlns.com/foaf/0.1/firstName> "Alyssa"^^xsd:string ;
 	<http://xmlns.com/foaf/0.1/lastName> "Weirman"^^xsd:string .
 
-<mailto:helen.daily@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> , <http://purl.org/podd/ns/poddUser#User> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> ;
+<mailto:helen.daily@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> ;
 	<http://xmlns.com/foaf/0.1/lastName> "Daily"^^xsd:string ;
 	<http://xmlns.com/foaf/0.1/firstName> "Helen"^^xsd:string .
 
-<mailto:xavier.sirault@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> , <http://purl.org/podd/ns/poddUser#User> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> .
+<mailto:xavier.sirault@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> .
 
-<mailto:xueqin.wang@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> , <http://purl.org/podd/ns/poddUser#User> , owl:NamedIndividual , owl:Thing , <http://xmlns.com/foaf/0.1/Person> .
+<mailto:xueqin.wang@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://purl.org/podd/ns/foaf#Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> .

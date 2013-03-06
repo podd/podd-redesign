@@ -1,150 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
-	xmlns="http://purl.org/podd/ns/dcTerms#"
 	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
 	xmlns:owl="http://www.w3.org/2002/07/owl#"
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:xml="http://www.w3.org/XML/1998/namespace">
+	xmlns:xml="http://www.w3.org/XML/1998/namespace"
+	xmlns:dc="http://purl.org/podd/ns/dcTerms#">
 
 <rdf:Description rdf:about="urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddUser/1">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
-	<owl:imports rdf:resource="http://purl.org/podd/ns/version/poddUser/1" />
+	<owl:imports rdf:resource="http://purl.org/podd/ns/version/poddUser/1"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/contributor">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/creator">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/publisher">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#hasAffiliation">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#hasPoddRole">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://xmlns.com/foaf/0.1/homepage">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://xmlns.com/foaf/0.1/mbox">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/created">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/date"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/date">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/modified">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/date"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#lastLoginTime">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#phoneNumber">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#postalAddress">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://xmlns.com/foaf/0.1/firstName">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://xmlns.com/foaf/0.1/lastName">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://xmlns.com/foaf/0.1/name">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://xmlns.com/foaf/0.1/title">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
 	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/dc/terms/Agent">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
 	<owl:equivalentClass rdf:resource="http://purl.org/podd/ns/foaf#Agent"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://purl.org/podd/ns/foaf#Agent">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://purl.org/dc/terms/Agent">
 	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/foaf#Agent">
-	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#PoddRole">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#RepositoryRole">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-	<rdfs:subClassOf rdf:resource="http://purl.org/podd/ns/poddUser#PoddRole"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#TopObjectRole">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-	<rdfs:subClassOf rdf:resource="http://purl.org/podd/ns/poddUser#PoddRole"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#User">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-	<rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://xmlns.com/foaf/0.1/Person">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#UserStatus">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
 	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://xmlns.com/foaf/0.1/Organization">
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
 	<rdfs:subClassOf rdf:resource="http://purl.org/dc/terms/Agent"/>
 	<rdfs:subClassOf rdf:resource="http://purl.org/podd/ns/foaf#Agent"/>
 </rdf:Description>
@@ -155,56 +100,34 @@
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#RoleAdministrator">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#PoddRole"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#RepositoryRole"/>
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#RoleAuthenticated">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#PoddRole"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#RepositoryRole"/>
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#RolePublic">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#PoddRole"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#RepositoryRole"/>
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#PoddRole"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#TopObjectRole"/>
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#RoleTopObjectMember">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#PoddRole"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#TopObjectRole"/>
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#RoleTopObjectObserver">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#PoddRole"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#TopObjectRole"/>
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#StatusActive">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#UserStatus"/>
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
 <rdf:Description rdf:about="http://purl.org/podd/ns/poddUser#StatusInactive">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#UserStatus"/>
-	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
