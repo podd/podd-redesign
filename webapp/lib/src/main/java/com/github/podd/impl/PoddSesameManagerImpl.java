@@ -1238,6 +1238,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * generic OWL concepts (i.e. OWL:Thing, OWL:Individial, OWL:NamedIndividual, OWL:Class) are not
      * included in the results.
      * 
+     * Properties with an annotation poddBase:doNotDisplay are also not included in the results.
+     * 
      * @param artifactID
      *            The artifact to which this object belongs
      * @param objectUri
@@ -1275,6 +1277,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append("FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
         sb.append("FILTER (?propertyUri != <" + RDFS.LABEL.stringValue() + ">) ");
         sb.append("FILTER (?propertyUri != <" + RDFS.COMMENT.stringValue() + ">) ");
+        
+        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
         
         sb.append(" } ");
         sb.append("  ORDER BY ASC(?weight) ASC(?propertyLabel) ");
