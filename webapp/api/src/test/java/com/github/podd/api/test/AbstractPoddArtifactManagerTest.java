@@ -5,6 +5,9 @@ package com.github.podd.api.test;
 
 import info.aduna.iteration.Iterations;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -21,8 +24,11 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -992,6 +998,105 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateSchemaImport() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
+    }
+    
+
+    /**
+     * Helper method to write Repository graphs to files when required.
+     * 
+     * NOTE 1: This test is to be regularly ignored as it does not test any functionality.
+     * 
+     * NOTE 2: Schemas and artifacts are loaded through the standard PODD manager API classes. One
+     * effect of this is that any existing version IRI in the source file is ignored. Therefore, the
+     * inferred triples will import the internally generated version.
+     * 
+     * @since 06/03/2013
+     */
+    @Ignore
+    @Test
+    public final void testWriteInferredOntologyToFile() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InputStream inputStream = this.getClass().getResourceAsStream("/test/artifacts/basic-20130206.ttl");
+        final RDFFormat readFormat = RDFFormat.TURTLE;
+        final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, readFormat);
+        
+        dumpRdfToFile(resultArtifactId.getInferredOntologyIRI().toOpenRDFURI(),
+                "/home/kutila/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+        
+/*        
+        String[] contexts = {
+                // "http://purl.org/podd/ns/version/dcTerms/1",
+                "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/dcTerms/1",
+                // "http://purl.org/podd/ns/version/foaf/1",
+                "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/foaf/1",
+                // "http://purl.org/podd/ns/version/poddUser/1",
+                "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddUser/1",
+                // "http://purl.org/podd/ns/version/poddBase/1",
+                "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddBase/1",
+                // "http://purl.org/podd/ns/version/poddScience/1",
+                "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1",
+                // "http://purl.org/podd/ns/version/poddPlant/1",
+                "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddPlant/1", };
+        
+        String[] fileNames = {
+                // "dcTerms",
+                "dcTermsInferred",
+                // "foaf",
+                "foafInferred",
+                // "poddUser",
+                "poddUserInferred",
+                // "poddBase",
+                "poddBaseInferred",
+                // "poddScience",
+                "poddScienceInferred",
+                // "poddPlant",
+                "poddPlantInferred", };
+        
+        for(int i = 0; i < contexts.length; i++)
+        {
+            URI context = ValueFactoryImpl.getInstance().createURI(contexts[i]);
+            final RDFFormat writeFormat = RDFFormat.RDFXML;
+            String path = "/home/kutila/";
+            
+            dumpRdfToFile(context, (path + fileNames[i]), writeFormat);
+        }
+*/
+     }
+    
+    /**
+     * Write contents of specified context to a file
+     * 
+     * @param context
+     * @param filename
+     * @param writeFormat
+     * @throws IOException
+     * @throws OpenRDFException
+     */
+    public void dumpRdfToFile(URI context, String filename, final RDFFormat writeFormat)
+        throws IOException, OpenRDFException
+    {
+        String outFilename = filename + "." + writeFormat.getFileExtensions().get(0);
+        
+        RDFWriter writer = Rio.createWriter(writeFormat, new FileOutputStream(filename));
+        writer.handleNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+        writer.handleNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
+        writer.handleNamespace("owl", "http://www.w3.org/2002/07/owl#");
+        writer.handleNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        writer.handleNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+        
+        writer.handleNamespace("dc", "http://purl.org/podd/ns/dcTerms#");
+        
+        writer.startRDF();
+        
+        List<Statement> inferredList =
+                Iterations.asList(this.testRepositoryConnection.getStatements(null, null, null, false, context));
+        for(Statement s : inferredList)
+        {
+            writer.handleStatement(s);
+        }
+        writer.endRDF();
+        this.log.info("Wrote {} statements to file {}", inferredList.size(), outFilename);
     }
     
     /**
