@@ -580,7 +580,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public URI getTopObjectIRI(final InferredOWLOntologyID ontologyIRI, final RepositoryConnection repositoryConnection)
         throws OpenRDFException
     {
-        List<URI> results = getTopObjects(ontologyIRI, repositoryConnection);
+        List<URI> results = this.getTopObjects(ontologyIRI, repositoryConnection);
         
         if(results.isEmpty())
         {

@@ -1069,6 +1069,27 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getTopObjectIRI(InferredOWLOntologyID, RepositoryConnection)}
+     * . 
+     */
+    @Test
+    public void testGetTopObjectIRI() throws Exception
+    {
+        // prepare: load test artifact
+        InferredOWLOntologyID nextOntologyID =
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+        
+        final URI topObjectList =
+                this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
+        
+        Assert.assertEquals("Not the expected top object URI",
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966"),
+                topObjectList);
+    }
+
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getWeightedProperties(InferredOWLOntologyID, URI, RepositoryConnection)}
      * . getWeightedProperties() is invoked for an internal object of an artifact.
      */
