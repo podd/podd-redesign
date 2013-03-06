@@ -14,9 +14,9 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -51,6 +51,10 @@ import com.github.podd.utils.PoddRdfConstants;
  */
 public abstract class AbstractPoddSesameManagerTest
 {
+    /* test artifact pair with PURLs */
+    private static final String TEST_ARTIFACT_BASIC_20130206_TTL = "/test/artifacts/basic-20130206.ttl";
+    private static final String TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL = "/test/artifacts/basic-20130206-inferred.ttl";
+
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private PoddSesameManager testPoddSesameManager;
@@ -636,8 +640,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         final InferredOWLOntologyID ontologyID1 =
-                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
-                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
         
         final String[] objectUris =
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
@@ -677,8 +681,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
-                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
         
         final String[] objectUris =
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
@@ -706,6 +710,45 @@ public abstract class AbstractPoddSesameManagerTest
         }
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getObjectDetailsForDisplay(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
+     */
+    @Test
+    public void testGetObjectDetailsForDisplayWithTopObject() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+        
+        final URI objectUri =
+                ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-1-20130206/object:2966");
+        
+        Model displayModel =
+                this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
+                        this.testRepositoryConnection);
+        
+        // verify:
+        Assert.assertNotNull("Display Model is null", displayModel);
+        Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
+        Assert.assertEquals("Display Model not of expected size", 42, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 17, displayModel.filter(objectUri, null, null).size());
+        
+        Assert.assertEquals("Expected 1 hasLeadInstitution statement", 1, displayModel.filter(objectUri, 
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution")
+                , null).size());
+        
+        Assert.assertEquals("Unexpected Lead Institution", "CSIRO HRPPC", displayModel.filter(objectUri, 
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).objectString());
+
+        Assert.assertTrue("Expected content missing in display model",
+                displayModel.toString().contains("Proceedings of the IEEE eScience 2010"));
+    }
+
     
     /**
      * Test method for
@@ -713,45 +756,38 @@ public abstract class AbstractPoddSesameManagerTest
      * .
      */
     @Test
-    public void testGetObjectDetailsForDisplay() throws Exception
+    public void testGetObjectDetailsForDisplayWithPublicationObject() throws Exception
     {
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
-                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
         
-        final String[] objectUris =
-                { "http://purl.org/podd/basic-1-20130206/object:2966",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#publication45",
-                // "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable",
-                };
+        final URI objectUri =
+                ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
         
-        final String[] expectedContent = { 
-                "CSIRO HRPPC",
-                "Demo material",
-                "Demo investigation",
-                "Proceedings of the IEEE eScience 2010",
-                //"",
-                };
-        // test in a loop these PODD objects for their display Models
-        for(int i = 0; i < objectUris.length; i++)
-        {
-            final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
-            
-            Model displayModel =
-                    this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
-                            this.testRepositoryConnection);
-            
-            // verify:
-            Assert.assertNotNull("Display Model is null", displayModel);
-            Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-            Assert.assertTrue("Expected content missing in display model", displayModel.toString().contains(expectedContent[i]));
-            
-            System.out.println(displayModel.toString());
-        }
+        Model displayModel =
+                this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
+                        this.testRepositoryConnection);
+        
+        // verify:
+        Assert.assertNotNull("Display Model is null", displayModel);
+        Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
+        Assert.assertEquals("Display Model not of expected size", 15, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 7, displayModel.filter(objectUri, null, null).size());
+        
+        Assert.assertEquals("Expected 1 hasPURL statement", 1, displayModel.filter(objectUri, 
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasPURL")
+                , null).size());
+        
+        Assert.assertEquals("Unexpected PURL value", "http://dx.doi.org/10.1109/eScience.2010.44", displayModel.filter(objectUri, 
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasPURL"), null).objectString());
+
+        // verify: a string search for some content
+        Assert.assertTrue("Expected content missing in display model",
+                displayModel.toString().contains("Proceedings of the IEEE eScience 2010"));
     }
     
     /**
@@ -987,8 +1023,8 @@ public abstract class AbstractPoddSesameManagerTest
     {
         // prepare: load test artifact
         InferredOWLOntologyID nextOntologyID =
-                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
-                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
         
         // DebugUtils.printContexts(testRepositoryConnection);
         // DebugUtils.printContents(testRepositoryConnection,
@@ -1043,8 +1079,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID nextOntologyID =
-                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
-                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
         
         Assert.assertEquals("http://purl.org/podd/basic-2-20130206/artifact:1", nextOntologyID.getOntologyIRI()
                 .toString());
@@ -1090,8 +1126,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID nextOntologyID =
-                this.loadOntologyFromResource("/test/artifacts/basic-20130206.ttl",
-                        "/test/artifacts/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
         
         final URI topObjectUri = this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
         
