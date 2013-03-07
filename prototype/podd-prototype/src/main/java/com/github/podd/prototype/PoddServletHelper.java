@@ -799,6 +799,9 @@ public class PoddServletHelper
             URITranslator.doTranslation(tempRepositoryConnection, context.stringValue(), newVersionURI.stringValue(),
                     context);
             
+            // FIXME: Check for dangling objects that are no longer linked to the top object in the artifact
+            // If there are any dangling objects delete them from the temp repository before loading into OWLAPI
+            
             // load into OWLAPI
             this.log.debug("Loading podd artifact from temp repository: {}", context);
             final OWLOntology nextOntology =
