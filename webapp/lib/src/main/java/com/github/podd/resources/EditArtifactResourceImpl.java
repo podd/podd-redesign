@@ -3,7 +3,6 @@
  */
 package com.github.podd.resources;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,10 +25,8 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
-import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -84,9 +81,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         InferredOWLOntologyID ontologyID;
         try
         {
-            final PoddArtifactManager artifactManager =
-                    ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
-            ontologyID = artifactManager.getArtifactByIRI(IRI.create(artifactUri));
+            ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
         }
         catch(final UnmanagedArtifactIRIException e)
         {
@@ -123,64 +118,58 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
         dataModel.put("util", new FreemarkerUtil());
         
+        // Defaults to false. Set to true if multiple objects are being edited concurrently
+        // TODO: investigate how to use this
+        boolean initialized = false;
+        
         RepositoryConnection conn = null;
         try
         {
-            conn = this.getPoddApplication().getPoddRepositoryManager().getRepository().getConnection();
+            conn = this.getPoddRepositoryManager().getRepository().getConnection();
             conn.begin();
             
             URI objectUri;
             
             if(objectToEdit == null)
             {
-                // FIXME: Should not be working with the PoddObjectLabel interface here. Hint: There
-                // may be hints as to a better solution in one of the predesigned manager
-                // interfaces!
-                objectUri =
-                        this.getPoddApplication().getPoddArtifactManager().getSesameManager()
-                                .getTopObjectIRI(ontologyID, conn);
+                objectUri = this.getPoddSesameManager().getTopObjectIRI(ontologyID, conn);
             }
             else
             {
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
             }
             
-            List<URI> objectTypes =
-                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
-                            .getObjectTypes(ontologyID, objectUri, conn);
+            List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
             if(objectTypes == null || objectTypes.isEmpty())
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
             
-            // TODO: Get label for the object type
-            URI objectType = objectTypes.get(0);
-            // if(objectType.getLabel() != null)
-            // {
-            // dataModel.put("objectType", objectType.getLabel());
-            // }
-            // else
-            // {
-            // dataModel.put("objectType", objectType.getObjectURI());
-            // }
+            // Get label for the object type
+            PoddObjectLabel objectType =
+                    this.getPoddSesameManager().getObjectLabel(ontologyID, objectTypes.get(0), conn);
+            if (objectType == null || objectType.getLabel() == null)
+            {
+                dataModel.put("objectType", objectTypes.get(0));
+            }
+            else
+            {
+                dataModel.put("objectType", objectType.getLabel());
+            }
+
+            PoddObjectLabel theObject = this.getPoddSesameManager().getObjectLabel(ontologyID, objectUri, conn);
+            dataModel.put("poddObject", theObject);
             
-            /**
-             * PoddObjectLabel theObject = SparqlQueryHelper.getPoddObject(ontologyID, objectUri,
-             * conn, assertedContexts); dataModel.put("poddObject", theObject);
-             * 
-             * // an ordered-list of the properties about the object final List<URI>
-             * orderedProperties = SparqlQueryHelper.getWeightedProperties(objectUri, conn,
-             * assertedContexts); this.log.info("Found {} properties about object {}",
-             * orderedProperties.size(), objectUri); dataModel.put("orderedPropertyList",
-             * orderedProperties);
-             * 
-             * // all statements which are needed to display these properties in HTML final Model
-             * allNeededStatementsForDisplay =
-             * SparqlQueryHelper.getPoddObjectDetailsForEdit(objectUri, conn, assertedContexts);
-             * dataModel.put("completeModel", allNeededStatementsForDisplay);
-             * 
-             * // TODO dataModel.put("initialized", false);
-             **/
+            // an ordered-list of the properties about the object
+            final List<URI> orderedProperties =
+                    this.getPoddSesameManager().getWeightedProperties(ontologyID, objectUri, conn);
+            this.log.info("Found {} properties about object {}", orderedProperties.size(), objectUri);
+            dataModel.put("orderedPropertyList", orderedProperties);
+            
+            // all statements which are needed to display these properties in HTML
+            final Model allNeededStatementsForEdit =
+                    this.getPoddSesameManager().getObjectDetailsForEdit(ontologyID, objectUri, conn);
+            dataModel.put("completeModel", allNeededStatementsForEdit);
             
             /*
              * // *** editObject.html.ftl ***
@@ -247,6 +236,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             }
         }
         
+        dataModel.put("initialized", initialized);
         return dataModel;
     }
 }

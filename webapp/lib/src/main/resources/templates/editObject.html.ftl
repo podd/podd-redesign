@@ -82,7 +82,7 @@
 				</label>
                 </li>
                 <li>
-                <input id="object_name" name="object_name" type="text" value="${poddObject.title!""}">
+                <input id="object_name" name="object_name" type="text" value="${poddObject.label!""}">
                 <h6 class="errorMsg">${objectNameError!""}</h6>
 	            </li>
 	            <li>
