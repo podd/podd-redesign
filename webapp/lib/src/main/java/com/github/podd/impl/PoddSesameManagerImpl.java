@@ -603,7 +603,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * The contexts searched in are, the given ongology's asserted and inferred graphs as well as
      * their imported schema ontology graphs.
      * 
-     * FIXME: Fix the algorithm for this to return only the most specific types
+     * This method depends on the poddBase:doNotDisplay annotation to filter out unwanted super-types.
      * 
      * @param ontologyID
      *            The artifact to which the object belongs
@@ -622,6 +622,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" WHERE { ");
         sb.append(" ?objectUri <" + RDF.TYPE + "> ?poddTypeUri . ");
         
+        sb.append(" FILTER NOT EXISTS { ?poddTypeUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
+        sb.append(" FILTER isIRI(?poddTypeUri) ");
+        
         // filter out TYPE statements for OWL:Thing, OWL:Individual, OWL:NamedIndividual & OWL:Class
         sb.append("FILTER (?poddTypeUri != <" + OWL.THING.stringValue() + ">) ");
         sb.append("FILTER (?poddTypeUri != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
@@ -635,7 +638,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery, this.versionAndSchemaContexts(ontologyID, repositoryConnection));
+                this.executeSparqlQuery(tupleQuery, this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
         
         List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
         

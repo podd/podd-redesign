@@ -646,12 +646,19 @@ public abstract class AbstractPoddSesameManagerTest
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
-                        "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", };
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#publication45",
+                        "mailto:alyssa.weirman@csiro.au",
+                        "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", 
+                        };
         
         final String[] expectedTypes =
-                { "http://purl.org/podd/ns/poddScience#Project", "http://purl.org/podd/ns/poddScience#Genotype",
+                { "http://purl.org/podd/ns/poddScience#Project", 
+                        "http://purl.org/podd/ns/poddScience#Genotype",
                         "http://purl.org/podd/ns/poddScience#Material",
-                        "http://purl.org/podd/ns/poddScience#ANZSRCAssertion", };
+                        "http://purl.org/podd/ns/poddScience#Publication",
+                        "http://purl.org/podd/ns/poddUser#User",
+                        "http://purl.org/podd/ns/poddScience#ANZSRCAssertion", 
+                        }; 
         
         // test in a loop these PODD objects for their types
         for(int i = 0; i < objectUris.length; i++)
