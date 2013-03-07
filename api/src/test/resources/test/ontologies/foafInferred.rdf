@@ -64,7 +64,7 @@
 	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 
-<rdf:Description rdf:about="http://purl.org/podd/ns/foaf#Agent">
+<rdf:Description rdf:about="http://xmlns.com/foaf/0.1/Agent">
 	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
 </rdf:Description>
 

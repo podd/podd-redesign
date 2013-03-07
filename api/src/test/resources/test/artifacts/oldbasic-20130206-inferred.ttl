@@ -278,6 +278,8 @@
 <http://purl.org/dc/terms/Agent> owl:equivalentClass <http://xmlns.com/foaf/0.1/Agent> ;
 	rdfs:subClassOf owl:Thing .
 
+<http://xmlns.com/foaf/0.1/Agent> rdfs:subClassOf owl:Thing .
+
 <http://purl.org/podd/ns/poddBase#FileReference> rdfs:subClassOf owl:Thing .
 
 <http://purl.org/podd/ns/poddBase#PoddInternalObject> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddObject> .
@@ -365,8 +367,6 @@
 <http://purl.org/podd/ns/poddUser#User> rdfs:subClassOf <http://xmlns.com/foaf/0.1/Person> .
 
 <http://purl.org/podd/ns/poddUser#UserStatus> rdfs:subClassOf owl:Thing .
-
-<http://xmlns.com/foaf/0.1/Agent> rdfs:subClassOf owl:Thing .
 
 <http://xmlns.com/foaf/0.1/Organization> rdfs:subClassOf <http://purl.org/dc/terms/Agent> , <http://xmlns.com/foaf/0.1/Agent> .
 
@@ -461,7 +461,9 @@
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3> .
 
 <http://purl.org/podd/basic-2-20130206/artifact:1#publication45> a <http://purl.org/podd/ns/poddBase#PoddInternalObject> , <http://purl.org/podd/ns/poddBase#PoddObject> , owl:Thing ;
+	<http://purl.org/podd/ns/poddScience#hasAbstract> " Data management has become a critical challenge faced by a wide array of scientiﬁc disciplines in which the provision of sound data management is pivotal to the achievements and impact of research projects. Massive and rapidly expanding amounts of data combined with data models that evolve over time contribute to making data management an increasingly challenging task that warrants a rethinking of its design. In this paper we present PODD, an ontology-centric architecture for data management systems that is extensible and domain independent. In this architecture, the behaviors of domain concepts and objects are captured entirely by ontological entities, around which all data management tasks are carried out. The open and semantic nature of ontology languages also makes PODD amenable to greater data reuse and interoperability. To evaluate the PODD architecture, we have applied it to the challenge of managing phenomics data."^^xsd:string ;
 	<http://purl.org/dc/terms/date> "2013-02-15"^^xsd:date ;
+	<http://purl.org/podd/ns/poddScience#publishedIn> "Proceedings of the IEEE eScience 2010"^^xsd:string ;
 	<http://purl.org/podd/ns/poddBase#hasURL> "http://dx.doi.org/10.1109/eScience.2010.44"^^xsd:anyURI ;
 	<http://purl.org/podd/ns/poddBase#poddObjectProperty> <http://purl.org/podd/basic-1-20130206/object:2966> ;
 	<http://purl.org/podd/ns/poddBase#containedBy> <http://purl.org/podd/basic-1-20130206/object:2966> .
@@ -532,14 +534,14 @@
 
 <http://purl.org/podd/ns/poddUser#StatusInactive> a <http://purl.org/podd/ns/poddUser#UserStatus> , owl:Thing .
 
-<mailto:alyssa.weirman@csiro.au> a <http://purl.org/dc/terms/Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Agent> , <http://xmlns.com/foaf/0.1/Person> ;
+<mailto:alyssa.weirman@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://xmlns.com/foaf/0.1/Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> ;
 	<http://xmlns.com/foaf/0.1/firstName> "Alyssa"^^xsd:string ;
 	<http://xmlns.com/foaf/0.1/lastName> "Weirman"^^xsd:string .
 
-<mailto:helen.daily@csiro.au> a <http://purl.org/dc/terms/Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Agent> , <http://xmlns.com/foaf/0.1/Person> ;
+<mailto:helen.daily@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://xmlns.com/foaf/0.1/Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> ;
 	<http://xmlns.com/foaf/0.1/lastName> "Daily"^^xsd:string ;
 	<http://xmlns.com/foaf/0.1/firstName> "Helen"^^xsd:string .
 
-<mailto:xavier.sirault@csiro.au> a <http://purl.org/dc/terms/Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Agent> , <http://xmlns.com/foaf/0.1/Person> .
+<mailto:xavier.sirault@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://xmlns.com/foaf/0.1/Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> .
 
-<mailto:xueqin.wang@csiro.au> a <http://purl.org/dc/terms/Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Agent> , <http://xmlns.com/foaf/0.1/Person> .
+<mailto:xueqin.wang@csiro.au> a <http://purl.org/dc/terms/Agent> , <http://xmlns.com/foaf/0.1/Agent> , owl:Thing , <http://xmlns.com/foaf/0.1/Person> .
