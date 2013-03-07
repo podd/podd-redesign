@@ -172,37 +172,40 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("completeModel", allNeededStatementsForEdit);
             
             /*
-             * // *** editObject.html.ftl ***
+             * *** editObject.html.ftl ***
              * 
-             * <#-- @ftlvariable name="isAdmin" type="boolean" -->
+             * @ftlvariable name="isAdmin" type="boolean"
              * 
-             * <#-- @ftlvariable name="canViewProjectParticipants" type="boolean" --> <#--
+             * @ftlvariable name="canViewProjectParticipants" type="boolean" 
              * 
-             * @ftlvariable name="initialized" type="boolean" --> <#-- @ftlvariable name="postUrl"
-             * type="java.lang.String" --> <#-- @ftlvariable name="objectPID"
-             * type="java.lang.String" --> <#-- @ftlvariable name="objectType"
-             * type="java.lang.String" --> <#-- @ftlvariable name="isProject" type="boolean" -->
-             * <#-- @ftlvariable name="elementList"
-             * type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" --> <#--
+             * @ftlvariable name="postUrl" type="java.lang.String"
              * 
-             * @ftlvariable name="refersList"
-             * type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>" --> <#--
+             * @ftlvariable name="objectPID" type="java.lang.String"
              * 
-             * @ftlvariable name="fileList"
-             * type="java.util.ArrayList<podd.resources.util.view.FileElement>" --> <#--
+             * @ftlvariable name="objectType" type="java.lang.String"
+             *  
+             * @ftlvariable name="isProject" type="boolean" 
              * 
-             * @ftlvariable name="canComplete" type="boolean" --> <#-- @ftlvariable name="aHREF"
-             * type="java.lang.String" -->
+             * @ftlvariable name="elementList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>"
              * 
-             * <#-- @ftlvariable name="errorMessage" type="java.lang.String" --> <#-- @ftlvariable
-             * name="objectNameError" type="java.lang.String" --> <#-- @ftlvariable
-             * name="objectDescriptionError" type="java.lang.String" --> <#-- @ftlvariable
-             * name="generalErrorList" type="java.util.ArrayList<java.lang.String>" --> <#--
+             * @ftlvariable name="refersList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>"
              * 
-             * @ftlvariable name="objectErrorList" type="java.util.ArrayList<java.lang.String>" -->
+             * @ftlvariable name="fileList" type="java.util.ArrayList<podd.resources.util.view.FileElement>"
+             * 
+             * @ftlvariable name="canComplete" type="boolean"
+             * 
+             * @ftlvariable name="aHREF" type="java.lang.String"
+             * 
+             * @ftlvariable name="errorMessage" type="java.lang.String"
+             * 
+             * @ftlvariable name="objectNameError" type="java.lang.String"
+             *  
+             * @ftlvariable name="objectDescriptionError" type="java.lang.String"
+             * 
+             * @ftlvariable name="generalErrorList" type="java.util.ArrayList<java.lang.String>"
+             * 
+             * @ftlvariable name="objectErrorList" type="java.util.ArrayList<java.lang.String>"
              */
-            
-            // *** attachFile.html.ftl ***
             
             // *** attachFile.html.ftl ***
             // stopRefreshKey - String
