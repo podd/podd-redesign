@@ -16,6 +16,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -365,6 +366,85 @@ public abstract class AbstractPoddSesameManagerTest
         }
         
     }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getCardinality(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
+     * .
+     */
+    @Test
+    public void testGetCardinalityWithTopObjectHasLeadInstitution() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+        
+        final URI topObjectUri =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966");
+        
+        URI hasLeadInstitutionPropertyUri =
+                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasLeadInstitution");
+        
+        Model displayModel =
+                this.testPoddSesameManager.getCardinality(ontologyID, topObjectUri, hasLeadInstitutionPropertyUri,
+                        this.testRepositoryConnection);
+        
+        // verify:
+        Assert.assertNotNull("Resultant Model is null", displayModel);
+        Assert.assertEquals("Resultant Model not of expected size", 1, displayModel.size());
+        
+        Assert.assertEquals(
+                "Expected 1 hasLeadInstitution cardinality statement",
+                1,
+                displayModel.filter(hasLeadInstitutionPropertyUri,
+                        ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#qualifiedCardinality"),
+                        null).size());
+        
+        Assert.assertEquals("Unexpected Cardinality for Lead Institution", "1", displayModel.filter(null, null, null)
+                .objectString());
+    }    
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getCardinality(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
+     * .
+     */
+    @Test
+    public void testGetCardinalityWithPublicationObjectHasAbstract() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+        
+        final URI publicationObjectUri =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
+        
+        URI hasAbstractPropertyUri =
+                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAbstract");
+        
+        Model displayModel =
+                this.testPoddSesameManager.getCardinality(ontologyID, publicationObjectUri, hasAbstractPropertyUri,
+                        this.testRepositoryConnection);
+        
+        // verify:
+        Assert.assertNotNull("Resultant Model is null", displayModel);
+        Assert.assertEquals("Resultant Model not of expected size", 1, displayModel.size());
+        
+        Assert.assertEquals(
+                "Expected 1 hasAbstract maxQualifiedcardinality statement",
+                1,
+                displayModel.filter(hasAbstractPropertyUri,
+                        ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#maxQualifiedCardinality"),
+                        null).size());
+        
+        Assert.assertEquals("Unexpected Cardinality for hasAbstract", "1", displayModel.filter(null, null, null)
+                .objectString());
+    }    
+    
     
     /**
      * Test method for
@@ -796,6 +876,48 @@ public abstract class AbstractPoddSesameManagerTest
                 displayModel.toString().contains("Proceedings of the IEEE eScience 2010"));
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getObjectDetailsForEdit(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
+     * 
+     * TODO: improve this once the method implementation is complete
+     * 
+     */
+    @Test
+    public void testGetObjectDetailsForEditWithTopObject() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+        
+        final URI objectUri =
+                ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-1-20130206/object:2966");
+        
+        Model displayModel =
+                this.testPoddSesameManager.getObjectDetailsForEdit(ontologyID, objectUri,
+                        this.testRepositoryConnection);
+        
+        // verify:
+        Assert.assertNotNull("Display Model is null", displayModel);
+        Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
+        Assert.assertEquals("Display Model not of expected size", 57, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 17, displayModel.filter(objectUri, null, null).size());
+        
+        Assert.assertEquals("Expected 1 hasLeadInstitution statement", 1, displayModel.filter(objectUri, 
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution")
+                , null).size());
+        
+        Assert.assertEquals("Unexpected Lead Institution", "CSIRO HRPPC", displayModel.filter(objectUri, 
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).objectString());
+
+        Assert.assertTrue("Expected content missing in display model",
+                displayModel.toString().contains("PODD - Towards An Extensible, Domain-agnostic Scientific Data Management System"));
+    }
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getOntologies(boolean, RepositoryConnection, URI)}

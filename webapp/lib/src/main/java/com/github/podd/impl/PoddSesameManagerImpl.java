@@ -185,7 +185,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public List<InferredOWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
     {
-        //FIXME: This implementation doesn't seem correct. Verify with tests.
+        // FIXME: This implementation doesn't seem correct. Verify with tests.
         return this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
     }
     
@@ -271,7 +271,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * ID of the current version of this ontology is returned.
      * 
      * @param ontologyIRI
-     *         Either an Ontology IRI or Version IRI for which the current version is requested. 
+     *            Either an Ontology IRI or Version IRI for which the current version is requested.
      * @param repositoryConnection
      * @param managementGraph
      * @return A List of InferredOWLOntologyIDs. If the ontology is managed, the list will contain
@@ -293,7 +293,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb1.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
         sb1.append(" ?ontologyIri <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
         sb1.append(" ?ontologyIri <" + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
-
+        
         sb1.append(" }");
         
         this.log.info("Generated SPARQL {} with ontologyIri bound to {}", sb1.toString(), ontologyIRI.toString());
@@ -603,7 +603,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * The contexts searched in are, the given ongology's asserted and inferred graphs as well as
      * their imported schema ontology graphs.
      * 
-     * This method depends on the poddBase:doNotDisplay annotation to filter out unwanted super-types.
+     * This method depends on the poddBase:doNotDisplay annotation to filter out unwanted
+     * super-types.
      * 
      * @param ontologyID
      *            The artifact to which the object belongs
@@ -622,7 +623,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" WHERE { ");
         sb.append(" ?objectUri <" + RDF.TYPE + "> ?poddTypeUri . ");
         
-        sb.append(" FILTER NOT EXISTS { ?poddTypeUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
+        sb.append(" FILTER NOT EXISTS { ?poddTypeUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                + "> true } ");
         sb.append(" FILTER isIRI(?poddTypeUri) ");
         
         // filter out TYPE statements for OWL:Thing, OWL:Individual, OWL:NamedIndividual & OWL:Class
@@ -638,7 +640,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery, this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
+                this.executeSparqlQuery(tupleQuery,
+                        this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
         
         List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
         
@@ -1003,72 +1006,76 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     /**
-     * Spike method only.
+     * Constructs a <code>Model</code> containing cardinality statements for a given PODD object and
+     * property.
      * 
-     * Retrieves the cardinalities from the schema ontologies, for the given concept and property.
+     * For example, passing in the URIs for a PoddTopObject and property hasLeadInstitution, the
+     * output Model will contain a single Statement of the form
+     * "{poddBase:hasLeadInstitution} {owl:maxQualifiedCardinality} {1}".
      * 
-     * NOTE: does not work on "unqualified" cardinality statements yet.
+     * This method currently handles only Qualified Cardinality statements, which are the only type
+     * found in PODD schema ontologies at present. However, as the property's value type is ignored,
+     * the output is incomplete if a property has more than one type of possible value with
+     * different cardinalities.
      * 
+     * @param artifactID
+     *            The artifact to which the object under consideration belongs
      * @param objectUri
+     *            The object under consideration
      * @param propertyUri
+     *            The property under consideration
      * @param repositoryConnection
-     * @param contexts
-     * @return an integer array of size 3.
+     * @return a Model containing simplified cardinality statements.
      * @throws OpenRDFException
      */
     @Override
     public Model getCardinality(final InferredOWLOntologyID artifactID, final URI objectUri, final URI propertyUri,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
-        final int[] cardinalities = { -1, -1, -1 };
+        /*
+         * Example of how a qualified cardinality statement appears in RDF triples
+         * 
+         * {poddBase:PoddTopObject} <rdfs:subClassOf> {_:node17l3l94qux1}
+         * 
+         * {_:node17l3l94qux1} <rdf:type> {owl:Restriction}
+         * 
+         * {_:node17l3l94qux1} <owl#onProperty> {poddBase:hasLeadInstitution}
+         * 
+         * {_:node17l3l94qux1} <owl:qualifiedCardinality> {"1"^^<xsd:nonNegativeInteger>}
+         * 
+         * {_:node17l3l94qux1} <owl:onDataRange> {xsd:string}
+         */
         
         final StringBuilder sb = new StringBuilder();
         
-        sb.append("SELECT ?maxCardinality ?minCardinality ?qualifiedCardinality ");
-        sb.append(" WHERE { ");
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?propertyUri <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxQualifiedCardinality . ");
+        sb.append(" ?propertyUri <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minQualifiedCardinality . ");
+        sb.append(" ?propertyUri <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality . ");
         
-        sb.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> ?poddConcept . ");
-        sb.append(" ?poddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
+        sb.append(" } WHERE { ");
+        
+        sb.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> ?somePoddConcept . ");
+        sb.append(" ?somePoddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
+        sb.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
         sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
-        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxCardinality } . ");
-        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxQualifiedCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minQualifiedCardinality } . ");
         sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality } . ");
         
         sb.append(" } ");
         
-        this.log.info("Created SPARQL {}", sb.toString());
+        this.log.info("Created SPARQL {} with propertyUri {} and poddObject {}", sb.toString(),
+                propertyUri.stringValue(), objectUri.stringValue());
         
-        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        tupleQuery.setBinding("poddConcept", objectUri);
-        tupleQuery.setBinding("propertyUri", propertyUri);
-        final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery,
-                        versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+        final GraphQuery query = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        query.setBinding("poddObject", objectUri);
+        query.setBinding("propertyUri", propertyUri);
         
-        for(BindingSet binding : queryResults.getBindingSets())
-        {
-            Value minCardinality = binding.getValue("minCardinality");
-            if(minCardinality != null && minCardinality instanceof Literal)
-            {
-                cardinalities[0] = ((Literal)minCardinality).intValue();
-            }
-            
-            Value qualifiedCardinality = binding.getValue("qualifiedCardinality");
-            if(qualifiedCardinality != null && qualifiedCardinality instanceof Literal)
-            {
-                cardinalities[1] = ((Literal)qualifiedCardinality).intValue();
-            }
-            
-            Value maxCardinality = binding.getValue("maxCardinality");
-            if(maxCardinality != null && maxCardinality instanceof Literal)
-            {
-                cardinalities[2] = ((Literal)maxCardinality).intValue();
-            }
-        }
+        final Model queryResults =
+                this.executeGraphQuery(query, versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
         
-        // return cardinalities;
-        // FIXME: TODO: Implement me
-        return new LinkedHashModel();
+        return queryResults;
     }
     
     /*
@@ -1164,7 +1171,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // value may not have a Label
         sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
-        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
+        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                + "> true } ");
         
         sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
         sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
@@ -1210,9 +1218,24 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" ?poddObject ?propertyUri ?value . ");
         sb.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
-        sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        
+        // property may not have a Label
+        sb.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
+        
         // value may not have a Label
         sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
+        
+        // cardinality
+        // sb.append(" OPTIONAL { ?value <" + RDF.TYPE.stringValue() + "> ?poddConcept } . ");
+        // sb.append(" OPTIONAL { ?poddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?b01 } . ");
+        // sb.append(" OPTIONAL { ?b01 <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri } . ");
+        // sb.append(" OPTIONAL { ?b01 <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxCardinality } . ");
+        // sb.append(" OPTIONAL { ?b01 <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minCardinality } . ");
+        // sb.append(" OPTIONAL { ?b01 <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality } . ");
+        
+        // avoid non-displayable properties (e.g. PoddInternalObject which is an "abstract" concept)
+        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                + "> true } ");
         
         sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
         sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
@@ -1281,7 +1304,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append("FILTER (?propertyUri != <" + RDFS.LABEL.stringValue() + ">) ");
         sb.append("FILTER (?propertyUri != <" + RDFS.COMMENT.stringValue() + ">) ");
         
-        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
+        sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                + "> true } ");
         
         sb.append(" } ");
         sb.append("  ORDER BY ASC(?weight) ASC(?propertyLabel) ");
@@ -1305,5 +1329,5 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         return resultList;
     }
-
+    
 }
