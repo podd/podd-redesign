@@ -3,6 +3,8 @@
  */
 package com.github.podd.resources;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +17,16 @@ import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
@@ -30,6 +38,7 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
@@ -49,6 +58,62 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     public EditArtifactResourceImpl()
     {
         super();
+    }
+    
+    /**
+     * Handle an HTTP POST request submitting RDF data to update an existing artifact
+     */
+    @Post(":rdf|rj|ttl")
+    public Representation editArtifactToRdf(final Representation entity, final Variant variant)
+        throws ResourceException
+    {
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        
+        if(artifactUri == null)
+        {
+            this.log.error("Artifact ID not submitted");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
+        }
+        
+        this.log.info("requesting edit artifact ({}): {}", variant.getMediaType().getName(), artifactUri);
+        
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
+                Collections.<URI> singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+        
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
+        
+        ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
+        
+        RDFWriter writer =
+                Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
+                        output);
+        
+        try
+        {
+            final InferredOWLOntologyID ontologyID =
+                    this.getPoddApplication().getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+            
+            // TODO: implement the edit logic!
+            
+            // - write the artifact ID into response
+            writer.startRDF();
+            OntologyUtils.ontologyIDsToHandler(Arrays.asList(ontologyID), writer);
+            writer.endRDF();
+            
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
+            
+        }
+        catch(OpenRDFException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
+        }
+        
+        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
+                .getDefaultMIMEType()));
     }
     
     /**
