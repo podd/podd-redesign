@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -1078,48 +1077,53 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return queryResults;
     }
     
-    /*
-     * Spike method.
+    /**
+     * Given a Collection concept's URI, this method attempts to return all the valid members that
+     * belong in the Collection.
      * 
-     * {http://purl.org/podd/ns/poddScience#PlatformType}
-     * <http://www.w3.org/2002/07/owl#equivalentClass> {_:genid1636663090} {_:genid1636663090}
-     * <http://www.w3.org/2002/07/owl#oneOf> {_:genid72508669}
-     * 
-     * {_:genid72508669} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
-     * {http://purl.org/podd/ns/poddScience#Software} {_:genid72508669}
-     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> {_:genid953844943}
-     * 
-     * {_:genid953844943} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
-     * {http://purl.org/podd/ns/poddScience#HardwareSoftware} {_:genid953844943}
-     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> {_:genid278519207}
-     * 
-     * {_:genid278519207} <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
-     * {http://purl.org/podd/ns/poddScience#Hardware} {_:genid278519207}
-     * <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
-     * {http://www.w3.org/1999/02/22-rdf-syntax-ns#nil}
-     * 
-     * SELECT ?member WHERE { ?conceptUri :equivalentClass ?b0 . ?b0 :oneOf ?b1 . ?b1 rdf:rest * /
-     * rdf:first ?member . }
+     * @param artifactID
+     *            The Collection should either belong to this artifact or be imported by it.
+     * @param conceptUri
+     *            A URI representing a Collection whose members are sought.
+     * @param repositoryConnection
+     * @return A List of URIs representing all valid members of the given Collection, or an empty
+     *         list if the URI does not represent a Collection.
+     * @throws OpenRDFException
      */
     @Override
     public List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI conceptUri,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
+        /*
+         * Example: Triples describing PlatformType enumeration consisting of 3 members.
+         * 
+         * {poddScience:PlatformType} <owl:equivalentClass> {_:genid1636663090}
+         * 
+         * {_:genid1636663090} <owl:oneOf> {_:genid72508669}
+         * 
+         * {_:genid72508669} <rdf:first> {poddScience:Software}
+         * 
+         * {_:genid72508669} <rdf:rest> {_:genid953844943}
+         * 
+         * {_:genid953844943} <rdf:first> {poddScience:HardwareSoftware}
+         * 
+         * {_:genid953844943} <rdf:rest> {_:genid278519207}
+         * 
+         * {_:genid278519207} <rdf:first> {poddScience:Hardware}
+         * 
+         * {_:genid278519207} <rdf:rest> {rdf:nil}
+         */
+        
         List<URI> results = new ArrayList<URI>();
         
         final StringBuilder sb = new StringBuilder();
-        
-        sb.append("SELECT ?member ?memberLabel ?memberDescription ");
-        sb.append(" WHERE { ");
-        
+        sb.append("SELECT ?member WHERE { ");
         sb.append(" ?poddConcept <" + OWL.EQUIVALENTCLASS.stringValue() + "> ?x . ");
         sb.append(" ?x <" + OWL.ONEOF.stringValue() + "> ?list . ");
         sb.append(" ?list <" + RDF.REST.stringValue() + ">*/<" + RDF.FIRST.stringValue() + "> ?member . ");
-        sb.append(" OPTIONAL { ?member <" + RDFS.LABEL.stringValue() + "> ?memberLabel } . ");
-        sb.append(" OPTIONAL { ?member <" + RDFS.COMMENT.stringValue() + "> ?memberDescription } . ");
         sb.append(" } ");
         
-        this.log.info("Created SPARQL {}", sb.toString());
+        this.log.info("Created SPARQL {} with poddConcept bound to {}", sb.toString(), conceptUri);
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddConcept", conceptUri);

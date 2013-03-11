@@ -16,7 +16,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -366,6 +365,97 @@ public abstract class AbstractPoddSesameManagerTest
         }
         
     }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getAllValidMembers(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
+     * 
+     * Tests retrieving all possible values for Collection types
+     */
+    @Test
+    public void testGetAllValidMembers() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
+                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+        
+        // Collections to test
+        URI[] collectionsToTest =
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Software"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "PublicationStatus"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "HasControlAssertion"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildTypeAssertion"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"), };
+        
+        URI[][] expectedMembers =
+                {
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Software"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Hardware"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "HardwareSoftware") },
+                        
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "Sex_NotApplicable"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Unknown"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "Sex_Hermaphrodite"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Female"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Male") },
+                        
+                        {}, // <poddScience:Software> is not a Collection
+                        
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "Published"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "NotPublished"), },
+                        
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "HasControl_Yes"),
+                                ValueFactoryImpl.getInstance()
+                                        .createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_No"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "HasControl_NotApplicable"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "HasControl_Unknown") },
+                        
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_Yes"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_No"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "WildType_NotApplicable"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "WildType_Unknown") },
+                        
+                        {
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC_Yes"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC_No"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "ANZSRC_NotApplicable"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "ANZSRC_Unknown") },
+                };
+        
+        // iterate through test data
+        for(int i = 0; i < collectionsToTest.length; i++)
+        {
+            List<URI> members =
+                    this.testPoddSesameManager.getAllValidMembers(ontologyID, collectionsToTest[i],
+                            this.testRepositoryConnection);
+            Assert.assertEquals("Not the expected number of members", expectedMembers[i].length, members.size());
+            
+            List<URI> expectedMembersList = Arrays.asList(expectedMembers[i]);
+            for(URI resultObject : members)
+            {
+                Assert.assertTrue("Unexpected member found", expectedMembersList.contains(resultObject));
+            }
+        }
+    }    
     
     /**
      * Test method for
