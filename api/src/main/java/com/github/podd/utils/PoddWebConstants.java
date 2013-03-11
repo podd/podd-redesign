@@ -151,6 +151,8 @@ public interface PoddWebConstants
     public static final String PROPERTY_CHALLENGE_AUTH_METHOD = "podd.webservice.auth.challenge.method";
     public static final String PROPERTY_TEST_WEBSERVICE_RESET_KEY = "podd.webservice.reset.key";
     
+    public static final String PROPERTY_PURL_PREFIX = "podd.purl.prefix";
+    
     /**
      * Key used to select published artifacts. Defaults to true.
      */

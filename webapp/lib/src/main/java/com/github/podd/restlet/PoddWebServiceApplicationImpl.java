@@ -415,6 +415,10 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final PoddPurlProcessorFactoryRegistry nextPurlRegistry = new PoddPurlProcessorFactoryRegistry();
         nextPurlRegistry.clear();
         final PoddPurlProcessorFactory nextPurlProcessorFactory = new UUIDPurlProcessorFactoryImpl();
+
+        final String purlPrefix = PropertyUtil.get(PoddWebConstants.PROPERTY_PURL_PREFIX, null);
+        ((UUIDPurlProcessorFactoryImpl)nextPurlProcessorFactory).setPrefix(purlPrefix);
+        
         nextPurlRegistry.add(nextPurlProcessorFactory);
         
         final PoddFileReferenceManager nextFileReferenceManager = new PoddFileReferenceManagerImpl();
