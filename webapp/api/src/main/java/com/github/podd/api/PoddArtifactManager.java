@@ -6,10 +6,10 @@ package com.github.podd.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
 import java.util.List;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
@@ -255,4 +255,18 @@ public interface PoddArtifactManager
      *            imports for the PODD Artifact.
      */
     void updateSchemaImport(OWLOntologyID artifactId, OWLOntologyID schemaOntologyId);
+
+    /**
+     * 
+     * @param artifactUri
+     * @param inputStream
+     * @param format
+     * @return
+     * @throws OpenRDFException
+     * @throws PoddException
+     * @throws IOException
+     * @throws OWLException
+     */
+    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final InputStream inputStream,
+            final RDFFormat format) throws OpenRDFException, PoddException, IOException, OWLException;
 }

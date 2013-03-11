@@ -769,6 +769,24 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         this.sesameManager = sesameManager;
     }
     
+    @Override
+    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final InputStream inputStream, RDFFormat format)throws OpenRDFException,
+    PoddException, IOException, OWLException
+    {
+        if(inputStream == null)
+        {
+            throw new NullPointerException("Input stream must not be null");
+        }
+        
+        if(format == null)
+        {
+            format = RDFFormat.RDFXML;
+        }
+        
+        //TODO
+        throw new RuntimeException("TODO: Implement updateArtifact");
+    }
+    
     /*
      * (non-Javadoc)
      * 
