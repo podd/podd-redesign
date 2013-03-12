@@ -11,7 +11,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -25,6 +24,7 @@ import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.model.IRI;
@@ -769,9 +769,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         this.sesameManager = sesameManager;
     }
     
+    /*
+     * (non-Javadoc)
+     * @see com.github.podd.api.PoddArtifactManager#updateArtifact(org.openrdf.model.URI, java.io.InputStream, org.openrdf.rio.RDFFormat)
+     * 
+     * This implementation performs most of the steps carried out during loadArtifact(). Therefore, code and comments are 
+     * duplicated across these two methods.
+     */
     @Override
-    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final InputStream inputStream, RDFFormat format)throws OpenRDFException,
-    PoddException, IOException, OWLException
+    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final InputStream inputStream, RDFFormat format,
+            final boolean isReplace) throws OpenRDFException, IOException, OWLException, PoddException
     {
         if(inputStream == null)
         {
@@ -783,8 +790,241 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             format = RDFFormat.RDFXML;
         }
         
-        //TODO
-        throw new RuntimeException("TODO: Implement updateArtifact");
+        InferredOWLOntologyID artifactID = this.getArtifactByIRI(IRI.create(artifactUri));
+        
+        Repository tempRepository = this.getRepositoryManager().getNewTemporaryRepository();
+        RepositoryConnection tempRepositoryConnection = null;
+        RepositoryConnection permanentRepositoryConnection = null;
+        InferredOWLOntologyID inferredOWLOntologyID = null;
+        
+        try
+        {
+            // create a temporary in-memory repository
+            tempRepositoryConnection = tempRepository.getConnection();
+            tempRepositoryConnection.begin();
+
+            permanentRepositoryConnection = this.getRepositoryManager().getRepository().getConnection();
+            permanentRepositoryConnection.begin();
+            
+            // load and copy the artifact's concrete statements to the temporary store
+            final RepositoryResult<Statement> repoResult =
+                    permanentRepositoryConnection.getStatements(null, null, null, false, artifactID.getVersionIRI()
+                            .toOpenRDFURI());
+            URI tempContext = artifactID.getVersionIRI().toOpenRDFURI();
+            tempRepositoryConnection.add(repoResult, tempContext);
+        
+            // update the artifact statements
+            if(isReplace)
+            {
+                // create an intermediate context and add "edit" statements to it
+                final URI intContext = IRI.create("urn:intermediate:").toOpenRDFURI();
+                tempRepositoryConnection.add(inputStream, "", format, intContext);
+                
+                // get all Subjects in "edit" statements
+                final RepositoryResult<Statement> statements =
+                        tempRepositoryConnection.getStatements(null, null, null, false, intContext);
+                final List<Statement> allEditStatements = Iterations.addAll(statements, new ArrayList<Statement>());
+                
+                // remove all references to these Subjects in "main" context
+                for(final Statement statement : allEditStatements)
+                {
+                    tempRepositoryConnection.remove(statement.getSubject(), null, null, tempContext);
+                }
+                
+                // copy the "edit" statements from intermediate context into our "main" context
+                tempRepositoryConnection.add(
+                        tempRepositoryConnection.getStatements(null, null, null, false, intContext), tempContext);
+            }
+            else
+            {
+                tempRepositoryConnection.add(inputStream, "", format, tempContext);
+            }
+
+            // FIXME: Check for dangling objects that are no longer linked to the top object in the artifact
+            // If there are any dangling objects delete them from the temp repository before loading into OWLAPI
+            
+            // handle PURLs (copied from loadArtifact)
+            if(this.getPurlManager() != null)
+            {
+                this.log.info("Handling Purl generation");
+                final Set<PoddPurlReference> purlResults =
+                        this.getPurlManager().extractPurlReferences(tempRepositoryConnection, tempContext);
+                
+                this.getPurlManager().convertTemporaryUris(purlResults, tempRepositoryConnection, tempContext);
+            }
+
+            // work on the file references (copied from loadArtifact)
+            if(this.getFileReferenceManager() != null)
+            {
+                this.log.info("Handling File reference validation");
+                // calls, to setup the results collection
+                final Set<PoddFileReference> fileReferenceResults =
+                        this.getFileReferenceManager().extractFileReferences(tempRepositoryConnection,
+                                tempContext);
+                
+                // optionally verify the file references
+                if(fileReferenceResults.size() > 0)
+                {
+                    this.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
+                            tempRepositoryConnection, tempContext);
+                    // TODO: Optionally remove invalid file references or mark them as invalid using
+                    // RDF statements/OWL Classes
+                }
+            }
+            
+            // increment the version
+            OWLOntologyID currentManagedArtifactID =
+                    this.getSesameManager().getCurrentArtifactVersion(IRI.create(artifactUri),
+                            permanentRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
+            
+            IRI newVersionIRI = IRI.create(this.incrementVersion(currentManagedArtifactID.getVersionIRI().toString()));
+            
+            // set version IRI in temporary repository
+            this.log.info("Setting version IRI to <{}>", newVersionIRI);
+            tempRepositoryConnection.remove(artifactID.getOntologyIRI().toOpenRDFURI(),
+                    PoddRdfConstants.OWL_VERSION_IRI, null, tempContext);
+            tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
+                    newVersionIRI.toOpenRDFURI(), tempContext);            
+            
+            
+            // Check and ensure any new schema ontology imports are for version IRIs
+            final Set<IRI> importedSchemas1 =
+                    this.getSesameManager().getDirectImports(tempRepositoryConnection, tempContext);
+            for(final IRI importedSchemaIRI : importedSchemas1)
+            {
+                final InferredOWLOntologyID schemaOntologyID =
+                        this.getSesameManager().getSchemaVersion(importedSchemaIRI, permanentRepositoryConnection,
+                                this.getRepositoryManager().getSchemaManagementGraph());
+                
+                if(!importedSchemaIRI.equals(schemaOntologyID.getVersionIRI()))
+                {
+                    // modify import to be a specific version of the schema
+                    this.log.info("Updating import to version <{}>", schemaOntologyID.getVersionIRI());
+                    tempRepositoryConnection.remove(artifactID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                            importedSchemaIRI.toOpenRDFURI(), tempContext);
+                    tempRepositoryConnection.add(artifactID.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                            schemaOntologyID.getVersionIRI().toOpenRDFURI(), tempContext);
+                }
+            }
+            
+            // cache schema ontologies in memory before loading statements into OWLAPI
+            final Set<IRI> importedSchemas2 =
+                    this.getSesameManager().getDirectImports(tempRepositoryConnection, tempContext);
+            for(final IRI importedSchemaIRI : importedSchemas2)
+            {
+                final InferredOWLOntologyID ontologyVersion =
+                        this.getSesameManager().getSchemaVersion(importedSchemaIRI,
+                                permanentRepositoryConnection, this.getRepositoryManager().getSchemaManagementGraph());
+                
+                this.getOWLManager().cacheSchemaOntology(ontologyVersion, permanentRepositoryConnection,
+                        this.getRepositoryManager().getSchemaManagementGraph());
+            }
+            
+            
+            // load into OWLAPI
+            this.log.debug("Loading podd artifact from temp repository: {}", tempContext);
+            final List<Statement> statements =
+                    Iterations.asList(tempRepositoryConnection
+                            .getStatements(null, null, null, true, tempContext));
+            
+            final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
+            
+            owlSource.setNamespaces(tempRepositoryConnection.getNamespaces());
+            
+            final OWLOntology nextOntology = this.getOWLManager().loadOntology(owlSource);
+            
+            // Check the OWLAPI OWLOntology against an OWLProfile to make sure it is in profile
+            final OWLProfileReport profileReport =
+                    this.getOWLManager().getReasonerProfile().checkOntology(nextOntology);
+            if(!profileReport.isInProfile())
+            {
+                this.getOWLManager().removeCache(nextOntology.getOntologyID());
+                throw new OntologyNotInProfileException(nextOntology, profileReport,
+                        "Ontology is not in required OWL Profile");
+            }
+            
+            // Use the OWLManager to create a reasoner over the ontology
+            final OWLReasoner nextReasoner = this.getOWLManager().createReasoner(nextOntology);
+            
+            // Test that the ontology was consistent with this reasoner
+            // This ensures in the case of Pellet that it is in the OWL2-DL profile
+            if(!nextReasoner.isConsistent())
+            {
+                this.getOWLManager().removeCache(nextOntology.getOntologyID());
+                throw new InconsistentOntologyException(nextReasoner, "Ontology is inconsistent");
+            }
+            
+            // Copy the statements to permanentRepositoryConnection
+            this.getOWLManager().dumpOntologyToRepository(nextOntology, permanentRepositoryConnection,
+                    nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
+            
+            // NOTE: At this stage, a client could be notified, and the artifact could be streamed
+            // back to them from permanentRepositoryConnection
+            
+            // Use an OWLAPI InferredAxiomGenerator together with the reasoner to create inferred
+            // axioms to store in the database.
+            // Serialise the inferred statements back to a different context in the permanent
+            // repository connection.
+            // The contexts to use within the permanent repository connection are all encapsulated
+            // in the InferredOWLOntologyID object.
+            inferredOWLOntologyID =
+                    this.getOWLManager().inferStatements(nextOntology, permanentRepositoryConnection);
+            
+            this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true,
+                    permanentRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
+            
+            permanentRepositoryConnection.commit();            
+            tempRepositoryConnection.rollback();
+            
+            return inferredOWLOntologyID;
+        }
+        catch(final Exception e)
+        {
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isActive())
+            {
+                tempRepositoryConnection.rollback();
+            }
+            
+            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isActive())
+            {
+                permanentRepositoryConnection.rollback();
+            }
+            
+            throw e;
+        }
+        finally
+        {
+            // release resources
+            if(inferredOWLOntologyID != null)
+            {
+                this.getOWLManager().removeCache(inferredOWLOntologyID);
+            }
+            
+            if(tempRepositoryConnection != null && tempRepositoryConnection.isOpen())
+            {
+                try
+                {
+                    tempRepositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
+            }
+            tempRepository.shutDown();
+            
+            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
+            {
+                try
+                {
+                    permanentRepositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
+            }
+        }
     }
     
     /*

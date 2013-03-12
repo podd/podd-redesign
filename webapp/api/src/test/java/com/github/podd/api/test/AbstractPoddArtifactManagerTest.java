@@ -21,6 +21,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -54,6 +55,7 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -64,10 +66,13 @@ import com.github.podd.utils.PoddRdfConstants;
 public abstract class AbstractPoddArtifactManagerTest
 {
     
+    private static final String TEST_ARTIFACT_1_INTERNAL_OBJECT = "/test/artifacts/basicProject-1-internal-object.rdf";
+    private static final String TEST_ARTIFACT_WITH_PURLS_1 = "/test/artifacts/project-with-purls-v1.rdf";
+
     private static final int EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE = 32;
-
+    
     private static final int EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED = 295;
-
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private PoddArtifactManager testArtifactManager;
@@ -253,35 +258,29 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED,
-                        this.testRepositoryConnection);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED,
-                        this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
-                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED,
-                        this.testRepositoryConnection);
+                this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED,
-                        this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED,
-                        this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPPlantOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_PLANT, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED,
-                        this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED, this.testRepositoryConnection);
         
         // prepare: update schema management graph
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
@@ -415,7 +414,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
         
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
@@ -486,7 +485,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";
@@ -529,7 +528,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";
@@ -567,7 +566,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
         
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
@@ -651,7 +650,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testLoadArtifactWithIncorrectFormat() throws Exception
     {
         final InputStream inputStream =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
         try
         {
             // invoke test method with the invalid RDF Format of TURTLE
@@ -675,29 +674,24 @@ public abstract class AbstractPoddArtifactManagerTest
         // prepare: load schema ontologies
         final InferredOWLOntologyID inferredDctermsOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_DCTERMS, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED,
-                        this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_DC_TERMS_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredFoafOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_FOAF, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED,
-                        this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_FOAF_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPUserOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_USER, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED,
-                        this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPBaseOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_BASE, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED,
-                        this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED, this.testRepositoryConnection);
         final InferredOWLOntologyID inferredPScienceOntologyID =
                 this.loadInferStoreOntology(PoddRdfConstants.PATH_PODD_SCIENCE, RDFFormat.RDFXML,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE, 
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED,
-                        this.testRepositoryConnection);
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE,
+                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
         
         // prepare: update schema management graph
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredDctermsOntologyID, false,
@@ -711,7 +705,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // PODD-Science ontology is not added to schema management graph
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
         final RDFFormat format = Rio.getParserFormatForMIMEType("application/rdf+xml", RDFFormat.RDFXML);
         
         try
@@ -757,7 +751,8 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      * 
-     * Tests loading an artifact which imports a previous version of a schema ontology (i.e. poddScience v1)
+     * Tests loading an artifact which imports a previous version of a schema ontology (i.e.
+     * poddScience v1)
      */
     @Test
     public final void testLoadArtifactWithNonCurrentSchemaVersionImport() throws Exception
@@ -792,9 +787,9 @@ public abstract class AbstractPoddArtifactManagerTest
                     "http://purl.org/podd/ns/version/dcTerms/1", 
                     "http://purl.org/podd/ns/version/poddUser/1",
                     "http://purl.org/podd/ns/version/poddBase/1",
-                    "http://purl.org/podd/ns/version/poddScience/1", // an older version 
+                    "http://purl.org/podd/ns/version/poddScience/1", // an older version
                     };
-
+            
             // verify: no. of import statements
             final int importStatementCount =
                     Iterations.asList(
@@ -825,7 +820,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = null;
         }
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
@@ -841,7 +836,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // load 1st artifact
         final InputStream inputStream4FirstArtifact =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
@@ -854,8 +849,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID secondArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 14, 
-                EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE, EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED, false);
+        this.verifyLoadedArtifact(firstArtifactId, 14, EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE,
+                EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_INFERRED, false);
         this.verifyLoadedArtifact(secondArtifactId, 14, 29, 290, true);
     }
     
@@ -935,7 +930,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1-internal-object.rdf");
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";
@@ -987,6 +982,164 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Test
+    public final void testUpdateArtifactAddNewPoddObjectWithMerge() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_WITH_PURLS_1);
+        
+        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
+        this.verifyLoadedArtifact(artifactId, 7, 29, 290, false);
+        
+        final InputStream editInputStream =
+                this.getClass().getResourceAsStream("/test/artifacts/fragment-1.rdf");
+        InferredOWLOntologyID updatedArtifact =
+                this.testArtifactManager.updateArtifact(artifactId.getVersionIRI().toOpenRDFURI(), editInputStream,
+                        RDFFormat.RDFXML, false);
+        
+        // verify: artifact is correctly updated
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
+            
+            Assert.assertEquals(34, nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
+            
+            // verify: a single statement exists of form {?x TYPE #Analysis} in concrete ontology
+            final List<Statement> testList =
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, RDF.TYPE, ValueFactoryImpl
+                            .getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Analysis"), false, updatedArtifact
+                            .getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Graph should have one TYPE is PoddScience:Analysis statement.", 1,
+                    testList.size());
+            
+            // verify: Demo_Analysis object exists
+            Assert.assertTrue("Wrong Subject", 
+                    testList.get(0).getSubject().toString().endsWith("artifact:1#Demo_Analysis"));
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+        
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testUpdateArtifactAddNewPoddObjectWithReplace() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }    
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testUpdateArtifactAddNonExistentArtifact() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }    
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testUpdateArtifactAddNewPoddObjectWithFileReferences() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }    
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testUpdateArtifactWithDanglingObjects() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }    
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     * Update an old version of an artifact
+     * 
+     */
+    @Ignore
+    @Test
+    public final void testUpdateArtifactWithPreviousVersionIRI() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }    
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testUpdateArtifactDeletePoddObject() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }    
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testUpdateArtifactMovePoddObject() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }    
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Ignore
+    @Test
+    public final void testUpdateArtifactModifyPoddObject() throws Exception
+    {
+        Assert.fail("Not yet implemented"); // TODO
+    }    
+
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImport(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
@@ -997,7 +1150,6 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.fail("Not yet implemented"); // TODO
     }
     
-
     /**
      * Helper method to write Repository graphs to files when required.
      * 
@@ -1021,7 +1173,7 @@ public abstract class AbstractPoddArtifactManagerTest
         dumpRdfToFile(resultArtifactId.getInferredOntologyIRI().toOpenRDFURI(),
                 "/home/kutila/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
         
-/*        
+/*            
         String[] contexts = {
                 // "http://purl.org/podd/ns/version/dcTerms/1",
                 "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/dcTerms/1",
@@ -1035,7 +1187,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1",
                 // "http://purl.org/podd/ns/version/poddPlant/1",
                 "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddPlant/1", };
-        
+            
         String[] fileNames = {
                 // "dcTerms",
                 "dcTermsInferred",
@@ -1049,7 +1201,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 "poddScienceInferred",
                 // "poddPlant",
                 "poddPlantInferred", };
-        
+            
         for(int i = 0; i < contexts.length; i++)
         {
             URI context = ValueFactoryImpl.getInstance().createURI(contexts[i]);
@@ -1058,8 +1210,8 @@ public abstract class AbstractPoddArtifactManagerTest
             
             dumpRdfToFile(context, (path + fileNames[i]), writeFormat);
         }
-*/
-     }
+*/    
+    }
     
     /**
      * Write contents of specified context to a file
@@ -1070,8 +1222,8 @@ public abstract class AbstractPoddArtifactManagerTest
      * @throws IOException
      * @throws OpenRDFException
      */
-    public void dumpRdfToFile(URI context, String filename, final RDFFormat writeFormat)
-        throws IOException, OpenRDFException
+    public void dumpRdfToFile(URI context, String filename, final RDFFormat writeFormat) throws IOException,
+        OpenRDFException
     {
         String outFilename = filename + "." + writeFormat.getFileExtensions().get(0);
         
