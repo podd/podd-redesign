@@ -4,6 +4,8 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,9 +32,11 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
@@ -63,7 +67,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     /**
      * Handle an HTTP POST request submitting RDF data to update an existing artifact
      */
-    @Post(":rdf|rj|ttl")
+    @Post("rdf|rj|ttl")
     public Representation editArtifactToRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
@@ -83,31 +87,45 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
-        ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
+        // - get input stream with edited RDF content
+        InputStream inputStream = null;
+        try
+        {
+            inputStream = entity.getStream();
+        }
+        catch(IOException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
+        }
+        RDFFormat inputFormat = Rio.getParserFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         
+        ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         RDFWriter writer =
                 Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
                         output);
         
         try
         {
+            final boolean isReplace = true;
             final InferredOWLOntologyID ontologyID =
-                    this.getPoddApplication().getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
-            
-            // TODO: implement the edit logic!
+                    this.getPoddArtifactManager().updateArtifact(ValueFactoryImpl.getInstance().createURI(artifactUri),
+                            inputStream, inputFormat, isReplace);
+            //TODO - send detailed errors for display where possible
             
             // - write the artifact ID into response
             writer.startRDF();
             OntologyUtils.ontologyIDsToHandler(Arrays.asList(ontologyID), writer);
             writer.endRDF();
-            
         }
         catch(final UnmanagedArtifactIRIException e)
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
-            
         }
-        catch(OpenRDFException e)
+        catch(final PoddException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response", e);
+        }
+        catch(OpenRDFException | IOException | OWLException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
