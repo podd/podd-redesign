@@ -996,10 +996,10 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactId, 7, 97, 393, false);
         
         final InputStream editInputStream =
-                this.getClass().getResourceAsStream("/test/artifacts/fragment-1.rdf");
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_PUBLICATION_OBJECT);
         InferredOWLOntologyID updatedArtifact =
                 this.testArtifactManager.updateArtifact(artifactId.getVersionIRI().toOpenRDFURI(), editInputStream,
-                        RDFFormat.RDFXML, false);
+                        RDFFormat.TURTLE, false);
         
         // verify: artifact is correctly updated
         RepositoryConnection nextRepositoryConnection = null;
@@ -1010,20 +1010,20 @@ public abstract class AbstractPoddArtifactManagerTest
             
             DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
             
-            Assert.assertEquals("Not expected # statements in graph", 102,
+            Assert.assertEquals("Not expected # statements in graph", 108,
                     nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
             
-            // verify: a single statement exists of form {?x TYPE #Analysis} in concrete ontology
+            // verify: 2 publications exist
             final List<Statement> testList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, RDF.TYPE, ValueFactoryImpl
-                            .getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Analysis"), false, updatedArtifact
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl
+                            .getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
-            Assert.assertEquals("Graph should have one TYPE is PoddScience:Analysis statement.", 2,
-                    testList.size());
+            Assert.assertEquals("Graph should have 2 publications", 2, testList.size());
             
-            // verify: Demo_Analysis object exists
-            Assert.assertTrue("Wrong Subject", 
-                    testList.get(0).getSubject().toString().endsWith("artifact:1#Demo_Analysis"));
+            // verify: newly added publication exists
+            Assert.assertTrue("New publication is missing", 
+                    testList.get(0).getObject().toString().endsWith("#publication46") || 
+                    testList.get(1).getObject().toString().endsWith("#publication46"));
         }
         finally
         {
@@ -1037,7 +1037,6 @@ public abstract class AbstractPoddArtifactManagerTest
             }
             nextRepositoryConnection = null;
         }
-        
     }
     
     /**
