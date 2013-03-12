@@ -1148,20 +1148,6 @@ public abstract class AbstractPoddArtifactManagerTest
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * .
-     * Update an old version of an artifact
-     * 
-     */
-    @Ignore
-    @Test
-    public final void testUpdateArtifactWithPreviousVersionIRI() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }    
-
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
-     * .
      */
     @Ignore
     @Test
