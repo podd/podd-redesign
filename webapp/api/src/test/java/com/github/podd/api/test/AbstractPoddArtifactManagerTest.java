@@ -1044,11 +1044,68 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * .
      */
-    @Ignore
     @Test
     public final void testUpdateArtifactAddNewPoddObjectWithReplace() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        
+        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        final int assertedStatementCount = 97;
+        this.verifyLoadedArtifact(artifactId, 7, assertedStatementCount, 393, false);
+        
+        final InputStream editInputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT);
+        InferredOWLOntologyID updatedArtifact =
+                this.testArtifactManager.updateArtifact(artifactId.getVersionIRI().toOpenRDFURI(), editInputStream,
+                        RDFFormat.TURTLE, true);
+        
+        // verify: artifact is correctly updated
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
+            
+            // verify: no change in number of statements
+            Assert.assertEquals("Not expected # statements in graph", assertedStatementCount,
+                    nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
+            
+            // TODO: verify version IRI has been incremented
+            
+            // verify: still only 1 publication
+            final List<Statement> testList =
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl
+                            .getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
+                            .getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Incorrect no. of hasPublication statements", 1, testList.size());
+            
+            // verify: publication info has been updated
+            final List<Statement> testList2 = Iterations.asList(nextRepositoryConnection.getStatements(
+                            null, 
+                            ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasYear"), 
+                            null, 
+                            false, updatedArtifact.getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Incorrect no. of hasYear statements", 1, testList2.size());
+            Assert.assertEquals("Publication Year has not bee updated", "2011", testList2.get(0).getObject().stringValue());
+            
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
     }    
 
     /**

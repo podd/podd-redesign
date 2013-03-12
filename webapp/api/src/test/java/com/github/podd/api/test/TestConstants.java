@@ -37,5 +37,7 @@ public interface TestConstants
     /** Test resource: fragment containing a Publication object  in Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_PUBLICATION_OBJECT = "/test/artifacts/fragment-new-publication.ttl";
 
+    /** Test resource: fragment containing a Publication object  in Turtle format */
+    public static final String TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT = "/test/artifacts/fragment-modified-publication.ttl";
     
 }
