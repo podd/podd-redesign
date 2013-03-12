@@ -778,7 +778,7 @@ public abstract class AbstractPoddSesameManagerTest
     @Test
     public void testGetDirectImports() throws Exception
     {
-        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+        final String resourcePath = TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT;
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         
         final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
@@ -1083,7 +1083,7 @@ public abstract class AbstractPoddSesameManagerTest
     @Test
     public void testGetOntologyIRI() throws Exception
     {
-        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+        final String resourcePath = TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT;
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         
         final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);

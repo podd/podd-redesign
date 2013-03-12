@@ -802,7 +802,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // create a temporary in-memory repository
             tempRepositoryConnection = tempRepository.getConnection();
             tempRepositoryConnection.begin();
-
+            
             permanentRepositoryConnection = this.getRepositoryManager().getRepository().getConnection();
             permanentRepositoryConnection.begin();
             

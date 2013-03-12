@@ -24,6 +24,7 @@ import org.openrdf.sail.memory.MemoryStore;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlReference;
+import com.github.podd.api.test.TestConstants;
 
 /**
  * Abstract class to test PoddPurlManager.
@@ -280,7 +281,7 @@ public abstract class AbstractPoddPurlManagerTest
      */
     protected URI loadTestResources() throws Exception
     {
-        final String resourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+        final String resourcePath = TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT;
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         
         final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);

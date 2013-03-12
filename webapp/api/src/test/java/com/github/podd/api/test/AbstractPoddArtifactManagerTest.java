@@ -66,8 +66,8 @@ import com.github.podd.utils.PoddRdfConstants;
 public abstract class AbstractPoddArtifactManagerTest
 {
     
-    private static final String TEST_ARTIFACT_1_INTERNAL_OBJECT = "/test/artifacts/basicProject-1-internal-object.rdf";
     private static final String TEST_ARTIFACT_WITH_PURLS_1 = "/test/artifacts/project-with-purls-v1.rdf";
+    private static final String TEST_ARTIFACT_20130206 = "/test/artifacts/basic-20130206.ttl";
 
     private static final int EXPECTED_TRIPLE_COUNT_TEST_ARTIFACT_CONCRETE = 32;
     
@@ -414,7 +414,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
@@ -485,7 +485,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";
@@ -528,7 +528,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";
@@ -566,7 +566,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
@@ -650,7 +650,7 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testLoadArtifactWithIncorrectFormat() throws Exception
     {
         final InputStream inputStream =
-                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         try
         {
             // invoke test method with the invalid RDF Format of TURTLE
@@ -705,7 +705,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // PODD-Science ontology is not added to schema management graph
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         final RDFFormat format = Rio.getParserFormatForMIMEType("application/rdf+xml", RDFFormat.RDFXML);
         
         try
@@ -836,7 +836,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // load 1st artifact
         final InputStream inputStream4FirstArtifact =
-                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
@@ -930,7 +930,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream(TEST_ARTIFACT_1_INTERNAL_OBJECT);
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         // MIME type should be either given by the user, detected from the content type on the
         // request, or autodetected using the Any23 Mime Detector
         final String mimeType = "application/rdf+xml";
@@ -991,10 +991,10 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         final InputStream inputStream =
-                this.getClass().getResourceAsStream(TEST_ARTIFACT_WITH_PURLS_1);
+                this.getClass().getResourceAsStream(TEST_ARTIFACT_20130206);
         
-        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
-        this.verifyLoadedArtifact(artifactId, 7, 29, 290, false);
+        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactId, 7, 97, 393, false);
         
         final InputStream editInputStream =
                 this.getClass().getResourceAsStream("/test/artifacts/fragment-1.rdf");
@@ -1011,14 +1011,15 @@ public abstract class AbstractPoddArtifactManagerTest
             
             DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
             
-            Assert.assertEquals(34, nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Not expected # statements in graph", 102,
+                    nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
             
             // verify: a single statement exists of form {?x TYPE #Analysis} in concrete ontology
             final List<Statement> testList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, RDF.TYPE, ValueFactoryImpl
                             .getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Analysis"), false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
-            Assert.assertEquals("Graph should have one TYPE is PoddScience:Analysis statement.", 1,
+            Assert.assertEquals("Graph should have one TYPE is PoddScience:Analysis statement.", 2,
                     testList.size());
             
             // verify: Demo_Analysis object exists

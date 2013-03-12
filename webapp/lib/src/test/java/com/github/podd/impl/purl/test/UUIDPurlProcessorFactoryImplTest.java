@@ -26,6 +26,7 @@ import com.github.podd.api.PoddRdfProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlProcessorPrefixes;
 import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
+import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.utils.PoddRdfUtils;
 
@@ -69,7 +70,7 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
             repositoryConnection.begin();
             
             // load RDF graph into Repository
-            final String artifactResourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+            final String artifactResourcePath = TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT;
             final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);
             Assert.assertNotNull("Could not find resource", inputStream);
             
@@ -134,7 +135,7 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
             repositoryConnection.begin();
             
             // load RDF graph into Repository
-            final String artifactResourcePath = "/test/artifacts/basicProject-1-internal-object.rdf";
+            final String artifactResourcePath = TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT;
             final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);
             Assert.assertNotNull("Could not find resource", inputStream);
             

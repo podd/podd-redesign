@@ -25,5 +25,8 @@ public interface TestConstants
     
     public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE = 83;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED = 265;
+ 
+    /** Test resource: artifact with 1 internal object */
+    public static final String TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT = "/test/artifacts/basic-1-internal-object.rdf";
     
 }
