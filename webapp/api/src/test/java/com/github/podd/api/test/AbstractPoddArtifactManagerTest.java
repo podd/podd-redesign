@@ -21,7 +21,6 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -1009,27 +1008,8 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
-            DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
-            
-            Assert.assertEquals("Not expected # statements in graph", 108,
-                    nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
-
-            // verify: owl:versionIRI incremented in graph
-            final List<Statement> versionIRIs =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, PoddRdfConstants.OWL_VERSION_IRI,
-                            null, false, updatedArtifact.getVersionIRI().toOpenRDFURI()));
-            Assert.assertEquals("Graph should have 2 publications", 1, versionIRIs.size());
-            Assert.assertEquals("Version IRI in graph not expected value",
-                    "http://purl.org/podd/basic-2-20130206/artifact:1:version:2", versionIRIs.get(0).getObject()
-                            .stringValue());
-            
-            // verify: current version updated in management graph
-            InferredOWLOntologyID currentArtifactVersion =
-                    this.testArtifactManager.getSesameManager().getCurrentArtifactVersion(
-                            updatedArtifact.getOntologyIRI(), nextRepositoryConnection, artifactGraph);
-            Assert.assertEquals("Version IRI in graph not expected value",
-                    "http://purl.org/podd/basic-2-20130206/artifact:1:version:2", currentArtifactVersion
-                            .getVersionIRI().toString());
+            verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    108, nextRepositoryConnection);
             
             // verify: 2 publications exist
             final List<Statement> testList =
@@ -1088,26 +1068,8 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
-            // verify: no change in number of statements
-            Assert.assertEquals("Not expected # statements in graph", assertedStatementCount,
-                    nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
-            
-            // verify: owl:versionIRI incremented
-            final List<Statement> versionIRIs =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, PoddRdfConstants.OWL_VERSION_IRI,
-                            null, false, updatedArtifact.getVersionIRI().toOpenRDFURI()));
-            Assert.assertEquals("Graph should have 2 publications", 1, versionIRIs.size());
-            Assert.assertEquals("Version IRI in graph not expected value",
-                    "http://purl.org/podd/basic-2-20130206/artifact:1:version:2", versionIRIs.get(0).getObject()
-                            .stringValue());
-            
-            // verify: current version updated in management graph
-            InferredOWLOntologyID currentArtifactVersion =
-                    this.testArtifactManager.getSesameManager().getCurrentArtifactVersion(
-                            updatedArtifact.getOntologyIRI(), nextRepositoryConnection, artifactGraph);
-            Assert.assertEquals("Version IRI in graph not expected value",
-                    "http://purl.org/podd/basic-2-20130206/artifact:1:version:2", currentArtifactVersion
-                            .getVersionIRI().toString());
+            verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    assertedStatementCount, nextRepositoryConnection);
             
             // verify: still only 1 publication
             final List<Statement> testList =
@@ -1171,13 +1133,64 @@ public abstract class AbstractPoddArtifactManagerTest
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * .
+     * 
+     * NOTE: Once file reference validation is implemented in the FileReferenceManager this test will fail.
+     * The referred file will have to be created for validation to pass.
      */
-    @Ignore
     @Test
     public final void testUpdateArtifactAddNewPoddObjectWithFileReferences() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
-    }    
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        
+        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactId, 7, 97, 393, false);
+        
+        final InputStream editInputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);
+        InferredOWLOntologyID updatedArtifact =
+                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), editInputStream,
+                        RDFFormat.RDFXML, false);
+        
+        
+        // verify:
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
+            
+            verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    105, nextRepositoryConnection);
+            
+            // verify: file reference object
+            final List<Statement> fileRefList =
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
+                            .createURI(PoddRdfConstants.PODD_BASE, "hasFileReference"), null, false, updatedArtifact
+                            .getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
+
+            Assert.assertTrue("File reference value incorrect",
+                    fileRefList.get(0).getObject().stringValue().endsWith("publication-pdf-a"));
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+
+    }
 
     /**
      * Test method for
@@ -1470,4 +1483,36 @@ public abstract class AbstractPoddArtifactManagerTest
         }
     }
     
+    /**
+     * Helper method to verify that an updated artifact has expected version IRI etc.
+     * 
+     * @param updatedArtifact
+     * @param expectedVersionIri
+     * @param expectedConcreteStatementCount
+     * @param nextRepositoryConnection
+     * @throws Exception
+     */
+    private void verifyUpdatedArtifact(InferredOWLOntologyID updatedArtifact, String expectedVersionIri,
+            long expectedConcreteStatementCount, RepositoryConnection nextRepositoryConnection) throws Exception
+    {
+        Assert.assertEquals("Unexpected concrete statement count", expectedConcreteStatementCount,
+                nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
+        
+        // verify: owl:versionIRI incremented in graph
+        final List<Statement> versionIRIs =
+                Iterations.asList(nextRepositoryConnection.getStatements(null, PoddRdfConstants.OWL_VERSION_IRI, null,
+                        false, updatedArtifact.getVersionIRI().toOpenRDFURI()));
+        Assert.assertEquals("Should have only 1 version IRI", 1, versionIRIs.size());
+        Assert.assertEquals("Version IRI not expected value", expectedVersionIri, versionIRIs.get(0).getObject()
+                .stringValue());
+        
+        // verify: current version updated in management graph
+        InferredOWLOntologyID currentArtifactVersion =
+                this.testArtifactManager.getSesameManager().getCurrentArtifactVersion(updatedArtifact.getOntologyIRI(),
+                        nextRepositoryConnection, artifactGraph);
+        Assert.assertEquals("Unexpected Version IRI in management graph", expectedVersionIri, currentArtifactVersion
+                .getVersionIRI().toString());
+    }
+
+   
 }
