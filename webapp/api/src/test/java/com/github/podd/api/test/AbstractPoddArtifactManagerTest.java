@@ -1043,7 +1043,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testUpdateArtifactAddNewPoddObjectWithReplace() throws Exception
+    public final void testUpdateArtifactModifyPoddObjectWithReplace() throws Exception
     {
         this.loadSchemaOntologies();
         
@@ -1224,18 +1224,6 @@ public abstract class AbstractPoddArtifactManagerTest
     @Ignore
     @Test
     public final void testUpdateArtifactMovePoddObject() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }    
-
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testUpdateArtifactModifyPoddObject() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
     }    
