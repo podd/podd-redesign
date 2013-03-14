@@ -817,7 +817,7 @@ public abstract class AbstractPoddSesameManagerTest
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#publication45",
-                        "mailto:alyssa.weirman@csiro.au",
+                        "mailto:helen.daily@csiro.au",
                         "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", 
                         };
         

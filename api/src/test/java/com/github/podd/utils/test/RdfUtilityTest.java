@@ -21,26 +21,19 @@ public class RdfUtilityTest
     @Test
     public void testValidateArtifactConnectedness() throws Exception
     {
-        String[] resourcePaths = {
-                "/test/artifacts/basic-20130206.ttl", 
-                "/test/artifacts/basic-1-internal-object.rdf"
-                };
-        RDFFormat[] formats = {
-                RDFFormat.TURTLE, 
-                RDFFormat.RDFXML
-                };
-        boolean[] expectedOutputs = {
-                false, 
-                false,
-                };
+        Object[][] testData = {
+                {"/test/artifacts/3-topobjects.ttl", RDFFormat.TURTLE, false},
+                {"/test/artifacts/basic-20130206.ttl", RDFFormat.TURTLE, true},
+                {"/test/artifacts/basic-1-internal-object.rdf", RDFFormat.RDFXML, false},
+        };
         
-        for (int i = 0; i < resourcePaths.length; i++)
+        for (int i = 0; i < testData.length; i++)
         {
-            final InputStream inputStream = this.getClass().getResourceAsStream(resourcePaths[i]);
+            final InputStream inputStream = this.getClass().getResourceAsStream((String)testData[i][0]);
             Assert.assertNotNull("Null resource", inputStream);
             
-            boolean isConnected = RdfUtility.isConnectedStructure(inputStream, formats[i]);
-            Assert.assertEquals("Not the expected validity", expectedOutputs[i], isConnected);
+            boolean isConnected = RdfUtility.isConnectedStructure(inputStream, (RDFFormat)testData[i][1]);
+            Assert.assertEquals("Not the expected validity", testData[i][2], isConnected);
         }
     }
 

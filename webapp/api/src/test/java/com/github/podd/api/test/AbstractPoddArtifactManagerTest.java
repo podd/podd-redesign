@@ -992,7 +992,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         
         final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactId, 7, 97, 393, false);
+        this.verifyLoadedArtifact(artifactId, 7, 90, 383, false);
         
         final InputStream editInputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT);
@@ -1009,7 +1009,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    108, nextRepositoryConnection);
+                    101, nextRepositoryConnection);
             
             // verify: 2 publications exist
             final List<Statement> testList =
@@ -1051,8 +1051,8 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         
         final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        final int assertedStatementCount = 97;
-        this.verifyLoadedArtifact(artifactId, 7, assertedStatementCount, 393, false);
+        final int assertedStatementCount = 90;
+        this.verifyLoadedArtifact(artifactId, 7, assertedStatementCount, 383, false);
         
         final InputStream editInputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT);
@@ -1146,7 +1146,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         
         final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactId, 7, 97, 393, false);
+        this.verifyLoadedArtifact(artifactId, 7, 90, 383, false);
         
         final InputStream editInputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);
@@ -1165,7 +1165,7 @@ public abstract class AbstractPoddArtifactManagerTest
             DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
             
             verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    105, nextRepositoryConnection);
+                    98, nextRepositoryConnection);
             
             // verify: file reference object
             final List<Statement> fileRefList =

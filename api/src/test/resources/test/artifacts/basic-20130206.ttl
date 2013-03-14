@@ -248,19 +248,6 @@
 
 
 
-###  mailto:alyssa.weirman@csiro.au
-
-<mailto:alyssa.weirman@csiro.au> rdf:type poddUser:User ,
-                                          owl:NamedIndividual ;
-                                 
-                                 rdfs:label "A. Wierman" ;
-                                 
-                                 <http://xmlns.com/foaf/0.1/firstName> "Alyssa" ;
-                                 
-                                 <http://xmlns.com/foaf/0.1/lastName> "Weirman" .
-
-
-
 ###  mailto:helen.daily@csiro.au
 
 <mailto:helen.daily@csiro.au> rdf:type poddUser:User ,
@@ -279,12 +266,6 @@
 <mailto:xavier.sirault@csiro.au> rdf:type poddUser:User ,
                                           owl:NamedIndividual .
 
-
-
-###  mailto:xueqin.wang@csiro.au
-
-<mailto:xueqin.wang@csiro.au> rdf:type poddUser:User ,
-                                       owl:NamedIndividual .
 
 
 
