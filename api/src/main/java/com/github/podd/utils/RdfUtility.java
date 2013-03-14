@@ -21,6 +21,7 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
@@ -35,10 +36,10 @@ public class RdfUtility
 {
     
     private final static Logger log = LoggerFactory.getLogger(RdfUtility.class);
-    
+
     /**
-     * Given an artifact, this method attempts to validate that all objects are connected in a
-     * hierarchy to the top object.
+     * Given an artifact, this method evaluates whether all Objects within the artifact are
+     * connected to the Top Object.
      * 
      * @param inputStream
      *            Input stream containing the artifact statements
@@ -73,88 +74,14 @@ public class RdfUtility
             // load artifact statements into repository
             connection.add(inputStream, "", format, context);
             // DebugUtils.printContents(connection, context);
-            
-            // - find artifact and top object URIs
-            final List<Statement> topObjects =
-                    Iterations.asList(connection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT, null,
-                            false, context));
-            
-            if(topObjects.size() != 1)
-            {
-                RdfUtility.log.info("Artifact should have exactly 1 Top Object");
-                return false;
-            }
-            
-            final URI topObject = (URI)topObjects.get(0).getObject();
-            final URI artifactUri = (URI)topObjects.get(0).getSubject();
-            
-            final List<URI> exclusions =
-                    Arrays.asList(new URI[] { 
-                            artifactUri, 
-                            topObject, 
-                            OWL.THING, 
-                            OWL.ONTOLOGY, 
-                            OWL.INDIVIDUAL,
-                            ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#NamedIndividual"),
-                            });
-            
-            
-            // - identify the potential PODD objects to check for connectivity
-            final Set<URI> potentialPoddObjects = new HashSet<URI>();
 
-            List<Statement> allStatements = Iterations.asList(connection.getStatements(null, null, null, false, context));
-            for (Statement s: allStatements)
-            {
-                final Value objectValue = s.getObject();
-                if(objectValue instanceof URI && !exclusions.contains(objectValue))
-                {
-                    potentialPoddObjects.add((URI)objectValue);
-                }
-                
-                final Value subjectValue = s.getSubject();
-                if(subjectValue instanceof URI && !exclusions.contains(subjectValue))
-                {
-                    potentialPoddObjects.add((URI)subjectValue);
-                }
-            }
+            return isConnectedStructure(connection, context);
             
-            RdfUtility.log.info("{} Objects to check for connectivity.", potentialPoddObjects.size());
-            for(final URI u : potentialPoddObjects)
-            {
-                System.out.println("    " + u);
-            }
-            
-            // - check for connectivity
-            final Queue<URI> queue = new LinkedList<URI>();
-            queue.add(artifactUri);
-            
-            while(!queue.isEmpty())
-            {
-                final URI currentNode = queue.remove();
-                
-                final List<URI> children = RdfUtility.getChildren(currentNode, connection, context);
-                for(final URI child : children)
-                {
-                    // visit child node
-                    if(potentialPoddObjects.contains(child))
-                    {
-                        potentialPoddObjects.remove(child);
-                        if(potentialPoddObjects.isEmpty())
-                        {
-                            // all potential PoddObjects are connected.
-                            return true;
-                        }
-                    }
-                    queue.add(child);
-                }
-            }
-            RdfUtility.log.info("{} unconnected object(s). {}", potentialPoddObjects.size(), potentialPoddObjects);
-            return false;
         }
         catch(final Exception e)
         {
             // better to throw an exception containing error details
-            RdfUtility.log.error("An exception in validateArtifactConnectedness() ", e);
+            RdfUtility.log.error("An exception in checking connectedness of artifact", e);
             return false;
         }
         finally
@@ -175,8 +102,144 @@ public class RdfUtility
         }
     }
     
-    private static List<URI> getChildren(final URI node, final RepositoryConnection connection, final URI... context)
-        throws Exception
+    /**
+     * Given an artifact, this method evaluates whether all Objects within the artifact are
+     * connected to the Top Object.
+     * 
+     * @param connection
+     *            The RepositoryConnection
+     * @param context
+     *            The Context within the RepositoryConnection.
+     * @return True if all internal objects are connected to the top object, false otherwise.
+     * @throws RepositoryException
+     */
+    public static boolean isConnectedStructure(final RepositoryConnection connection, final URI... context)
+        throws RepositoryException
+    {
+        // - find artifact and top object URIs
+        final List<Statement> topObjects =
+                Iterations.asList(connection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT, null,
+                        false, context));
+        
+        if(topObjects.size() != 1)
+        {
+            RdfUtility.log.info("Artifact should have exactly 1 Top Object");
+            return false;
+        }
+        
+        final URI artifactUri = (URI)topObjects.get(0).getSubject();
+        
+        Set<URI> disconnectedNodes = findDisconnectedNodes(artifactUri, connection, context);
+        if (disconnectedNodes == null || disconnectedNodes.isEmpty())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }    
+    
+    /**
+     * Given a set of RDF Statements, and a Root node, this method attempts to find any nodes that
+     * are not connected to the Root node.
+     * 
+     * A <b>Node</b> is a Value that is of type URI (i.e. Literals are ignored).
+     * 
+     * A direct connection between two nodes exist if there is a Statement with the two nodes as
+     * the Subject and the Object.
+     * 
+     * @param root
+     *            The Root of the Graph, from which connectedness is calculated.
+     * @param connection
+     *            A RepositoryConnection
+     * @param context
+     *            The Graph containing statements.
+     * @return A <code>Set</code> containing any URIs that are not connected to the Root.
+     * @throws RepositoryException
+     */
+    public static Set<URI> findDisconnectedNodes(final URI root, final RepositoryConnection connection,
+            final URI... context) throws RepositoryException
+    {
+        final List<URI> exclusions =
+                Arrays.asList(new URI[] { 
+                        root, 
+                        OWL.THING, 
+                        OWL.ONTOLOGY, 
+                        OWL.INDIVIDUAL,
+                        ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#NamedIndividual"),
+                        });
+        
+        // - identify nodes that should be connected to the root
+        final Set<URI> nodesToCheck = new HashSet<URI>();
+
+        List<Statement> allStatements = Iterations.asList(connection.getStatements(null, null, null, false, context));
+        for (Statement s: allStatements)
+        {
+            final Value objectValue = s.getObject();
+            if(objectValue instanceof URI && !exclusions.contains(objectValue))
+            {
+                nodesToCheck.add((URI)objectValue);
+            }
+            
+            final Value subjectValue = s.getSubject();
+            if(subjectValue instanceof URI && !exclusions.contains(subjectValue))
+            {
+                nodesToCheck.add((URI)subjectValue);
+            }
+        }
+        
+        RdfUtility.log.info("{} nodes to check for connectivity.", nodesToCheck.size());
+        // for(final URI u : objectsToCheck)
+        // {
+        // System.out.println("    " + u);
+        // }
+        
+        // - check for connectivity
+        final Queue<URI> queue = new LinkedList<URI>();
+        final Set<URI> visitedNodes = new HashSet<URI>(); // to handle cycles
+        queue.add(root);
+        visitedNodes.add(root);
+        
+        while(!queue.isEmpty())
+        {
+            final URI currentNode = queue.remove();
+            
+            final List<URI> children = RdfUtility.getImmediateChildren(currentNode, connection, context);
+            for(final URI child : children)
+            {
+                // visit child node
+                if(nodesToCheck.contains(child))
+                {
+                    nodesToCheck.remove(child);
+                    if(nodesToCheck.isEmpty())
+                    {
+                        // all identified nodes are connected.
+                        return nodesToCheck;
+                    }
+                }
+                if (!visitedNodes.contains(child))
+                {
+                    queue.add(child);
+                    visitedNodes.add(child);
+                }
+            }
+        }
+        RdfUtility.log.info("{} unconnected node(s). {}", nodesToCheck.size(), nodesToCheck);
+        return nodesToCheck;
+    }
+    
+    /**
+     * Internal helper method to retrieve the direct child objects of a given object.
+     * 
+     * @param node
+     * @param connection
+     * @param context
+     * @return 
+     * @throws RepositoryException
+     */
+    private static List<URI> getImmediateChildren(final URI node, final RepositoryConnection connection, final URI... context)
+        throws RepositoryException
     {
         final List<URI> children = new ArrayList<URI>();
         final List<Statement> childStatements =
