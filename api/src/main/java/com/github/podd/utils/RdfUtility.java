@@ -141,13 +141,13 @@ public class RdfUtility
     }    
     
     /**
-     * Given a set of RDF Statements, and a Root node, this method attempts to find any nodes that
-     * are not connected to the Root node.
+     * Given a set of RDF Statements, and a Root node, this method finds any nodes that are not
+     * connected to the Root node.
      * 
      * A <b>Node</b> is a Value that is of type URI (i.e. Literals are ignored).
      * 
-     * A direct connection between two nodes exist if there is a Statement with the two nodes as
-     * the Subject and the Object.
+     * A direct connection between two nodes exist if there is a Statement with the two nodes as the
+     * Subject and the Object.
      * 
      * @param root
      *            The Root of the Graph, from which connectedness is calculated.
@@ -189,7 +189,7 @@ public class RdfUtility
             }
         }
         
-        RdfUtility.log.info("{} nodes to check for connectivity.", nodesToCheck.size());
+        // RdfUtility.log.info("{} nodes to check for connectivity.", nodesToCheck.size());
         // for(final URI u : objectsToCheck)
         // {
         // System.out.println("    " + u);
