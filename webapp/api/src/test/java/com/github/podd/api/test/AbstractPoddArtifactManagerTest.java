@@ -1164,8 +1164,6 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
-            DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
-            
             verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     98, nextRepositoryConnection);
             
@@ -1199,12 +1197,64 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * .
      */
-    @Ignore
     @Test
     public final void testUpdateArtifactWithDanglingObjects() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
-    }    
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        
+        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        final int assertedStatementCount = 90;
+        this.verifyLoadedArtifact(artifactId, 7, assertedStatementCount, 383, false);
+        
+        final InputStream editInputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION);
+        InferredOWLOntologyID updatedArtifact =
+                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), editInputStream,
+                        RDFFormat.TURTLE, true);
+        
+        // verify:
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2", 78,
+                    nextRepositoryConnection);
+            
+            DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
+            
+            // verify: dangling objects are no longer in the updated artifact
+            String[] danglingObjects =
+                    { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3",
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A", };
+            for(String deletedObject : danglingObjects)
+            {
+                URI deletedObjURI = ValueFactoryImpl.getInstance().createURI(deletedObject);
+                Assert.assertEquals(
+                        "Dangling object should not exist",
+                        0,
+                        Iterations.asList(
+                                nextRepositoryConnection.getStatements(deletedObjURI, null, null, false,
+                                        updatedArtifact.getVersionIRI().toOpenRDFURI())).size());
+            }
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+    }
     
     /**
      * Test method for
