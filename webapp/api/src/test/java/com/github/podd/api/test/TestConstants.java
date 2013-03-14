@@ -42,5 +42,8 @@ public interface TestConstants
     
     /** Test resource: fragment containing a new File Reference object  in RDF/XML format */
     public static final String TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT = "/test/artifacts/fragment-new-file-ref.rdf";
+
+    /** Test resource: fragment modifying Demo_Investigation object to no longer contain SqueekeeMaterial. In Turtle format */
+    public static final String TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION = "/test/artifacts/fragment-modify-demo-investigation.ttl";
     
 }
