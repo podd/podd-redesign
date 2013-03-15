@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -101,9 +102,9 @@ public class OntologyUtils
      * @return A Collection of {@link InferredOWLOntologyID} instances derived from the statements
      *         in the model.
      */
-    public static Collection<InferredOWLOntologyID> modelToOntologyIDs(Model input)
+    public static List<InferredOWLOntologyID> modelToOntologyIDs(Model input)
     {
-        Collection<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
+        List<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
         
         Model typedOntologies = input.filter(null, RDF.TYPE, OWL.ONTOLOGY);
         
