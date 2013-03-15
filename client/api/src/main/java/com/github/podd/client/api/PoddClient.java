@@ -6,6 +6,7 @@ package com.github.podd.client.api;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.List;
 
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
@@ -129,14 +130,14 @@ public interface PoddClient
      *         access to which are published. This may include artifacts that the user cannot modify
      *         or fork.
      */
-    Collection<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException;
+    List<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException;
     
     /**
      * 
      * @return A list of {@link InferredOWLOntologyID}s identifying the artifacts that the user has
      *         access to which are unpublished.
      */
-    Collection<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException;
+    List<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException;
     
     /**
      * Submits a request to the PODD Login service to login the user with the given username and
