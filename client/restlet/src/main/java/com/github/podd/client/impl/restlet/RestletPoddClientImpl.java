@@ -201,30 +201,33 @@ public class RestletPoddClientImpl implements PoddClient
         resource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, Boolean.toString(published));
         resource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, Boolean.toString(unpublished));
         
-        final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
-        
-        if(!resource.getStatus().equals(Status.SUCCESS_OK))
-        {
-            throw new PoddClientException("Server returned a non-success status code: "
-                    + resource.getStatus().toString());
-        }
-        
         final Model results = new LinkedHashModel();
         
-        final RDFParser parser =
-                Rio.createParser(Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML));
-        parser.setRDFHandler(new StatementCollector(results));
+        final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
         
         try
         {
-            log.info("result: {}", getResponse.getText());
+            InputStream stream = getResponse.getStream();
             
-            if(getResponse.getStream() == null)
+            if(!resource.getStatus().equals(Status.SUCCESS_OK))
+            {
+                throw new PoddClientException("Server returned a non-success status code: "
+                        + resource.getStatus().toString());
+            }
+            
+            final RDFParser parser =
+                    Rio.createParser(Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(),
+                            RDFFormat.RDFXML));
+            parser.setRDFHandler(new StatementCollector(results));
+            
+            // log.info("result: {}", getResponse.getText());
+            
+            if(stream == null)
             {
                 throw new PoddClientException("Did not receive valid response from server");
             }
             
-            parser.parse(getResponse.getStream(), "");
+            parser.parse(stream, "");
         }
         catch(final RDFParseException e)
         {
@@ -312,7 +315,7 @@ public class RestletPoddClientImpl implements PoddClient
             }
             
             // HACK
-            if(resource.getStatus().equals(Status.REDIRECTION_SEE_OTHER))
+            if(resource.getStatus().equals(Status.REDIRECTION_SEE_OTHER) || resource.getStatus().isSuccess())
             {
                 this.currentCookies = resource.getCookieSettings();
             }
@@ -419,8 +422,7 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public InferredOWLOntologyID publishArtifact(final InferredOWLOntologyID ontologyIRI) throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new RuntimeException("TODO: Implement me!");
     }
     
     /*

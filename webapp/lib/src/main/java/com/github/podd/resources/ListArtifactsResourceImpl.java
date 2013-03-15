@@ -4,6 +4,7 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -221,6 +222,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not generate RDF output due to an exception in the writer", e);
         }
+        
+        log.info(new String(out.toByteArray(), StandardCharsets.UTF_8));
         
         ByteArrayRepresentation result = new ByteArrayRepresentation(out.toByteArray(), resultMediaType);
         
