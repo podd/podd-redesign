@@ -1,8 +1,12 @@
 package com.github.podd.restlet.test;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +19,7 @@ import org.restlet.ext.html.FormData;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +75,22 @@ public class AbstractResourceImplTest
     {
         Assert.assertFalse("Freemarker error.", body.contains("Java backtrace for programmers:"));
         Assert.assertFalse("Freemarker error.", body.contains("freemarker.core."));
+    }
+    
+    /**
+     * Builds a {@link Representation} from a Resource.
+     * 
+     * @param resourcePath
+     * @param mediaType
+     * @return
+     * @throws IOException
+     */
+    public Representation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
+        throws IOException
+    {
+        final InputStream in = new BufferedInputStream(this.getClass().getResourceAsStream(resourcePath));
+        final String stringInput = IOUtils.toString(in);
+        return new StringRepresentation(stringInput, mediaType);
     }
     
     /**

@@ -124,6 +124,31 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
+        final Representation input =
+                this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
+                        MediaType.APPLICATION_RDF_XML);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        // verify: results (expecting the added artifact's ontology IRI)
+        final String body = results.getText();
+        Assert.assertTrue(body.contains("http://"));
+        Assert.assertFalse(body.contains("html"));
+        Assert.assertFalse(body.contains("\n"));
+    }
+    
+    /**
+     * Test successful upload of a new artifact file while authenticated with the admin role.
+     * Expects a plain text response.
+     */
+    @Test
+    public void testUploadArtifactBasicRdfWithFormData() throws Exception
+    {
+        final ClientResource uploadArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        
         final URL fileUrl = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf");
         
         this.log.info("The URL is {}", fileUrl);
