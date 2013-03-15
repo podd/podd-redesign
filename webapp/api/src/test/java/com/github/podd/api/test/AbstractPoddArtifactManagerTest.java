@@ -1016,6 +1016,77 @@ public abstract class AbstractPoddArtifactManagerTest
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * .
+     * Tests adding a Podd Object inconsistent with the schema ontologies fails.
+     */
+    @Test
+    public final void testUpdateArtifactAddInconsistentObject() throws Exception
+    {
+        try
+        {
+            this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383, false,
+                    TestConstants.TEST_ARTIFACT_FRAGMENT_INCONSISTENT_OBJECT, RDFFormat.TURTLE, false);
+            Assert.fail("Should have thrown an InconsistentOntologyException");
+        }
+        catch(InconsistentOntologyException e)
+        {
+            Assert.assertEquals("Not the expected error message", "Ontology is inconsistent", e.getMessage());
+        }
+    }    
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     * 
+     * NOTE: Once file reference validation is implemented in the FileReferenceManager this test
+     * will fail. The referred file will have to be created for validation to pass.
+     */
+    @Test
+    public final void testUpdateArtifactAddNewPoddObjectWithFileReferences() throws Exception
+    {
+        final InferredOWLOntologyID updatedArtifact =
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383,
+                        false, TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT, RDFFormat.RDFXML, false);
+        
+        // verify:
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    98, nextRepositoryConnection);
+            
+            // verify: file reference object
+            final List<Statement> fileRefList =
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
+                            .createURI(PoddRdfConstants.PODD_BASE, "hasFileReference"), null, false, updatedArtifact
+                            .getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
+            
+            Assert.assertTrue("File reference value incorrect",
+                    fileRefList.get(0).getObject().stringValue().endsWith("publication-pdf-a"));
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+        
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
      */
     @Test
     public final void testUpdateArtifactAddNewPoddObjectWithMerge() throws Exception
@@ -1057,6 +1128,34 @@ public abstract class AbstractPoddArtifactManagerTest
                 nextRepositoryConnection.close();
             }
             nextRepositoryConnection = null;
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Test
+    public final void testUpdateArtifactAddToNonExistentArtifact() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final URI nonExistentArtifactURI =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-3-no-such-artifact");
+        
+        final InputStream editInputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT);
+        
+        try
+        {
+            this.testArtifactManager.updateArtifact(nonExistentArtifactURI, editInputStream, RDFFormat.TURTLE, true);
+            Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            Assert.assertEquals("Exception not due to expected IRI", nonExistentArtifactURI, e.getOntologyID()
+                    .toOpenRDFURI());
         }
     }
     
@@ -1119,150 +1218,6 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
-    public final void testUpdateArtifactAddToNonExistentArtifact() throws Exception
-    {
-        this.loadSchemaOntologies();
-        
-        final URI nonExistentArtifactURI =
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-3-no-such-artifact");
-        
-        final InputStream editInputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT);
-        
-        try
-        {
-            this.testArtifactManager.updateArtifact(nonExistentArtifactURI, editInputStream, RDFFormat.TURTLE, true);
-            Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
-        }
-        catch(final UnmanagedArtifactIRIException e)
-        {
-            Assert.assertEquals("Exception not due to expected IRI", nonExistentArtifactURI, e.getOntologyID()
-                    .toOpenRDFURI());
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
-     * .
-     * 
-     * NOTE: Once file reference validation is implemented in the FileReferenceManager this test
-     * will fail. The referred file will have to be created for validation to pass.
-     */
-    @Test
-    public final void testUpdateArtifactAddNewPoddObjectWithFileReferences() throws Exception
-    {
-        final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383,
-                        false, TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT, RDFFormat.RDFXML, false);
-        
-        // verify:
-        RepositoryConnection nextRepositoryConnection = null;
-        try
-        {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
-            nextRepositoryConnection.begin();
-            
-            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    98, nextRepositoryConnection);
-            
-            // verify: file reference object
-            final List<Statement> fileRefList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_BASE, "hasFileReference"), null, false, updatedArtifact
-                            .getVersionIRI().toOpenRDFURI()));
-            Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
-            
-            Assert.assertTrue("File reference value incorrect",
-                    fileRefList.get(0).getObject().stringValue().endsWith("publication-pdf-a"));
-        }
-        finally
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
-            {
-                nextRepositoryConnection.rollback();
-            }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
-            {
-                nextRepositoryConnection.close();
-            }
-            nextRepositoryConnection = null;
-        }
-        
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
-     * .
-     */
-    @Test
-    public final void testUpdateArtifactWithDanglingObjects() throws Exception
-    {
-        final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383,
-                        false, TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE, true);
-        
-        // verify:
-        RepositoryConnection nextRepositoryConnection = null;
-        try
-        {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
-            nextRepositoryConnection.begin();
-            
-            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    78, nextRepositoryConnection);
-            
-            DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
-            
-            // verify: dangling objects are no longer in the updated artifact
-            final String[] danglingObjects =
-                    { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
-                            "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3",
-                            "http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A", };
-            for(final String deletedObject : danglingObjects)
-            {
-                final URI deletedObjURI = ValueFactoryImpl.getInstance().createURI(deletedObject);
-                Assert.assertEquals(
-                        "Dangling object should not exist",
-                        0,
-                        Iterations.asList(
-                                nextRepositoryConnection.getStatements(deletedObjURI, null, null, false,
-                                        updatedArtifact.getVersionIRI().toOpenRDFURI())).size());
-            }
-        }
-        finally
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
-            {
-                nextRepositoryConnection.rollback();
-            }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
-            {
-                nextRepositoryConnection.close();
-            }
-            nextRepositoryConnection = null;
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
-     * .
-     */
-    @Ignore
-    @Test
-    public final void testUpdateArtifactDeletePoddObject() throws Exception
-    {
-        Assert.fail("Not yet implemented"); // TODO
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
-     * .
-     */
-    @Test
     public final void testUpdateArtifactMovePoddObject() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
@@ -1293,6 +1248,58 @@ public abstract class AbstractPoddArtifactManagerTest
                                     ValueFactoryImpl.getInstance().createURI(
                                             "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial"),
                                     false, updatedArtifact.getVersionIRI().toOpenRDFURI())).size());
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     */
+    @Test
+    public final void testUpdateArtifactWithDanglingObjects() throws Exception
+    {
+        final InferredOWLOntologyID updatedArtifact =
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383,
+                        false, TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE, true);
+        
+        // verify:
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    78, nextRepositoryConnection);
+            
+            // verify: dangling objects are no longer in the updated artifact
+            final String[] danglingObjects =
+                    { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3",
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A", };
+            for(final String deletedObject : danglingObjects)
+            {
+                final URI deletedObjURI = ValueFactoryImpl.getInstance().createURI(deletedObject);
+                Assert.assertEquals(
+                        "Dangling object should not exist",
+                        0,
+                        Iterations.asList(
+                                nextRepositoryConnection.getStatements(deletedObjURI, null, null, false,
+                                        updatedArtifact.getVersionIRI().toOpenRDFURI())).size());
+            }
         }
         finally
         {

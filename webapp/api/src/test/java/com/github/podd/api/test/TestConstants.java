@@ -38,6 +38,9 @@ public interface TestConstants
     public static final String TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT = "/test/artifacts/fragment-new-publication.ttl";
 
     /** Test resource: fragment containing a Publication object  in Turtle format */
+    public static final String TEST_ARTIFACT_FRAGMENT_INCONSISTENT_OBJECT = "/test/artifacts/fragment-inconsistent-object.ttl";
+
+    /** Test resource: fragment containing a Publication object  in Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT = "/test/artifacts/fragment-modified-publication.ttl";
     
     /** Test resource: fragment containing a new File Reference object  in RDF/XML format */
