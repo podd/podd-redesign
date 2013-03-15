@@ -4,12 +4,24 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.model.Model;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.Component;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -116,6 +128,32 @@ public class AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         return results.getText();
+    }
+    
+    /**
+     * Utility method to verify that RDF documents can be parsed and the resulting number of
+     * statements is as expected.
+     * 
+     * @param inputStream
+     * @param format
+     * @param expectedStatements
+     * @return
+     * @throws RDFParseException
+     * @throws RDFHandlerException
+     * @throws IOException
+     */
+    public Model assertRdf(final InputStream inputStream, RDFFormat format, int expectedStatements)
+        throws RDFParseException, RDFHandlerException, IOException
+    {
+        final Model model = new LinkedHashModel();
+        
+        final RDFParser parser = Rio.createParser(format);
+        parser.setRDFHandler(new StatementCollector(model));
+        parser.parse(inputStream, "");
+        
+        Assert.assertEquals(expectedStatements, model.size());
+        
+        return model;
     }
     
     /**
