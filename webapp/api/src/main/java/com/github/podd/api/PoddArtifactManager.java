@@ -237,6 +237,35 @@ public interface PoddArtifactManager
     void setSesameManager(PoddSesameManager sesameManager);
     
     /**
+     * Updates a managed artifact based on incoming modified RDF statements.
+     * 
+     * It is sufficient for the input stream to contain only the affected statements. If the update
+     * is only addition of new statements, <i>isReplace</i> option can be set to false. If the update
+     * involves modifying existing statements (e.g. moving an object or deleting a link between objects)
+     * <i>isReplace</i> should be set to true, and all statements making up the modified objects should
+     * be included.
+     * 
+     * @param artifactUri
+     *            The URI of the artifact to be updated. This should be an already managed artifact.
+     * @param inputStream
+     *            The RDF statements that need to be updated. It is not necessary to send the
+     *            complete artifact here, only sending the affected statements is sufficient.
+     * @param format
+     *            Format of the incoming RDF data content
+     * @param isReplace
+     *            Indicates whether the incoming statements should replace existing statements or
+     *            whether they should be merged with the existing ones.
+     * @return
+     * @throws OpenRDFException
+     * @throws PoddException
+     * @throws IOException
+     * @throws OWLException
+     */
+    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final InputStream inputStream,
+            final RDFFormat format, final boolean isReplace) throws OpenRDFException, PoddException,
+        IOException, OWLException;
+
+    /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
      * 
      * The Schema Ontology may have been imported as a different version, and these older versions
@@ -256,24 +285,4 @@ public interface PoddArtifactManager
      */
     void updateSchemaImport(OWLOntologyID artifactId, OWLOntologyID schemaOntologyId);
 
-    /**
-     * 
-     * @param artifactUri
-     *          The URI of the artifact to be updated. This should be an already managed artifact.
-     * @param inputStream
-     *          The RDF statements that need to be updated.
-     * @param format
-     *          Format of the incoming RDF data content
-     * @param isReplace
-     *          Indicates whether the incoming statements should replace existing statements or whether
-     *          they should be merged with the existing ones.
-     * @return
-     * @throws OpenRDFException
-     * @throws PoddException
-     * @throws IOException
-     * @throws OWLException
-     */
-    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final InputStream inputStream,
-            final RDFFormat format, final boolean isReplace) throws OpenRDFException, PoddException,
-        IOException, OWLException;
 }
