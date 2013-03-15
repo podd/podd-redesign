@@ -225,8 +225,6 @@ public abstract class AbstractPoddClientTest
     @Test
     public final void testListPublishedArtifactsEmpty() throws Exception
     {
-        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
         Collection<InferredOWLOntologyID> results = this.testClient.listPublishedArtifacts();
         Assert.assertTrue(results.isEmpty());
     }
@@ -253,6 +251,8 @@ public abstract class AbstractPoddClientTest
         
         // Returns a new version, as when the artifact is published it gets a new version
         InferredOWLOntologyID publishedArtifact = this.testClient.publishArtifact(newArtifact);
+        
+        this.testClient.logout();
         
         Collection<InferredOWLOntologyID> results = this.testClient.listPublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
