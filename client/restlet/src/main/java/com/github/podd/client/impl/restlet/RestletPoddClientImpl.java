@@ -32,6 +32,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -200,17 +201,30 @@ public class RestletPoddClientImpl implements PoddClient
         resource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, Boolean.toString(published));
         resource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, Boolean.toString(unpublished));
         
-        final Representation get = resource.get();
+        final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+        
+        if(!resource.getStatus().equals(Status.SUCCESS_OK))
+        {
+            throw new PoddClientException("Server returned a non-success status code: "
+                    + resource.getStatus().toString());
+        }
         
         final Model results = new LinkedHashModel();
         
         final RDFParser parser =
-                Rio.createParser(Rio.getParserFormatForMIMEType(get.getMediaType().getName(), RDFFormat.RDFXML));
+                Rio.createParser(Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML));
         parser.setRDFHandler(new StatementCollector(results));
         
         try
         {
-            parser.parse(get.getStream(), resource.getRootRef().toString());
+            log.info("result: {}", getResponse.getText());
+            
+            if(getResponse.getStream() == null)
+            {
+                throw new PoddClientException("Did not receive valid response from server");
+            }
+            
+            parser.parse(getResponse.getStream(), "");
         }
         catch(final RDFParseException e)
         {
