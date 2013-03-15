@@ -184,7 +184,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         return results;
     }
     
-    @Get("rdf|rj|ttl")
+    @Get("rdf|rj|json|ttl")
     public Representation getListArtifactsRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
@@ -206,10 +206,13 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
+            writer.startRDF();
             for(String nextKey : artifactsInternal.keySet())
             {
+                log.info("nextArtifact: {}", nextKey);
                 OntologyUtils.ontologyIDsToHandler(artifactsInternal.get(nextKey), writer);
             }
+            writer.endRDF();
         }
         catch(RDFHandlerException e)
         {
