@@ -780,11 +780,10 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
-            String[] expectedImports = { 
-                    "http://purl.org/podd/ns/version/dcTerms/1", 
-                    "http://purl.org/podd/ns/version/poddUser/1",
-                    "http://purl.org/podd/ns/version/poddBase/1",
-                    "http://purl.org/podd/ns/version/poddScience/1", // an older version
+            final String[] expectedImports =
+                    { "http://purl.org/podd/ns/version/dcTerms/1", "http://purl.org/podd/ns/version/poddUser/1",
+                            "http://purl.org/podd/ns/version/poddBase/1",
+                            "http://purl.org/podd/ns/version/poddScience/1", // an older version
                     };
             
             // verify: no. of import statements
@@ -794,11 +793,11 @@ public abstract class AbstractPoddArtifactManagerTest
                                     .getVersionIRI().toOpenRDFURI())).size();
             Assert.assertEquals("Graph should have 4 import statements", 4, importStatementCount);
             
-            for(int i = 0; i < expectedImports.length; i++)
+            for(final String expectedImport : expectedImports)
             {
                 final List<Statement> importStatements =
                         Iterations.asList(nextRepositoryConnection.getStatements(null, OWL.IMPORTS, ValueFactoryImpl
-                                .getInstance().createURI(expectedImports[i]), false, artifactId.getVersionIRI()
+                                .getInstance().createURI(expectedImport), false, artifactId.getVersionIRI()
                                 .toOpenRDFURI()));
                 
                 Assert.assertEquals("Expected 1 import statement per schema", 1, importStatements.size());
@@ -981,6 +980,39 @@ public abstract class AbstractPoddArtifactManagerTest
     }
     
     /**
+     * Internal helper method to carry out invoking updateArtifact()
+     * 
+     * @param resourcePath
+     * @param resourceFormat
+     * @param mgtGraphSize
+     * @param assertedStatementCount
+     * @param inferredStatementCount
+     * @param isPublished
+     * @param fragmentPath
+     * @param fragmentFormat
+     * @return
+     * @throws Exception
+     */
+    private InferredOWLOntologyID internalTestUpdateArtifact(final String resourcePath, final RDFFormat resourceFormat,
+            final int mgtGraphSize, final long assertedStatementCount, final long inferredStatementCount,
+            final boolean isPublished, final String fragmentPath, final RDFFormat fragmentFormat,
+            final boolean isReplace) throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        
+        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, resourceFormat);
+        this.verifyLoadedArtifact(artifactId, mgtGraphSize, assertedStatementCount, inferredStatementCount, isPublished);
+        
+        final InputStream editInputStream = this.getClass().getResourceAsStream(fragmentPath);
+        final InferredOWLOntologyID updatedArtifact =
+                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), editInputStream,
+                        fragmentFormat, isReplace);
+        return updatedArtifact;
+    }
+    
+    /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * .
@@ -988,20 +1020,9 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateArtifactAddNewPoddObjectWithMerge() throws Exception
     {
-        this.loadSchemaOntologies();
-        
-        final InputStream inputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        
-        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactId, 7, 90, 383, false);
-        
-        final InputStream editInputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT);
-        InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), editInputStream,
-                        RDFFormat.TURTLE, false);
-        
+        final InferredOWLOntologyID updatedArtifact =
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383,
+                        false, TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT, RDFFormat.TURTLE, false);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1010,20 +1031,20 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
-            verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     101, nextRepositoryConnection);
             
             // verify: 2 publications exist
             final List<Statement> testList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl
-                            .getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
+                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 2 publications", 2, testList.size());
             
             // verify: newly added publication exists
-            Assert.assertTrue("New publication is missing", 
-                    testList.get(0).getObject().toString().endsWith("#publication46") || 
-                    testList.get(1).getObject().toString().endsWith("#publication46"));
+            Assert.assertTrue("New publication is missing",
+                    testList.get(0).getObject().toString().endsWith("#publication46")
+                            || testList.get(1).getObject().toString().endsWith("#publication46"));
         }
         finally
         {
@@ -1047,21 +1068,9 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateArtifactModifyPoddObjectWithReplace() throws Exception
     {
-        this.loadSchemaOntologies();
-        
-        final InputStream inputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        
-        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        final int assertedStatementCount = 90;
-        this.verifyLoadedArtifact(artifactId, 7, assertedStatementCount, 383, false);
-        
-        final InputStream editInputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT);
-        InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), editInputStream,
-                        RDFFormat.TURTLE, true);
-        
+        final InferredOWLOntologyID updatedArtifact =
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383,
+                        false, TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT, RDFFormat.TURTLE, true);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1070,24 +1079,24 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
-            verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    assertedStatementCount, nextRepositoryConnection);
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    90, nextRepositoryConnection);
             
             // verify: still only 1 publication
             final List<Statement> testList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl
-                            .getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
+                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Incorrect no. of hasPublication statements", 1, testList.size());
             
             // verify: publication info has been updated
-            final List<Statement> testList2 = Iterations.asList(nextRepositoryConnection.getStatements(
-                            null, 
-                            ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasYear"), 
-                            null, 
-                            false, updatedArtifact.getVersionIRI().toOpenRDFURI()));
+            final List<Statement> testList2 =
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
+                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasYear"), null, false, updatedArtifact
+                            .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Incorrect no. of hasYear statements", 1, testList2.size());
-            Assert.assertEquals("Publication Year has not bee updated", "2011", testList2.get(0).getObject().stringValue());
+            Assert.assertEquals("Publication Year has not bee updated", "2011", testList2.get(0).getObject()
+                    .stringValue());
             
         }
         finally
@@ -1102,8 +1111,8 @@ public abstract class AbstractPoddArtifactManagerTest
             }
             nextRepositoryConnection = null;
         }
-    }    
-
+    }
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
@@ -1114,48 +1123,38 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         this.loadSchemaOntologies();
         
-        final URI nonExistentArtifactURI = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-3-no-such-artifact");
+        final URI nonExistentArtifactURI =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-3-no-such-artifact");
         
         final InputStream editInputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT);
         
         try
         {
-            this.testArtifactManager.updateArtifact(nonExistentArtifactURI, editInputStream,
-                    RDFFormat.TURTLE, true);
+            this.testArtifactManager.updateArtifact(nonExistentArtifactURI, editInputStream, RDFFormat.TURTLE, true);
             Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
         }
-        catch (UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException e)
         {
-            Assert.assertEquals("Exception not due to expected IRI", nonExistentArtifactURI, e.getOntologyID().toOpenRDFURI());
+            Assert.assertEquals("Exception not due to expected IRI", nonExistentArtifactURI, e.getOntologyID()
+                    .toOpenRDFURI());
         }
-    }    
+    }
     
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * .
      * 
-     * NOTE: Once file reference validation is implemented in the FileReferenceManager this test will fail.
-     * The referred file will have to be created for validation to pass.
+     * NOTE: Once file reference validation is implemented in the FileReferenceManager this test
+     * will fail. The referred file will have to be created for validation to pass.
      */
     @Test
     public final void testUpdateArtifactAddNewPoddObjectWithFileReferences() throws Exception
     {
-        this.loadSchemaOntologies();
-        
-        final InputStream inputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        
-        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactId, 7, 90, 383, false);
-        
-        final InputStream editInputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);
-        InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), editInputStream,
-                        RDFFormat.RDFXML, false);
-        
+        final InferredOWLOntologyID updatedArtifact =
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383,
+                        false, TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT, RDFFormat.RDFXML, false);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1164,7 +1163,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
-            verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     98, nextRepositoryConnection);
             
             // verify: file reference object
@@ -1173,7 +1172,7 @@ public abstract class AbstractPoddArtifactManagerTest
                             .createURI(PoddRdfConstants.PODD_BASE, "hasFileReference"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
-
+            
             Assert.assertTrue("File reference value incorrect",
                     fileRefList.get(0).getObject().stringValue().endsWith("publication-pdf-a"));
         }
@@ -1189,9 +1188,9 @@ public abstract class AbstractPoddArtifactManagerTest
             }
             nextRepositoryConnection = null;
         }
-
+        
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
@@ -1200,19 +1199,9 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateArtifactWithDanglingObjects() throws Exception
     {
-        this.loadSchemaOntologies();
-        
-        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        
-        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        final int assertedStatementCount = 90;
-        this.verifyLoadedArtifact(artifactId, 7, assertedStatementCount, 383, false);
-        
-        final InputStream editInputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION);
-        InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), editInputStream,
-                        RDFFormat.TURTLE, true);
+        final InferredOWLOntologyID updatedArtifact =
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383,
+                        false, TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE, true);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1221,19 +1210,19 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
-            verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2", 78,
-                    nextRepositoryConnection);
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    78, nextRepositoryConnection);
             
             DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
             
             // verify: dangling objects are no longer in the updated artifact
-            String[] danglingObjects =
+            final String[] danglingObjects =
                     { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
                             "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3",
                             "http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A", };
-            for(String deletedObject : danglingObjects)
+            for(final String deletedObject : danglingObjects)
             {
-                URI deletedObjURI = ValueFactoryImpl.getInstance().createURI(deletedObject);
+                final URI deletedObjURI = ValueFactoryImpl.getInstance().createURI(deletedObject);
                 Assert.assertEquals(
                         "Dangling object should not exist",
                         0,
@@ -1266,8 +1255,8 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactDeletePoddObject() throws Exception
     {
         Assert.fail("Not yet implemented"); // TODO
-    }    
-
+    }
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
@@ -1276,19 +1265,9 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateArtifactMovePoddObject() throws Exception
     {
-        this.loadSchemaOntologies();
-        
-        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        
-        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        final int assertedStatementCount = 90;
-        this.verifyLoadedArtifact(artifactId, 7, assertedStatementCount, 383, false);
-        
-        final InputStream editInputStream =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION);
-        InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), editInputStream,
-                        RDFFormat.TURTLE, true);
+        final InferredOWLOntologyID updatedArtifact =
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 383,
+                        false, TestConstants.TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION, RDFFormat.TURTLE, true);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1297,8 +1276,8 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
-            verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2", assertedStatementCount,
-                    nextRepositoryConnection);
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    90, nextRepositoryConnection);
             
             DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
             
@@ -1327,8 +1306,8 @@ public abstract class AbstractPoddArtifactManagerTest
             }
             nextRepositoryConnection = null;
         }
-    }    
-
+    }
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImport(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID)}
@@ -1361,10 +1340,10 @@ public abstract class AbstractPoddArtifactManagerTest
         final RDFFormat readFormat = RDFFormat.TURTLE;
         final InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, readFormat);
         
-        dumpRdfToFile(resultArtifactId.getInferredOntologyIRI().toOpenRDFURI(),
+        this.dumpRdfToFile(resultArtifactId.getInferredOntologyIRI().toOpenRDFURI(),
                 "/home/kutila/basic-20130206-inferred.ttl", RDFFormat.TURTLE);
         
-/*            
+        /*            
         String[] contexts = {
                 // "http://purl.org/podd/ns/version/dcTerms/1",
                 "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/dcTerms/1",
@@ -1413,12 +1392,12 @@ public abstract class AbstractPoddArtifactManagerTest
      * @throws IOException
      * @throws OpenRDFException
      */
-    public void dumpRdfToFile(URI context, String filename, final RDFFormat writeFormat) throws IOException,
-        OpenRDFException
+    public void dumpRdfToFile(final URI context, final String filename, final RDFFormat writeFormat)
+        throws IOException, OpenRDFException
     {
-        String outFilename = filename + "." + writeFormat.getFileExtensions().get(0);
+        final String outFilename = filename + "." + writeFormat.getFileExtensions().get(0);
         
-        RDFWriter writer = Rio.createWriter(writeFormat, new FileOutputStream(filename));
+        final RDFWriter writer = Rio.createWriter(writeFormat, new FileOutputStream(filename));
         writer.handleNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
         writer.handleNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
         writer.handleNamespace("owl", "http://www.w3.org/2002/07/owl#");
@@ -1429,9 +1408,9 @@ public abstract class AbstractPoddArtifactManagerTest
         
         writer.startRDF();
         
-        List<Statement> inferredList =
+        final List<Statement> inferredList =
                 Iterations.asList(this.testRepositoryConnection.getStatements(null, null, null, false, context));
-        for(Statement s : inferredList)
+        for(final Statement s : inferredList)
         {
             writer.handleStatement(s);
         }
@@ -1581,8 +1560,9 @@ public abstract class AbstractPoddArtifactManagerTest
      * @param nextRepositoryConnection
      * @throws Exception
      */
-    private void verifyUpdatedArtifact(InferredOWLOntologyID updatedArtifact, String expectedVersionIri,
-            long expectedConcreteStatementCount, RepositoryConnection nextRepositoryConnection) throws Exception
+    private void verifyUpdatedArtifact(final InferredOWLOntologyID updatedArtifact, final String expectedVersionIri,
+            final long expectedConcreteStatementCount, final RepositoryConnection nextRepositoryConnection)
+        throws Exception
     {
         Assert.assertEquals("Unexpected concrete statement count", expectedConcreteStatementCount,
                 nextRepositoryConnection.size(updatedArtifact.getVersionIRI().toOpenRDFURI()));
@@ -1596,12 +1576,11 @@ public abstract class AbstractPoddArtifactManagerTest
                 .stringValue());
         
         // verify: current version updated in management graph
-        InferredOWLOntologyID currentArtifactVersion =
+        final InferredOWLOntologyID currentArtifactVersion =
                 this.testArtifactManager.getSesameManager().getCurrentArtifactVersion(updatedArtifact.getOntologyIRI(),
-                        nextRepositoryConnection, artifactGraph);
+                        nextRepositoryConnection, this.artifactGraph);
         Assert.assertEquals("Unexpected Version IRI in management graph", expectedVersionIri, currentArtifactVersion
                 .getVersionIRI().toString());
     }
-
-   
+    
 }
