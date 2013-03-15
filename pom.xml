@@ -404,7 +404,14 @@
 					com.github.ansell.sesame-rio-extensions
 				</groupId>
 				<artifactId>sesame-rio-extensions-rdfjson</artifactId>
-				<version>0.3</version>
+				<version>${sesame-rio-extensions.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>
+					com.github.ansell.sesame-rio-extensions
+				</groupId>
+				<artifactId>sesame-rio-extensions-api</artifactId>
+				<version>${sesame-rio-extensions.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
