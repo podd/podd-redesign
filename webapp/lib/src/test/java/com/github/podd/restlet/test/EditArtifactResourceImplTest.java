@@ -11,8 +11,10 @@ import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -21,7 +23,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class EditArtifactResourceImplTest extends AbstractResourceImplTest
 {
-
+    
     @Ignore
     @Test
     public void testEditArtifactBasicJson() throws Exception
@@ -29,11 +31,76 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.fail("TODO: implement");
     }
     
-    @Ignore
+    @Test
+    public void testErrorEditArtifactRdfWithoutArtifactID() throws Exception
+    {
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+        
+        // there is no need to authenticate, have a test artifact or send RDF to modify as the
+        // artifact is checked for first
+        try
+        {
+            editArtifactClientResource.post(null, MediaType.TEXT_PLAIN);
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+    }
+    
+    @Test
+    public void testErrorEditArtifactRdfWithoutAuthentication() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = "urn:purl:dummy:artifact:uri:artifact:1";
+        
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                        MediaType.APPLICATION_RDF_XML);
+        
+        // invoke without authentication
+        try
+        {
+            editArtifactClientResource.post(input, MediaType.APPLICATION_RDF_XML);
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+    }
+    
     @Test
     public void testEditArtifactBasicRdf() throws Exception
     {
-        Assert.fail("TODO: implement");
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-2.rdf");
+        
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                        MediaType.APPLICATION_RDF_XML);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+
+        // verify: Inferred Ontology ID is received in RDF format
+        Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
+        Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
+        Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+        Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
     }
     
     @Ignore
@@ -42,9 +109,9 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     {
         Assert.fail("TODO: implement");
     }
-
+    
     /**
-     * Test viewing the edit HTML page for an internal PODD object. 
+     * Test viewing the edit HTML page for an internal PODD object.
      */
     @Test
     public void testGetEditArtifactInternalObjectHtml() throws Exception
@@ -72,7 +139,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
-     * Test viewing the edit HTML page for a PODD top object (i.e. a Project). 
+     * Test viewing the edit HTML page for a PODD top object (i.e. a Project).
      */
     @Ignore
     @Test
@@ -80,7 +147,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     {
         Assert.fail("TODO: implement");
     }
-
+    
     /**
      * Test posting to the edit HTML page modifying an internal PODD object.
      */

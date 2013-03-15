@@ -99,11 +99,13 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         RDFFormat inputFormat = Rio.getParserFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         
+        // - prepare response
         ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         RDFWriter writer =
                 Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
                         output);
-        
+
+        // - do the artifact update 
         try
         {
             final boolean isReplace = true;
