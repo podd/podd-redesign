@@ -46,4 +46,6 @@ public interface TestConstants
     /** Test resource: fragment modifying Demo_Investigation object to no longer contain SqueekeeMaterial. In Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION = "/test/artifacts/fragment-modify-demo-investigation.ttl";
     
+    /** Test resource: fragment moves SqueekeeMaterial to under My_Treatment1. In Turtle format */
+    public static final String TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION = "/test/artifacts/fragment-move-demo-investigation.ttl";
 }

@@ -1,0 +1,37 @@
+@prefix : <http://purl.org/podd/basic-2-20130206/artifact:1#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
+@prefix poddUser: <http://purl.org/podd/ns/poddUser#> .
+@prefix poddScience: <http://purl.org/podd/ns/poddScience#> .
+@base <http://purl.org/podd/basic-2-20130206/artifact:1> .
+
+# squeeke material is moved from Demo_Investigation, into My_Treatment1 
+
+
+###  http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation
+
+:Demo_Investigation rdf:type poddScience:Investigation ,
+                             owl:NamedIndividual ;
+                    
+                    rdfs:label "Demo investigation" ;
+                    
+                    poddScience:hasMaterial :Demo_Material ;
+                    
+                    poddScience:hasTreatment :My_Treatment1 .
+                    
+###  http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1
+
+:My_Treatment1 rdf:type poddScience:Treatment ,
+                        owl:NamedIndividual ;
+               
+	               rdfs:label "my treatment 1" ;
+	               
+                   poddScience:hasMaterial :SqueekeeMaterial .
+
+
+
