@@ -191,7 +191,7 @@ public class RestletPoddClientImpl implements PoddClient
         return !this.currentCookies.isEmpty();
     }
     
-    private Collection<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
+    private List<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
         throws PoddClientException
     {
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
@@ -246,7 +246,7 @@ public class RestletPoddClientImpl implements PoddClient
      * @see com.github.podd.client.api.PoddClient#listPublishedArtifacts()
      */
     @Override
-    public Collection<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException
+    public List<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException
     {
         return this.listArtifactsInternal(true, false);
     }
@@ -257,7 +257,7 @@ public class RestletPoddClientImpl implements PoddClient
      * @see com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()
      */
     @Override
-    public Collection<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException
+    public List<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException
     {
         return this.listArtifactsInternal(false, true);
     }
