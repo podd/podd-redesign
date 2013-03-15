@@ -3,6 +3,8 @@
  */
 package com.github.podd.restlet.test;
 
+import java.io.ByteArrayInputStream;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
@@ -11,6 +13,7 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
+import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -85,6 +88,61 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         
         Assert.assertTrue("Page did not contain no artifacts message", body.contains("No artifacts found"));
         this.assertFreemarker(body);
+    }
+    
+    /**
+     * Test authenticated access to list Artifacts in HTML with multiple loaded artifacts where all
+     * of the artifacts are unpublished, but also asking for published artifacts.
+     */
+    @Test
+    public void testListArtifactsRdfJsonMultipleAllUnpublishedWithPublished() throws Exception
+    {
+        // prepare: add two artifacts
+        final String artifactUri1 = this.loadTestArtifact("/test/artifacts/basicProject-1-internal-object.rdf");
+        final String artifactUri2 = this.loadTestArtifact("/test/artifacts/basic-2-internal-objects.rdf");
+        
+        final ClientResource listArtifactsClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
+        
+        listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, "true");
+        listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, "true");
+        
+        // Representation results = listArtifactsClientResource.get(MediaType.TEXT_HTML);
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
+                        RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify:
+        System.out.println("results:" + body);
+        
+        assertRdf(new ByteArrayInputStream(buf), format, expectedStatements)
+    }
+    
+    /**
+     * Test authenticated access to list Artifacts in HTML with multiple loaded artifacts where all
+     * of the artifacts are unpublished, but also asking for published artifacts.
+     */
+    @Test
+    public void testListArtifactsRdfJsonEmptyAllUnpublishedWithPublished() throws Exception
+    {
+        final ClientResource listArtifactsClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
+        
+        listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, "true");
+        listArtifactsClientResource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, "true");
+        
+        // Representation results = listArtifactsClientResource.get(MediaType.TEXT_HTML);
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
+                        RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify:
+        System.out.println("results:" + body);
+        
     }
     
 }

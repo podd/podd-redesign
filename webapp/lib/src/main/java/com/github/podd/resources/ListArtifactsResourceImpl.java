@@ -58,7 +58,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     /**
      * Handle http GET request to serve the list artifacts page.
      */
-    @Get("html")
+    @Get(":html")
     public Representation getListArtifactsPage(final Representation entity) throws ResourceException
     {
         this.log.info("@Get listArtifacts Page");
@@ -184,7 +184,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         return results;
     }
     
-    @Get("rdf|rj|json|ttl")
+    @Get(":rdf|rj|json|ttl")
     public Representation getListArtifactsRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
@@ -194,6 +194,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         if(resultFormat == null)
         {
+            this.log.error("Could not find an RDF serialiser matching the requested mime-type: "
+                    + variant.getMediaType().getName());
             throw new ResourceException(Status.CLIENT_ERROR_NOT_ACCEPTABLE,
                     "Could not find an RDF serialiser matching the requested mime-type: "
                             + variant.getMediaType().getName());
@@ -209,7 +211,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             writer.startRDF();
             for(String nextKey : artifactsInternal.keySet())
             {
-                log.info("nextArtifact: {}", nextKey);
+                // log.info("nextArtifact: {}", nextKey);
                 OntologyUtils.ontologyIDsToHandler(artifactsInternal.get(nextKey), writer);
             }
             writer.endRDF();
