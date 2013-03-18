@@ -51,8 +51,6 @@ import com.github.podd.utils.PoddRdfConstants;
 public abstract class AbstractPoddSesameManagerTest
 {
     /* test artifact pair with PURLs */
-    private static final String TEST_ARTIFACT_BASIC_20130206_TTL = "/test/artifacts/basic-20130206.ttl";
-    private static final String TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL = "/test/artifacts/basic-20130206-inferred.ttl";
 
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -379,8 +377,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         // Collections to test
         URI[] collectionsToTest =
@@ -468,8 +466,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI topObjectUri =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966");
@@ -507,8 +505,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI publicationObjectUri =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
@@ -809,8 +807,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         final InferredOWLOntologyID ontologyID1 =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final String[] objectUris =
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
@@ -857,8 +855,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final String[] objectUris =
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
@@ -897,8 +895,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI objectUri =
                 ValueFactoryImpl.getInstance().createURI(
@@ -937,8 +935,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI objectUri =
                 ValueFactoryImpl.getInstance().createURI(
@@ -980,8 +978,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI objectUri =
                 ValueFactoryImpl.getInstance().createURI(
@@ -1241,8 +1239,8 @@ public abstract class AbstractPoddSesameManagerTest
     {
         // prepare: load test artifact
         InferredOWLOntologyID nextOntologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         // DebugUtils.printContexts(testRepositoryConnection);
         // DebugUtils.printContents(testRepositoryConnection,
@@ -1296,8 +1294,8 @@ public abstract class AbstractPoddSesameManagerTest
     {
         // prepare: load test artifact
         InferredOWLOntologyID nextOntologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI topObjectList =
                 this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
@@ -1318,8 +1316,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID nextOntologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         Assert.assertEquals("http://purl.org/podd/basic-2-20130206/artifact:1", nextOntologyID.getOntologyIRI()
                 .toString());
@@ -1365,8 +1363,8 @@ public abstract class AbstractPoddSesameManagerTest
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         InferredOWLOntologyID nextOntologyID =
-                this.loadOntologyFromResource(TEST_ARTIFACT_BASIC_20130206_TTL,
-                        TEST_ARTIFACT_BASIC_20130206_INFERRED_TTL, RDFFormat.TURTLE);
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI topObjectUri = this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
         
