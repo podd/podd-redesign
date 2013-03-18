@@ -11,15 +11,6 @@ public class SparqlQueryTest extends AbstractOntologyTest
  *
     
     /**
-     * Test that all objects are linked to "PoddObject".
-    @Ignore
-    @Test
-    public void testAllObjectsAreLinkedToPoddObject() throws Exception
-    {
-        Assert.fail("TODO");
-    }
-    
-    /**
      * Test the performance of above queries. Move this to a separate test class.
     @Ignore
     @Test
@@ -159,94 +150,6 @@ public class SparqlQueryTest extends AbstractOntologyTest
         {
             System.out.println(childObjectList.get(i).getLabel());
             Assert.assertEquals("Incorrect object at position", expectedLabels[i], childObjectList.get(i).getLabel());
-        }
-    }
-    
-    
-    /**
-     * Tests retrieving all possible values for Collection types
-    @Ignore
-    @Test
-    public void testSpikeGetPossibleValues() throws Exception
-    {
-        // Create a list of contexts made up of the schema ontologies and the asserted artifact.
-        final List<URI> allContextsToQuery = new ArrayList<URI>(super.getSchemaOntologyGraphs());
-        final URI[] contexts = allContextsToQuery.toArray(new URI[0]);
-        
-        this.conn = this.getConnection();
-        
-        // types of Collections to test
-        URI[] collectionURIsToTest =
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Software"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "PublicationStatus"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "HasControlAssertion"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildTypeAssertion"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"), };
-        
-        URI[][] expectedMembers =
-                {
-                        {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Software"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Hardware"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "HardwareSoftware") },
-                        
-                        {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "Sex_NotApplicable"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Unknown"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "Sex_Hermaphrodite"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Female"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Male") },
-                        
-                        {}, // poddScience:Software is not a Collection
-                        
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "Published"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "NotPublished"), },
-                        
-                        {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "HasControl_Yes"),
-                                ValueFactoryImpl.getInstance()
-                                        .createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_No"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "HasControl_NotApplicable"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "HasControl_Unknown") },
-                        
-                        {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_Yes"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_No"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "WildType_NotApplicable"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "WildType_Unknown") },
-                        
-                        {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC_Yes"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC_No"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "ANZSRC_NotApplicable"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "ANZSRC_Unknown") },
-                
-                };
-        
-        // iterate through test data
-        for(int i = 0; i < collectionURIsToTest.length; i++)
-        {
-            List<PoddObjectLabel> members =
-                    SparqlQueryHelper.spikeGetPossibleValues(collectionURIsToTest[i], conn, contexts);
-            Assert.assertEquals("Not the expected number of members", expectedMembers[i].length, members.size());
-            
-            List<URI> expectedMembersList = Arrays.asList(expectedMembers[i]);
-            for(PoddObjectLabel resultObject : members)
-            {
-                Assert.assertTrue("Unexpected member found", expectedMembersList.contains(resultObject.getObjectURI()));
-            }
         }
     }
     
