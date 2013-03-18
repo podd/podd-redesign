@@ -19,6 +19,7 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -164,6 +165,31 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
+                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        // verify: results (expecting the added artifact's ontology IRI)
+        final String body = results.getText();
+        Assert.assertTrue(body.contains("http://"));
+        Assert.assertFalse(body.contains("html"));
+        Assert.assertFalse(body.contains("\n"));
+    }
+    
+    /**
+     * Test successful upload of a new artifact file while authenticated with the admin role.
+     * Expects a plain text response.
+     */
+    @Test
+    public void testUploadArtifactBasicTurtle() throws Exception
+    {
+        final ClientResource uploadArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_TTL_1_INTERNAL_OBJECT,
+                        MediaType.APPLICATION_RDF_TURTLE);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
                         MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: results (expecting the added artifact's ontology IRI)
