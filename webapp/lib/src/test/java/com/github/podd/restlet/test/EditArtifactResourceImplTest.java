@@ -95,7 +95,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                         MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final String body = results.getText();
-
+        
         // verify: Inferred Ontology ID is received in RDF format
         Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
         Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
@@ -135,34 +135,54 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
         
         // verify: publication46 has been aded to the artifact
-        String artifactBody = this.getArtifactStatementsFromServer(artifactUri, MediaType.APPLICATION_RDF_TURTLE);
+        final String artifactBody = this.getArtifactAsString(artifactUri, MediaType.APPLICATION_RDF_TURTLE);
         Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication46"));
         Assert.assertTrue("New publication not added to artifact",
                 artifactBody.contains("http://dx.doi.org/10.1109/eScience.2013.44"));
     }
     
-    /**
-     * Helper method to retrieve the asserted statements of a given artifact in a given media type.
-     * 
-     * @param artifactUri
-     * @param mediaType
-     * @return The artifact's asserted statements represented as a String
-     * @throws Exception
-     */
-    private String getArtifactStatementsFromServer(String artifactUri, MediaType mediaType) throws Exception
+    @Test
+    public void testEditArtifactTurtleWithDanglingObjects() throws Exception
     {
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        // prepare: add an artifact
+        final String artifactUri =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+        
+        // edit Representation contains statements in Turtle format
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION,
+                        MediaType.APPLICATION_RDF_TURTLE);
         
         final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        return results.getText();
+        final String updatedArtifactDetails = results.getText();
+        
+        // verify: Inferred Ontology ID is NOT in RDF format
+        Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
+        Assert.assertTrue("Artifact version has not been updated properly",
+                updatedArtifactDetails.contains("artifact:1:version:2"));
+        Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
+        Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
+        
+        // verify: objects left dangling after edit have been removed from the artifact
+        final String artifactBody = this.getArtifactAsString(artifactUri, MediaType.APPLICATION_RDF_TURTLE);
+        final String[] danglingObjects =
+                { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A", };
+        for(final String deletedObject : danglingObjects)
+        {
+            Assert.assertFalse("Dangling object still exists", artifactBody.contains(deletedObject));
+        }
     }
-    
     
     /**
      * Test viewing the edit HTML page for an internal PODD object.

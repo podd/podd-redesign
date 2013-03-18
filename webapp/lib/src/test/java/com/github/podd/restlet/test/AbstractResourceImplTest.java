@@ -1,10 +1,8 @@
 package com.github.podd.restlet.test;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -15,9 +13,6 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Status;
-import org.restlet.ext.html.FormData;
-import org.restlet.ext.html.FormDataSet;
-import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
@@ -88,11 +83,35 @@ public class AbstractResourceImplTest
     public Representation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
         throws IOException
     {
-        InputStream resourceAsStream = this.getClass().getResourceAsStream(resourcePath);
+        final InputStream resourceAsStream = this.getClass().getResourceAsStream(resourcePath);
         Assert.assertNotNull("Null resource", resourceAsStream);
         final InputStream in = new BufferedInputStream(resourceAsStream);
         final String stringInput = IOUtils.toString(in);
         return new StringRepresentation(stringInput, mediaType);
+    }
+    
+    /**
+     * Retrieves the asserted statements of a given artifact from the Server as a String.
+     * 
+     * @param artifactUri
+     *            The URI of the artifact requested
+     * @param mediaType
+     *            The format in which statements should be retrieved
+     * @return The artifact's asserted statements represented as a String
+     * @throws Exception
+     */
+    public String getArtifactAsString(final String artifactUri, final MediaType mediaType) throws Exception
+    {
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        return results.getText();
     }
     
     /**
@@ -135,7 +154,7 @@ public class AbstractResourceImplTest
      * @return The loaded artifact's URI
      * @throws Exception
      */
-    public String loadTestArtifact(final String resourceName, MediaType mediaType) throws Exception
+    public String loadTestArtifact(final String resourceName, final MediaType mediaType) throws Exception
     {
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
