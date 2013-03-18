@@ -7,6 +7,7 @@ import info.aduna.iteration.Iterations;
 
 import java.util.List;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -48,6 +49,21 @@ public class DebugUtils
         for(final Resource context : Iterations.asSet(conn.getContextIDs()))
         {
             System.out.println(context);
+        }
+        System.out.println("==================================================");
+    }
+
+    public static void printContents(final Model model) throws Exception
+    {
+        System.out.println("==================================================");
+        System.out.println("Model Contents: ");
+        System.out.println();
+        final Statement[] allStatements = model.toArray(new Statement[0]);
+        
+        for(final Statement stmt : allStatements)
+        {
+            System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {" + stmt.getObject()
+                    + "}");
         }
         System.out.println("==================================================");
     }
