@@ -88,7 +88,9 @@ public class AbstractResourceImplTest
     public Representation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
         throws IOException
     {
-        final InputStream in = new BufferedInputStream(this.getClass().getResourceAsStream(resourcePath));
+        InputStream resourceAsStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Null resource", resourceAsStream);
+        final InputStream in = new BufferedInputStream(resourceAsStream);
         final String stringInput = IOUtils.toString(in);
         return new StringRepresentation(stringInput, mediaType);
     }
@@ -114,7 +116,7 @@ public class AbstractResourceImplTest
     }
     
     /**
-     * Loads a test artifact.
+     * Loads a test artifact in RDF/XML format.
      * 
      * @param resourceName
      * @return The loaded artifact's URI
@@ -122,23 +124,26 @@ public class AbstractResourceImplTest
      */
     public String loadTestArtifact(final String resourceName) throws Exception
     {
+        return this.loadTestArtifact(resourceName, MediaType.APPLICATION_RDF_XML);
+    }
+    
+    /**
+     * Loads a test artifact in a given format.
+     * 
+     * @param resourceName
+     * @param mediaType
+     * @return The loaded artifact's URI
+     * @throws Exception
+     */
+    public String loadTestArtifact(final String resourceName, MediaType mediaType) throws Exception
+    {
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final URL fileUrl = this.getClass().getResource(resourceName);
-        
-        Assert.assertNotNull("Null artifact file", fileUrl);
-        
-        final File artifactDiskFile = new File(fileUrl.toURI());
-        final FileRepresentation fileRep = new FileRepresentation(artifactDiskFile, MediaType.APPLICATION_RDF_XML);
-        Assert.assertNotNull("Null FileRepresentation", fileRep);
-        
-        final FormDataSet form = new FormDataSet();
-        form.setMultipart(true);
-        form.getEntries().add(new FormData("file", fileRep));
+        final Representation input = this.buildRepresentationFromResource(resourceName, mediaType);
         
         final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
+                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
                         MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: results (expecting the added artifact's ontology IRI)
