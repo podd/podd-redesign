@@ -31,6 +31,9 @@ public interface TestConstants
     public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES = 28;
     public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES = 287;
 
+    /** Test resource (in Turtle): artifact with temporary URIs and 1 internal object having a PURL */
+    public static final String TEST_ARTIFACT_TTL_1_INTERNAL_OBJECT =  "/test/artifacts/connected-1-object.ttl";
+
     /** Test resource: artifact with PURLs and multiple internal objects in Turtle format */
     public static final String TEST_ARTIFACT_20130206 = "/test/artifacts/basic-20130206.ttl";
     
@@ -51,4 +54,5 @@ public interface TestConstants
     
     /** Test resource: fragment moves SqueekeeMaterial to under My_Treatment1. In Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION = "/test/artifacts/fragment-move-demo-investigation.ttl";
+
 }
