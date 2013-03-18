@@ -103,12 +103,66 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
     }
     
-    @Ignore
     @Test
     public void testEditArtifactBasicTurtle() throws Exception
     {
-        Assert.fail("TODO: implement");
+        // prepare: add an artifact
+        final String artifactUri =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
+        
+        // edit Representation contains statements in Turtle format
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT,
+                        MediaType.APPLICATION_RDF_TURTLE);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String updatedArtifactDetails = results.getText();
+        
+        // verify: Inferred Ontology ID is NOT in RDF format
+        Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
+        Assert.assertTrue("Artifact version has not been updated properly",
+                updatedArtifactDetails.contains("artifact:1:version:2"));
+        Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
+        Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
+        
+        // verify: publication46 has been aded to the artifact
+        String artifactBody = this.getArtifactStatementsFromServer(artifactUri, MediaType.APPLICATION_RDF_TURTLE);
+        Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication46"));
+        Assert.assertTrue("New publication not added to artifact",
+                artifactBody.contains("http://dx.doi.org/10.1109/eScience.2013.44"));
     }
+    
+    /**
+     * Helper method to retrieve the asserted statements of a given artifact in a given media type.
+     * 
+     * @param artifactUri
+     * @param mediaType
+     * @return The artifact's asserted statements represented as a String
+     * @throws Exception
+     */
+    private String getArtifactStatementsFromServer(String artifactUri, MediaType mediaType) throws Exception
+    {
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        return results.getText();
+    }
+    
     
     /**
      * Test viewing the edit HTML page for an internal PODD object.

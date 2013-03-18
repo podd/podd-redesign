@@ -78,8 +78,16 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Artifact ID not submitted");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
         }
+
+        boolean isReplace = true;
+        final String isReplaceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_REPLACE);
+        if (isReplaceStr != null)
+        {
+            isReplace = Boolean.valueOf(isReplaceStr);
+        }
         
-        this.log.info("requesting edit artifact ({}): {}", variant.getMediaType().getName(), artifactUri);
+        this.log.info("requesting edit artifact ({}): {}, with isReplace {}", variant.getMediaType().getName(),
+                artifactUri, isReplace);
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
                 Collections.<URI> singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
@@ -108,7 +116,6 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         // - do the artifact update 
         try
         {
-            final boolean isReplace = true;
             final InferredOWLOntologyID ontologyID =
                     this.getPoddArtifactManager().updateArtifact(ValueFactoryImpl.getInstance().createURI(artifactUri),
                             inputStream, inputFormat, isReplace);

@@ -139,7 +139,7 @@ public interface PoddWebConstants
     public static final String KEY_ARTIFACT_IDENTIFIER = "artifacturi";
     
     /**
-     * Key use to represent an object as part of a request
+     * Key used to represent an object as part of a request
      */
     public static final String KEY_OBJECT_IDENTIFIER = "objecturi";
     
@@ -162,5 +162,10 @@ public interface PoddWebConstants
      * Key used to select unpublished artifacts. Defaults to true for authenticated users.
      */
     public static final String KEY_UNPUBLISHED = "unpublished";
+
+    /**
+     * Key used in "edit" artifact to indicate whether it should be a "merge" or "replace".
+     */
+    public static final String KEY_EDIT_WITH_REPLACE = "isreplace";
     
 }
