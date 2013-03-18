@@ -79,12 +79,14 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     public void testEditArtifactBasicRdf() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-2.rdf");
+        final String artifactUri =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
         
         final Representation input =
                 this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
@@ -101,6 +103,11 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
         Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
         Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+        
+        // verify: publication46 has been added to the artifact
+        final String artifactBody = this.getArtifactAsString(artifactUri, MediaType.APPLICATION_RDF_XML);
+        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("rfc2616.html"));
+        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("publication-pdf-a"));
     }
     
     @Test
@@ -134,7 +141,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
         Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
         
-        // verify: publication46 has been aded to the artifact
+        // verify: publication46 has been added to the artifact
         final String artifactBody = this.getArtifactAsString(artifactUri, MediaType.APPLICATION_RDF_TURTLE);
         Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication46"));
         Assert.assertTrue("New publication not added to artifact",
