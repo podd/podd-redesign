@@ -12,6 +12,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * This class contains static methods to help debug contents of an RDF repository
@@ -25,7 +26,7 @@ public class DebugUtils
     /**
      * Helper method prints the contents of the given context of a Repository
      */
-    public static void printContents(RepositoryConnection conn, final URI context) throws Exception
+    public static void printContents(RepositoryConnection conn, final URI context) throws RepositoryException
     {
         System.out.println("==================================================");
         System.out.println("Graph = " + context);
@@ -42,7 +43,7 @@ public class DebugUtils
     /**
      * Helper method prints the contents of the given context of a Repository
      */
-    public static void printContexts(RepositoryConnection conn) throws Exception
+    public static void printContexts(RepositoryConnection conn) throws RepositoryException
     {
         System.out.println("==================================================");
         System.out.println("Contexts in Repository:  ");
@@ -53,7 +54,7 @@ public class DebugUtils
         System.out.println("==================================================");
     }
 
-    public static void printContents(final Model model) throws Exception
+    public static void printContents(final Model model)
     {
         System.out.println("==================================================");
         System.out.println("Model Contents: ");
