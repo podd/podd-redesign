@@ -3,11 +3,13 @@ package com.github.podd.restlet.test;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.openrdf.rio.RDFFormat;
 import org.restlet.Component;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -23,6 +25,8 @@ import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.PoddWebServiceApplicationImpl;
+import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -143,7 +147,7 @@ public class AbstractResourceImplTest
      */
     public String loadTestArtifact(final String resourceName) throws Exception
     {
-        return this.loadTestArtifact(resourceName, MediaType.APPLICATION_RDF_XML);
+        return this.loadTestArtifact(resourceName, MediaType.APPLICATION_RDF_XML).getOntologyIRI().toString();
     }
     
     /**
@@ -151,10 +155,12 @@ public class AbstractResourceImplTest
      * 
      * @param resourceName
      * @param mediaType
-     * @return The loaded artifact's URI
+     *            Specifies the media type of the resource to load (e.g. RDF/XML, Turtle)
+     * @return An InferredOWLOntologyID identifying the loaded artifact
      * @throws Exception
      */
-    public String loadTestArtifact(final String resourceName, final MediaType mediaType) throws Exception
+    public InferredOWLOntologyID loadTestArtifact(final String resourceName, final MediaType mediaType)
+        throws Exception
     {
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
@@ -163,15 +169,14 @@ public class AbstractResourceImplTest
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: results (expecting the added artifact's ontology IRI)
         final String body = results.getText();
-        Assert.assertTrue("Artifact URI should start with http", body.startsWith("http://"));
-        Assert.assertFalse("Should have no references to HTML", body.contains("html"));
-        Assert.assertFalse("Artifact URI should not contain newline character", body.contains("\n"));
+        final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
         
-        return body;
+        Assert.assertEquals("Should have got only 1 Ontology ID", 1, ontologyIDs.size());
+        return ontologyIDs.iterator().next();
     }
     
     /**
