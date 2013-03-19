@@ -5,9 +5,11 @@ package com.github.podd.restlet.test;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -20,6 +22,8 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -190,13 +194,17 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: results (expecting the added artifact's ontology IRI)
         final String body = results.getText();
-        Assert.assertTrue(body.contains("http://"));
-        Assert.assertFalse(body.contains("html"));
-        Assert.assertFalse(body.contains("\n"));
+        
+        Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
+        
+        Assert.assertNotNull("No ontology IDs in response", ontologyIDs);
+        Assert.assertEquals("More than 1 ontology ID in response", 1, ontologyIDs.size());
+        Assert.assertTrue("Ontology ID not of expected format",
+                ontologyIDs.iterator().next().toString().contains("artifact:1:version:1"));
     }
     
     /**
