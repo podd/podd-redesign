@@ -1,16 +1,23 @@
 package com.github.podd.utils;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,5 +166,29 @@ public class OntologyUtils
         }
         
         return results;
+    }
+    
+    /**
+     * Extracts the {@link InferredOWLOntologyID} instances that are represented as RDF
+     * {@link Statement}s in the given {@link String}.
+     * 
+     * @param string
+     *            The input string containing RDF statements.
+     * @param format
+     *            The format of RDF statements in the string  
+     * @return A Collection of {@link InferredOWLOntologyID} instances derived from the statements
+     *         in the string.
+     * @throws OpenRDFException
+     * @throws IOException
+     */
+    public static Collection<InferredOWLOntologyID> stringToOntologyID(String string, RDFFormat format)
+        throws OpenRDFException, IOException
+    {
+        Model model = new LinkedHashModel();
+        RDFParser parser = Rio.createParser(format);
+        parser.setRDFHandler(new StatementCollector(model));
+        parser.parse(new StringReader(string), "");
+        
+        return OntologyUtils.modelToOntologyIDs(model);
     }
 }
