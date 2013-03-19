@@ -796,13 +796,25 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             format = RDFFormat.RDFXML;
         }
         
-        InferredOWLOntologyID artifactID = this.getArtifactByIRI(IRI.create(artifactUri));
+        // check if updating from the most current version of the artifact
+        InferredOWLOntologyID currentArtifactID = this.getArtifactByIRI(IRI.create(artifactUri));
+        InferredOWLOntologyID artifactID = this.getArtifactByIRI(IRI.create(versionUri));
+        if(!artifactID.equals(currentArtifactID))
+        {
+            // FIXME - handle this conflict intelligently instead of rejecting the update.
+            // We never get in here because if the version IRI is old, an
+            // UnmanagedArtifactIRIException is
+            // thrown from getArtifactByIRI()
+            this.log.error(
+                    "Attempting to update from an older version of an artifact. <{}> has been succeeded by <{}>",
+                    versionUri, currentArtifactID.getVersionIRI().toString());
+        }
         
         Repository tempRepository = this.getRepositoryManager().getNewTemporaryRepository();
         RepositoryConnection tempRepositoryConnection = null;
         RepositoryConnection permanentRepositoryConnection = null;
         InferredOWLOntologyID inferredOWLOntologyID = null;
-        
+
         try
         {
             // create a temporary in-memory repository

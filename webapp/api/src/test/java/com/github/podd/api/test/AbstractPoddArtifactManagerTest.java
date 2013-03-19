@@ -1353,6 +1353,46 @@ public abstract class AbstractPoddArtifactManagerTest
 
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     * Tests attempting to update an artifact when an old version of the artifact has been used as the 
+     * basis of the update. This could occur due to concurrent updates.
+     * 
+     * Currently verifies that a failure occurs.  
+     */
+    @Test
+    public final void testUpdateArtifactWithOldVersion() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // upload artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 = this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, 90, 383, false);
+
+        // upload another version of artifact
+        final InputStream inputStream2 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv2 = this.testArtifactManager.loadArtifact(inputStream2, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv2, 7, 90, 383, false);
+
+        System.out.println(artifactIDv1);
+        System.out.println(artifactIDv2);
+        
+        final InputStream editInputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION);
+        try
+        {
+            this.testArtifactManager.updateArtifact(artifactIDv1.getOntologyIRI().toOpenRDFURI(), artifactIDv1
+                    .getVersionIRI().toOpenRDFURI(), editInputStream, RDFFormat.TURTLE, true, true);
+            Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
+        }
+        catch(UnmanagedArtifactIRIException e)
+        {
+            Assert.assertEquals("Exception not due to the expected artifact version", artifactIDv1.getVersionIRI(), e.getOntologyID());
+        }
+    }
+    
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImport(org.semanticweb.owlapi.model.OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      */
