@@ -190,7 +190,7 @@ public abstract class AbstractPoddSesameManagerTest
                 this.artifactGraph);
         this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
                 testInferredURI, this.artifactGraph);
-        this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+        this.testRepositoryConnection.add(testVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
                 testInferredURI, this.artifactGraph);
         
         return this.artifactGraph;
@@ -1097,6 +1097,78 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Wrong Ontology IRI", "urn:temp:uuid:artifact:1", ontologyIRI.toString());
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getOntologyVersion(IRI, RepositoryConnection, URI)}
+     * .
+     */
+    @Test
+    public void testGetOntologyVersionWithArtifact() throws Exception
+    {
+        // prepare: create artifact management graph
+        final URI artifactGraph = this.populateArtifactManagementGraph();
+        
+        // invoke test method:
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testPoddSesameManager.getOntologyVersion(IRI.create("http://purl.org/podd/99-99/version:1"),
+                        this.testRepositoryConnection, artifactGraph);
+        
+        // verify:
+        Assert.assertNotNull("Returned NULL inferredOntologyID", inferredOntologyID);
+        Assert.assertEquals("Not the expected version", IRI.create("http://purl.org/podd/99-99/version:1"),
+                inferredOntologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected inferred version",
+                IRI.create("urn:inferred:http://purl.org/podd/99-99/version:1"),
+                inferredOntologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getOntologyVersion(IRI, RepositoryConnection, URI)}
+     * .
+     */
+    @Test
+    public void testGetOntologyVersionWithNonCurrentSchema() throws Exception
+    {
+        // prepare: create artifact management graph
+        final URI schemaGraph = this.populateSchemaManagementGraph();
+        
+        // invoke test method:
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testPoddSesameManager.getOntologyVersion(
+                        IRI.create("http://purl.org/podd/ns/version/poddPlant/1"), this.testRepositoryConnection,
+                        schemaGraph);
+        
+        // verify:
+        Assert.assertNotNull("Returned NULL inferredOntologyID", inferredOntologyID);
+        Assert.assertEquals("Not the expected version", IRI.create("http://purl.org/podd/ns/version/poddPlant/1"),
+                inferredOntologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected inferred version",
+                IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/1"),
+                inferredOntologyID.getInferredOntologyIRI());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getOntologyVersion(IRI, RepositoryConnection, URI)}
+     * .
+     */
+    @Test
+    public void testGetOntologyVersionWithNonExistentSchema() throws Exception
+    {
+        // prepare: create artifact management graph
+        final URI schemaGraph = this.populateSchemaManagementGraph();
+        
+        // invoke test method:
+        final InferredOWLOntologyID inferredOntologyID =
+                this.testPoddSesameManager.getOntologyVersion(
+                        IRI.create("http://purl.org/podd/ns/version/poddPlant/3"), this.testRepositoryConnection,
+                        schemaGraph);
+        
+        // verify:
+        Assert.assertNull("Expected NULL inferredOntologyID", inferredOntologyID);
+    }
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getSchemaVersion(IRI, RepositoryConnection, URI)}

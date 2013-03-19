@@ -491,15 +491,22 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         return ontologyIRI;
     }
-    
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.github.podd.api.PoddSesameManager#getOntologyVersion(org.semanticweb.owlapi.model.IRI,
+     * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
+     */
     @Override
-    public InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection repositoryConnection,
-            URI schemaManagementGraph) throws OpenRDFException, UnmanagedSchemaIRIException
+    public InferredOWLOntologyID getOntologyVersion(IRI versionIRI, RepositoryConnection repositoryConnection,
+            URI managementGraph) throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(schemaManagementGraph);
+        dataset.addDefaultGraph(managementGraph);
         
-        // 1: see if the given IRI exists as a version IRI
+        // see if the given IRI exists as a version IRI
         final StringBuilder sb2 = new StringBuilder();
         sb2.append("SELECT ?ontologyIri ?inferredIri WHERE { ");
         sb2.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
@@ -507,10 +514,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb2.append(" ?versionIri <" + PoddRdfConstants.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredIri . ");
         sb2.append(" }");
         
-        this.log.info("Generated SPARQL {} with versionIri bound to <{}>", sb2.toString(), schemaVersionIRI.toString());
+        this.log.info("Generated SPARQL {} with versionIri bound to <{}>", sb2.toString(), versionIRI.toString());
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb2.toString());
-        query.setBinding("versionIri", schemaVersionIRI.toOpenRDFURI());
+        query.setBinding("versionIri", versionIRI.toOpenRDFURI());
         query.setDataset(dataset);
         
         final TupleQueryResult queryResults = query.evaluate();
@@ -524,11 +531,27 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final String nextInferredIRI = nextResult.getValue("inferredIri").stringValue();
             
             // return the first solution since there should only be only one result
-            return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), schemaVersionIRI, IRI.create(nextInferredIRI));
+            return new InferredOWLOntologyID(IRI.create(nextOntologyIRI), versionIRI, IRI.create(nextInferredIRI));
         }
         
-        // not a version IRI, return the current schema version
-        return this.getCurrentSchemaVersion(schemaVersionIRI, repositoryConnection, schemaManagementGraph);
+        // could not find given IRI as a version IRI
+        return null;
+    }
+    
+    @Override
+    public InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection repositoryConnection,
+            URI schemaManagementGraph) throws OpenRDFException, UnmanagedSchemaIRIException
+    {
+        InferredOWLOntologyID ontologyID = this.getOntologyVersion(schemaVersionIRI, repositoryConnection, schemaManagementGraph);
+        if (ontologyID != null)
+        {
+            return ontologyID;
+        }
+        else
+        {
+            // not a version IRI, return the current schema version
+            return this.getCurrentSchemaVersion(schemaVersionIRI, repositoryConnection, schemaManagementGraph);
+        }
     }
     
     /**
