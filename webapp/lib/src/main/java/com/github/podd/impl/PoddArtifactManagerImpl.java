@@ -48,6 +48,7 @@ import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.DeleteArtifactException;
+import com.github.podd.exception.DisconnectedObjectException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -782,7 +783,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public InferredOWLOntologyID updateArtifact(final URI artifactUri, final InputStream inputStream, RDFFormat format,
-            final boolean isReplace) throws OpenRDFException, IOException, OWLException, PoddException
+            final boolean isReplace, boolean force) throws OpenRDFException, IOException, OWLException, PoddException
     {
         if(inputStream == null)
         {
@@ -850,6 +851,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     RdfUtility.findDisconnectedNodes(artifactID.getOntologyIRI().toOpenRDFURI(),
                             tempRepositoryConnection, tempContext);
             this.log.info("Found {} dangling object(s). \n {}", danglingObjects.size(), danglingObjects);
+            if(!danglingObjects.isEmpty() && !force)
+            {
+                throw new DisconnectedObjectException(danglingObjects, "Update leads to disconnected PODD objects");
+            }
             for(URI danglingObject : danglingObjects)
             {
                 tempRepositoryConnection.remove(danglingObject, null, null, tempContext);
