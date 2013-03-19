@@ -33,6 +33,7 @@ public class IndexResourceImplTest extends AbstractResourceImplTest
         
         final String body = results.getText();
         Assert.assertTrue(body.contains("Welcome to PODD, please"));
+        assertFreemarker(body);
     }
     
 }
