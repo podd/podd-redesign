@@ -87,6 +87,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
+        // "force" query parameter is false by default
         
         final Representation input =
                 this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
@@ -122,6 +123,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
+        // "force" query parameter is false by default
         
         // edit Representation contains statements in Turtle format
         final Representation input =
@@ -160,6 +162,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(true));
         
         // edit Representation contains statements in Turtle format
         final Representation input =

@@ -167,5 +167,11 @@ public interface PoddWebConstants
      * Key used in "edit" artifact to indicate whether it should be a "merge" or "replace".
      */
     public static final String KEY_EDIT_WITH_REPLACE = "isreplace";
+
+    /**
+     * Key used in "edit" artifact to indicate whether any internal object deletions should be
+     * carried out without seeking user confirmation.
+     */
+    public static final String KEY_EDIT_WITH_FORCE = "isforce";
     
 }

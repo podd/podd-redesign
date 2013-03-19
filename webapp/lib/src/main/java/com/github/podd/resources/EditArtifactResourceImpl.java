@@ -86,6 +86,14 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             isReplace = Boolean.valueOf(isReplaceStr);
         }
         
+        boolean force = false;
+        final String forceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_FORCE);
+        if (forceStr != null)
+        {
+            force = Boolean.valueOf(forceStr);
+        }
+        
+        
         this.log.info("requesting edit artifact ({}): {}, with isReplace {}", variant.getMediaType().getName(),
                 artifactUri, isReplace);
         
@@ -118,7 +126,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             final InferredOWLOntologyID ontologyID =
                     this.getPoddArtifactManager().updateArtifact(ValueFactoryImpl.getInstance().createURI(artifactUri),
-                            inputStream, inputFormat, isReplace, true);
+                            inputStream, inputFormat, isReplace, force);
             //TODO - send detailed errors for display where possible
             
             // - write the artifact ID into response
