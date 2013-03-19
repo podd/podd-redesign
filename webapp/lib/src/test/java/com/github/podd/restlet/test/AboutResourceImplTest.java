@@ -35,6 +35,7 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
                 PoddRestletTestUtils.doTestUnAuthenticatedRequest(aboutClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK);
         
+        assertFreemarker(results.getText());
         Assert.assertTrue(results.getText().contains("The University of Queensland"));
     }
    
