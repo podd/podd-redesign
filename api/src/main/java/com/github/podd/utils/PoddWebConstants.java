@@ -139,6 +139,11 @@ public interface PoddWebConstants
     public static final String KEY_ARTIFACT_IDENTIFIER = "artifacturi";
     
     /**
+     * Key used to represent an artifact's version URI as part of a request
+     */
+    public static final String KEY_ARTIFACT_VERSION_IDENTIFIER = "artifactVersionUri";
+    
+    /**
      * Key used to represent an object as part of a request
      */
     public static final String KEY_OBJECT_IDENTIFIER = "objecturi";
@@ -173,5 +178,5 @@ public interface PoddWebConstants
      * carried out without seeking user confirmation.
      */
     public static final String KEY_EDIT_WITH_FORCE = "isforce";
-    
+
 }

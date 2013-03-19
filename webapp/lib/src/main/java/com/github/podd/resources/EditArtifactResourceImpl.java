@@ -76,9 +76,18 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         if(artifactUri == null)
         {
             this.log.error("Artifact ID not submitted");
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
 
+        final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER);
+        
+        if(versionUri == null)
+        {
+            this.log.error("Artifact Version IRI not submitted");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
+        }
+        
+        
         boolean isReplace = true;
         final String isReplaceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_REPLACE);
         if (isReplaceStr != null)

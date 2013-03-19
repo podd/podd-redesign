@@ -15,6 +15,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -59,6 +60,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
         
         final Representation input =
                 this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
@@ -79,13 +81,16 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     public void testEditArtifactBasicRdf() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri =
+        final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                .getOntologyIRI().toString());
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                .getVersionIRI().toString());
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
         // "force" query parameter is false by default
         
@@ -106,7 +111,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
         
         // verify: publication46 has been added to the artifact
-        final String artifactBody = this.getArtifactAsString(artifactUri, MediaType.APPLICATION_RDF_XML);
+        final String artifactBody =
+                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
         Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("rfc2616.html"));
         Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("publication-pdf-a"));
     }
@@ -115,13 +121,16 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     public void testEditArtifactBasicTurtle() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri =
+        final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                .getOntologyIRI().toString());
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                .getVersionIRI().toString());
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
         // "force" query parameter is false by default
         
@@ -144,7 +153,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
         
         // verify: publication46 has been added to the artifact
-        final String artifactBody = this.getArtifactAsString(artifactUri, MediaType.APPLICATION_RDF_TURTLE);
+        final String artifactBody =
+                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
         Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication46"));
         Assert.assertTrue("New publication not added to artifact",
                 artifactBody.contains("http://dx.doi.org/10.1109/eScience.2013.44"));
@@ -154,13 +164,16 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     public void testEditArtifactTurtleWithDanglingObjects() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri =
+        final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                .getOntologyIRI().toString());
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                .getVersionIRI().toString());
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(true));
         
@@ -183,7 +196,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
         
         // verify: objects left dangling after edit have been removed from the artifact
-        final String artifactBody = this.getArtifactAsString(artifactUri, MediaType.APPLICATION_RDF_TURTLE);
+        final String artifactBody =
+                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
         final String[] danglingObjects =
                 { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3",
