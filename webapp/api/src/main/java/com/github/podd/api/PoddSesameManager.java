@@ -144,7 +144,7 @@ public interface PoddSesameManager
     
     /**
      * If the given IRI represents a version IRI of a schema ontology, the Ontology ID for this
-     * schema version is returned. If the given IRI represents an ontology IR of a schema ontology,
+     * schema version is returned. If the given IRI represents an ontology IRI of a schema ontology,
      * the Ontology ID for the most current version of this schema ontology is returned.
      * 
      * 
