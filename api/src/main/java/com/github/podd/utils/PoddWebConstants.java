@@ -104,14 +104,9 @@ public interface PoddWebConstants
     public static final String PATH_ARTIFACT_GET_INFERRED = "artifact/inferred";
     
     /**
-     * Path to edit an artifact, merging it with existing statements
+     * Path to edit an artifact
      */
-    public static final String PATH_ARTIFACT_EDIT_MERGE = "artifact/edit/merge";
-    
-    /**
-     * Path to edit an artifact, replacing previous statements about the edited objects
-     */
-    public static final String PATH_ARTIFACT_EDIT_REPLACE = "artifact/edit/replace";
+    public static final String PATH_ARTIFACT_EDIT = "artifact/edit";
     
     /**
      * Path to delete an artifact. This uses HTTP delete method
@@ -141,7 +136,7 @@ public interface PoddWebConstants
     /**
      * Key used to represent an artifact's version URI as part of a request
      */
-    public static final String KEY_ARTIFACT_VERSION_IDENTIFIER = "artifactVersionUri";
+    public static final String KEY_ARTIFACT_VERSION_IDENTIFIER = "versionuri";
     
     /**
      * Key used to represent an object as part of a request

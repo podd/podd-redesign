@@ -36,7 +36,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     public void testErrorEditArtifactRdfWithoutArtifactID() throws Exception
     {
         final ClientResource editArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
         // there is no need to authenticate, have a test artifact or send RDF to modify as the
         // artifact is checked for first
@@ -57,7 +57,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final String artifactUri = "urn:purl:dummy:artifact:uri:artifact:1";
         
         final ClientResource editArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
@@ -85,7 +85,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource editArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
                 .getOntologyIRI().toString());
@@ -125,7 +125,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource editArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
                 .getOntologyIRI().toString());
@@ -168,7 +168,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource editArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
                 .getOntologyIRI().toString());
@@ -220,7 +220,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final String objectUri = "urn:hardcoded:purl:artifact:1#publication45";
         
         final ClientResource editArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);

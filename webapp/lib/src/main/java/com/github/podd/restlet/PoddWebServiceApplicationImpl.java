@@ -281,13 +281,9 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(getArtifactInferred, GetArtifactResourceImpl.class);
         
         // Add a route for the Edit Artifact page.
-        final String editArtifactMerge = PoddWebConstants.PATH_ARTIFACT_EDIT_MERGE;
-        this.log.info("attaching Edit Artifact (merge) service to path={}", editArtifactMerge);
-        router.attach(editArtifactMerge, EditArtifactResourceImpl.class);
-        
-        final String editArtifactReplace = PoddWebConstants.PATH_ARTIFACT_EDIT_REPLACE;
-        this.log.info("attaching Edit Artifact (replace) service to path={}", editArtifactReplace);
-        router.attach(editArtifactReplace, EditArtifactResourceImpl.class);
+        final String editArtifact = PoddWebConstants.PATH_ARTIFACT_EDIT;
+        this.log.info("attaching Edit Artifact service to path={}", editArtifact);
+        router.attach(editArtifact, EditArtifactResourceImpl.class);
         
         // Add a route for the Delete Artifact page.
         final String deleteArtifact = PoddWebConstants.PATH_ARTIFACT_DELETE;
