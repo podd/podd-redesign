@@ -211,7 +211,12 @@ public class AbstractResourceImplTest
         
         // verify: results (expecting the added artifact's ontology IRI)
         final String body = results.getText();
+        assertFreemarker(body);
         final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
+        
+        Assert.assertTrue("Artifact URI should start with http", body.startsWith("http://"));
+        Assert.assertFalse("Should have no references to HTML", body.contains("html"));
+        Assert.assertFalse("Artifact URI should not contain newline character", body.contains("\n"));
         
         Assert.assertEquals("Should have got only 1 Ontology ID", 1, ontologyIDs.size());
         return ontologyIDs.iterator().next();
