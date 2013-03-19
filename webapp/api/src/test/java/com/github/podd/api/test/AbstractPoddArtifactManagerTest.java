@@ -1008,7 +1008,9 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InputStream editInputStream = this.getClass().getResourceAsStream(fragmentPath);
         final InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), editInputStream,
+                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(),
+                        artifactId.getVersionIRI().toOpenRDFURI(),
+                        editInputStream,
                         fragmentFormat, isReplace, force);
         return updatedArtifact;
     }
@@ -1150,7 +1152,8 @@ public abstract class AbstractPoddArtifactManagerTest
         
         try
         {
-            this.testArtifactManager.updateArtifact(nonExistentArtifactURI, editInputStream, RDFFormat.TURTLE, true, true);
+            this.testArtifactManager.updateArtifact(nonExistentArtifactURI, nonExistentArtifactURI, 
+                    editInputStream, RDFFormat.TURTLE, true, true);
             Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
         }
         catch(final UnmanagedArtifactIRIException e)

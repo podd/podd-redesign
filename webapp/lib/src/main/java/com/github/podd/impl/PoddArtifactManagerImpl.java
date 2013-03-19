@@ -782,8 +782,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * code and comments are duplicated across these two methods.
      */
     @Override
-    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final InputStream inputStream, RDFFormat format,
-            final boolean isReplace, boolean force) throws OpenRDFException, IOException, OWLException, PoddException
+    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final URI versionUri,
+            final InputStream inputStream, RDFFormat format, final boolean isReplace, boolean force)
+        throws OpenRDFException, IOException, OWLException, PoddException
     {
         if(inputStream == null)
         {

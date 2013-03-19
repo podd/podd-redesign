@@ -135,6 +135,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             final InferredOWLOntologyID ontologyID =
                     this.getPoddArtifactManager().updateArtifact(ValueFactoryImpl.getInstance().createURI(artifactUri),
+                            ValueFactoryImpl.getInstance().createURI(versionUri),
                             inputStream, inputFormat, isReplace, force);
             //TODO - send detailed errors for display where possible
             

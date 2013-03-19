@@ -247,6 +247,8 @@ public interface PoddArtifactManager
      * 
      * @param artifactUri
      *            The URI of the artifact to be updated. This should be an already managed artifact.
+     * @param versionUri 
+     *            The Version URI of the artifact to be updated.
      * @param inputStream
      *            The RDF statements that need to be updated. It is not necessary to send the
      *            complete artifact here, only sending the affected statements is sufficient.
@@ -266,7 +268,7 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws OWLException
      */
-    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final InputStream inputStream,
+    public InferredOWLOntologyID updateArtifact(final URI artifactUri, URI versionUri, final InputStream inputStream,
             final RDFFormat format, final boolean isReplace, final boolean force) throws OpenRDFException,
         PoddException, IOException, OWLException;
 
