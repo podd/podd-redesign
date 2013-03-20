@@ -92,7 +92,7 @@
 <div id="buttonwrapper">
     <#if poddObject??>
 	    <#if  canEditObject?? && canEditObject>
-        <a href="${baseUrl}/artifact/edit/merge?artifacturi=${artifactUri?url!"unknown-artifacturi"}&objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Edit Object</a>
+        <a href="${baseUrl}/artifact/edit?artifacturi=${artifactUri?url!"unknown-artifacturi"}&objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Edit Object</a>
         </#if>
         <#if  canAddChildren?? && canAddChildren>
         <a href="${baseUrl}/object/${poddObject.objectURI!"unknown-pid"}/add">Add Child Object</a>
