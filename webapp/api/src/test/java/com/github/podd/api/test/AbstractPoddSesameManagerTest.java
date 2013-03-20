@@ -1404,7 +1404,7 @@ public abstract class AbstractPoddSesameManagerTest
                         "http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
         
         final List<URI> orderedPropertyUris =
-                this.testPoddSesameManager.getWeightedProperties(nextOntologyID, internalObjectUri,
+                this.testPoddSesameManager.getWeightedProperties(nextOntologyID, internalObjectUri, false,
                         testRepositoryConnection);
         
         // verify:
@@ -1442,7 +1442,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager
-                        .getWeightedProperties(nextOntologyID, topObjectUri, testRepositoryConnection);
+                        .getWeightedProperties(nextOntologyID, topObjectUri, false, testRepositoryConnection);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
@@ -1456,6 +1456,48 @@ public abstract class AbstractPoddSesameManagerTest
                         "http://purl.org/podd/ns/poddScience#hasProcess",
                         "http://purl.org/podd/ns/poddScience#hasProjectPlan",
                         "http://purl.org/podd/ns/poddScience#hasPublication",
+                        "http://purl.org/podd/ns/poddBase#hasPublicationStatus",
+                        "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
+                        "http://purl.org/podd/ns/poddBase#hasStartDate",
+                        "http://purl.org/podd/ns/poddBase#hasTopObjectStatus" };
+        for(int i = 0; i < orderedPropertyUris.size(); i++)
+        {
+            Assert.assertEquals("Property URI not in expected position",
+                    ValueFactoryImpl.getInstance().createURI(expectedUris[i]), orderedPropertyUris.get(i));
+        }
+    }
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getWeightedProperties(InferredOWLOntologyID, URI, boolean, RepositoryConnection)}
+     * .
+     * 
+     * getWeightedProperties() is invoked for the top object of an artifact with
+     * <i>excludeContainsProperties</i> set to true.
+     * 
+     */
+    @Test
+    public void testGetWeightedPropertiesOfATopObjectWithoutContainsProperties() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID nextOntologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        final URI topObjectUri = this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
+        
+        final List<URI> orderedPropertyUris =
+                this.testPoddSesameManager.getWeightedProperties(nextOntologyID, topObjectUri, true,
+                        testRepositoryConnection);
+        
+        // verify:
+        Assert.assertEquals("Incorrect number of statements about Top Object", 8, orderedPropertyUris.size());
+        
+        final String[] expectedUris =
+                { "http://purl.org/podd/ns/poddScience#hasANZSRC", "http://purl.org/podd/ns/poddBase#createdAt",
+                        "http://purl.org/dc/terms/creator",
+                        "http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator",
                         "http://purl.org/podd/ns/poddBase#hasPublicationStatus",
                         "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
                         "http://purl.org/podd/ns/poddBase#hasStartDate",

@@ -89,6 +89,12 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_DO_NOT_DISPLAY = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "doNotDisplay");
     
+    public static final URI PODD_BASE_DISPLAY_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "displayType");
+
+    public static final URI PODD_BASE_CONTAINS = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "contains");
+
     
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are

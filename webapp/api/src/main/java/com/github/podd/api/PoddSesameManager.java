@@ -182,6 +182,30 @@ public interface PoddSesameManager
         throws OpenRDFException, UnmanagedSchemaIRIException;
     
     /**
+     * Retrieve a list of <b>asserted</b> properties about the given object. The list is ordered
+     * based on property weights and secondarily based on property labels.
+     * 
+     * Properties RDF:Type, RDFS:Comment and RDFS:Label as well as properties whose values are
+     * generic OWL concepts (i.e. OWL:Thing, OWL:Individial, OWL:NamedIndividual, OWL:Class) are not
+     * included in the results.
+     * 
+     * Properties with an annotation poddBase:doNotDisplay are also not included in the results.
+     * 
+     * @param artifactID
+     *            The artifact to which this object belongs
+     * @param objectUri
+     *            The object whose properties are sought
+     * @param excludeContainsProperties
+     *            Whether to exclude sub-properties of "poddBase:contains" property
+     * @param repositoryConnection
+     * @return A List containing URIs of sorted properties about the object
+     * 
+     * @throws OpenRDFException
+     */
+    List<URI> getWeightedProperties(final InferredOWLOntologyID artifactID, final URI objectUri,
+            final boolean excludeContainsProperties, final RepositoryConnection repositoryConnection) throws OpenRDFException;
+    
+    /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
      * ontologyID were previously published.
      * 
@@ -265,9 +289,6 @@ public interface PoddSesameManager
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     Model getObjectDetailsForEdit(InferredOWLOntologyID artifactID, URI objectUri,
-            RepositoryConnection repositoryConnection) throws OpenRDFException;
-    
-    List<URI> getWeightedProperties(InferredOWLOntologyID artifactID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     Set<IRI> getDirectImports(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;

@@ -1239,13 +1239,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" ?poddObject ?propertyUri ?value . ");
         sb.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
         sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+        sb.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue() + "> ?propertyDisplayType . ");
         sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
         
         sb.append("} WHERE {");
         
         sb.append(" ?poddObject ?propertyUri ?value . ");
-        sb.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+        sb.append(" OPTIONAL {?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType } . ");
         
+        // property may not have a displayType
+        sb.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue() + "> ?propertyDisplayType } . ");
+
         // property may not have a Label
         sb.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
         
@@ -1271,10 +1275,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append("}");
         
-        this.log.info("Created SPARQL {}", sb.toString());
-        
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
         graphQuery.setBinding("poddObject", objectUri);
+        
+        this.log.info("Created SPARQL {} \n   with poddObject bound to {}", sb.toString(), objectUri);
         
         final Model queryResults =
                 this.executeGraphQuery(graphQuery,
@@ -1282,29 +1286,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         return queryResults;
     }
-    
-    /**
-     * Retrieve a list of <b>asserted</b> properties about the given object. The list is ordered
-     * based on property weights and secondarily based on property labels.
+
+    /*
+     * (non-Javadoc)
      * 
-     * Properties RDF:Type, RDFS:Comment and RDFS:Label as well as properties whose values are
-     * generic OWL concepts (i.e. OWL:Thing, OWL:Individial, OWL:NamedIndividual, OWL:Class) are not
-     * included in the results.
-     * 
-     * Properties with an annotation poddBase:doNotDisplay are also not included in the results.
-     * 
-     * @param artifactID
-     *            The artifact to which this object belongs
-     * @param objectUri
-     *            The object whose properties are sought
-     * @param repositoryConnection
-     * @return A List containing URIs of sorted properties about the object
-     * 
-     * @throws OpenRDFException
+     * @see com.github.podd.api.PoddSesameManager#getWeightedProperties(com.github.podd.utils.
+     * InferredOWLOntologyID, org.openrdf.model.URI, boolean,
+     * org.openrdf.repository.RepositoryConnection)
      */
     @Override
     public List<URI> getWeightedProperties(final InferredOWLOntologyID artifactID, final URI objectUri,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+            final boolean excludeContainsProperties, final RepositoryConnection repositoryConnection)
+        throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         
@@ -1330,6 +1323,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append("FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
         sb.append("FILTER (?propertyUri != <" + RDFS.LABEL.stringValue() + ">) ");
         sb.append("FILTER (?propertyUri != <" + RDFS.COMMENT.stringValue() + ">) ");
+        
+        if(excludeContainsProperties)
+        {
+            sb.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                    + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+        }
         
         sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
                 + "> true } ");

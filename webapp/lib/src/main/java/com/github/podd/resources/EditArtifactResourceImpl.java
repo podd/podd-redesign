@@ -227,6 +227,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("OWL_OBJECT_PROPERTY", OWL.OBJECTPROPERTY);
         dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
         dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
+        dataModel.put("PODD_BASE_DISPLAY_TYPE", PoddRdfConstants.PODD_BASE_DISPLAY_TYPE);
         dataModel.put("util", new FreemarkerUtil());
         
         // Defaults to false. Set to true if multiple objects are being edited concurrently
@@ -273,7 +274,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             
             // an ordered-list of the properties about the object
             final List<URI> orderedProperties =
-                    this.getPoddSesameManager().getWeightedProperties(ontologyID, objectUri, conn);
+                    this.getPoddSesameManager().getWeightedProperties(ontologyID, objectUri, true, conn);
             this.log.info("Found {} properties about object {}", orderedProperties.size(), objectUri);
             dataModel.put("orderedPropertyList", orderedProperties);
             

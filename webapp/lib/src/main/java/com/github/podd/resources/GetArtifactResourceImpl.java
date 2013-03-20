@@ -218,7 +218,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             // populate the properties of the object
             final List<URI> orderedProperties =
                     this.getPoddApplication().getPoddArtifactManager().getSesameManager()
-                            .getWeightedProperties(ontologyID, objectUri, conn);
+                            .getWeightedProperties(ontologyID, objectUri, false, conn);
             
             final Model allNeededStatementsForDisplay =
                     this.getPoddApplication().getPoddArtifactManager().getSesameManager()
