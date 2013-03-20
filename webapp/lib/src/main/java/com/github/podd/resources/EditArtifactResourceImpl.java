@@ -139,6 +139,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                             inputStream, inputFormat, isReplace, force);
             //TODO - send detailed errors for display where possible
             
+            // FIXME Change response format so that it does not resemble an empty OWL Ontology
             // - write the artifact ID into response
             writer.startRDF();
             OntologyUtils.ontologyIDsToHandler(Arrays.asList(ontologyID), writer);
