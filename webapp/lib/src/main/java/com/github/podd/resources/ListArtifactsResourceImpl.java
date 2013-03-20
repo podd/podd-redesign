@@ -4,6 +4,7 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,7 +59,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     /**
      * Handle http GET request to serve the list artifacts page.
      */
-    @Get("html")
+    @Get(":html")
     public Representation getListArtifactsPage(final Representation entity) throws ResourceException
     {
         this.log.info("@Get listArtifacts Page");
@@ -157,6 +158,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             
             if(unpublished)
             {
+                this.log.info("About to check for authentication to look at unpublished artifacts");
                 this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST);
                 
                 List<InferredOWLOntologyID> unpublishedResults = new ArrayList<InferredOWLOntologyID>();
@@ -184,7 +186,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         return results;
     }
     
-    @Get("rdf|rj|ttl")
+    @Get(":rdf|rj|json|ttl")
     public Representation getListArtifactsRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
@@ -194,6 +196,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         if(resultFormat == null)
         {
+            this.log.error("Could not find an RDF serialiser matching the requested mime-type: "
+                    + variant.getMediaType().getName());
             throw new ResourceException(Status.CLIENT_ERROR_NOT_ACCEPTABLE,
                     "Could not find an RDF serialiser matching the requested mime-type: "
                             + variant.getMediaType().getName());
@@ -206,16 +210,21 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
+            writer.startRDF();
             for(String nextKey : artifactsInternal.keySet())
             {
+                // log.info("nextArtifact: {}", nextKey);
                 OntologyUtils.ontologyIDsToHandler(artifactsInternal.get(nextKey), writer);
             }
+            writer.endRDF();
         }
         catch(RDFHandlerException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not generate RDF output due to an exception in the writer", e);
         }
+        
+        log.info(new String(out.toByteArray(), StandardCharsets.UTF_8));
         
         ByteArrayRepresentation result = new ByteArrayRepresentation(out.toByteArray(), resultMediaType);
         

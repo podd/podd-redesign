@@ -12,7 +12,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -22,6 +21,8 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -109,12 +110,114 @@ public class OntologyUtilsTest
      * Test method for
      * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToHandler(java.util.Collection, org.openrdf.rio.RDFHandler)}
      * .
+     * 
+     * @throws Exception
      */
-    @Ignore
     @Test
-    public final void testOntologyIDsToHandler()
+    public final void testOntologyIDsToHandlerAnonymousOntology() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        final Model input = new LinkedHashModel();
+        
+        OntologyUtils.ontologyIDsToHandler(Arrays.asList(new InferredOWLOntologyID((IRI)null, null, null)),
+                new StatementCollector(input));
+        
+        Assert.assertTrue(input.isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToHandler(java.util.Collection, org.openrdf.rio.RDFHandler)}
+     * .
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testOntologyIDsToHandlerEmptyNotNull() throws Exception
+    {
+        final Model input = new LinkedHashModel();
+        
+        OntologyUtils.ontologyIDsToHandler(Collections.<InferredOWLOntologyID> emptyList(), new StatementCollector(
+                input));
+        
+        Assert.assertTrue(input.isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToHandler(java.util.Collection, org.openrdf.rio.RDFHandler)}
+     * .
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testOntologyIDsToHandlerEmptyNull() throws Exception
+    {
+        OntologyUtils.ontologyIDsToHandler(Collections.<InferredOWLOntologyID> emptyList(), (RDFHandler)null);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToHandler(java.util.Collection, org.openrdf.rio.RDFHandler)}
+     * .
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testOntologyIDsToHandlerNoInferredIRI() throws Exception
+    {
+        final Model input = new LinkedHashModel();
+        
+        OntologyUtils.ontologyIDsToHandler(Arrays.asList(new InferredOWLOntologyID(IRI
+                .create("urn:test:ontology:iri:abc"), IRI.create("urn:test:ontology:iri:abc:version:1"), null)),
+                new StatementCollector(input));
+        
+        Assert.assertEquals(3, input.size());
+        Assert.assertTrue(input.contains(null, RDF.TYPE, OWL.ONTOLOGY));
+        Assert.assertTrue(input.contains(null, OWL.VERSIONIRI, null));
+        Assert.assertEquals(2, input.filter(null, RDF.TYPE, OWL.ONTOLOGY).size());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToHandler(java.util.Collection, org.openrdf.rio.RDFHandler)}
+     * .
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testOntologyIDsToHandlerNoVersionIRI() throws Exception
+    {
+        final Model input = new LinkedHashModel();
+        
+        OntologyUtils.ontologyIDsToHandler(
+                Arrays.asList(new InferredOWLOntologyID(IRI.create("urn:test:ontology:iri:abc"), null, null)),
+                new StatementCollector(input));
+        
+        Assert.assertEquals(1, input.size());
+        Assert.assertTrue(input.contains(null, RDF.TYPE, OWL.ONTOLOGY));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#ontologyIDsToHandler(java.util.Collection, org.openrdf.rio.RDFHandler)}
+     * .
+     * 
+     * @throws Exception
+     */
+    @Test
+    public final void testOntologyIDsToHandlerWithInferredIRI() throws Exception
+    {
+        final Model input = new LinkedHashModel();
+        
+        OntologyUtils.ontologyIDsToHandler(Arrays.asList(new InferredOWLOntologyID(IRI
+                .create("urn:test:ontology:iri:abc"), IRI.create("urn:test:ontology:iri:abc:version:1"), IRI
+                .create("urn:inferred:test:ontology:iri:abc:version:1:1"))), new StatementCollector(input));
+        
+        Assert.assertEquals(5, input.size());
+        Assert.assertTrue(input.contains(null, RDF.TYPE, OWL.ONTOLOGY));
+        Assert.assertTrue(input.contains(null, OWL.VERSIONIRI, null));
+        Assert.assertTrue(input.contains(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
+        Assert.assertEquals(3, input.filter(null, RDF.TYPE, OWL.ONTOLOGY).size());
     }
     
     /**
@@ -123,7 +226,7 @@ public class OntologyUtilsTest
      * .
      */
     @Test
-    public final void testOntologyIDsToModelAnonymousOntology()
+    public final void testOntologyIDsToModelAnonymousOntology() throws Exception
     {
         final Model input = new LinkedHashModel();
         

@@ -4,12 +4,24 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.model.Model;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.Component;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -70,7 +82,7 @@ public class AbstractResourceImplTest
      * @param body
      *            Generated output in which to look for possible freemarker errors.
      */
-    public void assertFreemarker(final String body)
+    protected void assertFreemarker(final String body)
     {
         Assert.assertFalse("Freemarker error.", body.contains("Java backtrace for programmers:"));
         Assert.assertFalse("Freemarker error.", body.contains("freemarker.core."));
@@ -84,7 +96,7 @@ public class AbstractResourceImplTest
      * @return
      * @throws IOException
      */
-    public Representation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
+    protected Representation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
         throws IOException
     {
         final InputStream resourceAsStream = this.getClass().getResourceAsStream(resourcePath);
@@ -104,7 +116,7 @@ public class AbstractResourceImplTest
      * @return The artifact's asserted statements represented as a String
      * @throws Exception
      */
-    public String getArtifactAsString(final String artifactUri, final MediaType mediaType) throws Exception
+    protected String getArtifactAsString(final String artifactUri, final MediaType mediaType) throws Exception
     {
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -119,6 +131,32 @@ public class AbstractResourceImplTest
     }
     
     /**
+     * Utility method to verify that RDF documents can be parsed and the resulting number of
+     * statements is as expected.
+     * 
+     * @param inputStream
+     * @param format
+     * @param expectedStatements
+     * @return
+     * @throws RDFParseException
+     * @throws RDFHandlerException
+     * @throws IOException
+     */
+    protected Model assertRdf(final InputStream inputStream, RDFFormat format, int expectedStatements)
+        throws RDFParseException, RDFHandlerException, IOException
+    {
+        final Model model = new LinkedHashModel();
+        
+        final RDFParser parser = Rio.createParser(format);
+        parser.setRDFHandler(new StatementCollector(model));
+        parser.parse(inputStream, "");
+        
+        Assert.assertEquals(expectedStatements, model.size());
+        
+        return model;
+    }
+    
+    /**
      * Returns the URI that can be used to access the given path.
      * 
      * @param path
@@ -126,7 +164,7 @@ public class AbstractResourceImplTest
      *            slash one will be added.
      * @return A full URI that can be used to dereference the given path on the test server.
      */
-    public String getUrl(final String path)
+    protected String getUrl(final String path)
     {
         if(!path.startsWith("/"))
         {
@@ -145,7 +183,7 @@ public class AbstractResourceImplTest
      * @return The loaded artifact's URI
      * @throws Exception
      */
-    public String loadTestArtifact(final String resourceName) throws Exception
+    protected String loadTestArtifact(final String resourceName) throws Exception
     {
         return this.loadTestArtifact(resourceName, MediaType.APPLICATION_RDF_XML).getOntologyIRI().toString();
     }
@@ -159,7 +197,7 @@ public class AbstractResourceImplTest
      * @return An InferredOWLOntologyID identifying the loaded artifact
      * @throws Exception
      */
-    public InferredOWLOntologyID loadTestArtifact(final String resourceName, final MediaType mediaType)
+    protected InferredOWLOntologyID loadTestArtifact(final String resourceName, final MediaType mediaType)
         throws Exception
     {
         final ClientResource uploadArtifactClientResource =
@@ -173,6 +211,10 @@ public class AbstractResourceImplTest
         
         // verify: results (expecting the added artifact's ontology IRI)
         final String body = results.getText();
+        
+        this.log.info(body);
+        assertFreemarker(body);
+        
         final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
         
         Assert.assertEquals("Should have got only 1 Ontology ID", 1, ontologyIDs.size());
