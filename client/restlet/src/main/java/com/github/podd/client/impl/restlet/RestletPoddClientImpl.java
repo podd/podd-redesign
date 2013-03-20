@@ -82,10 +82,10 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean deleteArtifact(final InferredOWLOntologyID artifactId) throws PoddClientException
     {
+        this.log.info("cookies: {}", this.currentCookies);
+        
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_DELETE));
         resource.getCookies().addAll(this.currentCookies);
-        
-        this.log.info("cookies: {}", this.currentCookies);
         
         resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
         
@@ -114,10 +114,10 @@ public class RestletPoddClientImpl implements PoddClient
     public void downloadArtifact(final InferredOWLOntologyID artifactId, final OutputStream outputStream,
             final RDFFormat format) throws PoddClientException
     {
+        this.log.info("cookies: {}", this.currentCookies);
+        
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         resource.getCookies().addAll(this.currentCookies);
-        
-        this.log.info("cookies: {}", this.currentCookies);
         
         resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
         
@@ -195,24 +195,31 @@ public class RestletPoddClientImpl implements PoddClient
     private List<InferredOWLOntologyID> listArtifactsInternal(final boolean published, final boolean unpublished)
         throws PoddClientException
     {
+        this.log.info("cookies: {}", this.currentCookies);
+        
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
         resource.getCookieSettings().addAll(this.currentCookies);
         
         resource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, Boolean.toString(published));
         resource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, Boolean.toString(unpublished));
         
-        final Model results = new LinkedHashModel();
-        
         final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+        
+        final Model results = new LinkedHashModel();
         
         try
         {
-            InputStream stream = getResponse.getStream();
-            
             if(!resource.getStatus().equals(Status.SUCCESS_OK))
             {
                 throw new PoddClientException("Server returned a non-success status code: "
                         + resource.getStatus().toString());
+            }
+            
+            InputStream stream = getResponse.getStream();
+            
+            if(stream == null)
+            {
+                throw new PoddClientException("Did not receive valid response from server");
             }
             
             final RDFParser parser =
@@ -221,11 +228,6 @@ public class RestletPoddClientImpl implements PoddClient
             parser.setRDFHandler(new StatementCollector(results));
             
             // log.info("result: {}", getResponse.getText());
-            
-            if(stream == null)
-            {
-                throw new PoddClientException("Did not receive valid response from server");
-            }
             
             parser.parse(stream, "");
         }
@@ -265,6 +267,8 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public List<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException
     {
+        this.log.info("cookies: {}", this.currentCookies);
+        
         return this.listArtifactsInternal(true, false);
     }
     
@@ -276,6 +280,8 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public List<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException
     {
+        this.log.info("cookies: {}", this.currentCookies);
+        
         return this.listArtifactsInternal(false, true);
     }
     
@@ -346,7 +352,12 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public boolean logout() throws PoddClientException
     {
+        this.log.info("cookies: {}", this.currentCookies);
+        
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGOUT));
+        // add the cookie settings so that the server knows who to logout
+        resource.getCookieSettings().addAll(this.currentCookies);
+        
         // TODO: when Cookies natively supported by Client Resource, or another method remove this
         // Until then, this is necessary to manually attach the cookies after login to the
         // redirected address.

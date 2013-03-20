@@ -158,6 +158,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             
             if(unpublished)
             {
+                this.log.info("About to check for authentication to look at unpublished artifacts");
                 this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST);
                 
                 List<InferredOWLOntologyID> unpublishedResults = new ArrayList<InferredOWLOntologyID>();

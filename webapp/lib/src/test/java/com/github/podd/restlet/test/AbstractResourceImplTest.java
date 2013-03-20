@@ -82,7 +82,7 @@ public class AbstractResourceImplTest
      * @param body
      *            Generated output in which to look for possible freemarker errors.
      */
-    public void assertFreemarker(final String body)
+    protected void assertFreemarker(final String body)
     {
         Assert.assertFalse("Freemarker error.", body.contains("Java backtrace for programmers:"));
         Assert.assertFalse("Freemarker error.", body.contains("freemarker.core."));
@@ -96,7 +96,7 @@ public class AbstractResourceImplTest
      * @return
      * @throws IOException
      */
-    public Representation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
+    protected Representation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
         throws IOException
     {
         final InputStream resourceAsStream = this.getClass().getResourceAsStream(resourcePath);
@@ -116,7 +116,7 @@ public class AbstractResourceImplTest
      * @return The artifact's asserted statements represented as a String
      * @throws Exception
      */
-    public String getArtifactAsString(final String artifactUri, final MediaType mediaType) throws Exception
+    protected String getArtifactAsString(final String artifactUri, final MediaType mediaType) throws Exception
     {
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -142,7 +142,7 @@ public class AbstractResourceImplTest
      * @throws RDFHandlerException
      * @throws IOException
      */
-    public Model assertRdf(final InputStream inputStream, RDFFormat format, int expectedStatements)
+    protected Model assertRdf(final InputStream inputStream, RDFFormat format, int expectedStatements)
         throws RDFParseException, RDFHandlerException, IOException
     {
         final Model model = new LinkedHashModel();
@@ -164,7 +164,7 @@ public class AbstractResourceImplTest
      *            slash one will be added.
      * @return A full URI that can be used to dereference the given path on the test server.
      */
-    public String getUrl(final String path)
+    protected String getUrl(final String path)
     {
         if(!path.startsWith("/"))
         {
@@ -183,7 +183,7 @@ public class AbstractResourceImplTest
      * @return The loaded artifact's URI
      * @throws Exception
      */
-    public String loadTestArtifact(final String resourceName) throws Exception
+    protected String loadTestArtifact(final String resourceName) throws Exception
     {
         return this.loadTestArtifact(resourceName, MediaType.APPLICATION_RDF_XML).getOntologyIRI().toString();
     }
@@ -197,7 +197,7 @@ public class AbstractResourceImplTest
      * @return An InferredOWLOntologyID identifying the loaded artifact
      * @throws Exception
      */
-    public InferredOWLOntologyID loadTestArtifact(final String resourceName, final MediaType mediaType)
+    protected InferredOWLOntologyID loadTestArtifact(final String resourceName, final MediaType mediaType)
         throws Exception
     {
         final ClientResource uploadArtifactClientResource =
@@ -211,12 +211,11 @@ public class AbstractResourceImplTest
         
         // verify: results (expecting the added artifact's ontology IRI)
         final String body = results.getText();
-        assertFreemarker(body);
-        final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
         
-        Assert.assertTrue("Artifact URI should start with http", body.startsWith("http://"));
-        Assert.assertFalse("Should have no references to HTML", body.contains("html"));
-        Assert.assertFalse("Artifact URI should not contain newline character", body.contains("\n"));
+        this.log.info(body);
+        assertFreemarker(body);
+        
+        final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
         
         Assert.assertEquals("Should have got only 1 Ontology ID", 1, ontologyIDs.size());
         return ontologyIDs.iterator().next();
