@@ -24,10 +24,12 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.restlet.resource.ClientResource;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Abstract tests for {@link PoddClient}.
@@ -79,6 +81,7 @@ public abstract class AbstractPoddClientTest
         Assert.assertNotNull("PODD Client implementation was null", this.testClient);
         
         this.testClient.setPoddServerUrl(this.getTestPoddServerUrl());
+        
     }
     
     /**
@@ -87,6 +90,13 @@ public abstract class AbstractPoddClientTest
     @After
     public void tearDown() throws Exception
     {
+        // Reset server after each test so that assertions are not dependent on the order of the
+        // tests, which is unpredictable
+        // HACK: This presumes that this reset service will exist and that it has this URL
+        final ClientResource resource =
+                new ClientResource(this.getTestPoddServerUrl() + "/" + PoddWebConstants.PATH_RESET_PREFIX + "r3set");
+        resource.get();
+        
         this.testClient = null;
     }
     
