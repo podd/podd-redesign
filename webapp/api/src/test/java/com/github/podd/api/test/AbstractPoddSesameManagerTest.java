@@ -992,8 +992,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 57, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 17, displayModel.filter(objectUri, null, null).size());
+        Assert.assertEquals("Display Model not of expected size", 64, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 22, displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals("Expected 1 hasLeadInstitution statement", 1, displayModel.filter(objectUri, 
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution")
