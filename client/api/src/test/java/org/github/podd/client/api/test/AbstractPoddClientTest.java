@@ -26,6 +26,8 @@ import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.resource.ClientResource;
 import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -38,6 +40,8 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public abstract class AbstractPoddClientTest
 {
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    
     private static final String TEST_ADMIN_PASSWORD = "testAdminPassword";
     private static final String TEST_ADMIN_USER = "testAdminUser";
     private PoddClient testClient;
@@ -297,6 +301,7 @@ public abstract class AbstractPoddClientTest
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
         Collection<InferredOWLOntologyID> results = this.testClient.listUnpublishedArtifacts();
+        this.log.info("unpublished artifacts which should be empty: {}", results);
         Assert.assertTrue(results.isEmpty());
     }
     
