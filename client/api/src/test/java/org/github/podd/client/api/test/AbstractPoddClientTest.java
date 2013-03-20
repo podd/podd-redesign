@@ -281,7 +281,6 @@ public abstract class AbstractPoddClientTest
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()}.
      */
-    @Ignore
     @Test
     public final void testListUnpublishedArtifactsEmpty() throws Exception
     {
@@ -294,7 +293,6 @@ public abstract class AbstractPoddClientTest
     /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listUnpublishedArtifacts()}.
      */
-    @Ignore
     @Test
     public final void testListUnpublishedArtifactsSingle() throws Exception
     {
