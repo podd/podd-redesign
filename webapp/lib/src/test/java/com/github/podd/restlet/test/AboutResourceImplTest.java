@@ -35,10 +35,11 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
                 PoddRestletTestUtils.doTestUnAuthenticatedRequest(aboutClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK);
         
-        assertFreemarker(results.getText());
-        Assert.assertTrue(results.getText().contains("The University of Queensland"));
+        final String body = results.getText();
+        assertFreemarker(body);
+        Assert.assertTrue(body.contains("The University of Queensland"));
     }
-   
+    
     /**
      * Tests that no error occurs when trying to get the get user resource while authenticated with
      * the admin role.
@@ -80,6 +81,5 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testNoAdminPrivileges);
         
     }
-    
     
 }
