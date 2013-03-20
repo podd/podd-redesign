@@ -3,10 +3,12 @@
  */
 package com.github.podd.utils.test;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,6 +21,7 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -232,6 +235,44 @@ public class OntologyUtilsTest
         Assert.assertTrue(ontologyIDsToModel.contains(null, OWL.VERSIONIRI, null));
         Assert.assertTrue(ontologyIDsToModel.contains(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
         Assert.assertEquals(3, ontologyIDsToModel.filter(null, RDF.TYPE, OWL.ONTOLOGY).size());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#stringToOntologyID(String, RDFFormat)}.
+     */
+    @Test
+    public final void testStringToOntologyIDsInRdfXml() throws Exception
+    {
+        final InputStream resourceStream = this.getClass().getResourceAsStream("/test/test-ontologyid-2.rdf");
+        final String rdfString = IOUtils.toString(resourceStream);
+        
+        final Collection<InferredOWLOntologyID> ontologyIDs =
+                OntologyUtils.stringToOntologyID(rdfString, RDFFormat.RDFXML);
+        
+        Assert.assertEquals("Did not find any Ontology IDs", 1, ontologyIDs.size());
+        Assert.assertEquals("Version IRI did not match",
+                "http://example.org/purl/c54fbaa5-0767-4f78-88b1-2509ff428f60/artifact:1:version:1", ontologyIDs
+                        .iterator().next().getVersionIRI().toString());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.utils.OntologyUtils#stringToOntologyID(String, RDFFormat)}.
+     */
+    @Test
+    public final void testStringToOntologyIDsInTurtle() throws Exception
+    {
+        final InputStream resourceStream = this.getClass().getResourceAsStream("/test/test-ontologyid-1.ttl");
+        final String rdfString = IOUtils.toString(resourceStream);
+        
+        final Collection<InferredOWLOntologyID> ontologyIDs =
+                OntologyUtils.stringToOntologyID(rdfString, RDFFormat.TURTLE);
+        
+        Assert.assertEquals("Did not find any Ontology IDs", 1, ontologyIDs.size());
+        Assert.assertEquals("Version IRI did not match",
+                "http://example.org/purl/91bb7bff-acd6-4b2e-abf7-ce74d3d91061/artifact:1:version:1", ontologyIDs
+                        .iterator().next().getVersionIRI().toString());
     }
     
 }

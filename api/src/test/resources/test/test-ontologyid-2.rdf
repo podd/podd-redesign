@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+<rdf:Description rdf:about="http://example.org/purl/c54fbaa5-0767-4f78-88b1-2509ff428f60/artifact:1">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://example.org/purl/c54fbaa5-0767-4f78-88b1-2509ff428f60/artifact:1:version:1">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://example.org/purl/c54fbaa5-0767-4f78-88b1-2509ff428f60/artifact:1">
+	<versionIRI xmlns="http://www.w3.org/2002/07/owl#" rdf:resource="http://example.org/purl/c54fbaa5-0767-4f78-88b1-2509ff428f60/artifact:1:version:1"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:podd:inferred:ontologyiriprefix:http://example.org/purl/c54fbaa5-0767-4f78-88b1-2509ff428f60/artifact:1:version:1">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://example.org/purl/c54fbaa5-0767-4f78-88b1-2509ff428f60/artifact:1:version:1">
+	<inferredVersion xmlns="http://purl.org/podd/ns/poddBase#" rdf:resource="urn:podd:inferred:ontologyiriprefix:http://example.org/purl/c54fbaa5-0767-4f78-88b1-2509ff428f60/artifact:1:version:1"/>
+</rdf:Description>
+
+</rdf:RDF>

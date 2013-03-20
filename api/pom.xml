@@ -64,6 +64,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.ansell.restlet-utils</groupId>
             <artifactId>restlet-utils</artifactId>
         </dependency>
