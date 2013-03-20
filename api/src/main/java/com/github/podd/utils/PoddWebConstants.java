@@ -111,7 +111,7 @@ public interface PoddWebConstants
     /**
      * Path to delete an artifact. This uses HTTP delete method
      */
-    public static final String PATH_ARTIFACT_DELETE = "artifact";
+    public static final String PATH_ARTIFACT_DELETE = "artifact/delete";
     
     /**
      * Path to the file reference attachment service
