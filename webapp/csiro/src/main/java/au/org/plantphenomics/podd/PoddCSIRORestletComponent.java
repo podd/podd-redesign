@@ -89,14 +89,6 @@ public class PoddCSIRORestletComponent extends Component
         this.initialise();
     }
     
-    /**
-     * @return the resetKey
-     */
-    protected String getResetKey()
-    {
-        return this.resetKey;
-    }
-    
     public void initialise()
     {
         // FIXME: Make this configurable
@@ -118,30 +110,16 @@ public class PoddCSIRORestletComponent extends Component
         // attach the resources first
         this.getDefaultHost().attach(resourcesPath, directory);
         
-        // NOTE: This needs to be Impl as Restlet is not designed using interfaces, so we cannot
-        // easily include our interface in the process.
         PoddWebServiceApplication nextApplication;
         try
         {
             nextApplication = new PoddWebServiceApplicationImpl();
             
-            // TODO: Add the reset resource separately here instead of always being present inside
-            // of PoddWebServiceApplicationImpl
-            
-            // Create a resource to use in integration tests to reset the application to a fresh
-            // state
-            // on demand, without adding this functionality to OasWebServiceApplicationImpl
-            // final TestResetResource reset = new TestResetResource(nextApplication);
-            // this.setResetKey(PropertyUtil.getProperty("oas.test.website.reset.key", ""));
-            // final String resetPath = "/reset/" + this.getResetKey();
-            // this.getDefaultHost().attach(resetPath, reset);
-            
             // attach the web services application
             this.getDefaultHost().attach("/", nextApplication);
             
             // setup the application after attaching it, as it requires Application.getContext() to
-            // not
-            // be null during the setup process
+            // not be null during the setup process
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
         }
         catch(final OpenRDFException e)
@@ -150,21 +128,6 @@ public class PoddCSIRORestletComponent extends Component
         }
         
         this.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
-    }
-    
-    /**
-     * This field is used in testing to enable the resetting of the internal elements of the website
-     * after each test.
-     * 
-     * It is protected by a simple runtime generated key to prevent this function leaking out if
-     * people directly deploy this TEST website component.
-     * 
-     * @param key
-     *            A simple key shared with us by the test running environment.
-     */
-    protected void setResetKey(final String key)
-    {
-        this.resetKey = key;
     }
     
 }
