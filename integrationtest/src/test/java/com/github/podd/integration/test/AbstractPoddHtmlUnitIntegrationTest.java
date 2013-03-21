@@ -110,7 +110,8 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
         try
         {
             // Reset using the maven build configured reset key from oas.properties
-            this.getWebTester().gotoPage("/reset" + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, ""));
+            this.getWebTester().gotoPage(
+                    "/reset" + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, ""));
         }
         catch(final Exception ex)
         {

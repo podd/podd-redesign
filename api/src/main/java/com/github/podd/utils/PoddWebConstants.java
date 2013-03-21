@@ -119,11 +119,6 @@ public interface PoddWebConstants
     public static final String PATH_ATTACH_FILE_REF = "attachref";
     
     /**
-     * Path prefix of the reset service
-     */
-    public static final String PATH_RESET_PREFIX = "reset";
-    
-    /**
      * Key used to represent user identifier part of a URL
      */
     public static final String KEY_USER_IDENTIFIER = "identifier";

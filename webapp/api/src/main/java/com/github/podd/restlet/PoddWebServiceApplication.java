@@ -82,6 +82,14 @@ public abstract class PoddWebServiceApplication extends Application
      */
     public abstract void setAuthenticator(ChallengeAuthenticator auth);
     
+    public abstract void setPoddArtifactManager(PoddArtifactManager poddArtifactManager);
+    
+    public abstract void setPoddRepositoryManager(PoddRepositoryManager poddRepositoryManager);
+    
+    public abstract void setPoddSchemaManager(PoddSchemaManager poddSchemaManager);
+    
+    public abstract void setRealm(PoddSesameRealm realm);
+    
     /**
      * Sets the realm which is used to manage users and roles.
      * 
@@ -95,4 +103,5 @@ public abstract class PoddWebServiceApplication extends Application
      * @param nextFreemarkerConfiguration
      */
     public abstract void setTemplateConfiguration(Configuration nextFreemarkerConfiguration);
+    
 }

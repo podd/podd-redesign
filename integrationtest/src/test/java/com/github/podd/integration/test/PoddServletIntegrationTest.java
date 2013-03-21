@@ -122,7 +122,8 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
     protected String loginAndAddArtifact(final InputStream path, final MediaType mediaType, final int expectedStatusCode)
         throws Exception
     {
-        this.login(AbstractPoddRestletClientIntegrationTest.TEST_USERNAME, AbstractPoddRestletClientIntegrationTest.TEST_PASSWORD);
+        this.login(AbstractPoddRestletClientIntegrationTest.TEST_USERNAME,
+                AbstractPoddRestletClientIntegrationTest.TEST_PASSWORD);
         
         final Request addRequest = new Request(Method.POST, this.BASE_URL + "/podd/artifact/new");
         addRequest.setCookies(this.cookies);
@@ -509,7 +510,8 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
     @Test
     public void testLogin() throws Exception
     {
-        this.login(AbstractPoddRestletClientIntegrationTest.TEST_USERNAME, AbstractPoddRestletClientIntegrationTest.TEST_PASSWORD);
+        this.login(AbstractPoddRestletClientIntegrationTest.TEST_USERNAME,
+                AbstractPoddRestletClientIntegrationTest.TEST_PASSWORD);
         
         // -- logout without sending cookie: should fail with Status 401 (UNAUTHORIZED)
         final Request incorrectLogoutRequest = new Request(Method.GET, this.BASE_URL + "/logout");
