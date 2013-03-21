@@ -215,7 +215,7 @@ public class RestletPoddClientImpl implements PoddClient
                         + resource.getStatus().toString());
             }
             
-            InputStream stream = getResponse.getStream();
+            final InputStream stream = getResponse.getStream();
             
             if(stream == null)
             {

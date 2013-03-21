@@ -1,24 +1,19 @@
 /**
  * 
  */
-package com.github.podd.resources;
-
-import java.util.Map;
+package com.github.podd.restlet.integrationtest;
 
 import org.openrdf.OpenRDFException;
-import org.restlet.data.MediaType;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.Restlet;
 import org.restlet.data.Status;
-import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
-import com.github.podd.restlet.PoddWebServiceApplicationImpl;
-import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Resets an application using ApplicationUtils.setupApplication.
@@ -26,10 +21,11 @@ import com.github.podd.utils.PoddWebConstants;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class TestResetResourceImpl extends AbstractPoddResourceImpl
+public class TestResetResourceImpl extends Restlet
 {
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private PoddWebServiceApplication application;
     
     /**
      */
@@ -38,24 +34,29 @@ public class TestResetResourceImpl extends AbstractPoddResourceImpl
         super();
     }
     
-    @Get
-    public Representation reset() throws ResourceException
+    public TestResetResourceImpl(final PoddWebServiceApplication nextApplication)
     {
+        this.application = nextApplication;
+    }
+    
+    @Override
+    public void handle(final Request request, final Response response)
+    {
+        super.handle(request, response);
+        
         this.log.info("========== Reset called ==========");
         try
         {
-            ApplicationUtils.setupApplication(this.getPoddApplication(), this.getPoddApplication().getContext());
+            ApplicationUtils.setupApplication(this.application, this.application.getContext());
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             this.log.error("Could not reset application", e);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not reset application", e);
         }
         this.log.info("========== Reset complete ==========");
         
-        this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
-        
-        return null;
+        response.setStatus(Status.SUCCESS_NO_CONTENT);
     }
     
 }

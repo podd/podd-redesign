@@ -1,7 +1,8 @@
+package au.org.plantphenomics.podd;
+
 /**
  * 
  */
-package com.github.podd.restlet;
 
 import org.openrdf.OpenRDFException;
 import org.restlet.Component;
@@ -16,6 +17,9 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.github.ansell.restletutils.ClassLoaderDirectory;
 import com.github.ansell.restletutils.CompositeClassLoader;
+import com.github.podd.restlet.ApplicationUtils;
+import com.github.podd.restlet.PoddWebServiceApplication;
+import com.github.podd.restlet.PoddWebServiceApplicationImpl;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -25,9 +29,9 @@ import com.github.podd.utils.PoddWebConstants;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public class PoddRestletComponent extends Component
+public class PoddCSIRORestletComponent extends Component
 {
-    private final Logger log = LoggerFactory.getLogger(PoddRestletComponent.class);
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private String resetKey;
     
@@ -40,7 +44,7 @@ public class PoddRestletComponent extends Component
     /**
      * 
      */
-    public PoddRestletComponent()
+    public PoddCSIRORestletComponent()
     {
         super();
         
@@ -52,7 +56,7 @@ public class PoddRestletComponent extends Component
     /**
      * @param arg0
      */
-    public PoddRestletComponent(final Reference arg0)
+    public PoddCSIRORestletComponent(final Reference arg0)
     {
         super(arg0);
         
@@ -64,7 +68,7 @@ public class PoddRestletComponent extends Component
     /**
      * @param xmlConfigRepresentation
      */
-    public PoddRestletComponent(final Representation xmlConfigRepresentation)
+    public PoddCSIRORestletComponent(final Representation xmlConfigRepresentation)
     {
         super(xmlConfigRepresentation);
         
@@ -76,7 +80,7 @@ public class PoddRestletComponent extends Component
     /**
      * @param xmlConfigurationRef
      */
-    public PoddRestletComponent(final String xmlConfigurationRef)
+    public PoddCSIRORestletComponent(final String xmlConfigurationRef)
     {
         super(xmlConfigurationRef);
         
@@ -140,7 +144,7 @@ public class PoddRestletComponent extends Component
             // be null during the setup process
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new RuntimeException("Could not setup application", e);
         }

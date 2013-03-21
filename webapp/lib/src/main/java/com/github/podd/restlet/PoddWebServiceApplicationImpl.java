@@ -32,7 +32,6 @@ import com.github.podd.resources.GetArtifactResourceImpl;
 import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.ListArtifactsResourceImpl;
-import com.github.podd.resources.TestResetResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
 import com.github.podd.utils.PoddWebConstants;
@@ -223,13 +222,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String loginFormPath = PoddWebConstants.PATH_LOGIN_FORM;
         this.log.info("attaching login service to path={}", loginFormPath);
         router.attach(loginFormPath, CookieLoginResourceImpl.class);
-        
-        // Add a route for the reset service.
-        final String resetPath =
-                PoddWebConstants.PATH_RESET_PREFIX
-                        + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
-        this.log.info("attaching reset service to path={}", resetPath);
-        router.attach(resetPath, TestResetResourceImpl.class);
         
         // Add a route for the About page.
         final String aboutPagePath = PoddWebConstants.PATH_ABOUT;
