@@ -382,14 +382,15 @@ public abstract class AbstractPoddSesameManagerTest
         
         // Collections to test
         URI[] collectionsToTest =
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Software"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "PublicationStatus"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "HasControlAssertion"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildTypeAssertion"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"), };
-        
+            { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatformType"),
+                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasSex"),
+                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasSoftware"),
+                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasPublicationStatus"),
+                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasControl"),
+                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasWildType"),
+//                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"),
+                    };
+
         URI[][] expectedMembers =
                 {
                         {
@@ -992,7 +993,7 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 64, displayModel.size());
+        Assert.assertEquals("Display Model not of expected size", 72, displayModel.size());
         Assert.assertEquals("Not the expected no. of statements about object", 22, displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals("Expected 1 hasLeadInstitution statement", 1, displayModel.filter(objectUri, 

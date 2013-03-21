@@ -1101,20 +1101,20 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     /**
-     * Given a Collection concept's URI, this method attempts to return all the valid members that
-     * belong in the Collection.
+     * Given a property URI, this method attempts to return all the valid members in the Range of that
+     * property.
      * 
      * @param artifactID
      *            The Collection should either belong to this artifact or be imported by it.
-     * @param conceptUri
-     *            A URI representing a Collection whose members are sought.
+     * @param propertyUri
+     *            The property whose members are sought.
      * @param repositoryConnection
      * @return A List of URIs representing all valid members of the given Collection, or an empty
-     *         list if the URI does not represent a Collection.
+     *         list if the property does not have a pre-defined set of possible members.
      * @throws OpenRDFException
      */
     @Override
-    public List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI conceptUri,
+    public List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI propertyUri,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
         /*
@@ -1141,15 +1141,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final StringBuilder sb = new StringBuilder();
         sb.append("SELECT ?member WHERE { ");
+        sb.append(" ?poddProperty <" + RDFS.RANGE.stringValue() + "> ?poddConcept . ");
         sb.append(" ?poddConcept <" + OWL.EQUIVALENTCLASS.stringValue() + "> ?x . ");
         sb.append(" ?x <" + OWL.ONEOF.stringValue() + "> ?list . ");
         sb.append(" ?list <" + RDF.REST.stringValue() + ">*/<" + RDF.FIRST.stringValue() + "> ?member . ");
         sb.append(" } ");
         
-        this.log.info("Created SPARQL {} with poddConcept bound to {}", sb.toString(), conceptUri);
+        this.log.info("Created SPARQL {} with poddProperty bound to {}", sb.toString(), propertyUri);
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        tupleQuery.setBinding("poddConcept", conceptUri);
+        tupleQuery.setBinding("poddProperty", propertyUri);
         final QueryResultCollector queryResults =
                 this.executeSparqlQuery(tupleQuery,
                         versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
