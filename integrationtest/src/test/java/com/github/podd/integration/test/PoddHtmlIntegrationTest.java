@@ -794,7 +794,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         // we should be at the index page with a 200 HTTP status after login
         this.getWebTester().assertResponseCode(200);
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/index"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/"));
         
         // verify that the Login link has disappeared
         this.getWebTester().assertTextNotPresent("Login");
@@ -819,7 +819,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         // we should be at the index page with a 200 HTTP status after login
         this.getWebTester().assertResponseCode(200);
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/index"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/"));
         
         // verify that the Login link has disappeared
         this.getWebTester().assertTextNotPresent("Login");
@@ -844,7 +844,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         // we should be at the index page with a 200 status code, but not logged in
         this.getWebTester().assertResponseCode(200);
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/index"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/"));
         
         // verify that the Login link has disappeared
         this.getWebTester().assertTextPresent("Login");
@@ -880,7 +880,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testSuccessIndexPageHtml()
     {
-        this.getWebTester().beginAt("/index");
+        this.getWebTester().beginAt("/");
         
         this.getWebTester().assertHeaderEquals("Content-Type", "text/html; charset=UTF-8");
         this.getWebTester().assertResponseCode(200);

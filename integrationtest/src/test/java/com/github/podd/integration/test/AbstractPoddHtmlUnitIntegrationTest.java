@@ -98,6 +98,8 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
     @After
     public void tearDown() throws Exception
     {
+        Exception e = null;
+        
         try
         {
             this.logout();
@@ -105,17 +107,19 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
         catch(final Exception ex)
         {
             AbstractPoddHtmlUnitIntegrationTest.LOGGER.error("Found exception in logout after test", ex);
+            e = ex;
         }
         
         try
         {
             // Reset using the maven build configured reset key from oas.properties
             this.getWebTester().gotoPage(
-                    "/reset" + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, ""));
+                    "/reset/" + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, ""));
         }
         catch(final Exception ex)
         {
             AbstractPoddHtmlUnitIntegrationTest.LOGGER.error("Found exception resetting application after test", ex);
+            e = ex;
         }
         
         try
@@ -125,8 +129,14 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
         catch(final Exception ex)
         {
             AbstractPoddHtmlUnitIntegrationTest.LOGGER.error("Found exception closing browser after test", ex);
+            e = ex;
         }
         
         this.setWebTester(null);
+        
+        if(e != null)
+        {
+            throw e;
+        }
     }
 }

@@ -495,7 +495,7 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
     @Test
     public void testHomePage() throws Exception
     {
-        final Request request = new Request(Method.GET, this.BASE_URL + "/index.html");
+        final Request request = new Request(Method.GET, this.BASE_URL + "/");
         final Response response = this.getClient().handle(request);
         
         Assert.assertEquals(Status.SUCCESS_OK.getCode(), response.getStatus().getCode());
