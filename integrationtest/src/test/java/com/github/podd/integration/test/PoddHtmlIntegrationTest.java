@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+
 import net.sourceforge.jwebunit.api.IElement;
 import net.sourceforge.jwebunit.exception.TestingEngineResponseException;
 
@@ -26,8 +27,8 @@ import org.slf4j.LoggerFactory;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 
 /**
- * Tests the PODD web applicaiton with text/html requests, which should mimic those from browsers. Other
- * tests can be setup to allow other Accept headers.
+ * Tests the PODD web applicaiton with text/html requests, which should mimic those from browsers.
+ * Other tests can be setup to allow other Accept headers.
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
@@ -793,8 +794,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         // we should be at the index page with a 200 HTTP status after login
         this.getWebTester().assertResponseCode(200);
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/index"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/"));
         
         // verify that the Login link has disappeared
         this.getWebTester().assertTextNotPresent("Login");
@@ -819,8 +819,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         // we should be at the index page with a 200 HTTP status after login
         this.getWebTester().assertResponseCode(200);
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/index"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/"));
         
         // verify that the Login link has disappeared
         this.getWebTester().assertTextNotPresent("Login");
@@ -845,8 +844,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         // we should be at the index page with a 200 status code, but not logged in
         this.getWebTester().assertResponseCode(200);
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/index"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/"));
         
         // verify that the Login link has disappeared
         this.getWebTester().assertTextPresent("Login");
@@ -857,8 +855,37 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         // verify the Logout link is NOT available
         this.getWebTester().assertTextNotPresent("Logout");
     }
-
-
+    
+    /**
+     * Quick test for resource loading and the clicking of a button on a page to generate a dialog
+     * using Javascript.
+     */
+    @Ignore
+    @Test
+    public void testResourceLoading()
+    {
+        this.getWebTester().beginAt("/resources/static/scripts/oas-rdf.js");
+        
+        this.getWebTester().gotoPage("/resources/static/oas-test.html");
+        
+        this.getWebTester().clickElementByXPath("//div[@id='science_thing']");
+        
+        this.getWebTester().clickButtonWithText("Create annotation");
+    }
+    
+    /**
+     * Tests whether an HTTP GET request to the index page using text/html generates an HTTP 200
+     * response.
+     */
+    @Test
+    public void testSuccessIndexPageHtml()
+    {
+        this.getWebTester().beginAt("/");
+        
+        this.getWebTester().assertHeaderEquals("Content-Type", "text/html; charset=UTF-8");
+        this.getWebTester().assertResponseCode(200);
+    }
+    
     /**
      * Test viewing current user details
      */
@@ -867,12 +894,11 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     {
         this.login("testUser", "testPassword");
         this.getWebTester().assertResponseCode(200);
-
+        
         this.getWebTester().clickLinkWithText("User page");
         this.getWebTester().assertResponseCode(200);
         
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/testUser"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/testUser"));
         
         // verify user details page headings are present
         this.getWebTester().assertTextPresent("Account Details");
@@ -891,7 +917,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     {
         this.login("testAdminUser", "testAdminPassword");
         this.getWebTester().assertResponseCode(200);
-
+        
         this.getWebTester().clickLinkWithText("User page");
         this.getWebTester().assertResponseCode(200);
         
@@ -916,20 +942,19 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     {
         this.login("testAdminUser", "testAdminPassword");
         this.getWebTester().assertResponseCode(200);
-
+        
         try
         {
             this.getWebTester().gotoPage("/user/noSuchUser");
             Assert.fail("An exception should've been thrown here.");
         }
-        catch (TestingEngineResponseException e)
+        catch(final TestingEngineResponseException e)
         {
             Assert.assertTrue("Not the expected exception", e.getMessage().contains("unexpected status code"));
         }
         this.getWebTester().assertResponseCode(404);
         
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/noSuchUser"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/noSuchUser"));
         
         // verify error message is present
         this.getWebTester().assertTextPresent("ERROR");
@@ -943,12 +968,11 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     {
         this.login("testAdminUser", "testAdminPassword");
         this.getWebTester().assertResponseCode(200);
-
+        
         this.getWebTester().gotoPage("/user/testUser");
         this.getWebTester().assertResponseCode(200);
         
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/testUser"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/testUser"));
         
         // verify user details page headings are present
         this.getWebTester().assertTextPresent("Account Details");
@@ -967,13 +991,13 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     {
         this.login("testUser", "testPassword");
         this.getWebTester().assertResponseCode(200);
-
+        
         try
         {
             this.getWebTester().gotoPage("/user/testAdminUser");
             Assert.fail("An exception should've been thrown here.");
         }
-        catch (TestingEngineResponseException e)
+        catch(final TestingEngineResponseException e)
         {
             Assert.assertTrue("Not the expected exception", e.getMessage().contains("unexpected status code"));
         }
@@ -984,36 +1008,6 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         // verify an error indication is present
         this.getWebTester().assertTextPresent("ERROR");
-    }
-
-    /**
-     * Quick test for resource loading and the clicking of a button on a page to generate a dialog
-     * using Javascript.
-     */
-    @Ignore
-    @Test
-    public void testResourceLoading()
-    {
-        this.getWebTester().beginAt("/resources/static/scripts/oas-rdf.js");
-        
-        this.getWebTester().gotoPage("/resources/static/oas-test.html");
-        
-        this.getWebTester().clickElementByXPath("//div[@id='science_thing']");
-        
-        this.getWebTester().clickButtonWithText("Create annotation");
-    }
-    
-    /**
-     * Tests whether an HTTP GET request to the index page using text/html generates
-     * an HTTP 200 response.
-     */
-    @Test
-    public void testSuccessIndexPageHtml()
-    {
-        this.getWebTester().beginAt("/index");
-        
-        this.getWebTester().assertHeaderEquals("Content-Type", "text/html; charset=UTF-8");
-        this.getWebTester().assertResponseCode(200);
     }
     
 }

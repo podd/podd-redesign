@@ -34,9 +34,38 @@ import org.slf4j.LoggerFactory;
  */
 public class SSHService
 {
-    protected Logger log = LoggerFactory.getLogger(this.getClass());
+    /**
+     * Copied from sshj net.schmizz.sshj.util.BasicFixture.java
+     * 
+     * @return
+     */
+    private static int getFreePort()
+    {
+        try
+        {
+            ServerSocket s = null;
+            try
+            {
+                s = new ServerSocket(0);
+                return s.getLocalPort();
+            }
+            finally
+            {
+                if(s != null)
+                {
+                    s.close();
+                }
+            }
+        }
+        catch(final IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
     
+    protected Logger log = LoggerFactory.getLogger(this.getClass());
     private SshServer server;
+    
     private boolean serverRunning = false;
     
     private final String hostkey = "/test/hostkey.pem";
@@ -116,35 +145,6 @@ public class SSHService
             this.serverRunning = false;
         }
         this.log.info("Exiting stopTestSSHServer()");
-    }
-    
-    /**
-     * Copied from sshj net.schmizz.sshj.util.BasicFixture.java
-     * 
-     * @return
-     */
-    private static int getFreePort()
-    {
-        try
-        {
-            ServerSocket s = null;
-            try
-            {
-                s = new ServerSocket(0);
-                return s.getLocalPort();
-            }
-            finally
-            {
-                if(s != null)
-                {
-                    s.close();
-                }
-            }
-        }
-        catch(final IOException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
     
 }

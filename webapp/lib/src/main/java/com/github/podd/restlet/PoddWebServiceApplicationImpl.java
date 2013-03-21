@@ -1,14 +1,10 @@
 package com.github.podd.restlet;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFFormat;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -17,10 +13,6 @@ import org.restlet.data.Protocol;
 import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Role;
-import org.semanticweb.owlapi.model.OWLException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,24 +21,8 @@ import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.api.PoddArtifactManager;
-import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
-import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.file.PoddFileReferenceManager;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
-import com.github.podd.api.purl.PoddPurlManager;
-import com.github.podd.api.purl.PoddPurlProcessorFactory;
-import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
-import com.github.podd.exception.PoddException;
-import com.github.podd.impl.PoddArtifactManagerImpl;
-import com.github.podd.impl.PoddOWLManagerImpl;
-import com.github.podd.impl.PoddRepositoryManagerImpl;
-import com.github.podd.impl.PoddSchemaManagerImpl;
-import com.github.podd.impl.PoddSesameManagerImpl;
-import com.github.podd.impl.file.PoddFileReferenceManagerImpl;
-import com.github.podd.impl.purl.PoddPurlManagerImpl;
-import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
 import com.github.podd.resources.DeleteArtifactResourceImpl;
@@ -56,10 +32,8 @@ import com.github.podd.resources.GetArtifactResourceImpl;
 import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.ListArtifactsResourceImpl;
-import com.github.podd.resources.TestResetResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.template.Configuration;
@@ -85,9 +59,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
      */
     private volatile Configuration freemarkerConfiguration;
     private volatile ChallengeAuthenticator auth;
-    private volatile PoddSesameRealmImpl realm;
-    
-    private Repository nextRepository;
+    private volatile PoddSesameRealm realm;
     
     private PoddRepositoryManager poddRepositoryManager;
     private PoddSchemaManager poddSchemaManager;
@@ -97,8 +69,10 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
      * Default Constructor.
      * 
      * Adds the necessary file protocols and sets up the template location.
+     * 
+     * @throws OpenRDFException
      */
-    public PoddWebServiceApplicationImpl()
+    public PoddWebServiceApplicationImpl() throws OpenRDFException
     {
         super();
         
@@ -132,8 +106,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // tunnel
         this.getTunnelService().setExtensionsTunnel(true);
         
-        this.nextRepository = ApplicationUtils.getNewRepository();
-        this.initializePoddManagers();
+        // This is setup inside of the PoddRepositoryManager
+        // this.nextRepository = ApplicationUtils.getNewRepository();
     }
     
     /**
@@ -209,6 +183,25 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     /**
+     * Call this method to clean up resources used by PODD. At present it shuts down the Repository.
+     */
+    public void cleanUpResources()
+    {
+        try
+        {
+            // clear all resources and shut down PODD
+            if(this.getPoddRepositoryManager().getRepository() != null)
+            {
+                this.getPoddRepositoryManager().getRepository().shutDown();
+            }
+        }
+        catch(final OpenRDFException e)
+        {
+            this.log.error("Test repository could not be shutdown", e);
+        }
+    }
+    
+    /**
      * Create the necessary connections between the application and its handlers.
      */
     @Override
@@ -229,13 +222,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String loginFormPath = PoddWebConstants.PATH_LOGIN_FORM;
         this.log.info("attaching login service to path={}", loginFormPath);
         router.attach(loginFormPath, CookieLoginResourceImpl.class);
-        
-        // Add a route for the reset service.
-        final String resetPath =
-                PoddWebConstants.PATH_RESET_PREFIX
-                        + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
-        this.log.info("attaching reset service to path={}", resetPath);
-        router.attach(resetPath, TestResetResourceImpl.class);
         
         // Add a route for the About page.
         final String aboutPagePath = PoddWebConstants.PATH_ABOUT;
@@ -351,7 +337,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public PoddSesameRealmImpl getRealm()
+    public PoddSesameRealm getRealm()
     {
         return this.realm;
     }
@@ -378,6 +364,46 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.auth = auth;
     }
     
+    /**
+     * @param poddArtifactManager
+     *            the poddArtifactManager to set
+     */
+    @Override
+    public void setPoddArtifactManager(final PoddArtifactManager poddArtifactManager)
+    {
+        this.poddArtifactManager = poddArtifactManager;
+    }
+    
+    /**
+     * @param poddRepositoryManager
+     *            the poddRepositoryManager to set
+     */
+    @Override
+    public void setPoddRepositoryManager(final PoddRepositoryManager poddRepositoryManager)
+    {
+        this.poddRepositoryManager = poddRepositoryManager;
+    }
+    
+    /**
+     * @param poddSchemaManager
+     *            the poddSchemaManager to set
+     */
+    @Override
+    public void setPoddSchemaManager(final PoddSchemaManager poddSchemaManager)
+    {
+        this.poddSchemaManager = poddSchemaManager;
+    }
+    
+    /**
+     * @param realm
+     *            the realm to set
+     */
+    @Override
+    public void setRealm(final PoddSesameRealm realm)
+    {
+        this.realm = realm;
+    }
+    
     @Override
     public void setRealm(final RestletUtilSesameRealm nextRealm)
     {
@@ -395,105 +421,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     public void setTemplateConfiguration(final Configuration nextFreemarkerConfiguration)
     {
         this.freemarkerConfiguration = nextFreemarkerConfiguration;
-    }
-    
-    /**
-     * Initialize all Managers used by PODD.
-     */
-    private void initializePoddManagers()
-    {
-        final PoddFileReferenceProcessorFactoryRegistry nextFileRegistry =
-                new PoddFileReferenceProcessorFactoryRegistry();
-        // clear any automatically added entries that may come from META-INF/services entries on the
-        // classpath
-        nextFileRegistry.clear();
-        
-        final PoddPurlProcessorFactoryRegistry nextPurlRegistry = new PoddPurlProcessorFactoryRegistry();
-        nextPurlRegistry.clear();
-        final PoddPurlProcessorFactory nextPurlProcessorFactory = new UUIDPurlProcessorFactoryImpl();
-
-        final String purlPrefix = PropertyUtil.get(PoddWebConstants.PROPERTY_PURL_PREFIX, null);
-        ((UUIDPurlProcessorFactoryImpl)nextPurlProcessorFactory).setPrefix(purlPrefix);
-        
-        nextPurlRegistry.add(nextPurlProcessorFactory);
-        
-        final PoddFileReferenceManager nextFileReferenceManager = new PoddFileReferenceManagerImpl();
-        nextFileReferenceManager.setProcessorFactoryRegistry(nextFileRegistry);
-        
-        final PoddPurlManager nextPurlManager = new PoddPurlManagerImpl();
-        nextPurlManager.setPurlProcessorFactoryRegistry(nextPurlRegistry);
-        
-        final PoddOWLManager nextOWLManager = new PoddOWLManagerImpl();
-        nextOWLManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
-        final OWLOntologyManager nextOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-        if(nextOWLOntologyManager == null)
-        {
-            this.log.error("OWLOntologyManager was null");
-        }
-        nextOWLManager.setOWLOntologyManager(nextOWLOntologyManager);
-        
-        this.poddRepositoryManager = new PoddRepositoryManagerImpl(this.nextRepository);
-        this.poddRepositoryManager.setSchemaManagementGraph(PoddWebServiceApplicationImpl.SCHEMA_MGT_GRAPH);
-        this.poddRepositoryManager.setArtifactManagementGraph(PoddWebServiceApplicationImpl.ARTIFACT_MGT_GRAPH);
-        
-        final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
-        
-        this.poddSchemaManager = new PoddSchemaManagerImpl();
-        this.poddSchemaManager.setOwlManager(nextOWLManager);
-        this.poddSchemaManager.setRepositoryManager(this.poddRepositoryManager);
-        this.poddSchemaManager.setSesameManager(poddSesameManager);
-        
-        this.poddArtifactManager = new PoddArtifactManagerImpl();
-        this.poddArtifactManager.setRepositoryManager(this.poddRepositoryManager);
-        this.poddArtifactManager.setFileReferenceManager(nextFileReferenceManager);
-        this.poddArtifactManager.setPurlManager(nextPurlManager);
-        this.poddArtifactManager.setOwlManager(nextOWLManager);
-        this.poddArtifactManager.setSchemaManager(this.poddSchemaManager);
-        this.poddArtifactManager.setSesameManager(poddSesameManager);
-        
-        /*
-         * Since the schema ontology upload feature is not yet supported, necessary schemas are
-         * uploaded here at application starts up.
-         */
-        try
-        {
-            this.getPoddSchemaManager().uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS), RDFFormat.RDFXML);
-            this.getPoddSchemaManager().uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF), RDFFormat.RDFXML);
-            this.getPoddSchemaManager().uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_USER), RDFFormat.RDFXML);
-            this.getPoddSchemaManager().uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
-            this.getPoddSchemaManager().uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
-            this.getPoddSchemaManager().uploadSchemaOntology(
-                    this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
-        }
-        catch(IOException | OpenRDFException | OWLException | PoddException e)
-        {
-            this.log.error("Fatal Error!!! Could not load schema ontologies", e);
-        }
-    }
-    
-    /**
-     * Call this method to clean up resources used by PODD. At present it shuts down the Repository.
-     */
-    public void cleanUpResources()
-    {
-        // clear all resources and shut down PODD
-        if(this.nextRepository != null)
-        {
-            try
-            {
-                this.nextRepository.shutDown();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Test repository could not be shutdown", e);
-            }
-        }
-        this.nextRepository = null;
     }
     
     @Override

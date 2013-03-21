@@ -198,24 +198,24 @@ public class RestletPoddClientImpl implements PoddClient
         this.log.info("cookies: {}", this.currentCookies);
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_LIST));
-        resource.getCookieSettings().addAll(this.currentCookies);
+        resource.getCookies().addAll(this.currentCookies);
         
         resource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, Boolean.toString(published));
         resource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, Boolean.toString(unpublished));
-        
-        final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
         
         final Model results = new LinkedHashModel();
         
         try
         {
+            final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+            
             if(!resource.getStatus().equals(Status.SUCCESS_OK))
             {
                 throw new PoddClientException("Server returned a non-success status code: "
                         + resource.getStatus().toString());
             }
             
-            InputStream stream = getResponse.getStream();
+            final InputStream stream = getResponse.getStream();
             
             if(stream == null)
             {
@@ -230,6 +230,8 @@ public class RestletPoddClientImpl implements PoddClient
             // log.info("result: {}", getResponse.getText());
             
             parser.parse(stream, "");
+            
+            return OntologyUtils.modelToOntologyIDs(results);
         }
         catch(final RDFParseException e)
         {
@@ -239,12 +241,14 @@ public class RestletPoddClientImpl implements PoddClient
         {
             throw new PoddClientException("Failed to process RDF", e);
         }
+        catch(final ResourceException e)
+        {
+            throw new PoddClientException("Failed to communicate with PODD Server", e);
+        }
         catch(final IOException e)
         {
             throw new PoddClientException("Input output exception while parsing RDF", e);
         }
-        
-        return OntologyUtils.modelToOntologyIDs(results);
     }
     
     /*
@@ -294,7 +298,7 @@ public class RestletPoddClientImpl implements PoddClient
     public boolean login(final String username, final String password) throws PoddClientException
     {
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGIN_SUBMIT));
-        resource.getCookieSettings().addAll(this.currentCookies);
+        resource.getCookies().addAll(this.currentCookies);
         
         // TODO: when Cookies natively supported by Client Resource, or another method remove this
         // Until then, this is necessary to manually attach the cookies after login to the
@@ -356,7 +360,7 @@ public class RestletPoddClientImpl implements PoddClient
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_LOGOUT));
         // add the cookie settings so that the server knows who to logout
-        resource.getCookieSettings().addAll(this.currentCookies);
+        resource.getCookies().addAll(this.currentCookies);
         
         // TODO: when Cookies natively supported by Client Resource, or another method remove this
         // Until then, this is necessary to manually attach the cookies after login to the

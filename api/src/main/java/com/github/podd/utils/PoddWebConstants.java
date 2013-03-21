@@ -61,7 +61,7 @@ public interface PoddWebConstants
     /**
      * Path to redirect user on successful login
      */
-    public static final String PATH_REDIRECT_LOGGED_IN = "index";
+    public static final String PATH_REDIRECT_LOGGED_IN = "";
     
     /**
      * Path to "about" page
@@ -76,7 +76,7 @@ public interface PoddWebConstants
     /**
      * Path to "index" page
      */
-    public static final String PATH_INDEX = "index";
+    public static final String PATH_INDEX = "";
     
     /**
      * Path to "user details" page
@@ -117,11 +117,6 @@ public interface PoddWebConstants
      * Path to the file reference attachment service
      */
     public static final String PATH_ATTACH_FILE_REF = "attachref";
-    
-    /**
-     * Path prefix of the reset service
-     */
-    public static final String PATH_RESET_PREFIX = "reset";
     
     /**
      * Key used to represent user identifier part of a URL

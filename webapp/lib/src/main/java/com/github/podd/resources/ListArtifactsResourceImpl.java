@@ -107,10 +107,11 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         // If the user is authenticated, set unpublished to true before checking the query
         // parameters
-        if(this.getClientInfo().isAuthenticated())
-        {
-            unpublished = true;
-        }
+        //if(this.getClientInfo().isAuthenticated())
+        //{
+        //    this.log.info("User was logged in");
+        //    unpublished = true;
+        //}
         
         if(unpublishedString != null)
         {
@@ -159,6 +160,9 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             if(unpublished)
             {
                 this.log.info("About to check for authentication to look at unpublished artifacts");
+                this.log.info("Is authenticated: {}", this.getRequest().getClientInfo().isAuthenticated());
+                this.log.info("Current user: {}", this.getRequest().getClientInfo().getUser());
+                
                 this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST);
                 
                 List<InferredOWLOntologyID> unpublishedResults = new ArrayList<InferredOWLOntologyID>();
