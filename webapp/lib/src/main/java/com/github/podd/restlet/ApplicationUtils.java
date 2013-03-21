@@ -3,6 +3,7 @@
  */
 package com.github.podd.restlet;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
 import org.restlet.Context;
 import org.restlet.ext.crypto.DigestAuthenticator;
@@ -23,11 +25,31 @@ import org.restlet.security.LocalVerifier;
 import org.restlet.security.Realm;
 import org.restlet.security.Role;
 import org.restlet.security.User;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
+import com.github.podd.api.PoddOWLManager;
+import com.github.podd.api.PoddSesameManager;
+import com.github.podd.api.file.PoddFileReferenceManager;
+import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.purl.PoddPurlManager;
+import com.github.podd.api.purl.PoddPurlProcessorFactory;
+import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
+import com.github.podd.exception.PoddException;
+import com.github.podd.impl.PoddArtifactManagerImpl;
+import com.github.podd.impl.PoddOWLManagerImpl;
+import com.github.podd.impl.PoddRepositoryManagerImpl;
+import com.github.podd.impl.PoddSchemaManagerImpl;
+import com.github.podd.impl.PoddSesameManagerImpl;
+import com.github.podd.impl.file.PoddFileReferenceManagerImpl;
+import com.github.podd.impl.purl.PoddPurlManagerImpl;
+import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -205,6 +227,7 @@ public class ApplicationUtils
     }
     
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
+        throws OpenRDFException
     {
         ApplicationUtils.log.info("application {}", application);
         ApplicationUtils.log.info("applicationContext {}", applicationContext);
@@ -213,15 +236,80 @@ public class ApplicationUtils
         roles.clear();
         roles.addAll(PoddRoles.getRoles());
         
-        Repository nextRepository = null;
+        Repository nextRepository = getNewRepository();
+        
+        application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextRepository));
+        application.getPoddRepositoryManager().setSchemaManagementGraph(PoddWebServiceApplicationImpl.SCHEMA_MGT_GRAPH);
+        application.getPoddRepositoryManager().setArtifactManagementGraph(
+                PoddWebServiceApplicationImpl.ARTIFACT_MGT_GRAPH);
+        
+        final PoddFileReferenceProcessorFactoryRegistry nextFileRegistry =
+                new PoddFileReferenceProcessorFactoryRegistry();
+        // clear any automatically added entries that may come from META-INF/services entries on the
+        // classpath
+        nextFileRegistry.clear();
+        
+        final PoddPurlProcessorFactoryRegistry nextPurlRegistry = new PoddPurlProcessorFactoryRegistry();
+        nextPurlRegistry.clear();
+        final PoddPurlProcessorFactory nextPurlProcessorFactory = new UUIDPurlProcessorFactoryImpl();
+        
+        final String purlPrefix = PropertyUtil.get(PoddWebConstants.PROPERTY_PURL_PREFIX, null);
+        ((UUIDPurlProcessorFactoryImpl)nextPurlProcessorFactory).setPrefix(purlPrefix);
+        
+        nextPurlRegistry.add(nextPurlProcessorFactory);
+        
+        final PoddFileReferenceManager nextFileReferenceManager = new PoddFileReferenceManagerImpl();
+        nextFileReferenceManager.setProcessorFactoryRegistry(nextFileRegistry);
+        
+        final PoddPurlManager nextPurlManager = new PoddPurlManagerImpl();
+        nextPurlManager.setPurlProcessorFactoryRegistry(nextPurlRegistry);
+        
+        final PoddOWLManager nextOWLManager = new PoddOWLManagerImpl();
+        nextOWLManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
+        final OWLOntologyManager nextOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        if(nextOWLOntologyManager == null)
+        {
+            log.error("OWLOntologyManager was null");
+        }
+        nextOWLManager.setOWLOntologyManager(nextOWLOntologyManager);
+        
+        final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
+        
+        application.setPoddSchemaManager(new PoddSchemaManagerImpl());
+        application.getPoddSchemaManager().setOwlManager(nextOWLManager);
+        application.getPoddSchemaManager().setRepositoryManager(application.getPoddRepositoryManager());
+        application.getPoddSchemaManager().setSesameManager(poddSesameManager);
+        
+        application.setPoddArtifactManager(new PoddArtifactManagerImpl());
+        application.getPoddArtifactManager().setRepositoryManager(application.getPoddRepositoryManager());
+        application.getPoddArtifactManager().setFileReferenceManager(nextFileReferenceManager);
+        application.getPoddArtifactManager().setPurlManager(nextPurlManager);
+        application.getPoddArtifactManager().setOwlManager(nextOWLManager);
+        application.getPoddArtifactManager().setSchemaManager(application.getPoddSchemaManager());
+        application.getPoddArtifactManager().setSesameManager(poddSesameManager);
+        
+        /*
+         * Since the schema ontology upload feature is not yet supported, necessary schemas are
+         * uploaded here at application starts up.
+         */
         try
         {
-            nextRepository = application.getPoddRepositoryManager().getRepository();
+            application.getPoddSchemaManager().uploadSchemaOntology(
+                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS), RDFFormat.RDFXML);
+            application.getPoddSchemaManager().uploadSchemaOntology(
+                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF), RDFFormat.RDFXML);
+            application.getPoddSchemaManager().uploadSchemaOntology(
+                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_USER), RDFFormat.RDFXML);
+            application.getPoddSchemaManager().uploadSchemaOntology(
+                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
+            application.getPoddSchemaManager().uploadSchemaOntology(
+                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
+            application.getPoddSchemaManager().uploadSchemaOntology(
+                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
         }
-        catch(final OpenRDFException e)
+        catch(IOException | OpenRDFException | OWLException | PoddException e)
         {
-            ApplicationUtils.log.error("Could not retrieve Repository from Application", e);
-            // Throw exception up ??
+            log.error("Fatal Error!!! Could not load schema ontologies", e);
         }
         
         // FIXME: Stub implementation in memory, based on the example restlet MemoryRealm class,
@@ -247,13 +335,15 @@ public class ApplicationUtils
         final URI testAdminUserHomePage = PoddRdfConstants.VALUE_FACTORY.createURI("http://www.example.com/testAdmin");
         final PoddUser testAdminUser =
                 new PoddUser("testAdminUser", "testAdminPassword".toCharArray(), "Test Admin", "User",
-                        "test.admin.user@example.com", PoddUserStatus.ACTIVE, testAdminUserHomePage, "UQ", "Orcid-Test-Admin");
+                        "test.admin.user@example.com", PoddUserStatus.ACTIVE, testAdminUserHomePage, "UQ",
+                        "Orcid-Test-Admin");
         final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
         nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
         nextRealm.map(testAdminUser, PoddRoles.AUTHENTICATED.getRole());
         
-        final URI testArtifactUri = PoddRdfConstants.VALUE_FACTORY.createURI("http://purl.org/podd/ns/artifact/artifact89");
-         nextRealm.map(testAdminUser, PoddRoles.PROJECT_ADMIN.getRole(), testArtifactUri);
+        final URI testArtifactUri =
+                PoddRdfConstants.VALUE_FACTORY.createURI("http://purl.org/podd/ns/artifact/artifact89");
+        nextRealm.map(testAdminUser, PoddRoles.PROJECT_ADMIN.getRole(), testArtifactUri);
         
         final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);
         

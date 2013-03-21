@@ -5,14 +5,18 @@ package com.github.podd.resources;
 
 import java.util.Map;
 
+import org.openrdf.OpenRDFException;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
+import com.github.podd.restlet.PoddWebServiceApplicationImpl;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -27,8 +31,6 @@ public class TestResetResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private PoddWebServiceApplication application;
-    
     /**
      */
     public TestResetResourceImpl()
@@ -36,29 +38,24 @@ public class TestResetResourceImpl extends AbstractPoddResourceImpl
         super();
     }
     
-    public TestResetResourceImpl(final PoddWebServiceApplication application)
-    {
-        this.application = application;
-    }
-    
     @Get
-    public Representation uploadArtifactFile(final Representation entity) throws ResourceException
+    public Representation reset() throws ResourceException
     {
-        // this.checkAuthentication(PoddAction.ROLE_EDIT);
+        this.log.info("========== Reset called ==========");
+        try
+        {
+            ApplicationUtils.setupApplication(this.getPoddApplication(), this.getPoddApplication().getContext());
+        }
+        catch(OpenRDFException e)
+        {
+            this.log.error("Could not reset application", e);
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not reset application", e);
+        }
+        this.log.info("========== Reset complete ==========");
         
-        this.log.info("========== Empty reset called ==========");
+        this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
         
-        // TODO: the reset logic should come here
-        // ApplicationUtils.setupApplication(this.application, this.application.getContext());
-        
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "index.html.ftl");
-        dataModel.put("pageTitle", "PODD has been reset");
-        
-        // Output the base template, with contentTemplate from the dataModel defining the
-        // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        return null;
     }
     
 }

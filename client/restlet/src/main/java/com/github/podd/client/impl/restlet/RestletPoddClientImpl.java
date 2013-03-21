@@ -203,12 +203,12 @@ public class RestletPoddClientImpl implements PoddClient
         resource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, Boolean.toString(published));
         resource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, Boolean.toString(unpublished));
         
-        final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
-        
         final Model results = new LinkedHashModel();
         
         try
         {
+            final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+            
             if(!resource.getStatus().equals(Status.SUCCESS_OK))
             {
                 throw new PoddClientException("Server returned a non-success status code: "
@@ -230,6 +230,8 @@ public class RestletPoddClientImpl implements PoddClient
             // log.info("result: {}", getResponse.getText());
             
             parser.parse(stream, "");
+            
+            return OntologyUtils.modelToOntologyIDs(results);
         }
         catch(final RDFParseException e)
         {
@@ -239,12 +241,14 @@ public class RestletPoddClientImpl implements PoddClient
         {
             throw new PoddClientException("Failed to process RDF", e);
         }
+        catch(final ResourceException e)
+        {
+            throw new PoddClientException("Failed to communicate with PODD Server", e);
+        }
         catch(final IOException e)
         {
             throw new PoddClientException("Input output exception while parsing RDF", e);
         }
-        
-        return OntologyUtils.modelToOntologyIDs(results);
     }
     
     /*

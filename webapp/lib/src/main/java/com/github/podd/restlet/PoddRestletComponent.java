@@ -3,6 +3,7 @@
  */
 package com.github.podd.restlet;
 
+import org.openrdf.OpenRDFException;
 import org.restlet.Component;
 import org.restlet.data.LocalReference;
 import org.restlet.data.Protocol;
@@ -110,26 +111,39 @@ public class PoddRestletComponent extends Component
         
         this.log.info("attaching resource handler to path={}", resourcesPath);
         
-        // NOTE: This needs to be Impl as Restlet is not designed using interfaces, so we cannot
-        // easily include our interface in the process.
-        final PoddWebServiceApplication nextApplication = new PoddWebServiceApplicationImpl();
-        
-        // Create a resource to use in integration tests to reset the application to a fresh state
-        // on demand, without adding this functionality to OasWebServiceApplicationImpl
-//        final TestResetResource reset = new TestResetResource(nextApplication);
-//        this.setResetKey(PropertyUtil.getProperty("oas.test.website.reset.key", ""));
-//        final String resetPath = "/reset/" + this.getResetKey();
-//        this.getDefaultHost().attach(resetPath, reset);
-        
         // attach the resources first
         this.getDefaultHost().attach(resourcesPath, directory);
         
-        // attach the web services application
-        this.getDefaultHost().attach("/", nextApplication);
-        
-        // setup the application after attaching it, as it requires Application.getContext() to not
-        // be null during the setup process
-        ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
+        // NOTE: This needs to be Impl as Restlet is not designed using interfaces, so we cannot
+        // easily include our interface in the process.
+        PoddWebServiceApplication nextApplication;
+        try
+        {
+            nextApplication = new PoddWebServiceApplicationImpl();
+            
+            // TODO: Add the reset resource separately here instead of always being present inside
+            // of PoddWebServiceApplicationImpl
+            
+            // Create a resource to use in integration tests to reset the application to a fresh
+            // state
+            // on demand, without adding this functionality to OasWebServiceApplicationImpl
+            // final TestResetResource reset = new TestResetResource(nextApplication);
+            // this.setResetKey(PropertyUtil.getProperty("oas.test.website.reset.key", ""));
+            // final String resetPath = "/reset/" + this.getResetKey();
+            // this.getDefaultHost().attach(resetPath, reset);
+            
+            // attach the web services application
+            this.getDefaultHost().attach("/", nextApplication);
+            
+            // setup the application after attaching it, as it requires Application.getContext() to
+            // not
+            // be null during the setup process
+            ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
+        }
+        catch(OpenRDFException e)
+        {
+            throw new RuntimeException("Could not setup application", e);
+        }
         
         this.log.info("routes={}", this.getDefaultHost().getRoutes().toString());
     }
