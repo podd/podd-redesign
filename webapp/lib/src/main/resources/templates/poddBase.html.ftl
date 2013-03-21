@@ -66,7 +66,7 @@
 
 		<!-- search panel -->
 		<div id="search">
-	    	<form enctype="multipart/form-data" method="post" action="/podd/search">
+	    	<form enctype="multipart/form-data" method="post" action="${baseUrl}/search">
 	    	
 				<#if (user)??>							
 						<input type="checkbox" name="scopeMyProjects" value="true" checked="checked" style="display:none"/> 
@@ -79,7 +79,7 @@
 	    		<div>
 	            <input class="searchTextField" name="allTheseWords" id="search-box" size="22" maxlength="200"/>
 	            <input class="searchButton" type="submit" name="search" value="search"/>
-	            <a href='/podd/search' >Advanced Search</a>
+	            <a href='${baseUrl}/search' >Advanced Search</a>
 	            </div>
 	        </form>
 	        
