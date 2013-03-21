@@ -239,11 +239,27 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     /**
      * Test viewing the edit HTML page for a PODD top object (i.e. a Project).
      */
-    @Ignore
     @Test
     public void testGetEditArtifactTopObjectHtml() throws Exception
     {
-        Assert.fail("TODO: implement");
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-2.rdf");
+        
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        // not requesting a specific object results in the Project being shown.
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify:
+        System.out.println(body);
+        this.assertFreemarker(body);
     }
     
     /**

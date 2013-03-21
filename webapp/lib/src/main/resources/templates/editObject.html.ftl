@@ -269,8 +269,21 @@ Input is the property URI.
 <#macro displayField propertyUri>
     <li>
 		<#local propertyType = completeModel.filter(propertyUri, RDF_TYPE, null).objectString()!"TYPE">
+		<#local displayType = completeModel.filter(propertyUri, PODD_BASE_DISPLAY_TYPE, null).objectString()!"http://purl.org/podd/ns/poddBase#DisplayType_ShortText">
 		<#local label = completeModel.filter(propertyUri, RDFS_LABEL, null).objectString()!"Missing Label">
+		<#local cardinality = completeModel.filter(propertyUri, OWL_CARDINALITY, null).objectString()!"-1">
+		<#local minCardinality = completeModel.filter(propertyUri, OWL_MIN_CARDINALITY, null).objectString()!"-1">
+		<#local maxCardinality = completeModel.filter(propertyUri, OWL_MAX_CARDINALITY, null).objectString()!"-1">
+		
+		
     	<span class="bold">${label}:</span>
+		<!-- cardinality = ${cardinality} , minCardinality = ${minCardinality}, maxCardinality = ${maxCardinality} -->
+		<#if cardinality == "1" || minCardinality == "1">
+		      <span icon="required"></span>
+		</#if>
+		<#if cardinality != "1" && maxCardinality != "1">
+            <a href="javascript:addField('${propertyUri}', 'input')" icon="addField" title="add ${label}"></a>
+		</#if>
 
 		<#-- get statement object(s) for this property. could be one or several. -->
 		<#local objectList = completeModel.filter(poddObject.uri, propertyUri, null).objects()>
@@ -284,14 +297,28 @@ Input is the property URI.
 			<li>
 				<#if propertyType == OWL_OBJECT_PROPERTY>
 					<!-- Object Property. is a FieldSet -->
-		        	<textarea id="${propertyUri}" name="${propertyUri}" cols="30" rows="2">${thisObject.stringValue()}</textarea>
 				<#elseif propertyType == OWL_DATA_PROPERTY>
 					<!-- Datatype Property -->
-		        	<textarea id="${propertyUri}" name="${propertyUri}" cols="30" rows="2">${thisObject.stringValue()}</textarea>
 				<#elseif propertyType == OWL_ANNOTATION_PROPERTY >
 					<!-- Annotation Property -->
-		        	<textarea id="${propertyUri}" name="${propertyUri}" cols="30" rows="2">${thisObject.stringValue()}</textarea>
 				</#if>
+				<!-- Display Type is: ${displayType} -->
+				<#if displayType == "http://purl.org/podd/ns/poddBase#DisplayType_ShortText">
+	        		<input id="${propertyUri}" name="${propertyUri}" value="${thisObject.stringValue()}" type="text">
+	        		
+	        	<#elseif displayType == "http://purl.org/podd/ns/poddBase#DisplayType_DropDownList">
+	        		<select id="${propertyUri}" name="${propertyUri}">
+	        			<#list members[propertyUri] as member>
+	        				<option value="${member.getObjectURI()}" 
+	        				<#if member.getObjectURI() == thisObject.stringValue()>
+	        					selected
+	        				</#if>
+	        				>${member.getLabel()}</option>
+	        			</#list>
+	        		</select>
+	        	<#else>
+	        		<textarea id="${propertyUri}" name="${propertyUri}" cols="30" rows="2">${thisObject.stringValue()}</textarea>
+	        	</#if>
 			</li>
 		</#list>
 		
@@ -499,6 +526,7 @@ Input is the property URI.
         var li = document.createElement("li");
         li.appendChild(element);
         document.getElementById('add_' + id).appendChild(li);
+		<#-- FIXME: append to correct parent -->
     }
 </script>
 

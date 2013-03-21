@@ -6,8 +6,10 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +42,7 @@ import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -227,7 +230,11 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("OWL_OBJECT_PROPERTY", OWL.OBJECTPROPERTY);
         dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
         dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
+        dataModel.put("OWL_MAX_CARDINALITY", PoddRdfConstants.OWL_MAX_QUALIFIED_CARDINALITY);
+        dataModel.put("OWL_MIN_CARDINALITY", PoddRdfConstants.OWL_MIN_QUALIFIED_CARDINALITY);
+        dataModel.put("OWL_CARDINALITY", PoddRdfConstants.OWL_QUALIFIED_CARDINALITY);
         dataModel.put("PODD_BASE_DISPLAY_TYPE", PoddRdfConstants.PODD_BASE_DISPLAY_TYPE);
+        
         dataModel.put("util", new FreemarkerUtil());
         
         // Defaults to false. Set to true if multiple objects are being edited concurrently
@@ -281,6 +288,38 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             // all statements which are needed to display these properties in HTML
             final Model allNeededStatementsForEdit =
                     this.getPoddSesameManager().getObjectDetailsForEdit(ontologyID, objectUri, conn);
+            
+            // find cardinalities of each property to be listed and add them to the Model
+            // TODO: can this be done inside sesameManager.getObjectDetailsForEdit()?
+            for (URI prop : orderedProperties)
+            {
+                Model cardinalityModel = this.getPoddSesameManager().getCardinality(ontologyID, objectUri, prop, conn);
+                allNeededStatementsForEdit.addAll(cardinalityModel);
+            }
+            
+            // identify Collection elements and add all their possible values to the data model
+            // TODO: figure out a better way of doing this
+            Map<String, List<PoddObjectLabel>> membersMap = new HashMap<String, List<PoddObjectLabel>>();
+            for (URI prop : orderedProperties)
+            {
+                String displayTypeValue =
+                        allNeededStatementsForEdit.filter(prop, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE, null)
+                                .objectString();
+                
+                if (PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN.stringValue().equals(displayTypeValue))
+                {
+                    final List<PoddObjectLabel> memberList = new ArrayList<PoddObjectLabel>();
+                    List<URI> allValidMembers = this.getPoddSesameManager().getAllValidMembers(ontologyID, prop, conn);
+                    for (URI member : allValidMembers)
+                    {
+                        memberList.add(this.getPoddSesameManager().getObjectLabel(ontologyID, member, conn));
+                    }
+                    membersMap.put(prop.toString(), memberList);
+                    System.out.println(prop + " has valid members: " + allValidMembers);
+                }
+            }
+            dataModel.put("members", membersMap);
+            
             dataModel.put("completeModel", allNeededStatementsForEdit);
             
             /*
