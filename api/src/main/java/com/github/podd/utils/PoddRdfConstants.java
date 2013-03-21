@@ -65,6 +65,15 @@ public interface PoddRdfConstants
     
     public static final URI OWL_VERSION_IRI = PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "versionIRI");
     
+    public static final URI OWL_MAX_QUALIFIED_CARDINALITY = PoddRdfConstants.VALUE_FACTORY
+            .createURI("http://www.w3.org/2002/07/owl#maxQualifiedCardinality");
+
+    public static final URI OWL_MIN_QUALIFIED_CARDINALITY = PoddRdfConstants.VALUE_FACTORY
+            .createURI("http://www.w3.org/2002/07/owl#minQualifiedCardinality");
+
+    public static final URI OWL_QUALIFIED_CARDINALITY = PoddRdfConstants.VALUE_FACTORY
+            .createURI("http://www.w3.org/2002/07/owl#qualifiedCardinality");
+    
     public static final URI PODDBASE_HAS_PUBLICATION_STATUS = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasPublicationStatus");
     
@@ -89,12 +98,32 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_DO_NOT_DISPLAY = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "doNotDisplay");
     
-    public static final URI PODD_BASE_DISPLAY_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "displayType");
-
     public static final URI PODD_BASE_CONTAINS = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "contains");
 
+    /** http://purl.org/podd/ns/poddBase#hasDisplayType */
+    public static final URI PODD_BASE_DISPLAY_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "hasDisplayType");
+
+    /** http://purl.org/podd/ns/poddBase#DisplayType_ShortText */
+    public static final URI PODD_BASE_DISPLAY_TYPE_SHORTTEXT = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "DisplayType_ShortText");
+    
+    /** http://purl.org/podd/ns/poddBase#DisplayType_LongText */
+    public static final URI PODD_BASE_DISPLAY_TYPE_LONGTEXT = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "DisplayType_LongText");
+    
+    /** http://purl.org/podd/ns/poddBase#DisplayType_DropDownList */
+    public static final URI PODD_BASE_DISPLAY_TYPE_DROPDOWN = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "DisplayType_DropDownList");
+    
+    /** http://purl.org/podd/ns/poddBase#DisplayType_CheckBox */
+    public static final URI PODD_BASE_DISPLAY_TYPE_CHECKBOX = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "DisplayType_CheckBox");
+    
+    /** http://purl.org/podd/ns/poddBase#DisplayType_Table */
+    public static final URI PODD_BASE_DISPLAY_TYPE_TABLE = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "DisplayType_Table");
     
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are
@@ -128,5 +157,6 @@ public interface PoddRdfConstants
     /** Default value is urn:podd:default:usermanagementgraph:  */
     public static final URI DEF_USER_MANAGEMENT_GRAPH = VALUE_FACTORY
             .createURI("urn:podd:default:usermanagementgraph:");
+
 
 }
