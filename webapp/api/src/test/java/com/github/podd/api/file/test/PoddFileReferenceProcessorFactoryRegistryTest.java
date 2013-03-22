@@ -15,14 +15,13 @@ import org.mockito.Mockito;
 import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
 import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
-import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.api.purl.test.PoddPurlProcessorFactoryRegistryTest;
 
 /**
  * Tests functionality of the PoddFileReferenceProcessorFactoryRegistry.
  * 
- * The test implementation is copied from {@link PoddPurlProcessorFactoryRegistryTest} and
- * with PURL related classes replaced by FileReference related classes.
+ * The test implementation is copied from {@link PoddPurlProcessorFactoryRegistryTest}
+ * with PURL related references replaced by corresponding FileReference references.
  * 
  * @author kutila
  * 
@@ -171,7 +170,7 @@ public class PoddFileReferenceProcessorFactoryRegistryTest
     @Test
     public void testGetInstance() throws Exception
     {
-        Assert.assertNotNull("getInstance was null", PoddPurlProcessorFactoryRegistry.getInstance());
+        Assert.assertNotNull("getInstance was null", PoddFileReferenceProcessorFactoryRegistry.getInstance());
     }
     
 }
