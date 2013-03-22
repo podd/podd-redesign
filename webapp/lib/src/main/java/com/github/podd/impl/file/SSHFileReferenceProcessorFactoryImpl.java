@@ -70,8 +70,8 @@ public class SSHFileReferenceProcessorFactoryImpl implements PoddSSHFileReferenc
     @Override
     public PoddFileReferenceProcessor getProcessor()
     {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO - configure processor
+        return new PoddSSHFileReferenceProcessorImpl();
     }
 
     @Override

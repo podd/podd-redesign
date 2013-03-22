@@ -3,6 +3,8 @@
  */
 package com.github.podd.api.file;
 
+import java.util.Collection;
+
 import org.openrdf.model.Graph;
 
 import com.github.podd.api.PoddRdfProcessor;
@@ -18,5 +20,5 @@ public interface PoddFileReferenceProcessor extends PoddRdfProcessor
 {
     boolean canHandle(Graph rdfStatements);
     
-    PoddFileReference createReference(Graph rdfStatements);
+    Collection<PoddFileReference> createReferences(Graph rdfStatements);
 }

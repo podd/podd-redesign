@@ -88,9 +88,9 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
     public Set<PoddFileReference> extractFileReferences(final RepositoryConnection repositoryConnection,
             final URI... contexts) throws RepositoryException
     {
-        final Set<PoddFileReference> internalPurlResults =
+        final Set<PoddFileReference> internalFileRefResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<PoddFileReference, Boolean>());
-        // NOTE: We use a Set to avoid duplicate calls to any Purl processors for any
+        // NOTE: We use a Set to avoid duplicate calls to any File Reference processors for any
         // temporary URI
         final Set<URI> temporaryURIs = Collections.newSetFromMap(new ConcurrentHashMap<URI, Boolean>());
         
@@ -121,20 +121,18 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
                 // FIXME: The following contains statements for the whole artifact
                 final Model results = QueryResults.asModel(queryResult);
                 
-                if(results != null)
+                if(!results.isEmpty())
                 {
-                    throw new RuntimeException("TODO: Implement splitting graph into distinct file references");
-                }
-                
-                // This processor factory matches the graph that we wish to use, so we create a
-                // processor instance now to create the PURL
-                // NOTE: This object cannot be shared as we do not specify that it needs to be
-                // threadsafe
-                final PoddFileReferenceProcessor processor = nextProcessorFactory.getProcessor();
-                
-                if(processor.canHandle(results))
-                {
-                    internalPurlResults.add(processor.createReference(results));
+                    // This processor factory matches the graph that we wish to use, so we create a
+                    // processor instance now to create the PURL
+                    // NOTE: This object cannot be shared as we do not specify that it needs to be
+                    // threadsafe
+                    final PoddFileReferenceProcessor processor = nextProcessorFactory.getProcessor();
+                    
+                    if(processor.canHandle(results))
+                    {
+                        internalFileRefResults.addAll(processor.createReferences(results));
+                    }
                 }
             }
             catch(final MalformedQueryException | QueryEvaluationException e)
@@ -142,7 +140,7 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
                 this.log.error("Unexpected query exception", e);
             }
         }
-        return internalPurlResults;
+        return internalFileRefResults;
     }
     
     /*
