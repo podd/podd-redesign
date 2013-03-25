@@ -7,7 +7,7 @@ import org.openrdf.model.Graph;
 import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddSSHFileReferenceProcessor;
 
-public class PoddSSHFileReferenceProcessorImpl implements PoddSSHFileReferenceProcessor 
+public class SSHFileReferenceProcessorImpl implements PoddSSHFileReferenceProcessor 
 {
 
     @Override

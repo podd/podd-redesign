@@ -71,7 +71,7 @@ public class SSHFileReferenceProcessorFactoryImpl implements PoddSSHFileReferenc
     public PoddFileReferenceProcessor getProcessor()
     {
         // TODO - configure processor
-        return new PoddSSHFileReferenceProcessorImpl();
+        return new SSHFileReferenceProcessorImpl();
     }
 
     @Override
