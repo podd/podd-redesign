@@ -739,7 +739,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
         // verify
-        this.verifyLoadedArtifact(firstArtifactId, 7, 33, 307, false);
+        this.verifyLoadedArtifact(firstArtifactId, 7, 33, 309, false);
         Assert.assertEquals("Version IRI of loaded ontology not expected value", firstArtifactId.getOntologyIRI()
                 .toString().concat(":version:1"), firstArtifactId.getVersionIRI().toString());
     }
@@ -772,7 +772,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID artifactId =
                 this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(artifactId, 7, 33, 307, false);
+        this.verifyLoadedArtifact(artifactId, 7, 33, 309, false);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -876,7 +876,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID firstArtifactId =
                 this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(firstArtifactId, 7, 29, 301, false);
+        this.verifyLoadedArtifact(firstArtifactId, 7, 29, 303, false);
         
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
@@ -890,7 +890,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertFalse("Two versions should NOT have the same Version IRI", firstArtifactId.getVersionIRI()
                 .toString().equals(secondArtifactId.getVersionIRI().toString()));
         
-        this.verifyLoadedArtifact(secondArtifactId, 7, 25, 293, false);
+        this.verifyLoadedArtifact(secondArtifactId, 7, 25, 295, false);
     }
     
     /**
@@ -912,7 +912,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID artifactId =
                 this.testArtifactManager.loadArtifact(inputStream4Artifact, RDFFormat.RDFXML);
         
-        this.verifyLoadedArtifact(artifactId, 7, 29, 301, true);
+        this.verifyLoadedArtifact(artifactId, 7, 29, 303, true);
         
         Assert.assertFalse("Version IRI in source should have been ignored", artifactId.getVersionIRI().toString()
                 .endsWith(":55"));
@@ -1073,7 +1073,7 @@ public abstract class AbstractPoddArtifactManagerTest
             Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
             
             Assert.assertTrue("File reference value incorrect",
-                    fileRefList.get(0).getObject().stringValue().endsWith("publication-pdf-a"));
+                    fileRefList.get(0).getObject().stringValue().endsWith("object-rice-scan-34343-a"));
         }
         finally
         {
@@ -1377,12 +1377,12 @@ public abstract class AbstractPoddArtifactManagerTest
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 = this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 7, 90, 394, false);
+        this.verifyLoadedArtifact(artifactIDv1, 7, 90, 396, false);
 
         // upload another version of artifact
         final InputStream inputStream2 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv2 = this.testArtifactManager.loadArtifact(inputStream2, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv2, 7, 90, 394, false);
+        this.verifyLoadedArtifact(artifactIDv2, 7, 90, 396, false);
 
         System.out.println(artifactIDv1);
         System.out.println(artifactIDv2);

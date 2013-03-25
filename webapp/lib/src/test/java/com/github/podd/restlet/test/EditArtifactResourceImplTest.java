@@ -113,8 +113,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         // verify: publication46 has been added to the artifact
         final String artifactBody =
                 this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
-        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("rfc2616.html"));
-        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("publication-pdf-a"));
+        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
+        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
     }
     
     @Test

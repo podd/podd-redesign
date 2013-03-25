@@ -8,19 +8,19 @@
 	xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
 	xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
 
-<!-- a file reference resource -->
-<rdf:Description rdf:about="urn:temp:uuid:publication-pdf-a">
+<!-- an SSH file reference resource with a temporary URL -->
+<rdf:Description rdf:about="urn:temp:uuid:object-rice-scan-34343-a">
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
-	<poddBase:hasFileReferenceType>HTTP</poddBase:hasFileReferenceType>
-	<poddBase:hasFileName>rfc2616.html</poddBase:hasFileName>
-	<poddBase:hasDescription>The http RFC</poddBase:hasDescription>
-	<poddBase:hasPath>Protocols/rfc2616</poddBase:hasPath>
-	<poddBase:hasAlias>w3</poddBase:hasAlias>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#SSHFileReference"/>
+	<rdfs:label>Rice tree scan 003454-98</rdfs:label>
+	<poddBase:hasAlias>csiro_dap</poddBase:hasAlias>
+	<poddBase:hasFileName>plant_003456-233445.bag.zip</poddBase:hasFileName>
+	<poddBase:hasPath>/dap/plant/rice-34343/</poddBase:hasPath>
 </rdf:Description>
 
 <!-- owner of file reference -->
 <rdf:Description rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#publication45">
-	<poddBase:hasFileReference rdf:resource="urn:temp:uuid:publication-pdf-a"/>
+	<poddBase:hasFileReference rdf:resource="urn:temp:uuid:object-rice-scan-34343-a"/>
 </rdf:Description>
 
 </rdf:RDF>
