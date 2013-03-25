@@ -2,6 +2,8 @@ package com.github.podd.api.file;
 
 import java.util.List;
 
+import org.openrdf.OpenRDFException;
+
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
 
 /**
@@ -29,8 +31,9 @@ public interface PoddFileRepositoryManager
      *            The string to map the given repository configuration to.
      * @param repositoryConfiguration
      *            The repository configuration object to add a mapping for.
+     * @throws OpenRDFException 
      */
-    void addRepositoryMapping(String alias, PoddFileRepository repositoryConfiguration);
+    void addRepositoryMapping(String alias, PoddFileRepository repositoryConfiguration) throws OpenRDFException;
     
     /**
      * Returns the repository configuration that is currently mapped using the given alias.
@@ -43,8 +46,9 @@ public interface PoddFileRepositoryManager
      * @return The file repository configuration targeted by the given alias.
      * @throws FileRepositoryMappingNotFoundException
      *             If the alias was not found in the current set of mappings.
+     * @throws OpenRDFException 
      */
-    PoddFileRepository getRepository(String alias) throws FileRepositoryMappingNotFoundException;
+    PoddFileRepository getRepository(String alias) throws FileRepositoryMappingNotFoundException, OpenRDFException;
     
     /**
      * Returns the aliases that are currently being mapped using the given repository configuration.
