@@ -158,5 +158,8 @@ public interface PoddRdfConstants
     public static final URI DEF_USER_MANAGEMENT_GRAPH = VALUE_FACTORY
             .createURI("urn:podd:default:usermanagementgraph:");
 
+    public static final URI DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH = VALUE_FACTORY
+            .createURI("urn:podd:default:filerepositorymanagementgraph:");
+
 
 }

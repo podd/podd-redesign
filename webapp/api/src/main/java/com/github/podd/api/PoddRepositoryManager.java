@@ -6,7 +6,6 @@ package com.github.podd.api;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 
 /**
  * Interface to manage the Sesame Repository used by PODD.
@@ -57,6 +56,13 @@ public interface PoddRepositoryManager
     void setSchemaManagementGraph(URI schemaManagementGraph);
     
     /**
+     * Sets the file repository management graph URI for use with this repository manager.
+     * 
+     * @param fileRepositoryManagementGraph
+     */
+    void setFileRepositoryManagementGraph(URI fileRepositoryManagementGraph);
+    
+    /**
      * 
      * @return The schema management graph URI for this repository manager.
      */
@@ -67,4 +73,11 @@ public interface PoddRepositoryManager
      * @return The artifact management graph URI for this repository manager.
      */
     URI getArtifactManagementGraph();
+
+    /**
+     * 
+     * @return The file repository management graph URI for this repository manager.
+     */
+    URI getFileRepositoryManagementGraph();
+
 }

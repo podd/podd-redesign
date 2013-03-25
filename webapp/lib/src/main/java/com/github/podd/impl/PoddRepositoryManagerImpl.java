@@ -26,6 +26,8 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
     
+    private URI fileRepositoryGraph = PoddRdfConstants.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH;
+    
     /**
      * Default constructor, which sets up an in-memory MemoryStore repository.
      */
@@ -59,6 +61,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
+    public URI getFileRepositoryManagementGraph()
+    {
+        return this.fileRepositoryGraph;
+    }
+    
+    @Override
     public Repository getNewTemporaryRepository() throws OpenRDFException
     {
         final Repository result = new SailRepository(new MemoryStore());
@@ -86,6 +94,12 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
+    public void setFileRepositoryManagementGraph(URI fileRepositoryManagementGraph)
+    {
+        this.fileRepositoryGraph = fileRepositoryManagementGraph;
+    }
+
+    @Override
     public void setRepository(final Repository repository) throws OpenRDFException
     {
         this.repository = repository;
@@ -96,5 +110,5 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     {
         this.schemaGraph = schemaManagementGraph;
     }
-    
+
 }

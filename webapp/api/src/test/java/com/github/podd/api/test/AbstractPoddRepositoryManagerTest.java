@@ -67,6 +67,17 @@ public abstract class AbstractPoddRepositoryManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getFileRepositoryManagementGraph()}.
+     */
+    @Test
+    public final void testGetFileRepositoryManagementGraph() throws Exception
+    {
+        Assert.assertNotNull("File repository management graph was null",
+                this.testRepositoryManager.getFileRepositoryManagementGraph());
+    }
+
+    /**
+     * Test method for
      * {@link com.github.podd.impl.PoddRepositoryManagerImpl#getNewTemporaryRepository()}.
      */
     @Test
@@ -130,6 +141,20 @@ public abstract class AbstractPoddRepositoryManagerTest
                 this.testRepositoryManager.getArtifactManagementGraph());
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.impl.PoddRepositoryManagerImpl#setFileRepositoryManagementGraph(org.openrdf.model.URI)}
+     * .
+     */
+    @Test
+    public final void testSetFileRepositoryManagementGraph() throws Exception
+    {
+        final URI testFileRepositoryMgtGraph = ValueFactoryImpl.getInstance().createURI("urn:test:file-repository-graph");
+        this.testRepositoryManager.setFileRepositoryManagementGraph(testFileRepositoryMgtGraph);
+        Assert.assertEquals("File Repository graph was not correctly set", testFileRepositoryMgtGraph,
+                this.testRepositoryManager.getFileRepositoryManagementGraph());
+    }
+
     /**
      * Test method for
      * {@link com.github.podd.impl.PoddRepositoryManagerImpl#setSchemaManagementGraph(org.openrdf.model.URI)}
