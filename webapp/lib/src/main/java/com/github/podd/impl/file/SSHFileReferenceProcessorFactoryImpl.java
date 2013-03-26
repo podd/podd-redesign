@@ -4,15 +4,21 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.kohsuke.MetaInfServices;
+import org.openrdf.model.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.file.PoddFileReferenceProcessor;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
 import com.github.podd.api.file.PoddSSHFileReferenceProcessorFactory;
+import com.github.podd.utils.PoddRdfConstants;
 
-@MetaInfServices(PoddFileReferenceProcessorFactory.class)
+/**
+ * An SSH File Reference Processor Factory that creates <code>SSHFileReferenceProcessorImpl</code> instances.
+ * 
+ * @author kutila
+ */
+@MetaInfServices(PoddSSHFileReferenceProcessorFactory.class)
 public class SSHFileReferenceProcessorFactoryImpl implements PoddSSHFileReferenceProcessorFactory
 {
 
@@ -37,42 +43,46 @@ public class SSHFileReferenceProcessorFactoryImpl implements PoddSSHFileReferenc
         return this.getClass().getName();
     }
     
-    
-    @Override
-    public String getSPARQLConstructBGP()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getSPARQLConstructWhere()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getSPARQLGroupBy()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getSPARQLVariable()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
     @Override
     public PoddFileReferenceProcessor getProcessor()
     {
         // TODO - configure processor
         return new SSHFileReferenceProcessorImpl();
     }
+
+    @Override
+    public String getSPARQLConstructBGP()
+    {
+        return "?subject ?predicate ?object";
+    }
+
+    @Override
+    public String getSPARQLConstructWhere()
+    {
+        final StringBuilder builder = new StringBuilder();
+        
+        // match all triples about a subject whose TYPE is poddBase:FileReference
+        builder.append(" ?subject <" + RDF.TYPE.stringValue() + "> <"
+                + PoddRdfConstants.PODDBASE_FILE_REFERENCE_TYPE.stringValue() + "> . ");
+        builder.append(" ?subject ?predicate ?object . ");
+        
+        return builder.toString();
+    }
+
+    @Override
+    public String getSPARQLGroupBy()
+    {
+        // an empty GROUP BY clause
+        return "";
+    }
+
+    @Override
+    public String getSPARQLVariable()
+    {
+        // to find ALL file references, subject should not be bound 
+        return "subject";
+    }
+
 
     @Override
     public Set<PoddProcessorStage> getStages()
