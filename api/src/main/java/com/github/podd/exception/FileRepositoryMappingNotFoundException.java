@@ -3,8 +3,6 @@
  */
 package com.github.podd.exception;
 
-import com.github.podd.api.file.PoddFileRepositoryManager;
-
 /**
  * An exception that is thrown to indicate that there was no file repository mapping found for the
  * given alias.
@@ -20,8 +18,7 @@ public class FileRepositoryMappingNotFoundException extends PoddException
     /**
      * 
      * @param alias
-     *            The file repository alias that was not found in the
-     *            {@link PoddFileRepositoryManager}.
+     *            The file repository alias that was not found in the PoddFileRepositoryManager.
      * @param msg
      *            The message for this exception.
      */
@@ -33,8 +30,7 @@ public class FileRepositoryMappingNotFoundException extends PoddException
     
     /**
      * @param alias
-     *            The file repository alias that was not found in the
-     *            {@link PoddFileRepositoryManager}.
+     *            The file repository alias that was not found in the PoddFileRepositoryManager.
      * @param msg
      *            The message for this exception.
      * @param throwable
@@ -48,8 +44,7 @@ public class FileRepositoryMappingNotFoundException extends PoddException
     
     /**
      * @param alias
-     *            The file repository alias that was not found in the
-     *            {@link PoddFileRepositoryManager}.
+     *            The file repository alias that was not found in the PoddFileRepositoryManager.
      * @param throwable
      *            The cause for this exception.
      */
@@ -60,8 +55,7 @@ public class FileRepositoryMappingNotFoundException extends PoddException
     }
     
     /**
-     * @return The alias that was not found in the set of mappings in the
-     *         {@link PoddFileRepositoryManager}.
+     * @return The alias that was not found in the set of mappings in the PoddFileRepositoryManager.
      */
     public String getAlias()
     {

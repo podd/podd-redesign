@@ -1,10 +1,14 @@
 package com.github.podd.api.file;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
+import com.github.podd.exception.PoddException;
 
 /**
  * A manager object used to manage configurations for file repositories.
@@ -31,7 +35,7 @@ public interface PoddFileRepositoryManager
      *            The string to map the given repository configuration to.
      * @param repositoryConfiguration
      *            The repository configuration object to add a mapping for.
-     * @throws OpenRDFException 
+     * @throws OpenRDFException
      */
     void addRepositoryMapping(String alias, PoddFileRepository repositoryConfiguration) throws OpenRDFException;
     
@@ -46,7 +50,7 @@ public interface PoddFileRepositoryManager
      * @return The file repository configuration targeted by the given alias.
      * @throws FileRepositoryMappingNotFoundException
      *             If the alias was not found in the current set of mappings.
-     * @throws OpenRDFException 
+     * @throws OpenRDFException
      */
     PoddFileRepository getRepository(String alias) throws FileRepositoryMappingNotFoundException, OpenRDFException;
     
@@ -57,7 +61,7 @@ public interface PoddFileRepositoryManager
      * @return Returns a list containing the aliases that are currently mapped to the given
      *         repository configuration.
      */
-    List<String> getRepositoryAlias(PoddFileRepository repositoryConfiguration);
+    List<String> getRepositoryAliases(PoddFileRepository repositoryConfiguration);
     
     /**
      * Removes the mapping for the given alias, returning the {@link PoddFileRepository} object that
@@ -70,4 +74,9 @@ public interface PoddFileRepositoryManager
      *             If the alias was not found in the current set of mappings.
      */
     PoddFileRepository removeRepositoryMapping(String alias) throws FileRepositoryMappingNotFoundException;
+    
+    void verifyFileReferences(Set<PoddFileReference> fileReferenceResults) throws OpenRDFException, PoddException, FileRepositoryMappingNotFoundException;
+    
+    void downloadFileReference(PoddFileReference nextFileReference, OutputStream outputStream) throws PoddException,
+        IOException;
 }
