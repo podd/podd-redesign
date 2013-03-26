@@ -3,11 +3,9 @@ package com.github.podd.impl.file;
 import java.util.Collection;
 import java.util.Set;
 
-import org.openrdf.model.Graph;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 
-import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddSSHFileReference;
 import com.github.podd.api.file.PoddSSHFileReferenceProcessor;
 
