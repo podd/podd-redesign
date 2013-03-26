@@ -3,7 +3,7 @@
  */
 package com.github.podd.api;
 
-import org.openrdf.model.Graph;
+import org.openrdf.model.Model;
 
 /**
  * 
@@ -12,7 +12,7 @@ import org.openrdf.model.Graph;
  * @param <T>
  *            The type of objects that this RDF Processor creates.
  */
-public interface PoddRdfProcessorFactory<T extends PoddRdfProcessor> extends PoddProcessorFactory<T, Graph>
+public interface PoddRdfProcessorFactory<T extends PoddRdfProcessor> extends PoddProcessorFactory<T, Model>
 {
     /**
      * Defines the SPARQL Construct Basic Graph Pattern (BGP) that will be used to create sets of

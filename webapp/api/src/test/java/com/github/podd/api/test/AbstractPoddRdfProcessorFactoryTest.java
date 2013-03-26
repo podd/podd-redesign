@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Graph;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.QueryLanguage;
@@ -28,7 +29,7 @@ import com.github.podd.utils.PoddRdfUtils;
  * 
  */
 public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProcessor> extends
-        AbstractPoddProcessorFactoryTest<T, Graph>
+        AbstractPoddProcessorFactoryTest<T, Model>
 {
     
     /*
@@ -38,7 +39,7 @@ public abstract class AbstractPoddRdfProcessorFactoryTest<T extends PoddRdfProce
     private PoddRdfProcessorFactory<T> rdfProcessorFactory;
     
     @Override
-    protected final PoddProcessorFactory<T, Graph> getNewPoddProcessorFactory()
+    protected final PoddProcessorFactory<T, Model> getNewPoddProcessorFactory()
     {
         return this.getNewPoddRdfProcessorFactory();
     }

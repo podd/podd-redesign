@@ -3,7 +3,7 @@
  */
 package com.github.podd.api;
 
-import org.openrdf.model.Graph;
+import org.openrdf.model.Model;
 
 /**
  * A type of PoddProcessor that processes RDF Graphs.
@@ -11,6 +11,6 @@ import org.openrdf.model.Graph;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public interface PoddRdfProcessor extends PoddProcessor<Graph>
+public interface PoddRdfProcessor extends PoddProcessor<Model>
 {
 }
