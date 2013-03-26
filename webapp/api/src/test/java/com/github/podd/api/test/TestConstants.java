@@ -36,6 +36,7 @@ public interface TestConstants
     public static final int TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES = 29;
     public static final int TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES = 303;
     
+    public static final String TEST_ARTIFACT_PURLS_2_FILE_REFS = "/test/artifacts/project-purls-file-ref.rdf"; 
     
     
     /** Test resource (in Turtle): artifact with temporary URIs and 1 internal object having a PURL */
