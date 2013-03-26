@@ -7,15 +7,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
+import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddFileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.exception.PoddException;
@@ -48,7 +52,7 @@ public interface PoddArtifactManager
      * @throws PoddException
      *             If an error occurred while deleting the artifact.
      */
-    boolean deleteArtifact(OWLOntologyID artifactId) throws PoddException;
+    boolean deleteArtifact(InferredOWLOntologyID artifactId) throws PoddException;
     
     /**
      * Exports the given artifact to the given output stream using an RDF format.
@@ -90,7 +94,8 @@ public interface PoddArtifactManager
     
     /**
      * 
-     * @return The {@link PoddFileReferenceManager} used to manage file references for artifacts.
+     * @return The {@link PoddFileReferenceManager} used to create and fetch file references from
+     *         artifacts.
      */
     PoddFileReferenceManager getFileReferenceManager();
     
@@ -176,8 +181,8 @@ public interface PoddArtifactManager
      * @throws UnmanagedArtifactIRIException
      *             If this is not a managed artifact
      */
-    InferredOWLOntologyID publishArtifact(OWLOntologyID ontologyId) throws PublishArtifactException, OpenRDFException,
-        UnmanagedArtifactIRIException;
+    InferredOWLOntologyID publishArtifact(InferredOWLOntologyID ontologyId) throws PublishArtifactException,
+        OpenRDFException, UnmanagedArtifactIRIException;
     
     /**
      * Sets the {@link PoddFileReferenceManager} to use for verifying file references for PODD
@@ -247,7 +252,7 @@ public interface PoddArtifactManager
      * 
      * @param artifactUri
      *            The URI of the artifact to be updated. This should be an already managed artifact.
-     * @param versionUri 
+     * @param versionUri
      *            The Version URI of the artifact to be updated.
      * @param inputStream
      *            The RDF statements that need to be updated. It is not necessary to send the
@@ -268,10 +273,10 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws OWLException
      */
-    public InferredOWLOntologyID updateArtifact(final URI artifactUri, URI versionUri, final InputStream inputStream,
+    InferredOWLOntologyID updateArtifact(final URI artifactUri, URI versionUri, final InputStream inputStream,
             final RDFFormat format, final boolean isReplace, final boolean force) throws OpenRDFException,
         PoddException, IOException, OWLException;
-
+    
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
      * 
@@ -290,6 +295,14 @@ public interface PoddArtifactManager
      *            The Ontology ID for the Schema Ontology which needs to be added or modified in the
      *            imports for the PODD Artifact.
      */
-    void updateSchemaImport(OWLOntologyID artifactId, OWLOntologyID schemaOntologyId);
-
+    InferredOWLOntologyID updateSchemaImport(InferredOWLOntologyID artifactId, InferredOWLOntologyID schemaOntologyId);
+    
+    InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
+            PoddFileReference fileReference) throws OpenRDFException, PoddException;
+    
+    Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId);
+    
+    Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
+    
+    Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
 }

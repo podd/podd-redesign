@@ -4,8 +4,10 @@
 package com.github.podd.api.file;
 
 import java.util.Collection;
+import java.util.Set;
 
-import org.openrdf.model.Graph;
+import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 
 import com.github.podd.api.PoddRdfProcessor;
 
@@ -16,9 +18,11 @@ import com.github.podd.api.PoddRdfProcessor;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public interface PoddFileReferenceProcessor extends PoddRdfProcessor
+public interface PoddFileReferenceProcessor<T extends PoddFileReference> extends PoddRdfProcessor
 {
-    boolean canHandle(Graph rdfStatements);
+    Set<URI> getTypes();
     
-    Collection<PoddFileReference> createReferences(Graph rdfStatements);
+    boolean canHandle(Model rdfStatements);
+    
+    Collection<T> createReferences(Model rdfStatements);
 }

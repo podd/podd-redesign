@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -73,10 +74,11 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
                         "Did not find an artifacturi parameter in the request");
             }
+            InferredOWLOntologyID currentVersion =
+                    this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactId));
             
-            result =
-                    this.getPoddApplication().getPoddArtifactManager()
-                            .deleteArtifact(new OWLOntologyID(IRI.create(artifactId)));
+            result = this.getPoddApplication().getPoddArtifactManager().deleteArtifact(currentVersion);
+            
             if(result)
             {
                 this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);

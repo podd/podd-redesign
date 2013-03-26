@@ -11,8 +11,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
@@ -26,10 +29,12 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
+import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.file.PoddFileReference;
+import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -95,8 +100,21 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("@Post attachFileReference ({})", variant.getMediaType().getName());
         
-        final InferredOWLOntologyID artifactMap =
-                this.doFileReferenceAttach(entity, artifactUri, versionUri, objectUri, inputStream, inputFormat);
+        InferredOWLOntologyID artifactMap = null;
+        try
+        {
+            artifactMap = this.doFileReferenceAttach(entity, artifactUri, versionUri, objectUri, inputStream, inputFormat);
+        }
+        catch(OpenRDFException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        catch(PoddException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
         
         this.log.info("Successfully attached file reference to artifact {}", artifactMap);
         
@@ -122,17 +140,20 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     }
     
     private InferredOWLOntologyID doFileReferenceAttach(final Representation entity, final String artifactUri,
-            final String versionUri, final String objectUri, final InputStream inputStream, final RDFFormat inputFormat)
+            final String versionUri, final String objectUri, final InputStream inputStream, final RDFFormat inputFormat) throws OpenRDFException, PoddException
     {
+        // - read RDF from input stream and generate file reference object
+        final Set<PoddFileReference> fileReferences = this.getPoddArtifactManager().getFileReferenceManager().extractFileReferences(null, null);
+        
         // TODO: inside File Ref Manager?
         // - is most current version of artifact being used?
-        
-        // - read RDF from input stream and generate file reference object
-        final PoddFileReference fileReference = null;
-        
+        InferredOWLOntologyID artifactId = new InferredOWLOntologyID(IRI.create(artifactUri), IRI.create(versionUri), null);
         // - validate reference
         // - add reference to artifact, compute inferences, update artifact ID etc.
-        this.getPoddArtifactManager().getFileReferenceManager().addFileReference(fileReference);
+        for (PoddFileReference fileReference: fileReferences)
+        {
+            this.getPoddArtifactManager().attachFileReference(artifactId, ValueFactoryImpl.getInstance().createURI(objectUri), fileReference);
+        }
         
         // - return: updated artifact ID, object URI, file reference object URI
         return null;

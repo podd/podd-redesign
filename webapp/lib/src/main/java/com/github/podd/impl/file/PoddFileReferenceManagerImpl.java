@@ -55,32 +55,6 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * (non-Javadoc)
      * 
      * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#addFileReference(com.github.podd.api.file
-     * .PoddFileReference)
-     */
-    @Override
-    public void addFileReference(final PoddFileReference reference)
-    {
-        throw new RuntimeException("TODO: Implement addFileReference");
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#deleteFileReference(com.github.podd.api
-     * .file.PoddFileReference)
-     */
-    @Override
-    public void deleteFileReference(final PoddFileReference reference)
-    {
-        throw new RuntimeException("TODO: Implement deleteFileReference");
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
      * com.github.podd.api.file.PoddFileReferenceManager#extractFileReferences(org.openrdf.repository
      * .RepositoryConnection, org.openrdf.model.URI[])
      */
@@ -90,12 +64,7 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
     {
         final Set<PoddFileReference> internalFileRefResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<PoddFileReference, Boolean>());
-        // NOTE: We use a Set to avoid duplicate calls to any File Reference processors for any
-        // temporary URI
-        final Set<URI> temporaryURIs = Collections.newSetFromMap(new ConcurrentHashMap<URI, Boolean>());
         
-        // NOTE: a Factory may handle only a particular temporary URI format, necessitating to
-        // go through multiple factories to extract ALL temporary URIs in the Repository.
         for(final PoddFileReferenceProcessorFactory nextProcessorFactory : this.getFileProcessorFactoryRegistry()
                 .getByStage(this.processorStage))
         {
@@ -158,45 +127,6 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * (non-Javadoc)
      * 
      * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#getFileReferences(org.semanticweb.owlapi
-     * .model.OWLOntologyID)
-     */
-    @Override
-    public Set<PoddFileReference> getFileReferences(final OWLOntologyID artifactId)
-    {
-        throw new RuntimeException("TODO: Implement getFileReferences");
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#getFileReferences(org.semanticweb.owlapi
-     * .model.OWLOntologyID, org.semanticweb.owlapi.model.IRI)
-     */
-    @Override
-    public Set<PoddFileReference> getFileReferences(final OWLOntologyID artifactId, final IRI objectIri)
-    {
-        throw new RuntimeException("TODO: Implement getFileReferences");
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.github.podd.api.file.PoddFileReferenceManager#getFileReferences(org.semanticweb.owlapi
-     * .model.OWLOntologyID, java.lang.String)
-     */
-    @Override
-    public Set<PoddFileReference> getFileReferences(final OWLOntologyID artifactId, final String alias)
-    {
-        throw new RuntimeException("TODO: Implement getFileReferences");
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
      * com.github.podd.api.file.PoddFileReferenceManager#setProcessorFactoryRegistry(com.github.
      * podd.api.file.PoddFileReferenceProcessorFactoryRegistry)
      */
@@ -204,19 +134,6 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
     public void setProcessorFactoryRegistry(final PoddFileReferenceProcessorFactoryRegistry registry)
     {
         this.registry = registry;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.api.file.PoddFileReferenceManager#verifyFileReferences(java.util.Set,
-     * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)
-     */
-    @Override
-    public void verifyFileReferences(final Set<PoddFileReference> fileReferenceResults,
-            final RepositoryConnection tempConn, final URI openRDFURI) throws RepositoryException
-    {
-        throw new RuntimeException("TODO: Implement verifyFileReferences");
     }
     
 }

@@ -86,7 +86,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public boolean deleteArtifact(final OWLOntologyID artifactId) throws PoddException
+    public boolean deleteArtifact(final InferredOWLOntologyID artifactId) throws PoddException
     {
         if(artifactId.getOntologyIRI() == null)
         {
@@ -434,8 +434,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 // optionally verify the file references
                 if(fileReferenceResults.size() > 0)
                 {
-                    this.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
-                            temporaryRepositoryConnection, randomContext);
+                    // FIXME: verifyFileReferences() has been moved to PoddFileRepositoryManager
+                    // this.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
+                    // temporaryRepositoryConnection, randomContext);
                     // TODO: Optionally remove invalid file references or mark them as invalid using
                     // RDF statements/OWL Classes
                 }
@@ -640,7 +641,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * OWLOntologyID)
      */
     @Override
-    public InferredOWLOntologyID publishArtifact(final OWLOntologyID ontologyId) throws OpenRDFException,
+    public InferredOWLOntologyID publishArtifact(final InferredOWLOntologyID ontologyId) throws OpenRDFException,
         PublishArtifactException, UnmanagedArtifactIRIException
     {
         final IRI ontologyIRI = ontologyId.getOntologyIRI();
@@ -814,7 +815,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         RepositoryConnection tempRepositoryConnection = null;
         RepositoryConnection permanentRepositoryConnection = null;
         InferredOWLOntologyID inferredOWLOntologyID = null;
-
+        
         try
         {
             // create a temporary in-memory repository
@@ -895,8 +896,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 // optionally verify the file references
                 if(fileReferenceResults.size() > 0)
                 {
-                    this.getFileReferenceManager().verifyFileReferences(fileReferenceResults, tempRepositoryConnection,
-                            tempContext);
+                    // FIXME: verifyFileReferences() has been moved to PoddFileRepositoryManager
+                    // this.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
+                    // tempRepositoryConnection, tempContext);
                     // TODO: Optionally remove invalid file references or mark them as invalid using
                     // RDF statements/OWL Classes
                 }
@@ -1052,7 +1054,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
     }
-
+    
     /*
      * (non-Javadoc)
      * 
@@ -1060,9 +1062,39 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID)
      */
     @Override
-    public void updateSchemaImport(final OWLOntologyID artifactId, final OWLOntologyID schemaOntologyId)
+    public InferredOWLOntologyID updateSchemaImport(final InferredOWLOntologyID artifactId,
+            final InferredOWLOntologyID schemaOntologyId)
     {
         throw new RuntimeException("TODO: Implement updateSchemaImport");
+    }
+
+    @Override
+    public InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
+            PoddFileReference fileReference) throws OpenRDFException, PoddException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias)
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }
