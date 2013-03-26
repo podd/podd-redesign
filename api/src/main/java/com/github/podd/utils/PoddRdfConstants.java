@@ -87,8 +87,11 @@ public interface PoddRdfConstants
             "NotPublished");
     
     public static final URI PODDBASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "PoddFileReference");
+            "FileReference");
     
+    public static final URI PODDBASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "SSHFileReference");
+
     public static final URI PODDBASE_CONTAINS = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "contains");
     
