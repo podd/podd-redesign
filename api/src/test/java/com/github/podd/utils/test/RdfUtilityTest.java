@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -127,4 +128,15 @@ public class RdfUtilityTest
         
     }
 
+    @Test
+    public void testInputStreamToModel() throws Exception
+    {
+        InputStream resourceStream = this.getClass().getResourceAsStream("/ontologies/poddScience.owl");
+        Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
+        
+        Assert.assertNotNull("Model was NULL", model);
+        Assert.assertFalse("Model was empty", model.isEmpty());
+        Assert.assertEquals("Not the expected number of statements in the Model", 1226, model.size());
+    }
+    
 }

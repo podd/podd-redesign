@@ -5,6 +5,7 @@ package com.github.podd.utils;
 
 import info.aduna.iteration.Iterations;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,9 +15,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.repository.Repository;
@@ -24,6 +28,9 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,6 +234,34 @@ public class RdfUtility
         }
         RdfUtility.log.info("{} unconnected node(s). {}", nodesToCheck.size(), nodesToCheck);
         return nodesToCheck;
+    }
+    
+    /**
+     * Helper method to load an {@link InputStream} into an {@link Model}.
+     * 
+     * @param resourceStream
+     *            The input stream with RDF statements
+     * @param format
+     *            Format found in the input RDF data
+     * @return an {@link Model} populated with the statements from the input stream.
+     * 
+     * @throws OpenRDFException
+     * @throws IOException
+     */
+    public static Model inputStreamToModel(final InputStream resourceStream, final RDFFormat format)
+        throws OpenRDFException, IOException
+    {
+        if(resourceStream == null)
+        {
+            throw new IOException("Inputstream was null");
+        }
+        
+        final Model concreteModel = new LinkedHashModel();
+        final RDFParser parser = Rio.createParser(format);
+        parser.setRDFHandler(new StatementCollector(concreteModel));
+        parser.parse(resourceStream, "");
+        
+        return concreteModel;
     }
     
     /**
