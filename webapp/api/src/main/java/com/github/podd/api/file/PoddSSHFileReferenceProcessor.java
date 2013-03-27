@@ -7,8 +7,10 @@ package com.github.podd.api.file;
  * Processes RDF Graph to generate a PoddSSHFileReference object for each SSH File Reference object
  * in the RDF Graph.
  * 
- * @author Peter Ansell p_ansell@yahoo.com
+ * @deprecated Not being used. The concrete implementations can directly inherit from
+ *             PoddFileReferenceProcessor with the appropriate FileReference specified as a generic.
  * 
+ * @author Peter Ansell p_ansell@yahoo.com
  */
 public interface PoddSSHFileReferenceProcessor extends PoddFileReferenceProcessor<PoddSSHFileReference>
 {
