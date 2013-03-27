@@ -1,0 +1,27 @@
+@prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
+@prefix : <http://test.example.org/filerepositoryaliases/> .
+
+# Default File Repositories for use with CSIRO PODD distribution.
+# This file is used ONLY if the file-repository-management graph of the RDF database does not have any configured
+# file repositories.
+#
+:localhost a poddBase:FileRepository , poddBase:HttpFileRepository ;
+poddBase:hasFileRepositoryAlias "localhost" ;
+poddBase:hasFileRepositoryProtocol "http" ;
+poddBase:hasFileRepositoryHost "localhost" .
+#
+# alias details for W3
+:w3 a poddBase:FileRepository , poddBase:HttpFileRepository ;
+poddBase:hasFileRepositoryAlias "w3" ;
+poddBase:hasFileRepositoryProtocol "http" ;
+poddBase:hasFileRepositoryHost "www.w3.org" .
+#
+# alias details for an SSH server
+:localssh a poddBase:FileRepository , poddBase:SshFileRepository ;
+poddBase:hasFileRepositoryAlias "localssh" ;
+poddBase:hasFileRepositoryProtocol "ssh" ;
+poddBase:hasFileRepositoryHost "localhost" ;
+poddBase:hasFileRepositoryPort "9856" ;
+poddBase:hasFileRepositoryFingerprint "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db" ;
+poddBase:hasFileRepositoryUsername "salt" ;
+poddBase:hasFileRepositorySecret "salt" .
