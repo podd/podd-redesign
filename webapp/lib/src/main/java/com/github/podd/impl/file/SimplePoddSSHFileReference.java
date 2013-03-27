@@ -19,6 +19,7 @@ public class SimplePoddSSHFileReference implements PoddSSHFileReference
     private InferredOWLOntologyID artifactID;
     private String label;
     private IRI objectIri;
+    private IRI parentIri;
     private String repositoryAlias;
     
     private String filename;
@@ -56,6 +57,12 @@ public class SimplePoddSSHFileReference implements PoddSSHFileReference
     }
 
     @Override
+    public IRI getParentIri()
+    {
+        return this.parentIri;
+    }
+
+    @Override
     public String getPath()
     {
         return this.path;
@@ -89,6 +96,12 @@ public class SimplePoddSSHFileReference implements PoddSSHFileReference
     public void setObjectIri(IRI objectIri)
     {
         this.objectIri = objectIri;
+    }
+
+    @Override
+    public void setParentIri(IRI parentIri)
+    {
+        this.parentIri = parentIri;
     }
 
     @Override

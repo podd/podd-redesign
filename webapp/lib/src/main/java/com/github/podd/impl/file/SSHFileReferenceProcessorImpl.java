@@ -11,9 +11,8 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
+import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.api.file.FileReferenceConstants;
-import com.github.podd.api.file.PoddFileReferenceProcessor;
 import com.github.podd.api.file.PoddSSHFileReference;
 import com.github.podd.api.file.PoddSSHFileReferenceProcessor;
 import com.github.podd.utils.PoddRdfConstants;
@@ -59,15 +58,18 @@ public class SSHFileReferenceProcessorImpl implements PoddSSHFileReferenceProces
         
         for(Iterator<Resource> iterator = fileRefUris.iterator(); iterator.hasNext();)
         {
-            //check when casting
-            URI fileRef = (URI)iterator.next();
+            Resource fileRef = iterator.next();
             
             Model model = rdfStatements.filter(fileRef, null, null);
             
             PoddSSHFileReference fileReference = new SimplePoddSSHFileReference();
-            fileReference.setArtifactID(null);
-            fileReference.setObjectIri(null);
-            //FIXME: artifactID, parent Uri, this object Uri
+            
+            //note: artifact ID and parent URI are not available to us in here
+
+            if (fileRef instanceof URI)
+            {
+                fileReference.setObjectIri(IRI.create((URI)fileRef));
+            }
             
             String label = model.filter(fileRef, RDFS.LABEL, null).objectString();
             if (label != null)

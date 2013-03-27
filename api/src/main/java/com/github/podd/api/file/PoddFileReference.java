@@ -35,11 +35,17 @@ public interface PoddFileReference
     
     /**
      * 
-     * @return The {@link IRI} of the object inside of the Artifact that this file reference is
-     *         linked to.
+     * @return The {@link IRI} of this file reference.
      */
     IRI getObjectIri();
     
+    /**
+     * 
+     * @return The {@link IRI} of the object inside of the Artifact that this file reference is
+     *         linked to.
+     */
+    IRI getParentIri();
+
     /**
      * 
      * @return The alias for the repository that is managing this file reference.
@@ -48,10 +54,10 @@ public interface PoddFileReference
     
     /**
      * 
-     * @param artifactUri
+     * @param artifactId
      *            The {@link InferredOWLOntologyID} for the Artifact that includes this file reference.
      */
-    void setArtifactID(InferredOWLOntologyID artifactUri);
+    void setArtifactID(InferredOWLOntologyID artifactId);
     
     /**
      * Sets a human readable label for this file reference.
@@ -65,12 +71,19 @@ public interface PoddFileReference
     
     /**
      * 
-     * @param objectUri
+     * @param objectIri
+     *            The {@link IRI} of this file reference.
+     */
+    void setObjectIri(IRI objectIri);
+    
+    /**
+     * 
+     * @param parentIri
      *            The {@link IRI} of the object inside of the Artifact that this file reference is
      *            linked to.
      */
-    void setObjectIri(IRI objectUri);
-    
+    void setParentIri(IRI parentIri);
+
     /**
      * Sets the alias used to name the repository configuration used to access this file reference.
      * 
