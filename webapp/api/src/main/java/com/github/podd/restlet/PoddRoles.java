@@ -22,20 +22,21 @@ import com.github.ansell.restletutils.RestletUtilRole;
 public enum PoddRoles implements RestletUtilRole
 {
     ADMIN("Administrator", "A repository administrator of the PODD System",
-            "http://purl.org/podd/oas/roles/administrator"),
+            "http://purl.org/podd/oas/roles/administrator", true),
     
-    AUTHENTICATED("Authenticated User", "A user of the PODD System", "http://purl.org/podd/oas/roles/authenticated"),
+    AUTHENTICATED("Authenticated User", "A user of the PODD System", "http://purl.org/podd/oas/roles/authenticated",
+            false),
     
     PROJECT_MEMBER("Project member", "A user who is a member of a particular project",
-            "http://purl.org/podd/oas/roles/project_member"),
+            "http://purl.org/podd/oas/roles/project_member", true),
     
     PROJECT_OBSERVER("Project observer", "A user who is an observer of a particular project",
-            "http://purl.org/podd/oas/roles/project_observer"),
+            "http://purl.org/podd/oas/roles/project_observer", true),
     
     PROJECT_ADMIN("Project Administrator", "A user who is an administrator of a particular project",
-            "http://purl.org/podd/oas/roles/project_administrator"),
-
-    ROLE_A("Role A", "A generic role", "http://purl.org/podd/oas/roles/role_a"),
+            "http://purl.org/podd/oas/roles/project_administrator", true),
+    
+    ROLE_A("Role A", "A generic role", "http://purl.org/podd/oas/roles/role_a", true),
     
     ;
     
@@ -79,9 +80,11 @@ public enum PoddRoles implements RestletUtilRole
         return result;
     }
     
-    private Role role;
+    private final Role role;
     
-    private URI uri;
+    private final URI uri;
+    
+    private final boolean isAssignable;
     
     /**
      * Constructor
@@ -90,10 +93,11 @@ public enum PoddRoles implements RestletUtilRole
      * @param description
      * @param uriString
      */
-    PoddRoles(final String roleName, final String description, final String uriString)
+    PoddRoles(final String roleName, final String description, final String uriString, final boolean isAssignable)
     {
         this.role = new Role(roleName, description);
         this.uri = ValueFactoryImpl.getInstance().createURI(uriString);
+        this.isAssignable = isAssignable;
     }
     
     /**
@@ -124,6 +128,12 @@ public enum PoddRoles implements RestletUtilRole
     public URI getURI()
     {
         return this.uri;
+    }
+    
+    @Override
+    public boolean isAssignable()
+    {
+        return this.isAssignable;
     }
     
 }
