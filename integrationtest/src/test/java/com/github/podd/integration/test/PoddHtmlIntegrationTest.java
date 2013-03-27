@@ -62,7 +62,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         final IElement passwordElement = this.getWebTester().getElementById("password");
         passwordElement.setAttribute("value", password);
         
-        this.getWebTester().clickButtonWithText("login");
+        this.getWebTester().clickButtonWithText("Login");
     }
     
     @Override

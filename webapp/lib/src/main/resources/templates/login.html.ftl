@@ -70,7 +70,7 @@
 			                </#if>
 			            </ol>
 			            <div id="buttonwrapper">
-							<button type="submit">login</button>
+							<button type="submit">Login</button>
 			            	<#if selfRegistrationEnabled?? && selfRegistrationEnabled>
 			            		<a href="${baseUrl}/admin/user/create?init=true">Register</a>
 			            	</#if>
