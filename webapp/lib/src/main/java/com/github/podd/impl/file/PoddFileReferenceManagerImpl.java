@@ -91,10 +91,10 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
                 if(!results.isEmpty())
                 {
                     // This processor factory matches the graph that we wish to use, so we create a
-                    // processor instance now to create the PURL
+                    // processor instance now to create the File Reference
                     // NOTE: This object cannot be shared as we do not specify that it needs to be
                     // threadsafe
-                    final PoddFileReferenceProcessor processor = nextProcessorFactory.getProcessor();
+                    final PoddFileReferenceProcessor<PoddFileReference> processor = nextProcessorFactory.getProcessor();
                     
                     if(processor.canHandle(results))
                     {
