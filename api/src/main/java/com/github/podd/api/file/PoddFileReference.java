@@ -4,7 +4,8 @@
 package com.github.podd.api.file;
 
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
+
+import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
  * Encapsulates File References that are tracked inside of PODD Artifacts.
@@ -19,9 +20,9 @@ public interface PoddFileReference
 {
     /**
      * 
-     * @return The {@link OWLOntologyID} for the Artifact that includes this file reference.
+     * @return The {@link InferredOWLOntologyID} for the Artifact that includes this file reference.
      */
-    OWLOntologyID getArtifactID();
+    InferredOWLOntologyID getArtifactID();
     
     /**
      * Returns the label that is assigned to this file reference.
@@ -48,9 +49,9 @@ public interface PoddFileReference
     /**
      * 
      * @param artifactUri
-     *            The {@link OWLOntologyID} for the Artifact that includes this file reference.
+     *            The {@link InferredOWLOntologyID} for the Artifact that includes this file reference.
      */
-    void setArtifactID(OWLOntologyID artifactUri);
+    void setArtifactID(InferredOWLOntologyID artifactUri);
     
     /**
      * Sets a human readable label for this file reference.

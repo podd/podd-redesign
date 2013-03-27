@@ -4,9 +4,9 @@
 package com.github.podd.impl.file;
 
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.file.PoddSSHFileReference;
+import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
  * A simple implementation of an SSH File Reference object for use within PODD.
@@ -16,7 +16,7 @@ import com.github.podd.api.file.PoddSSHFileReference;
 public class SimplePoddSSHFileReference implements PoddSSHFileReference
 {
 
-    private OWLOntologyID artifactID;
+    private InferredOWLOntologyID artifactID;
     private String label;
     private IRI objectIri;
     private String repositoryAlias;
@@ -32,7 +32,7 @@ public class SimplePoddSSHFileReference implements PoddSSHFileReference
     }
     
     @Override
-    public OWLOntologyID getArtifactID()
+    public InferredOWLOntologyID getArtifactID()
     {
         return this.artifactID;
     }
@@ -68,7 +68,7 @@ public class SimplePoddSSHFileReference implements PoddSSHFileReference
     }
 
     @Override
-    public void setArtifactID(OWLOntologyID artifactID)
+    public void setArtifactID(InferredOWLOntologyID artifactID)
     {
         this.artifactID = artifactID;
     }

@@ -7,9 +7,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.file.PoddFileReference;
+import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
  * Simple abstract test class for PoddFileReference
@@ -65,9 +65,11 @@ public abstract class AbstractPoddFileReferenceTest
     @Test
     public void testSetArtifactID() throws Exception
     {
-        OWLOntologyID ontologyID = new OWLOntologyID(
+        InferredOWLOntologyID ontologyID = new InferredOWLOntologyID(
                 IRI.create("urn:test:ontologyiri:abc"), 
-                IRI.create("urn:test:versioniri:abc:version:44"));
+                IRI.create("urn:test:versioniri:abc:version:44"),
+                IRI.create("urn:test:inferred:versioniri:abc:version:44")
+                );
         
         this.fileReference.setArtifactID(ontologyID);
     }
