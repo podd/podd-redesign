@@ -128,6 +128,18 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_DISPLAY_TYPE_TABLE = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "DisplayType_Table");
     
+    /** http://purl.org/podd/ns/poddBase#hasFileName */
+    public static final URI PODD_BASE_FILENAME = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "hasFileName");
+
+    public static final URI PODD_BASE_FILE_PATH = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "hasPath");
+
+    public static final URI PODD_BASE_ALIAS = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "hasAlias");
+
+
+    
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are
      * reusing it here.
@@ -163,6 +175,5 @@ public interface PoddRdfConstants
 
     public static final URI DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH = VALUE_FACTORY
             .createURI("urn:podd:default:filerepositorymanagementgraph:");
-
 
 }

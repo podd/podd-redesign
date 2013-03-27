@@ -14,27 +14,30 @@ import org.openrdf.model.impl.ValueFactoryImpl;
  */
 public class FileReferenceConstants
 {
-    public static final URI PODD_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "FileRepository");
-    public static final URI PODD_HTTP_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "HttpFileRepository");
-    public static final URI PODD_SSH_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "SshFileRepository");
+    private static final String PODD_BASE_PREFIX = "http://purl.org/podd/ns/poddBase#";
     
-    public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryAlias");
-    public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryProtocol");
-    public static final URI PODD_FILE_REPOSITORY_HOST = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryHost");
-    public static final URI PODD_FILE_REPOSITORY_PORT = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryPort");
+    public static final URI PODD_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(PODD_BASE_PREFIX,
+            "FileRepository");
+    public static final URI PODD_HTTP_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(PODD_BASE_PREFIX,
+            "HTTPFileRepository");
+    public static final URI PODD_SSH_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(PODD_BASE_PREFIX,
+            "SSHFileRepository");
+    
+    public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(PODD_BASE_PREFIX,
+            "hasAlias");
+    
+    public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(PODD_BASE_PREFIX,
+            "hasFileRepositoryProtocol");
+    public static final URI PODD_FILE_REPOSITORY_HOST = ValueFactoryImpl.getInstance().createURI(PODD_BASE_PREFIX,
+            "hasFileRepositoryHost");
+    public static final URI PODD_FILE_REPOSITORY_PORT = ValueFactoryImpl.getInstance().createURI(PODD_BASE_PREFIX,
+            "hasFileRepositoryPort");
     public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryFingerprint");
-    public static final URI PODD_FILE_REPOSITORY_USERNAME = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryUsername");
-    public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositorySecret");
+            PODD_BASE_PREFIX, "hasFileRepositoryFingerprint");
+    public static final URI PODD_FILE_REPOSITORY_USERNAME = ValueFactoryImpl.getInstance().createURI(PODD_BASE_PREFIX,
+            "hasFileRepositoryUsername");
+    public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(PODD_BASE_PREFIX,
+            "hasFileRepositorySecret");
     
     public static final String KEY_FILE_REF_TYPE = "file_reference_type";
     public static final String KEY_OBJECT_URI = "object_uri";
