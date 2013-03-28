@@ -472,7 +472,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
         final String sparqlQuery =
                 "SELECT ?x WHERE { ?x <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue() + ">  . " + " ?x <"
-                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT + "> ?y " + " }";
+                        + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT + "> ?y " + " }";
         this.log.info("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         
@@ -572,7 +572,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" WHERE { ");
         
-        sb.append(" ?artifactUri <" + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT.stringValue() + "> ?topObjectUri . \n");
+        sb.append(" ?artifactUri <" + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT.stringValue() + "> ?topObjectUri . \n");
         
         sb.append(" }");
         
@@ -815,9 +815,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final String sparqlQuery =
                 "ASK { " + "?artifact <" + PoddRdfConstants.OWL_VERSION_IRI.stringValue() + "> "
                         + ontologyID.getVersionIRI().toQuotedString() + " . " + "?artifact <"
-                        + PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT.stringValue() + "> ?top ." + " ?top <"
-                        + PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS.stringValue() + "> <"
-                        + PoddRdfConstants.PODDBASE_PUBLISHED.stringValue() + ">" + " }";
+                        + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT.stringValue() + "> ?top ." + " ?top <"
+                        + PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS.stringValue() + "> <"
+                        + PoddRdfConstants.PODD_BASE_PUBLISHED.stringValue() + ">" + " }";
         
         this.log.info("Generated SPARQL {}", sparqlQuery);
         
@@ -842,12 +842,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // be easier
         
         // remove previous value for publication status
-        repositoryConnection.remove(topObjectIRI, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS, null, ontologyID
+        repositoryConnection.remove(topObjectIRI, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, ontologyID
                 .getVersionIRI().toOpenRDFURI());
         
         // then insert the publication status as #Published
-        repositoryConnection.add(topObjectIRI, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODDBASE_PUBLISHED, ontologyID.getVersionIRI().toOpenRDFURI());
+        repositoryConnection.add(topObjectIRI, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
+                PoddRdfConstants.PODD_BASE_PUBLISHED, ontologyID.getVersionIRI().toOpenRDFURI());
         
         this.log.info("{} was set as Published", topObjectIRI);
     }
@@ -1313,7 +1313,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" OPTIONAL { ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
         // for ORDER BY
-        sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODDBASE_WEIGHT.stringValue() + "> ?weight } . ");
+        sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?weight } . ");
         
         sb.append("FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
         sb.append("FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");

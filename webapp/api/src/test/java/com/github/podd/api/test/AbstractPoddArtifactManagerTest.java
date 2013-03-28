@@ -956,13 +956,13 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: a single PUBLICATION_STATUS in asserted ontology
             final List<Statement> publicationStatusStatementList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null,
-                            PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS, null, false, publishedArtifactId
+                            PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, false, publishedArtifactId
                                     .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement.", 1,
                     publicationStatusStatementList.size());
             
             // verify: artifact is PUBLISHED
-            Assert.assertEquals("Wrong publication status", PoddRdfConstants.PODDBASE_PUBLISHED.toString(),
+            Assert.assertEquals("Wrong publication status", PoddRdfConstants.PODD_BASE_PUBLISHED.toString(),
                     publicationStatusStatementList.get(0).getObject().toString());
         }
         finally
@@ -1615,16 +1615,16 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: a single PUBLICATION_STATUS in asserted ontology
             final List<Statement> publicationStatusStatementList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null,
-                            PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS, null, false, inferredOntologyId
+                            PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, false, inferredOntologyId
                                     .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
                     publicationStatusStatementList.size());
             
             // verify: value of PUBLICATION_STATUS in asserted ontology
-            String publishedState = PoddRdfConstants.PODDBASE_NOT_PUBLISHED.toString();
+            String publishedState = PoddRdfConstants.PODD_BASE_NOT_PUBLISHED.toString();
             if(isPublished)
             {
-                publishedState = PoddRdfConstants.PODDBASE_PUBLISHED.toString();
+                publishedState = PoddRdfConstants.PODD_BASE_PUBLISHED.toString();
             }
             Assert.assertEquals("Wrong publication status", publishedState, publicationStatusStatementList.get(0)
                     .getObject().toString());

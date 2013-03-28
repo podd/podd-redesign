@@ -62,8 +62,22 @@ public interface PoddRdfConstants
 
     
     
+    /** Default value is urn:podd:default:artifactmanagementgraph:  */
+    public static final URI DEFAULT_ARTIFACT_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
+            .createURI("urn:podd:default:artifactmanagementgraph:");
     
-    public static final URI OWL_VERSION_IRI = PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "versionIRI");
+    /** Default value is urn:podd:default:schemamanagementgraph  */
+    public static final URI DEFAULT_SCHEMA_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
+            .createURI("urn:podd:default:schemamanagementgraph");
+
+    /** Default value is urn:podd:default:usermanagementgraph:  */
+    public static final URI DEF_USER_MANAGEMENT_GRAPH = VALUE_FACTORY
+            .createURI("urn:podd:default:usermanagementgraph:");
+
+    public static final URI DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH = VALUE_FACTORY
+            .createURI("urn:podd:default:filerepositorymanagementgraph:");
+
+    
     
     public static final URI OWL_MAX_QUALIFIED_CARDINALITY = PoddRdfConstants.VALUE_FACTORY
             .createURI("http://www.w3.org/2002/07/owl#maxQualifiedCardinality");
@@ -73,29 +87,50 @@ public interface PoddRdfConstants
 
     public static final URI OWL_QUALIFIED_CARDINALITY = PoddRdfConstants.VALUE_FACTORY
             .createURI("http://www.w3.org/2002/07/owl#qualifiedCardinality");
+
+    public static final URI OWL_VERSION_IRI = PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "versionIRI");    
     
-    public static final URI PODDBASE_HAS_PUBLICATION_STATUS = PoddRdfConstants.VALUE_FACTORY.createURI(
+    /**
+     * The OMV vocabulary defines a property for the current version of an ontology, so we are
+     * reusing it here.
+     */
+    public static final URI OMV_CURRENT_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
+            "http://omv.ontoware.org/ontology#", "currentVersion");
+    
+    /**
+     * Creating a property for PODD to track the currentInferredVersion for the inferred axioms
+     * ontology when linking from the ontology IRI.
+     */
+    public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "currentInferredVersion");
+    
+    /**
+     * Creating a property for PODD to track the inferredVersion for the inferred axioms ontology of
+     * a particular versioned ontology.
+     */
+    public static final URI PODD_BASE_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "inferredVersion");
+
+    
+    public static final URI PODD_BASE_HAS_PUBLICATION_STATUS = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasPublicationStatus");
     
-    public static final URI PODDBASE_HAS_TOP_OBJECT = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_HAS_TOP_OBJECT = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "artifactHasTopObject");
     
-    public static final URI PODDBASE_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+    public static final URI PODD_BASE_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "Published");
 
-    public static final URI PODDBASE_NOT_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+    public static final URI PODD_BASE_NOT_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "NotPublished");
     
-    public static final URI PODDBASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+    public static final URI PODD_BASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "FileReference");
     
-    public static final URI PODDBASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+    public static final URI PODD_BASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "SSHFileReference");
 
-    public static final URI PODDBASE_CONTAINS = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "contains");
-    
-    public static final URI PODDBASE_WEIGHT = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+    public static final URI PODD_BASE_WEIGHT = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
             "weight");
 
     public static final URI PODD_BASE_DO_NOT_DISPLAY = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
@@ -140,40 +175,4 @@ public interface PoddRdfConstants
 
 
     
-    /**
-     * The OMV vocabulary defines a property for the current version of an ontology, so we are
-     * reusing it here.
-     */
-    public static final URI OMV_CURRENT_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
-            "http://omv.ontoware.org/ontology#", "currentVersion");
-    
-    /**
-     * Creating a property for PODD to track the currentInferredVersion for the inferred axioms
-     * ontology when linking from the ontology IRI.
-     */
-    public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "currentInferredVersion");
-    
-    /**
-     * Creating a property for PODD to track the inferredVersion for the inferred axioms ontology of
-     * a particular versioned ontology.
-     */
-    public static final URI PODD_BASE_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "inferredVersion");
-    
-    /** Default value is urn:podd:default:artifactmanagementgraph:  */
-    public static final URI DEFAULT_ARTIFACT_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
-            .createURI("urn:podd:default:artifactmanagementgraph:");
-    
-    /** Default value is urn:podd:default:schemamanagementgraph  */
-    public static final URI DEFAULT_SCHEMA_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
-            .createURI("urn:podd:default:schemamanagementgraph");
-
-    /** Default value is urn:podd:default:usermanagementgraph:  */
-    public static final URI DEF_USER_MANAGEMENT_GRAPH = VALUE_FACTORY
-            .createURI("urn:podd:default:usermanagementgraph:");
-
-    public static final URI DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH = VALUE_FACTORY
-            .createURI("urn:podd:default:filerepositorymanagementgraph:");
-
 }

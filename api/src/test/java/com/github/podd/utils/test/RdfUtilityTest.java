@@ -98,7 +98,7 @@ public class RdfUtilityTest
                 connection.add(inputStream, "", (RDFFormat)testDatas[i][1], context);
                 
                 URI root = null;
-                RepositoryResult<Statement> statements = connection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT, null,
+                RepositoryResult<Statement> statements = connection.getStatements(null, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null,
                         false, context);
                 if (statements.hasNext())
                 {

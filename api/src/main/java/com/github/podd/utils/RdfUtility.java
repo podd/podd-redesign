@@ -125,7 +125,7 @@ public class RdfUtility
     {
         // - find artifact and top object URIs
         final List<Statement> topObjects =
-                Iterations.asList(connection.getStatements(null, PoddRdfConstants.PODDBASE_HAS_TOP_OBJECT, null,
+                Iterations.asList(connection.getStatements(null, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null,
                         false, context));
         
         if(topObjects.size() != 1)

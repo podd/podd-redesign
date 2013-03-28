@@ -25,7 +25,7 @@ import com.github.podd.utils.PoddRdfConstants;
 public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
 {
     
-    private final URI FILE_TYPE = PoddRdfConstants.PODDBASE_FILE_REFERENCE_TYPE_SSH;
+    private final URI FILE_TYPE = PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH;
     
     @Override
     public boolean canHandle(Model rdfStatements)

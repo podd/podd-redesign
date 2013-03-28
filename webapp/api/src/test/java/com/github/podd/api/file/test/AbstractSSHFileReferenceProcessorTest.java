@@ -66,7 +66,7 @@ public abstract class AbstractSSHFileReferenceProcessorTest extends
     @Override
     protected Set<URI> getExpectedFileReferenceTypes()
     {
-        return Collections.singleton(PoddRdfConstants.PODDBASE_FILE_REFERENCE_TYPE_SSH);
+        return Collections.singleton(PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
     }
     
 }

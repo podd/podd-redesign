@@ -1674,12 +1674,12 @@ public abstract class AbstractPoddSesameManagerTest
         
         // prepare: add dummy statements in relevant contexts to represent test artifact
         final URI subject = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
-        this.testRepositoryConnection.add(subject, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODDBASE_NOT_PUBLISHED, pVersionIRIv1.toOpenRDFURI());
+        this.testRepositoryConnection.add(subject, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
+                PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, pVersionIRIv1.toOpenRDFURI());
         
         final URI inferredSubject = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
-        this.testRepositoryConnection.add(inferredSubject, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODDBASE_NOT_PUBLISHED, pInferredVersionIRIv1.toOpenRDFURI());
+        this.testRepositoryConnection.add(inferredSubject, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
+                PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, pInferredVersionIRIv1.toOpenRDFURI());
         
         // verify: contexts populated for test artifact
         Assert.assertEquals("Asserted graph should have 1 statement", 1,
@@ -1702,12 +1702,12 @@ public abstract class AbstractPoddSesameManagerTest
         
         // prepare: add dummy statements in relevant contexts for version 2 of test artifact
         final URI subject2 = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
-        this.testRepositoryConnection.add(subject2, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODDBASE_NOT_PUBLISHED, pVersionIRIv2.toOpenRDFURI());
+        this.testRepositoryConnection.add(subject2, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
+                PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, pVersionIRIv2.toOpenRDFURI());
         
         final URI inferredSubject2 = ValueFactoryImpl.getInstance().createURI("http://purl.org/abc-def/artifact:1");
-        this.testRepositoryConnection.add(inferredSubject2, PoddRdfConstants.PODDBASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODDBASE_NOT_PUBLISHED, pInferredVersionIRIv2.toOpenRDFURI());
+        this.testRepositoryConnection.add(inferredSubject2, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
+                PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, pInferredVersionIRIv2.toOpenRDFURI());
         
         // verify: contexts populated for test artifact
         Assert.assertEquals("Asserted graph should have 1 statement", 1,
