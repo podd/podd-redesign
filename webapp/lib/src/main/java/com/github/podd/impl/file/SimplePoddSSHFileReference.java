@@ -116,4 +116,27 @@ public class SimplePoddSSHFileReference implements PoddSSHFileReference
         this.repositoryAlias = repositoryAlias;
     }
     
+    @Override
+    public String toString()
+    {
+        StringBuilder b = new StringBuilder();
+        b.append("[");
+        b.append(artifactID);
+        b.append(" , ");
+        b.append(parentIri);
+        b.append(" , ");
+        b.append(objectIri);
+        b.append(" , ");
+        b.append(label);
+        b.append(" , ");
+        b.append(filename);
+        b.append(" , ");
+        b.append(path);
+        b.append(" , ");
+        b.append(repositoryAlias);
+        b.append("]");
+        
+        return b.toString();
+    }
+    
 }

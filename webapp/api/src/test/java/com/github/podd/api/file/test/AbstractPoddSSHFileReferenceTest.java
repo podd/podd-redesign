@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.github.podd.api.file.PoddFileReference;
 import com.github.podd.api.file.PoddSSHFileReference;
 
 /**
@@ -14,7 +15,7 @@ import com.github.podd.api.file.PoddSSHFileReference;
  * 
  * @author kutila
  */
-public abstract class AbstractPoddSSHFileReferenceTest
+public abstract class AbstractPoddSSHFileReferenceTest extends AbstractPoddFileReferenceTest
 {
     protected PoddSSHFileReference sshFileReference;
     
@@ -24,15 +25,22 @@ public abstract class AbstractPoddSSHFileReferenceTest
      */
     protected abstract PoddSSHFileReference getNewPoddSSHFileReference();
     
+    protected final PoddFileReference getNewPoddFileReference() 
+    {
+        return this.getNewPoddSSHFileReference();
+    }
+    
     @Before
     public void setUp() throws Exception
     {
+        super.setUp();
         this.sshFileReference = this.getNewPoddSSHFileReference();
     }
     
     @After
     public void tearDown() throws Exception
     {
+        super.tearDown();
         this.sshFileReference = null;
     }
     
