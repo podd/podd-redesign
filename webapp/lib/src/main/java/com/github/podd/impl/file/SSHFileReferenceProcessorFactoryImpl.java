@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.file.FileReferenceProcessor;
+import com.github.podd.api.file.FileReferenceProcessorFactory;
 import com.github.podd.api.file.SSHFileReferenceProcessorFactory;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -18,7 +19,7 @@ import com.github.podd.utils.PoddRdfConstants;
  * 
  * @author kutila
  */
-@MetaInfServices(SSHFileReferenceProcessorFactory.class)
+@MetaInfServices(FileReferenceProcessorFactory.class)
 public class SSHFileReferenceProcessorFactoryImpl implements SSHFileReferenceProcessorFactory
 {
 
@@ -46,7 +47,6 @@ public class SSHFileReferenceProcessorFactoryImpl implements SSHFileReferencePro
     @Override
     public FileReferenceProcessor getProcessor()
     {
-        // TODO - configure processor
         return new SSHFileReferenceProcessorImpl();
     }
 

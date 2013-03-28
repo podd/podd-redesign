@@ -7,7 +7,6 @@ import com.github.podd.api.file.FileReferenceManager;
 import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
 import com.github.podd.api.file.test.AbstractFileReferenceManagerTest;
 import com.github.podd.impl.file.FileReferenceManagerImpl;
-import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 
 /**
  * Concrete test for FileReferenceManager
@@ -17,8 +16,11 @@ import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 public class FileReferenceManagerImplTest extends AbstractFileReferenceManagerTest
 {
     
-    /* (non-Javadoc)
-     * @see com.github.podd.api.file.test.AbstractFileReferenceManagerTest#getNewFileReferenceManager()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.github.podd.api.file.test.AbstractFileReferenceManagerTest#getNewFileReferenceManager()
      */
     @Override
     public FileReferenceManager getNewFileReferenceManager()
@@ -27,14 +29,19 @@ public class FileReferenceManagerImplTest extends AbstractFileReferenceManagerTe
         return fileRefManager;
     }
     
-    /* (non-Javadoc)
-     * @see com.github.podd.api.file.test.AbstractFileReferenceManagerTest#getNewPoddFileReferenceProcessorFactoryRegistry()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.api.file.test.AbstractFileReferenceManagerTest#
+     * getNewPoddFileReferenceProcessorFactoryRegistry()
      */
     @Override
     public FileReferenceProcessorFactoryRegistry getNewPoddFileReferenceProcessorFactoryRegistry()
     {
         FileReferenceProcessorFactoryRegistry registry = new FileReferenceProcessorFactoryRegistry();
-        registry.add(new SSHFileReferenceProcessorFactoryImpl());
+        
+        // this should happen automatically 
+        // registry.add(new SSHFileReferenceProcessorFactoryImpl());
         
         return registry;
     }
