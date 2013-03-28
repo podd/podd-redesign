@@ -14,8 +14,8 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.file.PoddFileReferenceManager;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
+import com.github.podd.api.file.FileReferenceManager;
+import com.github.podd.api.file.FileReferenceProcessorFactory;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.test.AbstractPoddArtifactManagerTest;
@@ -24,7 +24,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
-import com.github.podd.impl.file.PoddFileReferenceManagerImpl;
+import com.github.podd.impl.file.FileReferenceManagerImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 
@@ -48,9 +48,9 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddFileReferenceManager getNewFileReferenceManager()
+    protected FileReferenceManager getNewFileReferenceManager()
     {
-        return new PoddFileReferenceManagerImpl();
+        return new FileReferenceManagerImpl();
     }
     
     @Override
@@ -61,7 +61,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddFileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory()
+    protected FileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory()
     {
         // TODO Auto-generated method stub
         return null;
@@ -104,7 +104,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected PoddFileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory()
+    protected FileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory()
     {
         // TODO Auto-generated method stub
         return null;

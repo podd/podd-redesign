@@ -16,7 +16,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public interface PoddFileReference
+public interface FileReference
 {
     /**
      * 

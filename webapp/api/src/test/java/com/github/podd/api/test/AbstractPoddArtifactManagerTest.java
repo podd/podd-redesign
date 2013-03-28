@@ -44,9 +44,9 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.file.PoddFileReferenceManager;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.file.FileReferenceManager;
+import com.github.podd.api.file.FileReferenceProcessorFactory;
+import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
@@ -102,7 +102,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      * @return A new empty instance of an implementation of PoddFileReferenceManager.
      */
-    protected abstract PoddFileReferenceManager getNewFileReferenceManager();
+    protected abstract FileReferenceManager getNewFileReferenceManager();
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -121,7 +121,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * @return A new empty instance of an implementation of PoddFileReferenceProcessorFactory that
      *         can process HTTP-based file references.
      */
-    protected abstract PoddFileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory();
+    protected abstract FileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory();
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of {@link PoddOWLManager}
@@ -175,13 +175,13 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
-     * {@link PoddFileReferenceProcessorFactory} that can process SSH-based file references for each
+     * {@link FileReferenceProcessorFactory} that can process SSH-based file references for each
      * invocation.
      * 
      * @return A new empty instance of an implementation of PoddFileReferenceProcessorFactory that
      *         can process SSH-based file references.
      */
-    protected abstract PoddFileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
+    protected abstract FileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -305,8 +305,8 @@ public abstract class AbstractPoddArtifactManagerTest
         
         this.testRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
         
-        final PoddFileReferenceProcessorFactoryRegistry testFileRegistry =
-                new PoddFileReferenceProcessorFactoryRegistry();
+        final FileReferenceProcessorFactoryRegistry testFileRegistry =
+                new FileReferenceProcessorFactoryRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
         // classpath
         testFileRegistry.clear();
@@ -331,7 +331,7 @@ public abstract class AbstractPoddArtifactManagerTest
          * testFileRegistry.add(httpFactory);
          */
         
-        final PoddFileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
+        final FileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
         testFileReferenceManager.setProcessorFactoryRegistry(testFileRegistry);
         
         /**

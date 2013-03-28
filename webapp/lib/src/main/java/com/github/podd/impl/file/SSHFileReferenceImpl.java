@@ -5,7 +5,7 @@ package com.github.podd.impl.file;
 
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.api.file.PoddSSHFileReference;
+import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -13,7 +13,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
  * 
  * @author kutila
  */
-public class SimplePoddSSHFileReference implements PoddSSHFileReference
+public class SSHFileReferenceImpl implements SSHFileReference
 {
 
     private InferredOWLOntologyID artifactID;
@@ -28,7 +28,7 @@ public class SimplePoddSSHFileReference implements PoddSSHFileReference
     /**
      * Constructor
      */
-    public SimplePoddSSHFileReference()
+    public SSHFileReferenceImpl()
     {
     }
     

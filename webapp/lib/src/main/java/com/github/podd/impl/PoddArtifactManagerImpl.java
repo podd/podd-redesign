@@ -43,8 +43,8 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.file.PoddFileReference;
-import com.github.podd.api.file.PoddFileReferenceManager;
+import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.FileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.DeleteArtifactException;
@@ -69,7 +69,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private PoddFileReferenceManager fileReferenceManager;
+    private FileReferenceManager fileReferenceManager;
     private PoddOWLManager owlManager;
     private PoddPurlManager purlManager;
     private PoddSchemaManager schemaManager;
@@ -236,7 +236,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @see com.github.podd.api.PoddArtifactManager#getFileReferenceManager()
      */
     @Override
-    public PoddFileReferenceManager getFileReferenceManager()
+    public FileReferenceManager getFileReferenceManager()
     {
         return this.fileReferenceManager;
     }
@@ -427,7 +427,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 this.log.info("Handling File reference validation");
                 // calls, to setup the results collection
-                final Set<PoddFileReference> fileReferenceResults =
+                final Set<FileReference> fileReferenceResults =
                         this.getFileReferenceManager().extractFileReferences(temporaryRepositoryConnection,
                                 randomContext);
                 
@@ -725,7 +725,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * PoddFileReferenceManager)
      */
     @Override
-    public void setFileReferenceManager(final PoddFileReferenceManager fileManager)
+    public void setFileReferenceManager(final FileReferenceManager fileManager)
     {
         this.fileReferenceManager = fileManager;
     }
@@ -890,7 +890,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 this.log.info("Handling File reference validation");
                 // calls, to setup the results collection
-                final Set<PoddFileReference> fileReferenceResults =
+                final Set<FileReference> fileReferenceResults =
                         this.getFileReferenceManager().extractFileReferences(tempRepositoryConnection, tempContext);
                 
                 // optionally verify the file references
@@ -1070,28 +1070,28 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
 
     @Override
     public InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
-            PoddFileReference fileReference) throws OpenRDFException, PoddException
+            FileReference fileReference) throws OpenRDFException, PoddException
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId)
+    public Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri)
+    public Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias)
+    public Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias)
     {
         // TODO Auto-generated method stub
         return null;

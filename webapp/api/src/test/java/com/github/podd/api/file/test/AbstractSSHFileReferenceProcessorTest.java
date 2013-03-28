@@ -9,9 +9,9 @@ import java.util.Set;
 
 import org.openrdf.model.URI;
 
-import com.github.podd.api.file.PoddFileReferenceProcessor;
-import com.github.podd.api.file.PoddSSHFileReference;
-import com.github.podd.api.file.PoddSSHFileReferenceProcessor;
+import com.github.podd.api.file.FileReferenceProcessor;
+import com.github.podd.api.file.SSHFileReference;
+import com.github.podd.api.file.SSHFileReferenceProcessor;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -19,19 +19,19 @@ import com.github.podd.utils.PoddRdfConstants;
  * @author kutila
  *
  */
-public abstract class AbstractPoddSSHFileReferenceProcessorTest extends AbstractPoddFileReferenceProcessorTest<PoddSSHFileReference>
+public abstract class AbstractSSHFileReferenceProcessorTest extends AbstractFileReferenceProcessorTest<SSHFileReference>
 {
     @Override
-    protected final PoddFileReferenceProcessor<PoddSSHFileReference> getNewPoddFileReferenceProcessor()
+    protected final FileReferenceProcessor<SSHFileReference> getNewFileReferenceProcessor()
     {
-        return getNewPoddSSHFileReferenceProcessor();
+        return getNewSSHFileReferenceProcessor();
     }
 
-    protected abstract PoddSSHFileReferenceProcessor getNewPoddSSHFileReferenceProcessor();
+    protected abstract SSHFileReferenceProcessor getNewSSHFileReferenceProcessor();
 
 
     @Override
-    protected void verify2FileReferences(Collection<PoddSSHFileReference> fileReferences)
+    protected void verify2FileReferences(Collection<SSHFileReference> fileReferences)
     {
         // TODO Auto-generated method stub
         

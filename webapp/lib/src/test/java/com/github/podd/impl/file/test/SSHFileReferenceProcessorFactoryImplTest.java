@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRdfProcessor;
 import com.github.podd.api.PoddRdfProcessorFactory;
-import com.github.podd.api.file.PoddFileReferenceProcessor;
-import com.github.podd.api.file.PoddSSHFileReference;
-import com.github.podd.api.file.PoddSSHFileReferenceProcessor;
+import com.github.podd.api.file.FileReferenceProcessor;
+import com.github.podd.api.file.SSHFileReference;
+import com.github.podd.api.file.SSHFileReferenceProcessor;
 import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
@@ -39,7 +39,7 @@ import com.github.podd.utils.PoddRdfUtils;
  * @author kutila
  */
 public class SSHFileReferenceProcessorFactoryImplTest<T extends PoddRdfProcessor> extends
-        AbstractPoddRdfProcessorFactoryTest<PoddFileReferenceProcessor<PoddSSHFileReference>>
+        AbstractPoddRdfProcessorFactoryTest<FileReferenceProcessor<SSHFileReference>>
 {
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -59,7 +59,7 @@ public class SSHFileReferenceProcessorFactoryImplTest<T extends PoddRdfProcessor
     @Test
     public void testSPARQLQueryViaExecution() throws Exception
     {
-        final PoddRdfProcessorFactory<PoddSSHFileReferenceProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
+        final PoddRdfProcessorFactory<SSHFileReferenceProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
         
         // build SPARQL query
         final String sparql = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory);
@@ -111,7 +111,7 @@ public class SSHFileReferenceProcessorFactoryImplTest<T extends PoddRdfProcessor
     @Test
     public void testSPARQLQueryWithSubjectViaExecution() throws Exception
     {
-        final PoddRdfProcessorFactory<PoddSSHFileReferenceProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
+        final PoddRdfProcessorFactory<SSHFileReferenceProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
         
         final String fileReference = "http://purl.org/podd-test/130326f/object-rice-scan-34343-a";
         

@@ -14,11 +14,11 @@ import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 
-import com.github.podd.api.file.PoddFileReferenceProcessor;
-import com.github.podd.api.file.PoddSSHFileReference;
-import com.github.podd.api.file.PoddSSHFileReferenceProcessor;
-import com.github.podd.api.file.test.AbstractPoddFileReferenceProcessorTest;
-import com.github.podd.api.file.test.AbstractPoddSSHFileReferenceProcessorTest;
+import com.github.podd.api.file.FileReferenceProcessor;
+import com.github.podd.api.file.SSHFileReference;
+import com.github.podd.api.file.SSHFileReferenceProcessor;
+import com.github.podd.api.file.test.AbstractFileReferenceProcessorTest;
+import com.github.podd.api.file.test.AbstractSSHFileReferenceProcessorTest;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.file.SSHFileReferenceProcessorImpl;
 import com.github.podd.utils.PoddRdfConstants;
@@ -28,11 +28,11 @@ import com.github.podd.utils.RdfUtility;
  * 
  * @author kutila
  */
-public class SSHFileReferenceProcessorImplTest extends AbstractPoddSSHFileReferenceProcessorTest
+public class SSHFileReferenceProcessorImplTest extends AbstractSSHFileReferenceProcessorTest
 {
     
     @Override
-    protected PoddSSHFileReferenceProcessor getNewPoddSSHFileReferenceProcessor()
+    protected SSHFileReferenceProcessor getNewSSHFileReferenceProcessor()
     {
         return new SSHFileReferenceProcessorImpl();
     }

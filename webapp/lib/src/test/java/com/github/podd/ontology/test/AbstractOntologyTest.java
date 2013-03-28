@@ -30,8 +30,8 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.file.PoddFileReferenceManager;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.file.FileReferenceManager;
+import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
@@ -41,7 +41,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
-import com.github.podd.impl.file.PoddFileReferenceManagerImpl;
+import com.github.podd.impl.file.FileReferenceManagerImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -93,8 +93,8 @@ public class AbstractOntologyTest
      */
     private void initializeTestRepository()
     {
-        final PoddFileReferenceProcessorFactoryRegistry nextFileRegistry =
-                new PoddFileReferenceProcessorFactoryRegistry();
+        final FileReferenceProcessorFactoryRegistry nextFileRegistry =
+                new FileReferenceProcessorFactoryRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
         // classpath
         nextFileRegistry.clear();
@@ -104,7 +104,7 @@ public class AbstractOntologyTest
         final PoddPurlProcessorFactory nextPurlProcessorFactory = new UUIDPurlProcessorFactoryImpl();
         nextPurlRegistry.add(nextPurlProcessorFactory);
         
-        final PoddFileReferenceManager nextFileReferenceManager = new PoddFileReferenceManagerImpl();
+        final FileReferenceManager nextFileReferenceManager = new FileReferenceManagerImpl();
         nextFileReferenceManager.setProcessorFactoryRegistry(nextFileRegistry);
         
         final PoddPurlManager nextPurlManager = new PoddPurlManagerImpl();

@@ -8,28 +8,28 @@ import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.api.file.PoddFileReference;
+import com.github.podd.api.file.FileReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
- * Simple abstract test class for PoddFileReference
+ * Simple abstract test class for FileReference
  * 
  * @author kutila
  */
-public abstract class AbstractPoddFileReferenceTest
+public abstract class AbstractFileReferenceTest
 {
-    protected PoddFileReference fileReference;
+    protected FileReference fileReference;
     
     /**
      * 
-     * @return A new PoddFileReference instance for use by the test
+     * @return A new FileReference instance for use by the test
      */
-    protected abstract PoddFileReference getNewPoddFileReference();
+    protected abstract FileReference getNewFileReference();
     
     @Before
     public void setUp() throws Exception
     {
-        this.fileReference = this.getNewPoddFileReference();
+        this.fileReference = this.getNewFileReference();
     }
     
     @After

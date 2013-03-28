@@ -36,9 +36,9 @@ import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.file.PoddFileReferenceManager;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.file.FileReferenceManager;
+import com.github.podd.api.file.FileReferenceProcessorFactory;
+import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
@@ -48,7 +48,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
-import com.github.podd.impl.file.PoddFileReferenceManagerImpl;
+import com.github.podd.impl.file.FileReferenceManagerImpl;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
@@ -247,16 +247,16 @@ public class ApplicationUtils
         
         
         // File Reference manager
-        final PoddFileReferenceProcessorFactoryRegistry nextFileRegistry =
-                new PoddFileReferenceProcessorFactoryRegistry();
+        final FileReferenceProcessorFactoryRegistry nextFileRegistry =
+                new FileReferenceProcessorFactoryRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
         // classpath
         nextFileRegistry.clear();
-        final PoddFileReferenceProcessorFactory nextFileProcessorFactory = new SSHFileReferenceProcessorFactoryImpl();
+        final FileReferenceProcessorFactory nextFileProcessorFactory = new SSHFileReferenceProcessorFactoryImpl();
         // TODO: uncomment the next line once the Factory is ready for use
         // nextFileRegistry.add(nextFileProcessorFactory);
         
-        final PoddFileReferenceManager nextFileReferenceManager = new PoddFileReferenceManagerImpl();
+        final FileReferenceManager nextFileReferenceManager = new FileReferenceManagerImpl();
         nextFileReferenceManager.setProcessorFactoryRegistry(nextFileRegistry);
         
         

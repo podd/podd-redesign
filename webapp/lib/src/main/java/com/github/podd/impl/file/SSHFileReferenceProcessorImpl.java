@@ -13,8 +13,8 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.api.file.PoddSSHFileReference;
-import com.github.podd.api.file.PoddSSHFileReferenceProcessor;
+import com.github.podd.api.file.SSHFileReference;
+import com.github.podd.api.file.SSHFileReferenceProcessor;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -22,7 +22,7 @@ import com.github.podd.utils.PoddRdfConstants;
  *   
  * @author kutila
  */
-public class SSHFileReferenceProcessorImpl implements PoddSSHFileReferenceProcessor
+public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
 {
     
     private final URI FILE_TYPE = PoddRdfConstants.PODDBASE_FILE_REFERENCE_TYPE_SSH;
@@ -45,14 +45,14 @@ public class SSHFileReferenceProcessorImpl implements PoddSSHFileReferenceProces
     }
     
     @Override
-    public Collection<PoddSSHFileReference> createReferences(Model rdfStatements)
+    public Collection<SSHFileReference> createReferences(Model rdfStatements)
     {
         if (rdfStatements == null || rdfStatements.isEmpty())
         {
             return null;
         }
         
-        Set<PoddSSHFileReference> results = new HashSet<PoddSSHFileReference>();
+        Set<SSHFileReference> results = new HashSet<SSHFileReference>();
 
         Set<Resource> fileRefUris = rdfStatements.filter(null, RDF.TYPE, FILE_TYPE).subjects();
         
@@ -62,7 +62,7 @@ public class SSHFileReferenceProcessorImpl implements PoddSSHFileReferenceProces
             
             Model model = rdfStatements.filter(fileRef, null, null);
             
-            PoddSSHFileReference fileReference = new SimplePoddSSHFileReference();
+            SSHFileReference fileReference = new SSHFileReferenceImpl();
             
             //note: artifact ID and parent URI are not available to us in here
 

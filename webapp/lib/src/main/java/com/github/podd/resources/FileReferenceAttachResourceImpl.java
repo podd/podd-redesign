@@ -33,7 +33,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.file.PoddFileReference;
+import com.github.podd.api.file.FileReference;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
@@ -143,14 +143,14 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             final String versionUri, final String objectUri, final InputStream inputStream, final RDFFormat inputFormat) throws OpenRDFException, PoddException
     {
         // - read RDF from input stream and generate file reference object
-        final Set<PoddFileReference> fileReferences = this.getPoddArtifactManager().getFileReferenceManager().extractFileReferences(null, null);
+        final Set<FileReference> fileReferences = this.getPoddArtifactManager().getFileReferenceManager().extractFileReferences(null, null);
         
         // TODO: inside File Ref Manager?
         // - is most current version of artifact being used?
         InferredOWLOntologyID artifactId = new InferredOWLOntologyID(IRI.create(artifactUri), IRI.create(versionUri), null);
         // - validate reference
         // - add reference to artifact, compute inferences, update artifact ID etc.
-        for (PoddFileReference fileReference: fileReferences)
+        for (FileReference fileReference: fileReferences)
         {
             this.getPoddArtifactManager().attachFileReference(artifactId, ValueFactoryImpl.getInstance().createURI(objectUri), fileReference);
         }

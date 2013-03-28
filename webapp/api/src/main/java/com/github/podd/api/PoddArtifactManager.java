@@ -19,8 +19,8 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
-import com.github.podd.api.file.PoddFileReference;
-import com.github.podd.api.file.PoddFileReferenceManager;
+import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.FileReferenceManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
@@ -94,10 +94,10 @@ public interface PoddArtifactManager
     
     /**
      * 
-     * @return The {@link PoddFileReferenceManager} used to create and fetch file references from
+     * @return The {@link FileReferenceManager} used to create and fetch file references from
      *         artifacts.
      */
-    PoddFileReferenceManager getFileReferenceManager();
+    FileReferenceManager getFileReferenceManager();
     
     /**
      * 
@@ -185,13 +185,13 @@ public interface PoddArtifactManager
         OpenRDFException, UnmanagedArtifactIRIException;
     
     /**
-     * Sets the {@link PoddFileReferenceManager} to use for verifying file references for PODD
+     * Sets the {@link FileReferenceManager} to use for verifying file references for PODD
      * artifacts.
      * 
      * @param fileManager
      *            The manager to use for verifying file references for PODD artifacts.
      */
-    void setFileReferenceManager(PoddFileReferenceManager fileManager);
+    void setFileReferenceManager(FileReferenceManager fileManager);
     
     /**
      * Sets the {@link PoddOWLManager} instance to use when loading and dealing with Artifacts in
@@ -298,11 +298,11 @@ public interface PoddArtifactManager
     InferredOWLOntologyID updateSchemaImport(InferredOWLOntologyID artifactId, InferredOWLOntologyID schemaOntologyId);
     
     InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
-            PoddFileReference fileReference) throws OpenRDFException, PoddException;
+            FileReference fileReference) throws OpenRDFException, PoddException;
     
-    Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId);
+    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId);
     
-    Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
+    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
     
-    Set<PoddFileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
+    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
 }

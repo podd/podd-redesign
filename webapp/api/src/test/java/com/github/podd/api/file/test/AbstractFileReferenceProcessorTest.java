@@ -16,25 +16,25 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 
-import com.github.podd.api.file.PoddFileReference;
-import com.github.podd.api.file.PoddFileReferenceProcessor;
-import com.github.podd.api.file.PoddSSHFileReference;
+import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.FileReferenceProcessor;
+import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.utils.RdfUtility;
 
 /**
- * Abstract class to test PoddFileReferenceProcessor sub-classes.
+ * Abstract class to test FileReferenceProcessor sub-classes.
  * 
  * @author kutila
  * 
  */
-public abstract class AbstractPoddFileReferenceProcessorTest<T extends PoddFileReference>
+public abstract class AbstractFileReferenceProcessorTest<T extends FileReference>
 {
-    protected PoddFileReferenceProcessor<T> fileReferenceProcessor;
+    protected FileReferenceProcessor<T> fileReferenceProcessor;
     
     /**
-     * @return A new PoddFileReferenceProcessor instance for use by the test
+     * @return A new FileReferenceProcessor instance for use by the test
      */
-    protected abstract PoddFileReferenceProcessor<T> getNewPoddFileReferenceProcessor();
+    protected abstract FileReferenceProcessor<T> getNewFileReferenceProcessor();
     
     /**
      * @return The path to a Resource that has a set of RDF statements containing file references
@@ -53,7 +53,7 @@ public abstract class AbstractPoddFileReferenceProcessorTest<T extends PoddFileR
     @Before
     public void setUp() throws Exception
     {
-        this.fileReferenceProcessor = this.getNewPoddFileReferenceProcessor();
+        this.fileReferenceProcessor = this.getNewFileReferenceProcessor();
         Assert.assertNotNull("Null implementation of test file reference processor", this.fileReferenceProcessor);
     }
     

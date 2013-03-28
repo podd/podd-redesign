@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRepositoryManager;
-import com.github.podd.api.file.PoddFileReference;
+import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.api.file.PoddFileRepositoryManager;
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
@@ -130,7 +130,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
 
     @Override
-    public void verifyFileReferences(Set<PoddFileReference> fileReferenceResults) throws OpenRDFException,
+    public void verifyFileReferences(Set<FileReference> fileReferenceResults) throws OpenRDFException,
         PoddException, FileRepositoryMappingNotFoundException
     {
         // TODO Auto-generated method stub
@@ -138,7 +138,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
 
     @Override
-    public void downloadFileReference(PoddFileReference nextFileReference, OutputStream outputStream)
+    public void downloadFileReference(FileReference nextFileReference, OutputStream outputStream)
         throws PoddException, IOException
     {
         // TODO Auto-generated method stub

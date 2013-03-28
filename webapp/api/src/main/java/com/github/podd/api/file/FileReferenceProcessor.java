@@ -18,7 +18,7 @@ import com.github.podd.api.PoddRdfProcessor;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public interface PoddFileReferenceProcessor<T extends PoddFileReference> extends PoddRdfProcessor
+public interface FileReferenceProcessor<T extends FileReference> extends PoddRdfProcessor
 {
     /**
      * 

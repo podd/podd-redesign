@@ -22,21 +22,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddProcessorStage;
-import com.github.podd.api.file.PoddFileReference;
-import com.github.podd.api.file.PoddFileReferenceManager;
-import com.github.podd.api.file.PoddFileReferenceProcessor;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactory;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.FileReferenceManager;
+import com.github.podd.api.file.FileReferenceProcessor;
+import com.github.podd.api.file.FileReferenceProcessorFactory;
+import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
 import com.github.podd.utils.PoddRdfUtils;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
+public class FileReferenceManagerImpl implements FileReferenceManager
 {
     // Initially setup the registry to the global instance
-    private PoddFileReferenceProcessorFactoryRegistry registry = PoddFileReferenceProcessorFactoryRegistry
+    private FileReferenceProcessorFactoryRegistry registry = FileReferenceProcessorFactoryRegistry
             .getInstance();
     private PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -44,7 +44,7 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
     /**
      * 
      */
-    public PoddFileReferenceManagerImpl()
+    public FileReferenceManagerImpl()
     {
         // TODO Auto-generated constructor stub
     }
@@ -57,13 +57,13 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * .RepositoryConnection, org.openrdf.model.URI[])
      */
     @Override
-    public Set<PoddFileReference> extractFileReferences(final RepositoryConnection repositoryConnection,
+    public Set<FileReference> extractFileReferences(final RepositoryConnection repositoryConnection,
             final URI... contexts) throws RepositoryException
     {
-        final Set<PoddFileReference> internalFileRefResults =
-                Collections.newSetFromMap(new ConcurrentHashMap<PoddFileReference, Boolean>());
+        final Set<FileReference> internalFileRefResults =
+                Collections.newSetFromMap(new ConcurrentHashMap<FileReference, Boolean>());
         
-        for(final PoddFileReferenceProcessorFactory nextProcessorFactory : this.getFileProcessorFactoryRegistry()
+        for(final FileReferenceProcessorFactory nextProcessorFactory : this.getFileProcessorFactoryRegistry()
                 .getByStage(this.processorStage))
         {
             try
@@ -94,7 +94,7 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
                     // processor instance now to create the File Reference
                     // NOTE: This object cannot be shared as we do not specify that it needs to be
                     // threadsafe
-                    final PoddFileReferenceProcessor<PoddFileReference> processor = nextProcessorFactory.getProcessor();
+                    final FileReferenceProcessor<FileReference> processor = nextProcessorFactory.getProcessor();
                     
                     if(processor.canHandle(results))
                     {
@@ -116,7 +116,7 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * @see com.github.podd.api.file.PoddFileReferenceManager#getProcessorFactoryRegistry()
      */
     @Override
-    public PoddFileReferenceProcessorFactoryRegistry getFileProcessorFactoryRegistry()
+    public FileReferenceProcessorFactoryRegistry getFileProcessorFactoryRegistry()
     {
         return this.registry;
     }
@@ -129,7 +129,7 @@ public class PoddFileReferenceManagerImpl implements PoddFileReferenceManager
      * podd.api.file.PoddFileReferenceProcessorFactoryRegistry)
      */
     @Override
-    public void setProcessorFactoryRegistry(final PoddFileReferenceProcessorFactoryRegistry registry)
+    public void setProcessorFactoryRegistry(final FileReferenceProcessorFactoryRegistry registry)
     {
         this.registry = registry;
     }

@@ -75,8 +75,8 @@ public interface PoddFileRepositoryManager
      */
     PoddFileRepository removeRepositoryMapping(String alias) throws FileRepositoryMappingNotFoundException;
     
-    void verifyFileReferences(Set<PoddFileReference> fileReferenceResults) throws OpenRDFException, PoddException, FileRepositoryMappingNotFoundException;
+    void verifyFileReferences(Set<FileReference> fileReferenceResults) throws OpenRDFException, PoddException, FileRepositoryMappingNotFoundException;
     
-    void downloadFileReference(PoddFileReference nextFileReference, OutputStream outputStream) throws PoddException,
+    void downloadFileReference(FileReference nextFileReference, OutputStream outputStream) throws PoddException,
         IOException;
 }

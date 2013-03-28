@@ -15,35 +15,35 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 
-import com.github.podd.api.file.PoddFileReference;
-import com.github.podd.api.file.PoddFileReferenceManager;
-import com.github.podd.api.file.PoddFileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.FileReferenceManager;
+import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
 
 /**
- * Abstract test class for PoddFileReferenceManager.
+ * Abstract test class for FileReferenceManager.
  * 
  * @author kutila
  */
-public abstract class AbstractPoddFileReferenceManagerTest
+public abstract class AbstractFileReferenceManagerTest
 {
 
-    protected PoddFileReferenceManager testFileReferenceManager;
+    protected FileReferenceManager testFileReferenceManager;
     
-    private PoddFileReferenceProcessorFactoryRegistry testRegistry;
+    private FileReferenceProcessorFactoryRegistry testRegistry;
     
     private Repository testRepository;
     
     protected RepositoryConnection testRepositoryConnection;
     
     /**
-     * @return A new PoddFileReferenceManager instance for use by this test
+     * @return A new FileReferenceManager instance for use by this test
      */
-    public abstract PoddFileReferenceManager getNewPoddFileReferenceManager();
+    public abstract FileReferenceManager getNewFileReferenceManager();
     
     /**
      * @return A new FileReferenceProcessorFactory Registry for use by this test
      */
-    public abstract PoddFileReferenceProcessorFactoryRegistry getNewPoddFileReferenceProcessorFactoryRegistry();
+    public abstract FileReferenceProcessorFactoryRegistry getNewPoddFileReferenceProcessorFactoryRegistry();
     
     @Before
     public void setUp() throws Exception
@@ -51,7 +51,7 @@ public abstract class AbstractPoddFileReferenceManagerTest
         this.testRegistry = this.getNewPoddFileReferenceProcessorFactoryRegistry();
         Assert.assertNotNull("Null implementation of test Registry", this.testRegistry);
         
-        this.testFileReferenceManager = this.getNewPoddFileReferenceManager();
+        this.testFileReferenceManager = this.getNewFileReferenceManager();
         Assert.assertNotNull("Null implementation of test FileReferenceManager", this.testFileReferenceManager);
         
         this.testRepository = new SailRepository(new MemoryStore());
@@ -78,7 +78,7 @@ public abstract class AbstractPoddFileReferenceManagerTest
     public void testExtractFileReferences() throws Exception
     {
         URI someContext = null;
-        Set<PoddFileReference> extractedFileReferences =
+        Set<FileReference> extractedFileReferences =
                 this.testFileReferenceManager.extractFileReferences(testRepositoryConnection, someContext);
         // FIXME
     }

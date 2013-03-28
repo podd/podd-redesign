@@ -13,13 +13,13 @@ import org.openrdf.model.URI;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public interface PoddFileRepository<T extends PoddFileReference>
+public interface PoddFileRepository<T extends FileReference>
 {
     String getAlias();
     
     /**
      * 
-     * @return The set of RDF Types for {@link PoddFileReference}s that can be stored by this
+     * @return The set of RDF Types for {@link FileReference}s that can be stored by this
      *         repository. All of the non-OWL-built-in types should be in this set.
      */
     Set<URI> getTypes();
