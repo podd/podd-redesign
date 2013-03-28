@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.github.podd.api.PoddRepositoryManager;
@@ -25,6 +26,8 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     protected PoddRepositoryManager testRepositoryManager;
     
     /**
+     * {@link PoddFileRepositoryManager} is the object under test in this class.
+     * 
      * @return A new {@link PoddFileRepositoryManager} instance for use by the test
      */
     protected abstract PoddFileRepositoryManager getNewPoddFileRepositoryManager();
@@ -48,6 +51,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         this.testRepositoryManager = null;
     }
     
+    @Ignore
     @Test
     public void testAddRepositoryMapping() throws Exception
     {
@@ -57,6 +61,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         // TODO - implement me
     }
     
+    @Ignore
     @Test
     public void testGetRepository() throws Exception
     {
