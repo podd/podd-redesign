@@ -18,7 +18,6 @@ import org.openrdf.rio.RDFFormat;
 
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.FileReferenceProcessor;
-import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.utils.RdfUtility;
 
 /**
@@ -66,15 +65,16 @@ public abstract class AbstractFileReferenceProcessorTest<T extends FileReference
     @Test
     public void testCanHandle() throws Exception
     {
-        InputStream resourceStream = this.getClass().getResourceAsStream(this.getPathToResourceWith2FileReferences());
-        Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
-        Assert.assertTrue("Expected to be able to handle this Model", fileReferenceProcessor.canHandle(model));
+        final InputStream resourceStream =
+                this.getClass().getResourceAsStream(this.getPathToResourceWith2FileReferences());
+        final Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
+        Assert.assertTrue("Expected to be able to handle this Model", this.fileReferenceProcessor.canHandle(model));
     }
     
     @Test
     public void testCanHandleWithEmptyModel() throws Exception
     {
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         Assert.assertFalse("Should not be able to handle an empty model", this.fileReferenceProcessor.canHandle(model));
     }
     
@@ -93,23 +93,24 @@ public abstract class AbstractFileReferenceProcessorTest<T extends FileReference
     @Test
     public void testGetTypes() throws Exception
     {
-        Set<URI> types = this.fileReferenceProcessor.getTypes();
+        final Set<URI> types = this.fileReferenceProcessor.getTypes();
         Assert.assertFalse("No types found", types.isEmpty());
     }
     
     @Test
     public void testCreateReferences() throws Exception
     {
-        InputStream resourceStream = this.getClass().getResourceAsStream(this.getPathToResourceWith2FileReferences());
-        Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
+        final InputStream resourceStream =
+                this.getClass().getResourceAsStream(this.getPathToResourceWith2FileReferences());
+        final Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
         
-        Collection<T> references = this.fileReferenceProcessor.createReferences(model);
+        final Collection<T> references = this.fileReferenceProcessor.createReferences(model);
         
         Assert.assertNotNull("NULL collection of file references", references);
         Assert.assertFalse("No File references created", references.isEmpty());
         Assert.assertEquals("Not the expected number of file references", 2, references.size());
         
-        verify2FileReferences(references);
+        this.verify2FileReferences(references);
     }
     
     @Test
@@ -131,14 +132,13 @@ public abstract class AbstractFileReferenceProcessorTest<T extends FileReference
     @Test
     public void testGetTypesWithExpectedValues() throws Exception
     {
-        Set<URI> types = this.fileReferenceProcessor.getTypes();
+        final Set<URI> types = this.fileReferenceProcessor.getTypes();
         Assert.assertFalse("No types found", types.isEmpty());
         Assert.assertEquals("Not the expected number of types", 1, types.size());
-        for(URI nextExpectedType : getExpectedFileReferenceTypes())
+        for(final URI nextExpectedType : this.getExpectedFileReferenceTypes())
         {
             Assert.assertTrue("Not the expected file reference type", types.contains(nextExpectedType));
         }
     }
-    
     
 }
