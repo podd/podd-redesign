@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.query.GraphQuery;
@@ -17,7 +18,6 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResults;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,18 +35,18 @@ import com.github.podd.utils.PoddRdfUtils;
  */
 public class FileReferenceManagerImpl implements FileReferenceManager
 {
-    // Initially setup the registry to the global instance
-    private FileReferenceProcessorFactoryRegistry registry = FileReferenceProcessorFactoryRegistry
-            .getInstance();
-    private PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
+    // Initially setup the registry to the global instance
+    private FileReferenceProcessorFactoryRegistry registry = FileReferenceProcessorFactoryRegistry.getInstance();
+    
+    private final PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
+    
     /**
-     * 
+     * Default constructor
      */
     public FileReferenceManagerImpl()
     {
-        // TODO Auto-generated constructor stub
     }
     
     /*
@@ -58,7 +58,7 @@ public class FileReferenceManagerImpl implements FileReferenceManager
      */
     @Override
     public Set<FileReference> extractFileReferences(final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws RepositoryException
+            final URI... contexts) throws OpenRDFException
     {
         final Set<FileReference> internalFileRefResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<FileReference, Boolean>());
@@ -77,7 +77,6 @@ public class FileReferenceManagerImpl implements FileReferenceManager
                 for(final URI artifactGraphUri : contexts)
                 {
                     dataset.addDefaultGraph(artifactGraphUri);
-                    dataset.addNamedGraph(artifactGraphUri);
                 }
                 
                 // set the dataset for the query to be our artificially constructed dataset
@@ -85,7 +84,7 @@ public class FileReferenceManagerImpl implements FileReferenceManager
                 
                 final GraphQueryResult queryResult = graphQuery.evaluate();
                 
-                // FIXME: The following contains statements for the whole artifact
+                // following contains statements for file references from the whole artifact
                 final Model results = QueryResults.asModel(queryResult);
                 
                 if(!results.isEmpty())
