@@ -4,6 +4,7 @@
 package com.github.podd.impl.file.test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
@@ -33,6 +34,16 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
 {
     @Rule
     public final TemporaryFolder tempDirectory = new TemporaryFolder();
+
+    
+    @Override
+    protected Collection<URI> getExpectedTypes() throws Exception
+    {
+        Collection<URI> types = new ArrayList<URI>();
+        types.add(PoddRdfConstants.PODD_FILE_REPOSITORY);
+        types.add(PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
+        return types;
+    }
     
     /*
      * Create a {@link Model} containing configuration details for an SSH File Repository.
@@ -71,9 +82,9 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     }
     
     @Override
-    protected List<Model> getIncompleteModels()
+    protected Collection<Model> getIncompleteModels()
     {
-        final List<Model> incompleteModels = new ArrayList<Model>();
+        final Collection<Model> incompleteModels = new ArrayList<Model>();
         
         // - no "protocol"
         final Model model1 = new LinkedHashModel();
@@ -133,9 +144,11 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     @Override
     protected SSHFileReference getNewFileReference(final String alias)
     {
-        final SSHFileReference testFileRef = new SSHFileReferenceImpl();
-        testFileRef.setRepositoryAlias(alias);
-        return testFileRef;
+        final SSHFileReference testFileReference = new SSHFileReferenceImpl();
+        testFileReference.setRepositoryAlias(alias);
+        // other attributes are not set at present since these are not necessary for the tests
+        
+        return testFileReference;
     }
     
     /**
@@ -167,5 +180,5 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
             sshd.stopTestSSHServer();
         }
     }
-    
+
 }

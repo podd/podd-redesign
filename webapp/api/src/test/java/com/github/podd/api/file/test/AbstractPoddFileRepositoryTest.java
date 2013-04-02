@@ -3,7 +3,8 @@
  */
 package com.github.podd.api.file.test;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.After;
@@ -25,6 +26,13 @@ import com.github.podd.utils.PoddRdfConstants;
 public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
 {
     protected PoddFileRepository<T> testFileRepository;
+
+    /**
+     * @return A Collection of URIs representing the expected types of the test FileRepository
+     *         instance
+     */
+    protected abstract Collection<URI> getExpectedTypes() throws Exception;
+    
     
     /**
      * @return A new {@link PoddFileRepository} instance for use by the test
@@ -36,9 +44,18 @@ public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
      */
     protected abstract PoddFileRepository<T> getNewPoddFileRepository(final Model model) throws Exception;
     
+    /**
+     * @param alias
+     *            The alias to be assigned to the created FileReference.
+     * @return A new FileReference instance for use by the test
+     */
     protected abstract T getNewFileReference(String alias);
     
-    protected abstract List<Model> getIncompleteModels();
+    /**
+     * @return A Collection of Models that do not contain sufficient information to create a
+     *         FileRepository object
+     */
+    protected abstract Collection<Model> getIncompleteModels();
     
     @Before
     public void setUp() throws Exception
@@ -82,7 +99,7 @@ public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
     public void testCreateFileRepositoryWithIncompleteModel() throws Exception
     {
         
-        final List<Model> incompleteModels = this.getIncompleteModels();
+        final Collection<Model> incompleteModels = this.getIncompleteModels();
         
         for(final Model nextModel : incompleteModels)
         {
@@ -112,7 +129,11 @@ public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
         final Set<URI> types = this.testFileRepository.getTypes();
         Assert.assertNotNull("NULL types", types);
         Assert.assertEquals("Expected 2 TYPEs", 2, types.size());
-        Assert.assertTrue("Expected TYPE missing", types.contains(PoddRdfConstants.PODD_FILE_REPOSITORY));
+        Collection<URI> expectedTypes = this.getExpectedTypes();
+        for(URI uri : expectedTypes)
+        {
+            Assert.assertTrue("Expected TYPE missing", types.contains(uri));
+        }
     }
     
 }

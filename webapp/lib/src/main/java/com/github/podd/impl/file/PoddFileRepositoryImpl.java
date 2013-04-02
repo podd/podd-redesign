@@ -50,6 +50,11 @@ public abstract class PoddFileRepositoryImpl<T extends FileReference> implements
         {
             final Model aliasModel = model.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
             
+            if (aliasModel.size() != 1)
+            {
+                throw new IncompleteFileRepositoryException(model, "Model should have exactly 1 alias");
+            }
+            
             // alias
             this.alias = aliasModel.objectString();
             if(this.alias == null || this.alias.trim().length() < 1)
