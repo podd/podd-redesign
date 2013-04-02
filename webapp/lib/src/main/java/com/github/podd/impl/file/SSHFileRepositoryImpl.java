@@ -3,39 +3,67 @@
  */
 package com.github.podd.impl.file;
 
-import java.util.Set;
-
 import org.openrdf.model.Model;
-import org.openrdf.model.URI;
 
 import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.exception.IncompleteFileRepositoryException;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * @author kutila
  * 
  */
-public class SSHFileRepositoryImpl<SSHFileReference> implements PoddFileRepository<FileReference>
+public class SSHFileRepositoryImpl<SSHFileReference> extends PoddFileRepositoryImpl<FileReference>
 {
+    public final static String PROTOCOL_SSH = "SSH";
     
-    
-    public SSHFileRepositoryImpl(Model model) throws IncompleteFileRepositoryException
+    public SSHFileRepositoryImpl(final Model model) throws IncompleteFileRepositoryException
     {
-        //super(model);
-        // TODO 
+        super(model);
+        
+        // check that the model contains values for protocol, host, port, fingerprint, username, and
+        // secret
+        final String protocol =
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, null).objectString();
+        final String host =
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_HOST, null).objectString();
+        final String port =
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, null).objectString();
+        final String fingerprint =
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
+        final String username =
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
+        final String secret =
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET, null).objectString();
+        
+        if(protocol == null || host == null || port == null || fingerprint == null || username == null
+                || secret == null)
+        {
+            throw new IncompleteFileRepositoryException(model, "SSH repository configuration incomplete");
+        }
+        
+        if(!SSHFileRepositoryImpl.PROTOCOL_SSH.equals(protocol))
+        {
+            throw new IncompleteFileRepositoryException(model, "Protocol needs to be SSH");
+        }
     }
-
+    
     @Override
-    public boolean canHandle(FileReference reference)
+    public boolean canHandle(final FileReference reference)
     {
-        if (reference == null)
+        if(reference == null)
         {
             return false;
         }
         
-        String aliasFromFileRef = reference.getRepositoryAlias();
-        if (aliasFromFileRef == null)// || !alias.equals(aliasFromFileRef))
+        // unnecessary as Generics ensure only an SSHFileReference can be passed in
+        if(!(reference instanceof com.github.podd.api.file.SSHFileReference))
+        {
+            return false;
+        }
+        
+        final String aliasFromFileRef = reference.getRepositoryAlias();
+        if(aliasFromFileRef == null || !this.alias.equals(aliasFromFileRef))
         {
             return false;
         }
@@ -44,25 +72,10 @@ public class SSHFileRepositoryImpl<SSHFileReference> implements PoddFileReposito
     }
     
     @Override
-    public boolean validate(FileReference reference)
+    public boolean validate(final FileReference reference)
     {
-        // TODO 
+        // TODO
         return false;
     }
-
-    @Override
-    public String getAlias()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Set<URI> getTypes()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     
 }
