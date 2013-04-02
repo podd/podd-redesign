@@ -3,9 +3,19 @@
  */
 package com.github.podd.impl.file;
 
+import java.io.IOException;
+
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.sftp.FileAttributes;
+import net.schmizz.sshj.sftp.SFTPClient;
+
 import org.openrdf.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.SSHFileReference;
+import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.exception.IncompleteFileRepositoryException;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -13,9 +23,11 @@ import com.github.podd.utils.PoddRdfConstants;
  * @author kutila
  * 
  */
-public class SSHFileRepositoryImpl<SSHFileReference> extends PoddFileRepositoryImpl<FileReference>
+public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReference>
 {
     public final static String PROTOCOL_SSH = "SSH";
+    
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     public SSHFileRepositoryImpl(final Model model) throws IncompleteFileRepositoryException
     {
@@ -42,7 +54,7 @@ public class SSHFileRepositoryImpl<SSHFileReference> extends PoddFileRepositoryI
             throw new IncompleteFileRepositoryException(model, "SSH repository configuration incomplete");
         }
         
-        if(!SSHFileRepositoryImpl.PROTOCOL_SSH.equals(protocol))
+        if(!SSHFileRepositoryImpl.PROTOCOL_SSH.equalsIgnoreCase(protocol))
         {
             throw new IncompleteFileRepositoryException(model, "Protocol needs to be SSH");
         }
@@ -57,13 +69,13 @@ public class SSHFileRepositoryImpl<SSHFileReference> extends PoddFileRepositoryI
         }
         
         // unnecessary as Generics ensure only an SSHFileReference can be passed in
-        if(!(reference instanceof com.github.podd.api.file.SSHFileReference))
+        if(!(reference instanceof SSHFileReference))
         {
             return false;
         }
         
         final String aliasFromFileRef = reference.getRepositoryAlias();
-        if(aliasFromFileRef == null || !this.alias.equals(aliasFromFileRef))
+        if(aliasFromFileRef == null || !this.alias.equalsIgnoreCase(aliasFromFileRef))
         {
             return false;
         }
@@ -72,10 +84,62 @@ public class SSHFileRepositoryImpl<SSHFileReference> extends PoddFileRepositoryI
     }
     
     @Override
-    public boolean validate(final FileReference reference)
+    public boolean validate(final FileReference fileReference) throws FileReferenceNotSupportedException, IOException
     {
-        // TODO
-        return false;
+        if(!this.canHandle(fileReference))
+        {
+            throw new FileReferenceNotSupportedException(fileReference, "cannot handle file reference for validation");
+        }
+        
+        final String host =
+                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_HOST, null).objectString();
+        final String port =
+                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, null).objectString();
+        final String fingerprint =
+                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, null)
+                        .objectString();
+        final String username =
+                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
+        final String secret =
+                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET, null).objectString();
+        
+        int portNo = -1;
+        try
+        {
+            portNo = Integer.parseInt(port);
+        }
+        catch(final NumberFormatException e)
+        {
+            throw new IOException("Port number could not be parsed correctly: " + port);
+        }
+        
+        String fileName = ((SSHFileReference)fileReference).getFilename();
+        final String path = ((SSHFileReference)fileReference).getPath();
+        if(path != null && path.trim().length() > 0)
+        {
+            fileName = path + "/" + fileName;
+        }
+        
+        this.log.info("Validating file reference: " + host + ":" + port + " " + fileName);
+        
+        try (SSHClient sshClient = new SSHClient();)
+        {
+            sshClient.addHostKeyVerifier(fingerprint);
+            sshClient.connect(host, portNo);
+            
+            sshClient.authPassword(username, secret);
+            
+            try (SFTPClient sftp = sshClient.newSFTPClient();)
+            {
+                // check details of a remote file
+                final FileAttributes attribs = sftp.lstat(fileName);
+                if(attribs == null || attribs.getSize() <= 0)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     
 }

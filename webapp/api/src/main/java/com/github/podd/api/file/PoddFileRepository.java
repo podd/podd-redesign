@@ -3,9 +3,12 @@
  */
 package com.github.podd.api.file;
 
+import java.io.IOException;
 import java.util.Set;
 
 import org.openrdf.model.URI;
+
+import com.github.podd.exception.FileReferenceNotSupportedException;
 
 /**
  * This interface represents the basic type for all file repositories. PODD uses File Repositories
@@ -25,7 +28,16 @@ public interface PoddFileRepository<T extends FileReference>
     Set<URI> getTypes();
     
     // throw exception if this file reference cannot be handled by this repository
-    boolean validate(T reference);
+    /**
+     * Validates the given FileReference instance.
+     * 
+     * @param reference
+     *            The FileReference to be validated
+     * @return True if the validation was successful, false otherwise
+     * @throws FileReferenceNotSupportedException
+     * @throws IOException
+     */
+    boolean validate(T reference) throws FileReferenceNotSupportedException, IOException;
     
     /**
      * Checks whether this File Repository instance is capable of "handling" (i.e. validating) the
