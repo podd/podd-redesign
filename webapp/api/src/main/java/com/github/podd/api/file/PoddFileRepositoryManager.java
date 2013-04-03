@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 
+import com.github.podd.exception.FileRepositoryMappingExistsException;
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
 import com.github.podd.exception.PoddException;
 
@@ -15,7 +16,7 @@ import com.github.podd.exception.PoddException;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public interface PoddFileRepositoryManager
+public interface PoddFileRepositoryManager<T extends FileReference>
 {
     /**
      * Adds a mapping between the given IRI and the given repository configuration.
@@ -36,8 +37,14 @@ public interface PoddFileRepositoryManager
      * @param repositoryConfiguration
      *            The repository configuration object to add a mapping for.
      * @throws OpenRDFException
+     * @throws FileRepositoryMappingExistsException 
      */
-    void addRepositoryMapping(String alias, PoddFileRepository repositoryConfiguration) throws OpenRDFException;
+    void addRepositoryMapping(String alias, PoddFileRepository<T> repositoryConfiguration) throws OpenRDFException,
+        FileRepositoryMappingExistsException;
+
+    
+    void addRepositoryMapping(String alias, PoddFileRepository<FileReference> repositoryConfiguration, boolean overwrite)
+            throws OpenRDFException, FileRepositoryMappingExistsException;
     
     /**
      * Returns the repository configuration that is currently mapped using the given alias.
@@ -52,7 +59,7 @@ public interface PoddFileRepositoryManager
      *             If the alias was not found in the current set of mappings.
      * @throws OpenRDFException
      */
-    PoddFileRepository getRepository(String alias) throws FileRepositoryMappingNotFoundException, OpenRDFException;
+    PoddFileRepository<T> getRepository(String alias) throws FileRepositoryMappingNotFoundException, OpenRDFException;
     
     /**
      * Returns the aliases that are currently being mapped using the given repository configuration.
@@ -61,7 +68,7 @@ public interface PoddFileRepositoryManager
      * @return Returns a list containing the aliases that are currently mapped to the given
      *         repository configuration.
      */
-    List<String> getRepositoryAliases(PoddFileRepository repositoryConfiguration);
+    List<String> getRepositoryAliases(PoddFileRepository<T> repositoryConfiguration);
     
     /**
      * Removes the mapping for the given alias, returning the {@link PoddFileRepository} object that
@@ -73,10 +80,11 @@ public interface PoddFileRepositoryManager
      * @throws FileRepositoryMappingNotFoundException
      *             If the alias was not found in the current set of mappings.
      */
-    PoddFileRepository removeRepositoryMapping(String alias) throws FileRepositoryMappingNotFoundException;
+    PoddFileRepository<T> removeRepositoryMapping(String alias) throws FileRepositoryMappingNotFoundException;
     
     void verifyFileReferences(Set<FileReference> fileReferenceResults) throws OpenRDFException, PoddException, FileRepositoryMappingNotFoundException;
     
     void downloadFileReference(FileReference nextFileReference, OutputStream outputStream) throws PoddException,
         IOException;
+
 }

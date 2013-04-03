@@ -11,6 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.api.file.PoddFileRepositoryManager;
 
@@ -20,9 +21,9 @@ import com.github.podd.api.file.PoddFileRepositoryManager;
  * 
  * @author kutila
  */
-public abstract class AbstractPoddFileRepositoryManagerTest
+public abstract class AbstractPoddFileRepositoryManagerTest<T extends FileReference>
 {
-    protected PoddFileRepositoryManager testFileRepositoryManager;
+    protected PoddFileRepositoryManager<T> testFileRepositoryManager;
     protected PoddRepositoryManager testRepositoryManager;
     
     /**
@@ -30,7 +31,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
      * 
      * @return A new {@link PoddFileRepositoryManager} instance for use by the test
      */
-    protected abstract PoddFileRepositoryManager getNewPoddFileRepositoryManager();
+    protected abstract PoddFileRepositoryManager<T> getNewPoddFileRepositoryManager();
     
     /**
      * @return A new {@link PoddRepositoryManager} instance for use by the test
@@ -56,7 +57,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     public void testAddRepositoryMapping() throws Exception
     {
         String alias = "TODO:some-alias";
-        PoddFileRepository fileRepository = null;
+        PoddFileRepository<T> fileRepository = null;
         this.testFileRepositoryManager.addRepositoryMapping(alias, fileRepository);
         // TODO - implement me
     }
@@ -66,14 +67,14 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     public void testGetRepository() throws Exception
     {
         String alias = "TODO:some-alias";
-        PoddFileRepository repository = this.testFileRepositoryManager.getRepository(alias);
+        PoddFileRepository<T> repository = this.testFileRepositoryManager.getRepository(alias);
         // TODO - implement me
     }
     
     @Test
     public void testGetRepositoryAlias() throws Exception
     {
-        PoddFileRepository fileRepository = null;
+        PoddFileRepository<T> fileRepository = null;
         List<String> aliases = this.testFileRepositoryManager.getRepositoryAliases(fileRepository);
         // TODO - implement me
     }
@@ -82,7 +83,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     public void testRemoveRepositoryMapping() throws Exception
     {
         String alias = "TODO:some-alias";
-        PoddFileRepository removedRepositoryMapping = this.testFileRepositoryManager.removeRepositoryMapping(alias);
+        PoddFileRepository<T> removedRepositoryMapping = this.testFileRepositoryManager.removeRepositoryMapping(alias);
         // TODO - implement me
     }
     
