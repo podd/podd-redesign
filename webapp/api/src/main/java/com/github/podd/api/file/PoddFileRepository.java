@@ -28,7 +28,6 @@ public interface PoddFileRepository<T extends FileReference>
      */
     Set<URI> getTypes();
     
-    // throw exception if this file reference cannot be handled by this repository
     /**
      * Validates the given FileReference instance.
      * 
