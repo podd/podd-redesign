@@ -46,7 +46,12 @@ public class SSHService
      * port is used instead of it and returned.
      * 
      * @param port
-     * @return
+     *            The port on which the SSH service is to start. If this value is below 1024, a
+     *            random available port is used.
+     * @param tempDirectory
+     *            The temporary directory in which a copy of the host key file is maintained by the
+     *            server.
+     * @return The port on which the SSH service was started.
      * @throws Exception
      */
     public int startTestSSHServer(int port, final File tempDirectory) throws Exception

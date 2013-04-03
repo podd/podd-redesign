@@ -138,6 +138,11 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
                     return false;
                 }
             }
+            catch (IOException e)
+            {
+                // lstat() throws an IOException if the file does not exist
+                return false;
+            }
         }
         return true;
     }
