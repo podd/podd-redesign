@@ -153,10 +153,7 @@ public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
     
     /**
      * This test starts up an internal file repository source and therefore can be slow.
-     * 
-     * TODO: fix test failure when run through maven 
      */
-    @Ignore
     @Test
     public void testValidateSuccess() throws Exception
     {

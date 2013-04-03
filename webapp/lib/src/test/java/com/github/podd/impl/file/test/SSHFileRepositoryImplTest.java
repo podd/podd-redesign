@@ -201,9 +201,15 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         fileReference.setRepositoryAlias(alias);
         
         // prepare: get the name and path of File to be validated
+        /*
+         * NOTE: The TEST_FILE should be accessible on the file system as a file. If it is accessed
+         * as a resource made available from a different module, it will not be accessible to the
+         * SSH service.
+         */
         final String testFile = this.getClass().getResource(TestConstants.TEST_FILE).getFile();
         String fileName = testFile;
         String path = this.getClass().getResource(TestConstants.TEST_FILE).getPath();
+        
         final int lastSlashPosition = testFile.lastIndexOf(File.separatorChar);
         if(lastSlashPosition != -1)
         {

@@ -69,6 +69,6 @@ public interface TestConstants
     public static final String TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION = "/test/artifacts/fragment-move-demo-investigation.ttl";
 
     /** Test resource: any file which exists and can be used as a file reference */
-    public static final String TEST_FILE = "/test/artifacts/basicProject-2.rdf";
+    public static final String TEST_FILE = "/test/artifacts/basic-2.rdf";
 
 }
