@@ -32,7 +32,7 @@ import com.github.podd.utils.PoddRdfConstants;
  * 
  * @author kutila
  */
-public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager<FileReference>
+public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -49,14 +49,14 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager<
 
 
     @Override
-    public void addRepositoryMapping(String alias, PoddFileRepository<FileReference> repositoryConfiguration)
+    public void addRepositoryMapping(String alias, PoddFileRepository<?> repositoryConfiguration)
         throws OpenRDFException, FileRepositoryMappingExistsException
     {
         this.addRepositoryMapping(alias, repositoryConfiguration, false);
     }    
     
     @Override
-    public void addRepositoryMapping(String alias, PoddFileRepository<FileReference> repositoryConfiguration, boolean overwrite)
+    public void addRepositoryMapping(String alias, PoddFileRepository<?> repositoryConfiguration, boolean overwrite)
         throws OpenRDFException, FileRepositoryMappingExistsException
     {
         // - TODO: validate FileRepository configuration
@@ -162,7 +162,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager<
     }
 
     @Override
-    public List<String> getRepositoryAliases(PoddFileRepository<FileReference> repositoryConfiguration)
+    public List<String> getRepositoryAliases(PoddFileRepository<?> repositoryConfiguration)
     {
         // TODO Auto-generated method stub
         return null;
