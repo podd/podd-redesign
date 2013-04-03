@@ -94,6 +94,12 @@ public abstract class PoddFileRepositoryImpl<T extends FileReference> implements
     }
     
     @Override
+    public Model getAsModel()
+    {
+        return this.model;
+    }
+    
+    @Override
     public Set<URI> getTypes()
     {
         return this.types;

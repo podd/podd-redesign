@@ -6,6 +6,7 @@ package com.github.podd.api.file;
 import java.io.IOException;
 import java.util.Set;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 
 import com.github.podd.exception.FileReferenceNotSupportedException;
@@ -49,5 +50,13 @@ public interface PoddFileRepository<T extends FileReference>
      * @return
      */
     boolean canHandle(T reference);
+
+    /**
+     * Retrieve a Model representation of all this FileRepository. This should contain sufficient
+     * information to reconstruct this FileRepository object.
+     * 
+     * @return A Model representation containing all configurations of this FileRepository.
+     */
+    Model getAsModel();
     
 }
