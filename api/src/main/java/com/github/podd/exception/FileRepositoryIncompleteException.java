@@ -11,7 +11,7 @@ import org.openrdf.model.Model;
  * 
  * @author kutila
  */
-public class IncompleteFileRepositoryException extends PoddException
+public class FileRepositoryIncompleteException extends PoddException
 {
     private static final long serialVersionUID = -689252740293644258L;
 
@@ -25,7 +25,7 @@ public class IncompleteFileRepositoryException extends PoddException
      * @param msg
      *            The message for this exception.
      */
-    public IncompleteFileRepositoryException(final Model model, final String msg)
+    public FileRepositoryIncompleteException(final Model model, final String msg)
     {
         super(msg);
         this.model = model;
@@ -40,7 +40,7 @@ public class IncompleteFileRepositoryException extends PoddException
      * @param throwable
      *            The cause for this exception.
      */
-    public IncompleteFileRepositoryException(final Model model, final String msg, final Throwable throwable)
+    public FileRepositoryIncompleteException(final Model model, final String msg, final Throwable throwable)
     {
         super(msg, throwable);
         this.model = model;
@@ -53,7 +53,7 @@ public class IncompleteFileRepositoryException extends PoddException
      * @param throwable
      *            The cause for this exception.
      */
-    public IncompleteFileRepositoryException(final Model model, final Throwable throwable)
+    public FileRepositoryIncompleteException(final Model model, final Throwable throwable)
     {
         super(throwable);
         this.model = model;

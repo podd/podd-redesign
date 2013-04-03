@@ -18,7 +18,7 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.exception.FileReferenceNotSupportedException;
-import com.github.podd.exception.IncompleteFileRepositoryException;
+import com.github.podd.exception.FileRepositoryIncompleteException;
 
 /**
  * 
@@ -123,7 +123,7 @@ public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
                 this.getNewPoddFileRepository(nextModel);
                 Assert.fail("Should have thrown an IncompleteFileRepositoryException");
             }
-            catch(final IncompleteFileRepositoryException e)
+            catch(final FileRepositoryIncompleteException e)
             {
                 Assert.assertNotNull(e.getModel());
                 Assert.assertEquals("SSH repository configuration incomplete", e.getMessage());

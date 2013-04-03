@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.exception.FileReferenceNotSupportedException;
-import com.github.podd.exception.IncompleteFileRepositoryException;
+import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -29,7 +29,7 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    public SSHFileRepositoryImpl(final Model model) throws IncompleteFileRepositoryException
+    public SSHFileRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
     {
         super(model);
         
@@ -51,12 +51,12 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
         if(protocol == null || host == null || port == null || fingerprint == null || username == null
                 || secret == null)
         {
-            throw new IncompleteFileRepositoryException(model, "SSH repository configuration incomplete");
+            throw new FileRepositoryIncompleteException(model, "SSH repository configuration incomplete");
         }
         
         if(!SSHFileRepositoryImpl.PROTOCOL_SSH.equalsIgnoreCase(protocol))
         {
-            throw new IncompleteFileRepositoryException(model, "Protocol needs to be SSH");
+            throw new FileRepositoryIncompleteException(model, "Protocol needs to be SSH");
         }
     }
     

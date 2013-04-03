@@ -15,7 +15,7 @@ import org.openrdf.model.vocabulary.RDF;
 
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
-import com.github.podd.exception.IncompleteFileRepositoryException;
+import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -41,9 +41,9 @@ public abstract class PoddFileRepositoryImpl<T extends FileReference> implements
      * 
      * @param model
      *            A {@link Model} containing data to construct a File Repository configuration.
-     * @throws IncompleteFileRepositoryException
+     * @throws FileRepositoryIncompleteException
      */
-    public PoddFileRepositoryImpl(final Model model) throws IncompleteFileRepositoryException
+    public PoddFileRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
     {
         // check that the model contains an "alias" and at least one "type"
         try
@@ -52,14 +52,14 @@ public abstract class PoddFileRepositoryImpl<T extends FileReference> implements
             
             if (aliasModel.size() != 1)
             {
-                throw new IncompleteFileRepositoryException(model, "Model should have exactly 1 alias");
+                throw new FileRepositoryIncompleteException(model, "Model should have exactly 1 alias");
             }
             
             // alias
             this.alias = aliasModel.objectString();
             if(this.alias == null || this.alias.trim().length() < 1)
             {
-                throw new IncompleteFileRepositoryException(model, "File Repository Alias cannot be NULL/empty");
+                throw new FileRepositoryIncompleteException(model, "File Repository Alias cannot be NULL/empty");
             }
             
             this.aliasUri = aliasModel.subjects().iterator().next();
@@ -75,14 +75,14 @@ public abstract class PoddFileRepositoryImpl<T extends FileReference> implements
             }
             if(this.types.isEmpty())
             {
-                throw new IncompleteFileRepositoryException(model, "No FileRepsitoryType information found");
+                throw new FileRepositoryIncompleteException(model, "No FileRepsitoryType information found");
             }
             
             this.model = model;
         }
         catch(final Exception e)
         {
-            throw new IncompleteFileRepositoryException(model,
+            throw new FileRepositoryIncompleteException(model,
                     "Could not construct a valid FileRepository configuration", e);
         }
     }
