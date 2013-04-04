@@ -11,9 +11,18 @@ import java.util.Set;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.LiteralImpl;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.QueryResults;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.impl.DatasetImpl;
+import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +33,7 @@ import com.github.podd.api.file.PoddFileRepositoryManager;
 import com.github.podd.exception.FileRepositoryMappingExistsException;
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -38,16 +48,25 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
 
     private PoddRepositoryManager repositoryManager;
 
+    /**
+     * 
+     */
     public PoddFileRepositoryManagerImpl() 
     {
     }
 
+    @Override
     public void setRepositoryManager(PoddRepositoryManager repositoryManager)
     {
         this.repositoryManager = repositoryManager;
     }
 
-
+    @Override
+    public PoddRepositoryManager getRepositoryManager()
+    {
+        return this.repositoryManager;
+    }
+    
     @Override
     public void addRepositoryMapping(String alias, PoddFileRepository<?> repositoryConfiguration)
         throws OpenRDFException, FileRepositoryMappingExistsException
@@ -122,7 +141,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
 
     @Override
-    public PoddFileRepository<FileReference> getRepository(String alias) throws FileRepositoryMappingNotFoundException, OpenRDFException
+    public PoddFileRepository<?> getRepository(String alias) throws FileRepositoryMappingNotFoundException, OpenRDFException
     {
         if(alias == null)
         {
@@ -137,8 +156,34 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             
             URI context = this.repositoryManager.getFileRepositoryManagementGraph(); 
 
-            //TODO - retrieve mapping
-            conn.getStatements(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, new LiteralImpl(alias), false, context);
+            final StringBuilder sb = new StringBuilder();
+            
+            sb.append("CONSTRUCT { ");
+            sb.append(" ?aliasUri ?predicate ?object . ");
+            
+            sb.append(" } WHERE { ");
+            
+            sb.append(" ?aliasUri ?predicate ?object . ");
+            sb.append(" ?aliasUri <" + RDF.TYPE.stringValue() + "> <" + PoddRdfConstants.PODD_FILE_REPOSITORY.stringValue() + "> .");
+            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
+            
+            // TODO: filter out other aliases
+            // sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?otherAlias . ");
+            // sb.append("  ?otherAlias != ?alias . ");
+
+            sb.append(" } ");
+            
+            this.log.info("Created SPARQL {} with alias bound to {}", sb.toString(), alias);
+            
+            final GraphQuery query = conn.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+            query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(alias));
+            
+            final Model queryResults = this.executeGraphQuery(query, context);            
+            
+            DebugUtils.printContents(conn, context);
+            DebugUtils.printContents(queryResults);
+            
+            // TODO - how to construct a FileRepository object from this Model. Use a FileRepositoryFactory or reuse FileReferenceProcessors?
             return null;
         }
         finally
@@ -155,7 +200,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
 
     @Override
-    public PoddFileRepository<FileReference> removeRepositoryMapping(String alias) throws FileRepositoryMappingNotFoundException
+    public PoddFileRepository<?> removeRepositoryMapping(String alias) throws FileRepositoryMappingNotFoundException
     {
         // TODO Auto-generated method stub
         return null;
@@ -182,6 +227,53 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     {
         // TODO Auto-generated method stub
         
+    }
+    
+    
+    /**
+     * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
+     * 
+     * @param sparqlQuery
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    private QueryResultCollector executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
+        throws OpenRDFException
+    {
+        final DatasetImpl dataset = new DatasetImpl();
+        for(final URI uri : contexts)
+        {
+            dataset.addDefaultGraph(uri);
+        }
+        sparqlQuery.setDataset(dataset);
+        
+        QueryResultCollector results = new QueryResultCollector();
+        QueryResults.report(sparqlQuery.evaluate(), results);
+        
+        return results;
+    }
+    
+    /**
+     * Helper method to execute a given SPARQL Graph query.
+     * 
+     * @param sparqlQuery
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    private Model executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts) throws OpenRDFException
+    {
+        final DatasetImpl dataset = new DatasetImpl();
+        for(final URI uri : contexts)
+        {
+            dataset.addDefaultGraph(uri);
+        }
+        sparqlQuery.setDataset(dataset);
+        Model results = new LinkedHashModel();
+        sparqlQuery.evaluate(new StatementCollector(results));
+        
+        return results;
     }
     
 }

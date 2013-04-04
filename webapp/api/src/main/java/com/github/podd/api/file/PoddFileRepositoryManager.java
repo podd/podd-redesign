@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 
+import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.exception.FileRepositoryMappingExistsException;
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
 import com.github.podd.exception.PoddException;
@@ -86,5 +87,11 @@ public interface PoddFileRepositoryManager
     
     void downloadFileReference(FileReference nextFileReference, OutputStream outputStream) throws PoddException,
         IOException;
+
+
+    void setRepositoryManager(PoddRepositoryManager repositoryManager);
+
+
+    PoddRepositoryManager getRepositoryManager();
 
 }
