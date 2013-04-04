@@ -9,7 +9,7 @@ package com.github.podd.exception;
  * 
  * @author kutila
  */
-public class FileRepositoryMappingExistsException extends PoddException
+public class FileRepositoryMappingExistsException extends FileRepositoryException
 {
     
     private static final long serialVersionUID = 3224280634543226410L;

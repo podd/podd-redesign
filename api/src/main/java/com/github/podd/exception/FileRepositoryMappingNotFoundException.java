@@ -9,7 +9,7 @@ package com.github.podd.exception;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public class FileRepositoryMappingNotFoundException extends PoddException
+public class FileRepositoryMappingNotFoundException extends FileRepositoryException
 {
     private static final long serialVersionUID = -6834156313829093766L;
     
