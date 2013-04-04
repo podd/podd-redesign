@@ -61,8 +61,9 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
             
             conn.add(alias1Uri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
                     .createLiteral(TEST_ALIAS_1A), context);
-            conn.add(alias1Uri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
-                    .createLiteral(TEST_ALIAS_1B), context);
+            // FIXME - support multiple aliases for same repository configuration
+            // conn.add(alias1Uri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS,
+            // ValueFactoryImpl.getInstance().createLiteral(TEST_ALIAS_1B), context);
             
             conn.add(alias1Uri, PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance()
                     .createLiteral("SSH"), context);

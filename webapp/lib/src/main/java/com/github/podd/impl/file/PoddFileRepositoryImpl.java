@@ -46,45 +46,37 @@ public abstract class PoddFileRepositoryImpl<T extends FileReference> implements
     public PoddFileRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
     {
         // check that the model contains an "alias" and at least one "type"
-        try
+        final Model aliasModel = model.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
+        
+        if(aliasModel.size() != 1)
         {
-            final Model aliasModel = model.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
-            
-            if (aliasModel.size() != 1)
-            {
-                throw new FileRepositoryIncompleteException(model, "Model should have exactly 1 alias");
-            }
-            
-            // alias
-            this.alias = aliasModel.objectString();
-            if(this.alias == null || this.alias.trim().length() < 1)
-            {
-                throw new FileRepositoryIncompleteException(model, "File Repository Alias cannot be NULL/empty");
-            }
-            
-            this.aliasUri = aliasModel.subjects().iterator().next();
-            
-            // types
-            final Set<Value> typeValues = model.filter(this.aliasUri, RDF.TYPE, null).objects();
-            for(Value value : typeValues)
-            {
-                if(value instanceof URI)
-                {
-                    this.types.add((URI)value);
-                }
-            }
-            if(this.types.isEmpty())
-            {
-                throw new FileRepositoryIncompleteException(model, "No FileRepsitoryType information found");
-            }
-            
-            this.model = model;
+            throw new FileRepositoryIncompleteException(model, "Model should have exactly 1 alias");
         }
-        catch(final Exception e)
+        
+        // alias
+        this.alias = aliasModel.objectString();
+        if(this.alias == null || this.alias.trim().length() < 1)
         {
-            throw new FileRepositoryIncompleteException(model,
-                    "Could not construct a valid FileRepository configuration", e);
+            throw new FileRepositoryIncompleteException(model, "File Repository Alias cannot be NULL/empty");
         }
+        
+        this.aliasUri = aliasModel.subjects().iterator().next();
+        
+        // types
+        final Set<Value> typeValues = model.filter(this.aliasUri, RDF.TYPE, null).objects();
+        for(Value value : typeValues)
+        {
+            if(value instanceof URI)
+            {
+                this.types.add((URI)value);
+            }
+        }
+        if(this.types.isEmpty())
+        {
+            throw new FileRepositoryIncompleteException(model, "No FileRepsitoryType information found");
+        }
+        
+        this.model = model;
     }
     
     @Override
