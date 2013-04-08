@@ -74,7 +74,19 @@ public interface PoddFileRepositoryManager
      */
     List<String> getRepositoryAliases(PoddFileRepository<?> repositoryConfiguration) throws FileRepositoryException,
         OpenRDFException;
-    
+
+    /**
+     * Given an alias returns all aliases, including the given one, that map to the same repository
+     * configuration.
+     * 
+     * @param alias
+     * @return Returns a list of all aliases that are currently mapped to the same repository
+     *         configuration as the given alias.
+     * @throws FileRepositoryException
+     * @throws OpenRDFException
+     */
+    List<String> getRepositoryAliases(String alias) throws FileRepositoryException, OpenRDFException;
+
     /**
      * Removes the mapping for the given alias, returning the {@link PoddFileRepository} object that
      * was previously mapped to using the alias.
@@ -99,5 +111,5 @@ public interface PoddFileRepositoryManager
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
     
     PoddRepositoryManager getRepositoryManager();
-    
+
 }

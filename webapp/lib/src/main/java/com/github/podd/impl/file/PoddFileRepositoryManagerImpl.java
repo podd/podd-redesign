@@ -35,10 +35,10 @@ import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.api.file.PoddFileRepositoryManager;
 import com.github.podd.exception.FileRepositoryException;
+import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.exception.FileRepositoryMappingExistsException;
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
 import com.github.podd.exception.PoddException;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -61,18 +61,6 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public void setRepositoryManager(final PoddRepositoryManager repositoryManager)
-    {
-        this.repositoryManager = repositoryManager;
-    }
-    
-    @Override
-    public PoddRepositoryManager getRepositoryManager()
-    {
-        return this.repositoryManager;
-    }
-    
-    @Override
     public void addRepositoryMapping(final String alias, final PoddFileRepository<?> repositoryConfiguration)
         throws OpenRDFException, FileRepositoryException
     {
@@ -83,24 +71,32 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     public void addRepositoryMapping(final String alias, final PoddFileRepository<?> repositoryConfiguration,
             final boolean overwrite) throws OpenRDFException, FileRepositoryException
     {
-        // - TODO: validate FileRepository configuration
         if(repositoryConfiguration == null || alias == null)
         {
             throw new NullPointerException("Cannot add NULL as a File Repository mapping");
         }
         
+        final String aliasInLowerCase = alias.toLowerCase();
+        
         // - check if a mapping with this alias already exists
-        if(this.getRepository(alias) != null)
+        if(this.getRepository(aliasInLowerCase) != null)
         {
             if(overwrite)
             {
-                this.removeRepositoryMapping(alias);
+                this.removeRepositoryMapping(aliasInLowerCase);
             }
             else
             {
-                throw new FileRepositoryMappingExistsException(alias,
+                throw new FileRepositoryMappingExistsException(aliasInLowerCase,
                         "File Repository mapping with this alias already exists");
             }
+        }
+        
+        boolean repositoryConfigurationExistsInGraph = true;
+        if (this.getRepositoryAliases(repositoryConfiguration).isEmpty())
+        {
+            // adding a new repository configuration
+            repositoryConfigurationExistsInGraph = false;
         }
         
         final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
@@ -110,8 +106,33 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             conn = this.repositoryManager.getRepository().getConnection();
             conn.begin();
             
-            final Model model = repositoryConfiguration.getAsModel();
-            conn.add(model, context);
+            if (repositoryConfigurationExistsInGraph)
+            {
+                final Set<Resource> subjectUris =
+                        repositoryConfiguration
+                                .getAsModel()
+                                .filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null).subjects();
+                
+                this.log.info("Found {} subject URIs", subjectUris.size()); //DEBUG-----------------
+                for(final Resource subjectUri : subjectUris)
+                {
+                    conn.add(subjectUri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
+                            .createLiteral(aliasInLowerCase), context);
+                    this.log.info("Added alias '{}' triple with subject <{}>", aliasInLowerCase, subjectUri.stringValue());
+                }
+            }
+            else
+            {
+                final Model model = repositoryConfiguration.getAsModel();
+                if(model == null || model.isEmpty())
+                {
+                    throw new FileRepositoryIncompleteException(model,
+                            "Incomplete File Repository since Model is empty");
+                }
+                
+                // FIXME: create new unique PURL URI as subject for all the statements in the Model
+                conn.add(model, context);
+            }
             conn.commit();
         }
         catch(final Exception e)
@@ -140,12 +161,23 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
+    public void downloadFileReference(final FileReference nextFileReference, final OutputStream outputStream)
+        throws PoddException, IOException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
     public PoddFileRepository<?> getRepository(final String alias) throws FileRepositoryException, OpenRDFException
     {
         if(alias == null)
         {
             return null;
         }
+        
+        final String aliasInLowerCase = alias.toLowerCase();
+        final boolean multipleAliasesExist = this.getRepositoryAliases(aliasInLowerCase).size() > 1;
         
         RepositoryConnection conn = null;
         try
@@ -167,86 +199,28 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                     + PoddRdfConstants.PODD_FILE_REPOSITORY.stringValue() + "> .");
             sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
             
-            // TODO: filter out other aliases
-            // sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue()
-            // + "> ?otherAlias . ");
-            // sb.append("  ?otherAlias != ?alias . ");
-            
+            // filter to exclude other aliases
+            if (multipleAliasesExist)
+            {
+                sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue()
+                        + "> ?otherAlias . ");
+                sb.append(" FILTER ( str(?object) != str(?otherAlias) && str(?otherAlias) != str(?alias) )  . ");
+            }
             sb.append(" } ");
             
-            this.log.info("Created SPARQL {} with alias bound to '{}'", sb.toString(), alias);
+            this.log.info("Created SPARQL {} with alias bound to '{}'", sb.toString(), aliasInLowerCase);
             
             final GraphQuery query = conn.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
-            query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(alias));
+            query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase));
             
             final Model queryResults = this.executeGraphQuery(query, context);
-            
-            // DebugUtils.printContents(conn, context);
-            DebugUtils.printContents(queryResults);
             
             if(queryResults.isEmpty())
             {
                 return null;
             }
             
-            return PoddFileRepositoryFactory.createFileRepository(alias, queryResults);
-        }
-        finally
-        {
-            if(conn != null && conn.isActive())
-            {
-                conn.rollback();
-            }
-            if(conn != null && conn.isOpen())
-            {
-                conn.close();
-            }
-        }
-    }
-    
-    @Override
-    public PoddFileRepository<?> removeRepositoryMapping(final String alias) throws FileRepositoryException,
-        OpenRDFException
-    {
-        final PoddFileRepository<?> repositoryToRemove = this.getRepository(alias);
-        if(repositoryToRemove == null)
-        {
-            throw new FileRepositoryMappingNotFoundException(alias, "No File Repository mapped to this alias");
-        }
-        
-        RepositoryConnection conn = null;
-        try
-        {
-            conn = this.repositoryManager.getRepository().getConnection();
-            conn.begin();
-            
-            final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
-            
-            if(this.getRepositoryAliases(repositoryToRemove).size() > 1)
-            {
-                // several aliases map to this repository. only remove the statement which maps this
-                // alias
-                conn.remove(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
-                        .createLiteral(alias), context);
-                this.log.info("Removed ONLY the mapping for alias {}", alias);
-            }
-            else
-            {
-                // only one mapping exists. delete the repository configuration
-                final Set<Resource> subjectUris =
-                        repositoryToRemove
-                                .getAsModel()
-                                .filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS,
-                                        ValueFactoryImpl.getInstance().createLiteral(alias), context).subjects();
-                for(final Resource subjectUri : subjectUris)
-                {
-                    conn.remove(subjectUri, null, null, context);
-                    this.log.info("Removed ALL triples for alias with URI {}", alias, subjectUri.stringValue());
-                }
-            }
-            
-            conn.commit();
-            return repositoryToRemove;
+            return PoddFileRepositoryFactory.createFileRepository(aliasInLowerCase, queryResults);
         }
         finally
         {
@@ -265,9 +239,13 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     public List<String> getRepositoryAliases(final PoddFileRepository<?> repositoryConfiguration)
         throws FileRepositoryException, OpenRDFException
     {
+        return this.getRepositoryAliases(repositoryConfiguration.getAlias());
+    }
+    
+    @Override
+    public List<String> getRepositoryAliases(final String alias) throws FileRepositoryException, OpenRDFException
+    {
         final List<String> results = new ArrayList<String>();
-        
-        final String alias = repositoryConfiguration.getAlias();
         
         RepositoryConnection conn = null;
         try
@@ -312,16 +290,84 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public void verifyFileReferences(final Set<FileReference> fileReferenceResults) throws OpenRDFException,
-        PoddException, FileRepositoryMappingNotFoundException
+    public PoddRepositoryManager getRepositoryManager()
     {
-        // TODO Auto-generated method stub
-        
+        return this.repositoryManager;
     }
     
     @Override
-    public void downloadFileReference(final FileReference nextFileReference, final OutputStream outputStream)
-        throws PoddException, IOException
+    public PoddFileRepository<?> removeRepositoryMapping(final String alias) throws FileRepositoryException,
+        OpenRDFException
+    {
+        final String aliasInLowerCase = alias.toLowerCase();
+        
+        final PoddFileRepository<?> repositoryToRemove = this.getRepository(aliasInLowerCase);
+        if(repositoryToRemove == null)
+        {
+            throw new FileRepositoryMappingNotFoundException(aliasInLowerCase, "No File Repository mapped to this alias");
+        }
+        
+        // retrieved early simply to avoid having multiple RepositoryConnections open simultaneously
+        final int aliasCount = this.getRepositoryAliases(repositoryToRemove).size();
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repositoryManager.getRepository().getConnection();
+            conn.begin();
+            
+            final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
+            
+            if(aliasCount > 1)
+            {
+                // several aliases map to this repository. only remove the statement which maps this
+                // alias
+                conn.remove(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
+                        .createLiteral(aliasInLowerCase), context);
+                this.log.info("Removed ONLY the mapping for alias '{}'", aliasInLowerCase);
+            }
+            else
+            {
+                // only one mapping exists. delete the repository configuration
+                final Set<Resource> subjectUris =
+                        repositoryToRemove
+                                .getAsModel()
+                                .filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS,
+                                        ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase)).subjects();
+                
+                this.log.info("Need to remove {} triples", subjectUris.size()); //DEBUG output
+                for(final Resource subjectUri : subjectUris)
+                {
+                    conn.remove(subjectUri, null, null, context);
+                    this.log.info("Removed ALL triples for alias '{}' with URI <{}>", aliasInLowerCase, subjectUri.stringValue());
+                }
+            }
+            
+            conn.commit();
+            return repositoryToRemove;
+        }
+        finally
+        {
+            if(conn != null && conn.isActive())
+            {
+                conn.rollback();
+            }
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
+    }
+    
+    @Override
+    public void setRepositoryManager(final PoddRepositoryManager repositoryManager)
+    {
+        this.repositoryManager = repositoryManager;
+    }
+    
+    @Override
+    public void verifyFileReferences(final Set<FileReference> fileReferenceResults) throws OpenRDFException,
+        PoddException, FileRepositoryMappingNotFoundException
     {
         // TODO Auto-generated method stub
         
