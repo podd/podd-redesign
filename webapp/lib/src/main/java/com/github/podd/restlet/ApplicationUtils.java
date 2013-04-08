@@ -253,8 +253,7 @@ public class ApplicationUtils
         // classpath
         nextFileRegistry.clear();
         final FileReferenceProcessorFactory nextFileProcessorFactory = new SSHFileReferenceProcessorFactoryImpl();
-        // TODO: uncomment the next line once the Factory is ready for use
-        // nextFileRegistry.add(nextFileProcessorFactory);
+        nextFileRegistry.add(nextFileProcessorFactory);
         
         final FileReferenceManager nextFileReferenceManager = new FileReferenceManagerImpl();
         nextFileReferenceManager.setProcessorFactoryRegistry(nextFileRegistry);
