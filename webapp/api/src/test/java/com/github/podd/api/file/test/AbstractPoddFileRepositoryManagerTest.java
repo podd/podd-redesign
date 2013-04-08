@@ -237,6 +237,50 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     }
     
     @Test
+    public void testGetEquivalentAliasesSuccess() throws Exception
+    {
+        final List<String> aliases =
+                this.testFileRepositoryManager
+                        .getEquivalentAliases(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A);
+        
+        // verify:
+        Assert.assertNotNull("NULL list of aliases", aliases);
+        Assert.assertEquals("Not the expected number of aliases", 2, aliases.size());
+        Assert.assertTrue("Expected alias missing",
+                aliases.contains(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A));
+        Assert.assertTrue("Expected alias missing",
+                aliases.contains(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2B));
+    }
+    
+    @Test
+    public void testGetEquivalentAliasesWithNonExistentAlias() throws Exception
+    {
+        final List<String> aliases = this.testFileRepositoryManager.getEquivalentAliases("no_such_alias");
+        
+        // verify:
+        Assert.assertNotNull("NULL list of aliases", aliases);
+        Assert.assertEquals("Expected no aliases", 0, aliases.size());
+    }
+    
+    @Test
+    public void testGetEquivalentAliasesWithNullAlias() throws Exception
+    {
+        try
+        {
+            this.testFileRepositoryManager.getEquivalentAliases(null);
+            Assert.fail("Should have thrown a NULLPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            Assert.assertNotNull(e);
+        }
+    }
+    
+    
+    
+    
+    
+    @Test
     public void testGetRepositoryAliasesSuccess() throws Exception
     {
         final PoddFileRepository<?> fileRepository =
@@ -340,7 +384,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         // prepare:
         final List<String> existingAliases =
                 this.testFileRepositoryManager
-                        .getRepositoryAliases(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A);
+                        .getEquivalentAliases(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A);
         Assert.assertEquals("Test setup should have 2 aliases mapped", 2, existingAliases.size());
         existingAliases.remove(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A);
         

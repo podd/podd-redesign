@@ -194,7 +194,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
         }
         
         final String aliasInLowerCase = alias.toLowerCase();
-        final boolean multipleAliasesExist = this.getRepositoryAliases(aliasInLowerCase).size() > 1;
+        final boolean multipleAliasesExist = this.getEquivalentAliases(aliasInLowerCase).size() > 1;
         
         RepositoryConnection conn = null;
         try
@@ -256,13 +256,14 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     public List<String> getRepositoryAliases(final PoddFileRepository<?> repositoryConfiguration)
         throws FileRepositoryException, OpenRDFException
     {
-        return this.getRepositoryAliases(repositoryConfiguration.getAlias());
+        return this.getEquivalentAliases(repositoryConfiguration.getAlias());
     }
     
     @Override
-    public List<String> getRepositoryAliases(final String alias) throws FileRepositoryException, OpenRDFException
+    public List<String> getEquivalentAliases(final String alias) throws FileRepositoryException, OpenRDFException
     {
         final List<String> results = new ArrayList<String>();
+        final String aliasInLowerCase = alias.toLowerCase();
         
         RepositoryConnection conn = null;
         try
@@ -279,10 +280,10 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
             sb.append(" } ");
             
-            this.log.info("Created SPARQL {} with alias bound to '{}'", sb.toString(), alias);
+            this.log.info("Created SPARQL {} with alias bound to '{}'", sb.toString(), aliasInLowerCase);
             
             final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-            query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(alias));
+            query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase));
             
             final QueryResultCollector queryResults = this.executeSparqlQuery(query, context);
             for(final BindingSet binding : queryResults.getBindingSets())
@@ -386,6 +387,12 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     public void verifyFileReferences(final Set<FileReference> fileReferenceResults) throws OpenRDFException,
         PoddException, FileRepositoryMappingNotFoundException
     {
+        for (FileReference fileReference : fileReferenceResults)
+        {
+            PoddFileRepository<?> repository = this.getRepository(fileReference.getRepositoryAlias());
+            
+        }
+        
         // TODO Auto-generated method stub
         
     }

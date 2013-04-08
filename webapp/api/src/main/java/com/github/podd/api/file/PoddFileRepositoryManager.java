@@ -85,7 +85,7 @@ public interface PoddFileRepositoryManager
      * @throws FileRepositoryException
      * @throws OpenRDFException
      */
-    List<String> getRepositoryAliases(String alias) throws FileRepositoryException, OpenRDFException;
+    List<String> getEquivalentAliases(String alias) throws FileRepositoryException, OpenRDFException;
 
     /**
      * Removes the mapping for the given alias, returning the {@link PoddFileRepository} object that
