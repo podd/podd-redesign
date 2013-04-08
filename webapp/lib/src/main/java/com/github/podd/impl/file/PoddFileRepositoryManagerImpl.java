@@ -193,7 +193,10 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             return null;
         }
         
+        // Could use LCASE function in the SPARQL query instead of converting to lower case here 
+        // (http://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-lcase)
         final String aliasInLowerCase = alias.toLowerCase();
+        
         final boolean multipleAliasesExist = this.getEquivalentAliases(aliasInLowerCase).size() > 1;
         
         RepositoryConnection conn = null;
@@ -385,15 +388,21 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     
     @Override
     public void verifyFileReferences(final Set<FileReference> fileReferenceResults) throws OpenRDFException,
-        PoddException, FileRepositoryMappingNotFoundException
+        PoddException, FileRepositoryMappingNotFoundException 
     {
         for (FileReference fileReference : fileReferenceResults)
         {
-            PoddFileRepository<?> repository = this.getRepository(fileReference.getRepositoryAlias());
-            
+            final String alias = fileReference.getRepositoryAlias();
+            PoddFileRepository<FileReference> repository = (PoddFileRepository<FileReference>)this.getRepository(alias);
+            if (repository == null)
+            {
+                throw new FileRepositoryMappingNotFoundException(alias,
+                        "Could not find a File Repository configuration mapped to this alias");
+            }
+            //boolean validated = repository.validate(fileReference);
         }
         
-        // TODO Auto-generated method stub
+        // TODO - incomplete implementation. see whether this method will be used
         
     }
     
