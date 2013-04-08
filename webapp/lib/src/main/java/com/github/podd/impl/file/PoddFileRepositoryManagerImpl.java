@@ -12,6 +12,7 @@ import java.util.Set;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
@@ -26,6 +27,7 @@ import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,7 +115,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                                 .getAsModel()
                                 .filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null).subjects();
                 
-                this.log.info("Found {} subject URIs", subjectUris.size()); //DEBUG-----------------
+                this.log.info("Found {} subject URIs", subjectUris.size()); // should be only 1 here
                 for(final Resource subjectUri : subjectUris)
                 {
                     conn.add(subjectUri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
@@ -129,8 +131,23 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                     throw new FileRepositoryIncompleteException(model,
                             "Incomplete File Repository since Model is empty");
                 }
+
+                // check that the subject URIs used in the repository configuration are not already
+                // used in the
+                // file repository management graph
+                final Set<Resource> subjectUris =
+                        model.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null).subjects();
+                for(final Resource subjectUri : subjectUris)
+                {
+                    final RepositoryResult<Statement> statements =
+                            conn.getStatements(subjectUri, null, null, false, context);
+                    if(statements.hasNext())
+                    {
+                        throw new FileRepositoryIncompleteException(model,
+                                "Subject URIs used in Model already exist in Management Graph");
+                    }
+                }
                 
-                // FIXME: create new unique PURL URI as subject for all the statements in the Model
                 conn.add(model, context);
             }
             conn.commit();

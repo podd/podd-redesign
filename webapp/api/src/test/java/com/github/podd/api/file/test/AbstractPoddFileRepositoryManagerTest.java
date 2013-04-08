@@ -20,6 +20,7 @@ import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.api.file.PoddFileRepositoryManager;
 import com.github.podd.exception.FileRepositoryException;
+import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
 
 /**
@@ -131,6 +132,58 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         Assert.assertNotNull("Alias mapping returns NULL", mappedRepository);
     }
     
+    /**
+     * Tests addRepositoryMapping() when the input FileRepository's internal Model is NULL.
+     */
+    @Test
+    public void testAddRepositoryMappingWithIncompleteRepositoryConfiguration1() throws Exception
+    {
+        // prepare:
+        final String alias = "alias-1-gamma";
+        final PoddFileRepository<?> fileRepository =
+                this.buildFileRepositoryInstance(alias, null);
+        
+        Assert.assertNotNull("FileRepository was NULL", fileRepository);
+        
+        try
+        {
+            this.testFileRepositoryManager.addRepositoryMapping(alias, fileRepository);
+            Assert.fail("Should have thrown a FileRepositoryIncompleteException");
+        }
+        catch(final FileRepositoryIncompleteException e)
+        {
+            Assert.assertEquals("Not the expected error message", "Incomplete File Repository since Model is empty",
+                    e.getMessage());
+        }
+    }
+
+    /**
+     * Tests addRepositoryMapping() when the input FileRepository's internal Model uses a URI that already
+     * exists in the management graph. 
+     */
+    @Test
+    public void testAddRepositoryMappingWithIncompleteRepositoryConfiguration2() throws Exception
+    {
+        // prepare:
+        final String alias = "alias-1-gamma";
+        final URI duplicateAliasUri = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/alias/1-alpha");
+        final PoddFileRepository<?> fileRepository =
+                this.buildFileRepositoryInstance(alias, this.buildModelForFileRepository(duplicateAliasUri, alias));
+        
+        Assert.assertNotNull("FileRepository was NULL", fileRepository);
+        
+        try
+        {
+            this.testFileRepositoryManager.addRepositoryMapping(alias, fileRepository);
+            Assert.fail("Should have thrown a FileRepositoryIncompleteException");
+        }
+        catch(final FileRepositoryIncompleteException e)
+        {
+            Assert.assertEquals("Not the expected error message",
+                    "Subject URIs used in Model already exist in Management Graph", e.getMessage());
+        }
+    }
+
     @Test
     public void testAddRepositoryMappingWithNewRepositoryConfiguration() throws Exception
     {
