@@ -31,6 +31,9 @@ import com.github.podd.impl.file.SSHFileRepositoryImpl;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
+ * This concrete test class uses SSH File References and a test SSH file repository
+ * to run through the abstract PoddFileRepositoryManager tests.
+ * 
  * @author kutila
  */
 public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositoryManagerTest
