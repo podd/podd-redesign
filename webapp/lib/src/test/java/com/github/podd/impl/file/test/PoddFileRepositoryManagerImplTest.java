@@ -3,9 +3,12 @@
  */
 package com.github.podd.impl.file.test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -24,6 +27,7 @@ import com.github.podd.api.file.test.AbstractPoddFileRepositoryManagerTest;
 import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
+import com.github.podd.impl.file.SSHFileRepositoryImpl;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -31,6 +35,20 @@ import com.github.podd.utils.PoddRdfConstants;
  */
 public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositoryManagerTest
 {
+
+    @Rule
+    public final TemporaryFolder tempDirectory = new TemporaryFolder();
+
+    /** SSH File Repository server for tests */
+    protected SSHService sshd;
+    
+    
+    @Override
+    protected FileReference buildFileReference(final String alias, final String fileIdentifier)
+    {
+        return SSHService.getNewFileReference(alias, fileIdentifier);
+    }
+
     
     @Override
     protected PoddFileRepository<?> buildFileRepositoryInstance(final String alias, final Model model)
@@ -86,17 +104,17 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         // SSH implementation specific configurations
         model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance()
-                .createLiteral("SSH"));
+                .createLiteral(SSHFileRepositoryImpl.PROTOCOL_SSH));
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_HOST,
-                ValueFactoryImpl.getInstance().createLiteral("localhost"));
+                ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_HOST));
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PORT,
-                ValueFactoryImpl.getInstance().createLiteral("9856"));
+                ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_SERVICE_PORT));
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance()
-                .createLiteral("ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db"));
+                .createLiteral(SSHService.TEST_SSH_FINGERPRINT));
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, ValueFactoryImpl.getInstance()
-                .createLiteral("salt"));
+                .createLiteral(SSHService.TEST_SSH_USERNAME));
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET,
-                ValueFactoryImpl.getInstance().createLiteral("salt"));
+                ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_SECRET));
         
         return model;
     }
@@ -119,4 +137,22 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         return testFileRepositoryManager;
     }
     
+    @Override
+    protected void startRepositorySource() throws Exception
+    {
+        sshd = new SSHService();
+        final File tempDirForHostKey = this.tempDirectory.newFolder();
+        sshd.startTestSSHServer(Integer.parseInt(SSHService.TEST_SSH_SERVICE_PORT),
+                tempDirForHostKey);
+    }
+
+    @Override
+    protected void stopRepositorySource() throws Exception
+    {
+        if (sshd != null)
+        {
+            sshd.stopTestSSHServer();
+        }
+    }
+
 }

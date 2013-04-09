@@ -3,11 +3,14 @@
  */
 package com.github.podd.api.file.test;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -17,8 +20,11 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 
 import com.github.podd.api.PoddRepositoryManager;
+import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.api.file.PoddFileRepositoryManager;
+import com.github.podd.exception.FileReferenceInvalidException;
+import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.FileRepositoryException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
@@ -38,6 +44,8 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     
     protected PoddFileRepositoryManager testFileRepositoryManager;
     protected PoddRepositoryManager testRepositoryManager;
+    
+    protected abstract FileReference buildFileReference(final String alias, final String fileIdentifier);
     
     /**
      * Build a File Repository object in memory with the given alias and Model. ALl other method
@@ -71,6 +79,12 @@ public abstract class AbstractPoddFileRepositoryManagerTest
      * @throws OpenRDFException
      */
     protected abstract PoddFileRepositoryManager getNewPoddFileRepositoryManager() throws OpenRDFException;
+    
+
+    protected abstract void startRepositorySource() throws Exception;
+
+    protected abstract void stopRepositorySource() throws Exception;
+
     
     @Before
     public void setUp() throws Exception
@@ -234,6 +248,13 @@ public abstract class AbstractPoddFileRepositoryManagerTest
             Assert.assertEquals("Not the expected error message", "Cannot add NULL as a File Repository mapping",
                     e.getMessage());
         }
+    }
+    
+    @Ignore
+    @Test
+    public void testDownloadFileReference() throws Exception
+    {
+        // TODO - implement me
     }
     
     @Test
@@ -431,6 +452,89 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         catch(final FileRepositoryException e)
         {
             Assert.assertTrue(e instanceof FileRepositoryMappingNotFoundException);
+        }
+    }
+    
+    @Test
+    public void testVerifyFileReferencesWithNullFileReferences() throws Exception
+    {
+        try
+        {
+            this.testFileRepositoryManager.verifyFileReferences(null);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertTrue(e instanceof NullPointerException);
+        }
+    }
+    
+    @Test
+    public void testVerifyFileReferencesWithEmptyFileReferenceSet() throws Exception
+    {
+        final Set<FileReference> fileReferences = new HashSet<FileReference>();
+        this.testFileRepositoryManager.verifyFileReferences(fileReferences);
+    }
+
+    
+    /**
+     * This test starts up an internal file repository source and therefore can be slow.
+     */
+    @Test
+    public void testVerifyFileReferencesWithNoFailures() throws Exception
+    {
+        // prepare: create FileReferences to test
+        final Set<FileReference> fileReferences = new HashSet<FileReference>();
+        FileReference fileRefWithAlias1A = this.buildFileReference(TEST_ALIAS_1A, null);
+        fileReferences.add(fileRefWithAlias1A);
+        
+        FileReference fileRefWithAlias2A = this.buildFileReference(TEST_ALIAS_2A, null);
+        fileReferences.add(fileRefWithAlias2A);
+        
+        try
+        {
+            this.startRepositorySource();
+            this.testFileRepositoryManager.verifyFileReferences(fileReferences);
+        }
+        finally
+        {
+            this.stopRepositorySource();
+        }
+    }
+    
+    /**
+     * This test starts up an internal file repository source and therefore can be slow.
+     */
+    @Test
+    public void testVerifyFileReferencesWithOneFailure() throws Exception
+    {
+        // prepare: create FileReferences to test
+        final Set<FileReference> fileReferences = new HashSet<FileReference>();
+        FileReference fileRefWithAlias1A = this.buildFileReference(TEST_ALIAS_1A, null);
+        fileReferences.add(fileRefWithAlias1A);
+        
+        FileReference fileRefWithNoSuchFile = this.buildFileReference(TEST_ALIAS_1A, "no_such_file");
+        fileReferences.add(fileRefWithNoSuchFile);
+        
+        try
+        {
+            this.startRepositorySource();
+            
+            this.testFileRepositoryManager.verifyFileReferences(fileReferences);
+            Assert.fail("Verify should have thrown an Exception containing errors");
+        }
+        catch(FileReferenceVerificationFailureException e)
+        {
+            Assert.assertEquals("Expected 1 validation failure", 1, e.getValidationFailures().size());
+            Throwable throwable = e.getValidationFailures().get(fileRefWithNoSuchFile);
+            Assert.assertTrue("Not the expected cause of validation failure",
+                    throwable instanceof FileReferenceInvalidException);
+            Assert.assertEquals("Not the expected error message",
+                    "Remote File Repository says this File Reference is invalid", throwable.getMessage());
+        }
+        finally
+        {
+            this.stopRepositorySource();
         }
     }
     

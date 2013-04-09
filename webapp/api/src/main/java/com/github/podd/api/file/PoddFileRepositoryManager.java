@@ -20,7 +20,7 @@ import com.github.podd.exception.PoddException;
 public interface PoddFileRepositoryManager
 {
     /**
-     * Adds a mapping between the given IRI and the given repository configuration.
+     * Adds a mapping between the given String <i>alias</i> and the given repository configuration.
      * 
      * This mapping is necessary to link file references in PODD Artifacts with the correct file
      * repositories.
@@ -102,6 +102,19 @@ public interface PoddFileRepositoryManager
     PoddFileRepository<?> removeRepositoryMapping(String alias) throws FileRepositoryMappingNotFoundException,
         FileRepositoryException, OpenRDFException;
     
+    /**
+     * Verifies that a given set of {@link FileReference} objects are valid by checking they can be 
+     * accessed from the remote File Repository.
+     * 
+     * @param fileReferenceResults
+     *            The set of FileReferences to be verified
+     * @throws OpenRDFException
+     * @throws PoddException
+     * @throws FileRepositoryMappingNotFoundException
+     *             If at least one of the FileReferences fail validation, this Exception is thrown
+     *             containing a Map which contains the offending FileReferences and their causes of
+     *             failure.
+     */
     void verifyFileReferences(Set<FileReference> fileReferenceResults) throws OpenRDFException, PoddException,
         FileRepositoryMappingNotFoundException;
     

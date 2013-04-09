@@ -6,7 +6,9 @@ package com.github.podd.impl.file;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -36,6 +38,8 @@ import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.api.file.PoddFileRepositoryManager;
+import com.github.podd.exception.FileReferenceInvalidException;
+import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.FileRepositoryException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.exception.FileRepositoryMappingExistsException;
@@ -181,8 +185,8 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     public void downloadFileReference(final FileReference nextFileReference, final OutputStream outputStream)
         throws PoddException, IOException
     {
-        // TODO Auto-generated method stub
-        
+        // TODO 
+        throw new RuntimeException("TODO: Implement me");
     }
     
     @Override
@@ -388,22 +392,37 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     
     @Override
     public void verifyFileReferences(final Set<FileReference> fileReferenceResults) throws OpenRDFException,
-        PoddException, FileRepositoryMappingNotFoundException 
+        FileRepositoryException, FileReferenceVerificationFailureException
     {
-        for (FileReference fileReference : fileReferenceResults)
+        Map<FileReference, Throwable> errors = new HashMap<FileReference, Throwable>();
+        
+        for(FileReference fileReference : fileReferenceResults)
         {
             final String alias = fileReference.getRepositoryAlias();
             PoddFileRepository<FileReference> repository = (PoddFileRepository<FileReference>)this.getRepository(alias);
-            if (repository == null)
+            if(repository == null)
             {
-                throw new FileRepositoryMappingNotFoundException(alias,
-                        "Could not find a File Repository configuration mapped to this alias");
+                errors.put(fileReference, new FileRepositoryMappingNotFoundException(alias,
+                        "Could not find a File Repository configuration mapped to this alias"));
             }
-            //boolean validated = repository.validate(fileReference);
+            try
+            {
+                if(!repository.validate(fileReference))
+                {
+                    errors.put(fileReference, new FileReferenceInvalidException(fileReference,
+                            "Remote File Repository says this File Reference is invalid"));
+                }
+            }
+            catch(Exception e)
+            {
+                errors.put(fileReference, e);
+            }
         }
-        
-        // TODO - incomplete implementation. see whether this method will be used
-        
+       
+        if (!errors.isEmpty())
+        {
+            throw new FileReferenceVerificationFailureException(errors, "File Reference validation resulted in failures");
+        }
     }
     
     /**
