@@ -863,7 +863,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             if(isReplace)
             {
                 // create an intermediate context and add "edit" statements to it
-                final URI intContext = IRI.create("urn:intermediate:").toOpenRDFURI();
+                final URI intContext = IRI.create("urn:intermediate:" + UUID.randomUUID().toString()).toOpenRDFURI();
+                
                 tempRepositoryConnection.add(inputStream, "", format, intContext);
                 
                 // get all Subjects in "edit" statements
