@@ -38,6 +38,12 @@ import com.github.podd.impl.file.SSHFileReferenceImpl;
  */
 public class SSHService
 {
+    public static final String TEST_SSH_HOST = "localhost";
+    public static final String TEST_SSH_SERVICE_PORT = "9856";
+    public static final String TEST_SSH_FINGERPRINT = "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db";
+    public static final String TEST_SSH_USERNAME = "salt";
+    public static final String TEST_SSH_SECRET = "salt";
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private SshServer server;
