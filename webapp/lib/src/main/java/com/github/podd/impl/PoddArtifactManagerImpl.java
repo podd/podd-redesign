@@ -1069,6 +1069,103 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
 
     @Override
+    public InferredOWLOntologyID attachFileReferences(final InferredOWLOntologyID artifactId, final URI objectUri,
+            final InputStream inputStream, RDFFormat inputFormat) throws IOException, OpenRDFException, PoddException
+    {
+        if(inputStream == null)
+        {
+            throw new NullPointerException("Input stream must not be null");
+        }
+        
+        if(inputFormat == null)
+        {
+            inputFormat = RDFFormat.RDFXML;
+        }
+        
+        // is most current version of artifact being used?
+        InferredOWLOntologyID currentArtifactID = this.getArtifactByIRI(artifactId.getOntologyIRI());
+        if(!artifactId.equals(currentArtifactID))
+        {
+            throw new UnmanagedArtifactIRIException(artifactId.getVersionIRI(),
+                    "Artifact is not the most current version");
+        }        
+        
+        // temporary repository where the file reference RDF triples will be initially stored
+        final Repository tempRepository = this.repositoryManager.getNewTemporaryRepository();
+        RepositoryConnection temporaryRepositoryConnection = null;
+        
+        InferredOWLOntologyID inferredOWLOntologyID = null;
+        try
+        {
+            temporaryRepositoryConnection = tempRepository.getConnection();
+            final URI randomContext =
+                    ValueFactoryImpl.getInstance().createURI("urn:uuid:" + UUID.randomUUID().toString());
+            
+            // load the file reference RDF triples into a random context in the temporary repository
+            temporaryRepositoryConnection.add(inputStream, "", inputFormat, randomContext);
+            
+            // - generate file reference objects
+            final Set<FileReference> fileReferences =
+                    this.getFileReferenceManager().extractFileReferences(temporaryRepositoryConnection, randomContext);
+            
+            // - validate references
+            // TODO - validate and accumulate encountered validation failures to be sent back to client. 
+            
+            // - add reference to artifact, compute inferences, update artifact ID etc.
+            for (FileReference fileReference: fileReferences)
+            {
+                this.attachFileReference(artifactId, objectUri, fileReference);
+            }
+            
+        }
+        catch(final IOException e)
+        {
+            if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isActive())
+            {
+                temporaryRepositoryConnection.rollback();
+            }
+            
+//            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isActive())
+//            {
+//                permanentRepositoryConnection.rollback();
+//            }
+            
+            throw e;
+        }
+        finally
+        {
+            // release resources
+            
+            if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isOpen())
+            {
+                try
+                {
+                    temporaryRepositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
+            }
+            tempRepository.shutDown();
+            
+//            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
+//            {
+//                try
+//                {
+//                    permanentRepositoryConnection.close();
+//                }
+//                catch(final RepositoryException e)
+//                {
+//                    this.log.error("Found exception closing repository connection", e);
+//                }
+//            }
+        }
+        
+        return inferredOWLOntologyID;
+    }
+    
+    @Override
     public InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
             FileReference fileReference) throws OpenRDFException, PoddException
     {

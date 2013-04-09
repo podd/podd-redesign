@@ -12,8 +12,6 @@ import java.util.Set;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
@@ -300,9 +298,13 @@ public interface PoddArtifactManager
     InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
             FileReference fileReference) throws OpenRDFException, PoddException;
     
+    InferredOWLOntologyID attachFileReferences(InferredOWLOntologyID artifactId, URI objectUri,
+            InputStream inputStream, RDFFormat format) throws IOException, OpenRDFException, PoddException;
+
     Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId);
     
     Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
     
     Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
+
 }

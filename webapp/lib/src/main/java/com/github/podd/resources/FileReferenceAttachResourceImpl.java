@@ -16,6 +16,7 @@ import java.util.Set;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
@@ -105,15 +106,9 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             artifactMap = this.doFileReferenceAttach(entity, artifactUri, versionUri, objectUri, inputStream, inputFormat);
         }
-        catch(OpenRDFException e1)
+        catch(OpenRDFException | PoddException e)
         {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        catch(PoddException e1)
-        {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not attach file references", e);
         }
         
         this.log.info("Successfully attached file reference to artifact {}", artifactMap);
@@ -139,13 +134,24 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
                 .getDefaultMIMEType()));
     }
     
+    
     private InferredOWLOntologyID doFileReferenceAttach(final Representation entity, final String artifactUri,
-            final String versionUri, final String objectUri, final InputStream inputStream, final RDFFormat inputFormat) throws OpenRDFException, PoddException
+            final String versionUri, final String objectUri, final InputStream inputStream, final RDFFormat inputFormat)
+        throws OpenRDFException, PoddException
     {
-        // - read RDF from input stream and generate file reference object
-        final Set<FileReference> fileReferences = this.getPoddArtifactManager().getFileReferenceManager().extractFileReferences(null, null);
+        final URI objectToAttachTo = ValueFactoryImpl.getInstance().createURI(objectUri);
         
-        // TODO: inside File Ref Manager?
+        
+        // TODO: inside a Manager?
+        
+        // - read RDF into a RepositoryConnection from input stream 
+        RepositoryConnection conn = null;
+        URI randomContext = null;
+        
+        // - generate file reference object
+        final Set<FileReference> fileReferences =
+                this.getPoddArtifactManager().getFileReferenceManager().extractFileReferences(conn, randomContext);
+        
         // - is most current version of artifact being used?
         InferredOWLOntologyID artifactId = new InferredOWLOntologyID(IRI.create(artifactUri), IRI.create(versionUri), null);
         // - validate reference
@@ -158,6 +164,8 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         // - return: updated artifact ID, object URI, file reference object URI
         return null;
     }
+    
+    
     
     @Get
     public Representation attachFileReferencePageHtml(final Representation entity) throws ResourceException
