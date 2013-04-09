@@ -19,8 +19,6 @@ import org.openrdf.model.vocabulary.RDF;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.api.file.test.AbstractPoddFileRepositoryTest;
-import com.github.podd.api.test.TestConstants;
-import com.github.podd.impl.file.SSHFileReferenceImpl;
 import com.github.podd.impl.file.SSHFileRepositoryImpl;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -196,38 +194,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     @Override
     protected SSHFileReference getNewFileReference(String alias, String fileIdentifier)
     {
-        // prepare: create the FileReference to be validated
-        final SSHFileReference fileReference = new SSHFileReferenceImpl();
-        fileReference.setRepositoryAlias(alias);
-        
-        // prepare: get the name and path of File to be validated
-        /*
-         * NOTE: The TEST_FILE should be accessible on the file system as a file. If it is accessed
-         * as a resource made available from a different module, it will not be accessible to the
-         * SSH service.
-         */
-        final String testFile = this.getClass().getResource(TestConstants.TEST_FILE).getFile();
-        String fileName = testFile;
-        String path = this.getClass().getResource(TestConstants.TEST_FILE).getPath();
-        
-        final int lastSlashPosition = testFile.lastIndexOf(File.separatorChar);
-        if(lastSlashPosition != -1)
-        {
-            fileName = testFile.substring(lastSlashPosition + 1);
-            path = testFile.substring(0, lastSlashPosition);
-        }
-        
-        if (fileIdentifier != null)
-        {
-            fileReference.setFilename(fileIdentifier);
-        }
-        else
-        {
-            fileReference.setFilename(fileName);
-        }
-        fileReference.setPath(path);
-        
-        return fileReference;
+        return SSHService.getNewFileReference(alias, fileIdentifier);
     }
     
     protected void startRepositorySource() throws Exception

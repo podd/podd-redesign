@@ -26,6 +26,10 @@ import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.file.SSHFileReference;
+import com.github.podd.api.test.TestConstants;
+import com.github.podd.impl.file.SSHFileReferenceImpl;
+
 /**
  * A simple SSH Service for testing. This is based on the unit tests in the sshj project.
  * 
@@ -151,5 +155,50 @@ public class SSHService
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * 
+     * @param alias
+     *            The alias to be assigned to the created FileReference.
+     * @param fileIdentifier
+     *            If this parameter is not null, its value will be set as the file Identifier
+     * @return A new FileReference instance for use by tests
+     */
+    public static SSHFileReference getNewFileReference(String alias, String fileIdentifier)
+    {
+        // prepare: create the FileReference to be validated
+        final SSHFileReference fileReference = new SSHFileReferenceImpl();
+        fileReference.setRepositoryAlias(alias);
+        
+        // prepare: get the name and path of File to be validated
+        /*
+         * NOTE: The TEST_FILE should be accessible on the file system as a file. If it is accessed
+         * as a resource made available from a different module, it will not be accessible to the
+         * SSH service.
+         */
+        final String testFile = SSHService.class.getResource(TestConstants.TEST_FILE).getFile();
+        String fileName = testFile;
+        String path = SSHService.class.getResource(TestConstants.TEST_FILE).getPath();
+        
+        final int lastSlashPosition = testFile.lastIndexOf(File.separatorChar);
+        if(lastSlashPosition != -1)
+        {
+            fileName = testFile.substring(lastSlashPosition + 1);
+            path = testFile.substring(0, lastSlashPosition);
+        }
+        
+        if (fileIdentifier != null)
+        {
+            fileReference.setFilename(fileIdentifier);
+        }
+        else
+        {
+            fileReference.setFilename(fileName);
+        }
+        fileReference.setPath(path);
+        
+        return fileReference;
+    }
+    
     
 }
