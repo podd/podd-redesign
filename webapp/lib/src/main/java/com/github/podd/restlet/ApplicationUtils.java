@@ -39,6 +39,7 @@ import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.file.FileReferenceManager;
 import com.github.podd.api.file.FileReferenceProcessorFactory;
 import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.file.PoddFileRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
@@ -49,6 +50,7 @@ import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.impl.file.FileReferenceManagerImpl;
+import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
@@ -255,9 +257,13 @@ public class ApplicationUtils
         final FileReferenceProcessorFactory nextFileProcessorFactory = new SSHFileReferenceProcessorFactoryImpl();
         nextFileRegistry.add(nextFileProcessorFactory);
         
+        // File Reference Manager
         final FileReferenceManager nextFileReferenceManager = new FileReferenceManagerImpl();
         nextFileReferenceManager.setProcessorFactoryRegistry(nextFileRegistry);
         
+        // File Repository Manager
+        final PoddFileRepositoryManager nextFileRepositoryManager = new PoddFileRepositoryManagerImpl();
+        nextFileRepositoryManager.setRepositoryManager(application.getPoddRepositoryManager());
         
         // PURL manager
         final PoddPurlProcessorFactoryRegistry nextPurlRegistry = new PoddPurlProcessorFactoryRegistry();
@@ -291,6 +297,7 @@ public class ApplicationUtils
         application.setPoddArtifactManager(new PoddArtifactManagerImpl());
         application.getPoddArtifactManager().setRepositoryManager(application.getPoddRepositoryManager());
         application.getPoddArtifactManager().setFileReferenceManager(nextFileReferenceManager);
+        application.getPoddArtifactManager().setFileRepositoryManager(nextFileRepositoryManager);
         application.getPoddArtifactManager().setPurlManager(nextPurlManager);
         application.getPoddArtifactManager().setOwlManager(nextOWLManager);
         application.getPoddArtifactManager().setSchemaManager(application.getPoddSchemaManager());

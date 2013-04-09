@@ -19,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.FileReferenceManager;
+import com.github.podd.api.file.PoddFileRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
@@ -97,6 +98,13 @@ public interface PoddArtifactManager
      */
     FileReferenceManager getFileReferenceManager();
     
+    /**
+     * 
+     * @return The {@link PoddFileRepositoryManager} used to manage external file repository
+     *         configurations.
+     */
+    PoddFileRepositoryManager getFileRepositoryManager();
+
     /**
      * 
      * @return The {@link PoddOWLManager} used to manage OWL validation and inferencing for
@@ -191,6 +199,14 @@ public interface PoddArtifactManager
      */
     void setFileReferenceManager(FileReferenceManager fileManager);
     
+    /**
+     * Sets the {@link PoddFileRepositoryManager} to use for managing file repository configurations.
+     * 
+     * @param fileRepositoryManager
+     *            The manager to use for managing file repository configurations.
+     */
+    void setFileRepositoryManager(PoddFileRepositoryManager fileRepositoryManager);
+
     /**
      * Sets the {@link PoddOWLManager} instance to use when loading and dealing with Artifacts in
      * memory. This manager may not be used for some queries where SPARQL queries on the underlying

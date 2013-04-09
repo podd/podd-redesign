@@ -45,10 +45,12 @@ import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.FileReferenceManager;
+import com.github.podd.api.file.PoddFileRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.DeleteArtifactException;
 import com.github.podd.exception.DisconnectedObjectException;
+import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -70,6 +72,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private FileReferenceManager fileReferenceManager;
+    private PoddFileRepositoryManager fileRepositoryManager;
     private PoddOWLManager owlManager;
     private PoddPurlManager purlManager;
     private PoddSchemaManager schemaManager;
@@ -240,7 +243,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     {
         return this.fileReferenceManager;
     }
-    
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.api.PoddArtifactManager#getFileRepositoryManager()
+     */
+    @Override
+    public PoddFileRepositoryManager getFileRepositoryManager()
+    {
+        return this.fileRepositoryManager;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -729,7 +743,20 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     {
         this.fileReferenceManager = fileManager;
     }
-    
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.github.podd.api.PoddArtifactManager#setFileRepositoryManager(com.github.podd.api.file
+     * .PoddFileRepositoryManager)
+     */
+    @Override
+    public void setFileRepositoryManager(PoddFileRepositoryManager fileRepositoryManager)
+    {
+        this.fileRepositoryManager = fileRepositoryManager;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -1094,7 +1121,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final Repository tempRepository = this.repositoryManager.getNewTemporaryRepository();
         RepositoryConnection temporaryRepositoryConnection = null;
         
-        InferredOWLOntologyID inferredOWLOntologyID = null;
+        InferredOWLOntologyID inferredOWLOntologyID = artifactId;
         try
         {
             temporaryRepositoryConnection = tempRepository.getConnection();
@@ -1109,14 +1136,22 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     this.getFileReferenceManager().extractFileReferences(temporaryRepositoryConnection, randomContext);
             
             // - validate references
-            // TODO - validate and accumulate encountered validation failures to be sent back to client. 
+            try
+            {
+                this.fileRepositoryManager.verifyFileReferences(fileReferences);
+            }
+            catch (FileReferenceVerificationFailureException e)
+            {
+                this.log.warn("From " + fileReferences.size() + " file references, " + e.getValidationFailures().size()
+                        + " failed validation.");
+                // TODO - send these back to client 
+            }
             
             // - add reference to artifact, compute inferences, update artifact ID etc.
             for (FileReference fileReference: fileReferences)
             {
-                this.attachFileReference(artifactId, objectUri, fileReference);
+                inferredOWLOntologyID = this.attachFileReference(inferredOWLOntologyID, objectUri, fileReference);
             }
-            
         }
         catch(final IOException e)
         {
@@ -1193,5 +1228,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         // TODO Auto-generated method stub
         return null;
     }
+
     
 }
