@@ -273,17 +273,17 @@ public interface PoddArtifactManager
      *            complete artifact here, only sending the affected statements is sufficient.
      * @param format
      *            Format of the incoming RDF data content
-     * @param isReplace
-     *            Indicates whether the incoming statements should replace existing statements or
-     *            whether they should be merged with the existing ones.
-     * @param force
-     *            If true, indicates that any internal PODD objects that become disconnected from
-     *            the Top Object as a result of the update should be deleted. If false, a
-     *            DisconnectedObjectException is thrown if the update results in disconnected
-     *            objects.
-     * @param verifyFileReferences
-     *            If true, indicates that any File References found should be verified by accessing
-     *            them from their source.
+     * @param updatePolicy
+     *            Indicates whether the incoming statements should replace existing statements about
+     *            the same subjects or whether they should be merged with the existing ones.
+     * @param danglingObjectPolicy
+     *            The policy for handling any internal PODD objects that become disconnected from
+     *            the Top Object as a result of the update. FORCE_CLEAN policy silently deletes any
+     *            while REPORT policy throws a DisconnectedObjectException to inform of any
+     *            disconnected objects.
+     * @param fileReferencePolicy
+     *            Indicates whether any File References found should be verified by accessing them
+     *            from their source.
      * @return
      * @throws OpenRDFException
      * @throws PoddException
@@ -291,8 +291,9 @@ public interface PoddArtifactManager
      * @throws OWLException
      */
     InferredOWLOntologyID updateArtifact(final URI artifactUri, URI versionUri, final InputStream inputStream,
-            final RDFFormat format, final boolean isReplace, final boolean force, final boolean verifyFileReferences)
-        throws OpenRDFException, PoddException, IOException, OWLException;
+            final RDFFormat format, final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectPolicy,
+            final FileReferenceVerificationPolicy fileReferencePolicy) throws OpenRDFException, PoddException, IOException,
+        OWLException;
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.

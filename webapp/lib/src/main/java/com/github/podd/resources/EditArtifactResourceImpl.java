@@ -38,11 +38,13 @@ import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.DanglingObjectPolicy;
+import com.github.podd.api.FileReferenceVerificationPolicy;
+import com.github.podd.api.UpdatePolicy;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -91,11 +93,14 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         
-        boolean isReplace = true;
+        UpdatePolicy updatePolicy = UpdatePolicy.REPLACE_EXISTING;
         final String isReplaceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_REPLACE);
         if (isReplaceStr != null)
         {
-            isReplace = Boolean.valueOf(isReplaceStr);
+            if (Boolean.valueOf(isReplaceStr) == false)
+            {
+                updatePolicy = UpdatePolicy.MERGE_WITH_EXISTING;
+            }
         }
         
         boolean force = false;
@@ -107,7 +112,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         
         this.log.info("requesting edit artifact ({}): {}, with isReplace {}", variant.getMediaType().getName(),
-                artifactUri, isReplace);
+                artifactUri, updatePolicy);
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
                 Collections.<URI> singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
@@ -139,7 +144,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             final InferredOWLOntologyID ontologyID =
                     this.getPoddArtifactManager().updateArtifact(ValueFactoryImpl.getInstance().createURI(artifactUri),
                             ValueFactoryImpl.getInstance().createURI(versionUri),
-                            inputStream, inputFormat, isReplace, force, false);
+                            inputStream, inputFormat, updatePolicy, DanglingObjectPolicy.FORCE_CLEAN, FileReferenceVerificationPolicy.DO_NOT_VERIFY);
             //TODO - send detailed errors for display where possible
             
             // FIXME Change response format so that it does not resemble an empty OWL Ontology

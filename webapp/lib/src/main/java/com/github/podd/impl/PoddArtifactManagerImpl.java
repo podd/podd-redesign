@@ -38,11 +38,14 @@ import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
+import com.github.podd.api.UpdatePolicy;
+import com.github.podd.api.FileReferenceVerificationPolicy;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.FileReferenceManager;
 import com.github.podd.api.file.PoddFileRepositoryManager;
@@ -431,7 +434,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             this.handlePurls(temporaryRepositoryConnection, randomContext);
             
-            this.handleFileReferences(temporaryRepositoryConnection, randomContext, false);
+            this.handleFileReferences(temporaryRepositoryConnection, randomContext, FileReferenceVerificationPolicy.DO_NOT_VERIFY);
             
             final Repository permanentRepository = this.getRepositoryManager().getRepository();
             permanentRepositoryConnection = permanentRepository.getConnection();
@@ -486,7 +489,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 throw new EmptyOntologyException(null, "Loaded ontology is empty");
             }
-            this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext, false);
+            this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext, DanglingObjectPolicy.REPORT);
             
             // check and ensure schema ontology imports are for version IRIs
             this.handleSchemaImports(ontologyIRI, permanentRepositoryConnection, temporaryRepositoryConnection,
@@ -715,8 +718,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public InferredOWLOntologyID updateArtifact(final URI artifactUri, final URI versionUri,
-            final InputStream inputStream, RDFFormat format, final boolean isReplace, final boolean force,
-            final boolean verifyFileReferences) throws OpenRDFException, IOException, OWLException, PoddException
+            final InputStream inputStream, RDFFormat format, final UpdatePolicy updatePolicy,
+            final DanglingObjectPolicy danglingObjectAction, final FileReferenceVerificationPolicy fileReferenceAction)
+        throws OpenRDFException, IOException, OWLException, PoddException
     {
         if(inputStream == null)
         {
@@ -767,7 +771,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepositoryConnection.add(repoResult, tempContext);
             
             // update the artifact statements
-            if(isReplace)
+            if(UpdatePolicy.REPLACE_EXISTING.equals(updatePolicy))
             {
                 // create an intermediate context and add "edit" statements to it
                 final URI intContext = IRI.create("urn:intermediate:" + UUID.randomUUID().toString()).toOpenRDFURI();
@@ -794,11 +798,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 tempRepositoryConnection.add(inputStream, "", format, tempContext);
             }
             
-            this.handleDanglingObjects(artifactID.getOntologyIRI(), tempRepositoryConnection, tempContext, force);
+            this.handleDanglingObjects(artifactID.getOntologyIRI(), tempRepositoryConnection, tempContext, danglingObjectAction);
             
             this.handlePurls(tempRepositoryConnection, tempContext);
             
-            this.handleFileReferences(tempRepositoryConnection, tempContext, verifyFileReferences);
+            this.handleFileReferences(tempRepositoryConnection, tempContext, fileReferenceAction);
             
             // increment the version
             final OWLOntologyID currentManagedArtifactID =
@@ -912,7 +916,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @throws DisconnectedObjectException
      */
     private void handleDanglingObjects(final IRI artifactID,
-            final RepositoryConnection repositoryConnection, final URI context, boolean force)
+            final RepositoryConnection repositoryConnection, final URI context, DanglingObjectPolicy policy)
         throws RepositoryException, DisconnectedObjectException
     {
         final Set<URI> danglingObjects =
@@ -920,15 +924,22 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         repositoryConnection, context);
         this.log.info("Found {} dangling object(s). \n {}", danglingObjects.size(), danglingObjects);
         
-        if(!danglingObjects.isEmpty() && !force)
+        if(danglingObjects.isEmpty())
+        {
+            return;
+        }
+        
+        if(policy.equals(DanglingObjectPolicy.REPORT))
         {
             throw new DisconnectedObjectException(danglingObjects, "Update leads to disconnected PODD objects");
         }
-        
-        for(URI danglingObject : danglingObjects)
+        else if(policy.equals(DanglingObjectPolicy.FORCE_CLEAN))
         {
-            repositoryConnection.remove(danglingObject, null, null, context);
-            repositoryConnection.remove(null, null, (Value)danglingObject, context);
+            for(URI danglingObject : danglingObjects)
+            {
+                repositoryConnection.remove(danglingObject, null, null, context);
+                repositoryConnection.remove(null, null, (Value)danglingObject, context);
+            }
         }
     }
 
@@ -940,14 +951,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * 
      * @param repositoryConnection
      * @param context
-     * @param verify
+     * @param policy
      *            If true, verifies that FileReference objects are accessible from their respective
      *            remote File Repositories
      * 
      * @throws OpenRDFException
      * @throws PoddException
      */
-    private void handleFileReferences(final RepositoryConnection repositoryConnection, final URI context, boolean verify)
+    private void handleFileReferences(final RepositoryConnection repositoryConnection, final URI context, FileReferenceVerificationPolicy policy)
         throws OpenRDFException, PoddException
     {
         if(this.getFileReferenceManager() == null)
@@ -960,7 +971,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final Set<FileReference> fileReferenceResults =
                 this.getFileReferenceManager().extractFileReferences(repositoryConnection, context);
         
-        if (verify)
+        if (FileReferenceVerificationPolicy.VERIFY.equals(policy))
         {
             try
             {
