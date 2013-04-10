@@ -31,9 +31,11 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.FileReferenceVerificationPolicy;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
@@ -104,9 +106,13 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         InferredOWLOntologyID artifactMap = null;
         try
         {
-            artifactMap = this.doFileReferenceAttach(entity, artifactUri, versionUri, objectUri, inputStream, inputFormat);
+            FileReferenceVerificationPolicy verificationPolicy = FileReferenceVerificationPolicy.DO_NOT_VERIFY;
+            artifactMap = this.getPoddArtifactManager().attachFileReferences(
+                    ValueFactoryImpl.getInstance().createURI(artifactUri),
+                    ValueFactoryImpl.getInstance().createURI(versionUri),
+                    inputStream, inputFormat, verificationPolicy);
         }
-        catch(OpenRDFException | PoddException e)
+        catch(OpenRDFException | PoddException | IOException | OWLException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not attach file references", e);
         }

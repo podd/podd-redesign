@@ -398,6 +398,62 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#attachFileReferences(URI, URI, InputStream, RDFFormat, FileReferenceVerificationPolicy)}
+     * .
+     */
+    @Test
+    public final void testAttachFileReferencesWithoutVerification() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        
+        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactId, 7, 90, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final InputStream editInputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);
+        
+        final InferredOWLOntologyID updatedArtifact =
+                this.testArtifactManager.attachFileReferences(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
+                        .getVersionIRI().toOpenRDFURI(), editInputStream, RDFFormat.RDFXML,
+                        FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+        
+        // verify:
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    98, nextRepositoryConnection);
+            
+            // verify: file reference object
+            final List<Statement> fileRefList =
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
+                            .createURI(PoddRdfConstants.PODD_BASE, "hasFileReference"), null, false, updatedArtifact
+                            .getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
+            
+            Assert.assertTrue("File reference value incorrect",
+                    fileRefList.get(0).getObject().stringValue().endsWith("object-rice-scan-34343-a"));
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+    }
+    
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      * 

@@ -318,13 +318,15 @@ public interface PoddArtifactManager
     InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
             FileReference fileReference) throws OpenRDFException, PoddException;
     
-    InferredOWLOntologyID attachFileReferences(InferredOWLOntologyID artifactId, URI objectUri,
-            InputStream inputStream, RDFFormat format) throws IOException, OpenRDFException, PoddException;
+    InferredOWLOntologyID attachFileReferences(URI artifactUri, URI versionUri, InputStream inputStream,
+            RDFFormat format, FileReferenceVerificationPolicy fileReferenceVerificationPolicy) throws OpenRDFException,
+        IOException, OWLException, PoddException;
 
     Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId);
     
     Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
     
     Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
+
 
 }
