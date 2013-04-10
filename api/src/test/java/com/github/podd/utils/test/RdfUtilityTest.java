@@ -41,8 +41,7 @@ public class RdfUtilityTest
 
             {"/test/artifacts/disconnected-1-object.rdf", RDFFormat.RDFXML, false, 2},
             
-            // containedBy from object to TopObject is not identified in validation
-            { "/test/artifacts/basic-1-internal-object.rdf", RDFFormat.RDFXML, false, 2},
+            { "/test/artifacts/basic-1-internal-object.rdf", RDFFormat.RDFXML, true, 0},
 
             // disconnected segment has cycles within it
             {"/test/artifacts/disconnected-cycles.ttl", RDFFormat.TURTLE, false, 13},

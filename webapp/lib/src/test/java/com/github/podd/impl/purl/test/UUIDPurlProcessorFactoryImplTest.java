@@ -154,7 +154,7 @@ public class UUIDPurlProcessorFactoryImplTest extends AbstractPoddRdfProcessorFa
                 Assert.assertEquals("Subject was not what was requested", subject, statement.getSubject());
                 count++;
             }
-            Assert.assertEquals("SPARQL query did not match expected number of statements", 12, count);
+            Assert.assertEquals("SPARQL query did not match expected number of statements", 13, count);
             result.close();
             repositoryConnection.rollback();
         }

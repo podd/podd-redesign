@@ -237,17 +237,6 @@
     
 
 
-    <!-- mailto:alyssa.weirman@csiro.au -->
-
-    <owl:NamedIndividual rdf:about="mailto:alyssa.weirman@csiro.au">
-        <rdf:type rdf:resource="&poddUser;User"/>
-        <rdfs:label>A. Wierman</rdfs:label>
-        <foaf:lastName>Weirman</foaf:lastName>
-        <foaf:firstName>Alyssa</foaf:firstName>
-    </owl:NamedIndividual>
-    
-
-
     <!-- mailto:helen.daily@csiro.au -->
 
     <owl:NamedIndividual rdf:about="mailto:helen.daily@csiro.au">
@@ -267,11 +256,6 @@
     
 
 
-    <!-- mailto:xueqin.wang@csiro.au -->
-
-    <owl:NamedIndividual rdf:about="mailto:xueqin.wang@csiro.au">
-        <rdf:type rdf:resource="&poddUser;User"/>
-    </owl:NamedIndividual>
 </rdf:RDF>
 
 

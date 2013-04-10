@@ -21,14 +21,6 @@
 
 
 <!-- links to users -->
-<rdf:Description rdf:about="mailto:xueqin.wang@csiro.au">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#User"/>
-</rdf:Description>
-
-<rdf:Description rdf:about="mailto:alyssa.weirman@csiro.au">
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#User"/>
-</rdf:Description>
-
 <rdf:Description rdf:about="mailto:xavier.sirault@csiro.au">
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#User"/>
 </rdf:Description>

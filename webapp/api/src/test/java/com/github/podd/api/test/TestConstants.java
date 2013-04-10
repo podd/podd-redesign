@@ -26,6 +26,11 @@ public interface TestConstants
     public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE = 83;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED = 278;
  
+    /** Test resource: artifact with no internal objects */
+    public static final String TEST_ARTIFACT_BASIC_PROJECT_1 = "/test/artifacts/basicProject-1.rdf";
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_1_CONCRETE_TRIPLES = 21;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_1_INFERRED_TRIPLES = 295;
+
     /** Test resource: artifact with 1 internal object */
     public static final String TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT = "/test/artifacts/basic-1-internal-object.rdf";
     public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES = 28;
@@ -33,11 +38,37 @@ public interface TestConstants
 
     /** Test resource: artifact with 1 internal object, slightly different */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_2 = "/test/artifacts/basicProject-2.rdf";
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES = 29;
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES = 303;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES = 25;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES = 295;
+
+    /** Test resource: (in RDF/XML) artifact with published status */
+    public static final String TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED = "/test/artifacts/basicProject-1-published.rdf";
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_CONCRETE_TRIPLES = 25;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_INFERRED_TRIPLES = 295;
     
     public static final String TEST_ARTIFACT_PURLS_2_FILE_REFS = "/test/artifacts/project-purls-file-ref.rdf"; 
     
+    /** Test resource (in RDF/XML): invalid artifact with 2 lead institutes */
+    public static final String TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES = "/test/artifacts/bad-twoLeadInstitutions.rdf";
+    
+    /** Test resource: invalid with empty file */
+    public static final String TEST_INVALID_ARTIFACT_EMPTY =  "/test/ontologies/empty.owl";
+
+    
+    /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
+    public static final String TEST_ARTIFACT_IMPORT_PSCIENCEv1 = "/test/artifacts/project-imports-sciencev1-version.rdf";
+    public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_CONCRETE_TRIPLES = 29;
+    public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_INFERRED_TRIPLES = 301;
+    
+    /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
+    public static final String TEST_ARTIFACT_NO_VERSION_INFO = "/test/artifacts/project-with-no-version-info.rdf";
+    public static final int TEST_ARTIFACT_NO_VERSION_INFO_CONCRETE_TRIPLES = 29;
+    public static final int TEST_ARTIFACT_NO_VERSION_INFO_INFERRED_TRIPLES = 301;
+
+    /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
+    public static final String TEST_ARTIFACT_PURLS_v1 = "/test/artifacts/project-with-purls-v1.rdf";
+    public static final int TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES = 25;
+    public static final int TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES = 295;
     
     /** Test resource (in Turtle): artifact with temporary URIs and 1 internal object having a PURL */
     public static final String TEST_ARTIFACT_TTL_1_INTERNAL_OBJECT =  "/test/artifacts/connected-1-object.ttl";
@@ -70,5 +101,4 @@ public interface TestConstants
 
     /** Test resource: any file which exists and can be used as a file reference */
     public static final String TEST_FILE = "/test/artifacts/basic-2.rdf";
-
 }

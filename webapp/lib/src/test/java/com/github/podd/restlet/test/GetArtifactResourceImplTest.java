@@ -15,6 +15,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -26,7 +27,7 @@ import com.github.podd.utils.PoddWebConstants;
 public class GetArtifactResourceImplTest extends AbstractResourceImplTest
 {
     
-    private static final String TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT = "/test/artifacts/basicProject-1-internal-object.rdf";
+   // private static final String TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT = "/test/artifacts/basicProject-1-internal-object.rdf";
 
     /**
      * Test access without artifactID parameter gives a BAD_REQUEST error.
@@ -77,7 +78,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     public void testGetArtifactBasicHtml() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT);
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -108,7 +109,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     public void testGetArtifactHtmlAnalysisObject() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT);
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         final String objectUri = "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0";
 
@@ -175,7 +176,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     public void testGetArtifactBasicRdf() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT);
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -203,7 +204,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     public void testGetArtifactBasicTurtle() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT);
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -231,7 +232,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     public void testGetArtifactBasicJson() throws Exception
     {
         // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT);
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));

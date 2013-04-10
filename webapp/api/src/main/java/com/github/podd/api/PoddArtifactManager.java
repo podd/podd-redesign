@@ -281,6 +281,9 @@ public interface PoddArtifactManager
      *            the Top Object as a result of the update should be deleted. If false, a
      *            DisconnectedObjectException is thrown if the update results in disconnected
      *            objects.
+     * @param verifyFileReferences
+     *            If true, indicates that any File References found should be verified by accessing
+     *            them from their source.
      * @return
      * @throws OpenRDFException
      * @throws PoddException
@@ -288,8 +291,8 @@ public interface PoddArtifactManager
      * @throws OWLException
      */
     InferredOWLOntologyID updateArtifact(final URI artifactUri, URI versionUri, final InputStream inputStream,
-            final RDFFormat format, final boolean isReplace, final boolean force) throws OpenRDFException,
-        PoddException, IOException, OWLException;
+            final RDFFormat format, final boolean isReplace, final boolean force, final boolean verifyFileReferences)
+        throws OpenRDFException, PoddException, IOException, OWLException;
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.

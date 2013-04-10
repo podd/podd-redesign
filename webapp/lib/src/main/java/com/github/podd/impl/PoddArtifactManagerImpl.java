@@ -50,6 +50,7 @@ import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.DeleteArtifactException;
 import com.github.podd.exception.DisconnectedObjectException;
+import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
@@ -87,7 +88,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     public PoddArtifactManagerImpl()
     {
-        // TODO Auto-generated constructor stub
     }
     
     @Override
@@ -431,7 +431,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             this.handlePurls(temporaryRepositoryConnection, randomContext);
             
-            this.handleFileReferences(temporaryRepositoryConnection, randomContext);
+            this.handleFileReferences(temporaryRepositoryConnection, randomContext, false);
             
             final Repository permanentRepository = this.getRepositoryManager().getRepository();
             permanentRepositoryConnection = permanentRepository.getConnection();
@@ -482,6 +482,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 temporaryRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), PoddRdfConstants.OWL_VERSION_IRI,
                         newVersionIRI.toOpenRDFURI(), randomContext);
             }
+            else
+            {
+                throw new EmptyOntologyException(null, "Loaded ontology is empty");
+            }
+            this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext, false);
             
             // check and ensure schema ontology imports are for version IRIs
             this.handleSchemaImports(ontologyIRI, permanentRepositoryConnection, temporaryRepositoryConnection,
@@ -710,8 +715,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public InferredOWLOntologyID updateArtifact(final URI artifactUri, final URI versionUri,
-            final InputStream inputStream, RDFFormat format, final boolean isReplace, boolean force)
-        throws OpenRDFException, IOException, OWLException, PoddException
+            final InputStream inputStream, RDFFormat format, final boolean isReplace, final boolean force,
+            final boolean verifyFileReferences) throws OpenRDFException, IOException, OWLException, PoddException
     {
         if(inputStream == null)
         {
@@ -789,25 +794,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 tempRepositoryConnection.add(inputStream, "", format, tempContext);
             }
             
-            // check for dangling objects that are no longer linked to the artifact
-            // and delete them
-            Set<URI> danglingObjects =
-                    RdfUtility.findDisconnectedNodes(artifactID.getOntologyIRI().toOpenRDFURI(),
-                            tempRepositoryConnection, tempContext);
-            this.log.info("Found {} dangling object(s). \n {}", danglingObjects.size(), danglingObjects);
-            if(!danglingObjects.isEmpty() && !force)
-            {
-                throw new DisconnectedObjectException(danglingObjects, "Update leads to disconnected PODD objects");
-            }
-            for(URI danglingObject : danglingObjects)
-            {
-                tempRepositoryConnection.remove(danglingObject, null, null, tempContext);
-                tempRepositoryConnection.remove(null, null, (Value)danglingObject, tempContext);
-            }
+            this.handleDanglingObjects(artifactID.getOntologyIRI(), tempRepositoryConnection, tempContext, force);
             
             this.handlePurls(tempRepositoryConnection, tempContext);
             
-            this.handleFileReferences(tempRepositoryConnection, tempContext);
+            this.handleFileReferences(tempRepositoryConnection, tempContext, verifyFileReferences);
             
             // increment the version
             final OWLOntologyID currentManagedArtifactID =
@@ -908,26 +899,78 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /**
-     * Helper method to handle File References in a newly loaded/updated set of statements
+     * Checks for dangling objects that are not linked to the artifact and deletes them if
+     * <i>force</i> is true.
+     * 
+     * @param artifactID
+     * @param repositoryConnection
+     * @param context
+     * @param force
+     *            If true, deletes any dangling objects. If false, throws a
+     *            DisconnectedObjectException if any dangling objects are found.
+     * @throws RepositoryException
+     * @throws DisconnectedObjectException
      */
-    private void handleFileReferences(final RepositoryConnection repositoryConnection, final URI context)
-        throws OpenRDFException
+    private void handleDanglingObjects(final IRI artifactID,
+            final RepositoryConnection repositoryConnection, final URI context, boolean force)
+        throws RepositoryException, DisconnectedObjectException
     {
-        if(this.getFileReferenceManager() != null)
+        final Set<URI> danglingObjects =
+                RdfUtility.findDisconnectedNodes(artifactID.toOpenRDFURI(),
+                        repositoryConnection, context);
+        this.log.info("Found {} dangling object(s). \n {}", danglingObjects.size(), danglingObjects);
+        
+        if(!danglingObjects.isEmpty() && !force)
         {
-            this.log.info("Handling File reference validation");
-            // calls, to setup the results collection
-            final Set<FileReference> fileReferenceResults =
-                    this.getFileReferenceManager().extractFileReferences(repositoryConnection, context);
-            
-            // optionally verify the file references
-            if(fileReferenceResults.size() > 0)
+            throw new DisconnectedObjectException(danglingObjects, "Update leads to disconnected PODD objects");
+        }
+        
+        for(URI danglingObject : danglingObjects)
+        {
+            repositoryConnection.remove(danglingObject, null, null, context);
+            repositoryConnection.remove(null, null, (Value)danglingObject, context);
+        }
+    }
+
+    /**
+     * Helper method to handle File References in a newly loaded/updated set of statements.
+     * 
+     * TODO: Optionally remove invalid file references or mark them as invalid using RDF
+     * statements/OWL Classes
+     * 
+     * @param repositoryConnection
+     * @param context
+     * @param verify
+     *            If true, verifies that FileReference objects are accessible from their respective
+     *            remote File Repositories
+     * 
+     * @throws OpenRDFException
+     * @throws PoddException
+     */
+    private void handleFileReferences(final RepositoryConnection repositoryConnection, final URI context, boolean verify)
+        throws OpenRDFException, PoddException
+    {
+        if(this.getFileReferenceManager() == null)
+        {
+            return;
+        }
+
+        this.log.info("Handling File reference validation");
+
+        final Set<FileReference> fileReferenceResults =
+                this.getFileReferenceManager().extractFileReferences(repositoryConnection, context);
+        
+        if (verify)
+        {
+            try
             {
-                // FIXME: verifyFileReferences() has been moved to PoddFileRepositoryManager
-                // this.getFileReferenceManager().verifyFileReferences(fileReferenceResults,
-                // tempRepositoryConnection, tempContext);
-                // TODO: Optionally remove invalid file references or mark them as invalid using
-                // RDF statements/OWL Classes
+                this.fileRepositoryManager.verifyFileReferences(fileReferenceResults);
+            }
+            catch(FileReferenceVerificationFailureException e)
+            {
+                this.log.warn("From " + fileReferenceResults.size() + " file references, "
+                        + e.getValidationFailures().size() + " failed validation.");
+                throw e;
             }
         }
     }

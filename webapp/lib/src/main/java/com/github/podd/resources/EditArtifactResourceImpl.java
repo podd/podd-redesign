@@ -139,7 +139,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             final InferredOWLOntologyID ontologyID =
                     this.getPoddArtifactManager().updateArtifact(ValueFactoryImpl.getInstance().createURI(artifactUri),
                             ValueFactoryImpl.getInstance().createURI(versionUri),
-                            inputStream, inputFormat, isReplace, force);
+                            inputStream, inputFormat, isReplace, force, false);
             //TODO - send detailed errors for display where possible
             
             // FIXME Change response format so that it does not resemble an empty OWL Ontology

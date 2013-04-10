@@ -145,7 +145,8 @@ public abstract class AbstractPoddClientTest
         // verify that the artifact is accessible and complete
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 30);
+        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+                BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
         Assert.assertTrue(this.testClient.deleteArtifact(newArtifact));
     }
@@ -194,7 +195,8 @@ public abstract class AbstractPoddClientTest
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 30);
+        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+                BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
     }
     
     /**
@@ -278,7 +280,8 @@ public abstract class AbstractPoddClientTest
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 30);
+        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+                BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
         // Returns a new version, as when the artifact is published it gets a new version
         final InferredOWLOntologyID publishedArtifact = this.testClient.publishArtifact(newArtifact);
@@ -336,7 +339,8 @@ public abstract class AbstractPoddClientTest
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 30);
+        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+                BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
         final Collection<InferredOWLOntologyID> results = this.testClient.listUnpublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
@@ -446,11 +450,13 @@ public abstract class AbstractPoddClientTest
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        final Model model = this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 30);
+        final Model model = this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+                BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, newArtifact
                 .getVersionIRI().toOpenRDFURI()));
     }
     
+    private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 26;
 }

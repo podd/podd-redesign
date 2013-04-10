@@ -1567,10 +1567,10 @@ public abstract class AbstractPoddSesameManagerTest
     {
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         
-        final String testResourcePath = "/test/artifacts/basicProject-1-published.rdf";
+        final String testResourcePath = TestConstants.TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED;
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:uuid:artifact:version:55");
         
-        final boolean isPublished = this.internalTestIsPublished(testResourcePath, 23, versionUri, context);
+        final boolean isPublished = this.internalTestIsPublished(testResourcePath, 21, versionUri, context);
         Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
     }
     
@@ -1585,9 +1585,10 @@ public abstract class AbstractPoddSesameManagerTest
     {
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         
-        final String testResourcePath = "/test/artifacts/basicProject-1.rdf";
+        final String testResourcePath = TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1;
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:artifact:version:1");
-        final boolean isPublished = this.internalTestIsPublished(testResourcePath, 23, versionUri, context);
+        final boolean isPublished = this.internalTestIsPublished(testResourcePath, 
+                TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1_CONCRETE_TRIPLES, versionUri, context);
         Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
     }
     
