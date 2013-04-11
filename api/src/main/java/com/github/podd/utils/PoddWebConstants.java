@@ -139,6 +139,11 @@ public interface PoddWebConstants
     public static final String KEY_OBJECT_IDENTIFIER = "objecturi";
     
     /**
+     * Key used to represent the file reference verification policy to use
+     */
+    public static final String KEY_VERIFICATION_POLICY = "file_verification";
+
+    /**
      * Key used to represent a specific help page as part of a request
      */
     public static final String KEY_HELP_PAGE_IDENTIFIER = "helppage";

@@ -11,12 +11,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
@@ -30,13 +28,11 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.FileReferenceVerificationPolicy;
-import com.github.podd.api.file.FileReference;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
@@ -80,12 +76,12 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
         }
         
-        // check mandatory parameter: object URI to which file reference is to be attached
-        final String objectUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
-        if(objectUri == null)
+        // check optional parameter: whether file references should be verified. Defaults to NO
+        final String verifyFileRefs = this.getQuery().getFirstValue(PoddWebConstants.KEY_VERIFICATION_POLICY);
+        FileReferenceVerificationPolicy verificationPolicy = FileReferenceVerificationPolicy.DO_NOT_VERIFY;
+        if(verifyFileRefs != null && Boolean.valueOf(verifyFileRefs))
         {
-            this.log.error("Object URI not submitted");
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
+            verificationPolicy = FileReferenceVerificationPolicy.VERIFY;
         }
         
         // get input stream containing RDF statements
@@ -106,7 +102,6 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         InferredOWLOntologyID artifactMap = null;
         try
         {
-            FileReferenceVerificationPolicy verificationPolicy = FileReferenceVerificationPolicy.DO_NOT_VERIFY;
             artifactMap = this.getPoddArtifactManager().attachFileReferences(
                     ValueFactoryImpl.getInstance().createURI(artifactUri),
                     ValueFactoryImpl.getInstance().createURI(versionUri),
@@ -139,38 +134,6 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
                 .getDefaultMIMEType()));
     }
-    
-    
-    private InferredOWLOntologyID doFileReferenceAttach(final Representation entity, final String artifactUri,
-            final String versionUri, final String objectUri, final InputStream inputStream, final RDFFormat inputFormat)
-        throws OpenRDFException, PoddException
-    {
-        final URI objectToAttachTo = ValueFactoryImpl.getInstance().createURI(objectUri);
-        
-        
-        // TODO: inside a Manager?
-        
-        // - read RDF into a RepositoryConnection from input stream 
-        RepositoryConnection conn = null;
-        URI randomContext = null;
-        
-        // - generate file reference object
-        final Set<FileReference> fileReferences =
-                this.getPoddArtifactManager().getFileReferenceManager().extractFileReferences(conn, randomContext);
-        
-        // - is most current version of artifact being used?
-        InferredOWLOntologyID artifactId = new InferredOWLOntologyID(IRI.create(artifactUri), IRI.create(versionUri), null);
-        // - validate reference
-        // - add reference to artifact, compute inferences, update artifact ID etc.
-        for (FileReference fileReference: fileReferences)
-        {
-            this.getPoddArtifactManager().attachFileReference(artifactId, ValueFactoryImpl.getInstance().createURI(objectUri), fileReference);
-        }
-        
-        // - return: updated artifact ID, object URI, file reference object URI
-        return null;
-    }
-    
     
     
     @Get

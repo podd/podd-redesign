@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
+	xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
+
+<!-- an SSH file reference resource with a temporary URL -->
+<rdf:Description rdf:about="urn:temp:uuid:object-rice-scan-34343-a">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#SSHFileReference"/>
+	<rdfs:label>Rice tree scan 003454-98</rdfs:label>
+	<poddBase:hasAlias>alias-1-alpha</poddBase:hasAlias>
+	<poddBase:hasFileName>basic-2.rdf</poddBase:hasFileName>
+	<poddBase:hasPath>/test/artifacts/</poddBase:hasPath>
+</rdf:Description>
+
+<!-- owner of file reference -->
+<rdf:Description rdf:about="http://purl.org/podd/basic-2-20130206/artifact:1#publication45">
+	<poddBase:hasFileReference rdf:resource="urn:temp:uuid:object-rice-scan-34343-a"/>
+</rdf:Description>
+
+</rdf:RDF>
