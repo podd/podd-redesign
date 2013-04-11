@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.rio.RDFFormat;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.exception.FileRepositoryException;
@@ -45,6 +46,16 @@ public interface PoddFileRepositoryManager
     
     void addRepositoryMapping(String alias, PoddFileRepository<?> repositoryConfiguration, boolean overwrite)
         throws OpenRDFException, FileRepositoryException;
+    
+    /**
+     * Returns a list of all aliases that are currently mapped.
+     *  
+     * @return
+     * @throws FileRepositoryException
+     * @throws OpenRDFException
+     */
+    List<String> getAllAliases() throws FileRepositoryException, OpenRDFException;
+    
     
     /**
      * Returns the repository configuration that is currently mapped using the given alias.
@@ -88,6 +99,20 @@ public interface PoddFileRepositoryManager
     List<String> getEquivalentAliases(String alias) throws FileRepositoryException, OpenRDFException;
 
     /**
+     * Checks to see if the File Repository Management Graph contains any data, and if empty loads a
+     * default set of repository configurations and aliases from the specified file.
+     * 
+     * @param pathDefaultAliases
+     *            The path to a file containing default File Repository configurations
+     * @param rdfFormat
+     *            The RDF serialization format of the default alias file
+     * @throws OpenRDFException 
+     * @throws FileRepositoryException 
+     * @throws IOException 
+     */
+    void init(String pathDefaultAliases, RDFFormat rdfFormat) throws OpenRDFException, FileRepositoryException, IOException;
+    
+    /**
      * Removes the mapping for the given alias, returning the {@link PoddFileRepository} object that
      * was previously mapped to using the alias.
      * 
@@ -124,5 +149,6 @@ public interface PoddFileRepositoryManager
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
     
     PoddRepositoryManager getRepositoryManager();
+
 
 }

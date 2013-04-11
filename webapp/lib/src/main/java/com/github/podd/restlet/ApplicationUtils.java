@@ -264,6 +264,14 @@ public class ApplicationUtils
         // File Repository Manager
         final PoddFileRepositoryManager nextFileRepositoryManager = new PoddFileRepositoryManagerImpl();
         nextFileRepositoryManager.setRepositoryManager(application.getPoddRepositoryManager());
+        try
+        {
+            nextFileRepositoryManager.init(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE, RDFFormat.TURTLE);
+        }
+        catch (PoddException | IOException e)
+        {
+            log.error("Fatal Error!!! Could not initialize File Repository Manager", e);
+        }
         
         // PURL manager
         final PoddPurlProcessorFactoryRegistry nextPurlRegistry = new PoddPurlProcessorFactoryRegistry();

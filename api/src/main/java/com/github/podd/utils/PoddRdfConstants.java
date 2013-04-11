@@ -18,6 +18,9 @@ public interface PoddRdfConstants
 {
     public static final ValueFactory VALUE_FACTORY = ValueFactoryImpl.getInstance();
 
+    /** Path to default alias file */
+    public static final String PATH_DEFAULT_ALIASES_FILE = "/alias.ttl";
+    
     /** Path to dcTerms.owl */
     public static final String PATH_PODD_DCTERMS = "/ontologies/dcTerms.owl";
 
@@ -207,5 +210,5 @@ public interface PoddRdfConstants
     
     public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasFileRepositorySecret");
-    
+
 }

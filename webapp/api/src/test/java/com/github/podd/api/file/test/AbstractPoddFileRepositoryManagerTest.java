@@ -18,16 +18,19 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFFormat;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.api.file.PoddFileRepositoryManager;
+import com.github.podd.api.test.TestConstants;
 import com.github.podd.exception.FileReferenceInvalidException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.FileRepositoryException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Abstract test to verify that the PoddFileRepositoryManager API contract is followed by
@@ -80,11 +83,9 @@ public abstract class AbstractPoddFileRepositoryManagerTest
      */
     protected abstract PoddFileRepositoryManager getNewPoddFileRepositoryManager() throws OpenRDFException;
     
-
     protected abstract void startRepositorySource() throws Exception;
-
+    
     protected abstract void stopRepositorySource() throws Exception;
-
     
     @Before
     public void setUp() throws Exception
@@ -154,8 +155,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     {
         // prepare:
         final String alias = "alias-1-gamma";
-        final PoddFileRepository<?> fileRepository =
-                this.buildFileRepositoryInstance(alias, null);
+        final PoddFileRepository<?> fileRepository = this.buildFileRepositoryInstance(alias, null);
         
         Assert.assertNotNull("FileRepository was NULL", fileRepository);
         
@@ -170,10 +170,10 @@ public abstract class AbstractPoddFileRepositoryManagerTest
                     e.getMessage());
         }
     }
-
+    
     /**
-     * Tests addRepositoryMapping() when the input FileRepository's internal Model uses a URI that already
-     * exists in the management graph. 
+     * Tests addRepositoryMapping() when the input FileRepository's internal Model uses a URI that
+     * already exists in the management graph.
      */
     @Test
     public void testAddRepositoryMappingWithIncompleteRepositoryConfiguration2() throws Exception
@@ -197,7 +197,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
                     "Subject URIs used in Model already exist in Management Graph", e.getMessage());
         }
     }
-
+    
     @Test
     public void testAddRepositoryMappingWithNewRepositoryConfiguration() throws Exception
     {
@@ -258,6 +258,38 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     }
     
     @Test
+    public void testGetAllAliasesWhenEmpty() throws Exception
+    {
+        // prepare: clean up any aliases that already exist
+        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        connection.clear(fileRepositoryManagementGraph);
+        connection.close();
+        
+        final List<String> aliases = this.testFileRepositoryManager.getAllAliases();
+        
+        // verify:
+        Assert.assertNotNull("NULL list of aliases", aliases);
+        Assert.assertEquals("Not the expected number of aliases", 0, aliases.size());
+    }
+    
+    @Test
+    public void testGetAllAliasesSuccess() throws Exception
+    {
+        final List<String> aliases = this.testFileRepositoryManager.getAllAliases();
+        
+        // verify:
+        Assert.assertNotNull("NULL list of aliases", aliases);
+        Assert.assertEquals("Not the expected number of aliases", 3, aliases.size());
+        Assert.assertTrue("Expected alias missing",
+                aliases.contains(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A));
+        Assert.assertTrue("Expected alias missing",
+                aliases.contains(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A));
+        Assert.assertTrue("Expected alias missing",
+                aliases.contains(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2B));
+    }
+    
+    @Test
     public void testGetEquivalentAliasesSuccess() throws Exception
     {
         final List<String> aliases =
@@ -296,10 +328,6 @@ public abstract class AbstractPoddFileRepositoryManagerTest
             Assert.assertNotNull(e);
         }
     }
-    
-    
-    
-    
     
     @Test
     public void testGetRepositoryAliasesSuccess() throws Exception
@@ -385,6 +413,70 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     }
     
     @Test
+    public void testInitSuccess() throws Exception
+    {
+        // prepare: clean up any aliases that already exist
+        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        connection.clear(fileRepositoryManagementGraph);
+        connection.close();
+        Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
+                .getAllAliases().size());
+        
+        this.testFileRepositoryManager.init(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE, RDFFormat.TURTLE);
+        
+        // verify:
+        final List<String> allAliases = this.testFileRepositoryManager.getAllAliases();
+        Assert.assertEquals("Expected 1 alias", 1, allAliases.size());
+        Assert.assertTrue("Expected alias is missing", allAliases.contains("alias_local_ssh"));
+    }
+    
+    @Test
+    public void testInitWithNonExistentAliasFile() throws Exception
+    {
+        // prepare: clean up any aliases that already exist
+        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        connection.begin();
+        connection.clear(fileRepositoryManagementGraph);
+        connection.commit();
+        connection.close();
+        Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
+                .getAllAliases().size());
+        
+        try
+        {
+            this.testFileRepositoryManager.init(TestConstants.TEST_ARTIFACT_20130206 + "aa", RDFFormat.TURTLE);
+            Assert.fail("Should have thrown an Exception here");
+        }
+        catch(final Exception e)
+        {
+            Assert.assertTrue(e.getMessage().contains("Input stream"));
+        }
+    }
+    
+    @Test
+    public void testInitWithInvalidAliasFile() throws Exception
+    {
+        // prepare: clean up any aliases that already exist
+        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        connection.begin();
+        connection.clear(fileRepositoryManagementGraph);
+        connection.commit();
+        connection.close();
+        Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
+                .getAllAliases().size());
+        
+        // initializing with a Turtle file which is not an "alias" file
+        this.testFileRepositoryManager.init(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE);
+        
+        // verify:
+        final List<String> allAliases = this.testFileRepositoryManager.getAllAliases();
+        Assert.assertEquals("Expected 0 aliases", 0, allAliases.size());
+    }
+    
+    @Test
     public void testRemoveRepositoryMappingOnlyAlias() throws Exception
     {
         final PoddFileRepository<?> removedRepositoryMapping =
@@ -463,7 +555,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
             this.testFileRepositoryManager.verifyFileReferences(null);
             Assert.fail("Should have thrown a NullPointerException");
         }
-        catch (RuntimeException e)
+        catch(final RuntimeException e)
         {
             Assert.assertTrue(e instanceof NullPointerException);
         }
@@ -475,7 +567,6 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         final Set<FileReference> fileReferences = new HashSet<FileReference>();
         this.testFileRepositoryManager.verifyFileReferences(fileReferences);
     }
-
     
     /**
      * This test starts up an internal file repository source and therefore can be slow.
@@ -485,10 +576,12 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     {
         // prepare: create FileReferences to test
         final Set<FileReference> fileReferences = new HashSet<FileReference>();
-        FileReference fileRefWithAlias1A = this.buildFileReference(TEST_ALIAS_1A, null);
+        final FileReference fileRefWithAlias1A =
+                this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, null);
         fileReferences.add(fileRefWithAlias1A);
         
-        FileReference fileRefWithAlias2A = this.buildFileReference(TEST_ALIAS_2A, null);
+        final FileReference fileRefWithAlias2A =
+                this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A, null);
         fileReferences.add(fileRefWithAlias2A);
         
         try
@@ -510,10 +603,12 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     {
         // prepare: create FileReferences to test
         final Set<FileReference> fileReferences = new HashSet<FileReference>();
-        FileReference fileRefWithAlias1A = this.buildFileReference(TEST_ALIAS_1A, null);
+        final FileReference fileRefWithAlias1A =
+                this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, null);
         fileReferences.add(fileRefWithAlias1A);
         
-        FileReference fileRefWithNoSuchFile = this.buildFileReference(TEST_ALIAS_1A, "no_such_file");
+        final FileReference fileRefWithNoSuchFile =
+                this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, "no_such_file");
         fileReferences.add(fileRefWithNoSuchFile);
         
         try
@@ -523,10 +618,10 @@ public abstract class AbstractPoddFileRepositoryManagerTest
             this.testFileRepositoryManager.verifyFileReferences(fileReferences);
             Assert.fail("Verify should have thrown an Exception containing errors");
         }
-        catch(FileReferenceVerificationFailureException e)
+        catch(final FileReferenceVerificationFailureException e)
         {
             Assert.assertEquals("Expected 1 validation failure", 1, e.getValidationFailures().size());
-            Throwable throwable = e.getValidationFailures().get(fileRefWithNoSuchFile);
+            final Throwable throwable = e.getValidationFailures().get(fileRefWithNoSuchFile);
             Assert.assertTrue("Not the expected cause of validation failure",
                     throwable instanceof FileReferenceInvalidException);
             Assert.assertEquals("Not the expected error message",

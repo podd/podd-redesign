@@ -1,10 +1,9 @@
 @prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
 @prefix : <http://test.example.org/filerepositoryaliases/> .
 
-# Default File Repositories for use with CSIRO PODD distribution.
+# Default File Repositories for use with PODD unit tests.
 # This file is used ONLY if the file-repository-management graph of the RDF database does not have any configured
 # file repositories.
-#
 
 # alias details for a default SSH based file repository
 :localssh a poddBase:FileRepository , poddBase:SSHFileRepository ;

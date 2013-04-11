@@ -4,6 +4,7 @@
 package com.github.podd.impl.file;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,9 @@ import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +71,44 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
+    public void init(final String pathDefaultAliases, final RDFFormat rdfFormat) throws OpenRDFException,
+        FileRepositoryException, IOException
+    {
+        if(this.repositoryManager == null)
+        {
+            throw new NullPointerException("A RepositoryManager should be set before calling init()");
+        }
+        
+        if(this.getAllAliases().size() == 0)
+        {
+            this.log.info("File Repository Graph is empty. Loading default configurations...");
+            final InputStream inputStream = this.getClass().getResourceAsStream(pathDefaultAliases);
+            
+            final RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE);
+            final Model modelFromFile = new LinkedHashModel();
+            final StatementCollector collector = new StatementCollector(modelFromFile);
+            rdfParser.setRDFHandler(collector);
+            rdfParser.parse(inputStream, "");
+            
+            final Model allAliases = modelFromFile.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
+            
+            this.log.info("Found {} default aliases to add", allAliases.size());
+            
+            for(final Statement stmt : allAliases)
+            {
+                final String alias = stmt.getObject().stringValue();
+                final Model model = new LinkedHashModel();
+                model.addAll(modelFromFile.filter(stmt.getSubject(), null, null));
+                
+                final PoddFileRepository<?> fileRepository =
+                        PoddFileRepositoryFactory.createFileRepository(alias, model);
+                
+                this.addRepositoryMapping(alias, fileRepository, false);
+            }
+        }
+    }
+    
+    @Override
     public void addRepositoryMapping(final String alias, final PoddFileRepository<?> repositoryConfiguration)
         throws OpenRDFException, FileRepositoryException
     {
@@ -99,7 +141,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
         }
         
         boolean repositoryConfigurationExistsInGraph = true;
-        if (this.getRepositoryAliases(repositoryConfiguration).isEmpty())
+        if(this.getRepositoryAliases(repositoryConfiguration).isEmpty())
         {
             // adding a new repository configuration
             repositoryConfigurationExistsInGraph = false;
@@ -112,11 +154,10 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             conn = this.repositoryManager.getRepository().getConnection();
             conn.begin();
             
-            if (repositoryConfigurationExistsInGraph)
+            if(repositoryConfigurationExistsInGraph)
             {
                 final Set<Resource> subjectUris =
-                        repositoryConfiguration
-                                .getAsModel()
+                        repositoryConfiguration.getAsModel()
                                 .filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null).subjects();
                 
                 this.log.info("Found {} subject URIs", subjectUris.size()); // should be only 1 here
@@ -124,7 +165,8 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                 {
                     conn.add(subjectUri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
                             .createLiteral(aliasInLowerCase), context);
-                    this.log.info("Added alias '{}' triple with subject <{}>", aliasInLowerCase, subjectUri.stringValue());
+                    this.log.info("Added alias '{}' triple with subject <{}>", aliasInLowerCase,
+                            subjectUri.stringValue());
                 }
             }
             else
@@ -135,7 +177,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                     throw new FileRepositoryIncompleteException(model,
                             "Incomplete File Repository since Model is empty");
                 }
-
+                
                 // check that the subject URIs used in the repository configuration are not already
                 // used in the
                 // file repository management graph
@@ -185,8 +227,53 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     public void downloadFileReference(final FileReference nextFileReference, final OutputStream outputStream)
         throws PoddException, IOException
     {
-        // TODO 
+        // TODO
         throw new RuntimeException("TODO: Implement me");
+    }
+    
+    @Override
+    public List<String> getAllAliases() throws FileRepositoryException, OpenRDFException
+    {
+        final List<String> results = new ArrayList<String>();
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repositoryManager.getRepository().getConnection();
+            conn.begin();
+            
+            final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
+            
+            final StringBuilder sb = new StringBuilder();
+            
+            sb.append("SELECT ?alias WHERE { ");
+            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
+            sb.append(" } ");
+            
+            this.log.info("Created SPARQL {} ", sb.toString());
+            
+            final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+            
+            final QueryResultCollector queryResults = this.executeSparqlQuery(query, context);
+            for(final BindingSet binding : queryResults.getBindingSets())
+            {
+                final Value member = binding.getValue("alias");
+                results.add(member.stringValue());
+            }
+        }
+        finally
+        {
+            if(conn != null && conn.isActive())
+            {
+                conn.rollback();
+            }
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
+        
+        return results;
     }
     
     @Override
@@ -197,7 +284,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             return null;
         }
         
-        // Could use LCASE function in the SPARQL query instead of converting to lower case here 
+        // Could use LCASE function in the SPARQL query instead of converting to lower case here
         // (http://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-lcase)
         final String aliasInLowerCase = alias.toLowerCase();
         
@@ -224,7 +311,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
             
             // filter to exclude other aliases
-            if (multipleAliasesExist)
+            if(multipleAliasesExist)
             {
                 sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue()
                         + "> ?otherAlias . ");
@@ -329,7 +416,8 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
         final PoddFileRepository<?> repositoryToRemove = this.getRepository(aliasInLowerCase);
         if(repositoryToRemove == null)
         {
-            throw new FileRepositoryMappingNotFoundException(aliasInLowerCase, "No File Repository mapped to this alias");
+            throw new FileRepositoryMappingNotFoundException(aliasInLowerCase,
+                    "No File Repository mapped to this alias");
         }
         
         // retrieved early simply to avoid having multiple RepositoryConnections open simultaneously
@@ -360,11 +448,12 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                                 .filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS,
                                         ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase)).subjects();
                 
-                this.log.info("Need to remove {} triples", subjectUris.size()); //DEBUG output
+                this.log.info("Need to remove {} triples", subjectUris.size()); // DEBUG output
                 for(final Resource subjectUri : subjectUris)
                 {
                     conn.remove(subjectUri, null, null, context);
-                    this.log.info("Removed ALL triples for alias '{}' with URI <{}>", aliasInLowerCase, subjectUri.stringValue());
+                    this.log.info("Removed ALL triples for alias '{}' with URI <{}>", aliasInLowerCase,
+                            subjectUri.stringValue());
                 }
             }
             
@@ -394,12 +483,13 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     public void verifyFileReferences(final Set<FileReference> fileReferenceResults) throws OpenRDFException,
         FileRepositoryException, FileReferenceVerificationFailureException
     {
-        Map<FileReference, Throwable> errors = new HashMap<FileReference, Throwable>();
+        final Map<FileReference, Throwable> errors = new HashMap<FileReference, Throwable>();
         
-        for(FileReference fileReference : fileReferenceResults)
+        for(final FileReference fileReference : fileReferenceResults)
         {
             final String alias = fileReference.getRepositoryAlias();
-            PoddFileRepository<FileReference> repository = (PoddFileRepository<FileReference>)this.getRepository(alias);
+            final PoddFileRepository<FileReference> repository =
+                    (PoddFileRepository<FileReference>)this.getRepository(alias);
             if(repository == null)
             {
                 errors.put(fileReference, new FileRepositoryMappingNotFoundException(alias,
@@ -415,16 +505,17 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                                 "Remote File Repository says this File Reference is invalid"));
                     }
                 }
-                catch(Exception e)
+                catch(final Exception e)
                 {
                     errors.put(fileReference, e);
                 }
             }
         }
-       
-        if (!errors.isEmpty())
+        
+        if(!errors.isEmpty())
         {
-            throw new FileReferenceVerificationFailureException(errors, "File Reference validation resulted in failures");
+            throw new FileReferenceVerificationFailureException(errors,
+                    "File Reference validation resulted in failures");
         }
     }
     
