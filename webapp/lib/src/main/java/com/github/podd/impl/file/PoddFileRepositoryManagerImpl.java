@@ -405,17 +405,20 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                 errors.put(fileReference, new FileRepositoryMappingNotFoundException(alias,
                         "Could not find a File Repository configuration mapped to this alias"));
             }
-            try
+            else
             {
-                if(!repository.validate(fileReference))
+                try
                 {
-                    errors.put(fileReference, new FileReferenceInvalidException(fileReference,
-                            "Remote File Repository says this File Reference is invalid"));
+                    if(!repository.validate(fileReference))
+                    {
+                        errors.put(fileReference, new FileReferenceInvalidException(fileReference,
+                                "Remote File Repository says this File Reference is invalid"));
+                    }
                 }
-            }
-            catch(Exception e)
-            {
-                errors.put(fileReference, e);
+                catch(Exception e)
+                {
+                    errors.put(fileReference, e);
+                }
             }
         }
        
