@@ -29,6 +29,8 @@ import com.github.podd.utils.RdfUtility;
 public class RdfUtilityTest
 {
   
+    public static final String TEST_ARTIFACT_INVALID_3_TOP_OBJECTS = "/test/artifacts/bad-3-topobjects.ttl";
+    
     private final Object[][] testDatas = new Object[][] {
             {"/test/artifacts/basic-20130206.ttl", RDFFormat.TURTLE, true, 0},
             
@@ -51,7 +53,7 @@ public class RdfUtilityTest
     @Test
     public void testisConnectedStructureWithMultipleTopObjects() throws Exception
     {
-        final InputStream inputStream = this.getClass().getResourceAsStream("/test/artifacts/3-topobjects.ttl");
+        final InputStream inputStream = this.getClass().getResourceAsStream(TEST_ARTIFACT_INVALID_3_TOP_OBJECTS);
         Assert.assertNotNull("Null resource", inputStream);
         
         boolean isConnected = RdfUtility.isConnectedStructure(inputStream, RDFFormat.TURTLE);

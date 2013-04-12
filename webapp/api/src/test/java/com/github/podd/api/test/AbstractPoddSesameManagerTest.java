@@ -1337,7 +1337,7 @@ public abstract class AbstractPoddSesameManagerTest
     @Test
     public void testGetTopObjectsFromArtifactWithSeveralTopObjects() throws Exception
     {
-        final String testResourcePath = "/test/artifacts/3-topobjects.ttl";
+        final String testResourcePath = TestConstants.TEST_ARTIFACT_BAD_3_TOP_OBJECTS;
         // prepare: load test artifact
         InferredOWLOntologyID nextOntologyID = this.loadOntologyFromResource(testResourcePath, null, RDFFormat.TURTLE);
         

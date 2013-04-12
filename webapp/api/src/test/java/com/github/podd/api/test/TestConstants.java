@@ -51,6 +51,9 @@ public interface TestConstants
     /** Test resource (in RDF/XML): invalid artifact with 2 lead institutes */
     public static final String TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES = "/test/artifacts/bad-twoLeadInstitutions.rdf";
     
+    /** Test resource (in Turtle): invalid artifact with 3 top objects */
+    public static final String TEST_ARTIFACT_BAD_3_TOP_OBJECTS = "/test/artifacts/bad-3-topobjects.ttl";
+    
     /** Test resource: invalid with empty file */
     public static final String TEST_INVALID_ARTIFACT_EMPTY =  "/test/ontologies/empty.owl";
 
