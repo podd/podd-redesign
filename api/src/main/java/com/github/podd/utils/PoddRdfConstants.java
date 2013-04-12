@@ -107,6 +107,18 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "currentInferredVersion");
     
+    
+    public static final String HTTP = "http://www.w3.org/2011/http#";
+    
+    /** http://www.w3.org/2011/http#statusCodeValue */
+    public static final URI HTTP_STATUS_CODE_VALUE = ValueFactoryImpl.getInstance().createURI(
+            PoddRdfConstants.HTTP, "statusCodeValue");
+
+    /** http://www.w3.org/2011/http#reasonPhrase */
+    public static final URI HTTP_REASON_PHRASE = ValueFactoryImpl.getInstance().createURI(
+            PoddRdfConstants.HTTP, "reasonPhrase");
+
+    
     /**
      * Creating a property for PODD to track the inferredVersion for the inferred axioms ontology of
      * a particular versioned ontology.
@@ -226,4 +238,5 @@ public interface PoddRdfConstants
     public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasFileRepositorySecret");
 
+    
 }
