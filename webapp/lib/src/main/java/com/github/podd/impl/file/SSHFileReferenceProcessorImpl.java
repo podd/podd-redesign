@@ -77,19 +77,19 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
                     fileReference.setLabel(label);
                 }
                 
-                final String filename = model.filter(fileRef, PoddRdfConstants.PODD_BASE_FILENAME, null).objectString();
+                final String filename = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILENAME, null).objectString();
                 if(filename != null)
                 {
                     fileReference.setFilename(filename);
                 }
                 
-                final String path = model.filter(fileRef, PoddRdfConstants.PODD_BASE_FILE_PATH, null).objectString();
+                final String path = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILE_PATH, null).objectString();
                 if(path != null)
                 {
                     fileReference.setPath(path);
                 }
                 
-                final String alias = model.filter(fileRef, PoddRdfConstants.PODD_BASE_ALIAS, null).objectString();
+                final String alias = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objectString();
                 if(alias != null)
                 {
                     fileReference.setRepositoryAlias(alias);

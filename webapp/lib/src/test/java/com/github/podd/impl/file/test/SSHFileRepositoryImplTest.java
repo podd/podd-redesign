@@ -55,7 +55,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     protected PoddFileRepository<SSHFileReference> getNewPoddFileRepository() throws Exception
     {
         final Model model = new LinkedHashModel();
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_ALIAS,
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_HAS_ALIAS,
                 ValueFactoryImpl.getInstance().createLiteral(AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_FILE_REPOSITORY));
@@ -99,7 +99,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         
         // - no "protocol"
         final Model model1 = new LinkedHashModel();
-        model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_ALIAS,
+        model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_HAS_ALIAS,
                 ValueFactoryImpl.getInstance().createLiteral(AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_FILE_REPOSITORY));
@@ -126,7 +126,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         
         // - no "host"
         final Model model2 = new LinkedHashModel();
-        model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_ALIAS,
+        model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_HAS_ALIAS,
                 ValueFactoryImpl.getInstance().createLiteral(AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_FILE_REPOSITORY));
@@ -153,7 +153,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         
         // - no "fingerprint"
         final Model model3 = new LinkedHashModel();
-        model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_ALIAS,
+        model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_HAS_ALIAS,
                 ValueFactoryImpl.getInstance().createLiteral(AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_FILE_REPOSITORY));
@@ -180,7 +180,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         
         // - no protocol, host, port, fingerprint, username, secret
         final Model model4 = new LinkedHashModel();
-        model4.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_ALIAS,
+        model4.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_BASE_HAS_ALIAS,
                 ValueFactoryImpl.getInstance().createLiteral(AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model4.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_FILE_REPOSITORY));

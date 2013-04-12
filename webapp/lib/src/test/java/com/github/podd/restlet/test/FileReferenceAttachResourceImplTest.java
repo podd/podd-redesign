@@ -186,10 +186,10 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         final String completePath = this.getClass().getResource(TestConstants.TEST_REMOTE_FILE_PATH).getPath();
         
         final Resource aliasUri =
-                model.filter(null, PoddRdfConstants.PODD_BASE_ALIAS, null).subjects().iterator().next();
-        model.add(aliasUri, PoddRdfConstants.PODD_BASE_FILE_PATH,
+                model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).subjects().iterator().next();
+        model.add(aliasUri, PoddRdfConstants.PODD_BASE_HAS_FILE_PATH,
                 ValueFactoryImpl.getInstance().createLiteral(completePath));
-        model.add(aliasUri, PoddRdfConstants.PODD_BASE_FILENAME,
+        model.add(aliasUri, PoddRdfConstants.PODD_BASE_HAS_FILENAME,
                 ValueFactoryImpl.getInstance().createLiteral(TestConstants.TEST_REMOTE_FILE_NAME));
         
         // get a String representation of the statements in the Model

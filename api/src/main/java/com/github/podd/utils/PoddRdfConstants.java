@@ -174,22 +174,24 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_DISPLAY_TYPE_TABLE = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "DisplayType_Table");
     
+
+    // ----- file reference constants -----
+    
     /** http://purl.org/podd/ns/poddBase#hasFileReference */
-    public static final URI PODD_BASE_FILE_REFERENCE = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_HAS_FILE_REFERENCE = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasFileReference");
 
     /** http://purl.org/podd/ns/poddBase#hasFileName */
-    public static final URI PODD_BASE_FILENAME = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_HAS_FILENAME = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasFileName");
 
     /** http://purl.org/podd/ns/poddBase#hasPath */
-    public static final URI PODD_BASE_FILE_PATH = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_HAS_FILE_PATH = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasPath");
 
     /** http://purl.org/podd/ns/poddBase#hasAlias */
-    public static final URI PODD_BASE_ALIAS = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_HAS_ALIAS = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasAlias");
-
 
     /** http://purl.org/podd/ns/poddBase#FileReference */
     public static final URI PODD_BASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(
@@ -199,6 +201,9 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "SSHFileReference");
     
+
+    // ----- file repository constants -----
+    
     /** http://purl.org/podd/ns/poddBase#FileRepository */
     public static final URI PODD_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE,
             "FileRepository");
@@ -207,12 +212,9 @@ public interface PoddRdfConstants
     public static final URI PODD_SSH_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "SSHFileRepository");
     
+    /** http://purl.org/podd/ns/poddBase#HTTPFileRepository */
     public static final URI PODD_HTTP_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "HTTPFileRepository");
-    
-    /** http://purl.org/podd/ns/poddBase#hasAlias */
-    public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.PODD_BASE, "hasAlias");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryProtocol */
     public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(
