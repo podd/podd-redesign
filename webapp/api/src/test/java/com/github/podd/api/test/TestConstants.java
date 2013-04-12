@@ -101,5 +101,10 @@ public interface TestConstants
 
     /** Test resource: any file which exists and can be used as a file reference */
     public static final String TEST_FILE = "/test/artifacts/basic-2.rdf";
+    
     public static final String TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE = "/test/artifacts/fragment-new-file-ref-verifiable.rdf";
+    
+    /** Test resource: represents a file which is used to represent a resource stored on a remote file repository */
+    public static final String TEST_REMOTE_FILE_PATH = "/test";
+    public static final String TEST_REMOTE_FILE_NAME = "sample-resource.txt";
 }

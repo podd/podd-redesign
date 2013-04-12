@@ -13,9 +13,10 @@
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
 	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#SSHFileReference"/>
 	<rdfs:label>Rice tree scan 003454-98</rdfs:label>
-	<poddBase:hasAlias>alias-1-alpha</poddBase:hasAlias>
-	<poddBase:hasFileName>basic-2.rdf</poddBase:hasFileName>
-	<poddBase:hasPath>/test/artifacts/</poddBase:hasPath>
+	<poddBase:hasAlias>alias_local_ssh</poddBase:hasAlias>
+	<!-- file name and path should be programmatically set before this file reference is used -->
+	<!-- poddBase:hasFileName>some-resource.png</poddBase:hasFileName -->
+	<!-- poddBase:hasPath>/some/path</poddBase:hasPath -->
 </rdf:Description>
 
 <!-- owner of file reference -->

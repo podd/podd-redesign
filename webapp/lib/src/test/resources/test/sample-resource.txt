@@ -1,0 +1,2 @@
+While this is just a text file it represents a possibly large binary file which will reside
+on a remote file repository and be linked to a PODD artifact.

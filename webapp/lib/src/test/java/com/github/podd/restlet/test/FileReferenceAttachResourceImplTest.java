@@ -4,16 +4,29 @@
 package com.github.podd.restlet.test;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.StringWriter;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
@@ -21,6 +34,7 @@ import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.file.test.SSHService;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -31,51 +45,46 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
 {
     @Rule
     public final TemporaryFolder tempDirectory = new TemporaryFolder();
-
+    
     /** SSH File Repository server for tests */
     protected SSHService sshd;
     
     protected void startRepositorySource() throws Exception
     {
-        sshd = new SSHService();
+        this.sshd = new SSHService();
         final File tempDirForHostKey = this.tempDirectory.newFolder();
-        sshd.startTestSSHServer(Integer.parseInt(SSHService.TEST_SSH_SERVICE_PORT),
-                tempDirForHostKey);
+        this.sshd.startTestSSHServer(Integer.parseInt(SSHService.TEST_SSH_SERVICE_PORT), tempDirForHostKey);
     }
-
+    
     protected void stopRepositorySource() throws Exception
     {
-        if (sshd != null)
+        if(this.sshd != null)
         {
-            sshd.stopTestSSHServer();
+            this.sshd.stopTestSSHServer();
         }
     }
-
     
-    
-
     /**
      * Test successful attach of a file reference in RDF/XML
      */
     @Test
     public void testAttachFileReferenceRdfWithoutVerification() throws Exception
     {
-        // prepare: add an artifact 
+        // prepare: add an artifact
         // (use one with PURLs so that where to attach the file reference is known in advance)
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
-        
         final ClientResource fileRefAttachClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
-
         
         fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
                 .getOntologyIRI().toString());
         fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
                 .getVersionIRI().toString());
         // Query parameter Verification policy - NOT SUPPLIED - defaults to false
-        // fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(false));
+        // fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
+        // Boolean.toString(false));
         
         final Representation input =
                 this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
@@ -101,24 +110,26 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
     }
     
     /**
-     * Test successful attach of a file reference in RDF/XML
-     * TODO: setup file repositories before test
+     * Test successful attach of a file reference in RDF/XML with verification This test starts up
+     * an SSH server as a File Repository source and can be slow to complete.
      */
-    @Ignore 
     @Test
     public void testAttachFileReferenceRdfWithVerification() throws Exception
     {
         this.startRepositorySource();
         
-        // prepare: add an artifact 
+        // prepare: add an artifact
         // (use one with PURLs so that where to attach the file reference is known in advance)
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
+        // prepare: build test fragment with correct value set for poddBase:hasPath
+        final String fileReferenceString =
+                this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE);
+        Assert.assertFalse("Input FileReference could not be genereated", fileReferenceString.isEmpty());
         
         final ClientResource fileRefAttachClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
-
         
         fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
                 .getOntologyIRI().toString());
@@ -128,9 +139,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         
         try
         {
-            final Representation input =
-                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE,
-                            MediaType.APPLICATION_RDF_XML);
+            final Representation input = new StringRepresentation(fileReferenceString, MediaType.APPLICATION_RDF_XML);
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
@@ -155,7 +164,45 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             this.stopRepositorySource();
         }
     }
-
+    
+    /**
+     * Given the path to a resource containing an incomplete File Reference object, this method
+     * constructs a complete File Reference and returns it as an RDF/XML string.
+     * 
+     * @param fragmentSource
+     *            Location of resource containing incomplete File Reference
+     * @return String containing RDF statements
+     */
+    private String buildFileReferenceString(final String fragmentSource) throws Exception
+    {
+        // read the fragment's RDF statements into a Model
+        final InputStream inputStream = this.getClass().getResourceAsStream(fragmentSource);
+        final Model model = new LinkedHashModel();
+        final RDFParser rdfParser = Rio.createParser(RDFFormat.RDFXML);
+        rdfParser.setRDFHandler(new StatementCollector(model));
+        rdfParser.parse(inputStream, "");
+        
+        // path to be set as part of the file reference
+        final String completePath = this.getClass().getResource(TestConstants.TEST_REMOTE_FILE_PATH).getPath();
+        
+        final Resource aliasUri =
+                model.filter(null, PoddRdfConstants.PODD_BASE_ALIAS, null).subjects().iterator().next();
+        model.add(aliasUri, PoddRdfConstants.PODD_BASE_FILE_PATH,
+                ValueFactoryImpl.getInstance().createLiteral(completePath));
+        model.add(aliasUri, PoddRdfConstants.PODD_BASE_FILENAME,
+                ValueFactoryImpl.getInstance().createLiteral(TestConstants.TEST_REMOTE_FILE_NAME));
+        
+        // get a String representation of the statements in the Model
+        final StringWriter out = new StringWriter();
+        final RDFWriter writer = Rio.createWriter(RDFFormat.RDFXML, out);
+        writer.startRDF();
+        for(final Statement st : model)
+        {
+            writer.handleStatement(st);
+        }
+        writer.endRDF();
+        return out.getBuffer().toString();
+    }
     
     /**
      * Test attach a file reference without authentication
@@ -187,7 +234,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
     }
-
+    
     @Test
     public void testErrorAttachFileReferenceRdfWithoutArtifactID() throws Exception
     {
@@ -201,9 +248,8 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
         fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
         
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
-                        MediaType.APPLICATION_RDF_XML);
+        this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                MediaType.APPLICATION_RDF_XML);
         
         // there is no need to authenticate, have a test artifact or send RDF content as the
         // artifact ID is checked for first
@@ -237,15 +283,14 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         // authentication is required as version IRI is checked AFTER authentication
         try
         {
-                RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_XML, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+            RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                    MediaType.APPLICATION_RDF_XML, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
         }
     }
-
     
     /**
      * Test attach a file reference which fails verification in RDF/XML
@@ -254,15 +299,13 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
     @Test
     public void testErrorAttachFileReferenceRdfFileVerificationFailure() throws Exception
     {
-        // prepare: add an artifact 
+        // prepare: add an artifact
         // (use one with PURLs so that where to attach the file reference is known in advance)
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
-        
         final ClientResource fileRefAttachClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
-
         
         fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
                 .getOntologyIRI().toString());
@@ -276,8 +319,8 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         
         try
         {
-                RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_XML, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+            RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                    MediaType.APPLICATION_RDF_XML, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
         }
         catch(final ResourceException e)
         {
@@ -285,7 +328,6 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             System.out.println("44444444444444 " + e.getCause().getMessage());
         }
     }
-
     
     /**
      * Test successful attach of a file reference in Turtle

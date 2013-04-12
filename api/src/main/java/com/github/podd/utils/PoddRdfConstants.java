@@ -162,20 +162,28 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_DISPLAY_TYPE_TABLE = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "DisplayType_Table");
     
+    /** http://purl.org/podd/ns/poddBase#hasFileReference */
+    public static final URI PODD_BASE_FILE_REFERENCE = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "hasFileReference");
+
     /** http://purl.org/podd/ns/poddBase#hasFileName */
     public static final URI PODD_BASE_FILENAME = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasFileName");
 
+    /** http://purl.org/podd/ns/poddBase#hasPath */
     public static final URI PODD_BASE_FILE_PATH = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasPath");
 
+    /** http://purl.org/podd/ns/poddBase#hasAlias */
     public static final URI PODD_BASE_ALIAS = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasAlias");
 
 
+    /** http://purl.org/podd/ns/poddBase#FileReference */
     public static final URI PODD_BASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "FileReference");
     
+    /** http://purl.org/podd/ns/poddBase#SSHFileReference */
     public static final URI PODD_BASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "SSHFileReference");
     
@@ -190,24 +198,31 @@ public interface PoddRdfConstants
     public static final URI PODD_HTTP_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "HTTPFileRepository");
     
+    /** http://purl.org/podd/ns/poddBase#hasAlias */
     public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasAlias");
     
+    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryProtocol */
     public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasFileRepositoryProtocol");
     
+    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryHost */
     public static final URI PODD_FILE_REPOSITORY_HOST = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasFileRepositoryHost");
     
+    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryPort */
     public static final URI PODD_FILE_REPOSITORY_PORT = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasFileRepositoryPort");
     
+    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryFingerprint */
     public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasFileRepositoryFingerprint");
     
+    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryUsername */
     public static final URI PODD_FILE_REPOSITORY_USERNAME = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasFileRepositoryUsername");
     
+    /** http://purl.org/podd/ns/poddBase#hasFileRepositorySecret */
     public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasFileRepositorySecret");
 
