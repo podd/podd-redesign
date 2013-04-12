@@ -327,10 +327,9 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         }
         catch(final ResourceException e)
         {
-            // TODO - validate status code & response body RDF errors
-            Representation responseEntity = fileRefAttachClientResource.getResponseEntity();
-            
             Assert.assertEquals(Status.SERVER_ERROR_BAD_GATEWAY, e.getStatus());
+            Representation responseEntity = fileRefAttachClientResource.getResponseEntity();
+            Assert.assertTrue(responseEntity.getText().contains("File Reference validation resulted in failures"));
         }
     }
     
