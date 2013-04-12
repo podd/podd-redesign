@@ -228,6 +228,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         try
         {
             fileRefAttachClientResource.post(input, MediaType.APPLICATION_RDF_XML);
+            Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
         {
@@ -256,6 +257,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         try
         {
             fileRefAttachClientResource.post(null, MediaType.TEXT_PLAIN);
+            Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
         {
@@ -284,7 +286,8 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                    MediaType.APPLICATION_RDF_XML, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.testWithAdminPrivileges);
+            Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
         {
@@ -295,7 +298,6 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
     /**
      * Test attach a file reference which fails verification in RDF/XML
      */
-    @Ignore
     @Test
     public void testErrorAttachFileReferenceRdfFileVerificationFailure() throws Exception
     {
@@ -320,12 +322,15 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                    MediaType.APPLICATION_RDF_XML, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.testWithAdminPrivileges);
+            Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
         {
-            Assert.assertEquals(Status.SERVER_ERROR_INTERNAL, e.getStatus());
-            System.out.println("44444444444444 " + e.getCause().getMessage());
+            // TODO - validate status code & response body RDF errors
+            Representation responseEntity = fileRefAttachClientResource.getResponseEntity();
+            
+            Assert.assertEquals(Status.SERVER_ERROR_BAD_GATEWAY, e.getStatus());
         }
     }
     

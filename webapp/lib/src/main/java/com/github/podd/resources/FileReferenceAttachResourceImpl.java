@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.FileReferenceVerificationPolicy;
+import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
@@ -106,6 +107,10 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
                     ValueFactoryImpl.getInstance().createURI(artifactUri),
                     ValueFactoryImpl.getInstance().createURI(versionUri),
                     inputStream, inputFormat, verificationPolicy);
+        }
+        catch(FileReferenceVerificationFailureException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_BAD_GATEWAY, "File reference(s) failed verification", e);
         }
         catch(OpenRDFException | PoddException | IOException | OWLException e)
         {
