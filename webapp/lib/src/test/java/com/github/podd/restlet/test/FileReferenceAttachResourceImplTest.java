@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -70,8 +69,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
     @Test
     public void testAttachFileReferenceRdfWithoutVerification() throws Exception
     {
-        // prepare: add an artifact
-        // (use one with PURLs so that where to attach the file reference is known in advance)
+        // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
@@ -83,8 +81,6 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
                 .getVersionIRI().toString());
         // Query parameter Verification policy - NOT SUPPLIED - defaults to false
-        // fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
-        // Boolean.toString(false));
         
         final Representation input =
                 this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
@@ -110,7 +106,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
     }
     
     /**
-     * Test successful attach of a file reference in RDF/XML with verification This test starts up
+     * Test successful attach of a file reference in RDF/XML with verification. This test starts up
      * an SSH server as a File Repository source and can be slow to complete.
      */
     @Test
@@ -118,28 +114,28 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
     {
         this.startRepositorySource();
         
-        // prepare: add an artifact
-        // (use one with PURLs so that where to attach the file reference is known in advance)
-        final InferredOWLOntologyID artifactID =
-                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
-        
-        // prepare: build test fragment with correct value set for poddBase:hasPath
-        final String fileReferenceString =
-                this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE);
-        Assert.assertFalse("Input FileReference could not be genereated", fileReferenceString.isEmpty());
-        
-        final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
-        
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
-        
         try
         {
-            final Representation input = new StringRepresentation(fileReferenceString, MediaType.APPLICATION_RDF_XML);
+            // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
+            final InferredOWLOntologyID artifactID =
+                    this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+            
+            // prepare: build test fragment with correct value set for poddBase:hasPath
+            final String fileReferenceAsString =
+                    this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE,
+                            RDFFormat.RDFXML);
+            Assert.assertFalse("Input FileReference could not be genereated", fileReferenceAsString.isEmpty());
+            
+            final ClientResource fileRefAttachClientResource =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+            
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
+            
+            final Representation input = new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_XML);
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
@@ -166,6 +162,104 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
     }
     
     /**
+     * Test successful attach of a file reference in Turtle with verification. This test starts up
+     * an SSH server as a File Repository source and can be slow to complete.
+     */
+    @Test
+    public void testAttachFileReferenceTurtleWithVerification() throws Exception
+    {
+        this.startRepositorySource();
+        
+        try
+        {
+            // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
+            final InferredOWLOntologyID artifactID =
+                    this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+            
+            // prepare: build test fragment with correct value set for poddBase:hasPath
+            final String fileReferenceAsString =
+                    this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE_TTL,
+                            RDFFormat.TURTLE);
+            Assert.assertFalse("Input FileReference could not be genereated", fileReferenceAsString.isEmpty());
+            
+            final ClientResource fileRefAttachClientResource =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+            
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
+            
+            final Representation input = new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_TURTLE);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = results.getText();
+            
+            // verify: Inferred Ontology ID is received in RDF format
+            Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
+            Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+            Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+            
+            // verify: new file reference has been added to the artifact
+            final String artifactBody =
+                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
+            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
+            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+        }
+        finally
+        {
+            this.stopRepositorySource();
+        }
+    }
+    
+    
+    /**
+     * Test successful attach of a file reference in Turtle
+     */
+    @Test
+    public void testAttachFileReferenceTurtleWithoutVerification() throws Exception
+    {
+        // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
+        final InferredOWLOntologyID artifactID =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        final ClientResource fileRefAttachClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+        
+        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                .getOntologyIRI().toString());
+        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                .getVersionIRI().toString());
+        // Query parameter Verification policy - NOT SUPPLIED - defaults to false
+        
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT_TTL,
+                        MediaType.APPLICATION_RDF_TURTLE);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify: An updated Inferred Ontology ID is received
+        Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
+        Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+        Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+        
+        // verify: new file reference has been added to the artifact
+        final String artifactBody =
+                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
+        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
+        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+    }
+    
+    
+    /**
      * Given the path to a resource containing an incomplete File Reference object, this method
      * constructs a complete File Reference and returns it as an RDF/XML string.
      * 
@@ -173,12 +267,12 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
      *            Location of resource containing incomplete File Reference
      * @return String containing RDF statements
      */
-    private String buildFileReferenceString(final String fragmentSource) throws Exception
+    private String buildFileReferenceString(final String fragmentSource, RDFFormat format) throws Exception
     {
         // read the fragment's RDF statements into a Model
         final InputStream inputStream = this.getClass().getResourceAsStream(fragmentSource);
         final Model model = new LinkedHashModel();
-        final RDFParser rdfParser = Rio.createParser(RDFFormat.RDFXML);
+        final RDFParser rdfParser = Rio.createParser(format);
         rdfParser.setRDFHandler(new StatementCollector(model));
         rdfParser.parse(inputStream, "");
         
@@ -194,7 +288,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         
         // get a String representation of the statements in the Model
         final StringWriter out = new StringWriter();
-        final RDFWriter writer = Rio.createWriter(RDFFormat.RDFXML, out);
+        final RDFWriter writer = Rio.createWriter(format, out);
         writer.startRDF();
         for(final Statement st : model)
         {
@@ -296,13 +390,15 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
     }
     
     /**
-     * Test attach a file reference which fails verification in RDF/XML
+     * Test attach a file reference which fails verification in RDF/XML.
+     * 
+     * NOTE: This test causes Restlet to print a stack trace when the "502 Bad Gateway" Exception is
+     * thrown.
      */
     @Test
     public void testErrorAttachFileReferenceRdfFileVerificationFailure() throws Exception
     {
-        // prepare: add an artifact
-        // (use one with PURLs so that where to attach the file reference is known in advance)
+        // prepare: add an artifact (with PURLs so where to attach FileRef is known in advance)
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
@@ -331,19 +427,6 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             Representation responseEntity = fileRefAttachClientResource.getResponseEntity();
             Assert.assertTrue(responseEntity.getText().contains("File Reference validation resulted in failures"));
         }
-    }
-    
-    /**
-     * Test successful attach of a file reference in Turtle
-     */
-    @Ignore
-    @Test
-    public void testAttachFileReferenceBasicTurtle() throws Exception
-    {
-        final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
-        
-        Assert.fail("TODO: implement me");
     }
     
 }

@@ -96,6 +96,9 @@ public interface TestConstants
     /** Test resource: fragment containing a new File Reference object  in RDF/XML format */
     public static final String TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT = "/test/artifacts/fragment-new-file-ref.rdf";
 
+    /** Test resource: fragment containing a new File Reference object  in Turtle format */
+    public static final String TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT_TTL = "/test/artifacts/fragment-new-file-ref.ttl";
+    
     /** Test resource: fragment modifying Demo_Investigation object to no longer contain SqueekeeMaterial. In Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION = "/test/artifacts/fragment-modify-demo-investigation.ttl";
     
@@ -106,8 +109,11 @@ public interface TestConstants
     public static final String TEST_FILE = "/test/artifacts/basic-2.rdf";
     
     public static final String TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE = "/test/artifacts/fragment-new-file-ref-verifiable.rdf";
+
+    public static final String TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE_TTL = "/test/artifacts/fragment-new-file-ref-verifiable.ttl";
     
     /** Test resource: represents a file which is used to represent a resource stored on a remote file repository */
     public static final String TEST_REMOTE_FILE_PATH = "/test";
     public static final String TEST_REMOTE_FILE_NAME = "sample-resource.txt";
+    
 }
