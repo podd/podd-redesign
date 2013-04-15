@@ -191,7 +191,11 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_HAS_FILE_PATH = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasPath");
 
-    /** http://purl.org/podd/ns/poddBase#hasAlias */
+    /** 
+     * http://purl.org/podd/ns/poddBase#hasAlias
+     * 
+     * This property is used to specify an "alias" value found inside a FileReference. 
+     */
     public static final URI PODD_BASE_HAS_ALIAS = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "hasAlias");
 
@@ -218,9 +222,13 @@ public interface PoddRdfConstants
     public static final URI PODD_HTTP_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.FILE_REPOSITORY, "HTTPFileRepository");
 
-    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryProtocol */
+    /**
+     * http://purl.org/podd/ns/poddBase#hasFileRepositoryAlias
+     * 
+     * This property is ONLY used in the File Repository management implementations.  
+     */
     public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.FILE_REPOSITORY, "hasAlias");
+            PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryAlias");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryProtocol */
     public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(

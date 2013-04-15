@@ -8,7 +8,7 @@
 
 # alias details for a default SSH based file repository
 :localssh a fileRepository:FileRepository , fileRepository:SSHFileRepository ;
-poddBase:hasAlias "alias_local_ssh" ;
+fileRepository:hasFileRepositoryAlias "alias_local_ssh" ;
 fileRepository:hasFileRepositoryProtocol "SSH" ;
 fileRepository:hasFileRepositoryHost "localhost" ;
 fileRepository:hasFileRepositoryPort "9856" ;

@@ -99,7 +99,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         final Model model = new LinkedHashModel();
         for(final String alias : aliases)
         {
-            model.add(aliasUri, PoddRdfConstants.PODD_BASE_HAS_ALIAS, ValueFactoryImpl.getInstance()
+            model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
                     .createLiteral(alias));
         }
         model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_FILE_REPOSITORY);
