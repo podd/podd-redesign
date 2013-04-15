@@ -1,3 +1,4 @@
+@prefix fileRepository: <http://purl.org/podd/ns/fileRepository#> .
 @prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
 @prefix : <http://test.example.org/filerepositoryaliases/> .
 
@@ -6,11 +7,11 @@
 # file repositories.
 
 # alias details for a default SSH based file repository
-:localssh a poddBase:FileRepository , poddBase:SSHFileRepository ;
+:localssh a fileRepository:FileRepository , fileRepository:SSHFileRepository ;
 poddBase:hasAlias "alias_local_ssh" ;
-poddBase:hasFileRepositoryProtocol "SSH" ;
-poddBase:hasFileRepositoryHost "localhost" ;
-poddBase:hasFileRepositoryPort "9856" ;
-poddBase:hasFileRepositoryFingerprint "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db" ;
-poddBase:hasFileRepositoryUsername "salt" ;
-poddBase:hasFileRepositorySecret "salt" .
+fileRepository:hasFileRepositoryProtocol "SSH" ;
+fileRepository:hasFileRepositoryHost "localhost" ;
+fileRepository:hasFileRepositoryPort "9856" ;
+fileRepository:hasFileRepositoryFingerprint "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db" ;
+fileRepository:hasFileRepositoryUsername "salt" ;
+fileRepository:hasFileRepositorySecret "salt" .

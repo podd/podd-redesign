@@ -55,6 +55,8 @@ public interface PoddRdfConstants
 
     public static final String PODD_PLANT = "http://purl.org/podd/ns/poddPlant#";
 
+    public static final String FILE_REPOSITORY = "http://purl.org/podd/ns/fileRepository#";
+
     
     /**
      * An arbitrary prefix to use for automatically assigning ontology IRIs to inferred ontologies.
@@ -205,40 +207,44 @@ public interface PoddRdfConstants
     // ----- file repository constants -----
     
     /** http://purl.org/podd/ns/poddBase#FileRepository */
-    public static final URI PODD_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE,
+    public static final URI PODD_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.FILE_REPOSITORY,
             "FileRepository");
     
     /** http://purl.org/podd/ns/poddBase#SSHFileRepository */
     public static final URI PODD_SSH_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.PODD_BASE, "SSHFileRepository");
+            PoddRdfConstants.FILE_REPOSITORY, "SSHFileRepository");
     
     /** http://purl.org/podd/ns/poddBase#HTTPFileRepository */
     public static final URI PODD_HTTP_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.PODD_BASE, "HTTPFileRepository");
+            PoddRdfConstants.FILE_REPOSITORY, "HTTPFileRepository");
+
+    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryProtocol */
+    public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(
+            PoddRdfConstants.FILE_REPOSITORY, "hasAlias");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryProtocol */
     public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.PODD_BASE, "hasFileRepositoryProtocol");
+            PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryProtocol");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryHost */
     public static final URI PODD_FILE_REPOSITORY_HOST = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.PODD_BASE, "hasFileRepositoryHost");
+            PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryHost");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryPort */
     public static final URI PODD_FILE_REPOSITORY_PORT = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.PODD_BASE, "hasFileRepositoryPort");
+            PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryPort");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryFingerprint */
     public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.PODD_BASE, "hasFileRepositoryFingerprint");
+            PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryFingerprint");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryUsername */
     public static final URI PODD_FILE_REPOSITORY_USERNAME = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.PODD_BASE, "hasFileRepositoryUsername");
+            PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryUsername");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositorySecret */
     public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.PODD_BASE, "hasFileRepositorySecret");
+            PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositorySecret");
 
     
 }
