@@ -956,7 +956,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertFalse("Two versions should NOT have the same Version IRI", firstArtifactId.getVersionIRI()
                 .toString().equals(secondArtifactId.getVersionIRI().toString()));
         
-        this.verifyLoadedArtifact(secondArtifactId, 7, 25, 295, false);
+        this.verifyLoadedArtifact(secondArtifactId, 7, 25, 294, false);
     }
     
     /**
@@ -1460,12 +1460,12 @@ public abstract class AbstractPoddArtifactManagerTest
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 = this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 7, 90, 396, false);
+        this.verifyLoadedArtifact(artifactIDv1, 7, 90, 395, false);
 
         // upload another version of artifact
         final InputStream inputStream2 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv2 = this.testArtifactManager.loadArtifact(inputStream2, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv2, 7, 90, 396, false);
+        this.verifyLoadedArtifact(artifactIDv2, 7, 90, 395, false);
 
         System.out.println(artifactIDv1);
         System.out.println(artifactIDv2);
