@@ -84,7 +84,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             this.log.info("File Repository Graph is empty. Loading default configurations...");
             final InputStream inputStream = this.getClass().getResourceAsStream(pathDefaultAliases);
             
-            final RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE);
+            final RDFParser rdfParser = Rio.createParser(rdfFormat);
             final Model modelFromFile = new LinkedHashModel();
             final StatementCollector collector = new StatementCollector(modelFromFile);
             rdfParser.setRDFHandler(collector);
