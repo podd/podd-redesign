@@ -42,6 +42,13 @@ public interface PoddRdfConstants
     /** Path to poddAnimal.owl */
     public static final String PATH_PODD_ANIMAL = "/ontologies/poddAnimal.owl";
 
+    /**
+     *  Path to poddFileRepository.owl.  
+     *    
+     *  This ontology is NOT part of the standard schema ontologies. It is a separate
+     *  ontology used to validate File Repository configurations.  
+     */
+    public static final String PATH_PODD_FILE_REPOSITORY = "/ontologies/poddFileRepository.owl";
     
     public static final String PODD_DCTERMS = "http://purl.org/podd/ns/dcTerms#";
 
@@ -192,7 +199,7 @@ public interface PoddRdfConstants
             PoddRdfConstants.PODD_BASE, "hasPath");
 
     /** 
-     * http://purl.org/podd/ns/poddBase#hasAlias
+     * http://purl.org/podd/ns/poddBase#hasAlias. 
      * 
      * This property is used to specify an "alias" value found inside a FileReference. 
      */
