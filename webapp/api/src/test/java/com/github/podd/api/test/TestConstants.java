@@ -105,6 +105,10 @@ public interface TestConstants
     /** Test resource: fragment moves SqueekeeMaterial to under My_Treatment1. In Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION = "/test/artifacts/fragment-move-demo-investigation.ttl";
 
+    /** Test resource: an alias file which is disconnected */
+    public static final String TEST_ALIAS_BAD = "/test//bad-alias.ttl";
+
+    
     /** Test resource: any file which exists and can be used as a file reference */
     public static final String TEST_FILE = "/test/artifacts/basic-2.rdf";
     
