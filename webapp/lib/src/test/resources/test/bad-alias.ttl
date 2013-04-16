@@ -11,6 +11,7 @@
 #################################################################
 #
 #    This is an INVALID alias file for testing.
+#    A File Repository alias is not specified.
 #
 #################################################################
 <http://test.example.org/filerepositoryaliases#defaultaliasfile> rdf:type owl:Ontology ;

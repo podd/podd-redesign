@@ -468,7 +468,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
                 .getAllAliases().size());
         
-        // initializing with a Turtle file which is not an "alias" file
+        // initializing with a Turtle file which is an inconsistent "alias" file
         this.testFileRepositoryManager.init(TestConstants.TEST_ALIAS_BAD, RDFFormat.TURTLE);
         
         // verify:
