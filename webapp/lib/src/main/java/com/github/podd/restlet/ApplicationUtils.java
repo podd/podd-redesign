@@ -261,18 +261,6 @@ public class ApplicationUtils
         final FileReferenceManager nextFileReferenceManager = new FileReferenceManagerImpl();
         nextFileReferenceManager.setProcessorFactoryRegistry(nextFileRegistry);
         
-        // File Repository Manager
-        final PoddFileRepositoryManager nextFileRepositoryManager = new PoddFileRepositoryManagerImpl();
-        nextFileRepositoryManager.setRepositoryManager(application.getPoddRepositoryManager());
-        try
-        {
-            nextFileRepositoryManager.init(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE, RDFFormat.TURTLE);
-        }
-        catch (PoddException | IOException e)
-        {
-            log.error("Fatal Error!!! Could not initialize File Repository Manager", e);
-        }
-        
         // PURL manager
         final PoddPurlProcessorFactoryRegistry nextPurlRegistry = new PoddPurlProcessorFactoryRegistry();
         nextPurlRegistry.clear();
@@ -294,6 +282,21 @@ public class ApplicationUtils
             log.error("OWLOntologyManager was null");
         }
         nextOWLManager.setOWLOntologyManager(nextOWLOntologyManager);
+
+        // File Repository Manager
+        final PoddFileRepositoryManager nextFileRepositoryManager = new PoddFileRepositoryManagerImpl();
+        nextFileRepositoryManager.setRepositoryManager(application.getPoddRepositoryManager());
+        nextFileRepositoryManager.setOWLManager(nextOWLManager);
+        try
+        {
+            nextFileRepositoryManager.init(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE, RDFFormat.TURTLE);
+        }
+        catch (PoddException | IOException e)
+        {
+            log.error("Fatal Error!!! Could not initialize File Repository Manager", e);
+        }
+        
+        
         
         final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
         

@@ -8,6 +8,7 @@ import java.util.Set;
 import org.openrdf.OpenRDFException;
 import org.openrdf.rio.RDFFormat;
 
+import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.exception.FileRepositoryException;
 import com.github.podd.exception.FileRepositoryMappingNotFoundException;
@@ -149,6 +150,10 @@ public interface PoddFileRepositoryManager
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
     
     PoddRepositoryManager getRepositoryManager();
+
+    void setOWLManager(PoddOWLManager owlManager);
+
+    PoddOWLManager getOWLManager();
 
 
 }

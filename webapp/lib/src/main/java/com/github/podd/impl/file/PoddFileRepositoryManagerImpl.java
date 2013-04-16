@@ -35,9 +35,24 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
+import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
+import org.semanticweb.owlapi.io.OWLParserException;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.profiles.OWLProfile;
+import org.semanticweb.owlapi.profiles.OWLProfileRegistry;
+import org.semanticweb.owlapi.profiles.OWLProfileReport;
+import org.semanticweb.owlapi.profiles.OWLProfileViolation;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
+import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
+import org.semanticweb.owlapi.rio.RioParserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
@@ -63,6 +78,8 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     
     private PoddRepositoryManager repositoryManager;
     
+    private PoddOWLManager owlManager;
+    
     /**
      * 
      */
@@ -79,6 +96,23 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             throw new NullPointerException("A RepositoryManager should be set before calling init()");
         }
         
+        // load poddFileRepository.owl into OWLAPI
+        final Model schemaModel = new LinkedHashModel();
+        try
+        {
+            final InputStream inputA = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_FILE_REPOSITORY);
+            final RDFParser rdfParserA = Rio.createParser(RDFFormat.RDFXML);
+            final StatementCollector collectorA = new StatementCollector(schemaModel);
+            rdfParserA.setRDFHandler(collectorA);
+            rdfParserA.parse(inputA, "");
+            
+            this.verifyFileRepositoryModelWithOWL(schemaModel, "application/rdf+xml");
+        }
+        catch(final Exception e)
+        {
+            throw new FileRepositoryIncompleteException(schemaModel, "Could not load poddFileRepository.owl");
+        }
+        
         if(this.getAllAliases().size() == 0)
         {
             this.log.info("File Repository Graph is empty. Loading default configurations...");
@@ -91,6 +125,9 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             rdfParser.parse(inputStream, "");
             
             final Model allAliases = modelFromFile.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
+            
+            // validate the default alias file against the File Repository configuration schema
+            this.verifyFileRepositoryModelWithOWL(modelFromFile, "");
             
             this.log.info("Found {} default aliases to add", allAliases.size());
             
@@ -179,8 +216,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                 }
                 
                 // check that the subject URIs used in the repository configuration are not already
-                // used in the
-                // file repository management graph
+                // used in the file repository management graph
                 final Set<Resource> subjectUris =
                         model.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null).subjects();
                 for(final Resource subjectUri : subjectUris)
@@ -402,6 +438,12 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
+    public PoddOWLManager getOWLManager()
+    {
+        return this.owlManager;
+    }
+    
+    @Override
     public PoddRepositoryManager getRepositoryManager()
     {
         return this.repositoryManager;
@@ -474,6 +516,12 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
+    public void setOWLManager(final PoddOWLManager owlManager)
+    {
+        this.owlManager = owlManager;
+    }
+    
+    @Override
     public void setRepositoryManager(final PoddRepositoryManager repositoryManager)
     {
         this.repositoryManager = repositoryManager;
@@ -516,6 +564,74 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
         {
             throw new FileReferenceVerificationFailureException(errors,
                     "File Reference validation resulted in failures");
+        }
+    }
+    
+    /**
+     * Helper method to verify a given Model represents a FileRepository configuration complying
+     * with poddFileRepository OWL Ontology.
+     * <br>
+     * Any ontologies imported by the one to be validated must be already loaded into the
+     * OWLOntologyManager's memory.
+     * <br>
+     * NOTE: When this method returns, the ontology built from the input Model remains in the 
+     * OWLManager's memory.
+     * 
+     * @param model
+     *            A Model which should contain an Ontology with File Repository configurations
+     * @param mimeType
+     * @throws FileRepositoryException
+     */
+    private void verifyFileRepositoryModelWithOWL(final Model model, final String mimeType)
+        throws FileRepositoryException
+    {
+        
+        final RioRDFOntologyFormatFactory ontologyFormatFactory =
+                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(mimeType);
+        final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
+        
+        OWLOntology nextOntology = null;
+        
+        try
+        {
+            nextOntology = this.getOWLManager().getOWLOntologyManager().createOntology();
+            final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(model.iterator());
+            
+            owlParser.parse(owlSource, nextOntology);
+        }
+        catch(OWLOntologyCreationException | OWLParserException | IOException e)
+        {
+            throw new FileRepositoryIncompleteException(model, "Error creating ontology for validation");
+        }
+        // verify: ontology is not empty
+        if(nextOntology.isEmpty())
+        {
+            throw new FileRepositoryIncompleteException(model, "Loaded ontology was empty");
+        }
+        
+        // hard-coded - all our ontologies are expected to be in OWL-DL
+        final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(OWLProfile.OWL2_DL);
+        
+        // verify: check ontology in profile
+        final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
+        if(!profileReport.isInProfile())
+        {
+            for(final OWLProfileViolation v : profileReport.getViolations())
+            {
+                System.out.println(" Profile violation = " + v.toString());
+            }
+            throw new FileRepositoryIncompleteException(model, "Ontology not in profile");
+        }
+        
+        // verify: check consistency
+        final OWLReasonerFactory reasonerFactory =
+                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+        final OWLReasoner reasoner = reasonerFactory.createReasoner(nextOntology);
+        
+        if(!reasoner.isConsistent())
+        {
+            this.getOWLManager().getOWLOntologyManager().removeOntology(nextOntology);
+            throw new FileRepositoryIncompleteException(model, "Ontology is inconsistent");
         }
     }
     

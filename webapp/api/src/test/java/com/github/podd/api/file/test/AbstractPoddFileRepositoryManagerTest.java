@@ -469,7 +469,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
                 .getAllAliases().size());
         
         // initializing with a Turtle file which is not an "alias" file
-        this.testFileRepositoryManager.init(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE);
+        this.testFileRepositoryManager.init(TestConstants.TEST_ALIAS_BAD, RDFFormat.TURTLE);
         
         // verify:
         final List<String> allAliases = this.testFileRepositoryManager.getAllAliases();

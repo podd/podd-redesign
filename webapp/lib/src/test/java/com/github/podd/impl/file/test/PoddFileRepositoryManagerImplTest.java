@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.openrdf.OpenRDFException;
@@ -18,13 +19,18 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
+import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.PoddFileRepository;
 import com.github.podd.api.file.PoddFileRepositoryManager;
 import com.github.podd.api.file.test.AbstractPoddFileRepositoryManagerTest;
 import com.github.podd.exception.FileReferenceNotSupportedException;
+import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
 import com.github.podd.impl.file.SSHFileRepositoryImpl;
@@ -133,9 +139,17 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         repositoryManager.setRepository(testRepository);
         repositoryManager.setFileRepositoryManagementGraph(PoddRdfConstants.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH);
         
+        // create an OWL Manager
+        final PoddOWLManager owlManager = new PoddOWLManagerImpl();
+        owlManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
+        final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+        Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
+        owlManager.setOWLOntologyManager(manager);
+        
         // create the PoddFileRepositoryManager for testing
         final PoddFileRepositoryManager testFileRepositoryManager = new PoddFileRepositoryManagerImpl();
         testFileRepositoryManager.setRepositoryManager(repositoryManager);
+        testFileRepositoryManager.setOWLManager(owlManager);
         
         return testFileRepositoryManager;
     }
