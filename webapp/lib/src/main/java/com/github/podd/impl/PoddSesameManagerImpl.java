@@ -1357,4 +1357,25 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return resultList;
     }
     
+    @Override
+    public Model searchOntologyLabels(final String searchTerm, final int limit, final int offset,
+            final RepositoryConnection repositoryConnection, final InferredOWLOntologyID[] contextsToSearch)
+        throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        //FIXME - write the SPARQL, test, set contexts ...
+        
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        //graphQuery.setBinding("poddObject", searchTerm);
+        
+        this.log.info("Created SPARQL {} \n   with poddObject bound to {}", sb.toString(), searchTerm);
+        
+        final URI[] contexts = null; //from contextsToSearch
+        final Model queryResults = this.executeGraphQuery(graphQuery, contexts);
+        
+        return queryResults;
+    }
+
 }

@@ -296,4 +296,18 @@ public interface PoddSesameManager
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
 
+    /**
+     * 
+     * 
+     * @param searchTerm
+     * @param limit
+     * @param offset
+     * @param repositoryConnection
+     * @param contextsToSearch
+     * @return
+     */
+    Model searchOntologyLabels(String searchTerm, int limit, int offset,
+            final RepositoryConnection repositoryConnection, InferredOWLOntologyID[] contextsToSearch)
+        throws OpenRDFException;
+
 }

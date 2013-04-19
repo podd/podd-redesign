@@ -119,6 +119,12 @@ public interface PoddWebConstants
     public static final String PATH_ATTACH_FILE_REF = "attachref";
     
     /**
+     * Path to the ontology search service
+     */
+    public static final String PATH_SEARCH = "search";
+
+    
+    /**
      * Key used to represent user identifier part of a URL
      */
     public static final String KEY_USER_IDENTIFIER = "identifier";
@@ -173,5 +179,10 @@ public interface PoddWebConstants
      * carried out without seeking user confirmation.
      */
     public static final String KEY_EDIT_WITH_FORCE = "isforce";
+
+    /**
+     * Key used in "search" service to specify the term being searched for.
+     */
+    public static final String KEY_SEARCHTERM = "searchterm";
 
 }

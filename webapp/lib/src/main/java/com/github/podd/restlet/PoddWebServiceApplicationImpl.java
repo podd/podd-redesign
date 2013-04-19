@@ -16,7 +16,6 @@ import org.restlet.security.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
@@ -32,6 +31,7 @@ import com.github.podd.resources.GetArtifactResourceImpl;
 import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.ListArtifactsResourceImpl;
+import com.github.podd.resources.SearchOntologyResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
 import com.github.podd.utils.PoddWebConstants;
@@ -281,6 +281,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.info("attaching File Reference Attach service to path={}", attachFileReference);
         router.attach(attachFileReference, FileReferenceAttachResourceImpl.class);
         
+        // Add a route for the Search ontology service.
+        final String searchService = PoddWebConstants.PATH_SEARCH;
+        this.log.info("attaching Search Ontology service to path={}", searchService);
+        router.attach(searchService, SearchOntologyResourceImpl.class);
+
         // Add a route for Logout service
         // final String logout = "logout";
         // PropertyUtils.getProperty(PropertyUtils.PROPERTY_LOGOUT_FORM_PATH,
