@@ -54,7 +54,7 @@ public class FileReferenceProcessorFactoryRegistry extends
      * @see org.semanticweb.owlapi.util.AbstractServiceLoader#getKey(java.lang.Object)
      */
     @Override
-    protected final String getKey(final FileReferenceProcessorFactory nextFactory)
+    public final String getKey(final FileReferenceProcessorFactory nextFactory)
     {
         return nextFactory.getKey();
     }
