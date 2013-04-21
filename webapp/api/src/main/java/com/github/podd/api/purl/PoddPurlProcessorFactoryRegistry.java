@@ -60,7 +60,7 @@ public class PoddPurlProcessorFactoryRegistry extends AbstractServiceLoader<Stri
      * @see org.semanticweb.owlapi.util.AbstractServiceLoader#getKey(java.lang.Object)
      */
     @Override
-    protected final String getKey(final PoddPurlProcessorFactory nextFactory)
+    public final String getKey(final PoddPurlProcessorFactory nextFactory)
     {
         return nextFactory.getKey();
     }

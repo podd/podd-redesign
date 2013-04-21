@@ -124,6 +124,10 @@
         </dependency>
         <dependency>
             <groupId>com.github.ansell.owlapi</groupId>
+            <artifactId>owlapi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ansell.owlapi</groupId>
             <artifactId>owlapi-impl</artifactId>
             <!-- TODO: FIXME: This is necessary to use AddImport right now. -->
             <scope>compile</scope>
