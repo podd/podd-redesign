@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openrdf.model.Model;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -20,6 +21,7 @@ import org.restlet.resource.ResourceException;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -136,7 +138,13 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         this.assertFreemarker(body);
         
-        assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 14);
+        Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 14);
+        
+        Assert.assertEquals(7, model.subjects().size());
+        Assert.assertEquals(12, model.predicates().size());
+        Assert.assertEquals(14, model.objects().size());
+        
+        DebugUtils.printContents(model);
     }
 
     /**
