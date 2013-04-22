@@ -202,6 +202,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit anything");
         }
         
+        this.log.info("media-type: {}", entity.getMediaType());
+        
         InferredOWLOntologyID artifactMap;
         
         if(MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true))
@@ -298,11 +300,48 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e);
         }
         
-        this.log.error("props={}", props.toString());
+        this.log.info("props={}", props.toString());
         
         if(file == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit a valid file and filename");
+        }
+        
+        this.log.info("filename={}", file.toAbsolutePath().toString());
+        this.log.info("contentType={}", contentType);
+        
+        RDFFormat format = null;
+        
+        // If the content type was application/octet-stream then use the file name instead
+        // Browsers attach this content type when they are not sure what the real type is
+        if(MediaType.APPLICATION_OCTET_STREAM.getName().equals(contentType))
+        {
+            format = Rio.getParserFormatForFileName(file.getFileName().toString());
+            
+            this.log.info("octet-stream contentType filename format={}", format);
+        }
+        // Otherwise use the content type directly in preference to using the filename
+        else if(contentType != null)
+        {
+            format = Rio.getParserFormatForMIMEType(contentType);
+            
+            this.log.info("non-octet-stream contentType format={}", format);
+        }
+        
+        // If the content type choices failed to resolve the type, then try the filename
+        if(format == null)
+        {
+            format = Rio.getParserFormatForFileName(file.getFileName().toString());
+            
+            this.log.info("non-content-type filename format={}", format);
+        }
+        
+        // Or fallback to RDF/XML which at minimum is able to detect when the document is
+        // structurally invalid
+        if(format == null)
+        {
+            this.log.warn("Could not determine RDF format from request so falling back to RDF/XML");
+            format = RDFFormat.RDFXML;
         }
         
         InputStream inputStream = null;
@@ -314,9 +353,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "File IO error occurred", e);
         }
-        // FIXME: Avoid using hardcoded format where possible by having user specify the format,
-        // which could be an alternative property in the multi-part/form-data map
-        final RDFFormat format = RDFFormat.RDFXML;
+        
         return uploadFileAndLoadArtifactIntoPodd(inputStream, format);
     }
     
