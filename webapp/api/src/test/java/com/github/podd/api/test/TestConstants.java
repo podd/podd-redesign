@@ -78,7 +78,8 @@ public interface TestConstants
 
     /** Test resource: artifact with PURLs and multiple internal objects in Turtle format */
     public static final String TEST_ARTIFACT_20130206 = "/test/artifacts/basic-20130206.ttl";
-    public static final int TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES = 395;
+    public static final int TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES = 91;
+    public static final int TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES = 538;
 
     /** Test resource (in Turtle): inferred artifact with PURLs and multiple internal objects */
     public static final String TEST_ARTIFACT_20130206_INFERRED = "/test/artifacts/basic-20130206-inferred.ttl";

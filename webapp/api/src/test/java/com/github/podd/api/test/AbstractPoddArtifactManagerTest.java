@@ -409,7 +409,9 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         
         final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactId, 7, 90, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        this.verifyLoadedArtifact(artifactId, 7, 
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final InputStream editInputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);
         
@@ -426,7 +428,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    98, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, nextRepositoryConnection);
             
             // verify: file reference object
             final List<Statement> fileRefList =
@@ -1096,7 +1098,8 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         try
         {
-            this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 
+            this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7,
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                     TestConstants.TEST_ARTIFACT_FRAGMENT_INCONSISTENT_OBJECT, RDFFormat.TURTLE, UpdatePolicy.MERGE_WITH_EXISTING, 
                     DanglingObjectPolicy.FORCE_CLEAN, 
@@ -1121,7 +1124,8 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactAddNewPoddObjectWithFileReferences() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 
+                        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES,
                         false, TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT, RDFFormat.RDFXML, UpdatePolicy.MERGE_WITH_EXISTING, 
                         DanglingObjectPolicy.FORCE_CLEAN, 
@@ -1135,7 +1139,8 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    98, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8,
+                    nextRepositoryConnection);
             
             // verify: file reference object
             final List<Statement> fileRefList =
@@ -1171,7 +1176,8 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactAddNewPoddObjectWithMerge() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90, 
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 
+                        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, 
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES,
                         false, TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT, RDFFormat.TURTLE, UpdatePolicy.MERGE_WITH_EXISTING, 
                         DanglingObjectPolicy.FORCE_CLEAN, 
@@ -1185,7 +1191,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    101, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 11, nextRepositoryConnection);
             
             // verify: 2 publications exist
             final List<Statement> testList =
@@ -1252,7 +1258,8 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactModifyPoddObjectWithReplace() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90,
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 
+                        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT, RDFFormat.TURTLE,
                         UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
@@ -1266,7 +1273,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    90, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, nextRepositoryConnection);
             
             // verify: still only 1 publication
             final List<Statement> testList =
@@ -1308,7 +1315,8 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactMovePoddObject() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90,
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 
+                        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION, RDFFormat.TURTLE,
                         UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
@@ -1322,7 +1330,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    90, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, nextRepositoryConnection);
             
             DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
             
@@ -1362,7 +1370,8 @@ public abstract class AbstractPoddArtifactManagerTest
     public final void testUpdateArtifactWithDanglingObjects() throws Exception
     {
         final InferredOWLOntologyID updatedArtifact =
-                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90,
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 
+                        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE,
                         UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
@@ -1376,7 +1385,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    78, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES - 12, nextRepositoryConnection);
             
             // verify: dangling objects are no longer in the updated artifact
             final String[] danglingObjects =
@@ -1418,7 +1427,8 @@ public abstract class AbstractPoddArtifactManagerTest
     {
         try
         {
-            this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7, 90,
+            this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7,
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                     TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE,
                     UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.REPORT,
@@ -1460,12 +1470,16 @@ public abstract class AbstractPoddArtifactManagerTest
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv1 = this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv1, 7, 90, 395, false);
+        this.verifyLoadedArtifact(artifactIDv1, 7, 
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
 
         // upload another version of artifact
         final InputStream inputStream2 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactIDv2 = this.testArtifactManager.loadArtifact(inputStream2, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactIDv2, 7, 90, 395, false);
+        this.verifyLoadedArtifact(artifactIDv2, 7,
+        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
 
         System.out.println(artifactIDv1);
         System.out.println(artifactIDv2);
