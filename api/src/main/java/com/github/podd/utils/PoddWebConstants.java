@@ -185,4 +185,9 @@ public interface PoddWebConstants
      */
     public static final String KEY_SEARCHTERM = "searchterm";
 
+    /**
+     * Key used in "search" service to specify the RDF types of objects being searched for.
+     */
+    public static final String KEY_SEARCH_TYPES = "searchtypes";
+
 }
