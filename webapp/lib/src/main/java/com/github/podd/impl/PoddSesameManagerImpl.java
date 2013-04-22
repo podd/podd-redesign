@@ -19,6 +19,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -1358,21 +1359,43 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public Model searchOntologyLabels(final String searchTerm, final int limit, final int offset,
-            final RepositoryConnection repositoryConnection, final InferredOWLOntologyID[] contextsToSearch)
+    public Model searchOntologyLabels(final String searchTerm, final InferredOWLOntologyID artifactID, final int limit,
+            final int offset, final RepositoryConnection repositoryConnection, URI... searchTypes)
         throws OpenRDFException
     {
+        final URI[] contexts = this.versionAndSchemaContexts(artifactID, repositoryConnection);
+
         final StringBuilder sb = new StringBuilder();
         
-        //FIXME - write the SPARQL, test, set contexts ...
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?uri <"+ RDF.TYPE.stringValue() + "> ?label ");
+        sb.append(" } WHERE { ");
+
+        // limit the "types" of objects to search for
+        if (searchTypes != null)
+        {
+            for (URI type : searchTypes)
+            {
+                sb.append(" ?uri <" + RDF.TYPE.stringValue() + "> <" + type.stringValue() + "> . " );
+            }
+        }
         
+        sb.append(" ?uri <" + RDFS.LABEL.stringValue() + "> ?label . ");
         
+        // filter for "searchTerm" in label
+        sb.append(" FILTER(CONTAINS( LCASE(?label) , LCASE(?searchTerm) )) ");
+        
+        sb.append(" } LIMIT ");
+        sb.append(limit);
+        
+        sb.append(" OFFSET ");
+        sb.append(offset);
+
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
-        //graphQuery.setBinding("poddObject", searchTerm);
+        graphQuery.setBinding("searchTerm", ValueFactoryImpl.getInstance().createLiteral(searchTerm));
         
-        this.log.info("Created SPARQL {} \n   with poddObject bound to {}", sb.toString(), searchTerm);
+        this.log.info("Created SPARQL {} with searchTerm bound to '{}' ", sb.toString(), searchTerm);
         
-        final URI[] contexts = null; //from contextsToSearch
         final Model queryResults = this.executeGraphQuery(graphQuery, contexts);
         
         return queryResults;

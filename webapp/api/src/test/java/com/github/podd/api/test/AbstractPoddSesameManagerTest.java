@@ -14,6 +14,7 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -1590,6 +1591,49 @@ public abstract class AbstractPoddSesameManagerTest
         final boolean isPublished = this.internalTestIsPublished(testResourcePath, 
                 TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1_CONCRETE_TRIPLES, versionUri, context);
         Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#searchOntologyLabels(String, InferredOWLOntologyID, int, int, RepositoryConnection, URI...)}
+     */
+    @Test
+    public void testSearchOntologyLabelsForPlatforms() throws Exception
+    {
+        // prepare:
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        final String searchTerm = "ME";
+        final URI[] searchTypes = {
+                PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
+                PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "NamedIndividual")
+                };
+        final Model result =
+                this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, 1000, 0,
+                        this.testRepositoryConnection, searchTypes);
+
+        // verify:
+        Assert.assertNotNull("NULL result", result);
+        Assert.assertEquals("Not the expected number of search results", 9, result.size());
+        
+        Assert.assertEquals("Expected Platform SPAD Meter not found", 1,
+                result.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("SPAD Meter")).size());
+        Assert.assertEquals("Expected Platform Pyrometer not found", 1,
+                result.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Pyrometer")).size());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#searchOntologyLabels(String, InferredOWLOntologyID, int, int, RepositoryConnection, URI...)}
+     */
+    @Ignore
+    @Test
+    public void testSearchOntologyLabelsOther() throws Exception
+    {
+
     }
     
     /**
