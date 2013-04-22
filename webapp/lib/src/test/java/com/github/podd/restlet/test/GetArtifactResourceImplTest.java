@@ -227,7 +227,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     /**
      * Test authenticated access to get Artifact in RDF/JSON
      */
-    @Ignore
     @Test
     public void testGetArtifactBasicJson() throws Exception
     {
