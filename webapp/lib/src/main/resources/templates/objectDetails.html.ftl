@@ -50,7 +50,7 @@
             <div about="${poddObject.objectURI!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
                 <ol>
                 	<#-- object URI, Title and description -->
-                    <li><span class="bold">URI: </span> <a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${poddObject.objectURI?url}">${util.clipProtocol(poddObject.objectURI!"Unknown URI")}</a></li>
+                    <li><span class="bold">URI: </span> <a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${poddObject.objectURI?url}">${util.clipProtocol(poddObject.objectURI!"Unknown URI")}</a></li>
                     <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.label!""}</span></li>
                     <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
                     
@@ -68,7 +68,7 @@
 
 <#if refersToList?? && refersToList?has_content>
 <#list refersToList as element>
-    <br>
+    <br />
     <@refersToTable element=element/>
 </#list>
 </#if>
@@ -92,7 +92,7 @@
 <div id="buttonwrapper">
     <#if poddObject??>
 	    <#if  canEditObject?? && canEditObject>
-        <a href="${baseUrl}/artifact/edit?artifacturi=${artifactUri?url!"unknown-artifacturi"}&objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Edit Object</a>
+        <a href="${baseUrl}/artifact/edit?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Edit Object</a>
         </#if>
         <#if  canAddChildren?? && canAddChildren>
         <a href="${baseUrl}/object/${poddObject.objectURI!"unknown-pid"}/add">Add Child Object</a>
@@ -138,9 +138,9 @@ Macro to display information about the PODD object being viewed
 						<#local tempUri = util.getUri(thisObject)>
 						<#if tempUri??>
 							<#local valueLabel = completeModel.filter(thisObject, RDFS_LABEL, null).objectString()!thisObject.stringValue()>
-							<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
+							<span><a property="${propertyUri}" href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
 						<#else>
-							<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
+							<span><a property="${propertyUri}" href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 						</#if>
 					<#else>
 						<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}">${thisObject.stringValue()}</span>
@@ -155,9 +155,9 @@ Macro to display information about the PODD object being viewed
 					<#local tempUri = util.getUri(thisObject)>
 					<#if tempUri??>
 						<#local valueLabel = completeModel.filter(thisObject, RDFS_LABEL, null).objectString()!thisObject.stringValue()>
-						<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
+						<span><a property="${propertyUri}" href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
 					<#else>
-						<span><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
+						<span><a property="${propertyUri}" href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 					</#if>
 				<#else>
 					<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}">${thisObject.stringValue()}</span>

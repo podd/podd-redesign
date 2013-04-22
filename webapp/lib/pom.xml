@@ -203,6 +203,11 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+        	<groupId>com.github.ansell.semargl</groupId>
+        	<artifactId>semargl-sesame</artifactId>
+        	<scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <testResources>

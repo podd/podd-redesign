@@ -149,7 +149,7 @@ public class AbstractResourceImplTest
         
         final RDFParser parser = Rio.createParser(format);
         parser.setRDFHandler(new StatementCollector(model));
-        parser.parse(inputStream, "");
+        parser.parse(inputStream, "http://test.podd.example.org/should/not/occur/in/a/real/graph/");
         
         Assert.assertEquals(expectedStatements, model.size());
         
