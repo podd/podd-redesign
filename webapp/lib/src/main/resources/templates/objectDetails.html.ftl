@@ -155,9 +155,9 @@ Macro to display information about the PODD object being viewed
 					<#local tempUri = util.getUri(thisObject)>
 					<#if tempUri??>
 						<#local valueLabel = completeModel.filter(thisObject, RDFS_LABEL, null).objectString()!thisObject.stringValue()>
-						<span property="${propertyUri}><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
+						<span property="${propertyUri}"><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(valueLabel)}</a></span>
 					<#else>
-						<span property="${propertyUri}><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
+						<span property="${propertyUri}"><a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 					</#if>
 				<#else>
 					<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}">${thisObject.stringValue()}</span>
