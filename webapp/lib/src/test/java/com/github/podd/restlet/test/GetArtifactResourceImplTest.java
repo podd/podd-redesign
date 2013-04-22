@@ -3,9 +3,13 @@
  */
 package com.github.podd.restlet.test;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -100,6 +104,40 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
         
         this.assertFreemarker(body);
+    }
+
+    /**
+     * Test authenticated access to get Artifact in HTML with a check on the RDFa
+     */
+    @Ignore
+    @Test
+    public void testGetArtifactBasicHtmlRDFa() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify:
+        Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
+        Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
+        
+        Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
+        Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
+        Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
+        
+        this.assertFreemarker(body);
+        
+        assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, -1);
     }
 
     /**
