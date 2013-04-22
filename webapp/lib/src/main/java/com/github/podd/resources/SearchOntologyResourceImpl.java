@@ -45,12 +45,12 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    @Get("rdf|rj|json")
+    @Get("rdf|rj|json|ttl")
     public Representation getRdf(final Variant variant) throws ResourceException
     {
         this.log.info("searchRdf");
         
-        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         RDFWriter writer = null;
         
         // search term - mandatory parameter
@@ -69,7 +69,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final UnmanagedArtifactIRIException e)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find the given artifact", e);
         }
         
         // search Types - optional parameter

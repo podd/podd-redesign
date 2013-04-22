@@ -4,7 +4,6 @@
 package com.github.podd.restlet.test;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.impl.LinkedHashModel;
@@ -18,6 +17,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
@@ -65,8 +65,106 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         return resultModel;
     }
     
+    @Test
+    public void testErrorSearchRdfWithInvalidArtifactID() throws Exception
+    {
+        // prepare:
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
+        
+        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "Scan");
+        searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, "http://no.such.artifact");
+        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
+                "http://purl.org/podd/ns/poddScience#Platform");
+        
+        // there is no need to authenticate or have a test artifact as the artifact ID is checked
+        // for first
+        try
+        {
+            searchClientResource.get(MediaType.APPLICATION_RDF_XML);
+            Assert.fail("Should have thrown a ResourceException");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+    }
+    
+    @Test
+    public void testErrorSearchRdfWithoutAuthentication() throws Exception
+    {
+        // prepare:
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
+        
+        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "Scan");
+        searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
+                .toString());
+        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
+                "http://purl.org/podd/ns/poddScience#Platform");
+        
+        // request without authentication
+        try
+        {
+            searchClientResource.get(MediaType.APPLICATION_RDF_XML);
+            Assert.fail("Should have thrown a ResourceException");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+    }
+    
+    @Test
+    public void testErrorSearchRdfWithoutSearchTerm() throws Exception
+    {
+        // prepare:
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
+        
+        // no search term!
+        searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
+                .toString());
+        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
+                "http://purl.org/podd/ns/poddScience#Platform");
+        
+        // there is no need to authenticate or have a test artifact as the search term is checked
+        // for first
+        try
+        {
+            searchClientResource.get(MediaType.APPLICATION_RDF_XML);
+            Assert.fail("Should have thrown a ResourceException");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+    }
+    
     /**
-     * Test successful search for a Platform in RDF
+     * Test successful search for a Platform in JSON format
+     */
+    @Test
+    public void testSearchJson() throws Exception
+    {
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform", OWL.THING.stringValue() };
+        final MediaType requestMediaType = MediaType.APPLICATION_JSON;
+        
+        final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType);
+        
+        Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
+        System.out.println(resultModel.toString());
+        Assert.assertEquals("Expected Platform CabScan not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("CabScan")).size());
+        Assert.assertEquals("Expected Platform PlantScan not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("PlantScan")).size());
+    }
+    
+    /**
+     * Test successful search for a Platform in RDF/XML
      */
     @Test
     public void testSearchRdfForPlatforms() throws Exception
@@ -87,7 +185,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
-     * Test successful search for PoddScience:Sex values in RDF
+     * Test successful search for PoddScience:Sex values in RDF/XML
      */
     @Test
     public void testSearchRdfForSex() throws Exception
@@ -105,38 +203,22 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
-     * 
-     * TODO: still identifies as RDF/XML at server resource
-     * 
+     * Test successful search for a Platform in Turtle
      */
-    @Ignore
     @Test
     public void testSearchTurtle() throws Exception
     {
-        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Sex" };
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform", OWL.THING.stringValue() };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_TURTLE;
         
-        final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType);
+        final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType);
         
         Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
-        Assert.assertEquals("Value Hermaphrodite not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Hermaphrodite")).size());
-        Assert.assertEquals("Value Male not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Male")).size());
-    }
-    
-    /**
-     */
-    @Ignore
-    @Test
-    public void testErrorSearchRdf_Cause1() throws Exception
-    {
-    }
-    
-    @Ignore
-    @Test
-    public void testErrorSearchRdf_Cause2() throws Exception
-    {
+        System.out.println(resultModel.toString());
+        Assert.assertEquals("Expected Platform CabScan not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("CabScan")).size());
+        Assert.assertEquals("Expected Platform PlantScan not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("PlantScan")).size());
     }
     
 }
