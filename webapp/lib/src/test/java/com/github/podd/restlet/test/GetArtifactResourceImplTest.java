@@ -109,7 +109,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     /**
      * Test authenticated access to get Artifact in HTML with a check on the RDFa
      */
-    @Ignore
     @Test
     public void testGetArtifactBasicHtmlRDFa() throws Exception
     {
@@ -137,7 +136,28 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         this.assertFreemarker(body);
         
-        assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, -1);
+        assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 14);
+    }
+
+    /**
+     * Test parsing a simple RDFa document
+     */
+    @Test
+    public void testSimpleRDFaParse() throws Exception
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML+RDFa 1.0//EN\" \"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd\">");
+        sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\""); 
+        sb.append(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"");
+        sb.append(" version=\"XHTML+RDFa 1.0\">");
+        sb.append("<head>");
+        sb.append(" <link rel=\"stylesheet\" href=\"http://localhost:8080/test/styles/mystyle.css\" media=\"screen\" type=\"text/css\" />");
+        sb.append("</head>");
+        sb.append("<body>");
+        sb.append("</body>");
+        sb.append("</html>");
+        assertRdf(new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 1);
     }
 
     /**
