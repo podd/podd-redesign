@@ -33,8 +33,9 @@ import com.github.podd.utils.PoddWebConstants;
 public class GetArtifactResourceImplTest extends AbstractResourceImplTest
 {
     
-   // private static final String TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT = "/test/artifacts/basicProject-1-internal-object.rdf";
-
+    // private static final String TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT =
+    // "/test/artifacts/basicProject-1-internal-object.rdf";
+    
     /**
      * Test access without artifactID parameter gives a BAD_REQUEST error.
      */
@@ -107,7 +108,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         this.assertFreemarker(body);
     }
-
+    
     /**
      * Test authenticated access to get Artifact in HTML with a check on the RDFa
      */
@@ -140,13 +141,15 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 14);
         
+        // RDFa generates spurious triples, use at your own risk
+        // Only rely on numbers from actual RDF serialisations
         Assert.assertEquals(7, model.subjects().size());
         Assert.assertEquals(12, model.predicates().size());
         Assert.assertEquals(14, model.objects().size());
         
         DebugUtils.printContents(model);
     }
-
+    
     /**
      * Test parsing a simple RDFa document
      */
@@ -156,7 +159,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         StringBuilder sb = new StringBuilder();
         
         sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML+RDFa 1.0//EN\" \"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd\">");
-        sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\""); 
+        sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\"");
         sb.append(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"");
         sb.append(" version=\"XHTML+RDFa 1.0\">");
         sb.append("<head>");
@@ -167,7 +170,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         sb.append("</html>");
         assertRdf(new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 1);
     }
-
+    
     /**
      * Test authenticated access to get an internal podd object in HTML
      */
@@ -178,7 +181,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         final String objectUri = "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0";
-
+        
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         
@@ -227,13 +230,14 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
         
-        Assert.assertTrue("Publication title is missing", body.contains("Towards An Extensible, Domain-agnostic Scientific Data Management System"));
+        Assert.assertTrue("Publication title is missing",
+                body.contains("Towards An Extensible, Domain-agnostic Scientific Data Management System"));
         Assert.assertTrue("#publishedIn value is missing", body.contains("Proceedings of the IEEE eScience 2010"));
-        Assert.assertTrue("Publicatin's PURL value is missing", body.contains("http://dx.doi.org/10.1109/eScience.2010.44"));
+        Assert.assertTrue("Publicatin's PURL value is missing",
+                body.contains("http://dx.doi.org/10.1109/eScience.2010.44"));
         
         this.assertFreemarker(body);
     }
-
     
     /**
      * Test authenticated access to get Artifact in RDF/XML
@@ -261,6 +265,14 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         // verify: received contents have artifact URI
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
+        
+        Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 28);
+        
+        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(15, model.predicates().size());
+        Assert.assertEquals(24, model.objects().size());
+        
+        DebugUtils.printContents(model);
     }
     
     /**
@@ -288,6 +300,14 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         // verify: received contents have artifact's ontology and version IRIs
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
+
+        Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 28);
+        
+        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(15, model.predicates().size());
+        Assert.assertEquals(24, model.objects().size());
+        
+        DebugUtils.printContents(model);
     }
     
     /**
@@ -316,6 +336,14 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         // verify: received contents have artifact's ontology and version IRIs
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
+
+        Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFJSON, 28);
+        
+        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(15, model.predicates().size());
+        Assert.assertEquals(24, model.objects().size());
+        
+        DebugUtils.printContents(model);
     }
     
 }
