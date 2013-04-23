@@ -152,7 +152,7 @@ public class UUIDPurlProcessorImpl implements PoddPurlProcessor
         
         final URI purl = ValueFactoryImpl.getInstance().createURI(b.toString());
         
-        this.log.info("Generated PURL {}", purl);
+        this.log.debug("Generated PURL {}", purl);
         
         return new SimplePoddPurlReference(inputUri, purl);
     }
