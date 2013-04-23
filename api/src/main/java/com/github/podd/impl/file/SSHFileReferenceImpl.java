@@ -3,10 +3,17 @@
  */
 package com.github.podd.impl.file;
 
+import java.util.Arrays;
+
+import org.openrdf.model.Model;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * A simple implementation of an SSH File Reference object for use within PODD.
@@ -15,7 +22,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public class SSHFileReferenceImpl implements SSHFileReference
 {
-
+    
     private InferredOWLOntologyID artifactID;
     private String label;
     private IRI objectIri;
@@ -37,79 +44,79 @@ public class SSHFileReferenceImpl implements SSHFileReference
     {
         return this.artifactID;
     }
-
+    
     @Override
     public String getFilename()
     {
         return this.filename;
     }
-
+    
     @Override
     public String getLabel()
     {
         return this.label;
     }
-
+    
     @Override
     public IRI getObjectIri()
     {
         return this.objectIri;
     }
-
+    
     @Override
     public IRI getParentIri()
     {
         return this.parentIri;
     }
-
+    
     @Override
     public String getPath()
     {
         return this.path;
     }
-
+    
     @Override
     public String getRepositoryAlias()
     {
         return this.repositoryAlias;
     }
-
+    
     @Override
     public void setArtifactID(InferredOWLOntologyID artifactID)
     {
         this.artifactID = artifactID;
     }
-
+    
     @Override
     public void setFilename(String filename)
     {
         this.filename = filename;
     }
-
+    
     @Override
     public void setLabel(String label)
     {
         this.label = label;
     }
-
+    
     @Override
     public void setObjectIri(IRI objectIri)
     {
         this.objectIri = objectIri;
     }
-
+    
     @Override
     public void setParentIri(IRI parentIri)
     {
         this.parentIri = parentIri;
     }
-
+    
     @Override
     public void setPath(String path)
     {
         this.path = path;
     }
-
+    
     @Override
     public void setRepositoryAlias(String repositoryAlias)
     {
@@ -137,6 +144,25 @@ public class SSHFileReferenceImpl implements SSHFileReference
         b.append("]");
         
         return b.toString();
+    }
+    
+    public Model toRDF()
+    {
+        ValueFactory vf = PoddRdfConstants.VALUE_FACTORY;
+        Model result = new LinkedHashModel();
+        
+        if(getArtifactID() != null)
+        {
+            OntologyUtils.ontologyIDsToModel(Arrays.asList(getArtifactID()), result);
+        }
+        
+        if(getFilename() != null)
+        {
+            result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILENAME,
+                    vf.createLiteral(getFilename()));
+        }
+        
+        return result;
     }
     
 }
