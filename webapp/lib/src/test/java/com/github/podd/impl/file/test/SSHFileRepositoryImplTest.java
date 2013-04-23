@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -216,11 +217,11 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         try
         {
             return SSHService.getNewFileReference(alias, fileIdentifier,
-                    tempDirectory.newFolder("sshfilerepositoryimpltest-resources").toPath());
+                    tempDirectory.newFolder("sshfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                            .toPath());
         }
         catch(IOException e)
         {
-            Assert.fail("Found IOException while creating file reference");
             throw new RuntimeException(e);
         }
     }

@@ -6,6 +6,7 @@ package com.github.podd.impl.file.test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -68,11 +69,11 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         try
         {
             return SSHService.getNewFileReference(alias, fileIdentifier,
-                    tempDirectory.newFolder("poddfilerepositoryimpltest-resources").toPath());
+                    tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                            .toPath());
         }
         catch(IOException e)
         {
-            Assert.fail("Found IOException while creating file reference");
             throw new RuntimeException(e);
         }
     }
