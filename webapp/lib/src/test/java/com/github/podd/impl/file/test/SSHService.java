@@ -221,6 +221,9 @@ public class SSHService
          * as a resource made available from a different module, it will not be accessible to the
          * SSH service.
          */
+        
+        // NOTE: This is very very bad practice with Maven. The resource should be copied out to a
+        // temporary directory first
         final String testFile = SSHService.class.getResource(TestConstants.TEST_FILE).getFile();
         String fileName = testFile;
         String path = SSHService.class.getResource(TestConstants.TEST_FILE).getPath();
