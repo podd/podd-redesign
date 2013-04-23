@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
+import com.github.podd.api.file.FileReference;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -71,8 +72,7 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public InferredOWLOntologyID attachFileReference(final InferredOWLOntologyID ontologyIRI, final IRI objectIRI,
-            final String label, final String repositoryAlias, final String filePathInRepository)
+    public InferredOWLOntologyID attachFileReference(final FileReference ref)
         throws PoddClientException
     {
         // TODO Auto-generated method stub
