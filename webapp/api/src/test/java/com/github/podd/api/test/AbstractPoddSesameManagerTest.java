@@ -52,7 +52,7 @@ import com.github.podd.utils.PoddRdfConstants;
 public abstract class AbstractPoddSesameManagerTest
 {
     /* test artifact pair with PURLs */
-
+    
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
     private PoddSesameManager testPoddSesameManager;
@@ -133,7 +133,7 @@ public abstract class AbstractPoddSesameManagerTest
         }
         
         URI ontologyURI = GraphUtil.getUniqueSubjectURI(concreteModel, RDF.TYPE, OWL.ONTOLOGY);
-        log.info("ontology URI: {}", ontologyURI);
+        log.debug("ontology URI: {}", ontologyURI);
         // dump the statements into the correct context of the Repository
         this.testRepositoryConnection.add(concreteModel,
                 GraphUtil.getUniqueObjectURI(concreteModel, ontologyURI, OWL.VERSIONIRI));
@@ -166,7 +166,7 @@ public abstract class AbstractPoddSesameManagerTest
                         "/test/ontologies/poddScienceInferred.rdf", "/test/ontologies/poddPlantInferred.rdf", };
         for(int i = 0; i < schemaResourcePaths.length; i++)
         {
-            log.info("Next paths: {} {}", schemaResourcePaths[i], schemaInferredResourcePaths[i]);
+            log.debug("Next paths: {} {}", schemaResourcePaths[i], schemaInferredResourcePaths[i]);
             this.loadOntologyFromResource(schemaResourcePaths[i], schemaInferredResourcePaths[i], RDFFormat.RDFXML);
         }
     }
@@ -191,8 +191,8 @@ public abstract class AbstractPoddSesameManagerTest
                 this.artifactGraph);
         this.testRepositoryConnection.add(testOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
                 testInferredURI, this.artifactGraph);
-        this.testRepositoryConnection.add(testVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                testInferredURI, this.artifactGraph);
+        this.testRepositoryConnection.add(testVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, testInferredURI,
+                this.artifactGraph);
         
         return this.artifactGraph;
     }
@@ -221,20 +221,19 @@ public abstract class AbstractPoddSesameManagerTest
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddPlant/1");
         final URI pPlantInferredURI =
                 ValueFactoryImpl.getInstance().createURI("urn:inferred:http://purl.org/podd/ns/version/poddPlant/1");
-
+        
         final URI pPlantVersionURIv2 =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddPlant/2");
         final URI pPlantInferredURIv2 =
                 ValueFactoryImpl.getInstance().createURI("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2");
-        
         
         // Podd-Base
         this.testRepositoryConnection.add(pbBaseOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pbInferredURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pbVersionURI,
                 this.schemaGraph);
-        this.testRepositoryConnection.add(pbVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                pbInferredURI, this.schemaGraph);
+        this.testRepositoryConnection.add(pbVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, pbInferredURI,
+                this.schemaGraph);
         this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.OMV_CURRENT_VERSION, pbVersionURI,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pbBaseOntologyURI, PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION,
@@ -246,15 +245,18 @@ public abstract class AbstractPoddSesameManagerTest
          * 
          * <urn:inferred:http://purl.org/podd/ns/version/poddBase/1> <RDF:Type> <OWL:Ontology>
          * 
-         * <http://purl.org/podd/ns/poddBase> <OWL:VersionIRI> <http://purl.org/podd/ns/version/poddBase/1>
+         * <http://purl.org/podd/ns/poddBase> <OWL:VersionIRI>
+         * <http://purl.org/podd/ns/version/poddBase/1>
          * 
-         * <http://purl.org/podd/ns/version/poddBase/1> <poddBase:InferredVersion> <urn:inferred:http://purl.org/podd/ns/version/poddBase/1>
+         * <http://purl.org/podd/ns/version/poddBase/1> <poddBase:InferredVersion>
+         * <urn:inferred:http://purl.org/podd/ns/version/poddBase/1>
          * 
-         * <http://purl.org/podd/ns/poddBase> <OMV:CurrentVersion> <http://purl.org/podd/ns/version/poddBase/1>
+         * <http://purl.org/podd/ns/poddBase> <OMV:CurrentVersion>
+         * <http://purl.org/podd/ns/version/poddBase/1>
          * 
-         * <http://purl.org/podd/ns/poddBase> <poddBase:CurrentInferredVersion> <urn:inferred:http://purl.org/podd/ns/version/poddBase/1> 
+         * <http://purl.org/podd/ns/poddBase> <poddBase:CurrentInferredVersion>
+         * <urn:inferred:http://purl.org/podd/ns/version/poddBase/1>
          */
-        
         
         // Podd-Science
         this.testRepositoryConnection.add(pScienceOntologyURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
@@ -274,7 +276,7 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(pPlantInferredURI, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantVersionURIv2, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantInferredURIv2, RDF.TYPE, OWL.ONTOLOGY, this.schemaGraph);
-
+        
         this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pPlantVersionURI,
                 this.schemaGraph);
         this.testRepositoryConnection.add(pPlantOntologyURI, PoddRdfConstants.OWL_VERSION_IRI, pPlantVersionURIv2,
@@ -288,10 +290,10 @@ public abstract class AbstractPoddSesameManagerTest
                 pPlantInferredURIv2, this.schemaGraph);
         this.testRepositoryConnection.add(pPlantVersionURI, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
                 pPlantInferredURI, this.schemaGraph);
-
+        
         this.testRepositoryConnection.add(pPlantVersionURIv2, PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
                 pPlantInferredURIv2, this.schemaGraph);
-
+        
         return this.schemaGraph;
     }
     
@@ -383,15 +385,16 @@ public abstract class AbstractPoddSesameManagerTest
         
         // Collections to test
         URI[] collectionsToTest =
-            { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatformType"),
-                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasSex"),
-                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasSoftware"),
-                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasPublicationStatus"),
-                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasControl"),
-                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasWildType"),
-//                    ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"),
-                    };
-
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatformType"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasSex"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasSoftware"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasPublicationStatus"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasControl"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasWildType"),
+                // ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                // "ANZSRCAssertion"),
+                };
+        
         URI[][] expectedMembers =
                 {
                         {
@@ -438,8 +441,7 @@ public abstract class AbstractPoddSesameManagerTest
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
                                         "ANZSRC_NotApplicable"),
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "ANZSRC_Unknown") },
-                };
+                                        "ANZSRC_Unknown") }, };
         
         // iterate through test data
         for(int i = 0; i < collectionsToTest.length; i++)
@@ -455,7 +457,7 @@ public abstract class AbstractPoddSesameManagerTest
                 Assert.assertTrue("Unexpected member found", expectedMembersList.contains(resultObject));
             }
         }
-    }    
+    }
     
     /**
      * Test method for
@@ -494,8 +496,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         Assert.assertEquals("Unexpected Cardinality for Lead Institution", "1", displayModel.filter(null, null, null)
                 .objectString());
-    }    
-
+    }
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getCardinality(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
@@ -511,7 +513,8 @@ public abstract class AbstractPoddSesameManagerTest
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI publicationObjectUri =
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
+                ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
         
         URI hasAbstractPropertyUri =
                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAbstract");
@@ -527,14 +530,14 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals(
                 "Expected 1 hasAbstract maxQualifiedcardinality statement",
                 1,
-                displayModel.filter(hasAbstractPropertyUri,
-                        ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#maxQualifiedCardinality"),
-                        null).size());
+                displayModel.filter(
+                        hasAbstractPropertyUri,
+                        ValueFactoryImpl.getInstance().createURI(
+                                "http://www.w3.org/2002/07/owl#maxQualifiedCardinality"), null).size());
         
         Assert.assertEquals("Unexpected Cardinality for hasAbstract", "1", displayModel.filter(null, null, null)
                 .objectString());
-    }    
-    
+    }
     
     /**
      * Test method for
@@ -741,7 +744,7 @@ public abstract class AbstractPoddSesameManagerTest
                 IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddScience/43"),
                 inferredOntologyID.getInferredOntologyIRI());
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getCurrentSchemaVersion(org.semanticweb.owlapi.model.IRI)}
@@ -769,7 +772,7 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Not the expected current inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2"),
                 inferredOntologyID.getInferredOntologyIRI());
-    }    
+    }
     
     /**
      * Test method for
@@ -817,18 +820,13 @@ public abstract class AbstractPoddSesameManagerTest
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#publication45",
-                        "mailto:helen.daily@csiro.au",
-                        "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", 
-                        };
+                        "mailto:helen.daily@csiro.au", "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", };
         
         final String[] expectedTypes =
-                { "http://purl.org/podd/ns/poddScience#Project", 
-                        "http://purl.org/podd/ns/poddScience#Genotype",
+                { "http://purl.org/podd/ns/poddScience#Project", "http://purl.org/podd/ns/poddScience#Genotype",
                         "http://purl.org/podd/ns/poddScience#Material",
-                        "http://purl.org/podd/ns/poddScience#Publication",
-                        "http://purl.org/podd/ns/poddUser#User",
-                        "http://purl.org/podd/ns/poddScience#ANZSRCAssertion", 
-                        }; 
+                        "http://purl.org/podd/ns/poddScience#Publication", "http://purl.org/podd/ns/poddUser#User",
+                        "http://purl.org/podd/ns/poddScience#ANZSRCAssertion", };
         
         // test in a loop these PODD objects for their types
         for(int i = 0; i < objectUris.length; i++)
@@ -901,8 +899,7 @@ public abstract class AbstractPoddSesameManagerTest
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI objectUri =
-                ValueFactoryImpl.getInstance().createURI(
-                        "http://purl.org/podd/basic-1-20130206/object:2966");
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966");
         
         Model displayModel =
                 this.testPoddSesameManager.getObjectDetailsForDisplay(ontologyID, objectUri,
@@ -912,19 +909,30 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
         Assert.assertEquals("Display Model not of expected size", 42, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 17, displayModel.filter(objectUri, null, null).size());
+        Assert.assertEquals("Not the expected no. of statements about object", 17,
+                displayModel.filter(objectUri, null, null).size());
         
-        Assert.assertEquals("Expected 1 hasLeadInstitution statement", 1, displayModel.filter(objectUri, 
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution")
-                , null).size());
+        Assert.assertEquals(
+                "Expected 1 hasLeadInstitution statement",
+                1,
+                displayModel
+                        .filter(objectUri,
+                                ValueFactoryImpl.getInstance().createURI(
+                                        "http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).size());
         
-        Assert.assertEquals("Unexpected Lead Institution", "CSIRO HRPPC", displayModel.filter(objectUri, 
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).objectString());
-
-        Assert.assertTrue("Expected content missing in display model",
-                displayModel.toString().contains("PODD - Towards An Extensible, Domain-agnostic Scientific Data Management System"));
+        Assert.assertEquals(
+                "Unexpected Lead Institution",
+                "CSIRO HRPPC",
+                displayModel
+                        .filter(objectUri,
+                                ValueFactoryImpl.getInstance().createURI(
+                                        "http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).objectString());
+        
+        Assert.assertTrue(
+                "Expected content missing in display model",
+                displayModel.toString().contains(
+                        "PODD - Towards An Extensible, Domain-agnostic Scientific Data Management System"));
     }
-
     
     /**
      * Test method for
@@ -952,15 +960,23 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
         Assert.assertEquals("Display Model not of expected size", 15, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 7, displayModel.filter(objectUri, null, null).size());
+        Assert.assertEquals("Not the expected no. of statements about object", 7,
+                displayModel.filter(objectUri, null, null).size());
         
-        Assert.assertEquals("Expected 1 hasPURL statement", 1, displayModel.filter(objectUri, 
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasPURL")
-                , null).size());
+        Assert.assertEquals(
+                "Expected 1 hasPURL statement",
+                1,
+                displayModel.filter(objectUri,
+                        ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasPURL"), null)
+                        .size());
         
-        Assert.assertEquals("Unexpected PURL value", "http://dx.doi.org/10.1109/eScience.2010.44", displayModel.filter(objectUri, 
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasPURL"), null).objectString());
-
+        Assert.assertEquals(
+                "Unexpected PURL value",
+                "http://dx.doi.org/10.1109/eScience.2010.44",
+                displayModel.filter(objectUri,
+                        ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasPURL"), null)
+                        .objectString());
+        
         // verify: a string search for some content
         Assert.assertTrue("Expected content missing in display model",
                 displayModel.toString().contains("Proceedings of the IEEE eScience 2010"));
@@ -984,30 +1000,41 @@ public abstract class AbstractPoddSesameManagerTest
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final URI objectUri =
-                ValueFactoryImpl.getInstance().createURI(
-                        "http://purl.org/podd/basic-1-20130206/object:2966");
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966");
         
         Model displayModel =
-                this.testPoddSesameManager.getObjectDetailsForEdit(ontologyID, objectUri,
-                        this.testRepositoryConnection);
+                this.testPoddSesameManager
+                        .getObjectDetailsForEdit(ontologyID, objectUri, this.testRepositoryConnection);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
         Assert.assertEquals("Display Model not of expected size", 72, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 22, displayModel.filter(objectUri, null, null).size());
+        Assert.assertEquals("Not the expected no. of statements about object", 22,
+                displayModel.filter(objectUri, null, null).size());
         
-        Assert.assertEquals("Expected 1 hasLeadInstitution statement", 1, displayModel.filter(objectUri, 
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution")
-                , null).size());
+        Assert.assertEquals(
+                "Expected 1 hasLeadInstitution statement",
+                1,
+                displayModel
+                        .filter(objectUri,
+                                ValueFactoryImpl.getInstance().createURI(
+                                        "http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).size());
         
-        Assert.assertEquals("Unexpected Lead Institution", "CSIRO HRPPC", displayModel.filter(objectUri, 
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).objectString());
-
-        Assert.assertTrue("Expected content missing in display model",
-                displayModel.toString().contains("PODD - Towards An Extensible, Domain-agnostic Scientific Data Management System"));
+        Assert.assertEquals(
+                "Unexpected Lead Institution",
+                "CSIRO HRPPC",
+                displayModel
+                        .filter(objectUri,
+                                ValueFactoryImpl.getInstance().createURI(
+                                        "http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).objectString());
+        
+        Assert.assertTrue(
+                "Expected content missing in display model",
+                displayModel.toString().contains(
+                        "PODD - Towards An Extensible, Domain-agnostic Scientific Data Management System"));
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getOntologies(boolean, RepositoryConnection, URI)}
@@ -1170,7 +1197,7 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNull("Expected NULL inferredOntologyID", inferredOntologyID);
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getSchemaVersion(IRI, RepositoryConnection, URI)}
@@ -1244,8 +1271,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         // verify:
         Assert.assertNotNull("Returned NULL OntologyID", ontologyID);
-        Assert.assertEquals("Not the expected version",
-                IRI.create("http://purl.org/podd/ns/version/poddPlant/2"), ontologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected version", IRI.create("http://purl.org/podd/ns/version/poddPlant/2"),
+                ontologyID.getVersionIRI());
         Assert.assertEquals("Not the expected inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2"),
                 ontologyID.getInferredOntologyIRI());
@@ -1270,8 +1297,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         // verify:
         Assert.assertNotNull("Returned NULL ontologyID", ontologyID);
-        Assert.assertEquals("Not the expected version",
-                IRI.create("http://purl.org/podd/ns/version/poddPlant/2"), ontologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected version", IRI.create("http://purl.org/podd/ns/version/poddPlant/2"),
+                ontologyID.getVersionIRI());
         Assert.assertEquals("Not the expected inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2"),
                 ontologyID.getInferredOntologyIRI());
@@ -1296,13 +1323,13 @@ public abstract class AbstractPoddSesameManagerTest
         
         // verify:
         Assert.assertNotNull("Returned NULL ontologyID", ontologyID);
-        Assert.assertEquals("Not the expected version",
-                IRI.create("http://purl.org/podd/ns/version/poddPlant/1"), ontologyID.getVersionIRI());
+        Assert.assertEquals("Not the expected version", IRI.create("http://purl.org/podd/ns/version/poddPlant/1"),
+                ontologyID.getVersionIRI());
         Assert.assertEquals("Not the expected inferred version",
                 IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/1"),
                 ontologyID.getInferredOntologyIRI());
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getTopObjects(InferredOWLOntologyID, RepositoryConnection)}
@@ -1361,7 +1388,7 @@ public abstract class AbstractPoddSesameManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getTopObjectIRI(InferredOWLOntologyID, RepositoryConnection)}
-     * . 
+     * .
      */
     @Test
     public void testGetTopObjectIRI() throws Exception
@@ -1371,14 +1398,13 @@ public abstract class AbstractPoddSesameManagerTest
                 this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
-        final URI topObjectList =
-                this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
+        final URI topObjectList = this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
         
         Assert.assertEquals("Not the expected top object URI",
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966"),
                 topObjectList);
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getWeightedProperties(InferredOWLOntologyID, URI, RepositoryConnection)}
@@ -1443,8 +1469,8 @@ public abstract class AbstractPoddSesameManagerTest
         final URI topObjectUri = this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, testRepositoryConnection);
         
         final List<URI> orderedPropertyUris =
-                this.testPoddSesameManager
-                        .getWeightedProperties(nextOntologyID, topObjectUri, false, testRepositoryConnection);
+                this.testPoddSesameManager.getWeightedProperties(nextOntologyID, topObjectUri, false,
+                        testRepositoryConnection);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
@@ -1468,7 +1494,7 @@ public abstract class AbstractPoddSesameManagerTest
                     ValueFactoryImpl.getInstance().createURI(expectedUris[i]), orderedPropertyUris.get(i));
         }
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getWeightedProperties(InferredOWLOntologyID, URI, boolean, RepositoryConnection)}
@@ -1588,8 +1614,9 @@ public abstract class AbstractPoddSesameManagerTest
         
         final String testResourcePath = TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1;
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:artifact:version:1");
-        final boolean isPublished = this.internalTestIsPublished(testResourcePath, 
-                TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1_CONCRETE_TRIPLES, versionUri, context);
+        final boolean isPublished =
+                this.internalTestIsPublished(testResourcePath,
+                        TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1_CONCRETE_TRIPLES, versionUri, context);
         Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
     }
     
@@ -1607,14 +1634,13 @@ public abstract class AbstractPoddSesameManagerTest
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
         final String searchTerm = "ME";
-        final URI[] searchTypes = {
-                PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
-                PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "NamedIndividual")
-                };
+        final URI[] searchTypes =
+                { PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
+                        PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final Model result =
                 this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, 1000, 0,
                         this.testRepositoryConnection, searchTypes);
-
+        
         // verify:
         Assert.assertNotNull("NULL result", result);
         Assert.assertEquals("Not the expected number of search results", 9, result.size());
@@ -1633,7 +1659,7 @@ public abstract class AbstractPoddSesameManagerTest
     @Test
     public void testSearchOntologyLabelsOther() throws Exception
     {
-
+        
     }
     
     /**
