@@ -114,6 +114,8 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
                             break;
                         }
                     }
+                    fileReference
+                            .setParentPredicateIRI(IRI.create(linksToFileReference.predicates().iterator().next()));
                 }
                 
                 results.add(fileReference);

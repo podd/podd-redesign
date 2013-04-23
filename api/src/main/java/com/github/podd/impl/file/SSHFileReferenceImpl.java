@@ -4,10 +4,13 @@
 package com.github.podd.impl.file;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import org.openrdf.model.Model;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.vocabulary.RDFS;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.api.file.SSHFileReference;
@@ -31,6 +34,7 @@ public class SSHFileReferenceImpl implements SSHFileReference
     
     private String filename;
     private String path;
+    private IRI parentPredicateIRI;
     
     /**
      * Constructor
@@ -67,6 +71,12 @@ public class SSHFileReferenceImpl implements SSHFileReference
     public IRI getParentIri()
     {
         return this.parentIri;
+    }
+    
+    @Override
+    public IRI getParentPredicateIRI()
+    {
+        return this.parentPredicateIRI;
     }
     
     @Override
@@ -109,6 +119,12 @@ public class SSHFileReferenceImpl implements SSHFileReference
     public void setParentIri(IRI parentIri)
     {
         this.parentIri = parentIri;
+    }
+    
+    @Override
+    public void setParentPredicateIRI(IRI parentPredicateIRI)
+    {
+        this.parentPredicateIRI = parentPredicateIRI;
     }
     
     @Override
@@ -160,6 +176,29 @@ public class SSHFileReferenceImpl implements SSHFileReference
         {
             result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILENAME,
                     vf.createLiteral(getFilename()));
+        }
+        
+        if(getLabel() != null)
+        {
+            result.add(this.objectIri.toOpenRDFURI(), RDFS.LABEL, vf.createLiteral(getLabel()));
+        }
+        
+        if(getPath() != null)
+        {
+            result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILE_PATH,
+                    vf.createLiteral(getPath()));
+        }
+        
+        if(getRepositoryAlias() != null)
+        {
+            result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_ALIAS,
+                    vf.createLiteral(getRepositoryAlias()));
+        }
+        
+        if(getParentIri() != null && getParentPredicateIRI() != null)
+        {
+            result.add(getParentIri().toOpenRDFURI(), getParentPredicateIRI().toOpenRDFURI(),
+                    this.objectIri.toOpenRDFURI());
         }
         
         return result;

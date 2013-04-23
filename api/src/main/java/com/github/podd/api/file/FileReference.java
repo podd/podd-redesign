@@ -45,7 +45,13 @@ public interface FileReference
      *         linked to.
      */
     IRI getParentIri();
-
+    
+    /**
+     * 
+     * @return The {@link IRI} of the predicate used to link the file reference to its parent.
+     */
+    IRI getParentPredicateIRI();
+    
     /**
      * 
      * @return The alias for the repository that is managing this file reference.
@@ -55,7 +61,8 @@ public interface FileReference
     /**
      * 
      * @param artifactId
-     *            The {@link InferredOWLOntologyID} for the Artifact that includes this file reference.
+     *            The {@link InferredOWLOntologyID} for the Artifact that includes this file
+     *            reference.
      */
     void setArtifactID(InferredOWLOntologyID artifactId);
     
@@ -83,7 +90,14 @@ public interface FileReference
      *            linked to.
      */
     void setParentIri(IRI parentIri);
-
+    
+    /**
+     * 
+     * @param parentPredicateIRI
+     *            The {@link IRI} of the predicate used to link the file reference to its parent.
+     */
+    void setParentPredicateIRI(IRI parentPredicateIRI);
+    
     /**
      * Sets the alias used to name the repository configuration used to access this file reference.
      * 
