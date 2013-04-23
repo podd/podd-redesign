@@ -147,7 +147,10 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals(12, model.predicates().size());
         Assert.assertEquals(14, model.objects().size());
         
-        DebugUtils.printContents(model);
+        if(log.isDebugEnabled())
+        {
+            DebugUtils.printContents(model);
+        }
     }
     
     /**
@@ -272,7 +275,10 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals(15, model.predicates().size());
         Assert.assertEquals(24, model.objects().size());
         
-        DebugUtils.printContents(model);
+        if(log.isDebugEnabled())
+        {
+            DebugUtils.printContents(model);
+        }
     }
     
     /**
@@ -300,14 +306,17 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         // verify: received contents have artifact's ontology and version IRIs
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
-
+        
         Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 28);
         
         Assert.assertEquals(5, model.subjects().size());
         Assert.assertEquals(15, model.predicates().size());
         Assert.assertEquals(24, model.objects().size());
         
-        DebugUtils.printContents(model);
+        if(log.isDebugEnabled())
+        {
+            DebugUtils.printContents(model);
+        }
     }
     
     /**
@@ -336,14 +345,17 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         // verify: received contents have artifact's ontology and version IRIs
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
-
+        
         Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFJSON, 28);
         
         Assert.assertEquals(5, model.subjects().size());
         Assert.assertEquals(15, model.predicates().size());
         Assert.assertEquals(24, model.objects().size());
         
-        DebugUtils.printContents(model);
+        if(log.isDebugEnabled())
+        {
+            DebugUtils.printContents(model);
+        }
     }
     
 }

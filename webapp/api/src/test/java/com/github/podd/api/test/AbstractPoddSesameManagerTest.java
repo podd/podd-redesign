@@ -1790,8 +1790,11 @@ public abstract class AbstractPoddSesameManagerTest
         this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2, true,
                 this.testRepositoryConnection, this.artifactGraph);
         
-        DebugUtils.printContexts(testRepositoryConnection);
-        DebugUtils.printContents(testRepositoryConnection, this.artifactGraph);
+        if(log.isDebugEnabled())
+        {
+            DebugUtils.printContexts(testRepositoryConnection);
+            DebugUtils.printContents(testRepositoryConnection, this.artifactGraph);
+        }
         
         // verify:
         this.verifyManagementGraphContents(7, this.artifactGraph, pArtifactIRI, pVersionIRIv2, pInferredVersionIRIv2);
@@ -1931,8 +1934,11 @@ public abstract class AbstractPoddSesameManagerTest
         this.testPoddSesameManager.updateManagedPoddArtifactVersion(nextOntologyIDv2, false,
                 this.testRepositoryConnection, this.artifactGraph);
         
-        DebugUtils.printContexts(testRepositoryConnection);
-        DebugUtils.printContents(testRepositoryConnection, artifactGraph);
+        if(log.isDebugEnabled())
+        {
+            DebugUtils.printContexts(testRepositoryConnection);
+            DebugUtils.printContents(testRepositoryConnection, artifactGraph);
+        }
         
         // verify: version 2 is inserted, as verified by the extra statements, but the current
         // versions are not modified this time

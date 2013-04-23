@@ -12,6 +12,8 @@ import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.semanticweb.owlapi.model.IRI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.api.file.SSHFileReferenceProcessor;
@@ -25,6 +27,7 @@ import com.github.podd.utils.PoddRdfConstants;
  */
 public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
 {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     @Override
     public boolean canHandle(final Model rdfStatements)
@@ -64,7 +67,10 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
             {
                 final Model model = rdfStatements.filter(fileRef, null, null);
                 
-                DebugUtils.printContents(model);
+                if(log.isDebugEnabled())
+                {
+                    DebugUtils.printContents(model);
+                }
                 
                 final SSHFileReference fileReference = new SSHFileReferenceImpl();
                 
