@@ -205,40 +205,46 @@ public class SSHService
      * 
      * @param alias
      *            The alias to be assigned to the created FileReference.
-     * @param fileIdentifier
-     *            If this parameter is not null, its value will be set as the file Identifier
+     * @param invalidFileIdentifier
+     *            If this parameter is not null, its value will be set as the file Identifier and
+     *            the file will not be copied out.
+     * 
      * @return A new FileReference instance for use by tests
+     * @throws IOException
      */
-    public static SSHFileReference getNewFileReference(String alias, String fileIdentifier, Path tempDirectory)
+    public static SSHFileReference getNewFileReference(String alias, String invalidFileIdentifier, Path tempDirectory)
+        throws IOException
     {
         final SSHFileReference fileReference = new SSHFileReferenceImpl();
         fileReference.setRepositoryAlias(alias);
         
-        final InputStream testFile = SSHService.class.getResourceAsStream(TestConstants.TEST_FILE_REFERENCE_PATH);
-        String fileName = TestConstants.TEST_FILE_REFERENCE_PATH;
-        
-        final int lastSlashPosition = fileName.lastIndexOf("/");
-        if(lastSlashPosition != -1)
-        {
-            fileName = fileName.substring(lastSlashPosition + 1);
-        }
-        
         Path finalPath = null;
         
-        if(fileIdentifier != null)
+        if(invalidFileIdentifier != null)
         {
-            finalPath = tempDirectory.resolve(fileIdentifier);
-            fileReference.setFilename(fileIdentifier);
+            finalPath = tempDirectory.resolve(invalidFileIdentifier);
+            fileReference.setFilename(invalidFileIdentifier);
         }
         else
         {
-            finalPath = tempDirectory.resolve(fileName);
-            fileReference.setFilename(fileName);
+            try (final InputStream testFile =
+                    SSHService.class.getResourceAsStream(TestConstants.TEST_FILE_REFERENCE_PATH);)
+            {
+                String fileName = TestConstants.TEST_FILE_REFERENCE_PATH;
+                
+                final int lastSlashPosition = fileName.lastIndexOf("/");
+                if(lastSlashPosition != -1)
+                {
+                    fileName = fileName.substring(lastSlashPosition + 1);
+                }
+                
+                finalPath = tempDirectory.resolve(fileName);
+                fileReference.setFilename(fileName);
+                
+                Files.createFile(finalPath);
+                Files.copy(testFile, finalPath, StandardCopyOption.REPLACE_EXISTING);
+            }
         }
-        
-        Files.createFile(finalPath);
-        
-        Files.copy(testFile, finalPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         
         fileReference.setPath(finalPath.getParent().toString());
         

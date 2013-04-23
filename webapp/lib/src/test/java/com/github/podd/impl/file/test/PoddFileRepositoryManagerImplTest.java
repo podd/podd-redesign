@@ -65,7 +65,16 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     @Override
     protected FileReference buildFileReference(final String alias, final String fileIdentifier)
     {
-        return SSHService.getNewFileReference(alias, fileIdentifier);
+        try
+        {
+            return SSHService.getNewFileReference(alias, fileIdentifier,
+                    tempDirectory.newFolder("poddfilerepositoryimpltest-resources").toPath());
+        }
+        catch(IOException e)
+        {
+            Assert.fail("Found IOException while creating file reference");
+            throw new RuntimeException(e);
+        }
     }
     
     @Override

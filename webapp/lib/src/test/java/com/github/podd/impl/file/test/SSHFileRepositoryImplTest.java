@@ -4,10 +4,12 @@
 package com.github.podd.impl.file.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -211,7 +213,16 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     @Override
     protected SSHFileReference getNewFileReference(final String alias, final String fileIdentifier)
     {
-        return SSHService.getNewFileReference(alias, fileIdentifier);
+        try
+        {
+            return SSHService.getNewFileReference(alias, fileIdentifier,
+                    tempDirectory.newFolder("sshfilerepositoryimpltest-resources").toPath());
+        }
+        catch(IOException e)
+        {
+            Assert.fail("Found IOException while creating file reference");
+            throw new RuntimeException(e);
+        }
     }
     
     @Override
