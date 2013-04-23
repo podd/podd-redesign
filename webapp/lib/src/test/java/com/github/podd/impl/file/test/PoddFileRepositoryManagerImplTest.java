@@ -3,11 +3,12 @@
  */
 package com.github.podd.impl.file.test;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.openrdf.OpenRDFException;
@@ -37,27 +38,35 @@ import com.github.podd.impl.file.SSHFileRepositoryImpl;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
- * This concrete test class uses SSH File References and a test SSH file repository
- * to run through the abstract PoddFileRepositoryManager tests.
+ * This concrete test class uses SSH File References and a test SSH file repository to run through
+ * the abstract PoddFileRepositoryManager tests.
  * 
  * @author kutila
  */
 public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositoryManagerTest
 {
-
+    
     @Rule
     public final TemporaryFolder tempDirectory = new TemporaryFolder();
-
+    
     /** SSH File Repository server for tests */
     protected SSHService sshd;
     
+    private Path sshDir = null;
+    
+    @Before
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        sshDir = tempDirectory.newFolder("podd-filerepository-manager-impl-test").toPath();
+    }
     
     @Override
     protected FileReference buildFileReference(final String alias, final String fileIdentifier)
     {
         return SSHService.getNewFileReference(alias, fileIdentifier);
     }
-
     
     @Override
     protected PoddFileRepository<?> buildFileRepositoryInstance(final String alias, final Model model)
@@ -158,18 +167,16 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     protected void startRepositorySource() throws Exception
     {
         sshd = new SSHService();
-        final File tempDirForHostKey = this.tempDirectory.newFolder();
-        sshd.startTestSSHServer(Integer.parseInt(SSHService.TEST_SSH_SERVICE_PORT),
-                tempDirForHostKey);
+        sshd.startTestSSHServer(Integer.parseInt(SSHService.TEST_SSH_SERVICE_PORT), sshDir);
     }
-
+    
     @Override
     protected void stopRepositorySource() throws Exception
     {
-        if (sshd != null)
+        if(sshd != null)
         {
-            sshd.stopTestSSHServer();
+            sshd.stopTestSSHServer(sshDir);
         }
     }
-
+    
 }

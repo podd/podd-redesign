@@ -7,9 +7,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +67,7 @@ public class SSHService
      * @return The port on which the SSH service was started.
      * @throws Exception
      */
-    public int startTestSSHServer(int port, final File tempDirectory) throws Exception
+    public int startTestSSHServer(int port, final Path tempDirectory) throws Exception
     {
         if(port < 1024)
         {
@@ -81,7 +84,7 @@ public class SSHService
         }
         // Copy the host key file out to a temporary directory so that the server can lock it as
         // required and cannot modify the test resource
-        final Path tempFile = Files.createTempFile(tempDirectory.toPath(), "podd-test-ssh-hostkey-", ".pem");
+        final Path tempFile = Files.createTempFile(tempDirectory, "podd-test-ssh-hostkey-", ".pem");
         Files.copy(input, tempFile, StandardCopyOption.REPLACE_EXISTING);
         
         this.server.setCommandFactory(new ScpCommandFactory());
@@ -110,6 +113,7 @@ public class SSHService
         namedFactoryList.add(new SftpSubsystem.Factory());
         this.server.setSubsystemFactories(namedFactoryList);
         
+        this.log.info("about to start the SSHD server on port: " + port);
         this.server.start();
         this.serverRunning = true;
         this.log.info("started the SSHD server on port: " + port);
@@ -121,7 +125,7 @@ public class SSHService
      * 
      * @throws Exception
      */
-    public void stopTestSSHServer() throws Exception
+    public void stopTestSSHServer(final Path tempDirectory) throws Exception
     {
         this.log.info("Entering stopTestSSHServer()");
         if(this.server != null && this.serverRunning)
@@ -129,8 +133,42 @@ public class SSHService
             this.log.info("Stop SSHD server");
             this.server.stop();
             this.serverRunning = false;
+            this.log.info("Stopped SSHD server");
         }
+        
+        this.deleteDirectory(tempDirectory);
+        
         this.log.info("Exiting stopTestSSHServer()");
+    }
+    
+    private void deleteDirectory(Path dir) throws IOException
+    {
+        Files.walkFileTree(dir, new SimpleFileVisitor<Path>()
+            {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
+                {
+                    log.trace("Deleting file: {}", file);
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+                
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException
+                {
+                    log.trace("Deleting dir: {}", dir);
+                    if(exc == null)
+                    {
+                        Files.delete(dir);
+                        return FileVisitResult.CONTINUE;
+                    }
+                    else
+                    {
+                        throw exc;
+                    }
+                }
+                
+            });
     }
     
     /**
@@ -146,6 +184,7 @@ public class SSHService
             try
             {
                 s = new ServerSocket(0);
+                s.setReuseAddress(true);
                 return s.getLocalPort();
             }
             finally
@@ -161,7 +200,7 @@ public class SSHService
             throw new RuntimeException(e);
         }
     }
-
+    
     /**
      * 
      * @param alias
@@ -193,7 +232,7 @@ public class SSHService
             path = testFile.substring(0, lastSlashPosition);
         }
         
-        if (fileIdentifier != null)
+        if(fileIdentifier != null)
         {
             fileReference.setFilename(fileIdentifier);
         }
@@ -205,6 +244,5 @@ public class SSHService
         
         return fileReference;
     }
-    
     
 }

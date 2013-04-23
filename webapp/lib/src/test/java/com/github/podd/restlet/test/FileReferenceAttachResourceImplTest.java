@@ -6,8 +6,10 @@ package com.github.podd.restlet.test;
 import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.file.Path;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -48,18 +50,27 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
     /** SSH File Repository server for tests */
     protected SSHService sshd;
     
+    private Path sshDir = null;
+    
+    @Before
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        sshDir = tempDirectory.newFolder("podd-filerepository-manager-impl-test").toPath();
+    }
+    
     protected void startRepositorySource() throws Exception
     {
         this.sshd = new SSHService();
-        final File tempDirForHostKey = this.tempDirectory.newFolder();
-        this.sshd.startTestSSHServer(Integer.parseInt(SSHService.TEST_SSH_SERVICE_PORT), tempDirForHostKey);
+        this.sshd.startTestSSHServer(Integer.parseInt(SSHService.TEST_SSH_SERVICE_PORT), sshDir);
     }
     
     protected void stopRepositorySource() throws Exception
     {
         if(this.sshd != null)
         {
-            this.sshd.stopTestSSHServer();
+            this.sshd.stopTestSSHServer(sshDir);
         }
     }
     
@@ -133,7 +144,8 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     .getOntologyIRI().toString());
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
                     .getVersionIRI().toString());
-            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
+                    Boolean.toString(true));
             
             final Representation input = new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_XML);
             
@@ -189,9 +201,11 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                     .getOntologyIRI().toString());
             fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
                     .getVersionIRI().toString());
-            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
+                    Boolean.toString(true));
             
-            final Representation input = new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_TURTLE);
+            final Representation input =
+                    new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_TURTLE);
             
             final Representation results =
                     RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
@@ -215,7 +229,6 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             this.stopRepositorySource();
         }
     }
-    
     
     /**
      * Test successful attach of a file reference in Turtle
@@ -257,7 +270,6 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
         Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
     }
-    
     
     /**
      * Given the path to a resource containing an incomplete File Reference object, this method
