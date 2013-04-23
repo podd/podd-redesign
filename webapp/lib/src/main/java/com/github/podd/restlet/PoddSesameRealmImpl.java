@@ -168,7 +168,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     {
         URI nextUserUUID = super.addUser(nextUser);
         
-        this.log.info("adding org, orcid, uri");
+        this.log.debug("adding org, orcid, uri");
         
         RepositoryConnection conn = null;
         try
@@ -238,7 +238,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     protected PoddUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
     {
-        this.log.info("Building RestletUtilUser from SPARQL results");
+        this.log.debug("Building RestletUtilUser from SPARQL results");
         
         final PoddUser result =
                 new PoddUser(userIdentifier, bindingSet.getValue(PARAM_USER_SECRET).stringValue().toCharArray(),
@@ -296,7 +296,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     protected String buildSparqlQueryForCommonObjectRoles(final String userIdentifier, final Collection<URI> objectUris)
     {
-        this.log.info("Building SPARQL query for common Roles across Objects");
+        this.log.debug("Building SPARQL query for common Roles across Objects");
         
         final StringBuilder query = new StringBuilder();
         
@@ -356,7 +356,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     protected String buildSparqlQueryToFindUser(final String userIdentifier, boolean findAllUsers)
     {
-        this.log.info("Building SPARQL query");
+        this.log.debug("Building SPARQL query");
         
         final StringBuilder query = new StringBuilder();
         
@@ -585,7 +585,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             {
                 if(!queryResult.hasNext())
                 {
-                    this.log.info("Could not find role with mappings for user: {}", user.getIdentifier());
+                    this.log.warn("Could not find role with mappings for user: {}", user.getIdentifier());
                 }
                 
                 while(queryResult.hasNext())

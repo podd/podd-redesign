@@ -220,70 +220,70 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // NOTE: This only displays the login form. All HTTP POST requests to the login path should
         // be handled by the Authenticator
         final String loginFormPath = PoddWebConstants.PATH_LOGIN_FORM;
-        this.log.info("attaching login service to path={}", loginFormPath);
+        this.log.debug("attaching login service to path={}", loginFormPath);
         router.attach(loginFormPath, CookieLoginResourceImpl.class);
         
         // Add a route for the About page.
         final String aboutPagePath = PoddWebConstants.PATH_ABOUT;
-        this.log.info("attaching about service to path={}", aboutPagePath);
+        this.log.debug("attaching about service to path={}", aboutPagePath);
         router.attach(aboutPagePath, AboutResourceImpl.class);
         
         // Add a route for the Help pages.
         final String helpOverviewPath = PoddWebConstants.PATH_HELP;
-        this.log.info("attaching about service to path={}", helpOverviewPath);
+        this.log.debug("attaching about service to path={}", helpOverviewPath);
         router.attach(helpOverviewPath, HelpResourceImpl.class);
         final String helpPagePath = PoddWebConstants.PATH_HELP + "/{" + PoddWebConstants.KEY_HELP_PAGE_IDENTIFIER + "}";
-        this.log.info("attaching about service to path={}", helpPagePath);
+        this.log.debug("attaching about service to path={}", helpPagePath);
         router.attach(helpPagePath, HelpResourceImpl.class);
         
         // Add a route for the Index page.
         final String indexPagePath = PoddWebConstants.PATH_INDEX;
-        this.log.info("attaching index service to path={}", indexPagePath);
+        this.log.debug("attaching index service to path={}", indexPagePath);
         router.attach(indexPagePath, IndexResourceImpl.class);
         
         // Add a route for the User Details page.
         final String userDetailsPath =
                 PoddWebConstants.PATH_USER_DETAILS + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
-        this.log.info("attaching user details service to path={}", userDetailsPath);
+        this.log.debug("attaching user details service to path={}", userDetailsPath);
         router.attach(userDetailsPath, UserDetailsResourceImpl.class);
         
         // Add a route for the List Artifacts page.
         final String listArtifactsPath = PoddWebConstants.PATH_ARTIFACT_LIST;
-        this.log.info("attaching List Artifacts service to path={}", listArtifactsPath);
+        this.log.debug("attaching List Artifacts service to path={}", listArtifactsPath);
         router.attach(listArtifactsPath, ListArtifactsResourceImpl.class);
         
         // Add a route for the Upload Artifact page.
         final String uploadArtifactPath = PoddWebConstants.PATH_ARTIFACT_UPLOAD;
-        this.log.info("attaching Upload Artifact service to path={}", uploadArtifactPath);
+        this.log.debug("attaching Upload Artifact service to path={}", uploadArtifactPath);
         router.attach(uploadArtifactPath, UploadArtifactResourceImpl.class);
         
         // Add a route for the Get Artifact page.
         final String getArtifactBase = PoddWebConstants.PATH_ARTIFACT_GET_BASE;
-        this.log.info("attaching Get Artifact (base) service to path={}", getArtifactBase);
+        this.log.debug("attaching Get Artifact (base) service to path={}", getArtifactBase);
         router.attach(getArtifactBase, GetArtifactResourceImpl.class);
         
         final String getArtifactInferred = PoddWebConstants.PATH_ARTIFACT_GET_INFERRED;
-        this.log.info("attaching Get Artifact (inferred) service to path={}", getArtifactInferred);
+        this.log.debug("attaching Get Artifact (inferred) service to path={}", getArtifactInferred);
         router.attach(getArtifactInferred, GetArtifactResourceImpl.class);
         
         // Add a route for the Edit Artifact page.
         final String editArtifact = PoddWebConstants.PATH_ARTIFACT_EDIT;
-        this.log.info("attaching Edit Artifact service to path={}", editArtifact);
+        this.log.debug("attaching Edit Artifact service to path={}", editArtifact);
         router.attach(editArtifact, EditArtifactResourceImpl.class);
         
         // Add a route for the Delete Artifact page.
         final String deleteArtifact = PoddWebConstants.PATH_ARTIFACT_DELETE;
-        this.log.info("attaching Delete Artifact service to path={}", deleteArtifact);
+        this.log.debug("attaching Delete Artifact service to path={}", deleteArtifact);
         router.attach(deleteArtifact, DeleteArtifactResourceImpl.class);
         
         // Add a route for the Delete Artifact page.
         final String attachFileReference = PoddWebConstants.PATH_ATTACH_FILE_REF;
-        this.log.info("attaching File Reference Attach service to path={}", attachFileReference);
+        this.log.debug("attaching File Reference Attach service to path={}", attachFileReference);
         router.attach(attachFileReference, FileReferenceAttachResourceImpl.class);
         
         // Add a route for the Search ontology service.
         final String searchService = PoddWebConstants.PATH_SEARCH;
-        this.log.info("attaching Search Ontology service to path={}", searchService);
+        this.log.debug("attaching Search Ontology service to path={}", searchService);
         router.attach(searchService, SearchOntologyResourceImpl.class);
 
         // Add a route for Logout service
@@ -294,7 +294,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // FIXME: Switch between the logout resource implementations here based on the authenticator
         // router.attach(logout, CookieLogoutResourceImpl.class);
         
-        this.log.info("routes={}", router.getRoutes().toString());
+        this.log.debug("routes={}", router.getRoutes().toString());
         
         // put the authenticator in front of the resource router so it can handle challenge
         // responses and forward them on to the right location after locking in the authentication

@@ -203,7 +203,7 @@ public class ApplicationUtils
             {
                 repository.initialize();
                 
-                ApplicationUtils.log.info("Using sesame http repository as repository for PODD");
+                ApplicationUtils.log.info("Using sesame http repository as repository for PODD: {}", repositoryUrl);
                 
                 return repository;
             }
@@ -233,8 +233,8 @@ public class ApplicationUtils
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
         throws OpenRDFException
     {
-        ApplicationUtils.log.info("application {}", application);
-        ApplicationUtils.log.info("applicationContext {}", applicationContext);
+        ApplicationUtils.log.debug("application {}", application);
+        ApplicationUtils.log.debug("applicationContext {}", applicationContext);
         
         final List<Role> roles = application.getRoles();
         roles.clear();
@@ -373,15 +373,15 @@ public class ApplicationUtils
         
         final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);
         
-        ApplicationUtils.log.info("testAdminUserRoles: {}, {}", testAdminUserRoles, testAdminUserRoles.size());
+        ApplicationUtils.log.debug("testAdminUserRoles: {}, {}", testAdminUserRoles, testAdminUserRoles.size());
         
         final User findUser = nextRealm.findUser("testAdminUser");
         
-        ApplicationUtils.log.info("findUser: {}", findUser);
-        ApplicationUtils.log.info("findUser.getFirstName: {}", findUser.getFirstName());
-        ApplicationUtils.log.info("findUser.getLastName: {}", findUser.getLastName());
-        ApplicationUtils.log.info("findUser.getName: {}", findUser.getName());
-        ApplicationUtils.log.info("findUser.getIdentifier: {}", findUser.getIdentifier());
+        ApplicationUtils.log.debug("findUser: {}", findUser);
+        ApplicationUtils.log.debug("findUser.getFirstName: {}", findUser.getFirstName());
+        ApplicationUtils.log.debug("findUser.getLastName: {}", findUser.getLastName());
+        ApplicationUtils.log.debug("findUser.getName: {}", findUser.getName());
+        ApplicationUtils.log.debug("findUser.getIdentifier: {}", findUser.getIdentifier());
         
         // TODO: Define groups here also
         
