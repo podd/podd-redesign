@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.pod.utils.test;
+package com.github.podd.utils.test;
 
 import java.util.Date;
 
