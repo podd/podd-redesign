@@ -55,7 +55,7 @@ public abstract class PoddFileRepositoryImpl<T extends FileReference> implements
         
         // alias
         this.alias = aliasModel.objectString();
-        if(this.alias == null || this.alias.trim().length() < 1)
+        if(this.alias == null || this.alias.trim().isEmpty())
         {
             throw new FileRepositoryIncompleteException(model, "File Repository Alias cannot be NULL/empty");
         }
