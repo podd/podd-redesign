@@ -61,9 +61,9 @@ public class SSHFileReferenceProcessorFactoryImpl implements SSHFileReferencePro
     {
         final StringBuilder builder = new StringBuilder();
         
-        // match all triples about a subject whose TYPE is poddBase:FileReference
+        // match all triples about a subject whose TYPE is poddBase:SSHFileReference
         builder.append(" ?subject <" + RDF.TYPE.stringValue() + "> <"
-                + PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE.stringValue() + "> . ");
+                + PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH.stringValue() + "> . ");
         builder.append(" ?subject ?predicate ?object . ");
         
         return builder.toString();
