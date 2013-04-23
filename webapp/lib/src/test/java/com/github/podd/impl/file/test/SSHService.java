@@ -209,41 +209,38 @@ public class SSHService
      *            If this parameter is not null, its value will be set as the file Identifier
      * @return A new FileReference instance for use by tests
      */
-    public static SSHFileReference getNewFileReference(String alias, String fileIdentifier)
+    public static SSHFileReference getNewFileReference(String alias, String fileIdentifier, Path tempDirectory)
     {
-        // prepare: create the FileReference to be validated
         final SSHFileReference fileReference = new SSHFileReferenceImpl();
         fileReference.setRepositoryAlias(alias);
         
-        // prepare: get the name and path of File to be validated
-        /*
-         * NOTE: The TEST_FILE should be accessible on the file system as a file. If it is accessed
-         * as a resource made available from a different module, it will not be accessible to the
-         * SSH service.
-         */
+        final InputStream testFile = SSHService.class.getResourceAsStream(TestConstants.TEST_FILE_REFERENCE_PATH);
+        String fileName = TestConstants.TEST_FILE_REFERENCE_PATH;
         
-        // NOTE: This is very very bad practice with Maven. The resource should be copied out to a
-        // temporary directory first
-        final String testFile = SSHService.class.getResource(TestConstants.TEST_FILE).getFile();
-        String fileName = testFile;
-        String path = SSHService.class.getResource(TestConstants.TEST_FILE).getPath();
-        
-        final int lastSlashPosition = testFile.lastIndexOf(File.separatorChar);
+        final int lastSlashPosition = fileName.lastIndexOf("/");
         if(lastSlashPosition != -1)
         {
-            fileName = testFile.substring(lastSlashPosition + 1);
-            path = testFile.substring(0, lastSlashPosition);
+            fileName = fileName.substring(lastSlashPosition + 1);
         }
+        
+        Path finalPath = null;
         
         if(fileIdentifier != null)
         {
+            finalPath = tempDirectory.resolve(fileIdentifier);
             fileReference.setFilename(fileIdentifier);
         }
         else
         {
+            finalPath = tempDirectory.resolve(fileName);
             fileReference.setFilename(fileName);
         }
-        fileReference.setPath(path);
+        
+        Files.createFile(finalPath);
+        
+        Files.copy(testFile, finalPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        
+        fileReference.setPath(finalPath.getParent().toString());
         
         return fileReference;
     }

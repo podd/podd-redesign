@@ -111,7 +111,7 @@ public interface TestConstants
 
     
     /** Test resource: any file which exists and can be used as a file reference */
-    public static final String TEST_FILE = "/test/artifacts/basic-2.rdf";
+    public static final String TEST_FILE_REFERENCE_PATH = "/test/artifacts/basic-2.rdf";
     
     public static final String TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE = "/test/artifacts/fragment-new-file-ref-verifiable.rdf";
 
