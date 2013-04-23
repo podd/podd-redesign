@@ -1091,15 +1091,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         return inferredOWLOntologyID;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.api.PoddArtifactManager#updateSchemaImport(org.semanticweb.owlapi.model.
-     * OWLOntologyID, org.semanticweb.owlapi.model.OWLOntologyID)
-     */
     @Override
-    public InferredOWLOntologyID updateSchemaImport(final InferredOWLOntologyID artifactId,
-            final InferredOWLOntologyID schemaOntologyId)
+    public InferredOWLOntologyID updateSchemaImports(final InferredOWLOntologyID artifactId,
+            Set<OWLOntologyID> oldSchemaOntologyIds, final Set<OWLOntologyID> schemaOntologyId)
     {
         throw new RuntimeException("TODO: Implement updateSchemaImport");
     }
@@ -1118,8 +1112,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
             FileReference fileReference) throws OpenRDFException, PoddException
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new RuntimeException("TODO: Implement attachFileReference");
     }
 
     @Override

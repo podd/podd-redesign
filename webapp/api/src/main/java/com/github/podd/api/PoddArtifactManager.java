@@ -104,7 +104,7 @@ public interface PoddArtifactManager
      *         configurations.
      */
     PoddFileRepositoryManager getFileRepositoryManager();
-
+    
     /**
      * 
      * @return The {@link PoddOWLManager} used to manage OWL validation and inferencing for
@@ -200,13 +200,14 @@ public interface PoddArtifactManager
     void setFileReferenceManager(FileReferenceManager fileManager);
     
     /**
-     * Sets the {@link PoddFileRepositoryManager} to use for managing file repository configurations.
+     * Sets the {@link PoddFileRepositoryManager} to use for managing file repository
+     * configurations.
      * 
      * @param fileRepositoryManager
      *            The manager to use for managing file repository configurations.
      */
     void setFileRepositoryManager(PoddFileRepositoryManager fileRepositoryManager);
-
+    
     /**
      * Sets the {@link PoddOWLManager} instance to use when loading and dealing with Artifacts in
      * memory. This manager may not be used for some queries where SPARQL queries on the underlying
@@ -292,8 +293,8 @@ public interface PoddArtifactManager
      */
     InferredOWLOntologyID updateArtifact(final URI artifactUri, URI versionUri, final InputStream inputStream,
             final RDFFormat format, final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectPolicy,
-            final FileReferenceVerificationPolicy fileReferencePolicy) throws OpenRDFException, PoddException, IOException,
-        OWLException;
+            final FileReferenceVerificationPolicy fileReferencePolicy) throws OpenRDFException, PoddException,
+        IOException, OWLException;
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
@@ -309,11 +310,16 @@ public interface PoddArtifactManager
      * @param artifactId
      *            The Ontology ID for the PODD Artifact which needs to have its Schema Ontology
      *            imports modified.
-     * @param schemaOntologyId
-     *            The Ontology ID for the Schema Ontology which needs to be added or modified in the
-     *            imports for the PODD Artifact.
+     * @param oldSchemaOntologyIds
+     *            The Ontology IDs for the Schema Ontologies which need to be removed in the imports
+     *            for the PODD Artifact.
+     * @param newSchemaOntologyIds
+     *            The Ontology IDs for the Schema Ontologies which need to be added or modified in
+     *            the imports for the PODD Artifact.
+     * @return The updated Ontology ID for the PODD Artifact after the schemas were updated.
      */
-    InferredOWLOntologyID updateSchemaImport(InferredOWLOntologyID artifactId, InferredOWLOntologyID schemaOntologyId);
+    InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
+            Set<OWLOntologyID> oldSchemaOntologyIds, Set<OWLOntologyID> newSchemaOntologyIds);
     
     InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
             FileReference fileReference) throws OpenRDFException, PoddException;
@@ -321,12 +327,11 @@ public interface PoddArtifactManager
     InferredOWLOntologyID attachFileReferences(URI artifactUri, URI versionUri, InputStream inputStream,
             RDFFormat format, FileReferenceVerificationPolicy fileReferenceVerificationPolicy) throws OpenRDFException,
         IOException, OWLException, PoddException;
-
+    
     Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId);
     
     Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
     
     Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
-
-
+    
 }
