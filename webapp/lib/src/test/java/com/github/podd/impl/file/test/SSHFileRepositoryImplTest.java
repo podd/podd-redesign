@@ -46,8 +46,10 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     @Override
     public void setUp() throws Exception
     {
-        super.setUp();
         sshDir = tempDirectory.newFolder("podd-filerepository-manager-impl-test").toPath();
+        this.sshd = new SSHService();
+        this.sshd.startTestSSHServer(sshDir);
+        super.setUp();
     }
     
     @Override
@@ -229,8 +231,6 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     @Override
     protected void startRepositorySource() throws Exception
     {
-        this.sshd = new SSHService();
-        this.sshd.startTestSSHServer(sshDir);
     }
     
     @Override

@@ -574,19 +574,19 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     @Test
     public void testVerifyFileReferencesWithNoFailures() throws Exception
     {
-        // prepare: create FileReferences to test
-        final Set<FileReference> fileReferences = new HashSet<FileReference>();
-        final FileReference fileRefWithAlias1A =
-                this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, null);
-        fileReferences.add(fileRefWithAlias1A);
-        
-        final FileReference fileRefWithAlias2A =
-                this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A, null);
-        fileReferences.add(fileRefWithAlias2A);
-        
         try
         {
             this.startRepositorySource();
+            // prepare: create FileReferences to test
+            final Set<FileReference> fileReferences = new HashSet<FileReference>();
+            final FileReference fileRefWithAlias1A =
+                    this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, null);
+            fileReferences.add(fileRefWithAlias1A);
+            
+            final FileReference fileRefWithAlias2A =
+                    this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A, null);
+            fileReferences.add(fileRefWithAlias2A);
+            
             this.testFileRepositoryManager.verifyFileReferences(fileReferences);
         }
         finally
@@ -601,19 +601,20 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     @Test
     public void testVerifyFileReferencesWithOneFailure() throws Exception
     {
-        // prepare: create FileReferences to test
-        final Set<FileReference> fileReferences = new HashSet<FileReference>();
-        final FileReference fileRefWithAlias1A =
-                this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, null);
-        fileReferences.add(fileRefWithAlias1A);
-        
-        final FileReference fileRefWithNoSuchFile =
-                this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, "no_such_file");
-        fileReferences.add(fileRefWithNoSuchFile);
-        
+        FileReference fileRefWithNoSuchFile = null;
         try
         {
             this.startRepositorySource();
+            
+            // prepare: create FileReferences to test
+            final Set<FileReference> fileReferences = new HashSet<FileReference>();
+            final FileReference fileRefWithAlias1A =
+                    this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, null);
+            fileReferences.add(fileRefWithAlias1A);
+            
+            fileRefWithNoSuchFile =
+                    this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, "no_such_file");
+            fileReferences.add(fileRefWithNoSuchFile);
             
             this.testFileRepositoryManager.verifyFileReferences(fileReferences);
             Assert.fail("Verify should have thrown an Exception containing errors");
@@ -621,6 +622,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         catch(final FileReferenceVerificationFailureException e)
         {
             Assert.assertEquals("Expected 1 validation failure", 1, e.getValidationFailures().size());
+            Assert.assertNotNull(fileRefWithNoSuchFile);
             final Throwable throwable = e.getValidationFailures().get(fileRefWithNoSuchFile);
             Assert.assertTrue("Not the expected cause of validation failure",
                     throwable instanceof FileReferenceInvalidException);
