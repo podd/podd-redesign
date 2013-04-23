@@ -1090,6 +1090,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final InferredOWLOntologyID inferredOWLOntologyID =
                 this.getOWLManager().inferStatements(nextOntology, permanentRepositoryConnection);
         
+        // Check file references after inferencing to accurately identify the parent object
         this.handleFileReferences(permanentRepositoryConnection, fileReferencePolicy, inferredOWLOntologyID
                 .getVersionIRI().toOpenRDFURI(), inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI());
         

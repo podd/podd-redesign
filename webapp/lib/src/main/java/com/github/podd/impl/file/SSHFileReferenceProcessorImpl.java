@@ -64,7 +64,7 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
                 
                 final SSHFileReference fileReference = new SSHFileReferenceImpl();
                 
-                // note: artifact ID and parent URI are not available to us in here
+                // note: artifact ID is not available to us in here and must be added externally
                 
                 if(fileRef instanceof URI)
                 {
@@ -77,13 +77,15 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
                     fileReference.setLabel(label);
                 }
                 
-                final String filename = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILENAME, null).objectString();
+                final String filename =
+                        model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILENAME, null).objectString();
                 if(filename != null)
                 {
                     fileReference.setFilename(filename);
                 }
                 
-                final String path = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILE_PATH, null).objectString();
+                final String path =
+                        model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILE_PATH, null).objectString();
                 if(path != null)
                 {
                     fileReference.setPath(path);
@@ -94,6 +96,23 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
                 {
                     fileReference.setRepositoryAlias(alias);
                 }
+                
+                Model linksToFileReference = rdfStatements.filter(null, null, fileRef);
+                
+                // TODO: Need to use a SPARQL query to verify that the property is a sub-property of
+                // PODD Contains
+                if(!linksToFileReference.isEmpty())
+                {
+                    for(Resource nextResource : linksToFileReference.subjects())
+                    {
+                        if(nextResource instanceof URI)
+                        {
+                            fileReference.setParentIri(IRI.create((URI)nextResource));
+                            break;
+                        }
+                    }
+                }
+                
                 results.add(fileReference);
             }
         }

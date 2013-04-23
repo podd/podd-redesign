@@ -49,7 +49,8 @@ public abstract class AbstractSSHFileReferenceProcessorTest extends
         for(final SSHFileReference sshFileReference : fileReferences)
         {
             Assert.assertNull("Artifact ID should be NULL", sshFileReference.getArtifactID());
-            Assert.assertNull("Parent IRI should be NULL", sshFileReference.getParentIri());
+            Assert.assertEquals("http://purl.org/podd-test/130326f/objA24#SqueekeeMaterial", sshFileReference
+                    .getParentIri().toString());
             Assert.assertTrue("File Reference URI is not an expected one",
                     objectIriList.contains(sshFileReference.getObjectIri().toString()));
             Assert.assertTrue("Label is not an expected one", labelList.contains(sshFileReference.getLabel()));
