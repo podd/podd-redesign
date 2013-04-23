@@ -42,7 +42,7 @@ import com.github.podd.impl.file.SSHFileReferenceImpl;
 public class SSHService
 {
     public static final String TEST_SSH_HOST = "localhost";
-    public static final String TEST_SSH_SERVICE_PORT = "9856";
+    public int TEST_SSH_SERVICE_PORT;
     public static final String TEST_SSH_FINGERPRINT = "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db";
     public static final String TEST_SSH_USERNAME = "salt";
     public static final String TEST_SSH_SECRET = "salt";
@@ -67,14 +67,11 @@ public class SSHService
      * @return The port on which the SSH service was started.
      * @throws Exception
      */
-    public int startTestSSHServer(int port, final Path tempDirectory) throws Exception
+    public int startTestSSHServer(final Path tempDirectory) throws Exception
     {
-        if(port < 1024)
-        {
-            port = SSHService.getFreePort();
-        }
+        TEST_SSH_SERVICE_PORT = SSHService.getFreePort();
         this.server = SshServer.setUpDefaultServer();
-        this.server.setPort(port);
+        this.server.setPort(TEST_SSH_SERVICE_PORT);
         
         final InputStream input = this.getClass().getResourceAsStream(this.hostkey);
         
@@ -113,11 +110,11 @@ public class SSHService
         namedFactoryList.add(new SftpSubsystem.Factory());
         this.server.setSubsystemFactories(namedFactoryList);
         
-        this.log.info("about to start the SSHD server on port: " + port);
+        this.log.info("about to start the SSHD server on port: " + TEST_SSH_SERVICE_PORT);
         this.server.start();
         this.serverRunning = true;
-        this.log.info("started the SSHD server on port: " + port);
-        return port;
+        this.log.info("started the SSHD server on port: " + TEST_SSH_SERVICE_PORT);
+        return TEST_SSH_SERVICE_PORT;
     }
     
     /**

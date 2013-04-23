@@ -87,7 +87,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                         SSHService.TEST_SSH_HOST)));
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHService.TEST_SSH_SERVICE_PORT)));
+                        sshd.TEST_SSH_SERVICE_PORT)));
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_FINGERPRINT)));
@@ -128,7 +128,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                         SSHService.TEST_SSH_HOST)));
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHService.TEST_SSH_SERVICE_PORT)));
+                        sshd.TEST_SSH_SERVICE_PORT)));
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_FINGERPRINT)));
@@ -156,7 +156,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                         SSHFileRepositoryImpl.PROTOCOL_SSH)));
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHService.TEST_SSH_SERVICE_PORT)));
+                        sshd.TEST_SSH_SERVICE_PORT)));
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_FINGERPRINT)));
@@ -187,7 +187,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                         SSHService.TEST_SSH_HOST)));
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHService.TEST_SSH_SERVICE_PORT)));
+                        sshd.TEST_SSH_SERVICE_PORT)));
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_USERNAME)));
@@ -230,7 +230,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     protected void startRepositorySource() throws Exception
     {
         this.sshd = new SSHService();
-        this.sshd.startTestSSHServer(Integer.parseInt(SSHService.TEST_SSH_SERVICE_PORT), sshDir);
+        this.sshd.startTestSSHServer(sshDir);
     }
     
     @Override
