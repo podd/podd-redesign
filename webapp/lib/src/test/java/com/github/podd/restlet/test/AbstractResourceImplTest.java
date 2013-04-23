@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ServerSocket;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
@@ -53,7 +54,7 @@ public class AbstractResourceImplTest
     /**
      * Determines the TEST_PORT number to use for the test server
      */
-    protected static final int TEST_PORT = 8182;
+    protected int TEST_PORT;
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -86,6 +87,36 @@ public class AbstractResourceImplTest
     {
         Assert.assertFalse("Freemarker error.", body.contains("Java backtrace for programmers:"));
         Assert.assertFalse("Freemarker error.", body.contains("freemarker.core."));
+    }
+    
+    /**
+     * Copied from sshj net.schmizz.sshj.util.BasicFixture.java
+     * 
+     * @return
+     */
+    private int getFreePort()
+    {
+        try
+        {
+            ServerSocket s = null;
+            try
+            {
+                s = new ServerSocket(0);
+                s.setReuseAddress(true);
+                return s.getLocalPort();
+            }
+            finally
+            {
+                if(s != null)
+                {
+                    s.close();
+                }
+            }
+        }
+        catch(final IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
     
     /**
@@ -168,11 +199,11 @@ public class AbstractResourceImplTest
     {
         if(!path.startsWith("/"))
         {
-            return "http://localhost:" + AbstractResourceImplTest.TEST_PORT + "/podd/" + path;
+            return "http://localhost:" + TEST_PORT + "/podd/" + path;
         }
         else
         {
-            return "http://localhost:" + AbstractResourceImplTest.TEST_PORT + "/podd" + path;
+            return "http://localhost:" + TEST_PORT + "/podd" + path;
         }
     }
     
@@ -233,8 +264,10 @@ public class AbstractResourceImplTest
     {
         this.component = new Component();
         
+        TEST_PORT = getFreePort();
+        
         // Add a new HTTP server listening on the given TEST_PORT.
-        this.component.getServers().add(Protocol.HTTP, AbstractResourceImplTest.TEST_PORT);
+        this.component.getServers().add(Protocol.HTTP, TEST_PORT);
         
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);
