@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResults;
@@ -29,16 +30,17 @@ import com.github.podd.api.file.SSHFileReferenceProcessor;
 import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRdfUtils;
 
 /**
  * Concrete class to test SSHFileReferenceProcessorFactoryImpl. In addition to the abstract
- * super-classes tests that verify a valid SPARQL is generated, two tests which verify that
- * they are able to extract SSH File References from an RDF graph are included.
+ * super-classes tests that verify a valid SPARQL is generated, two tests which verify that they are
+ * able to extract SSH File References from an RDF graph are included.
  * 
  * @author kutila
  */
-public class SSHFileReferenceProcessorFactoryImplTest<T extends PoddRdfProcessor> extends
+public class SSHFileReferenceProcessorFactoryImplTest extends
         AbstractPoddRdfProcessorFactoryTest<FileReferenceProcessor<SSHFileReference>>
 {
     
@@ -59,7 +61,8 @@ public class SSHFileReferenceProcessorFactoryImplTest<T extends PoddRdfProcessor
     @Test
     public void testSPARQLQueryViaExecution() throws Exception
     {
-        final PoddRdfProcessorFactory<SSHFileReferenceProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
+        final PoddRdfProcessorFactory<SSHFileReferenceProcessor> rdfProcessorFactory =
+                this.getNewPoddRdfProcessorFactory();
         
         // build SPARQL query
         final String sparql = PoddRdfUtils.buildSparqlConstructQuery(rdfProcessorFactory);
@@ -88,12 +91,12 @@ public class SSHFileReferenceProcessorFactoryImplTest<T extends PoddRdfProcessor
             final Model model = QueryResults.asModel(query.evaluate());
             
             Assert.assertFalse("Empty Model, no file references found.", model.isEmpty());
-            Assert.assertEquals("Expected 2 file references", 2, model.subjects().size());
-            
-            repositoryConnection.rollback();
+            Model type = model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE);
+            Assert.assertEquals("Expected 2 file references", 2, type.size());
         }
         finally
         {
+            repositoryConnection.rollback();
             if(repositoryConnection != null)
             {
                 repositoryConnection.close();
@@ -111,7 +114,8 @@ public class SSHFileReferenceProcessorFactoryImplTest<T extends PoddRdfProcessor
     @Test
     public void testSPARQLQueryWithSubjectViaExecution() throws Exception
     {
-        final PoddRdfProcessorFactory<SSHFileReferenceProcessor> rdfProcessorFactory = this.getNewPoddRdfProcessorFactory();
+        final PoddRdfProcessorFactory<SSHFileReferenceProcessor> rdfProcessorFactory =
+                this.getNewPoddRdfProcessorFactory();
         
         final String fileReference = "http://purl.org/podd-test/130326f/object-rice-scan-34343-a";
         
@@ -143,14 +147,15 @@ public class SSHFileReferenceProcessorFactoryImplTest<T extends PoddRdfProcessor
             // verify SPARQL generated a graph as expected
             final Model model = QueryResults.asModel(query.evaluate());
             Assert.assertFalse("Empty Model, no file references found.", model.isEmpty());
-            Assert.assertEquals("Expected only 1 file reference", 1, model.subjects().size());
-            Assert.assertEquals("Not the expected file reference", fileReference, model.subjects().iterator().next()
+            Model type = model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE);
+            Assert.assertEquals("Expected only 1 file reference", 1, type.size());
+            Assert.assertEquals("Not the expected file reference", fileReference, type.subjects().iterator().next()
                     .stringValue());
-            
-            repositoryConnection.rollback();
         }
         finally
         {
+            repositoryConnection.rollback();
+            
             if(repositoryConnection != null)
             {
                 repositoryConnection.close();
