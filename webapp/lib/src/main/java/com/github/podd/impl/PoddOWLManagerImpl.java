@@ -111,14 +111,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         // them
         // in the proper order for loading.
         final List<InferredOWLOntologyID> imports = this.buildTwoLevelOrderedImportsList(ontologyID, conn, context);
-        this.log.info("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
+        this.log.debug("The schema ontology {} has {} imports.", baseOntologyVersionIRI, imports.size());
         
         // -- load the imported ontologies into the Manager's cache. It is expected that they are
         // already in the Repository
         for(final InferredOWLOntologyID inferredOntologyID : imports)
         {
             final URI contextToLoadFrom = inferredOntologyID.getVersionIRI().toOpenRDFURI();
-            this.log.info("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
+            this.log.debug("About to load {} from context {}", inferredOntologyID, contextToLoadFrom);
             this.parseRDFStatements(conn, contextToLoadFrom);
             
             final URI inferredContextToLoadFrom = inferredOntologyID.getInferredOntologyIRI().toOpenRDFURI();
@@ -187,7 +187,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                 "SELECT ?x ?xv ?xiv WHERE { " + subject + " <" + OWL.IMPORTS.stringValue() + "> ?xv ." + "?x <"
                         + PoddRdfConstants.OWL_VERSION_IRI + "> ?xv ." + "?x <"
                         + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION + "> ?xiv ." + " }";
-        this.log.info("Generated SPARQL {}", sparqlQuery);
+        this.log.debug("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         
         final DatasetImpl dataset = new DatasetImpl();
@@ -264,7 +264,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         {
             if(profiles.size() > 1)
             {
-                this.log.info("Reasoner factory supports {} profiles. Returning one of: {}", profiles.size(), profiles);
+                this.log.debug("Reasoner factory supports {} profiles. Returning one of: {}", profiles.size(), profiles);
             }
             return profiles.iterator().next();
         }
