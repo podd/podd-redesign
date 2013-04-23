@@ -122,7 +122,9 @@ public abstract class AbstractFileReferenceManagerTest
         Assert.assertEquals("Not the expected number of file references", 1, extractedFileReferences.size());
         final FileReference fileReference = extractedFileReferences.iterator().next();
         Assert.assertNull("Artifact ID should be NULL", fileReference.getArtifactID());
-        Assert.assertNull("Parent IRI should be NULL", fileReference.getParentIri());
+        Assert.assertEquals("Not the expected Parent IRI",
+                "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", fileReference.getParentIri()
+                        .toString());
         Assert.assertEquals("Not the expected IRI", "urn:temp:uuid:object-rice-scan-34343-a", fileReference
                 .getObjectIri().toString());
         Assert.assertEquals("Not the expected label", "Rice tree scan 003454-98", fileReference.getLabel());
@@ -155,7 +157,9 @@ public abstract class AbstractFileReferenceManagerTest
         for(final FileReference fileReference : extractedFileReferences)
         {
             Assert.assertNull("Artifact ID should be NULL", fileReference.getArtifactID());
-            Assert.assertNull("Parent IRI should be NULL", fileReference.getParentIri());
+            Assert.assertEquals("Parent IRI is not as expected",
+                    "http://purl.org/podd-test/130326f/objA24#SqueekeeMaterial", fileReference.getParentIri()
+                            .toString());
             Assert.assertTrue("File Reference URI is not an expected one",
                     expectedObjectIris.contains(fileReference.getObjectIri().toString()));
             Assert.assertTrue("Label is not an expected one", expectedLabels.contains(fileReference.getLabel()));
