@@ -8,12 +8,14 @@ import java.util.Set;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.api.file.SSHFileReferenceProcessor;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -62,6 +64,8 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
             {
                 final Model model = rdfStatements.filter(fileRef, null, null);
                 
+                DebugUtils.printContents(model);
+                
                 final SSHFileReference fileReference = new SSHFileReferenceImpl();
                 
                 // note: artifact ID is not available to us in here and must be added externally
@@ -71,30 +75,29 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
                     fileReference.setObjectIri(IRI.create((URI)fileRef));
                 }
                 
-                final String label = model.filter(fileRef, RDFS.LABEL, null).objectString();
-                if(label != null)
+                final Set<Value> label = model.filter(fileRef, RDFS.LABEL, null).objects();
+                if(!label.isEmpty())
                 {
-                    fileReference.setLabel(label);
+                    fileReference.setLabel(label.iterator().next().stringValue());
                 }
                 
-                final String filename =
-                        model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILENAME, null).objectString();
-                if(filename != null)
+                final Set<Value> filename =
+                        model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILENAME, null).objects();
+                if(!filename.isEmpty())
                 {
-                    fileReference.setFilename(filename);
+                    fileReference.setFilename(filename.iterator().next().stringValue());
                 }
                 
-                final String path =
-                        model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILE_PATH, null).objectString();
-                if(path != null)
+                final Set<Value> path = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_FILE_PATH, null).objects();
+                if(!path.isEmpty())
                 {
-                    fileReference.setPath(path);
+                    fileReference.setPath(path.iterator().next().stringValue());
                 }
                 
-                final String alias = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objectString();
-                if(alias != null)
+                final Set<Value> alias = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objects();
+                if(!alias.isEmpty())
                 {
-                    fileReference.setRepositoryAlias(alias);
+                    fileReference.setRepositoryAlias(alias.iterator().next().stringValue());
                 }
                 
                 Model linksToFileReference = rdfStatements.filter(null, null, fileRef);
