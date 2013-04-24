@@ -7,12 +7,17 @@ import java.io.StringReader;
 import java.util.Collection;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.Timeout;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.model.Model;
@@ -28,6 +33,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Status;
+import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
@@ -51,6 +57,9 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class AbstractResourceImplTest
 {
+    @Rule
+    public TemporaryFolder tempDirectory = new TemporaryFolder();
+    
     /**
      * Timeout tests after 30 seconds.
      */
@@ -77,6 +86,8 @@ public class AbstractResourceImplTest
     protected final boolean testNoAdminPrivileges = false;
     
     private Component component;
+    
+    protected Path testDir;
     
     public AbstractResourceImplTest()
     {
@@ -133,14 +144,18 @@ public class AbstractResourceImplTest
      * @return
      * @throws IOException
      */
-    protected Representation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
+    protected FileRepresentation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
         throws IOException
     {
-        final InputStream resourceAsStream = this.getClass().getResourceAsStream(resourcePath);
-        Assert.assertNotNull("Null resource", resourceAsStream);
-        final InputStream in = new BufferedInputStream(resourceAsStream);
-        final String stringInput = IOUtils.toString(in);
-        return new StringRepresentation(stringInput, mediaType);
+        Path target = testDir.resolve(Paths.get(resourcePath).getFileName());
+        
+        try (final InputStream input = this.getClass().getResourceAsStream(resourcePath))
+        {
+            Files.copy(input, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+        
+        final FileRepresentation fileRep = new FileRepresentation(target.toFile(), mediaType);
+        return fileRep;
     }
     
     /**
@@ -293,6 +308,8 @@ public class AbstractResourceImplTest
         
         // Start the component.
         this.component.start();
+        
+        testDir = tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
     }
     
     /**

@@ -4,11 +4,17 @@
 package com.github.podd.restlet.test;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -41,15 +47,13 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource uploadArtifactResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final URL fileUrl = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf");
-        Assert.assertNotNull("Null artifact file", fileUrl);
-        
-        final File artifactDiskFile = new File(fileUrl.toURI());
-        final FileRepresentation fileRep = new FileRepresentation(artifactDiskFile, MediaType.APPLICATION_RDF_XML);
+        final Representation input =
+                this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
+                        MediaType.APPLICATION_RDF_XML);
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(true);
-        form.getEntries().add(new FormData("file", fileRep));
+        form.getEntries().add(new FormData("file", input));
         
         try
         {
@@ -96,18 +100,13 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final URL fileUrl = this.getClass().getResource("/test/artifacts/basicProject-1-internal-object.rdf");
-        
-        this.log.info("The URL is {}", fileUrl);
-        Assert.assertNotNull("Null artifact file", fileUrl);
-        
-        final File artifactDiskFile = new File(fileUrl.toURI());
-        final FileRepresentation fileRep = new FileRepresentation(artifactDiskFile, MediaType.APPLICATION_RDF_XML);
-        Assert.assertNotNull("Null FileRepresentation", fileRep);
+        final Representation input =
+                this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
+                        MediaType.APPLICATION_RDF_XML);
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(true);
-        form.getEntries().add(new FormData("file", fileRep));
+        form.getEntries().add(new FormData("file", input));
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
