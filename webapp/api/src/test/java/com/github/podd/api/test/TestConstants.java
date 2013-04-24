@@ -107,7 +107,7 @@ public interface TestConstants
     public static final String TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION = "/test/artifacts/fragment-move-demo-investigation.ttl";
 
     /** Test resource: an alias file which is disconnected */
-    public static final String TEST_ALIAS_BAD = "/test//bad-alias.ttl";
+    public static final String TEST_ALIAS_BAD = "/test/bad-alias.ttl";
 
     
     /** Test resource: any file which exists and can be used as a file reference */
