@@ -3,13 +3,16 @@
  */
 package com.github.podd.restlet.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -158,7 +161,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             // prepare: build test fragment with correct value set for poddBase:hasPath
             final String fileReferenceAsString =
                     this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE,
-                            RDFFormat.RDFXML);
+                            RDFFormat.RDFXML, sshDir);
             Assert.assertFalse("Input FileReference could not be genereated", fileReferenceAsString.isEmpty());
             
             final ClientResource fileRefAttachClientResource =
@@ -215,7 +218,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             // prepare: build test fragment with correct value set for poddBase:hasPath
             final String fileReferenceAsString =
                     this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE_TTL,
-                            RDFFormat.TURTLE);
+                            RDFFormat.TURTLE, sshDir);
             Assert.assertFalse("Input FileReference could not be genereated", fileReferenceAsString.isEmpty());
             
             final ClientResource fileRefAttachClientResource =
@@ -303,35 +306,32 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
      *            Location of resource containing incomplete File Reference
      * @return String containing RDF statements
      */
-    private String buildFileReferenceString(final String fragmentSource, RDFFormat format) throws Exception
+    private String buildFileReferenceString(final String fragmentSource, RDFFormat format, Path testDirectory)
+        throws Exception
     {
         // read the fragment's RDF statements into a Model
         final InputStream inputStream = this.getClass().getResourceAsStream(fragmentSource);
-        final Model model = new LinkedHashModel();
-        final RDFParser rdfParser = Rio.createParser(format);
-        rdfParser.setRDFHandler(new StatementCollector(model));
-        rdfParser.parse(inputStream, "");
+        final Model model = Rio.parse(inputStream, "", format);
         
         // path to be set as part of the file reference
-        final String completePath = this.getClass().getResource(TestConstants.TEST_REMOTE_FILE_PATH).getPath();
+        final Path completePath = testDirectory.resolve(TestConstants.TEST_REMOTE_FILE_NAME);
+        Files.copy(
+                this.getClass().getResourceAsStream(
+                        TestConstants.TEST_REMOTE_FILE_PATH + "/" + TestConstants.TEST_REMOTE_FILE_NAME), completePath,
+                StandardCopyOption.REPLACE_EXISTING);
         
         final Resource aliasUri =
                 model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).subjects().iterator().next();
         model.add(aliasUri, PoddRdfConstants.PODD_BASE_HAS_FILE_PATH,
-                ValueFactoryImpl.getInstance().createLiteral(completePath));
+                ValueFactoryImpl.getInstance().createLiteral(testDirectory.toAbsolutePath().toString()));
         model.add(aliasUri, PoddRdfConstants.PODD_BASE_HAS_FILENAME,
                 ValueFactoryImpl.getInstance().createLiteral(TestConstants.TEST_REMOTE_FILE_NAME));
         
         // get a String representation of the statements in the Model
         final StringWriter out = new StringWriter();
-        final RDFWriter writer = Rio.createWriter(format, out);
-        writer.startRDF();
-        for(final Statement st : model)
-        {
-            writer.handleStatement(st);
-        }
-        writer.endRDF();
-        return out.getBuffer().toString();
+        Rio.write(model, out, format);
+        
+        return out.toString();
     }
     
     /**

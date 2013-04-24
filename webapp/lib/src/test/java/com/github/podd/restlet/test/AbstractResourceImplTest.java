@@ -5,11 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Collection;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.ServerSocket;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
@@ -21,7 +17,6 @@ import org.junit.rules.Timeout;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.model.Model;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
@@ -57,10 +52,10 @@ import com.github.podd.utils.PoddWebConstants;
 public class AbstractResourceImplTest
 {
     /**
-     * Timeout tests after 1 minute.
+     * Timeout tests after 30 seconds.
      */
     @Rule
-    public Timeout timeout = new Timeout(60000);
+    public Timeout timeout = new Timeout(30000);
     
     /**
      * Determines the TEST_PORT number to use for the test server

@@ -103,13 +103,15 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         InferredOWLOntologyID artifactMap = null;
         try
         {
-            artifactMap = this.getPoddArtifactManager().attachFileReferences(
-                    ValueFactoryImpl.getInstance().createURI(artifactUri),
-                    ValueFactoryImpl.getInstance().createURI(versionUri),
-                    inputStream, inputFormat, verificationPolicy);
+            artifactMap =
+                    this.getPoddArtifactManager().attachFileReferences(
+                            ValueFactoryImpl.getInstance().createURI(artifactUri),
+                            ValueFactoryImpl.getInstance().createURI(versionUri), inputStream, inputFormat,
+                            verificationPolicy);
         }
         catch(FileReferenceVerificationFailureException e)
         {
+            log.error("File reference validation errors: {}", e.getValidationFailures());
             throw new ResourceException(Status.SERVER_ERROR_BAD_GATEWAY, "File reference(s) failed verification", e);
         }
         catch(OpenRDFException | PoddException | IOException | OWLException e)
@@ -139,7 +141,6 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
                 .getDefaultMIMEType()));
     }
-    
     
     @Get
     public Representation attachFileReferencePageHtml(final Representation entity) throws ResourceException
