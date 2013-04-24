@@ -90,8 +90,8 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public void init(final String pathDefaultAliases, final RDFFormat rdfFormat) throws OpenRDFException,
-        FileRepositoryException, IOException
+    public void init(final Model defaultAliasConfiguration) throws OpenRDFException, FileRepositoryException,
+        IOException
     {
         if(this.repositoryManager == null)
         {
@@ -101,26 +101,18 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
         if(this.getAllAliases().size() == 0)
         {
             this.log.warn("File Repository Graph is empty. Loading default configurations...");
-            final InputStream inputStream = this.getClass().getResourceAsStream(pathDefaultAliases);
-            
-            final RDFParser rdfParser = Rio.createParser(rdfFormat);
-            final Model modelFromFile = new LinkedHashModel();
-            final StatementCollector collector = new StatementCollector(modelFromFile);
-            rdfParser.setRDFHandler(collector);
-            rdfParser.parse(inputStream, "");
             
             // validate the default alias file against the File Repository configuration schema
-            this.verifyFileRepositoryAgainstSchema(modelFromFile, rdfFormat.getDefaultMIMEType());
+            this.verifyFileRepositoryAgainstSchema(defaultAliasConfiguration);
             
-            final Model allAliases = modelFromFile.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
+            final Model allAliases = defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
             
             this.log.warn("Found {} default aliases to add", allAliases.size());
             
             for(final Statement stmt : allAliases)
             {
                 final String alias = stmt.getObject().stringValue();
-                final Model model = new LinkedHashModel();
-                model.addAll(modelFromFile.filter(stmt.getSubject(), null, null));
+                final Model model = defaultAliasConfiguration.filter(stmt.getSubject(), null, null);
                 
                 final PoddFileRepository<?> fileRepository =
                         PoddFileRepositoryFactory.createFileRepository(alias, model);
@@ -559,7 +551,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
      * @param mimeType
      * @throws FileRepositoryException
      */
-    private void verifyFileRepositoryAgainstSchema(final Model model, final String mimeType)
+    private void verifyFileRepositoryAgainstSchema(final Model model)
         throws FileRepositoryException
     {
         OWLOntology fileRepositoryOntology = null;
@@ -576,9 +568,9 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             rdfParserA.parse(inputA, "");
             
             // verify & load poddFileRepository.owl into OWLAPI
-            fileRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel, "application/rdf+xml");
+            fileRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel);
             
-            defaultAliasOntology = this.checkForConsistentOwlDlOntology(model, mimeType);
+            defaultAliasOntology = this.checkForConsistentOwlDlOntology(model);
         }
         catch(final PoddException | OpenRDFException | IOException e)
         {
@@ -614,16 +606,15 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
      * 
      * @param model
      *            A Model which should contain an Ontology
-     * @param mimeType
      * @return The loaded Ontology if verification succeeds
      * @throws FileRepositoryException
      *             If verification fails
      */
-    private OWLOntology checkForConsistentOwlDlOntology(final Model model, final String mimeType)
+    private OWLOntology checkForConsistentOwlDlOntology(final Model model)
         throws EmptyOntologyException, OntologyNotInProfileException, InconsistentOntologyException
     {
         final RioRDFOntologyFormatFactory ontologyFormatFactory =
-                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(mimeType);
+                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(RDFFormat.RDFXML.getDefaultMIMEType());
         final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
         
         OWLOntology nextOntology = null;

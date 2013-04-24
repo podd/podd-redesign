@@ -4,17 +4,20 @@
 package com.github.podd.restlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
 import org.restlet.Context;
 import org.restlet.ext.crypto.DigestAuthenticator;
@@ -247,10 +250,8 @@ public class ApplicationUtils
         application.getPoddRepositoryManager().setArtifactManagementGraph(
                 PoddWebServiceApplicationImpl.ARTIFACT_MGT_GRAPH);
         
-        
         // File Reference manager
-        final FileReferenceProcessorFactoryRegistry nextFileRegistry =
-                new FileReferenceProcessorFactoryRegistry();
+        final FileReferenceProcessorFactoryRegistry nextFileRegistry = new FileReferenceProcessorFactoryRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
         // classpath
         nextFileRegistry.clear();
@@ -282,21 +283,20 @@ public class ApplicationUtils
             log.error("OWLOntologyManager was null");
         }
         nextOWLManager.setOWLOntologyManager(nextOWLOntologyManager);
-
+        
         // File Repository Manager
         final PoddFileRepositoryManager nextFileRepositoryManager = new PoddFileRepositoryManagerImpl();
         nextFileRepositoryManager.setRepositoryManager(application.getPoddRepositoryManager());
         nextFileRepositoryManager.setOWLManager(nextOWLManager);
         try
         {
-            nextFileRepositoryManager.init(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE, RDFFormat.TURTLE);
+            Model aliasConfiguration = application.getAliasesConfiguration();
+            nextFileRepositoryManager.init(application.getAliasesConfiguration());
         }
-        catch (PoddException | IOException e)
+        catch(PoddException | IOException e)
         {
             log.error("Fatal Error!!! Could not initialize File Repository Manager", e);
         }
-        
-        
         
         final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
         

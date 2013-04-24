@@ -1,11 +1,13 @@
 package com.github.podd.api.file;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.rio.RDFFormat;
 
 import com.github.podd.api.PoddOWLManager;
@@ -50,13 +52,12 @@ public interface PoddFileRepositoryManager
     
     /**
      * Returns a list of all aliases that are currently mapped.
-     *  
+     * 
      * @return
      * @throws FileRepositoryException
      * @throws OpenRDFException
      */
     List<String> getAllAliases() throws FileRepositoryException, OpenRDFException;
-    
     
     /**
      * Returns the repository configuration that is currently mapped using the given alias.
@@ -86,7 +87,7 @@ public interface PoddFileRepositoryManager
      */
     List<String> getRepositoryAliases(PoddFileRepository<?> repositoryConfiguration) throws FileRepositoryException,
         OpenRDFException;
-
+    
     /**
      * Given an alias returns all aliases, including the given one, that map to the same repository
      * configuration.
@@ -98,20 +99,18 @@ public interface PoddFileRepositoryManager
      * @throws OpenRDFException
      */
     List<String> getEquivalentAliases(String alias) throws FileRepositoryException, OpenRDFException;
-
+    
     /**
      * Checks to see if the File Repository Management Graph contains any data, and if empty loads a
-     * default set of repository configurations and aliases from the specified file.
+     * default set of repository configurations and aliases from the specified model.
      * 
-     * @param pathDefaultAliases
-     *            The path to a file containing default File Repository configurations
-     * @param rdfFormat
-     *            The RDF serialization format of the default alias file
-     * @throws OpenRDFException 
-     * @throws FileRepositoryException 
-     * @throws IOException 
+     * @param defaultAliasesConfiguraton
+     *            A model containing the default aliases configuration to be used if necessary.
+     * @throws OpenRDFException
+     * @throws FileRepositoryException
+     * @throws IOException
      */
-    void init(String pathDefaultAliases, RDFFormat rdfFormat) throws OpenRDFException, FileRepositoryException, IOException;
+    void init(Model defaultAliasesConfiguraton) throws OpenRDFException, FileRepositoryException, IOException;
     
     /**
      * Removes the mapping for the given alias, returning the {@link PoddFileRepository} object that
@@ -129,7 +128,7 @@ public interface PoddFileRepositoryManager
         FileRepositoryException, OpenRDFException;
     
     /**
-     * Verifies that a given set of {@link FileReference} objects are valid by checking they can be 
+     * Verifies that a given set of {@link FileReference} objects are valid by checking they can be
      * accessed from the remote File Repository.
      * 
      * @param fileReferenceResults
@@ -150,10 +149,9 @@ public interface PoddFileRepositoryManager
     void setRepositoryManager(PoddRepositoryManager repositoryManager);
     
     PoddRepositoryManager getRepositoryManager();
-
+    
     void setOWLManager(PoddOWLManager owlManager);
-
+    
     PoddOWLManager getOWLManager();
-
-
+    
 }

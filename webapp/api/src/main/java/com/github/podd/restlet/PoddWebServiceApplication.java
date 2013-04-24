@@ -1,8 +1,11 @@
 package com.github.podd.restlet;
 
+import java.io.InputStream;
 import java.util.Collection;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.rio.RDFFormat;
 import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -103,5 +106,9 @@ public abstract class PoddWebServiceApplication extends Application
      * @param nextFreemarkerConfiguration
      */
     public abstract void setTemplateConfiguration(Configuration nextFreemarkerConfiguration);
+    
+    public abstract Model getAliasesConfiguration();
+    
+    public abstract void setAliasesConfiguration(Model aliasesConfiguration);
     
 }

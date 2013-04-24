@@ -3,6 +3,7 @@
  */
 package com.github.podd.api.file.test;
 
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.FileReference;
@@ -423,7 +425,10 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
                 .getAllAliases().size());
         
-        this.testFileRepositoryManager.init(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE, RDFFormat.TURTLE);
+        try (final InputStream input = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE))
+        {
+            this.testFileRepositoryManager.init(Rio.parse(input, "", RDFFormat.TURTLE));
+        }
         
         // verify:
         final List<String> allAliases = this.testFileRepositoryManager.getAllAliases();
@@ -444,9 +449,9 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
                 .getAllAliases().size());
         
-        try
+        try (final InputStream input = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206 + "aa"))
         {
-            this.testFileRepositoryManager.init(TestConstants.TEST_ARTIFACT_20130206 + "aa", RDFFormat.TURTLE);
+            this.testFileRepositoryManager.init(Rio.parse(input, "", RDFFormat.TURTLE));
             Assert.fail("Should have thrown an Exception here");
         }
         catch(final Exception e)
@@ -468,8 +473,11 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
                 .getAllAliases().size());
         
-        // initializing with a Turtle file which is an inconsistent "alias" file
-        this.testFileRepositoryManager.init(TestConstants.TEST_ALIAS_BAD, RDFFormat.TURTLE);
+        try (final InputStream input = this.getClass().getResourceAsStream(TestConstants.TEST_ALIAS_BAD))
+        {
+            // initializing with a Turtle file which is an inconsistent "alias" file
+            this.testFileRepositoryManager.init(Rio.parse(input, "", RDFFormat.TURTLE));
+        }
         
         // verify:
         final List<String> allAliases = this.testFileRepositoryManager.getAllAliases();

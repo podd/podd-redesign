@@ -1,10 +1,18 @@
 package com.github.podd.restlet;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -22,6 +30,7 @@ import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
 import com.github.podd.resources.DeleteArtifactResourceImpl;
@@ -34,6 +43,7 @@ import com.github.podd.resources.ListArtifactsResourceImpl;
 import com.github.podd.resources.SearchOntologyResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.template.Configuration;
@@ -64,6 +74,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     private PoddRepositoryManager poddRepositoryManager;
     private PoddSchemaManager poddSchemaManager;
     private PoddArtifactManager poddArtifactManager;
+    
+    private Model aliasesConfiguration = new LinkedHashModel();
     
     /**
      * Default Constructor.
@@ -285,7 +297,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String searchService = PoddWebConstants.PATH_SEARCH;
         this.log.debug("attaching Search Ontology service to path={}", searchService);
         router.attach(searchService, SearchOntologyResourceImpl.class);
-
+        
         // Add a route for Logout service
         // final String logout = "logout";
         // PropertyUtils.getProperty(PropertyUtils.PROPERTY_LOGOUT_FORM_PATH,
@@ -434,6 +446,33 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         super.stop();
         this.cleanUpResources();
         this.log.info("== Shutting down PODD Web Application ==");
+    }
+    
+    @Override
+    public Model getAliasesConfiguration()
+    {
+        // If the aliasConfiguration is empty then populate it with the default aliases here
+        if(aliasesConfiguration.isEmpty())
+        {
+            try (final InputStream input =
+                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE))
+            {
+                setAliasesConfiguration(Rio.parse(input, "", RDFFormat.TURTLE));
+            }
+            catch(IOException | RDFParseException | UnsupportedRDFormatException e)
+            {
+                this.log.error("Could not load default aliases");
+                throw new PoddRuntimeException("Could not load default aliases", e);
+            }
+        }
+        
+        return this.aliasesConfiguration;
+    }
+    
+    @Override
+    public void setAliasesConfiguration(Model aliasesConfiguration)
+    {
+        this.aliasesConfiguration = aliasesConfiguration;
     }
     
 }
