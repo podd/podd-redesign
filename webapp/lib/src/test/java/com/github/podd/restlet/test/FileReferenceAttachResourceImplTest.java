@@ -4,10 +4,14 @@
 package com.github.podd.restlet.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,9 +23,11 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -60,6 +66,24 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         this.sshd = new SSHService();
         this.sshd.startTestSSHServer(sshDir);
         super.setUp();
+    }
+    
+    /**
+     * Override this to change the test aliases for a given test.
+     * 
+     * @return A {@link Model} containing the statements relevant to test aliases.
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
+     * @throws RDFParseException
+     */
+    protected Model getTestAliases() throws RDFParseException, UnsupportedRDFormatException, IOException
+    {
+        String configuration =
+                IOUtils.toString(this.getClass().getResourceAsStream("/test/test-alias.ttl"), StandardCharsets.UTF_8);
+        
+        configuration = configuration.replace("9856", Integer.toString(sshd.TEST_SSH_SERVICE_PORT));
+        
+        return Rio.parse(new StringReader(configuration), "", RDFFormat.TURTLE);
     }
     
     protected void startRepositorySource() throws Exception

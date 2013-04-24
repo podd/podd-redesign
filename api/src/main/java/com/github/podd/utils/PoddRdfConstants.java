@@ -19,7 +19,7 @@ public interface PoddRdfConstants
     public static final ValueFactory VALUE_FACTORY = ValueFactoryImpl.getInstance();
 
     /** Path to default alias file */
-    public static final String PATH_DEFAULT_ALIASES_FILE = "/alias.ttl";
+    public static final String PATH_DEFAULT_ALIASES_FILE = "/com/github/podd/api/file/default-file-repositories.ttl";
     
     /** Path to dcTerms.owl */
     public static final String PATH_PODD_DCTERMS = "/ontologies/dcTerms.owl";

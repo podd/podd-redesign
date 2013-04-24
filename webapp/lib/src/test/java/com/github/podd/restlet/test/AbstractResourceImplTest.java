@@ -3,12 +3,14 @@ package com.github.podd.restlet.test;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.Collection;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -22,6 +24,7 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.Component;
 import org.restlet.data.MediaType;
@@ -279,12 +282,30 @@ public class AbstractResourceImplTest
         // PropertyUtil.get(OasProps.PROP_WS_URI_PATH, OasProps.DEF_WS_URI_PATH),
                 "/podd/", nextApplication);
         
+        nextApplication.setAliasesConfiguration(getTestAliases());
+        
         // The application cannot be setup properly until it is attached, as it requires
         // Application.getContext() to not return null
         ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
         
         // Start the component.
         this.component.start();
+    }
+    
+    /**
+     * Override this to change the test aliases for a given test.
+     * 
+     * @return A {@link Model} containing the statements relevant to test aliases.
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
+     * @throws RDFParseException
+     */
+    protected Model getTestAliases() throws RDFParseException, UnsupportedRDFormatException, IOException
+    {
+        String configuration =
+                IOUtils.toString(this.getClass().getResourceAsStream("/test/test-alias.ttl"), StandardCharsets.UTF_8);
+        
+        return Rio.parse(new StringReader(configuration), "", RDFFormat.TURTLE);
     }
     
     /**
