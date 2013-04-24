@@ -162,6 +162,7 @@ public class SSHFileReferenceImpl implements SSHFileReference
         return b.toString();
     }
     
+    @Override
     public Model toRDF()
     {
         ValueFactory vf = PoddRdfConstants.VALUE_FACTORY;

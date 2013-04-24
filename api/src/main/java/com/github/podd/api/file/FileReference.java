@@ -3,6 +3,7 @@
  */
 package com.github.podd.api.file;
 
+import org.openrdf.model.Model;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -105,4 +106,11 @@ public interface FileReference
      *            Alias for the repository that is managing this file reference.
      */
     void setRepositoryAlias(String repositoryAlias);
+    
+    /**
+     * Convert this file reference to RDF and return the statements in a {@link Model}.
+     * 
+     * @return A {@link Model} containing the RDF statements representing this file reference.
+     */
+    Model toRDF();
 }
