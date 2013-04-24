@@ -30,6 +30,7 @@ import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.api.file.FileReferenceConstants;
+import com.github.podd.impl.file.test.SSHService;
 
 /**
  * This integration test class validates the PODD-prototype web service operations.
@@ -231,18 +232,19 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
     @Test
     public void testAttachReference_SSH() throws Exception
     {
+        final Path tempFolder = this.tempDirectory.newFolder().toPath();
+        
         // -- start the test SSH Service here since other tests don't need it
         final SSHService sshd = new SSHService();
         
         try
         {
-            final File tempFolder = this.tempDirectory.newFolder();
             final InputStream testUploadedFile =
                     this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
-            final Path tempFile = Files.createTempFile(tempFolder.toPath(), "basicProject-1", ".rdf");
+            final Path tempFile = Files.createTempFile(tempFolder, "basicProject-1", ".rdf");
             Files.copy(testUploadedFile, tempFile, StandardCopyOption.REPLACE_EXISTING);
             
-            sshd.startTestSSHServer(9856, tempFolder);
+            sshd.startTestSSHServer(tempFolder);
             
             // -- login and add an artifact
             final InputStream input =
@@ -267,7 +269,7 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
             form.add(FileReferenceConstants.KEY_ARTIFACT_URI, artifactUri);
             form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
             form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "localssh");
-            form.add(FileReferenceConstants.KEY_FILE_PATH, tempFolder.toPath().toAbsolutePath().toString());
+            form.add(FileReferenceConstants.KEY_FILE_PATH, tempFolder.toAbsolutePath().toString());
             form.add(FileReferenceConstants.KEY_FILE_NAME, tempFile.getFileName().toString());
             form.add(FileReferenceConstants.KEY_FILE_DESCRIPTION,
                     "Refers to one of the test artifacts, to be accessed through an ssh server");
@@ -293,7 +295,7 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
         }
         finally
         {
-            sshd.stopTestSSHServer();
+            sshd.stopTestSSHServer(tempFolder);
         }
     }
     

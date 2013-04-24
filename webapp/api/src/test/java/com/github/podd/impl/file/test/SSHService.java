@@ -13,15 +13,52 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.InvalidKeyException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.sshd.SshServer;
+import org.apache.sshd.common.Channel;
+import org.apache.sshd.common.Cipher;
+import org.apache.sshd.common.Compression;
+import org.apache.sshd.common.ForwardingAcceptorFactory;
+import org.apache.sshd.common.KeyExchange;
+import org.apache.sshd.common.Mac;
 import org.apache.sshd.common.NamedFactory;
+import org.apache.sshd.common.Signature;
+import org.apache.sshd.common.cipher.AES128CBC;
+import org.apache.sshd.common.cipher.AES128CTR;
+import org.apache.sshd.common.cipher.AES192CBC;
+import org.apache.sshd.common.cipher.AES256CBC;
+import org.apache.sshd.common.cipher.AES256CTR;
+import org.apache.sshd.common.cipher.ARCFOUR128;
+import org.apache.sshd.common.cipher.ARCFOUR256;
+import org.apache.sshd.common.cipher.BlowfishCBC;
+import org.apache.sshd.common.cipher.TripleDESCBC;
+import org.apache.sshd.common.compression.CompressionNone;
+import org.apache.sshd.common.forward.DefaultForwardingAcceptorFactory;
 import org.apache.sshd.common.keyprovider.FileKeyPairProvider;
+import org.apache.sshd.common.mac.HMACMD5;
+import org.apache.sshd.common.mac.HMACMD596;
+import org.apache.sshd.common.mac.HMACSHA1;
+import org.apache.sshd.common.mac.HMACSHA196;
+import org.apache.sshd.common.random.BouncyCastleRandom;
+import org.apache.sshd.common.random.JceRandom;
+import org.apache.sshd.common.random.SingletonRandomFactory;
+import org.apache.sshd.common.signature.SignatureDSA;
+import org.apache.sshd.common.signature.SignatureRSA;
+import org.apache.sshd.common.util.SecurityUtils;
 import org.apache.sshd.server.CommandFactory;
 import org.apache.sshd.server.PasswordAuthenticator;
+import org.apache.sshd.server.channel.ChannelDirectTcpip;
+import org.apache.sshd.server.channel.ChannelSession;
 import org.apache.sshd.server.command.ScpCommandFactory;
+import org.apache.sshd.server.filesystem.NativeFileSystemFactory;
+import org.apache.sshd.server.kex.DHG1;
+import org.apache.sshd.server.kex.DHG14;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.sftp.SftpSubsystem;
@@ -54,6 +91,76 @@ public class SSHService
     
     private final String hostkey = "/test/hostkey.pem";
     
+    public static SshServer getTestServer()
+    {
+        SshServer sshd = new SshServer();
+        // DHG14 uses 2048 bits key which are not supported by the default JCE provider
+        // if (SecurityUtils.isBouncyCastleRegistered()) {
+        // sshd.setKeyExchangeFactories(Arrays.<NamedFactory<KeyExchange>>asList(
+        // new DHG14.Factory(),
+        // new DHG1.Factory()));
+        // sshd.setRandomFactory(new SingletonRandomFactory(new BouncyCastleRandom.Factory()));
+        // } else {
+        sshd.setKeyExchangeFactories(Arrays.<NamedFactory<KeyExchange>> asList(new DHG1.Factory()));
+        sshd.setRandomFactory(new SingletonRandomFactory(new JceRandom.Factory()));
+        // }
+        setUpDefaultCiphers(sshd);
+        // Compression is not enabled by default
+        // sshd.setCompressionFactories(Arrays.<NamedFactory<Compression>>asList(
+        // new CompressionNone.Factory(),
+        // new CompressionZlib.Factory(),
+        // new CompressionDelayedZlib.Factory()));
+        sshd.setCompressionFactories(Arrays.<NamedFactory<Compression>> asList(new CompressionNone.Factory()));
+        sshd.setMacFactories(Arrays.<NamedFactory<Mac>> asList(new HMACMD5.Factory(), new HMACSHA1.Factory(),
+                new HMACMD596.Factory(), new HMACSHA196.Factory()));
+        sshd.setChannelFactories(Arrays.<NamedFactory<Channel>> asList(new ChannelSession.Factory(),
+                new ChannelDirectTcpip.Factory()));
+        sshd.setSignatureFactories(Arrays.<NamedFactory<Signature>> asList(new SignatureDSA.Factory(),
+                new SignatureRSA.Factory()));
+        sshd.setFileSystemFactory(new NativeFileSystemFactory());
+        
+        ForwardingAcceptorFactory faf = new DefaultForwardingAcceptorFactory();
+        sshd.setTcpipForwardNioSocketAcceptorFactory(faf);
+        sshd.setX11ForwardNioSocketAcceptorFactory(faf);
+        
+        return sshd;
+    }
+    
+    private static void setUpDefaultCiphers(SshServer sshd)
+    {
+        List<NamedFactory<Cipher>> avail = new LinkedList<NamedFactory<Cipher>>();
+        avail.add(new AES128CTR.Factory());
+        avail.add(new AES256CTR.Factory());
+        avail.add(new ARCFOUR128.Factory());
+        avail.add(new ARCFOUR256.Factory());
+        avail.add(new AES128CBC.Factory());
+        avail.add(new TripleDESCBC.Factory());
+        avail.add(new BlowfishCBC.Factory());
+        avail.add(new AES192CBC.Factory());
+        avail.add(new AES256CBC.Factory());
+        
+        for(Iterator<NamedFactory<Cipher>> i = avail.iterator(); i.hasNext();)
+        {
+            final NamedFactory<Cipher> f = i.next();
+            try
+            {
+                final Cipher c = f.create();
+                final byte[] key = new byte[c.getBlockSize()];
+                final byte[] iv = new byte[c.getIVSize()];
+                c.init(Cipher.Mode.Encrypt, key, iv);
+            }
+            catch(InvalidKeyException e)
+            {
+                i.remove();
+            }
+            catch(Exception e)
+            {
+                i.remove();
+            }
+        }
+        sshd.setCipherFactories(avail);
+    }
+    
     /**
      * Start an SSH service on the specified port. If the port is below 1024, a random available
      * port is used instead of it and returned.
@@ -70,7 +177,9 @@ public class SSHService
     public int startTestSSHServer(final Path tempDirectory) throws Exception
     {
         TEST_SSH_SERVICE_PORT = SSHService.getFreePort();
-        this.server = SshServer.setUpDefaultServer();
+        this.log.info("about to start the SSHD server on port: " + TEST_SSH_SERVICE_PORT);
+        // this.server = SshServer.setUpDefaultServer();
+        this.server = getTestServer();
         this.server.setPort(TEST_SSH_SERVICE_PORT);
         
         final InputStream input = this.getClass().getResourceAsStream(this.hostkey);
@@ -110,7 +219,6 @@ public class SSHService
         namedFactoryList.add(new SftpSubsystem.Factory());
         this.server.setSubsystemFactories(namedFactoryList);
         
-        this.log.info("about to start the SSHD server on port: " + TEST_SSH_SERVICE_PORT);
         this.server.start();
         this.serverRunning = true;
         this.log.info("started the SSHD server on port: " + TEST_SSH_SERVICE_PORT);

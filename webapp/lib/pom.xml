@@ -189,21 +189,6 @@
 			<artifactId>sshj</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.sshd</groupId>
-			<artifactId>sshd-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.github.ansell.semargl</groupId>
 			<artifactId>semargl-sesame</artifactId>
 			<scope>test</scope>
@@ -252,9 +237,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<parallel>classes</parallel>
-					<threadCount>4</threadCount>
-					<forkCount>4</forkCount>
+					<parallel>both</parallel>
+					<threadCount>3</threadCount>
+					<forkCount>2</forkCount>
 					<reuseForks>false</reuseForks>
 					<argLine>-Xmx1024M -XX:MaxPermSize=512M</argLine>
 				</configuration>
