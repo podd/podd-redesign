@@ -496,6 +496,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         
         try (final InputStream input = this.getClass().getResourceAsStream(TestConstants.TEST_ALIAS_BAD))
         {
+            Assert.assertNotNull("Could not find test resource", input);
             // initializing with a Turtle file which is an inconsistent "alias" file
             this.testFileRepositoryManager.init(Rio.parse(input, "", RDFFormat.TURTLE));
         }
