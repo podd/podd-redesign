@@ -3,7 +3,12 @@
  */
 package com.github.podd.restlet.integrationtest;
 
+import java.io.IOException;
+
 import org.openrdf.OpenRDFException;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.Component;
 import org.restlet.data.LocalReference;
 import org.restlet.data.Protocol;
@@ -135,12 +140,14 @@ public class PoddRestletIntegrationTestComponent extends Component
             // attach the web services application
             this.getDefaultHost().attach("/", nextApplication);
             
+            nextApplication.setAliasesConfiguration(Rio.parse(this.getClass().getResourceAsStream("/test-alias.ttl"),
+                    "", RDFFormat.TURTLE));
+            
             // setup the application after attaching it, as it requires Application.getContext() to
-            // not
-            // be null during the setup process
+            // not be null during the setup process
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
         }
-        catch(final OpenRDFException e)
+        catch(final OpenRDFException | UnsupportedRDFormatException | IOException e)
         {
             throw new RuntimeException("Could not setup application", e);
         }
