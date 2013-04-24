@@ -4,6 +4,7 @@
 package com.github.podd.restlet.integrationtest;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -47,6 +48,8 @@ public class TestResetResourceImpl extends Restlet
         this.log.info("========== Reset called ==========");
         try
         {
+            // Reset the aliases configuration to that it will be regenerated each time
+            this.application.setAliasesConfiguration(new LinkedHashModel());
             ApplicationUtils.setupApplication(this.application, this.application.getContext());
         }
         catch(final OpenRDFException e)
