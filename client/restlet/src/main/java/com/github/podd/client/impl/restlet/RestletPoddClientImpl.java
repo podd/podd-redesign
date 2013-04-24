@@ -6,6 +6,8 @@ package com.github.podd.client.impl.restlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,6 +26,7 @@ import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.InputRepresentation;
+import org.restlet.representation.ReaderRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
@@ -36,6 +39,7 @@ import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
+import com.github.podd.impl.file.SSHFileReferenceImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddWebConstants;
@@ -72,11 +76,48 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public InferredOWLOntologyID attachFileReference(final FileReference ref)
-        throws PoddClientException
+    public InferredOWLOntologyID attachFileReference(final FileReference ref) throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return null;
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+        resource.getCookies().addAll(this.currentCookies);
+        
+        Model rdf = ref.toRDF();
+        
+        StringWriter writer = new StringWriter();
+        
+        try
+        {
+            Rio.write(rdf, writer, RDFFormat.RDFJSON);
+        }
+        catch(RDFHandlerException e)
+        {
+            throw new PoddClientException("Could not generate RDF from file reference", e);
+        }
+        
+        final Representation rep =
+                new ReaderRepresentation(new StringReader(writer.toString()), RestletUtilMediaType.APPLICATION_RDF_JSON);
+        
+        final Representation post = resource.post(rep, RestletUtilMediaType.APPLICATION_RDF_JSON);
+        
+        try
+        {
+            final Model parsedStatements = this.parseRdf(post);
+            
+            final Collection<InferredOWLOntologyID> result = OntologyUtils.modelToOntologyIDs(parsedStatements);
+            
+            if(!result.isEmpty())
+            {
+                return result.iterator().next();
+            }
+            
+            throw new PoddClientException("Failed to verify that the file reference was attached correctly.");
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Could not parse artifact details due to an IOException", e);
+        }
     }
     
     @Override
@@ -403,17 +444,6 @@ public class RestletPoddClientImpl implements PoddClient
         }
     }
     
-    private Model parseRdf(final InputStream stream, final RDFFormat format) throws RDFParseException,
-        RDFHandlerException, UnsupportedRDFormatException, IOException
-    {
-        final Model result = new LinkedHashModel();
-        final RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(result));
-        parser.parse(stream, this.getUrl(""));
-        
-        return result;
-    }
-    
     private Model parseRdf(final Representation rep) throws PoddClientException, IOException
     {
         final RDFFormat format = Rio.getParserFormatForMIMEType(rep.getMediaType().getName());
@@ -426,9 +456,9 @@ public class RestletPoddClientImpl implements PoddClient
         
         try
         {
-            return this.parseRdf(rep.getStream(), format);
+            return Rio.parse(rep.getStream(), "", format);
         }
-        catch(RDFParseException | RDFHandlerException | UnsupportedRDFormatException e)
+        catch(RDFParseException | UnsupportedRDFormatException e)
         {
             throw new PoddClientException("There was an error parsing the artifact", e);
         }

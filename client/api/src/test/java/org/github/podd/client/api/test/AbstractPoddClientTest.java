@@ -24,12 +24,16 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.client.api.PoddClient;
+import com.github.podd.impl.file.SSHFileReferenceImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Abstract tests for {@link PoddClient}.
@@ -62,14 +66,8 @@ public abstract class AbstractPoddClientTest
     protected Model parseRdf(final InputStream inputStream, final RDFFormat format, final int expectedStatements)
         throws RDFParseException, RDFHandlerException, IOException
     {
-        final Model model = new LinkedHashModel();
-        
-        final RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(model));
-        parser.parse(inputStream, "");
-        
+        final Model model = Rio.parse(inputStream, "", format);
         Assert.assertEquals(expectedStatements, model.size());
-        
         return model;
     }
     
@@ -119,11 +117,35 @@ public abstract class AbstractPoddClientTest
      * {@link com.github.podd.client.api.PoddClient#attachFileReference(OWLOntologyID, org.semanticweb.owlapi.model.IRI, String, String, String)}
      * .
      */
-    @Ignore
     @Test
     public final void testAttachFileReference() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        // TODO: Pick a project with more child objects
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        Assert.assertNotNull(newArtifact);
+        Assert.assertNotNull(newArtifact.getOntologyIRI());
+        Assert.assertNotNull(newArtifact.getVersionIRI());
+        
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
+        this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
+        Model parseRdf = this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+                BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
+        
+        Model topObject = parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null);
+        
+        Assert.assertEquals("Did not find unique top object in artifact", 1, topObject.size());
+        
+        SSHFileReference testRef = new SSHFileReferenceImpl();
+        testRef.setArtifactID(newArtifact);
+        testRef.setParentIri(IRI.create(topObject.objectURI()));
+        //testRef.setFilename(filename);
+        testRef.setLabel("Client uploaded file reference number 42");
+        //testRef.setObjectIri(objectIri);
     }
     
     /**
@@ -145,7 +167,7 @@ public abstract class AbstractPoddClientTest
         // verify that the artifact is accessible and complete
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+        Model parseRdf = this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
                 BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
         Assert.assertTrue(this.testClient.deleteArtifact(newArtifact));
