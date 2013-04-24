@@ -16,6 +16,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.Timeout;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.model.Model;
 import org.openrdf.model.impl.LinkedHashModel;
@@ -54,6 +56,12 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class AbstractResourceImplTest
 {
+    /**
+     * Timeout tests after 1 minute.
+     */
+    @Rule
+    public Timeout timeout = new Timeout(60000);
+    
     /**
      * Determines the TEST_PORT number to use for the test server
      */

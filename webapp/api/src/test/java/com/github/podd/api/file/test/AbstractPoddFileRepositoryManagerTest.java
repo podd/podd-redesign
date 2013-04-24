@@ -415,7 +415,29 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     }
     
     @Test
-    public void testInitSuccess() throws Exception
+    public void testInitSuccessTest() throws Exception
+    {
+        // prepare: clean up any aliases that already exist
+        final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
+        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        connection.clear(fileRepositoryManagementGraph);
+        connection.close();
+        Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
+                .getAllAliases().size());
+        
+        try (final InputStream input = this.getClass().getResourceAsStream("/test/test-alias.ttl"))
+        {
+            this.testFileRepositoryManager.init(Rio.parse(input, "", RDFFormat.TURTLE));
+        }
+        
+        // verify:
+        final List<String> allAliases = this.testFileRepositoryManager.getAllAliases();
+        Assert.assertEquals("Expected 1 alias", 1, allAliases.size());
+        Assert.assertEquals("alias_local_ssh", allAliases.get(0));
+    }
+    
+    @Test
+    public void testInitSuccessDefault() throws Exception
     {
         // prepare: clean up any aliases that already exist
         final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
@@ -432,8 +454,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         
         // verify:
         final List<String> allAliases = this.testFileRepositoryManager.getAllAliases();
-        Assert.assertEquals("Expected 1 alias", 1, allAliases.size());
-        Assert.assertTrue("Expected alias is missing", allAliases.contains("alias_local_ssh"));
+        Assert.assertEquals("Expected 0 alias", 0, allAliases.size());
     }
     
     @Test

@@ -105,7 +105,8 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             // validate the default alias file against the File Repository configuration schema
             this.verifyFileRepositoryAgainstSchema(defaultAliasConfiguration);
             
-            final Model allAliases = defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
+            final Model allAliases =
+                    defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
             
             this.log.warn("Found {} default aliases to add", allAliases.size());
             
@@ -551,8 +552,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
      * @param mimeType
      * @throws FileRepositoryException
      */
-    private void verifyFileRepositoryAgainstSchema(final Model model)
-        throws FileRepositoryException
+    private void verifyFileRepositoryAgainstSchema(final Model model) throws FileRepositoryException
     {
         OWLOntology fileRepositoryOntology = null;
         OWLOntology defaultAliasOntology = null;
@@ -574,11 +574,9 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
         }
         catch(final PoddException | OpenRDFException | IOException e)
         {
-            e.printStackTrace();
-            
             final String msg = "Failed verification of the FileRepsitory against poddFileRepository.owl";
             this.log.error(msg, e);
-            throw new FileRepositoryIncompleteException(schemaModel, msg);
+            throw new FileRepositoryIncompleteException(schemaModel, msg, e);
         }
         finally
         {
@@ -610,11 +608,12 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
      * @throws FileRepositoryException
      *             If verification fails
      */
-    private OWLOntology checkForConsistentOwlDlOntology(final Model model)
-        throws EmptyOntologyException, OntologyNotInProfileException, InconsistentOntologyException
+    private OWLOntology checkForConsistentOwlDlOntology(final Model model) throws EmptyOntologyException,
+        OntologyNotInProfileException, InconsistentOntologyException
     {
         final RioRDFOntologyFormatFactory ontologyFormatFactory =
-                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(RDFFormat.RDFXML.getDefaultMIMEType());
+                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType());
         final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
         
         OWLOntology nextOntology = null;
@@ -632,10 +631,11 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
             throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
         }
         
-        if(nextOntology.isEmpty())
-        {
-            throw new EmptyOntologyException(nextOntology, "Ontology was empty");
-        }
+        // Repository configuration can be an empty ontology
+        // if(nextOntology.isEmpty())
+        // {
+        // throw new EmptyOntologyException(nextOntology, "Ontology was empty");
+        // }
         
         // verify that the ontology in OWL-DL profile
         final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(OWLProfile.OWL2_DL);
