@@ -53,9 +53,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTest
 {
-    @Rule
-    public final TemporaryFolder tempDirectory = new TemporaryFolder();
-    
     /** SSH File Repository server for tests */
     protected SSHService sshd;
     
