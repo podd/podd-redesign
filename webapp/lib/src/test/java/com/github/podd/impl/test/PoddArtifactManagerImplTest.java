@@ -25,6 +25,7 @@ import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.impl.file.FileReferenceManagerImpl;
+import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 
@@ -106,8 +107,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     @Override
     protected FileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new SSHFileReferenceProcessorFactoryImpl();
     }
     
     @Override
