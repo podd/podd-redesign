@@ -78,10 +78,12 @@ public class SSHFileReferenceProcessorFactoryImplTest extends
             
             // load RDF graph into Repository
             final String artifactResourcePath = TestConstants.TEST_ARTIFACT_PURLS_2_FILE_REFS;
-            final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);
-            Assert.assertNotNull("Could not find resource", inputStream);
+            try (final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);)
+            {
+                Assert.assertNotNull("Could not find resource", inputStream);
+                repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
+            }
             
-            repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
             repositoryConnection.commit();
             repositoryConnection.begin();
             
@@ -135,10 +137,12 @@ public class SSHFileReferenceProcessorFactoryImplTest extends
             
             // load RDF graph into Repository
             final String artifactResourcePath = TestConstants.TEST_ARTIFACT_PURLS_2_FILE_REFS;
-            final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);
-            Assert.assertNotNull("Could not find resource", inputStream);
+            try (final InputStream inputStream = this.getClass().getResourceAsStream(artifactResourcePath);)
+            {
+                Assert.assertNotNull("Could not find resource", inputStream);
+                repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
+            }
             
-            repositoryConnection.add(inputStream, "", RDFFormat.RDFXML);
             repositoryConnection.commit();
             repositoryConnection.begin();
             
