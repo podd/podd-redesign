@@ -187,6 +187,8 @@ public abstract class AbstractPoddClientTest
             testRef.setParentIri(IRI.create(topObject.objectURI()));
             // TODO: If this breaks then need to attach it to a different part of an extended project
             testRef.setObjectIri(IRI.create(topObject.objectURI()));
+            
+            this.testClient.attachFileReference(testRef);
         }
         finally
         {

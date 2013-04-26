@@ -4,27 +4,23 @@
 package com.github.podd.client.impl.restlet.test;
 
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.github.podd.client.api.test.AbstractPoddClientTest;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.data.CharacterSet;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Status;
 import org.restlet.resource.ClientResource;
 
 import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.FileReferenceConstants;
+import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.client.api.PoddClient;
+import com.github.podd.client.api.test.AbstractPoddClientTest;
 import com.github.podd.client.impl.restlet.RestletPoddClientImpl;
+import com.github.podd.impl.file.SSHFileReferenceImpl;
 import com.github.podd.impl.file.test.SSHService;
 
 /**
@@ -37,9 +33,11 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
 {
     @Rule
     public TemporaryFolder tempDirectory = new TemporaryFolder();
+    
     private SSHService sshd;
+    
     private Path tempFolder;
-    private Path tempFile;
+    private Map<String, Path> tempFiles = new ConcurrentHashMap<String, Path>();
     
     @Override
     protected PoddClient getNewPoddClientInstance()
@@ -64,10 +62,46 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
     }
     
     @Override
-    protected FileReference deployFileReference(String label)
+    protected FileReference deployFileReference(String label) throws Exception
     {
-        // TODO Auto-generated method stub
-        return null;
+        Path nextTempFile;
+        
+        if(tempFiles.containsKey(label))
+        {
+            nextTempFile = tempFiles.get(label);
+        }
+        else
+        {
+            nextTempFile = tempFolder.resolve("file-" + label.hashCode() + ".data");
+        }
+        
+        if(!Files.exists(nextTempFile))
+        {
+            // Put a file into the server for this file reference to ensure that it validates to a
+            // file
+            try (final InputStream testUploadedFile =
+                    this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");)
+            {
+                Files.createFile(nextTempFile);
+                
+                tempFiles.put(label, nextTempFile);
+                Files.copy(testUploadedFile, nextTempFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            catch(FileAlreadyExistsException e)
+            {
+                // Ignore, the file may have been created by another thread since we entered this
+                // block.
+            }
+        }
+        
+        SSHFileReference nextFileReference = new SSHFileReferenceImpl();
+        
+        nextFileReference.setPath(tempFolder.toAbsolutePath().toString());
+        nextFileReference.setFilename(nextTempFile.getFileName().toString());
+        nextFileReference.setRepositoryAlias("localssh");
+        nextFileReference.setLabel(label);
+        
+        return nextFileReference;
     }
     
     @Override
@@ -76,13 +110,9 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
         tempFolder = this.tempDirectory.newFolder().toPath();
         
         sshd = new SSHService();
-        
-        // Put a file into the server to ensure that it is not empty.
-        final InputStream testUploadedFile =
-                this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
-        
-        tempFile = Files.createTempFile(tempFolder, "basicProject-1", ".rdf");
-        Files.copy(testUploadedFile, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        // This is setup to match the "localssh" repository alias defined in
+        // src/main/resources/test-alias.ttl
+        sshd.TEST_SSH_SERVICE_PORT = 9856;
         
         sshd.startTestSSHServer(tempFolder);
     }
