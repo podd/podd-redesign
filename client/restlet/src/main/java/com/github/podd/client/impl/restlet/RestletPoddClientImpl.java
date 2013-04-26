@@ -105,6 +105,8 @@ public class RestletPoddClientImpl implements PoddClient
         final Representation rep =
                 new ReaderRepresentation(new StringReader(writer.toString()), RestletUtilMediaType.APPLICATION_RDF_JSON);
         
+        log.info("Attach file reference triples: {}", writer);
+        
         final Representation post = resource.post(rep, RestletUtilMediaType.APPLICATION_RDF_JSON);
         
         try

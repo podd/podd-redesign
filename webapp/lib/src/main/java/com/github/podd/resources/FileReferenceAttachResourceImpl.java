@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.FileReferenceVerificationPolicy;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
+import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
@@ -113,6 +114,14 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             log.error("File reference validation errors: {}", e.getValidationFailures());
             throw new ResourceException(Status.SERVER_ERROR_BAD_GATEWAY, "File reference(s) failed verification", e);
+        }
+        catch(OntologyNotInProfileException e)
+        {
+            log.error("The ontology was not suitable for our reasoner after the changes: {}", e.getProfileReport());
+            throw new ResourceException(
+                    Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Ontology was not consistent after the changes. Was the parent object correct before the submission.",
+                    e);
         }
         catch(OpenRDFException | PoddException | IOException | OWLException e)
         {
