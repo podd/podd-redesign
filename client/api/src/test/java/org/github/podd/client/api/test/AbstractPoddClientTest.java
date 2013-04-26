@@ -15,22 +15,21 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
-import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.client.api.PoddClient;
+import com.github.podd.client.api.PoddClientException;
 import com.github.podd.impl.file.SSHFileReferenceImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
@@ -44,8 +43,9 @@ public abstract class AbstractPoddClientTest
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private static final String TEST_ADMIN_PASSWORD = "testAdminPassword";
-    private static final String TEST_ADMIN_USER = "testAdminUser";
+    protected static final String TEST_ADMIN_PASSWORD = "testAdminPassword";
+    protected static final String TEST_ADMIN_USER = "testAdminUser";
+    
     private PoddClient testClient;
     
     /**
@@ -76,6 +76,42 @@ public abstract class AbstractPoddClientTest
      * these tests for extensive verification.
      */
     protected abstract void resetTestPoddServer();
+    
+    /**
+     * Instruct the implementors of this test to attempt to deploy a file reference that has the
+     * given label and return a partial FileReference object that contains the specific details of
+     * how and where the file reference is located.
+     * <p>
+     * The {@link FileReference#getArtifactID()}, {@link FileReference#getObjectIri()},
+     * {@link FileReference#getParentIri()}, and {@link FileReference#getParentPredicateIRI()}
+     * SHOULD not be populated, as they will be overwritten.
+     * <p>
+     * The {@link FileReference#getRepositoryAlias()} MUST be populated, and MUST match an alias
+     * returned from {@link PoddClient#listFileReferenceRepositories()}.
+     * <p>
+     * Successive calls with different labels must return distinct FileReferences.
+     * <p>
+     * Successive calls with the same label must return a FileReference containing the same
+     * essential details.
+     * 
+     * @param label
+     *            The label to give the file reference.
+     * @return A partially populated {@link FileReference} object.
+     */
+    protected abstract FileReference deployFileReference(String label);
+    
+    /**
+     * Any file repositories necessary to perform file reference attachment tests must be available
+     * after this method completes.
+     */
+    protected abstract void startFileRepositoryTest() throws Exception;
+    
+    /**
+     * Any file repositories that were made active for this test can now be shutdown.
+     * <p>
+     * For example, an SSH server created specifically for this test may be cleaned up and shutdown.
+     */
+    protected abstract void endFileRepositoryTest() throws Exception;
     
     /**
      * @throws java.lang.Exception
@@ -133,19 +169,22 @@ public abstract class AbstractPoddClientTest
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        Model parseRdf = this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
-                BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
+        Model parseRdf =
+                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
+                        BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
-        Model topObject = parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null);
+        Model topObject =
+                parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT,
+                        null);
         
         Assert.assertEquals("Did not find unique top object in artifact", 1, topObject.size());
         
         SSHFileReference testRef = new SSHFileReferenceImpl();
         testRef.setArtifactID(newArtifact);
         testRef.setParentIri(IRI.create(topObject.objectURI()));
-        //testRef.setFilename(filename);
+        // testRef.setFilename(filename);
         testRef.setLabel("Client uploaded file reference number 42");
-        //testRef.setObjectIri(objectIri);
+        // testRef.setObjectIri(objectIri);
     }
     
     /**
@@ -167,8 +206,9 @@ public abstract class AbstractPoddClientTest
         // verify that the artifact is accessible and complete
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        Model parseRdf = this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
-                BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
+        Model parseRdf =
+                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
+                        BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
         Assert.assertTrue(this.testClient.deleteArtifact(newArtifact));
     }
@@ -217,7 +257,7 @@ public abstract class AbstractPoddClientTest
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                 BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
     }
     
@@ -302,7 +342,7 @@ public abstract class AbstractPoddClientTest
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                 BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
         // Returns a new version, as when the artifact is published it gets a new version
@@ -361,7 +401,7 @@ public abstract class AbstractPoddClientTest
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
+        this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
                 BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
         final Collection<InferredOWLOntologyID> results = this.testClient.listUnpublishedArtifacts();
@@ -472,8 +512,9 @@ public abstract class AbstractPoddClientTest
         
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
         this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        final Model model = this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON, 
-                BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
+        final Model model =
+                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
+                        BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
         
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, newArtifact
