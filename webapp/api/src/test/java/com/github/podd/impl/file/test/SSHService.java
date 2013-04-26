@@ -79,7 +79,7 @@ import com.github.podd.impl.file.SSHFileReferenceImpl;
 public class SSHService
 {
     public static final String TEST_SSH_HOST = "localhost";
-    public int TEST_SSH_SERVICE_PORT;
+    public int TEST_SSH_SERVICE_PORT = -1;
     public static final String TEST_SSH_FINGERPRINT = "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db";
     public static final String TEST_SSH_USERNAME = "salt";
     public static final String TEST_SSH_SECRET = "salt";
@@ -176,7 +176,11 @@ public class SSHService
      */
     public int startTestSSHServer(final Path tempDirectory) throws Exception
     {
-        TEST_SSH_SERVICE_PORT = SSHService.getFreePort();
+        // Only find a free port if the port was not configured before this point
+        if(TEST_SSH_SERVICE_PORT <= 0)
+        {
+            TEST_SSH_SERVICE_PORT = SSHService.getFreePort();
+        }
         this.log.info("about to start the SSHD server on port: " + TEST_SSH_SERVICE_PORT);
         // this.server = SshServer.setUpDefaultServer();
         this.server = getTestServer();
