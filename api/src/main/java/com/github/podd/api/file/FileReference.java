@@ -5,6 +5,7 @@ package com.github.podd.api.file;
 
 import org.openrdf.model.Model;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.utils.InferredOWLOntologyID;
 
@@ -21,9 +22,9 @@ public interface FileReference
 {
     /**
      * 
-     * @return The {@link InferredOWLOntologyID} for the Artifact that includes this file reference.
+     * @return The {@link OWLOntologyID} for the Artifact that includes this file reference.
      */
-    InferredOWLOntologyID getArtifactID();
+    OWLOntologyID getArtifactID();
     
     /**
      * Returns the label that is assigned to this file reference.
@@ -62,10 +63,10 @@ public interface FileReference
     /**
      * 
      * @param artifactId
-     *            The {@link InferredOWLOntologyID} for the Artifact that includes this file
+     *            The {@link OWLOntologyID} for the Artifact that includes this file
      *            reference.
      */
-    void setArtifactID(InferredOWLOntologyID artifactId);
+    void setArtifactID(OWLOntologyID artifactId);
     
     /**
      * Sets a human readable label for this file reference.

@@ -177,18 +177,27 @@ public abstract class AbstractPoddClientTest
                             BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
             
             Model topObject =
-                    parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT,
-                            null);
+                    parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(),
+                            PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null);
             
             Assert.assertEquals("Did not find unique top object in artifact", 1, topObject.size());
             
             FileReference testRef = this.deployFileReference("test-file-label");
             testRef.setArtifactID(newArtifact);
             testRef.setParentIri(IRI.create(topObject.objectURI()));
-            // TODO: If this breaks then need to attach it to a different part of an extended project
+            // TODO: If this breaks then need to attach it to a different part of an extended
+            // project
             testRef.setObjectIri(IRI.create(topObject.objectURI()));
             
-            this.testClient.attachFileReference(testRef);
+            InferredOWLOntologyID afterFileAttachment = this.testClient.attachFileReference(testRef);
+            
+            Assert.assertNotNull(afterFileAttachment);
+            Assert.assertNotNull(afterFileAttachment.getOntologyIRI());
+            Assert.assertNotNull(afterFileAttachment.getVersionIRI());
+            
+            Assert.assertEquals(newArtifact.getOntologyIRI(), afterFileAttachment.getOntologyIRI());
+            // Version should have been updated by the operation
+            Assert.assertNotEquals(newArtifact.getVersionIRI(), afterFileAttachment.getVersionIRI());
         }
         finally
         {

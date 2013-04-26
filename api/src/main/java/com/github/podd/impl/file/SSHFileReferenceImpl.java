@@ -12,6 +12,7 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDFS;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -26,7 +27,7 @@ import com.github.podd.utils.PoddRdfConstants;
 public class SSHFileReferenceImpl implements SSHFileReference
 {
     
-    private InferredOWLOntologyID artifactID;
+    private OWLOntologyID artifactID;
     private String label;
     private IRI objectIri;
     private IRI parentIri;
@@ -44,7 +45,7 @@ public class SSHFileReferenceImpl implements SSHFileReference
     }
     
     @Override
-    public InferredOWLOntologyID getArtifactID()
+    public OWLOntologyID getArtifactID()
     {
         return this.artifactID;
     }
@@ -92,9 +93,16 @@ public class SSHFileReferenceImpl implements SSHFileReference
     }
     
     @Override
-    public void setArtifactID(InferredOWLOntologyID artifactID)
+    public void setArtifactID(OWLOntologyID artifactID)
     {
-        this.artifactID = artifactID;
+        if(artifactID instanceof InferredOWLOntologyID)
+        {
+            this.artifactID = ((InferredOWLOntologyID)artifactID).getBaseOWLOntologyID();
+        }
+        else
+        {
+            this.artifactID = artifactID;
+        }
     }
     
     @Override
@@ -170,7 +178,7 @@ public class SSHFileReferenceImpl implements SSHFileReference
         
         if(getArtifactID() != null)
         {
-            OntologyUtils.ontologyIDToRDF(getArtifactID().getBaseOWLOntologyID(), result);
+            OntologyUtils.ontologyIDToRDF(getArtifactID(), result);
         }
         
         if(getFilename() != null)
