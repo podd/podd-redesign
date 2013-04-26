@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.FileReferenceConstants;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.impl.file.SSHFileReferenceImpl;
@@ -82,6 +83,11 @@ public class RestletPoddClientImpl implements PoddClient
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
         resource.getCookies().addAll(this.currentCookies);
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, ref.getArtifactID().getOntologyIRI()
+                .toString());
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, ref.getArtifactID()
+                .getVersionIRI().toString());
+        resource.addQueryParameter(FileReferenceConstants.KEY_OBJECT_URI, ref.getObjectIri().toString());
         
         Model rdf = ref.toRDF();
         

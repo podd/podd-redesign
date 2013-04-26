@@ -31,6 +31,7 @@ import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.api.file.FileReferenceConstants;
 import com.github.podd.impl.file.test.SSHService;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * This integration test class validates the PODD-prototype web service operations.
@@ -196,7 +197,7 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
         // -- generate and send an attach request
         final Form form = new Form();
         form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
-        form.add(FileReferenceConstants.KEY_ARTIFACT_URI, artifactUri);
+        form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
         form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
         form.add(FileReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616");
@@ -266,7 +267,7 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
             // -- generate and send an attach request
             final Form form = new Form();
             form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "SSH");
-            form.add(FileReferenceConstants.KEY_ARTIFACT_URI, artifactUri);
+            form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
             form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
             form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "localssh");
             form.add(FileReferenceConstants.KEY_FILE_PATH, tempFolder.toAbsolutePath().toString());
@@ -326,7 +327,7 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
         // -- generate and send an attach request
         final Form form = new Form();
         form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
-        form.add(FileReferenceConstants.KEY_ARTIFACT_URI, artifactUri);
+        form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         // object URI is missing here
         form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
         form.add(FileReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616");
@@ -367,7 +368,7 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
         // -- generate and send an attach request
         final Form form = new Form();
         form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
-        form.add(FileReferenceConstants.KEY_ARTIFACT_URI, artifactUri);
+        form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
         form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
         form.add(FileReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616thisiswrong");
