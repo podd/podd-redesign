@@ -5,11 +5,7 @@ package com.github.podd.utils;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
@@ -165,25 +161,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
     
     public Model toRDF(Model result)
     {
-        ValueFactory vf = ValueFactoryImpl.getInstance();
-        
-        if(this.getOntologyIRI() != null)
-        {
-            result.add(vf.createStatement(this.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-            if(this.getVersionIRI() != null)
-            {
-                result.add(vf.createStatement(this.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-                result.add(vf.createStatement(this.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, this
-                        .getVersionIRI().toOpenRDFURI()));
-                if(this.getInferredOntologyIRI() != null)
-                {
-                    result.add(vf.createStatement(this.getInferredOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
-                    result.add(vf.createStatement(this.getVersionIRI().toOpenRDFURI(),
-                            PoddRdfConstants.PODD_BASE_INFERRED_VERSION, this.getInferredOntologyIRI().toOpenRDFURI()));
-                }
-            }
-        }
-        
-        return result;
+        return OntologyUtils.ontologyIDToRDF(this, result);
     }
+    
 }

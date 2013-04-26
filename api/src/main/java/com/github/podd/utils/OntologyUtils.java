@@ -10,7 +10,9 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
@@ -19,6 +21,7 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,5 +194,35 @@ public class OntologyUtils
         parser.parse(new StringReader(string), "");
         
         return OntologyUtils.modelToOntologyIDs(model);
+    }
+
+    public static Model ontologyIDToRDF(OWLOntologyID ontology, Model result)
+    {
+        ValueFactory vf = ValueFactoryImpl.getInstance();
+        
+        if(ontology.getOntologyIRI() != null)
+        {
+            result.add(vf.createStatement(ontology.getOntologyIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+            if(ontology.getVersionIRI() != null)
+            {
+                result.add(vf.createStatement(ontology.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
+                result.add(vf.createStatement(ontology.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, ontology
+                        .getVersionIRI().toOpenRDFURI()));
+                if(ontology instanceof InferredOWLOntologyID)
+                {
+                    InferredOWLOntologyID inferredOntology = (InferredOWLOntologyID)ontology;
+                    if(((InferredOWLOntologyID)inferredOntology).getInferredOntologyIRI() != null)
+                    {
+                        result.add(vf.createStatement(inferredOntology.getInferredOntologyIRI().toOpenRDFURI(),
+                                RDF.TYPE, OWL.ONTOLOGY));
+                        result.add(vf.createStatement(inferredOntology.getVersionIRI().toOpenRDFURI(),
+                                PoddRdfConstants.PODD_BASE_INFERRED_VERSION, inferredOntology.getInferredOntologyIRI()
+                                        .toOpenRDFURI()));
+                    }
+                }
+            }
+        }
+        
+        return result;
     }
 }

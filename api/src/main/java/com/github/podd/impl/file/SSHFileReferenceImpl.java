@@ -170,7 +170,7 @@ public class SSHFileReferenceImpl implements SSHFileReference
         
         if(getArtifactID() != null)
         {
-            OntologyUtils.ontologyIDsToModel(Arrays.asList(getArtifactID()), result);
+            OntologyUtils.ontologyIDToRDF(getArtifactID().getBaseOWLOntologyID(), result);
         }
         
         if(getFilename() != null)

@@ -5,6 +5,8 @@ package com.github.podd.impl;
 
 import info.aduna.iteration.Iterations;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -1112,8 +1115,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final FileReferenceVerificationPolicy fileReferenceVerificationPolicy) throws OpenRDFException,
         IOException, OWLException, PoddException
     {
-        return this.updateArtifact(artifactUri, versionUri, inputStream, format, UpdatePolicy.MERGE_WITH_EXISTING,
-                DanglingObjectPolicy.REPORT, fileReferenceVerificationPolicy);
+        Model model = Rio.parse(inputStream, "", format);
+        
+        model.removeAll(model.filter(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
+        
+        ByteArrayOutputStream output = new ByteArrayOutputStream(8192);
+        
+        Rio.write(model, output, RDFFormat.RDFJSON);
+        
+        return this.updateArtifact(artifactUri, versionUri, new ByteArrayInputStream(output.toByteArray()),
+                RDFFormat.RDFJSON, UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.REPORT,
+                fileReferenceVerificationPolicy);
     }
     
     @Override
