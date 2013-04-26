@@ -3,4 +3,4 @@
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
-package org.github.podd.client.api.test;
+package com.github.podd.client.api.test;

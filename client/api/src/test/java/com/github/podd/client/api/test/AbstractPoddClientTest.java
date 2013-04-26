@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.github.podd.client.api.test;
+package com.github.podd.client.api.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,10 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.client.api.PoddClient;
-import com.github.podd.client.api.PoddClientException;
-import com.github.podd.impl.file.SSHFileReferenceImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -43,8 +40,8 @@ public abstract class AbstractPoddClientTest
 {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    protected static final String TEST_ADMIN_PASSWORD = "testAdminPassword";
     protected static final String TEST_ADMIN_USER = "testAdminUser";
+    protected static final String TEST_ADMIN_PASSWORD = "testAdminPassword";
     
     private PoddClient testClient;
     
@@ -97,8 +94,10 @@ public abstract class AbstractPoddClientTest
      * @param label
      *            The label to give the file reference.
      * @return A partially populated {@link FileReference} object.
+     * @throws Exception
+     *             If there were any issues deploying a file reference for this label.
      */
-    protected abstract FileReference deployFileReference(String label);
+    protected abstract FileReference deployFileReference(String label) throws Exception;
     
     /**
      * Any file repositories necessary to perform file reference attachment tests must be available
@@ -158,33 +157,41 @@ public abstract class AbstractPoddClientTest
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
-        // TODO: Pick a project with more child objects
-        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
-        Assert.assertNotNull("Test resource missing", input);
-        
-        final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
-        Assert.assertNotNull(newArtifact);
-        Assert.assertNotNull(newArtifact.getOntologyIRI());
-        Assert.assertNotNull(newArtifact.getVersionIRI());
-        
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
-        this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
-        Model parseRdf =
-                this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
-                        BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
-        
-        Model topObject =
-                parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT,
-                        null);
-        
-        Assert.assertEquals("Did not find unique top object in artifact", 1, topObject.size());
-        
-        SSHFileReference testRef = new SSHFileReferenceImpl();
-        testRef.setArtifactID(newArtifact);
-        testRef.setParentIri(IRI.create(topObject.objectURI()));
-        // testRef.setFilename(filename);
-        testRef.setLabel("Client uploaded file reference number 42");
-        // testRef.setObjectIri(objectIri);
+        try
+        {
+            this.startFileRepositoryTest();
+            
+            // TODO: Pick a project with more child objects
+            final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+            Assert.assertNotNull("Test resource missing", input);
+            
+            final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+            Assert.assertNotNull(newArtifact);
+            Assert.assertNotNull(newArtifact.getOntologyIRI());
+            Assert.assertNotNull(newArtifact.getVersionIRI());
+            
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8096);
+            this.testClient.downloadArtifact(newArtifact, outputStream, RDFFormat.RDFJSON);
+            Model parseRdf =
+                    this.parseRdf(new ByteArrayInputStream(outputStream.toByteArray()), RDFFormat.RDFJSON,
+                            BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
+            
+            Model topObject =
+                    parseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT,
+                            null);
+            
+            Assert.assertEquals("Did not find unique top object in artifact", 1, topObject.size());
+            
+            FileReference testRef = this.deployFileReference("test-file-label");
+            testRef.setArtifactID(newArtifact);
+            testRef.setParentIri(IRI.create(topObject.objectURI()));
+            // TODO: If this breaks then need to attach it to a different part of an extended project
+            testRef.setObjectIri(IRI.create(topObject.objectURI()));
+        }
+        finally
+        {
+            this.endFileRepositoryTest();
+        }
     }
     
     /**
