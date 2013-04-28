@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcterms="http://purl.org/dc/terms/" 
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:ex="http://example.org/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:sioc="http://rdfs.org/sioc/ns#"
+	xmlns:podd="http://www.podd.org/poddModel#" 
+    version="XHTML+RDFa 1.0">
+	<head>
+		<title>PODD Test Page</title>
+	    <link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-smoothness.css" media="screen" type="text/css" />
+		<script type="text/javascript">
+		// setup the global oas namespace and subnamespaces
+		oas = {};
+		oas.rdf = {};
+		oas.autocomplete = {};
+		oas.ontology = {};
+		String.prototype.htmlescape = function () { return this.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;");};
+		</script>
+		
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
+
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.core.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.widget.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.core.js"></script>
+
+		<!-- Dependencies for rdfquery -->
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdfquery.rules-1.1-SNAPSHOT.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdf.turtle.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.bounce.js"></script>
+		
+		<!-- Dependencies for autocomplete -->
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.mouse.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.position.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.selectable.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.resizable.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.sortable.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.button.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.dialog.js"></script>
+	    
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.autocomplete.js"></script>
+
+		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script>
+
+		<!-- Dependencies for jstree -->
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.hotkeys.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.cookie.js"></script>
+	    
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.jstree.js"></script>
+
+	</head>
+	<body class="testpage">
+	    <h1>PODD Test Page</h1>
+	
+		File name:<input id="in1File" type="text" cols="30" value=""><br>
+		Random:   <input id="in2Random" type="text" cols="30" value=""><br>
+		Platform:  <input id="in4" type="text" cols="30" value="">
+		<input id="in3" type="hidden" cols="30" value=""><br>
+		<br>
+		<button id="btn1">Button 1</button>
+		<button id="btn2">Ajax Test</button>
+		<button id="btn4">Clear Message</button>
+    	<br>
+		<p id="message1">Message should come here</p>
+
+	</body>
+</html>
