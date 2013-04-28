@@ -1370,7 +1370,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final StringBuilder sb = new StringBuilder();
         
         sb.append("CONSTRUCT { ");
-        sb.append(" ?uri <" + RDF.TYPE.stringValue() + "> ?label ");
+        sb.append(" ?uri <" + RDFS.LABEL.stringValue() + "> ?label ");
         sb.append(" } WHERE { ");
         
         // limit the "types" of objects to search for
