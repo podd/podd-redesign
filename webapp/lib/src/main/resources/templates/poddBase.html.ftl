@@ -47,6 +47,13 @@
     <link rel="stylesheet" href="${baseUrl}/resources/styles/podd-colours.css" media="screen" type="text/css" />
     <link rel="icon" href="${baseUrl}/resources/images/podd.ico" type="image/png" />
     <link rel="shortcut icon" href="${baseUrl}/resources/images/podd_ico.png" type="image/png" />
+    
+    <script type="text/javascript">
+		// setup the global PODD object
+		podd = {};
+		podd.baseUrl = "${baseUrl}";
+	</script>
+    
 </head>
 
 <body>

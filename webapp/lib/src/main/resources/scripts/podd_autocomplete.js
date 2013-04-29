@@ -253,20 +253,32 @@ oas.autocomplete.constructAutocomplete = function()
   }
 
   /*
-     Call a remote web service using AJAX, parse the RDF response to a JSON array 
-     and set to the autocomplete data.
+     Call Search Ontology Resource Service using AJAX, convert the RDF response to a JSON array 
+     and set to the array as autocomplete data.
    */
-  function autoCompleteCallback(/* object with 'term'*/ request, /* function */ response) {
-    var requestUrl = 'http://localhost:8080/static/results/result3.rdf?searchterm=' + request.term;
+  function autoCompleteCallback(/* object with 'search term' */ request, /* function */ response) {
+    
+	requestUrl = podd.baseUrl + '/search';  
+	
+	// var requestUrl2 = 'http://localhost:8080/static/results/result3.rdf?searchterm=' + request.term;
 
-    $.get(requestUrl, function(data){
-        var formattedData = parsesearchresults(requestUrl, data);
-        //console.debug(data.toString());
-        //console.debug(formattedData);
-	response(formattedData);
-      }
+	queryParams = { 
+			searchterm: request.term, 
+			artifacturi: 'http://purl.org/podd/basic-2-20130206/artifact:1',
+			searchtypes: 'http://purl.org/podd/ns/poddScience#Platform' 
+	};
+	
+    // console.debug('Request: ' + requestUrl);
+    
+    $.get(requestUrl, queryParams,
+    	function(data){
+    	    console.debug('Response: ' + data.toString());
+	        var formattedData = parsesearchresults(requestUrl, data);
+	        //console.debug(formattedData);
+	        response(formattedData);
+    	},
+    	'json'
     );
-
   }
 
   /*
@@ -280,9 +292,9 @@ oas.autocomplete.constructAutocomplete = function()
     var rdfSearchResults = nextDatabank.load(data);
 	
     // console.debug("About to create query");
-	var bookQuery = $.rdf({ databank: nextDatabank })
+	var myQuery = $.rdf({ databank: nextDatabank })
 	    .where('?pUri <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel');
-	var bindings = bookQuery.select();	
+	var bindings = myQuery.select();	
 	
     var nodeChildren = [];
     $.each(bindings, function(index, value)
@@ -293,7 +305,8 @@ oas.autocomplete.constructAutocomplete = function()
 
             nodeChildren.push(nextChild);
         });
-        
+    // TODO: Sort based on weights for properties
+    
     return nodeChildren;
   };
 
@@ -309,13 +322,12 @@ $(document).ready(function() {
     minLength: 2, //minimum length to trigger autocomplete 
     source: autoCompleteCallback, 
     select: function( event, ui ) {
-	console.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
-	$( '#in3' ).val( ui.item.value );
-	$( '#in4' ).val( ui.item.label );
-	$( '#message1' ).html( 'Selected : ' + ui.item.value );
+    	console.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
+    	$( '#in3' ).val( ui.item.value );
+    	$( '#in4' ).val( ui.item.label );
+    	$( '#message1' ).html( 'Selected : ' + ui.item.value );
         return false;
      }
-
   });
 
   $("#in1File").blur(doBlur);
