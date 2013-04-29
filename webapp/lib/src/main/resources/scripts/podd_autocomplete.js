@@ -219,7 +219,7 @@ oas.autocomplete.constructAutocomplete = function()
 
   /* Display a message on leaving text field */
   function doBlur(){
-    $("#message1").html("File name set to: <b>" + $("#in1File").val() + "</b>"); 
+    $("#message1").html("File name set to: <b>" + $("#in1File").val() + "</b>");
   }
 
   /*
@@ -261,11 +261,16 @@ oas.autocomplete.constructAutocomplete = function()
 	requestUrl = podd.baseUrl + '/search';  
 	
 	// var requestUrl2 = 'http://localhost:8080/static/results/result3.rdf?searchterm=' + request.term;
+	var artifactUri = $('#podd_artifact').attr('href');
+	var searchTypes = $('#podd_type').attr('value');
+	
+	console.debug('Searching artifact: "' + artifactUri + '" for searchTypes: "' + searchTypes + '" for search term: "'
+			+ request.term + '".');
 
 	queryParams = { 
 			searchterm: request.term, 
-			artifacturi: 'http://purl.org/podd/basic-2-20130206/artifact:1',
-			searchtypes: 'http://purl.org/podd/ns/poddScience#Platform' 
+			artifacturi: artifactUri,
+			searchtypes: searchTypes 
 	};
 	
     // console.debug('Request: ' + requestUrl);

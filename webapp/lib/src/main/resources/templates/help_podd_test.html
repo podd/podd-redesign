@@ -34,10 +34,24 @@
 
 	    <h3>Test Auto Complete Functionality</h3>
 		<br>
+		<div class='podd_artifact' resource='http://purl.org/podd/basic-2-20130206/artifact:1'>The artifact contains
+			<span property="http://purl.org/podd/ns/poddBase#artifactHasTopObject">
+				<span class='podd_object' resource='http://purl.org/podd/basic-1-20130206/object:2966'>the PODD object 
+					<span value='http://www.w3.org/2000/01/rdf-schema#label'>Project#2012-0006_ Cotton Leaf Morphology</span>.
+				</span>
+			</span>
+		</div> 
+		<br>
+		
+		<p>
+		This page is about artifact <a id='podd_artifact' href='http://purl.org/podd/basic-2-20130206/artifact:1'>A</a> and
+		object <a id='podd_object' href='http://purl.org/podd/basic-1-20130206/object:2966'>Project#2013-0006</a><br>
+		</p>
 		
 		File name:<input id="in1File" type="text" cols="30" value=""><br>
 		Random:   <input id="in2Random" type="text" cols="30" value=""><br>
-		Platform:  <input class="autocomplete" id="in4" type="text" cols="30" value="">
+		<span id='podd_type' value='http://purl.org/podd/ns/poddScience#Platform'>Platform:</span>
+		  <input class="autocomplete" id="in4" type="text" cols="30" value="">
 		<input id="in3" type="hidden" cols="30" value=""><br>
 		<br>
 		<button id="btn1">Button 1</button>
