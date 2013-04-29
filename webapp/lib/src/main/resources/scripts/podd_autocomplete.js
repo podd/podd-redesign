@@ -317,7 +317,7 @@ oas.autocomplete.constructAutocomplete = function()
 $(document).ready(function() {
 
   // auto complete 1
-  $( "#in4" ).autocomplete({ 
+  $( ".autocomplete" ).autocomplete({ 
     delay: 500, //milliseconds
     minLength: 2, //minimum length to trigger autocomplete 
     source: autoCompleteCallback, 
