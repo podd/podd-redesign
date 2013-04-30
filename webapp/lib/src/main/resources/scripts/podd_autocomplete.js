@@ -207,6 +207,21 @@ oas.autocomplete.constructAutocomplete = function()
 
 // --------------------------------
 
+  /* Manually created fragment for submission into edit artifact service */
+  var nextDatabank = $.rdf.databank()
+	.base('http://purl.org/podd/basic-2-20130206/artifact:1')
+	.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
+	.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+	.prefix('owl', 'http://www.w3.org/2002/07/owl#')
+	.prefix('poddScience', 'http://purl.org/podd/ns/poddScience#')
+	.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+	.add('<genotype33> rdf:type poddScience:Genotype .')
+	.add('<genotype33> rdf:type owl:NamedIndividual .')
+	.add('<genotype33> rdfs:label "Genotype 33" .')
+	.add('<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> poddScience:hasGenotype <genotype33> .')
+
+  var theMessageBox = '#message1';
+	
   /* Display a Message */
   function displayMessage(event){
     var messageBox = event.data.param1;
@@ -219,37 +234,48 @@ oas.autocomplete.constructAutocomplete = function()
 
   /* Display a message on leaving text field */
   function doBlur(){
-    $("#message1").html("File name set to: <b>" + $("#in1File").val() + "</b>");
+    $('#message1').html('The value of field "' + $(this).attr('id') +  '" was set to: "<b>' + $(this).val() + '</b>".');
   }
+  
+  /* Invoke the Edit PODD Artifact Service with the modified RDF triples */
+  function updateArtifact(){
+	console.debug('inside doUpdate()');
+	  
+	requestUrl = podd.baseUrl + '/artifact/edit';  
 
-  /*
-   Retrieve a static RDF file from the server, send it through parsesearchresults() and
-   display results in a paragraph.
-   set its values into array that can be used in autocomplete()
-  */
-  function doProcess(event){
+	
+	var artifactUri = $('#podd_artifact').val();
+	var versionUri = $('#podd_artifact_version').val();
+	var modifiedTriples = $.toJSON(nextDatabank.dump({format: 'application/json'})); 
+	
+	console.debug('Updating artifact: "' + artifactUri + '" version: "' + versionUri + '" .');
+    console.debug('The content: ' + modifiedTriples);
 
-    var fileToRequest = event.data.param1;
-    var randomVal = event.data.param2;
-
-    console.debug('/* Requesting file "' + fileToRequest + '" with random value "' + randomVal + '" */');
-
-    var requestUrl = "results/" + fileToRequest + "?q=" + randomVal;
-
-    $.get(requestUrl, onGetSuccess);
-    
-  }
-
-  function onGetSuccess(data) {
-    console.debug('AJAX Get succeeded');
-    var list = oas.rdf.parsesearchresults('this.url', data);
-
-    $("#message1").text('');  
-    $.each(list, function(index, value) {
-    	$('#message1').append(' [' + value.label + '] = <i>' + value.value + '</i><br>');	
+    // set query parameters in the URI as setting them under data failed, mostly leading to a 415 error
+	requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactUri)
+				+ '&versionuri='  + encodeURIComponent(versionUri)
+				+ '&isforce=true';
+	console.debug('Request (POST):  ' + requestUrl);
+	
+    $.ajax({
+    	url: requestUrl,
+    	type: 'POST',
+    	data: modifiedTriples,
+    	contentType: 'application/rdf+json', // what we're sending
+    	dataType: 'json', // what is expected back
+    	success: function(resultData, status, xhr){
+    		console.debug('########## SUCCESS###### ' + resultData);
+    		console.debug(xhr.responseText);
+    		$(theMessageBox).html('<i>Successfully edited artifact.</i><br><p>' +
+    				xhr.responseText + '</p><br>');
+    	},
+    	error: function(xhr,status,error){
+    		console.debug('$$$$$ ERROR $$$$$ ' + error);
+    		console.debug(xhr.statusText);
+    	}
     });
-
-    return list;
+    
+    
   }
 
   /*
@@ -260,8 +286,7 @@ oas.autocomplete.constructAutocomplete = function()
     
 	requestUrl = podd.baseUrl + '/search';  
 	
-	// var requestUrl2 = 'http://localhost:8080/static/results/result3.rdf?searchterm=' + request.term;
-	var artifactUri = $('#podd_artifact').attr('href');
+	var artifactUri = $('#podd_artifact').val();
 	var searchTypes = $('#podd_type').attr('value');
 	
 	console.debug('Searching artifact: "' + artifactUri + '" for searchTypes: "' + searchTypes + '" for search term: "'
@@ -335,11 +360,11 @@ $(document).ready(function() {
      }
   });
 
-  $("#in1File").blur(doBlur);
+  $(".short_text").blur(updateArtifact);
 
   $('#btn1').click({param1: '#message1', param2: 'Button 1 clicked'}, displayMessage);
 
-  $('#btn2').click({param1: $("#in1File").val() , param2: $("#in2Random").val()}, doProcess);
+  // $('#btn2').click({param1: $("#in1").val() , param2: $("#in2Random").val()}, doProcess);
 
   $('#btn4').click({param1: '#message1', param2: '[Message]'}, displayMessage);
 
