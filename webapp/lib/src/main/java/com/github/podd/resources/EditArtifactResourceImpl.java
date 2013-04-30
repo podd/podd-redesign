@@ -72,7 +72,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     /**
      * Handle an HTTP POST request submitting RDF data to update an existing artifact
      */
-    @Post("rdf|rj|ttl")
+    @Post("rdf|rj|json|ttl")
     public Representation editArtifactToRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
@@ -92,24 +92,29 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
         }
         
-        
+        // - optional parameter 'isreplace'
         UpdatePolicy updatePolicy = UpdatePolicy.REPLACE_EXISTING;
         final String isReplaceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_REPLACE);
-        if (isReplaceStr != null)
+        if (isReplaceStr != null && (Boolean.valueOf(isReplaceStr) == false))
         {
-            if (Boolean.valueOf(isReplaceStr) == false)
-            {
-                updatePolicy = UpdatePolicy.MERGE_WITH_EXISTING;
-            }
+            updatePolicy = UpdatePolicy.MERGE_WITH_EXISTING;
         }
         
-        boolean force = false;
+        // - optional parameter 'isforce'
+        DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
         final String forceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_FORCE);
-        if (forceStr != null)
+        if (forceStr != null && Boolean.valueOf(forceStr))
         {
-            force = Boolean.valueOf(forceStr);
+            danglingObjectPolicy = DanglingObjectPolicy.FORCE_CLEAN;
         }
         
+        // - optional parameter 'verifyfilerefs'
+        FileReferenceVerificationPolicy fileRefVerificationPolicy = FileReferenceVerificationPolicy.DO_NOT_VERIFY;
+        final String fileRefVerifyStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES);
+        if (fileRefVerifyStr != null && Boolean.valueOf(fileRefVerifyStr))
+        {
+            fileRefVerificationPolicy = FileReferenceVerificationPolicy.VERIFY;
+        }
         
         this.log.info("requesting edit artifact ({}): {}, with isReplace {}", variant.getMediaType().getName(),
                 artifactUri, updatePolicy);
@@ -130,7 +135,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
         }
-        RDFFormat inputFormat = Rio.getParserFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
+        RDFFormat inputFormat = Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
         
         // - prepare response
         ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
@@ -144,7 +149,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             final InferredOWLOntologyID ontologyID =
                     this.getPoddArtifactManager().updateArtifact(ValueFactoryImpl.getInstance().createURI(artifactUri),
                             ValueFactoryImpl.getInstance().createURI(versionUri),
-                            inputStream, inputFormat, updatePolicy, DanglingObjectPolicy.FORCE_CLEAN, FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                            inputStream, inputFormat, updatePolicy, danglingObjectPolicy, fileRefVerificationPolicy);
             //TODO - send detailed errors for display where possible
             
             // FIXME Change response format so that it does not resemble an empty OWL Ontology

@@ -209,6 +209,45 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
+     * NOTE: The expected 500 error causes a stacktrace to be printed on the server 
+     */
+    @Test
+    public void testErrorEditArtifactTurtleWithReportDanglingObjects() throws Exception
+    {
+        // prepare: add an artifact
+        final InferredOWLOntologyID artifactID =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                .getOntologyIRI().toString());
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                .getVersionIRI().toString());
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(false));
+        
+        // edit Representation contains statements in Turtle format
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION,
+                        MediaType.APPLICATION_RDF_TURTLE);
+        
+        try
+        {
+            RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                    MediaType.APPLICATION_RDF_TURTLE, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+            Assert.fail("Should have failed when dangling objects were identified");
+        }
+        catch (ResourceException e)
+        {
+            Assert.assertEquals(Status.SERVER_ERROR_INTERNAL, e.getStatus());
+            //the cause is not available to the client for verification
+        }
+    }
+    
+    
+    /**
      * Test viewing the edit HTML page for an internal PODD object.
      */
     @Test
