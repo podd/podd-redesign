@@ -34,6 +34,13 @@
 
 	    <h3>Test Auto Complete Functionality</h3>
 		<br>
+		<br>
+		<div>
+			Project (Artifact) IRI: <input class='noaction' id='podd_artifact' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1'><br>
+			<button id="btn2">Retrieve Artifact</button><br>
+		</div>
+		<br><br>
+		
 		<div class='podd_artifact' resource='http://purl.org/podd/basic-2-20130206/artifact:1'>The artifact contains
 			<span property="http://purl.org/podd/ns/poddBase#artifactHasTopObject">
 				<span class='podd_object' resource='http://purl.org/podd/basic-1-20130206/object:2966'>the PODD object 
@@ -43,23 +50,24 @@
 		</div> 
 		<br>
 		
-		<p>
-		Artifact URI: <input class='noaction' id='podd_artifact' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1'><br>
+		<div>
 		Version URI: <input class='noaction' id='podd_artifact_version' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1:version:1'><br>
-		PODD Object: <input class='noaction' id='podd_object' cols='60' value='http://purl.org/podd/basic-1-20130206/object:2966'><br>
-		</p>
+		Object URI:&nbsp; <input class='noaction' id='podd_object' cols='60' value='http://purl.org/podd/basic-1-20130206/object:2966'><br>
+		</div>
+		<br><br>
 		
-		<span property=''>Input: <input class="short_text" id="in1" type="text" cols="30" value=""></span><br>
+		<span property=''>Auto Update: <input class="short_text_XXXXX" id="in1" type="text" cols="30" value=""></span><br>
 		
-		Random:   <input class="short_text" id="in2Random" type="text" cols="30" value=""><br>
-		
+		<!-- Random:   <input class="short_text" id="in2Random" type="text" cols="30" value="">-->
+		<br>
+		 
 		<span id='podd_type' value='http://purl.org/podd/ns/poddScience#Platform'>Platform:</span>
 		  <input class="autocomplete" id="in4" type="text" cols="30" value="">
 		<input id="in3" type="hidden" cols="30" value=""><br>
 		<br>
-		<button id="btn1">Button 1</button>
-		<button id="btn2">Ajax Test</button>
-		<button id="btn4">Clear Message</button>
     	<br>
-		<p id="message1">Message should come here</p>
-
+    	<div>
+			<p id="message1">Message should come here</p><br>
+			<button id="btn4">Clear Message</button>
+			<button id="btn1">Test Button</button>
+		</div>
