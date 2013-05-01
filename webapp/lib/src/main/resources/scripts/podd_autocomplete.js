@@ -210,19 +210,19 @@ oas.autocomplete.constructAutocomplete = function() {
 // --------------------------------
 
 /* Manually created fragment for submission into edit artifact service */
-var nextDatabank = $.rdf
-		.databank()
-		.base('http://purl.org/podd/basic-2-20130206/artifact:1')
-		.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
-		.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-		.prefix('owl', 'http://www.w3.org/2002/07/owl#')
-		.prefix('poddScience', 'http://purl.org/podd/ns/poddScience#')
-		.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
-		.add('<genotype33> rdf:type poddScience:Genotype .')
-		.add('<genotype33> rdf:type owl:NamedIndividual .')
-		.add('<genotype33> rdfs:label "Genotype 33" .')
-		.add(
-				'<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> poddScience:hasGenotype <genotype33> .')
+var nextDatabank = $.rdf.databank();
+
+//		.base('http://purl.org/podd/basic-2-20130206/artifact:1')
+//		.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
+//		.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+//		.prefix('owl', 'http://www.w3.org/2002/07/owl#')
+//		.prefix('poddScience', 'http://purl.org/podd/ns/poddScience#')
+//		.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+//		.add('<genotype33> rdf:type poddScience:Genotype .')
+//		.add('<genotype33> rdf:type owl:NamedIndividual .')
+//		.add('<genotype33> rdfs:label "Genotype 33" .')
+//		.add(
+//				'<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> poddScience:hasGenotype <genotype33> .')
 
 var theMessageBox = '#message1';
 
@@ -237,7 +237,7 @@ function displayMessage(event) {
 
 /* Display a message on leaving text field */
 function doBlur() {
-	$('#message1').html(
+	$(theMessageBox).html(
 			'The value of field "' + $(this).attr('id') + '" was set to: "<b>'
 					+ $(this).val() + '</b>".');
 }
@@ -249,16 +249,48 @@ function getArtifact() {
 	var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
 	console.debug('The Request will go to: ' + requestUrl);
+	$.ajax({
+		url : requestUrl,
+		type : 'GET',
+		//dataType : 'application/rdf+xml', // what is expected back
+		success : function(resultData, status, xhr) {
+			console.debug('########## SUCCESS ###### ' + resultData);
+			nextDatabank = nextDatabank.load(resultData);
+			console.debug('' + nextDatabank);
+			$(theMessageBox).html(
+					'<i>Successfully retrieved artifact.</i><br>');
+		},
+		error : function(xhr, status, error) {
+			console.debug(status + ' $$$$$ ERROR $$$$$ ' + error);
+			//console.debug(xhr.statusText);
+		}
+	});
+	
 }
 
 /* Invoke the Edit PODD Artifact Service with the modified RDF triples */
-function updateArtifact() {
+function updateArtifact(isNew, property, newValue, oldValue) {
 	console.debug('inside updateArtifact()');
-
+	
 	requestUrl = podd.baseUrl + '/artifact/edit';
 
 	var artifactUri = $('#podd_artifact').val();
 	var versionUri = $('#podd_artifact_version').val();
+	
+	var topObject = '<http://purl.org/podd/basic-1-20130206/object:2966>';
+	
+	console.debug('Databank before add:' + nextDatabank);
+	
+	if (!isNew) {
+		nextDatabank.remove(topObject + ' ' + property + ' ' + oldValue);
+	}
+	
+	triple = topObject + ' ' + property + ' ' + newValue;
+	nextDatabank.add(triple);
+	//nextDatabank.add(topObject + ' <http://www.w3.org/2000/01/rdf-schema#label> "' + updatedValue + '"');
+	
+	console.debug('Databank after add:' + nextDatabank);
+	
 	var modifiedTriples = $.toJSON(nextDatabank.dump({
 		format : 'application/json'
 	}));
@@ -383,9 +415,28 @@ $(document).ready(
 							$('#message1').html('Selected : ' + ui.item.value);
 							return false;
 						}
-					});
+			});
 
-			$(".short_text").blur(updateArtifact);
+			// update the project title
+			$(".short_text").blur(function(){
+				var isNewTriple = false;
+				var parent = '';
+				var property = '<' + $(this).attr('property') + '>';
+				var oldValue = '"Project#2012-0006_ Cotton Leaf Morphology"'
+				var newValue = '"' + $(this).val() + '"';
+				console.debug(' property: "' + property + '" value: ' + newValue);
+				updateArtifact(isNewTriple, property, newValue, oldValue);
+			});
+			
+			// add a new Platform
+			$(".autocomplete").blur(function(){
+				var parent = '';
+				var isNewTriple = true;
+				var property = '<' + $(this).attr('property') + '>';
+				var value = '<' + $('#in3').val() + '>';
+				console.debug(' property: ' + property + ' value: ' + value);
+				updateArtifact(isNewTriple, property, value);
+			});
 
 			$('#btn1').click({
 				param1 : '#message1',

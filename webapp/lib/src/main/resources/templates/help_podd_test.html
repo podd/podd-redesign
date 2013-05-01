@@ -56,13 +56,15 @@
 		</div>
 		<br><br>
 		
-		<span property=''>Auto Update: <input class="short_text_XXXXX" id="in1" type="text" cols="30" value=""></span><br>
+		<span property=''>Edit Project Title: <input class="short_text"
+			property="http://www.w3.org/2000/01/rdf-schema#label" 
+			id="in1" type="text" cols="60" value="Enter Project Title"></span><br>
 		
 		<!-- Random:   <input class="short_text" id="in2Random" type="text" cols="30" value="">-->
 		<br>
 		 
-		<span id='podd_type' value='http://purl.org/podd/ns/poddScience#Platform'>Platform:</span>
-		  <input class="autocomplete" id="in4" type="text" cols="30" value="">
+		<span id='podd_type' value='http://purl.org/podd/ns/poddScience#Platform'>Add Platform:</span>
+		  <input class="autocomplete" property="http://purl.org/podd/ns/poddScience#hasPlatform" id="in4" type="text" cols="30" value="">
 		<input id="in3" type="hidden" cols="30" value=""><br>
 		<br>
     	<br>
