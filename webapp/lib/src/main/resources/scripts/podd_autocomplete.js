@@ -342,20 +342,30 @@ function updateArtifact(isNew, property, newValue, oldValue) {
 	var versionUri = $('#podd_artifact_version').val();
 	console.debug('[updateArtifact] artifact details: "' + artifactUri + '" version: "'	+ versionUri + '" .');
 	
-	var topObject = '<http://purl.org/podd/basic-1-20130206/object:2966>';
-	
 	debugPrintDatabank(nextDatabank, '[updateArtifact] Databank at start:');
+
+	// - find the topObject URI
+	var topObject = ''; //'<http://purl.org/podd/basic-1-20130206/object:2966>';
+	
+	var myQuery = $.rdf({
+		databank : nextDatabank
+	})
+	.where('?artifact poddBase:artifactHasTopObject ?topObject')
+	var bindings = myQuery.select();
+
+	$.each(bindings, function(index, value) {
+		topObject = value.topObject.value;
+	});
+
 	
 	if (!isNew) {
-//		tripleToRemove = topObject + ' ' + property + ' ' + oldValue;
-//		pattern = $.rdf.triple(topObject, property, oldValue);
-//		nextDatabank.remove(pattern);
-		deleteProjectTitle2(nextDatabank);
+		//deleteProjectTitle4(nextDatabank);
+	    deleteTriples(nextDatabank, '<' + topObject + '>', 'rdfs:label');
 		debugPrintDatabank(nextDatabank,
 				'[updateArtifact] Databank after removing: ' + nextDatabank.size());
 	}
 	
-	triple = topObject + ' ' + property + ' ' + newValue;
+	triple = '<' + topObject + '>' + ' ' + property + ' ' + newValue;
 	nextDatabank.add(triple);
 	
 	debugPrintDatabank(nextDatabank, '[updateArtifact] Databank after adding new triple:');
@@ -516,46 +526,45 @@ function getProjectTitle(nextDatabank) {
 };
 
 /* 
- * Remove the specified pattern from the databank.
- * 
- * TODO: when query contains multiple triples per binding, decide which
- * triple to delete. One option is to pass in details of triple to delete so that 
- * there is only one where() and that can be deleted.
- * 
+ * Remove the "project title" from the databank.
  */
-function deleteProjectTitle2(nextDatabank) {
-	console.debug('[deleteTriple2] start');
+function deleteProjectTitle4(nextDatabank) {
+	console.debug('[deleteProjectTitle4] start');
 	
+	var myQuery = $.rdf({
+		databank : nextDatabank
+	})
+	.where('?artifact poddBase:artifactHasTopObject ?topObject')
+	.where('?topObject rdfs:label ?projectTitle');
+	var bindings = myQuery.select();
+
+	$.each(bindings, function(index, value) {
+		var topObjectUri = value.topObject.value;
+	    console.debug('[deleteProjectTitle4] The topObject = ' + topObjectUri); 
+	    
+	    deleteTriples(nextDatabank, '<' + topObjectUri + '>', 'rdfs:label');
+	});
+	
+	console.debug('[deleteProjectTitle4] end');
+}
+
+
+/* 
+ * Removes triples in the given databank that match the specified subject and property.
+ * All parameters are mandatory.  
+ */
+function deleteTriples(nextDatabank, subject, property) {
 	$.rdf({
 		databank : nextDatabank
 	})
- 	  .where('?artifact poddBase:artifactHasTopObject ?topObject')
-	  .where('?topObject rdfs:label ?projectTitle')
+ 	  .where(subject + ' ' + property + ' ?object')
 	  .sources()
-	  .each(function (index, tripleArray) {
-	    console.debug('[deleteTriple2] The triple = ' + tripleArray[0]); 
-	    console.debug('[deleteTriple2] The triple = ' + tripleArray[1]);
-	    
-	    // test: iterate through array
-	    $.each(tripleArray, function(index2, triple) {
-	    	console.debug('[deleteTriple2] property = ' + triple.property);
-	    	
-//	    	sqSize = $.rdf()
-//	    	.add(triple)
-//	    	.where('?p rdfs:label ?value').select().size();
-//	    	console.debug('[deleteTriple2] sub-query result size = ' + sqSize);
-//	    	
-	    });
-	    
-	    
-	    // This may delete wrong triple if the order is not guaranteed!
-	    try{
-	    	nextDatabank.remove(this[1]);
-	    }catch (err) {
-	    	console.debug(err);
-	    }
-	  });
-	console.debug('[deleteTriple2] end');
+	  .each(
+			function(index, tripleArray) {
+				console.debug('[deleteTriple] object to delete = '
+						+ tripleArray[0]);
+				nextDatabank.remove(tripleArray[0]);
+			});
 }
 
 
@@ -599,7 +608,7 @@ $(document).ready(
 				var property = '<' + $(this).attr('property') + '>';
 				var oldValueFormatted = '"' + $('#in1Hidden').val() + '"'; 
 				var newValueFormatted = '"' + $(this).val() + '"';
-				console.debug('Change property: <' + property + '> from ' + oldValueFormatted + '" to ' + newValueFormatted + '.');
+				console.debug('Change property: ' + property + ' from ' + oldValueFormatted + ' to ' + newValueFormatted + '.');
 				updateArtifact(isNewTriple, property, newValueFormatted, oldValueFormatted);
 			});
 			
