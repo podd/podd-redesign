@@ -211,7 +211,6 @@ oas.autocomplete.constructAutocomplete = function() {
 
 /* Manually created fragment for submission into edit artifact service */
 var nextDatabank = $.rdf.databank();
-
 //		.base('http://purl.org/podd/basic-2-20130206/artifact:1')
 //		.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
 //		.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
@@ -223,6 +222,62 @@ var nextDatabank = $.rdf.databank();
 //		.add('<genotype33> rdfs:label "Genotype 33" .')
 //		.add(
 //				'<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> poddScience:hasGenotype <genotype33> .')
+
+
+
+function removeTriple() {
+	
+	var myDatabank = $.rdf.databank()
+	.base('http://purl.org/podd/basic-2-20130206/artifact:1/')
+	.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
+	.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+	.prefix('owl', 'http://www.w3.org/2002/07/owl#')
+	.prefix('poddScience', 'http://purl.org/podd/ns/poddScience#')
+	.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+	.add('<myTopObject> poddBase:hasGenotype <genotype33> .')
+	.add('<genotype33> rdf:type poddScience:Genotype .')
+	.add('<genotype33> rdf:type owl:NamedIndividual .')
+	.add('<genotype33> rdfs:label "Genotype 33" .')
+	.add(
+			'<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> poddScience:hasGenotype <genotype33> .')
+	
+	debugPrintDatabank(myDatabank, '[DEBUG] initial');
+	
+	myDatabank.remove('<genotype33> rdfs:label "Genotype 33"');
+	debugPrintDatabank(myDatabank, '[DEBUG] removed');
+	
+	myDatabank.add('<genotype33> rdfs:comment "This is a simple comment" ');
+	debugPrintDatabank(myDatabank, '[DEBUG] added');
+	
+	console.debug('-------------');
+	$.rdf({
+		databank : myDatabank
+	})
+	  .where('<http://purl.org/podd/basic-2-20130206/artifact:1/genotype33> rdfs:comment ?object')
+	  .sources()
+	  .each(function () {
+	    console.debug('The triple = ' + this[0]); 
+	    
+	    try{
+	    	myDatabank.remove(this[0]);
+	    }catch (err) {
+	    	console.debug(err);
+	    }
+	  });
+	console.debug('-------------');
+	
+	debugPrintDatabank(myDatabank, '[DEBUG] removed');
+	
+}
+
+
+function debugPrintDatabank(databank, message) {
+	var triples = $.toJSON(
+			databank.dump({format : 'application/json'})
+			);
+	console.debug(message + ': (' + databank.size() + ') ' + triples);
+}
+
 
 var theMessageBox = '#message1';
 
@@ -243,25 +298,34 @@ function doBlur() {
 }
 
 /* Retrieve the current version of an artifact and populate the databank */
-function getArtifact() {
-	console.debug('Inside getArtifact()');
-	var artifactUri = $('#podd_artifact').val();
+function getArtifact(artifactUri) {
 	var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
-	console.debug('The Request will go to: ' + requestUrl);
+	console.debug('[getArtifact] Request to: ' + requestUrl);
 	$.ajax({
 		url : requestUrl,
 		type : 'GET',
 		//dataType : 'application/rdf+xml', // what is expected back
 		success : function(resultData, status, xhr) {
-			console.debug('########## SUCCESS ###### ' + resultData);
+			nextDatabank = $.rdf.databank();
 			nextDatabank = nextDatabank.load(resultData);
-			console.debug('' + nextDatabank);
+			console.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextDatabank.size());
+
+			// update version IRI on page
+			var artifactId = getOntologyID(nextDatabank);
+			console.debug('[getArtifact] Version IRI : ' + artifactId[0].versionIri);
+			$('#podd_artifact_version').val(artifactId[0].versionIri);
+			
+			// update project title on page
+			var titles = getProjectTitle(nextDatabank);
+			$('#in1').val(titles[0].title);
+			$('#in1Hidden').val(titles[0].title);
+			
 			$(theMessageBox).html(
-					'<i>Successfully retrieved artifact.</i><br>');
+					'<i>Successfully retrieved artifact version: ' + artifactId[0].versionIri + '</i><br>');
 		},
 		error : function(xhr, status, error) {
-			console.debug(status + ' $$$$$ ERROR $$$$$ ' + error);
+			console.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
 			//console.debug(xhr.statusText);
 		}
 	});
@@ -270,40 +334,41 @@ function getArtifact() {
 
 /* Invoke the Edit PODD Artifact Service with the modified RDF triples */
 function updateArtifact(isNew, property, newValue, oldValue) {
-	console.debug('inside updateArtifact()');
+	console.debug('[updateArtifact] start');
 	
 	requestUrl = podd.baseUrl + '/artifact/edit';
 
 	var artifactUri = $('#podd_artifact').val();
 	var versionUri = $('#podd_artifact_version').val();
+	console.debug('[updateArtifact] artifact details: "' + artifactUri + '" version: "'	+ versionUri + '" .');
 	
 	var topObject = '<http://purl.org/podd/basic-1-20130206/object:2966>';
 	
-	console.debug('Databank before add:' + nextDatabank);
+	debugPrintDatabank(nextDatabank, '[updateArtifact] Databank at start:');
 	
 	if (!isNew) {
-		nextDatabank.remove(topObject + ' ' + property + ' ' + oldValue);
+//		tripleToRemove = topObject + ' ' + property + ' ' + oldValue;
+//		pattern = $.rdf.triple(topObject, property, oldValue);
+//		nextDatabank.remove(pattern);
+		deleteProjectTitle2(nextDatabank);
+		debugPrintDatabank(nextDatabank,
+				'[updateArtifact] Databank after removing: ' + nextDatabank.size());
 	}
 	
 	triple = topObject + ' ' + property + ' ' + newValue;
 	nextDatabank.add(triple);
-	//nextDatabank.add(topObject + ' <http://www.w3.org/2000/01/rdf-schema#label> "' + updatedValue + '"');
 	
-	console.debug('Databank after add:' + nextDatabank);
+	debugPrintDatabank(nextDatabank, '[updateArtifact] Databank after adding new triple:');
 	
 	var modifiedTriples = $.toJSON(nextDatabank.dump({
 		format : 'application/json'
 	}));
 
-	console.debug('Updating artifact: "' + artifactUri + '" version: "'
-			+ versionUri + '" .');
-	console.debug('The content: ' + modifiedTriples);
-
 	// set query parameters in the URI as setting them under data failed, mostly
 	// leading to a 415 error
 	requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactUri)
 			+ '&versionuri=' + encodeURIComponent(versionUri) + '&isforce=true';
-	console.debug('Request (POST):  ' + requestUrl);
+	console.debug('[updateArtifact] Request (POST):  ' + requestUrl);
 
 	$.ajax({
 		url : requestUrl,
@@ -312,14 +377,16 @@ function updateArtifact(isNew, property, newValue, oldValue) {
 		contentType : 'application/rdf+json', // what we're sending
 		dataType : 'json', // what is expected back
 		success : function(resultData, status, xhr) {
-			console.debug('########## SUCCESS###### ' + resultData);
-			console.debug(xhr.responseText);
+			console.debug('[updateArtifact] ### SUCCESS ### ' + resultData);
+			console.debug('[updateArtifact] ' + xhr.responseText);
 			$(theMessageBox).html(
 					'<i>Successfully edited artifact.</i><br><p>'
 							+ xhr.responseText + '</p><br>');
+			
+			getArtifact(artifactUri);
 		},
 		error : function(xhr, status, error) {
-			console.debug('$$$$$ ERROR $$$$$ ' + error);
+			console.debug('[updateArtifact] $$$ ERROR $$$ ' + error);
 			console.debug(xhr.statusText);
 		}
 	});
@@ -387,6 +454,114 @@ function parsesearchresults(/* string */searchURL, /* rdf/json */data) {
 	return nodeChildren;
 };
 
+/* 
+ * Parse the given Databank and extract the artifact IRI and version IRI
+ * of the ontology/artifact contained within. 
+ */
+function getOntologyID(nextDatabank) {
+	//console.debug("[getVersion] start");
+
+	var myQuery = $.rdf({
+		databank : nextDatabank
+	}).where('?artifactIri <http://www.w3.org/2002/07/owl#versionIRI> ?versionIri');
+	var bindings = myQuery.select();
+
+	var nodeChildren = [];
+	$.each(bindings, function(index, value) {
+		var nextChild = {};
+		nextChild.artifactIri = value.artifactIri.value;
+		nextChild.versionIri = value.versionIri.value;
+
+		nodeChildren.push(nextChild);
+		//console.debug('[getVersion] Found version: ' + nextChild.versionIri + ' and artifact ID: ' + nextChild.artifactIri);
+	});
+
+	if (nodeChildren.length > 1){
+		console.debug('[getVersion] ERROR - More than 1 version IRI statement found!!!');
+	}
+	
+	return nodeChildren;
+};
+
+/* 
+ * Parse the given Databank and extract the Project title
+ * of the artifact contained within. 
+ */
+function getProjectTitle(nextDatabank) {
+	console.debug("[getProjectTitle] start");
+
+	var myQuery = $.rdf({
+		databank : nextDatabank
+	})
+	.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+	.prefix('rdfs',	'http://www.w3.org/2000/01/rdf-schema#')
+	.where('?artifact poddBase:artifactHasTopObject ?topObject')
+	.where('?topObject rdfs:label ?projectTitle');
+	var bindings = myQuery.select();
+
+	var nodeChildren = [];
+	$.each(bindings, function(index, value) {
+		var nextChild = {};
+		nextChild.title = value.projectTitle.value;
+
+		nodeChildren.push(nextChild);
+		console.debug('[getProjectTitle] Found title: ' + nextChild.title);
+	});
+
+	if (nodeChildren.length > 1){
+		console.debug('[getProjectTitle] ERROR - More than 1 Project Title found!!!');
+	}
+	
+	return nodeChildren;
+};
+
+/* 
+ * Remove the specified pattern from the databank.
+ * 
+ * TODO: when query contains multiple triples per binding, decide which
+ * triple to delete. One option is to pass in details of triple to delete so that 
+ * there is only one where() and that can be deleted.
+ * 
+ */
+function deleteProjectTitle2(nextDatabank) {
+	console.debug('[deleteTriple2] start');
+	
+	$.rdf({
+		databank : nextDatabank
+	})
+ 	  .where('?artifact poddBase:artifactHasTopObject ?topObject')
+	  .where('?topObject rdfs:label ?projectTitle')
+	  .sources()
+	  .each(function (index, tripleArray) {
+	    console.debug('[deleteTriple2] The triple = ' + tripleArray[0]); 
+	    console.debug('[deleteTriple2] The triple = ' + tripleArray[1]);
+	    
+	    // test: iterate through array
+	    $.each(tripleArray, function(index2, triple) {
+	    	console.debug('[deleteTriple2] property = ' + triple.property);
+	    	
+//	    	sqSize = $.rdf()
+//	    	.add(triple)
+//	    	.where('?p rdfs:label ?value').select().size();
+//	    	console.debug('[deleteTriple2] sub-query result size = ' + sqSize);
+//	    	
+	    });
+	    
+	    
+	    // This may delete wrong triple if the order is not guaranteed!
+	    try{
+	    	nextDatabank.remove(this[1]);
+	    }catch (err) {
+	    	console.debug(err);
+	    }
+	  });
+	console.debug('[deleteTriple2] end');
+}
+
+
+
+
+
 // --------------------------------
 // everything needs to come in here
 // --------------------------------
@@ -422,10 +597,10 @@ $(document).ready(
 				var isNewTriple = false;
 				var parent = '';
 				var property = '<' + $(this).attr('property') + '>';
-				var oldValue = '"Project#2012-0006_ Cotton Leaf Morphology"'
-				var newValue = '"' + $(this).val() + '"';
-				console.debug(' property: "' + property + '" value: ' + newValue);
-				updateArtifact(isNewTriple, property, newValue, oldValue);
+				var oldValueFormatted = '"' + $('#in1Hidden').val() + '"'; 
+				var newValueFormatted = '"' + $(this).val() + '"';
+				console.debug('Change property: <' + property + '> from ' + oldValueFormatted + '" to ' + newValueFormatted + '.');
+				updateArtifact(isNewTriple, property, newValueFormatted, oldValueFormatted);
 			});
 			
 			// add a new Platform
@@ -433,23 +608,28 @@ $(document).ready(
 				var parent = '';
 				var isNewTriple = true;
 				var property = '<' + $(this).attr('property') + '>';
-				var value = '<' + $('#in3').val() + '>';
-				console.debug(' property: ' + property + ' value: ' + value);
-				updateArtifact(isNewTriple, property, value);
+				var newValue = '<' + $('#in3').val() + '>';
+				console.debug('Add new property: <' + property + '> <' + newValue + '>');
+				updateArtifact(isNewTriple, property, newValue);
 			});
 
+			// retrieve artifact and load it to databank
+			$('#btn2').click(function(){
+				var artifactUri = $('#podd_artifact').val();
+				getArtifact(artifactUri);
+				//removeTriple();
+			});
+
+			// test that the Message Box works
 			$('#btn1').click({
-				param1 : '#message1',
+				param1 : theMessageBox,
 				param2 : 'Test Button clicked'
 			}, displayMessage);
 
-			$('#btn2').click(getArtifact);
-			
-			// $("#in2Random").val()}, doProcess);
-
+			// clear the Message Box
 			$('#btn4').click({
-				param1 : '#message1',
-				param2 : '[Message]'
+				param1 : theMessageBox,
+				param2 : '[Message should come here]'
 			}, displayMessage);
 
 		});

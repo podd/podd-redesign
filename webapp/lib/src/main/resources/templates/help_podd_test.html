@@ -51,14 +51,17 @@
 		<br>
 		
 		<div>
-		Version URI: <input class='noaction' id='podd_artifact_version' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1:version:1'><br>
-		Object URI:&nbsp; <input class='noaction' id='podd_object' cols='60' value='http://purl.org/podd/basic-1-20130206/object:2966'><br>
+		Version URI: <input class='noaction' id='podd_artifact_version' type='hidden' value='Version should come here'><br>
+		Object URI:&nbsp; <input class='noaction' id='podd_object' cols='90' value='http://purl.org/podd/basic-1-20130206/object:2966'><br>
 		</div>
 		<br><br>
 		
 		<span property=''>Edit Project Title: <input class="short_text"
 			property="http://www.w3.org/2000/01/rdf-schema#label" 
-			id="in1" type="text" cols="60" value="Enter Project Title"></span><br>
+			id="in1" type="text" cols="60" value="Enter Project Title">
+			<input class='noaction' id='in1Hidden' type='hidden' value=''>	
+		</span>
+		<br>
 		
 		<!-- Random:   <input class="short_text" id="in2Random" type="text" cols="30" value="">-->
 		<br>
