@@ -292,34 +292,31 @@ function getArtifact(artifactUri) {
 	
 }
 
-/* Invoke the Edit PODD Artifact Service with the modified RDF triples */
-function updateArtifact(isNew, property, newValue, oldValue) {
+/* 
+ * Invoke the Edit Artifact Service to update the artifact with changed object attributes.
+ * 
+ * {
+ * 	isNew: boolean,
+ * 	property: String value of predicate URI surrounded by angle brackets,
+ * 	newValue: String, (Should be surrounded by angle brackets if a URI, or double quotes if a String literal)
+ * 	oldValue: String, (Should be surrounded by angle brackets if a URI, or double quotes if a String literal)
+ * } 
+ */
+function updatePoddObject(
+		/* String */ objectUri, 
+		/* array of objects */ attributes) {
+	
 	requestUrl = podd.baseUrl + '/artifact/edit';
 
-	console.debug('[updateArtifact] artifact details: "' + artifactIri + '" version: "'	+ versionIri + '" .');
+	console.debug('[updatePoddObject]  "' + objectUri + '" of artifact ('	+ versionIri + ') .');
 	
-	//debugPrintDatabank(nextDatabank, '[updateArtifact] Databank at start:');
-
-	// - find the parent object's URI
-	var parentUri = '<>';
-	var myQuery = $.rdf({
-		databank : nextDatabank
-	})
-	.where('?artifact poddBase:artifactHasTopObject ?topObject')
-	var bindings = myQuery.select();
-	$.each(bindings, function(index, value) {
-		parentUri = '<' + value.topObject.value + '>';
+	$.each(attributes, function(index, attribute) {
+		console.debug('[updatePoddObject] handling property: ' + attribute. property);
+		if (!attribute.isNew) {
+		    deleteTriples(nextDatabank, objectUri, attribute.property);
+		}
+		nextDatabank.add(objectUri + ' ' + attribute.property + ' ' + attribute.newValue);
 	});
-
-	if (!isNew) {
-		// - delete triple containing old value
-	    deleteTriples(nextDatabank, parentUri, 'rdfs:label');
-		//debugPrintDatabank(nextDatabank, '[updateArtifact] Databank after removing: ' + nextDatabank.size());
-	}
-	
-	nextDatabank.add(parentUri + ' ' + property + ' ' + newValue);
-	
-	//debugPrintDatabank(nextDatabank, '[updateArtifact] Databank after adding new triple:');
 	
 	var modifiedTriples = $.toJSON(nextDatabank.dump({
 		format : 'application/json'
@@ -329,7 +326,7 @@ function updateArtifact(isNew, property, newValue, oldValue) {
 	// leading to a 415 error
 	requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri)
 			+ '&versionuri=' + encodeURIComponent(versionIri) + '&isforce=true';
-	console.debug('[updateArtifact] Request (POST):  ' + requestUrl);
+	console.debug('[updatePoddObject] Request (POST):  ' + requestUrl);
 
 	$.ajax({
 		url : requestUrl,
@@ -338,8 +335,8 @@ function updateArtifact(isNew, property, newValue, oldValue) {
 		contentType : 'application/rdf+json', // what we're sending
 		dataType : 'json', // what is expected back
 		success : function(resultData, status, xhr) {
-			console.debug('[updateArtifact] ### SUCCESS ### ' + resultData);
-			console.debug('[updateArtifact] ' + xhr.responseText);
+			console.debug('[updatePoddObject] ### SUCCESS ### ' + resultData);
+			// console.debug('[updatePoddObject] ' + xhr.responseText);
 			$(theMessageBox).html(
 					'<i>Successfully edited artifact.</i><br><p>'
 							+ xhr.responseText + '</p><br>');
@@ -347,12 +344,12 @@ function updateArtifact(isNew, property, newValue, oldValue) {
 			getArtifact(artifactIri);
 		},
 		error : function(xhr, status, error) {
-			console.debug('[updateArtifact] $$$ ERROR $$$ ' + error);
+			console.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
 			console.debug(xhr.statusText);
 		}
 	});
-
 }
+
 
 /*
  * Call Search Ontology Resource Service using AJAX, convert the RDF response to
@@ -521,23 +518,37 @@ $(document).ready(
 
 			// update the project title
 			$(".short_text").blur(function(){
-				var isNewTriple = false;
-				var parent = '';
-				var property = '<' + $(this).attr('property') + '>';
-				var oldValueFormatted = '"' + $('#in1Hidden').val() + '"'; 
-				var newValueFormatted = '"' + $(this).val() + '"';
-				console.debug('Change property: ' + property + ' from ' + oldValueFormatted + ' to ' + newValueFormatted + '.');
-				updateArtifact(isNewTriple, property, newValueFormatted, oldValueFormatted);
+				var objectUri = '<' + $('#podd_object').val() + '>';
+				
+				var attributes = [];
+				var nextAttribute = {};
+				nextAttribute.isNew = false;
+				nextAttribute.property = '<' + $(this).attr('property') + '>';
+				nextAttribute.newValue = '"' + $(this).val() + '"';
+				nextAttribute.oldValue = '"' + $('#in1Hidden').val() + '"';
+
+				attributes.push(nextAttribute);
+				
+				console.debug('Change property: ' + nextAttribute.property + ' from ' + 
+						nextAttribute.oldValue + ' to ' + nextAttribute.newValue + '.');
+
+				updatePoddObject(objectUri, attributes);
 			});
 			
 			// add a new Platform
 			$(".autocomplete").blur(function(){
-				var parent = '';
-				var isNewTriple = true;
-				var property = '<' + $(this).attr('property') + '>';
-				var newValue = '<' + $('#in3').val() + '>';
-				console.debug('Add new property: <' + property + '> <' + newValue + '>');
-				updateArtifact(isNewTriple, property, newValue);
+				var objectUri = '<' + $('#podd_object').val() + '>';
+
+				var attributes = [];
+				var nextAttribute = {};
+				nextAttribute.isNew = true;
+				nextAttribute.property = '<' + $(this).attr('property') + '>';
+				nextAttribute.newValue = '<' + $('#in3').val() + '>';
+				attributes.push(nextAttribute);
+				
+				console.debug('Add new property: <' + nextAttribute.property + '> <' + nextAttribute.newValue + '>');
+				
+				updatePoddObject(objectUri, attributes);
 			});
 
 			// retrieve artifact and load it to databank
