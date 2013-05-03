@@ -182,8 +182,31 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/poddBase#DisplayType_Table */
     public static final URI PODD_BASE_DISPLAY_TYPE_TABLE = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "DisplayType_Table");
-    
 
+    
+    // ----- custom representation of cardinalities -----
+
+    /** http://purl.org/podd/ns/poddBase#hasCardinality. Represents a <b>hasCardinality</b> property. */
+    public static final URI PODD_BASE_HAS_CARDINALITY = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
+            "hasCardinality");
+
+    /** http://purl.org/podd/ns/poddBase#Cardinality_Exactly_One */
+    public static final URI PODD_BASE_CARDINALITY_EXACTLY_ONE = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "Cardinality_Exactly_One");
+    
+    /** http://purl.org/podd/ns/poddBase#Cardinality_One_Or_Many */
+    public static final URI PODD_BASE_CARDINALITY_ONE_OR_MANY = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "Cardinality_One_Or_Many");
+
+    /** http://purl.org/podd/ns/poddBase#Cardinality_Zero_Or_One */
+    public static final URI PODD_BASE_CARDINALITY_ZERO_OR_ONE = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "Cardinality_Zero_Or_One");
+    
+    /** http://purl.org/podd/ns/poddBase#Cardinality_Zero_Or_Many */
+    public static final URI PODD_BASE_CARDINALITY_ZERO_OR_MANY = PoddRdfConstants.VALUE_FACTORY.createURI(
+            PoddRdfConstants.PODD_BASE, "Cardinality_Zero_Or_Many");
+    
+    
     // ----- file reference constants -----
     
     /** http://purl.org/podd/ns/poddBase#hasFileReference */

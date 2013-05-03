@@ -19,6 +19,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -188,6 +189,89 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // FIXME: This implementation doesn't seem correct. Verify with tests.
         return this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
     }
+    
+    @Override
+    public URI getCardinalityValue(final InferredOWLOntologyID artifactID, final URI objectUri, final URI propertyUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        /*
+         * Example of how a qualified cardinality statement appears in RDF triples
+         * 
+         * {poddBase:PoddTopObject} <rdfs:subClassOf> {_:node17l3l94qux1}
+         * 
+         * {_:node17l3l94qux1} <rdf:type> {owl:Restriction}
+         * 
+         * {_:node17l3l94qux1} <owl#onProperty> {poddBase:hasLeadInstitution}
+         * 
+         * {_:node17l3l94qux1} <owl:qualifiedCardinality> {"1"^^<xsd:nonNegativeInteger>}
+         * 
+         * {_:node17l3l94qux1} <owl:onDataRange> {xsd:string}
+         */
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?qualifiedCardinality ?minQualifiedCardinality ?maxQualifiedCardinality ");
+        sb.append(" WHERE { ");
+        
+        sb.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> ?somePoddConcept . ");
+        sb.append(" ?somePoddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
+        sb.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxQualifiedCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minQualifiedCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality } . ");
+        
+        sb.append(" } ");
+        
+        this.log.debug("Created SPARQL {} with propertyUri {} and poddObject {}", sb, propertyUri, objectUri);
+        
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        query.setBinding("poddObject", objectUri);
+        query.setBinding("propertyUri", propertyUri);
+        
+        final QueryResultCollector queryResults =
+                this.executeSparqlQuery(query, versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+        
+        for(BindingSet next : queryResults.getBindingSets())
+        {
+            final Value qualifiedCardinalityValue = next.getValue("qualifiedCardinality");
+            if(qualifiedCardinalityValue != null)
+            {
+                return PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE;
+            }
+            
+            int minCardinality = -1;
+            int maxCardinality = -1;
+            
+            final Value minCardinalityValue = next.getValue("minQualifiedCardinality");
+            if(minCardinalityValue != null && minCardinalityValue instanceof LiteralImpl)
+            {
+                minCardinality = ((LiteralImpl)minCardinalityValue).intValue();
+            }
+            
+            final Value maxCardinalityValue = next.getValue("maxQualifiedCardinality");
+            if(maxCardinalityValue != null && maxCardinalityValue instanceof LiteralImpl)
+            {
+                maxCardinality = ((LiteralImpl)maxCardinalityValue).intValue();
+            }
+
+            if (maxCardinality == 1 && minCardinality < 1)
+            {
+                return PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE;
+            }
+            else if (minCardinality == 1 && maxCardinality != 1)
+            {
+                return PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY;
+            }
+            else //default rule
+            {
+                return PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY;
+            }
+        }
+
+        return null;
+    }
+
     
     /*
      * (non-Javadoc)
@@ -1235,6 +1319,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public Model getObjectDetailsForEdit(final InferredOWLOntologyID artifactID, final URI objectUri,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
+        final Model resultModel = new LinkedHashModel();
+
+        // --- add object type
+        final List<URI> objectTypes = this.getObjectTypes(artifactID, objectUri, repositoryConnection);
+        if (objectTypes != null && objectTypes.size() > 0)
+        {
+            resultModel.add(objectUri, RDF.TYPE, objectTypes.get(0));
+        }
+        
+        // --- add displayable property values, details of properties, and value labels if present
         final StringBuilder sb = new StringBuilder();
         
         sb.append("CONSTRUCT { ");
@@ -1288,7 +1382,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 this.executeGraphQuery(graphQuery,
                         versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
         
-        return queryResults;
+        resultModel.addAll(queryResults);
+        
+        // --- add cardinalities for each displayable property
+        final List<URI> allProperties = this.getWeightedProperties(artifactID, objectUri, true, repositoryConnection);
+        for(URI propertyUri : allProperties)
+        {
+            
+        }
+        
+        return resultModel;
     }
     
     /*

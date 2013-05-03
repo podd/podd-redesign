@@ -461,6 +461,51 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
+     * .
+     */
+    @Test
+    public void testGetCardinalityValue() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        final URI projectObject =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966");
+        final URI publication45 =
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
+        
+        final URI[][] testData =
+                {
+                    { projectObject, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasLeadInstitution"),
+                            PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE },
+                    { publication45, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAbstract"),
+                            PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                    { projectObject, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasPURL"),
+                        PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                    { projectObject, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
+                        PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY },
+                    { publication45, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasYear"),
+                        PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                    { publication45, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAuthors"),
+                        PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                };        
+        
+        for (int i = 0; i < testData.length; i++)
+        {
+            final URI cardinalityValue =
+                    this.testPoddSesameManager.getCardinalityValue(ontologyID, testData[i][0], testData[i][1],
+                            this.testRepositoryConnection);
+            Assert.assertEquals("Not the expected cardinality value", testData[i][2], cardinalityValue);
+        }
+    }
+
+    
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getCardinality(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
      * .
      */

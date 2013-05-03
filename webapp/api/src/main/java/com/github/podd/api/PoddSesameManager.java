@@ -18,6 +18,7 @@ import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Manages interactions with Sesame Repositories for PODD.
@@ -62,6 +63,43 @@ public interface PoddSesameManager
      */
     List<InferredOWLOntologyID> getAllOntologyVersions(IRI ontologyIRI, RepositoryConnection connection,
             URI ontologyManagementGraph) throws OpenRDFException;
+
+    /**
+     * Calculates the cardinality value for a given PODD object and property.
+     * 
+     * Possible output URIs represent the following cardinalities:
+     * <ul>
+     *  <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE} (Mandatory)</li>
+     *  <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY} (Mandatory, can have multiple values)</li>
+     *  <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY} (Optional, can have multiple values)</li>
+     *  <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE} (Optional, the default)</li>
+     * </ul>
+     * 
+     * <p>For example, passing in <i>PoddTopObject</i> and property <i>hasLeadInstitution</i>, will return
+     * {@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE}.</p>
+     * <br>
+     * <p>
+     * <b>NOTE:</b> This method currently handles only Qualified Cardinality statements, which are the only type
+     * found in PODD schema ontologies at present. However, as the property's value type is ignored,
+     * the output is incomplete if a property has more than one type of possible value with
+     * different cardinalities.
+     * </p>
+     * 
+     * @param artifactID
+     *            The artifact to which the object under consideration belongs
+     * @param objectUri
+     *            The object under consideration
+     * @param propertyUri
+     *            The property under consideration
+     * @param repositoryConnection
+     * @return a URI representing the cardinality value.
+     * @throws OpenRDFException
+     * 
+     * @since 03/05/2013
+     */
+    URI getCardinalityValue(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+
     
     /**
      * Returns current version details of an artifact ontology which has the given IRI as the
@@ -303,6 +341,12 @@ public interface PoddSesameManager
     List<URI> getAllValidMembers(InferredOWLOntologyID artifactID, URI conceptUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
+    /**
+     * TODO: remove this from the API once the other method is used successfully
+     * 
+     * @deprecated use
+     *             {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
+     */
     Model getCardinality(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
@@ -316,5 +360,6 @@ public interface PoddSesameManager
 
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
+
 
 }
