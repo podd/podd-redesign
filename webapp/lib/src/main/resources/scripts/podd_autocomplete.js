@@ -509,7 +509,7 @@ $(document).ready(
 						select : function(event, ui) {
 							console.debug('Option selected "' + ui.item.label
 									+ '" with value "' + ui.item.value + '".');
-							$('#in3').val(ui.item.value);
+							$('#in4Hidden').val(ui.item.value);
 							$('#in4').val(ui.item.label);
 							$('#message1').html('Selected : ' + ui.item.value);
 							return false;
@@ -543,7 +543,7 @@ $(document).ready(
 				var nextAttribute = {};
 				nextAttribute.isNew = true;
 				nextAttribute.property = '<' + $(this).attr('property') + '>';
-				nextAttribute.newValue = '<' + $('#in3').val() + '>';
+				nextAttribute.newValue = '<' + $('#' + $(this).attr('id') + 'Hidden').val() + '>';
 				attributes.push(nextAttribute);
 				
 				console.debug('Add new property: <' + nextAttribute.property + '> <' + nextAttribute.newValue + '>');
