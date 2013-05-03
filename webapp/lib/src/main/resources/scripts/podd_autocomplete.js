@@ -224,52 +224,11 @@ var nextDatabank = $.rdf.databank();
 //				'<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> poddScience:hasGenotype <genotype33> .')
 
 
+var artifactIri;
 
-function removeTriple() {
-	
-	var myDatabank = $.rdf.databank()
-	.base('http://purl.org/podd/basic-2-20130206/artifact:1/')
-	.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
-	.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-	.prefix('owl', 'http://www.w3.org/2002/07/owl#')
-	.prefix('poddScience', 'http://purl.org/podd/ns/poddScience#')
-	.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
-	.add('<myTopObject> poddBase:hasGenotype <genotype33> .')
-	.add('<genotype33> rdf:type poddScience:Genotype .')
-	.add('<genotype33> rdf:type owl:NamedIndividual .')
-	.add('<genotype33> rdfs:label "Genotype 33" .')
-	.add(
-			'<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material> poddScience:hasGenotype <genotype33> .')
-	
-	debugPrintDatabank(myDatabank, '[DEBUG] initial');
-	
-	myDatabank.remove('<genotype33> rdfs:label "Genotype 33"');
-	debugPrintDatabank(myDatabank, '[DEBUG] removed');
-	
-	myDatabank.add('<genotype33> rdfs:comment "This is a simple comment" ');
-	debugPrintDatabank(myDatabank, '[DEBUG] added');
-	
-	console.debug('-------------');
-	$.rdf({
-		databank : myDatabank
-	})
-	  .where('<http://purl.org/podd/basic-2-20130206/artifact:1/genotype33> rdfs:comment ?object')
-	  .sources()
-	  .each(function () {
-	    console.debug('The triple = ' + this[0]); 
-	    
-	    try{
-	    	myDatabank.remove(this[0]);
-	    }catch (err) {
-	    	console.debug(err);
-	    }
-	  });
-	console.debug('-------------');
-	
-	debugPrintDatabank(myDatabank, '[DEBUG] removed');
-	
-}
+var versionIri;
 
+var theMessageBox = '#message1';
 
 function debugPrintDatabank(databank, message) {
 	var triples = $.toJSON(
@@ -278,8 +237,6 @@ function debugPrintDatabank(databank, message) {
 	console.debug(message + ': (' + databank.size() + ') ' + triples);
 }
 
-
-var theMessageBox = '#message1';
 
 /* Display a Message */
 function displayMessage(event) {
@@ -311,18 +268,21 @@ function getArtifact(artifactUri) {
 			nextDatabank = nextDatabank.load(resultData);
 			console.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextDatabank.size());
 
-			// update version IRI on page
+			// update variables and page contents with retrieved artifact info
 			var artifactId = getOntologyID(nextDatabank);
-			console.debug('[getArtifact] Version IRI : ' + artifactId[0].versionIri);
-			$('#podd_artifact_version').val(artifactId[0].versionIri);
+			artifactIri = artifactId[0].artifactIri;
+			versionIri = artifactId[0].versionIri;
+			
+			$('#podd_artifact').val(artifactIri);
+			$('#podd_artifact_version').val(versionIri);
 			
 			// update project title on page
-			var titles = getProjectTitle(nextDatabank);
-			$('#in1').val(titles[0].title);
-			$('#in1Hidden').val(titles[0].title);
+			var title = getProjectTitle(nextDatabank);
+			$('#in1').val(title.value);
+			$('#in1Hidden').val(title.value);
 			
 			$(theMessageBox).html(
-					'<i>Successfully retrieved artifact version: ' + artifactId[0].versionIri + '</i><br>');
+					'<i>Successfully retrieved artifact version: ' + versionIri + '</i><br>');
 		},
 		error : function(xhr, status, error) {
 			console.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
@@ -334,41 +294,32 @@ function getArtifact(artifactUri) {
 
 /* Invoke the Edit PODD Artifact Service with the modified RDF triples */
 function updateArtifact(isNew, property, newValue, oldValue) {
-	console.debug('[updateArtifact] start');
-	
 	requestUrl = podd.baseUrl + '/artifact/edit';
 
-	var artifactUri = $('#podd_artifact').val();
-	var versionUri = $('#podd_artifact_version').val();
-	console.debug('[updateArtifact] artifact details: "' + artifactUri + '" version: "'	+ versionUri + '" .');
+	console.debug('[updateArtifact] artifact details: "' + artifactIri + '" version: "'	+ versionIri + '" .');
 	
-	debugPrintDatabank(nextDatabank, '[updateArtifact] Databank at start:');
+	//debugPrintDatabank(nextDatabank, '[updateArtifact] Databank at start:');
 
-	// - find the topObject URI
-	var topObject = ''; //'<http://purl.org/podd/basic-1-20130206/object:2966>';
-	
+	// - find the parent object's URI
+	var parentUri = '<>';
 	var myQuery = $.rdf({
 		databank : nextDatabank
 	})
 	.where('?artifact poddBase:artifactHasTopObject ?topObject')
 	var bindings = myQuery.select();
-
 	$.each(bindings, function(index, value) {
-		topObject = value.topObject.value;
+		parentUri = '<' + value.topObject.value + '>';
 	});
 
-	
 	if (!isNew) {
-		//deleteProjectTitle4(nextDatabank);
-	    deleteTriples(nextDatabank, '<' + topObject + '>', 'rdfs:label');
-		debugPrintDatabank(nextDatabank,
-				'[updateArtifact] Databank after removing: ' + nextDatabank.size());
+		// - delete triple containing old value
+	    deleteTriples(nextDatabank, parentUri, 'rdfs:label');
+		//debugPrintDatabank(nextDatabank, '[updateArtifact] Databank after removing: ' + nextDatabank.size());
 	}
 	
-	triple = '<' + topObject + '>' + ' ' + property + ' ' + newValue;
-	nextDatabank.add(triple);
+	nextDatabank.add(parentUri + ' ' + property + ' ' + newValue);
 	
-	debugPrintDatabank(nextDatabank, '[updateArtifact] Databank after adding new triple:');
+	//debugPrintDatabank(nextDatabank, '[updateArtifact] Databank after adding new triple:');
 	
 	var modifiedTriples = $.toJSON(nextDatabank.dump({
 		format : 'application/json'
@@ -376,8 +327,8 @@ function updateArtifact(isNew, property, newValue, oldValue) {
 
 	// set query parameters in the URI as setting them under data failed, mostly
 	// leading to a 415 error
-	requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactUri)
-			+ '&versionuri=' + encodeURIComponent(versionUri) + '&isforce=true';
+	requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri)
+			+ '&versionuri=' + encodeURIComponent(versionIri) + '&isforce=true';
 	console.debug('[updateArtifact] Request (POST):  ' + requestUrl);
 
 	$.ajax({
@@ -393,7 +344,7 @@ function updateArtifact(isNew, property, newValue, oldValue) {
 					'<i>Successfully edited artifact.</i><br><p>'
 							+ xhr.responseText + '</p><br>');
 			
-			getArtifact(artifactUri);
+			getArtifact(artifactIri);
 		},
 		error : function(xhr, status, error) {
 			console.debug('[updateArtifact] $$$ ERROR $$$ ' + error);
@@ -407,25 +358,20 @@ function updateArtifact(isNew, property, newValue, oldValue) {
  * Call Search Ontology Resource Service using AJAX, convert the RDF response to
  * a JSON array and set to the array as autocomplete data.
  */
-function autoCompleteCallback(/* object with 'search term' */request, /* function */
-		response) {
+function autoCompleteCallback(/* object with 'search term' */ request, /* function */ response) {
 
 	requestUrl = podd.baseUrl + '/search';
 
-	var artifactUri = $('#podd_artifact').val();
 	var searchTypes = $('#podd_type').attr('value');
 
-	console.debug('Searching artifact: "' + artifactUri
-			+ '" for searchTypes: "' + searchTypes + '" for search term: "'
-			+ request.term + '".');
+	console.debug('Searching artifact: "' + artifactIri.toString() + '" in searchTypes: "' + searchTypes 
+			+ '" for terms matching "'	+ request.term + '".');
 
 	queryParams = {
 		searchterm : request.term,
-		artifacturi : artifactUri,
+		artifacturi : artifactIri.toString(),
 		searchtypes : searchTypes
 	};
-
-	// console.debug('Request: ' + requestUrl);
 
 	$.get(requestUrl, queryParams, function(data) {
 		console.debug('Response: ' + data.toString());
@@ -469,7 +415,6 @@ function parsesearchresults(/* string */searchURL, /* rdf/json */data) {
  * of the ontology/artifact contained within. 
  */
 function getOntologyID(nextDatabank) {
-	//console.debug("[getVersion] start");
 
 	var myQuery = $.rdf({
 		databank : nextDatabank
@@ -483,7 +428,6 @@ function getOntologyID(nextDatabank) {
 		nextChild.versionIri = value.versionIri.value;
 
 		nodeChildren.push(nextChild);
-		//console.debug('[getVersion] Found version: ' + nextChild.versionIri + ' and artifact ID: ' + nextChild.artifactIri);
 	});
 
 	if (nodeChildren.length > 1){
@@ -512,41 +456,17 @@ function getProjectTitle(nextDatabank) {
 	var nodeChildren = [];
 	$.each(bindings, function(index, value) {
 		var nextChild = {};
-		nextChild.title = value.projectTitle.value;
+		nextChild.value = value.projectTitle.value;
 
 		nodeChildren.push(nextChild);
-		console.debug('[getProjectTitle] Found title: ' + nextChild.title);
 	});
 
 	if (nodeChildren.length > 1){
 		console.debug('[getProjectTitle] ERROR - More than 1 Project Title found!!!');
 	}
 	
-	return nodeChildren;
+	return nodeChildren[0];
 };
-
-/* 
- * Remove the "project title" from the databank.
- */
-function deleteProjectTitle4(nextDatabank) {
-	console.debug('[deleteProjectTitle4] start');
-	
-	var myQuery = $.rdf({
-		databank : nextDatabank
-	})
-	.where('?artifact poddBase:artifactHasTopObject ?topObject')
-	.where('?topObject rdfs:label ?projectTitle');
-	var bindings = myQuery.select();
-
-	$.each(bindings, function(index, value) {
-		var topObjectUri = value.topObject.value;
-	    console.debug('[deleteProjectTitle4] The topObject = ' + topObjectUri); 
-	    
-	    deleteTriples(nextDatabank, '<' + topObjectUri + '>', 'rdfs:label');
-	});
-	
-	console.debug('[deleteProjectTitle4] end');
-}
 
 
 /* 
@@ -569,8 +489,6 @@ function deleteTriples(nextDatabank, subject, property) {
 
 
 
-
-
 // --------------------------------
 // everything needs to come in here
 // --------------------------------
@@ -586,7 +504,7 @@ $(document).ready(
 						source : autoCompleteCallback,
 						
 						focus : function(event, ui) {
-							// hack to prevent ui.item.value from appearing in the textbox
+							// prevent ui.item.value from appearing in the textbox
 							$('#in4').val(ui.item.label);
 							return false;
 						},
