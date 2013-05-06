@@ -1,0 +1,60 @@
+
+<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-smoothness.css" media="screen" type="text/css" />
+		
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
+
+ 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.core.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.widget.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.core.js"></script>
+
+		Dependencies for rdfquery
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdfquery.rules-1.1-SNAPSHOT.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdf.turtle.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.bounce.js"></script>
+		
+		Dependencies for autocomplete
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.mouse.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.position.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.selectable.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.resizable.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.sortable.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.button.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.dialog.js"></script>
+	    
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.autocomplete.js"></script>
+
+		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script>
+		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
+
+		Dependencies for jstree
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.hotkeys.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.cookie.js"></script>
+	    
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.jstree.js"></script>
+ 
+ 	<script type="text/javascript">
+		// --------------------------------
+		// everything needs to come in here
+		// --------------------------------
+		$(document).ready(
+			function() {
+				console.debug('document.ready() starting...');
+				loadObjectDetails();
+				console.debug('document.ready() completing...');
+		});
+		</script>
+
+
+		
+
+
+	    <h3>Edit PODD Object</h3>
+		<br>
+		<br>
+		<div>
+			Project (Artifact) IRI: <input class='noaction' id='podd_artifact' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1'><br>
+			<button id="btn2">Retrieve Artifact</button><br>
+		</div>
+		<br><br>
+		
