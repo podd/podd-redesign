@@ -251,7 +251,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
      * Test viewing the edit HTML page for an internal PODD object.
      */
     @Test
-    public void testGetEditArtifactInternalObjectHtml() throws Exception
+    public void testGetEditArtifactHtmlForInternalObject() throws Exception
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-2.rdf");
@@ -279,7 +279,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
      * Test viewing the edit HTML page for a PODD top object (i.e. a Project).
      */
     @Test
-    public void testGetEditArtifactTopObjectHtml() throws Exception
+    public void testGetEditArtifactHtmlForTopObject() throws Exception
     {
         // prepare: add an artifact
         final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-2.rdf");
@@ -300,6 +300,35 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         System.out.println(body);
         this.assertFreemarker(body);
     }
+
+    /**
+     * Test getting a {@link Model} containing statements to display "edit object" page
+     */
+    @Test
+    public void testGetEditArtifactRdfForTopObject() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact("/test/artifacts/basic-2.rdf");
+        
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        // not requesting a specific object results in the Project being shown.
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify: TODO
+        System.out.println(body);
+        
+        this.assertFreemarker(body);
+    }
+    
+    
     
     /**
      * Test posting to the edit HTML page modifying an internal PODD object.

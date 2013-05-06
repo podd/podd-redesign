@@ -74,6 +74,7 @@
 	<div id="details">  <!-- Collapsible div -->
 
 		<div id="project_details" class="fieldset">
+        <div about="${poddObject.objectURI!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
 			<!-- standard attributes -->
 			<ol>
 	        	<li>
@@ -271,9 +272,9 @@ Input is the property URI.
 		<#local propertyType = completeModel.filter(propertyUri, RDF_TYPE, null).objectString()!"TYPE">
 		<#local displayType = completeModel.filter(propertyUri, PODD_BASE_DISPLAY_TYPE, null).objectString()!"http://purl.org/podd/ns/poddBase#DisplayType_ShortText">
 		<#local label = completeModel.filter(propertyUri, RDFS_LABEL, null).objectString()!"Missing Label">
-		<#local cardinality = completeModel.filter(propertyUri, OWL_CARDINALITY, null).objectString()!"-1">
-		<#local minCardinality = completeModel.filter(propertyUri, OWL_MIN_CARDINALITY, null).objectString()!"-1">
-		<#local maxCardinality = completeModel.filter(propertyUri, OWL_MAX_CARDINALITY, null).objectString()!"-1">
+		<#local cardinality = completeModel.filter(propertyUri, PODD_BASE_HAS_CARDINALITY, null).objectString()!"-1">
+		<#local minCardinality = "-1">
+		<#local maxCardinality = "-1">
 		
 		
     	<span class="bold">${label}:</span>
@@ -304,8 +305,8 @@ Input is the property URI.
 				</#if>
 				<!-- Display Type is: ${displayType} -->
 				<#if displayType == "http://purl.org/podd/ns/poddBase#DisplayType_ShortText">
-	        		<input id="${propertyUri}" name="${propertyUri}" value="${thisObject.stringValue()}" type="text">
-	        		
+	        		<input property="${propertyUri}"  id="${propertyUri}" name="${propertyUri}" value="${thisObject.stringValue()}" type="text">
+						        		
 	        	<#elseif displayType == "http://purl.org/podd/ns/poddBase#DisplayType_DropDownList">
 	        		<select id="${propertyUri}" name="${propertyUri}">
 	        			<#list members[propertyUri] as member>
