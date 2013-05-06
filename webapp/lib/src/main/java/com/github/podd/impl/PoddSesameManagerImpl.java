@@ -1305,14 +1305,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     /**
-     * Work in progress [25/02/2013]
-     * 
-     * Attempting to retrieve sufficient triples to display the object_edit page
+     * This method returns a {@link Model} containing sufficient triples to construct the HTML page for
+     * editing an object.
      * 
      * @param objectUri
      * @param repositoryConnection
      * @param contexts
-     * @return
+     * @return A Model containing necessary triples
      * @throws OpenRDFException
      */
     @Override
@@ -1328,6 +1327,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             resultModel.add(objectUri, RDF.TYPE, objectTypes.get(0));
         }
         
+        
         // --- add displayable property values, details of properties, and value labels if present
         final StringBuilder sb = new StringBuilder();
         
@@ -1337,6 +1337,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
         sb.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
                 + "> ?propertyDisplayType . ");
+        sb.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue()
+                + "> ?propertyWeight . ");
         sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
         
         sb.append("} WHERE {");
@@ -1350,21 +1352,19 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         // property may not have a Label
         sb.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
-        
+
+        // property may not have a weight
+        sb.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight } . ");
+
         // value may not have a Label
         sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
-        
-        // cardinality
-        // sb.append(" OPTIONAL { ?value <" + RDF.TYPE.stringValue() + "> ?poddConcept } . ");
-        // sb.append(" OPTIONAL { ?poddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?b01 } . ");
-        // sb.append(" OPTIONAL { ?b01 <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri } . ");
-        // sb.append(" OPTIONAL { ?b01 <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxCardinality } . ");
-        // sb.append(" OPTIONAL { ?b01 <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minCardinality } . ");
-        // sb.append(" OPTIONAL { ?b01 <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality } . ");
         
         // avoid non-displayable properties (e.g. PoddInternalObject which is an "abstract" concept)
         sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
                 + "> true } ");
+        
+        // avoid, since we add object type and label to the Model up front
+        sb.append(" FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
         
         sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
         sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
@@ -1384,11 +1384,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         resultModel.addAll(queryResults);
         
-        // --- add cardinalities for each displayable property
+        // --- add cardinality for each displayable property
         final List<URI> allProperties = this.getWeightedProperties(artifactID, objectUri, true, repositoryConnection);
         for(URI propertyUri : allProperties)
         {
-            
+            final URI cardinalityValue = this.getCardinalityValue(artifactID, objectUri, propertyUri, repositoryConnection);
+            if (cardinalityValue != null)
+            {
+                resultModel.add(propertyUri, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
+            }
         }
         
         return resultModel;

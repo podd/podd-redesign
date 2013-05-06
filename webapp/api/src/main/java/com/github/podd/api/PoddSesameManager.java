@@ -69,20 +69,24 @@ public interface PoddSesameManager
      * 
      * Possible output URIs represent the following cardinalities:
      * <ul>
-     *  <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE} (Mandatory)</li>
-     *  <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY} (Mandatory, can have multiple values)</li>
-     *  <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY} (Optional, can have multiple values)</li>
-     *  <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE} (Optional, the default)</li>
+     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE} (Mandatory)</li>
+     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY} (Mandatory, can have multiple
+     * values)</li>
+     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY} (Optional, can have multiple
+     * values)</li>
+     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE} (Optional, the default)</li>
      * </ul>
      * 
-     * <p>For example, passing in <i>PoddTopObject</i> and property <i>hasLeadInstitution</i>, will return
-     * {@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE}.</p>
+     * <p>
+     * For example, passing in <i>PoddTopObject</i> and property <i>hasLeadInstitution</i>, will
+     * return {@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE}.
+     * </p>
      * <br>
      * <p>
-     * <b>NOTE:</b> This method currently handles only Qualified Cardinality statements, which are the only type
-     * found in PODD schema ontologies at present. However, as the property's value type is ignored,
-     * the output is incomplete if a property has more than one type of possible value with
-     * different cardinalities.
+     * <b>NOTE:</b> This method currently handles only Qualified Cardinality statements, which are
+     * the only type found in PODD schema ontologies at present. However, as the property's value
+     * type is ignored, the output is incomplete if a property has more than one type of possible
+     * value with different cardinalities.
      * </p>
      * 
      * @param artifactID
@@ -92,7 +96,8 @@ public interface PoddSesameManager
      * @param propertyUri
      *            The property under consideration
      * @param repositoryConnection
-     * @return a URI representing the cardinality value.
+     * @return a URI representing the cardinality value or NULL if no cardinality statements were
+     *         found
      * @throws OpenRDFException
      * 
      * @since 03/05/2013

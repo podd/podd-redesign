@@ -23,6 +23,7 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
@@ -1054,9 +1055,15 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 72, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 22,
+        Assert.assertEquals("Display Model not of expected size", 78, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 20,
                 displayModel.filter(objectUri, null, null).size());
+        
+        Assert.assertEquals("Object not typed as a Project", "http://purl.org/podd/ns/poddScience#Project",
+                displayModel.filter(objectUri, RDF.TYPE, null).objectString());
+        Assert.assertEquals("Object Label incorrect", "Project#2012-0006_ Cotton Leaf Morphology",
+                displayModel.filter(objectUri, RDFS.LABEL, null).objectString());
+
         
         Assert.assertEquals(
                 "Expected 1 hasLeadInstitution statement",
@@ -1074,6 +1081,38 @@ public abstract class AbstractPoddSesameManagerTest
                                 ValueFactoryImpl.getInstance().createURI(
                                         "http://purl.org/podd/ns/poddBase#hasLeadInstitution"), null).objectString());
         
+        // verify: #hasLeadInstitution property
+        final Model leadInstituteTriples =
+                displayModel.filter(
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasLeadInstitution"),
+                        null, null);
+        Assert.assertEquals("Not the expected no. of statements about property #hasLeadInstitution", 5,
+                leadInstituteTriples.size());
+        Assert.assertEquals("Unexpected Label for #hasLeadInstitution", "Lead Institution", leadInstituteTriples
+                .filter(null, RDFS.LABEL, null).objectString());
+        Assert.assertEquals("Unexpected Type for #hasLeadInstitution", OWL.DATATYPEPROPERTY, leadInstituteTriples
+                .filter(null, RDF.TYPE, null).objectURI());
+        Assert.assertEquals("Unexpected Display Type for #hasLeadInstitution", PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_SHORTTEXT, leadInstituteTriples
+                .filter(null, ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/ns/poddBase#hasDisplayType"), null).objectURI());
+        Assert.assertEquals("Unexpected Cardinality for #hasLeadInstitution",
+                PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE,
+                leadInstituteTriples.filter(null, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, null).objectURI());        
+        
+        // verify: :publication45
+        Assert.assertEquals("Unexpected value for #hasPublication", 
+                ValueFactoryImpl.getInstance().createURI(
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#publication45"),
+                displayModel.filter(null,
+                        ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddScience#hasPublication"),
+                        null).objectURI());
+        Assert.assertEquals(
+                "Missing label for :publication45",
+                1,
+                displayModel.filter(
+                        ValueFactoryImpl.getInstance().createURI(
+                                "http://purl.org/podd/basic-2-20130206/artifact:1#publication45"), RDFS.LABEL, null)
+                        .size());
         Assert.assertTrue(
                 "Expected content missing in display model",
                 displayModel.toString().contains(
