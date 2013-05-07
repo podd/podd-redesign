@@ -1419,9 +1419,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // for ORDER BY
         sb.append(" OPTIONAL { ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
         
-        // value may not have a Label
-        sb.append(" OPTIONAL { ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
-        
         // for ORDER BY
         sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?weight } . ");
         
