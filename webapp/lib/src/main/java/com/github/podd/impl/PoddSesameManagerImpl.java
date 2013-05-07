@@ -1337,8 +1337,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
         sb.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
                 + "> ?propertyDisplayType . ");
-        sb.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue()
-                + "> ?propertyWeight . ");
         sb.append(" ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel . ");
         
         sb.append("} WHERE {");
@@ -1352,9 +1350,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         // property may not have a Label
         sb.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
-
-        // property may not have a weight
-        sb.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight } . ");
 
         // value may not have a Label
         sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
@@ -1384,10 +1379,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         resultModel.addAll(queryResults);
         
-        // --- add cardinality for each displayable property
-        final List<URI> allProperties = this.getWeightedProperties(artifactID, objectUri, true, repositoryConnection);
-        for(URI propertyUri : allProperties)
+        final boolean excludeContainsProperties = true;
+        final List<URI> allProperties = this.getWeightedProperties(artifactID, objectUri, excludeContainsProperties, repositoryConnection);
+        for (int i = 0; i < allProperties.size(); i++)
         {
+            URI propertyUri = allProperties.get(i);
+            // ---- add property displaying order as "weight"
+            resultModel.add(propertyUri, PoddRdfConstants.PODD_BASE_WEIGHT, ValueFactoryImpl.getInstance().createLiteral(i));
+            
+            // --- add cardinality for each displayable property
             final URI cardinalityValue = this.getCardinalityValue(artifactID, objectUri, propertyUri, repositoryConnection);
             if (cardinalityValue != null)
             {
