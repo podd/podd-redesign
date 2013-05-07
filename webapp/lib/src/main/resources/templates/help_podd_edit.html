@@ -1,19 +1,19 @@
 
 <link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-smoothness.css" media="screen" type="text/css" />
 		
-    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
+    	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
 
  	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.core.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.widget.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.core.js"></script>
 
-		Dependencies for rdfquery
+		<!-- Dependencies for rdfquery -->
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdfquery.rules-1.1-SNAPSHOT.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdf.turtle.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.bounce.js"></script>
 		
-		Dependencies for autocomplete
+		<!-- Dependencies for autocomplete -->
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.mouse.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.position.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.selectable.js"></script>
@@ -24,26 +24,16 @@
 	    
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.autocomplete.js"></script>
 
-		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script>
-		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
-
-		Dependencies for jstree
+		<!-- Dependencies for jstree -->
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.hotkeys.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.cookie.js"></script>
 	    
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.jstree.js"></script>
  
- 	<script type="text/javascript">
-		// --------------------------------
-		// everything needs to come in here
-		// --------------------------------
-		$(document).ready(
-			function() {
-				console.debug('document.ready() starting...');
-				loadObjectDetails();
-				console.debug('document.ready() completing...');
-		});
-		</script>
+ 		<!-- Dependencies for PODD -->
+		<!-- script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script-->
+		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
+
 
 
 		
@@ -56,5 +46,45 @@
 			Project (Artifact) IRI: <input class='noaction' id='podd_artifact' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1'><br>
 			<button id="btn2">Retrieve Artifact</button><br>
 		</div>
+
+	<h3 class="underlined_heading">Project Details
+	</h3>
+	<div id="details">  <!-- Collapsible div -->
+			<!-- standard attributes -->
+			<ol>
+	        	<li>
+	            <label for="object_name" class="bold">Title:
+					<span icon="required"></span>
+				</label>
+                </li>
+                
+                <li>
+                <input id="object_name" name="object_name" type="text" value="${poddObject.label!""}">
+                <h6 class="errorMsg">${objectNameError!""}</h6>
+	            </li>
+	            
+	            <li>
+	            <label for="object_description" class="bold">Description:</label>
+                </li>
+                
+                <li>
+				<textarea id="object_description" name="object_description" cols="30" rows="2">${poddObject.description!""}</textarea>
+                <span id="object_desc_text_limit"></span>
+                <h6 class="errorMsg">${objectDescriptionError!""}</h6>
+				</li>
+			<!--  other attributes -->
+
+            </ol>
+        </div>
+    </div>  <!-- details - Collapsible div -->
+
+
+
+		
+		<div id="header">
+		<ul id='list_attributes'>
+		</ul>
+		</div>
+		
 		<br><br>
 		
