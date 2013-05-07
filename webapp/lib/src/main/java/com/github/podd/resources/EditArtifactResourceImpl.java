@@ -23,7 +23,6 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
@@ -223,7 +222,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     /**
      * Request for RDF data for building the "edit object" page. 
      */
-    @Get("rdf|rj|ttl")
+    @Get("rdf|rj|json|ttl")
     public Representation getEditArtifactRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         // the artifact in which editing is requested
