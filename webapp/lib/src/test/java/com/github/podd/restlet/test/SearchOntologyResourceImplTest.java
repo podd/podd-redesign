@@ -164,6 +164,28 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
+     * Test successful search for a FOR Codes in RDF/XML
+     */
+    @Test
+    public void testSearchRdfForANZSRCAssertion() throws Exception
+    {
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#ANZSRCAssertion"};
+        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
+        
+        final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType);
+        
+        // verify:
+        Assert.assertEquals("Not the expected number of results", 4, resultModel.size());
+        Assert.assertEquals("Expected Assertion 'Yes' not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Yes")).size());
+        Assert.assertEquals("Expected Assertion 'Unknown' not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Unknown")).size());
+        Assert.assertEquals("Expected Assertion 'Not Applicable' not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Not Applicable")).size());
+    }
+        
+    
+    /**
      * Test successful search for a Platform in RDF/XML
      */
     @Test

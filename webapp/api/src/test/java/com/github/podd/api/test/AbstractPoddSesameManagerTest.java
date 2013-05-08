@@ -1739,11 +1739,31 @@ public abstract class AbstractPoddSesameManagerTest
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#searchOntologyLabels(String, InferredOWLOntologyID, int, int, RepositoryConnection, URI...)}
      */
-    @Ignore
     @Test
     public void testSearchOntologyLabelsOther() throws Exception
     {
+        // prepare:
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
         
+        final String searchTerm = "";
+        final URI[] searchTypes =
+                { PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"),
+                        PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "NamedIndividual") };
+        final Model result =
+                this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, 1000, 0,
+                        this.testRepositoryConnection, searchTypes);
+        
+        // verify:
+        Assert.assertNotNull("NULL result", result);
+        Assert.assertEquals("Not the expected number of search results", 4, result.size());
+        
+        Assert.assertEquals("Expected Literal 'Not Applicable' not found", 1,
+                result.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Not Applicable")).size());
+        Assert.assertEquals("Expected Literal 'No' not found", 1,
+                result.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("No")).size());
     }
     
     /**
