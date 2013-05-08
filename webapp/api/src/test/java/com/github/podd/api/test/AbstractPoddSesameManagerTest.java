@@ -14,7 +14,6 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -1055,7 +1054,7 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 82, displayModel.size());
+        Assert.assertEquals("Display Model not of expected size", 90, displayModel.size());
         Assert.assertEquals("Not the expected no. of statements about object", 20,
                 displayModel.filter(objectUri, null, null).size());
         

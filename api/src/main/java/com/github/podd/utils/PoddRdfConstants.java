@@ -183,6 +183,10 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_DISPLAY_TYPE_TABLE = PoddRdfConstants.VALUE_FACTORY.createURI(
             PoddRdfConstants.PODD_BASE, "DisplayType_Table");
 
+    /** http://purl.org/podd/ns/poddBase#hasAllowedValue */
+    public static final URI PODD_BASE_ALLOWED_VALUE = ValueFactoryImpl.getInstance().createURI(
+            PoddRdfConstants.PODD_BASE, "hasAllowedValue");
+
     
     // ----- custom representation of cardinalities -----
 

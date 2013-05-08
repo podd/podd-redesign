@@ -1393,6 +1393,26 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             {
                 resultModel.add(propertyUri, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
             }
+            
+            // --- for 'drop-down' type properties, add all possible options into Model
+            final Model filter = resultModel.filter(propertyUri, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE, null);
+            if(filter.size() == 1 && PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN.equals(filter.objectURI()))
+            {
+                final URI propertyValue = resultModel.filter(objectUri, propertyUri, null).objectURI();
+                
+                final List<URI> valueTypes = this.getObjectTypes(artifactID, propertyValue, repositoryConnection);
+                if(valueTypes.size() > 0)
+                {
+                    final Model allPossibleValues =
+                            this.searchOntologyLabels("", artifactID, 1000, 0, repositoryConnection, valueTypes.get(0));
+                    
+                    for(Statement s : allPossibleValues)
+                    {
+                        resultModel.add(propertyUri, PoddRdfConstants.PODD_BASE_ALLOWED_VALUE, s.getSubject());
+                        resultModel.add(s);
+                    }
+                }
+            }
         }
         
         return resultModel;
