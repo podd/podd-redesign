@@ -35,42 +35,34 @@
 		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
 
 
-
-		
-
-
-	    <h3>Edit PODD Object</h3>
-		<br>
-		<br>
 		<div>
 			Project (Artifact) IRI: <input class='noaction' id='podd_artifact' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1'><br>
-			<button id="btn2">Retrieve Artifact</button><br>
 		</div>
-
-	<h3 class="underlined_heading">Project Details
-	</h3>
+	<br><br>
+	
+	<h3 class="underlined_heading">Project Details</h3>
 	<div id="details">  <!-- Collapsible div -->
 			<!-- standard attributes -->
 			<ol>
+				<!-- object name -->
 	        	<li>
-	            <label for="object_name" class="bold">Title:
-					<span icon="required"></span>
-				</label>
+		            <label for="object_name" class="bold">Title:
+						<span icon="required"></span>
+					</label>
                 </li>
-                
                 <li>
-                <input id="object_name" name="object_name" type="text" value="${poddObject.label!""}">
-                <h6 class="errorMsg">${objectNameError!""}</h6>
+	                <input id="object_name" name="object_name" type="text" value="${poddObject.label!""}">
+	                <h6 class="errorMsg">${objectNameError!""}</h6>
 	            </li>
 	            
+	            <!-- object description -->
 	            <li>
-	            <label for="object_description" class="bold">Description:</label>
+		            <label for="object_description" class="bold">Description:</label>
                 </li>
-                
                 <li>
-				<textarea id="object_description" name="object_description" cols="30" rows="2">${poddObject.description!""}</textarea>
-                <span id="object_desc_text_limit"></span>
-                <h6 class="errorMsg">${objectDescriptionError!""}</h6>
+					<textarea id="object_description" name="object_description" cols="30" rows="2">${poddObject.description!""}</textarea>
+	                <span id="object_desc_text_limit"></span>
+	                <h6 class="errorMsg">${objectDescriptionError!""}</h6>
 				</li>
 			<!--  other attributes -->
 

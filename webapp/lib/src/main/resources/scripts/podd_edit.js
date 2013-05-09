@@ -142,8 +142,10 @@ function displayEditField(index, nextField) {
 	// console.debug('[' + nextField.weight + '] <' + nextField.propertyUri + '> "' + nextField.propertyLabel + '" <' +
 	//		nextField.displayType + '> <' + nextField.cardinality + '>');
 
+	// field name
     var span = $('<span>');
     span.attr('class', 'bold');
+    span.attr('property', nextField.propertyUri);
     span.html(nextField.propertyLabel);
 
     var li = $("<li>")
@@ -156,10 +158,10 @@ function displayEditField(index, nextField) {
 		li.append(spanRequired);
 	}
 	
-	// display (+) icon with action to add extra values
+	// display (+) icon to add extra values
 	if (nextField.cardinality == CARD_ZeroOrMany || nextField.cardinality == CARD_OneOrMany) {
 		link = $('<a>');
-		link.attr('href', 'javascript:addNewEmptyField()');
+		link.attr('href', 'javascript:addNewEmptyField("' + nextField.propertyLabel + '")');
 		link.attr('icon', 'addField');
 		link.attr('title', 'add ' + nextField.propertyLabel);
 		li.append(link);
@@ -168,55 +170,13 @@ function displayEditField(index, nextField) {
 	var li2 = $("<li>")
 	
 	if (nextField.displayType == DISPLAY_LongText) {
-		var input = $('<input>', {
-			id: 'prop_' + nextField.propertyLabel,
-			name: 'prop_' + nextField.propertyLabel,
-		    type:'textarea',
-		    value: nextField.displayValue
-		});
-		li2.append(input);
+		li2.append(addFieldInputText(input, 'textarea'));
+		
+	} else if (nextField.displayType == DISPLAY_ShortText) {
+		li2.append(addFieldInputText(nextField, 'text'));
 		
 	} else if (nextField.displayType == DISPLAY_DropDown) {
-		var select = $('<select>', {
-			id: 'prop_' + nextField.propertyLabel,
-			name: 'prop_' + nextField.propertyLabel,
-		});
-		
-		var myQuery = $.rdf({
-			databank : nextDatabank
-		})
-		.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
-		.where('<' + nextField.propertyUri + '> poddBase:hasAllowedValue ?pValue')
-		.optional('?pValue <http://www.w3.org/2000/01/rdf-schema#label> ?pDisplayValue')
-		;
-		var bindings = myQuery.select();
-//		console.debug('Found ' + bindings.length + ' bindings for query');
-		$.each(bindings, function(index, value) {
-			
-			var optionValue = value.pValue.value;
-			
-			var optionDisplayValue = value.pValue.value;
-			if (value.pDisplayValue != 'undefined') {
-				optionDisplayValue = value.pDisplayValue.value;
-			}
-			
-			var selectedVal = false;
-			console.debug(nextField.valueUri + ' against ' + optionValue);
-			if (nextField.valueUri == optionValue)	{
-				console.debug(optionValue + ' is the current selected value');
-				selectedVal = true;
-			}
-			
-			var option = $('<option>', {
-				value: optionValue,
-				text: optionDisplayValue,
-				selected: selectedVal
-			});
-			
-			select.append(option);
-		});
-		
-		li2.append(select);
+		li2.append(addFieldDropDownList(nextField));
 		
 	} else if (nextField.displayType == DISPLAY_CheckBox) {
 		checkBox = $('<p>');
@@ -236,20 +196,82 @@ function displayEditField(index, nextField) {
 
 		li2.append(checkBox);
 		
-	} else { // default, short_text
-		var input = $("<input>", {
-			id: 'prop_' + nextField.propertyLabel,
-			name: 'prop_' + nextField.propertyLabel,
-			type: 'text',
-			value: nextField.displayValue
-		});
-		li2.append(input);
+	} else { // default
+		li2.append(addFieldInputText(nextField, 'text'));
 	}
 
 	li.append(li2);
 	$("#details ol").append(li);
 }
 
+/*
+ * Construct an HTML input field of a given type.
+ */
+function addFieldInputText(nextField, inputType) {
+	var input = $('<input>', {
+		id: 'prop_' + nextField.propertyLabel,
+		name: 'prop_' + nextField.propertyLabel,
+	    type: inputType,
+	    value: nextField.displayValue
+	});
+	return input;
+}
+
+/*
+ * Construct an HTML drop-down list for the given field. 
+ */
+function addFieldDropDownList(nextField) {
+	var select = $('<select>', {
+		id: 'prop_' + nextField.propertyLabel,
+		name: 'prop_' + nextField.propertyLabel,
+	});
+	
+	var myQuery = $.rdf({
+		databank : nextDatabank
+	})
+	.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+	.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
+	.where('<' + nextField.propertyUri + '> poddBase:hasAllowedValue ?pValue')
+	.optional('?pValue rdfs:label ?pDisplayValue')
+	;
+	var bindings = myQuery.select();
+	// console.debug('Found ' + bindings.length + ' bindings for query');
+	$.each(bindings, function(index, value) {
+		
+		var optionValue = value.pValue.value;
+		
+		var optionDisplayValue = value.pValue.value;
+		if (value.pDisplayValue != 'undefined') {
+			optionDisplayValue = value.pDisplayValue.value;
+		}
+		
+		var selectedVal = false;
+		if (nextField.valueUri == optionValue)	{
+			console.debug('SELECTED option = ' + optionValue);
+			selectedVal = true;
+		}
+		
+		var option = $('<option>', {
+			value: optionValue,
+			text: optionDisplayValue,
+			selected: selectedVal
+		});
+		
+		select.append(option);
+	});
+	return select;
+}
+
+//simply copied from PODD-1, does not work
+function addNewEmptyField(id) {
+	console.debug('Add new Empty field for "' + id + '"');
+//    var element = document.createElement(type);
+//    element.setAttribute('id', id);
+//    element.setAttribute('name', id);
+//    var li = document.createElement("li");
+//    li.appendChild(element);
+//    document.getElementById('add_' + id).appendChild(li);
+}
 
 /*
  * Search Ontology Resource Service using AJAX, convert the RDF response to
@@ -280,14 +302,4 @@ function searchOntologyService(
 }
 
 
-
-//simply copied from PODD-1, does not work
-function addNewEmptyField(id, type) {
-    var element = document.createElement(type);
-    element.setAttribute('id', id);
-    element.setAttribute('name', id);
-    var li = document.createElement("li");
-    li.appendChild(element);
-    document.getElementById('add_' + id).appendChild(li);
-}
 
