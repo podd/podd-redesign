@@ -51,7 +51,7 @@
 					</label>
                 </li>
                 <li>
-	                <input id="object_name" name="object_name" type="text" value="${poddObject.label!""}">
+	                <input id="object_name" name="object_name" type="text" value="$_{poddObject.label}">
 	                <h6 class="errorMsg">${objectNameError!""}</h6>
 	            </li>
 	            
@@ -60,16 +60,23 @@
 		            <label for="object_description" class="bold">Description:</label>
                 </li>
                 <li>
-					<textarea id="object_description" name="object_description" cols="30" rows="2">${poddObject.description!""}</textarea>
+					<textarea id="object_description" name="object_description" cols="30" rows="2">$_{poddObject.description!""}</textarea>
 	                <span id="object_desc_text_limit"></span>
 	                <h6 class="errorMsg">${objectDescriptionError!""}</h6>
 				</li>
 			<!--  other attributes -->
 
             </ol>
-        </div>
-    </div>  <!-- details - Collapsible div -->
 
+			<br>
+			<label id="tLbl1">Hello there</label><br>
+			<p id="p1">Message</p><br>
+			<br>
+			
+			<button id='btn9' class='clonable'>Test</button>
+
+
+    </div>  <!-- details - Collapsible div -->
 
 
 		

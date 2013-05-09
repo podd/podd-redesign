@@ -15,6 +15,9 @@ $(document).ready(
 
 		getPoddObjectForEdit(artifactUri, objectUri);
 
+		// use delegation for dynamically added .clonable anchors
+		$("#details").delegate(".clonable","click", cloneEmptyField);
+
 		console.debug('### initialization complete ###');
 });
 
@@ -161,28 +164,31 @@ function displayEditField(index, nextField) {
 	// display (+) icon to add extra values
 	if (nextField.cardinality == CARD_ZeroOrMany || nextField.cardinality == CARD_OneOrMany) {
 		link = $('<a>');
-		link.attr('href', 'javascript:addNewEmptyField("' + nextField.propertyLabel + '")');
+		//link.attr('href', '#');
 		link.attr('icon', 'addField');
-		link.attr('title', 'add ' + nextField.propertyLabel);
+		link.attr('title', 'Add ' + nextField.propertyLabel);
+		link.attr('class', 'clonable');
+		link.attr('id', 'cid_' + nextField.propertyUri);
+		link.attr('property', nextField.propertyUri);
 		li.append(link);
 	}
 	
 	var li2 = $("<li>")
+	li2.attr('id', 'id_li_' + nextField.propertyUri);
 	
 	if (nextField.displayType == DISPLAY_LongText) {
 		li2.append(addFieldInputText(input, 'textarea'));
 		
 	} else if (nextField.displayType == DISPLAY_ShortText) {
 		li2.append(addFieldInputText(nextField, 'text'));
-		
+
 	} else if (nextField.displayType == DISPLAY_DropDown) {
 		li2.append(addFieldDropDownList(nextField));
 		
 	} else if (nextField.displayType == DISPLAY_CheckBox) {
-		checkBox = $('<p>');
-		checkBox.text('CheckBox here');
-		
-		li2.append(checkBox);
+		var input = addFieldInputText(nextField, 'checkbox')
+		var label = '<label>' + nextField.displayValue + '</label>';
+		li2.append(input.after(label));
 		
 	} else if (nextField.displayType == DISPLAY_Table) {
 		checkBox = $('<p>');
@@ -200,20 +206,109 @@ function displayEditField(index, nextField) {
 		li2.append(addFieldInputText(nextField, 'text'));
 	}
 
-	li.append(li2);
+	var subList = $('<ul>').append(li2);
+	li.append(subList);
 	$("#details ol").append(li);
 }
+
+function cloneEmptyField() {
+	console.debug('A clonable was clicked somewhere!');
+	var thisId = $(this).attr('id');
+	console.debug('Clicked clonable: ' + thisId);
+	
+	var idToClone = '#id_http://purl.org/podd/ns/poddScience_hasANZSRC'; //'#id_' + $(this).attr('property');
+	console.debug('Requested cloning ' + idToClone);
+
+	var clonedField = $(idToClone).clone(true);
+	clonedField.attr('id', 'LABEL_cloned');
+	console.debug('Cloned: ' + clonedField.attr('id'));
+	
+	$(this).append(clonedField);
+	console.debug('appended cloned field');
+	
+	var newObject = jQuery.extend(true, {}, $(idToClone));
+	console.debug('## SO clone: ' + newObject);
+	$(this).append(newObject);
+	
+	// debug - cloning
+	var p1Id = '#p1';
+	var cloned = $(p1Id).clone()
+	var oldId = cloned.attr('id');
+	cloned.attr('id', oldId + '_v1');
+	$(this).append(cloned);
+
+}
+
+function old(){
+	
+	var toClone = $(idToClone);
+	var clonedField = toClone.clone();
+	clonedField.attr('id', idToClone + '_some_random_val');
+	clonedField.val('');
+	
+	toClone.append(clonedField);
+	
+	console.debug('Cloning completed');
+	
+}
+
+
+
+
+//simply copied from PODD-1, does not work
+function addNewEmptyField(id) {
+	console.debug('Add new Empty field for "' + id + '"');
+	
+	var parentId = 'id_li' + id;
+	console.debug('Add after parent with id: ' + $('"#' + parentId + '"').attr('id'));
+	
+	var clonableId = 'id_' + id;
+	//var clonedField = $('"#' + clonableId + '"').clone();
+	var clonedField = $('#p1').clone();
+	console.debug('Cloned field of type: ' + clonedField.attr('type'));
+	
+	//$(parentId).append(clonedField);
+	$('#id_http://purl.org/podd/ns/poddScience#hasANZSRC').append(clonedField);
+	
+	
+//	var cloned = $('#p1').clone()
+//	var oldId = cloned.attr('id');
+//	cloned.attr('id', oldId + '_v1');
+	
+	//$('#tLbl1').append(clonedField);
+	$('#p1').html('button clicked');
+	
+	
+//    var element = document.createElement(type);
+//    element.setAttribute('id', id);
+//    element.setAttribute('name', id);
+//    var li = document.createElement("li");
+//    li.appendChild(element);
+//    document.getElementById('add_' + id).appendChild(li);
+}
+
+
 
 /*
  * Construct an HTML input field of a given type.
  */
 function addFieldInputText(nextField, inputType) {
+	
+	var displayValue = nextField.displayValue;
+	if (inputType == 'checkbox'){
+		displayValue = nextField.valueUri;
+	}
+	
+	var idString = 'id_' + nextField.propertyUri;
+	idString = idString.replace("#", "_");
+	
 	var input = $('<input>', {
-		id: 'prop_' + nextField.propertyLabel,
-		name: 'prop_' + nextField.propertyLabel,
+		id: idString,
+		name: 'name_' + nextField.propertyLabel,
 	    type: inputType,
-	    value: nextField.displayValue
+	    value: displayValue
 	});
+	
 	return input;
 }
 
@@ -222,8 +317,8 @@ function addFieldInputText(nextField, inputType) {
  */
 function addFieldDropDownList(nextField) {
 	var select = $('<select>', {
-		id: 'prop_' + nextField.propertyLabel,
-		name: 'prop_' + nextField.propertyLabel,
+		id: 'id_' + nextField.propertyUri,
+		name: 'name_' + nextField.propertyLabel,
 	});
 	
 	var myQuery = $.rdf({
@@ -262,16 +357,6 @@ function addFieldDropDownList(nextField) {
 	return select;
 }
 
-//simply copied from PODD-1, does not work
-function addNewEmptyField(id) {
-	console.debug('Add new Empty field for "' + id + '"');
-//    var element = document.createElement(type);
-//    element.setAttribute('id', id);
-//    element.setAttribute('name', id);
-//    var li = document.createElement("li");
-//    li.appendChild(element);
-//    document.getElementById('add_' + id).appendChild(li);
-}
 
 /*
  * Search Ontology Resource Service using AJAX, convert the RDF response to
