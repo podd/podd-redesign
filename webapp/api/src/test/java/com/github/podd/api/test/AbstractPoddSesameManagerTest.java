@@ -888,6 +888,94 @@ public abstract class AbstractPoddSesameManagerTest
                     objectTypes.get(0));
         }
     }
+
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getObjectData(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
+     */
+    @Test
+    public void testGetPoddObjectData() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        final String[] objectUris =
+                { 
+                        "http://purl.org/podd/basic-1-20130206/object:2966",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                        "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", //NOT a PODD Object
+                        };
+
+        final Object[][] expectedResults = 
+            {
+                {20, 1, "Project#2012-0006_ Cotton Leaf Morphology", "http://purl.org/podd/basic-2-20130206/artifact:1"},
+                {4, 1, "Demo genotype", "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material"},
+                {5, 1, "Squeekee material", "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation"},
+                {6, 3, "Not Applicable"}, 
+            };
+        
+        // test in a loop these PODD objects for their details
+        for(int i = 0; i < objectUris.length; i++)
+        {
+            final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
+            
+            final Model model =
+                    this.testPoddSesameManager.getObjectData(ontologyID, objectUri, this.testRepositoryConnection);
+            
+            // verify: statement count
+            Assert.assertNotNull("NULL model as result", model);
+            Assert.assertEquals("Not the expected no. of statements in model", expectedResults[i][0], model.size());
+            
+            // verify: parent object
+            Model parentFilter = model.filter(null, null, objectUri);
+            Assert.assertEquals("More than expected parent found", expectedResults[i][1], parentFilter.subjects().size());
+            if (parentFilter.subjects().size() == 1)
+            {
+                Assert.assertTrue(
+                        "Expected Parent is missing",
+                        parentFilter.subjects().contains(
+                                ValueFactoryImpl.getInstance().createURI(expectedResults[i][3].toString())));
+            }
+            
+            // verify: label
+            Assert.assertEquals("Not the expected label", expectedResults[i][2], model.filter(null, RDFS.LABEL, null)
+                    .objectString());
+        }
+        
+        Assert.assertTrue("Expected empty Model for NULL object",
+                this.testPoddSesameManager.getObjectData(ontologyID, null, this.testRepositoryConnection).isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
+     */
+    @Test
+    public void testGetObjectTypeMetadata() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+
+        final URI objectUri = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation");
+        
+        final Model model =
+                this.testPoddSesameManager.getObjectTypeMetadata(ontologyID, objectUri, this.testRepositoryConnection);
+
+        // verify: TODO
+        DebugUtils.printContents(this.testRepositoryConnection, 
+                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/1"));
+        DebugUtils.printContents(model);
+    }
     
     /**
      * Test method for

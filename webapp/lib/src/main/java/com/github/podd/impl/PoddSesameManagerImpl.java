@@ -1248,6 +1248,82 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return results;
     }
     
+    @Override
+    public Model getObjectData(final InferredOWLOntologyID artifactID, final URI objectUri,
+    final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        if (objectUri == null)
+        {
+            return new LinkedHashModel();
+        }
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?parent ?somePropertyUri ?poddObject . ");
+        
+        sb.append("} WHERE {");
+        
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?parent ?somePropertyUri ?poddObject . ");
+        
+        sb.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectUri);
+        
+        final Model queryResults =
+                this.executeGraphQuery(graphQuery,
+                        versionAndSchemaContexts(artifactID, repositoryConnection));
+        
+        return queryResults;
+    }
+    
+    @Override
+    public Model getObjectTypeMetadata(final InferredOWLOntologyID artifactID, final URI objectType,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        if (objectType == null)
+        {
+            return new LinkedHashModel();
+        }
+     
+        // - find all Properties and their ranges
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?poddObject ?propertyUri ?owlClass . ");
+        sb.append(" ?poddObject ?propertyUri ?rangeClass . ");
+        sb.append(" ?poddObject ?propertyUri ?valueRange . ");
+        
+        sb.append("} WHERE {");
+        
+        sb.append(" ?poddObject <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
+        sb.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        sb.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange } . ");
+        
+        sb.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectType);
+        
+        final Model queryResults =
+                this.executeGraphQuery(graphQuery,
+                        versionAndSchemaContexts(artifactID, repositoryConnection));
+        
+        
+        // -- for each property, get meta-data necessary to render it
+        // FIXME
+        
+        
+        
+        return queryResults;
+    }
+    
     /**
      * The result of this method is a Model containing all data required for displaying the details
      * of the object in HTML+RDFa.

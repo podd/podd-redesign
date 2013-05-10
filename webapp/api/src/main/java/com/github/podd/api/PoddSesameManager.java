@@ -161,6 +161,56 @@ public interface PoddSesameManager
         throws OpenRDFException;
     
     /**
+     * For a given PODD Object, this method finds all property values associated with it and also
+     * links from others (e.g. parent objects) to this object. For example:
+     * <ul>
+     * <li>{pObj_x} rdfs:label {"X"}</li>
+     * <li>{pObj_x} rdfs:comment {"This object is about X"}</li>
+     * <li>{pObj_x} poddScience:hasInvestigation {pChild_y}</li>
+     * <li>{pArent} poddScience:hasProcess {pObj_x}</li>
+     * </ul>
+     * <br>
+     * If the object URI is null, an empty {@link Model} is returned.
+     * 
+     * @param artifactID
+     *            The PODD artifact to which this object belongs
+     * @param objectUri
+     *            The object whose details are sought.
+     * @param repositoryConnection
+     * @return A {@link Model} containing all statements about the object.
+     * @throws OpenRDFException
+     * 
+     * @since 10/05/2013
+     */
+    Model getObjectData(InferredOWLOntologyID artifactID, URI objectUri, RepositoryConnection repositoryConnection)
+        throws OpenRDFException;
+
+    /**
+     * <p>
+     * For a given PODD Object type, this method returns meta-data about it which can be used to
+     * render the object.
+     * </p>
+     * <p>
+     * Even though this method deals with concepts defined in PODD schema ontologies, an associated
+     * artifact ID is required. This is used to select which schema ontologies and versions should
+     * be considered.
+     * </p>
+     * 
+     * @param artifactID
+     *            The associated artifact
+     * @param objectType
+     *            The object type whose details are sought
+     * @param repositoryConnection
+     * @return A {@link Model} containing statements which are useful for displaying this Object
+     *         Type
+     * @throws OpenRDFException
+     * 
+     * @since 10/05/2013
+     */
+    Model getObjectTypeMetadata(InferredOWLOntologyID artifactID, URI objectType,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+
+    /**
      * Returns a collection of ontologies managed in the given graph, optionally only returning the
      * current version.
      * 
@@ -365,6 +415,5 @@ public interface PoddSesameManager
 
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
-
 
 }
