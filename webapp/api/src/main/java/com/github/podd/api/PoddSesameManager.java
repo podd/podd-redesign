@@ -106,6 +106,10 @@ public interface PoddSesameManager
             RepositoryConnection repositoryConnection) throws OpenRDFException;
 
     
+    URI getCardinalityValue(URI objectUri, URI propertyUri,
+            boolean findFromType, RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
+
+    
     /**
      * Returns current version details of an artifact ontology which has the given IRI as the
      * Ontology IRI or Version IRI.
@@ -193,6 +197,8 @@ public interface PoddSesameManager
      * 
      * @param objectType
      *            The object type whose details are sought
+     * @param includeDoNotDisplayProperties
+     *            If true, properties that have been annotated as "Do Not Display" are also included
      * @param repositoryConnection
      * @param contexts
      *            The contexts from which metadata is to be retrieved
@@ -202,8 +208,8 @@ public interface PoddSesameManager
      * 
      * @since 10/05/2013
      */
-    Model getObjectTypeMetadata(URI objectType, RepositoryConnection repositoryConnection,
-            URI... contexts) throws OpenRDFException;
+    Model getObjectTypeMetadata(URI objectType, boolean includeDoNotDisplayProperties,
+            RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
 
     /**
      * Returns a collection of ontologies managed in the given graph, optionally only returning the

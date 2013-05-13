@@ -152,7 +152,7 @@ public abstract class AbstractPoddSesameManagerTest
      * This method loads all PODD schema ontologies and their pre-computed inferred statements into
      * the test repository.
      */
-    private void loadSchemaOntologies() throws Exception
+    private List<InferredOWLOntologyID> loadSchemaOntologies() throws Exception
     {
         String[] schemaResourcePaths =
                 { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
@@ -165,11 +165,18 @@ public abstract class AbstractPoddSesameManagerTest
                 { "/test/ontologies/dcTermsInferred.rdf", "/test/ontologies/foafInferred.rdf",
                         "/test/ontologies/poddUserInferred.rdf", "/test/ontologies/poddBaseInferred.rdf",
                         "/test/ontologies/poddScienceInferred.rdf", "/test/ontologies/poddPlantInferred.rdf", };
+        
+        
+        final List<InferredOWLOntologyID> schemaList = new ArrayList<InferredOWLOntologyID>();
         for(int i = 0; i < schemaResourcePaths.length; i++)
         {
             log.debug("Next paths: {} {}", schemaResourcePaths[i], schemaInferredResourcePaths[i]);
-            this.loadOntologyFromResource(schemaResourcePaths[i], schemaInferredResourcePaths[i], RDFFormat.RDFXML);
+            final InferredOWLOntologyID ontologyID =
+                    this.loadOntologyFromResource(schemaResourcePaths[i], schemaInferredResourcePaths[i],
+                            RDFFormat.RDFXML);
+            schemaList.add(ontologyID);
         }
+        return schemaList;
     }
     
     /**
@@ -466,7 +473,7 @@ public abstract class AbstractPoddSesameManagerTest
      * .
      */
     @Test
-    public void testGetCardinalityValue() throws Exception
+    public void testGetCardinalityValueWithPoddObject() throws Exception
     {
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
@@ -504,6 +511,55 @@ public abstract class AbstractPoddSesameManagerTest
         }
     }
 
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(URI, URI, boolean, RepositoryConnection, URI...)}
+     * .
+     */
+    @Test
+    public void testGetCardinalityValueWithPoddObjectType() throws Exception
+    {
+        // prepare: load schema ontologies
+        final List<InferredOWLOntologyID> loadedSchemaOntologies = this.loadSchemaOntologies();
+        
+        // prepare: build list of Contexts
+        final List<URI> contexts = new ArrayList<URI>();
+        for (InferredOWLOntologyID ontologyID : loadedSchemaOntologies)
+        {
+            contexts.add(ontologyID.getVersionIRI().toOpenRDFURI());
+        }
+        
+        // prepare: test data
+        final URI projectType =
+                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project");
+        final URI publicationType =
+                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Publication");
+        
+        final URI[][] testData =
+            {
+                { projectType, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasLeadInstitution"),
+                        PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE },
+                { publicationType, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAbstract"),
+                        PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                { projectType, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasPURL"),
+                    PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                { projectType, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
+                    PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY },
+                { publicationType, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasYear"),
+                    PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+                { publicationType, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAuthors"),
+                    PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
+            };        
+        
+        for (int i = 0; i < testData.length; i++)
+        {
+            final URI cardinalityValue =
+                    this.testPoddSesameManager.getCardinalityValue(testData[i][0], testData[i][1], true,
+                            testRepositoryConnection, contexts.toArray(new URI[0]));
+            Assert.assertEquals("Not the expected cardinality value", testData[i][2], cardinalityValue);
+        }
+    }
+    
     
     /**
      * Test method for
@@ -955,7 +1011,7 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(URI, RepositoryConnection, URI...)}
+     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(URI, boolean, RepositoryConnection, URI...)}
      * .
      */
     @Test
@@ -976,25 +1032,44 @@ public abstract class AbstractPoddSesameManagerTest
             contexts.add(nextDirectImport.toOpenRDFURI());
         }
         
-        final URI objectTypeUri =
-                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype");
-                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project");
-                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment");
-                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions");
+        // Format: Object Type, includeDoNotDisplayProperties, expected model size, 
+        // expected property count, do-not-display statement count
+        final Object[][] testData =
+            {
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"),false,
+                        107, 22, 0 },
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"),true,
+                    119, 24, 2 },
+                    
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"),false,
+                    50, 10, 0 },
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"),true,
+                    55, 11, 1 },
+                    
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),false,
+                    27, 5, 0 },
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),true,
+                    32, 6, 1 },
+                    
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),false,
+                    37, 7, 0 },
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),true,
+                    42, 8, 1 },
+            };        
         
-        final Model model =
-                this.testPoddSesameManager.getObjectTypeMetadata(objectTypeUri, this.testRepositoryConnection,
-                        contexts.toArray(new URI[0]));
-        
-        // verify: TODO
-//        DebugUtils.printContents(this.testRepositoryConnection,
-//                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/1"));
-        DebugUtils.printContents(model);
-        
-        Assert.assertEquals("Not the expected statement count in Model", 
-                //95, // with doNotDisplayStatements
-                85, // without doNotDisplayStatements
-                model.size());
+        for (int i = 0; i < testData.length; i++)
+        {
+            final Model model =
+                    this.testPoddSesameManager.getObjectTypeMetadata((URI)testData[i][0], (Boolean)testData[i][1],
+                            this.testRepositoryConnection, contexts.toArray(new URI[0]));
+
+            // verify:
+            Assert.assertEquals("Not the expected statement count in Model", testData[i][2], model.size());
+            Assert.assertEquals("Not the expected no. of properties", testData[i][3],
+                    model.filter((URI)testData[i][0], null, null).size() - 1);
+            Assert.assertEquals("Not the expected no. of non-displayable properties", testData[i][4],
+                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        }        
     }
     
     /**
