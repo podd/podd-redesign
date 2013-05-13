@@ -952,7 +952,8 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertFalse("Two versions should NOT have the same Version IRI", firstArtifactId.getVersionIRI()
                 .toString().equals(secondArtifactId.getVersionIRI().toString()));
         
-        this.verifyLoadedArtifact(secondArtifactId, 7, 25, 294, false);
+        this.verifyLoadedArtifact(secondArtifactId, 7, TestConstants.TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES, false);
     }
     
     /**
