@@ -164,10 +164,10 @@ public interface PoddSesameManager
      * For a given PODD Object, this method finds all property values associated with it and also
      * links from others (e.g. parent objects) to this object. For example:
      * <ul>
-     * <li>{pObj_x} rdfs:label {"X"}</li>
-     * <li>{pObj_x} rdfs:comment {"This object is about X"}</li>
-     * <li>{pObj_x} poddScience:hasInvestigation {pChild_y}</li>
-     * <li>{pArent} poddScience:hasProcess {pObj_x}</li>
+     * <li>&lt;pObj_x&gt; rdfs:label "X" .</li>
+     * <li>&lt;pObj_x&gt; rdfs:comment "This is a PODD process object" .</li>
+     * <li>&lt;pObj_x&gt; poddScience:hasInvestigation &lt;pChild_y&gt; .</li>
+     * <li>&lt;pArent&gt; poddScience:hasProcess &lt;pObj_x&gt; .</li>
      * </ul>
      * <br>
      * If the object URI is null, an empty {@link Model} is returned.
@@ -190,25 +190,20 @@ public interface PoddSesameManager
      * For a given PODD Object type, this method returns meta-data about it which can be used to
      * render the object.
      * </p>
-     * <p>
-     * Even though this method deals with concepts defined in PODD schema ontologies, an associated
-     * artifact ID is required. This is used to select which schema ontologies and versions should
-     * be considered.
-     * </p>
      * 
-     * @param artifactID
-     *            The associated artifact
      * @param objectType
      *            The object type whose details are sought
      * @param repositoryConnection
+     * @param contexts
+     *            The contexts from which metadata is to be retrieved
      * @return A {@link Model} containing statements which are useful for displaying this Object
      *         Type
      * @throws OpenRDFException
      * 
      * @since 10/05/2013
      */
-    Model getObjectTypeMetadata(InferredOWLOntologyID artifactID, URI objectType,
-            RepositoryConnection repositoryConnection) throws OpenRDFException;
+    Model getObjectTypeMetadata(URI objectType, RepositoryConnection repositoryConnection,
+            URI... contexts) throws OpenRDFException;
 
     /**
      * Returns a collection of ontologies managed in the given graph, optionally only returning the

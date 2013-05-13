@@ -1281,47 +1281,104 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public Model getObjectTypeMetadata(final InferredOWLOntologyID artifactID, final URI objectType,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    public Model getObjectTypeMetadata(final URI objectType, final RepositoryConnection repositoryConnection,
+            URI... contexts) throws OpenRDFException
     {
+        final boolean includeDoNotDisplayProperties = false;
+        
+        final Model results = new LinkedHashModel();
         if (objectType == null)
         {
-            return new LinkedHashModel();
+            return results;
         }
      
         // - find all Properties and their ranges
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb1 = new StringBuilder();
         
-        sb.append("CONSTRUCT { ");
-        sb.append(" ?poddObject ?propertyUri ?owlClass . ");
-        sb.append(" ?poddObject ?propertyUri ?rangeClass . ");
-        sb.append(" ?poddObject ?propertyUri ?valueRange . ");
+        sb1.append("CONSTRUCT { ");
+        sb1.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
+        sb1.append(" ?poddObject ?propertyUri ?owlClass . ");
+        sb1.append(" ?poddObject ?propertyUri ?rangeClass . ");
+        sb1.append(" ?poddObject ?propertyUri ?valueRange . ");
         
-        sb.append("} WHERE {");
+        sb1.append("} WHERE {");
         
-        sb.append(" ?poddObject <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
-        sb.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
-        sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
-        sb.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
-        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass } . ");
-        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange } . ");
+        sb1.append(" ?poddObject <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        sb1.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        sb1.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        sb1.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
+        sb1.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass } . ");
+        sb1.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange } . ");
         
-        sb.append("}");
+        if (!includeDoNotDisplayProperties)
+        {
+            // avoid non-displayable properties (e.g. poddBase:hasURL)
+            sb1.append(" FILTER NOT EXISTS { ?propertyUri <"
+                    + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
+        }
+
+        sb1.append("}");
         
-        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb1.toString());
         graphQuery.setBinding("poddObject", objectType);
         
-        final Model queryResults =
-                this.executeGraphQuery(graphQuery,
-                        versionAndSchemaContexts(artifactID, repositoryConnection));
+        final Model queryResults1 = this.executeGraphQuery(graphQuery, contexts);
+        results.addAll(queryResults1);
         
+        // -- for each property, get meta-data about it
+        final Set<URI> properties = queryResults1.predicates();
+        for (URI property : properties)
+        {
+            // - find property: type (e.g. object/datatype/annotation), label, display-type, weight
+            final StringBuilder sb2 = new StringBuilder();
+            
+            sb2.append("CONSTRUCT { ");
+            sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+            sb2.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
+                    + "> ?propertyDisplayType . ");
+            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight . ");
+
+            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> ?propertyDoNotDisplay . ");
+            
+            sb2.append("} WHERE {");
+            
+            sb2.append(" OPTIONAL {?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType } . ");
+            
+            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
+                    + "> ?propertyDisplayType } . ");
+            
+            sb2.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
+
+            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight } . ");
+            
+            if(includeDoNotDisplayProperties)
+            {
+                sb2.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                        + "> ?propertyDoNotDisplay } . ");
+            }
+            
+            // avoid, since we add object type and label to the Model up front
+            sb2.append(" FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
+            
+            sb2.append("}");
+            
+            final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2.toString());
+            graphQuery2.setBinding("propertyUri", property);
+            
+            this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}", sb2, property);
+
+            final Model queryResults2 = this.executeGraphQuery(graphQuery2, contexts);
+            results.addAll(queryResults2);
+            
+            
+            // - DONOTDisplay value (exclude these altogether?)
+            // - cardinality
+            
+        }
         
-        // -- for each property, get meta-data necessary to render it
         // FIXME
-        
-        
-        
-        return queryResults;
+        return results;
     }
     
     /**

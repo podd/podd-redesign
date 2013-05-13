@@ -6,6 +6,7 @@ package com.github.podd.api.test;
 import info.aduna.iteration.Iterations;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -954,27 +955,46 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(URI, RepositoryConnection, URI...)}
      * .
      */
     @Test
     public void testGetObjectTypeMetadata() throws Exception
     {
-        // prepare: load schema ontologies and test artifact
+        // prepare: load schema ontologies
         this.loadSchemaOntologies();
-        InferredOWLOntologyID ontologyID =
+        
+        // prepare: the contexts to search in - (load an artifact and get its imported schemas)
+        final InferredOWLOntologyID ontologyID =
                 this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
                         TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
-
-        final URI objectUri = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation");
+        final Set<IRI> directImports =
+                this.testPoddSesameManager.getDirectImports(ontologyID, testRepositoryConnection);
+        final List<URI> contexts = new ArrayList<URI>(directImports.size() + 2);
+        for(IRI nextDirectImport : directImports)
+        {
+            contexts.add(nextDirectImport.toOpenRDFURI());
+        }
+        
+        final URI objectTypeUri =
+                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype");
+                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project");
+                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment");
+                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions");
         
         final Model model =
-                this.testPoddSesameManager.getObjectTypeMetadata(ontologyID, objectUri, this.testRepositoryConnection);
-
+                this.testPoddSesameManager.getObjectTypeMetadata(objectTypeUri, this.testRepositoryConnection,
+                        contexts.toArray(new URI[0]));
+        
         // verify: TODO
-        DebugUtils.printContents(this.testRepositoryConnection, 
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/1"));
+//        DebugUtils.printContents(this.testRepositoryConnection,
+//                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/version/poddScience/1"));
         DebugUtils.printContents(model);
+        
+        Assert.assertEquals("Not the expected statement count in Model", 
+                //95, // with doNotDisplayStatements
+                85, // without doNotDisplayStatements
+                model.size());
     }
     
     /**
