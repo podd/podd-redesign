@@ -209,6 +209,56 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
     }
     
+    /*
+     * FIXME: implement me.
+     */
+    @Override
+    public void exportObjectMetadata(URI objectType, OutputStream outputStream, RDFFormat format,
+            boolean includeDoNotDisplayProperties) throws OpenRDFException, PoddException, IOException
+    {
+        List<URI> contexts = new ArrayList<URI>();
+        
+        //XXX - hack together contexts for testing only
+        String[] ccs = {
+                "http://purl.org/podd/ns/version/dcTerms/1",
+                "http://purl.org/podd/ns/version/foaf/1",
+                "http://purl.org/podd/ns/version/poddUser/1",
+                "http://purl.org/podd/ns/version/poddBase/1",
+                "http://purl.org/podd/ns/version/poddScience/1",
+                "http://purl.org/podd/ns/version/poddPlant/1",
+            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/dcTerms/1",
+            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/foaf/1",
+            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddUser/1",
+            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddBase/1",
+            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1",
+            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddPlant/1",
+            };
+        for (String c : ccs)
+        {
+            contexts.add(ValueFactoryImpl.getInstance().createURI(c));
+        }
+        
+        RepositoryConnection connection = null;
+        
+        try
+        {
+            connection = this.getRepositoryManager().getRepository().getConnection();
+            
+            final Model model =
+                    this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, connection,
+                            contexts.toArray(new URI[0]));
+            
+            Rio.write(model, outputStream, format);
+        }
+        finally
+        {
+            if(connection != null)
+            {
+                connection.close();
+            }
+        }
+    }    
+    
     @Override
     public InferredOWLOntologyID getArtifactByIRI(final IRI artifactIRI) throws UnmanagedArtifactIRIException
     {
@@ -1155,5 +1205,5 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         // TODO Auto-generated method stub
         return null;
     }
-    
+
 }

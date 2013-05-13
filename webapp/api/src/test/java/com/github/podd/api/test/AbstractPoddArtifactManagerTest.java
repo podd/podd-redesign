@@ -5,6 +5,7 @@ package com.github.podd.api.test;
 
 import info.aduna.iteration.Iterations;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -499,6 +500,31 @@ public abstract class AbstractPoddArtifactManagerTest
                     resultArtifactId.getOntologyIRI(), e.getOntologyID());
         }
         
+    }
+    
+    @Test
+    public final void testExportObjectMetadata() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+
+        final URI objectTypeUri =
+                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype");
+                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project");
+                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment");
+                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions");
+
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        final boolean includeDoNotDisplayProperties = false;
+        this.testArtifactManager.exportObjectMetadata(objectTypeUri, output, RDFFormat.TURTLE, includeDoNotDisplayProperties);
+        
+        System.out.println(output.toString());
     }
     
     @Test
