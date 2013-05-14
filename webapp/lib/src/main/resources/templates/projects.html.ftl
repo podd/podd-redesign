@@ -73,7 +73,13 @@
 No artifacts found
 </#if>
 
+<div id="buttonwrapper">
+     <a href="${baseUrl}/artifact/addobject?objecttypeuri=http://purl.org/podd/ns/poddScience#Project">Create Project</a>
+</div>
+
+
 </div>  <!-- content pane -->
+
 
 
 <#macro addArtifactDetails aArtifact>
