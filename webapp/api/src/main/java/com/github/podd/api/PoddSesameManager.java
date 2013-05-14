@@ -65,6 +65,19 @@ public interface PoddSesameManager
             URI ontologyManagementGraph) throws OpenRDFException;
 
     /**
+     * Gets all schema ontology versions currently configured in this PODD server.
+     * 
+     * @param repositoryConnection
+     * @param schemaManagementGraph
+     * @return
+     * @throws OpenRDFException
+     * 
+     * @since 14/05/2013
+     */
+    List<InferredOWLOntologyID> getAllSchemaOntologyVersions(RepositoryConnection repositoryConnection,
+            URI schemaManagementGraph) throws OpenRDFException;
+    
+    /**
      * Calculates the cardinality value for a given PODD object and property.
      * 
      * Possible output URIs represent the following cardinalities:

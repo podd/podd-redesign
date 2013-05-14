@@ -183,6 +183,38 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
+    public List<InferredOWLOntologyID> getAllSchemaOntologyVersions(final RepositoryConnection repositoryConnection,
+            final URI schemaManagementGraph) throws OpenRDFException
+    {
+        final List<InferredOWLOntologyID> returnList = new ArrayList<InferredOWLOntologyID>();
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?ontologyIri ?cv ?civ WHERE { ");
+        
+        sb.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
+        sb.append(" ?ontologyIri <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
+        sb.append(" ?ontologyIri <" + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+        
+        sb.append(" }");
+        
+        this.log.debug("Generated SPARQL {} ", sb);
+        
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        final QueryResultCollector queryResults = this.executeSparqlQuery(query, schemaManagementGraph);
+        
+        for(BindingSet nextResult : queryResults.getBindingSets())
+        {
+            final String nextOntologyIRI = nextResult.getValue("ontologyIri").stringValue();
+            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
+            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
+            
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), IRI
+                    .create(nextInferredIRI)));
+        }
+        return returnList;
+    }
+
+    @Override
     public List<InferredOWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
     {
@@ -235,7 +267,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" } ");
         
-        this.log.info("Created SPARQL {} with propertyUri {} and poddObject {}", sb, propertyUri, objectUri);
+        this.log.debug("Created SPARQL {} with propertyUri {} and poddObject {}", sb, propertyUri, objectUri);
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         query.setBinding("propertyUri", propertyUri);
