@@ -5,6 +5,7 @@ package com.github.podd.api.test;
 
 import info.aduna.iteration.Iterations;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,16 +20,20 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
@@ -502,8 +507,13 @@ public abstract class AbstractPoddArtifactManagerTest
         
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, InferredOWLOntologyID)}
+     * .
+     */
     @Test
-    public final void testExportObjectMetadata() throws Exception
+    public final void testExportObjectMetadataWithArtifact() throws Exception
     {
         this.loadSchemaOntologies();
         
@@ -514,17 +524,69 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
 
-        final URI objectTypeUri =
-                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype");
-                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project");
-                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment");
-                //ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions");
-
-        final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        final boolean includeDoNotDisplayProperties = false;
-        this.testArtifactManager.exportObjectMetadata(objectTypeUri, output, RDFFormat.TURTLE, includeDoNotDisplayProperties);
+        this.internalTestExportObjectmetadata(artifactIDv1);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, InferredOWLOntologyID)}
+     * .
+     */
+    @Test
+    public final void testExportObjectMetadataWithoutArtifact() throws Exception
+    {
+        this.loadSchemaOntologies();
         
-        System.out.println(output.toString());
+        this.internalTestExportObjectmetadata(null);
+    }
+
+    private final void internalTestExportObjectmetadata(InferredOWLOntologyID artifactID) throws Exception{
+
+        // Format: Object Type, includeDoNotDisplayProperties, expected model size, 
+        // expected property count, do-not-display statement count
+        final Object[][] testData =
+            {
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"),false,
+                        107, 22, 0 },
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"),true,
+                    119, 24, 2 },
+                    
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"),false,
+                    50, 10, 0 },
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"),true,
+                    55, 11, 1 },
+                    
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),false,
+                    27, 5, 0 },
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),true,
+                    32, 6, 1 },
+                    
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),false,
+                    37, 7, 0 },
+                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),true,
+                    42, 8, 1 },
+            };        
+        
+        for (int i = 0; i < testData.length; i++)
+        {
+            final ByteArrayOutputStream output = new ByteArrayOutputStream();
+            
+            this.testArtifactManager.exportObjectMetadata((URI)testData[i][0], output, RDFFormat.TURTLE, (Boolean)testData[i][1], artifactID);
+
+            // parse output into a Model
+            ByteArrayInputStream bin = new ByteArrayInputStream(output.toByteArray());
+            RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE);
+            Model model = new LinkedHashModel();
+            rdfParser.setRDFHandler(new StatementCollector(model));
+            rdfParser.parse(bin, "");
+
+            // verify:
+            Assert.assertEquals("Not the expected statement count in Model", testData[i][2], model.size());
+            Assert.assertEquals("Not the expected no. of properties", testData[i][3],
+                    model.filter((URI)testData[i][0], null, null).size() - 1);
+            Assert.assertEquals("Not the expected no. of non-displayable properties", testData[i][4],
+                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        }        
     }
     
     @Test

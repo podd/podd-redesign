@@ -209,40 +209,38 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
     }
     
-    /*
-     * FIXME: implement me.
-     */
     @Override
-    public void exportObjectMetadata(URI objectType, OutputStream outputStream, RDFFormat format,
-            boolean includeDoNotDisplayProperties) throws OpenRDFException, PoddException, IOException
+    public void exportObjectMetadata(final URI objectType, final OutputStream outputStream, final RDFFormat format,
+            final boolean includeDoNotDisplayProperties, final InferredOWLOntologyID artifactID)
+        throws OpenRDFException, PoddException, IOException
     {
-        List<URI> contexts = new ArrayList<URI>();
-        
-        //XXX - hack together contexts for testing only
-        String[] ccs = {
-                "http://purl.org/podd/ns/version/dcTerms/1",
-                "http://purl.org/podd/ns/version/foaf/1",
-                "http://purl.org/podd/ns/version/poddUser/1",
-                "http://purl.org/podd/ns/version/poddBase/1",
-                "http://purl.org/podd/ns/version/poddScience/1",
-                "http://purl.org/podd/ns/version/poddPlant/1",
-            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/dcTerms/1",
-            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/foaf/1",
-            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddUser/1",
-            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddBase/1",
-            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddScience/1",
-            "urn:podd:inferred:ontologyiriprefix:http://purl.org/podd/ns/version/poddPlant/1",
-            };
-        for (String c : ccs)
-        {
-            contexts.add(ValueFactoryImpl.getInstance().createURI(c));
-        }
-        
         RepositoryConnection connection = null;
         
         try
         {
             connection = this.getRepositoryManager().getRepository().getConnection();
+            
+            List<URI> contexts = new ArrayList<URI>();
+            if(artifactID != null)
+            {
+                contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
+                
+                final Set<IRI> directImports = this.sesameManager.getDirectImports(artifactID, connection);
+                for(IRI directImport : directImports)
+                {
+                    contexts.add(directImport.toOpenRDFURI());
+                }
+            }
+            else
+            {
+                List<InferredOWLOntologyID> allSchemaOntologyVersions =
+                        this.sesameManager.getAllSchemaOntologyVersions(connection,
+                                this.repositoryManager.getSchemaManagementGraph());
+                for(InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
+                {
+                    contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
+                }
+            }
             
             final Model model =
                     this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, connection,
@@ -257,7 +255,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 connection.close();
             }
         }
-    }    
+    }
     
     @Override
     public InferredOWLOntologyID getArtifactByIRI(final IRI artifactIRI) throws UnmanagedArtifactIRIException

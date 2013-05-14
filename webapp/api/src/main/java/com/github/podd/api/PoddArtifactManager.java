@@ -79,17 +79,22 @@ public interface PoddArtifactManager
 
     /**
      * Exports metadata about the given object Type to the given output stream using an RDF Format.
-     *  
+     * This method is only to be used to obtain metadata for display purposes.
+     * 
      * @param objectType
      * @param outputStream
      * @param format
      * @param includeDoNotDisplayProperties
+     * @param artifactID
+     *            If present, the artifact ID is used to select the schema ontologies from which
+     *            necessary metadata is to be extracted
      * @throws OpenRDFException
      * @throws PoddException
      * @throws IOException
      */
-    void exportObjectMetadata(URI objectType, OutputStream outputStream, RDFFormat format, boolean includeDoNotDisplayProperties)
-        throws OpenRDFException, PoddException, IOException;
+    void exportObjectMetadata(URI objectType, OutputStream outputStream, RDFFormat format,
+            boolean includeDoNotDisplayProperties, final InferredOWLOntologyID artifactID) throws OpenRDFException,
+        PoddException, IOException;
     
     /**
      * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI.
