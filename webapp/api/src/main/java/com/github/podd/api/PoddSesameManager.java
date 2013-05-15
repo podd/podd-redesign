@@ -326,9 +326,12 @@ public interface PoddSesameManager
     
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
-     * is carried out in are the specified artifact's concrete triples and the ontologies imported
-     * by that artifact. An optional array of URIs can be used to limit the RDF types of objects to
+     * is carried out in the specified artifact's concrete triples and the ontologies imported by
+     * that artifact. An optional array of URIs can be used to limit the RDF types of objects to
      * match. <br>
+     * 
+     * TODO: Replace all invocations of this method with the overloaded method which takes in an
+     * array of contexts instead of an artifact ID.
      * 
      * @param searchTerm
      *            A String term which is searched for in the RDF:Labels
@@ -344,6 +347,25 @@ public interface PoddSesameManager
      */
     Model searchOntologyLabels(String searchTerm, InferredOWLOntologyID artifactID, int limit, int offset,
             final RepositoryConnection repositoryConnection, URI... searchTypes) throws OpenRDFException;
+
+    /**
+     * Carries out a case-insensitive search for objects whose labels match a given term. The search
+     * is carried out in the specified contexts. An optional array of URIs can be used to limit the
+     * RDF types of objects to match. <br>
+     * 
+     * @param searchTerm
+     *            A String term which is searched for in the RDF:Labels
+     * @param searchTypes
+     *            The types (i.e. RDF:Type) of results to match with the search term
+     * @param limit
+     * @param offset
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    Model searchOntologyLabels(String searchTerm, URI[] searchTypes, int limit, int offset,
+            RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     /**
      * Sets the given Ontology IRI to be published. This restricts the ability to publish the

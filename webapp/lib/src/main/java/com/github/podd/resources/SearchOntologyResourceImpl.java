@@ -4,8 +4,10 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -60,16 +62,19 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Search term not submitted");
         }
         
-        // artifact ID - mandatory parameter
+        // artifact ID - optional parameter
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
-        InferredOWLOntologyID ontologyID;
-        try
+        InferredOWLOntologyID ontologyID = null;
+        if (artifactUri != null)
         {
-            ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
-        }
-        catch(final UnmanagedArtifactIRIException e)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find the given artifact", e);
+            try
+            {
+                ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+            }
+            catch(final UnmanagedArtifactIRIException e)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find the given artifact", e);
+            }
         }
         
         // search Types - optional parameter
@@ -86,8 +91,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         this.log.info("requesting search ({}): {}, {}", variant.getMediaType().getName(), searchTerm, artifactUri);
         
         // TODO - add a new PoddAction to suit the search.
-        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST,
-                Collections.<URI> singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST, Collections.<URI> emptySet());
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
@@ -134,13 +138,15 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
      * API.
      */
     private Model searchForOntologyLabels(final InferredOWLOntologyID ontologyID, final String searchTerm,
-            final URI[] searchTypes) throws OpenRDFException
+            final URI[] searchTypes) throws OpenRDFException, ResourceException
     {
+        
         final RepositoryConnection conn = this.getPoddRepositoryManager().getRepository().getConnection();
         conn.begin();
         try
         {
-            return this.getPoddSesameManager().searchOntologyLabels(searchTerm, ontologyID, 1000, 0, conn, searchTypes);
+            final URI[] contexts = this.buildContextArray(ontologyID, conn);
+            return this.getPoddSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, conn, contexts);
         }
         finally
         {
@@ -151,5 +157,38 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             }
         }
     }
+    
+    /**
+     * @param artifactID
+     * @param connection
+     * @throws OpenRDFException
+     */
+    private URI[] buildContextArray(final InferredOWLOntologyID artifactID, final RepositoryConnection connection
+            ) throws OpenRDFException
+    {
+        final List<URI> contexts = new ArrayList<URI>();
+        if(artifactID != null)
+        {
+            contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
+            
+            final Set<IRI> directImports = this.getPoddSesameManager().getDirectImports(artifactID, connection);
+            for(IRI directImport : directImports)
+            {
+                contexts.add(directImport.toOpenRDFURI());
+            }
+        }
+        else
+        {
+            List<InferredOWLOntologyID> allSchemaOntologyVersions =
+                    this.getPoddSesameManager().getAllSchemaOntologyVersions(connection,
+                            this.getPoddRepositoryManager().getSchemaManagementGraph());
+            for(InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
+            {
+                contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
+            }
+        }
+        return contexts.toArray(new URI[0]);
+    }
+
     
 }

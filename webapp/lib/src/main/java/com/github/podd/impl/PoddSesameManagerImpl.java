@@ -1674,6 +1674,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         throws OpenRDFException
     {
         final URI[] contexts = this.versionAndSchemaContexts(artifactID, repositoryConnection);
+        return this.searchOntologyLabels(searchTerm, searchTypes, limit, offset, repositoryConnection, contexts);
+    }
+    
+    @Override
+    public Model searchOntologyLabels(final String searchTerm, URI[] searchTypes, final int limit,
+                final int offset, final RepositoryConnection repositoryConnection, URI... contexts)
+            throws OpenRDFException
+        {
         
         final StringBuilder sb = new StringBuilder();
         
