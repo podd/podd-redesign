@@ -36,14 +36,14 @@
 		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script>
 		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
 
-<script type="text/javascript" src="${baseUrl}/scripts/animatedcollapse.js">
-    /* this needs to be placed at the top of the file so that we can add divs as they are created !!!! */
-    /***********************************************
-     * Animated Collapsible DIV v2.4- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
-     * This notice MUST stay intact for legal use
-     * Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
-     ***********************************************/
-</script>
+		<script type="text/javascript" src="${baseUrl}/resources/scripts/animatedcollapse.js">
+		    /* this needs to be placed at the top of the file so that we can add divs as they are created !!!! */
+		    /***********************************************
+		     * Animated Collapsible DIV v2.4- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
+		     * This notice MUST stay intact for legal use
+		     * Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
+		     ***********************************************/
+		</script>
 
 <div id="title_pane">
     <h3>${title!""}</h3>
@@ -63,17 +63,10 @@
 </ol>
 </#if>
 
-<p>Object  Type: ${objectType}</p>
-<p>Artifact URI: ${artifactUri!""}</p>
-<br>
-
-		<div>
-			Project (Artifact) IRI: <input class='noaction' id='podd_artifact' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1'><br>
-		</div>
-	<br><br>
-	
-	<h3 class="underlined_heading">Project Details</h3>
-	<div id="details">  <!-- Collapsible div -->
+	<h3 class="underlined_heading">${objectType.label!""} Details
+		<a href="javascript:animatedcollapse.toggle('${objectType.label}_details')" icon="toggle" title="View Details"></a>
+	</h3>	
+	<div id='${objectType.label}_details'>  <!-- Collapsible div -->
 			<!-- standard attributes -->
 			<ol>
 				<!-- object name -->
@@ -83,7 +76,7 @@
 					</label>
                 </li>
                 <li>
-	                <input id="object_name" name="object_name" type="text" value="$_{poddObject.label}">
+	                <input id="object_name" name="object_name" type="text" value="">
 	                <h6 class="errorMsg">${objectNameError!""}</h6>
 	            </li>
 	            
@@ -92,7 +85,7 @@
 		            <label for="object_description" class="bold">Description:</label>
                 </li>
                 <li>
-					<textarea id="object_description" name="object_description" cols="30" rows="2">$_{poddObject.description!""}</textarea>
+					<textarea id="object_description" name="object_description" cols="30" rows="2"></textarea>
 	                <span id="object_desc_text_limit"></span>
 	                <h6 class="errorMsg">${objectDescriptionError!""}</h6>
 				</li>
@@ -107,6 +100,14 @@
 			
 			<button id='btn9' class='clonable'>Test</button>
 
+		<p>Artifact URI: ${artifactUri!""}</p>
+		<br>
+
+		<div>
+			Project (Artifact) IRI: <input class='noaction' id='podd_artifact' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1'><br>
+		</div>
+	<br><br>
+	
 
     </div>  <!-- details - Collapsible div -->
 
@@ -118,4 +119,8 @@
 		</div>
 		
 		<br><br>
+		
+    <script type="text/javascript">
+	    animatedcollapse.addDiv('${objectType.label}_details', 'fade=1,hide=0');
+    </script>
 		

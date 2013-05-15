@@ -173,7 +173,7 @@ function displayEditField(index, nextField) {
 		li.append(link);
 	}
 	
-	var li2 = $("<li>")
+	var li2 = $("<li>");
 	li2.attr('id', 'id_li_' + nextField.propertyUri);
 	
 	if (nextField.displayType == DISPLAY_LongText) {
@@ -191,13 +191,13 @@ function displayEditField(index, nextField) {
 		li2.append(input.after(label));
 		
 	} else if (nextField.displayType == DISPLAY_Table) {
-		checkBox = $('<p>');
+		var checkBox = $('<p>');
 		checkBox.text('Table here please');
 
 		li2.append(checkBox);
 		
 	} else if (nextField.displayType == DISPLAY_AutoComplete) {
-		checkBox = $('<p>');
+		var checkBox = $('<p>');
 		checkBox.text('Auto complete please');
 
 		li2.append(checkBox);
@@ -212,30 +212,28 @@ function displayEditField(index, nextField) {
 }
 
 function cloneEmptyField() {
-	console.debug('A clonable was clicked somewhere!');
 	var thisId = $(this).attr('id');
 	console.debug('Clicked clonable: ' + thisId);
 	
-	var idToClone = '#id_http://purl.org/podd/ns/poddScience_hasANZSRC'; //'#id_' + $(this).attr('property');
-	console.debug('Requested cloning ' + idToClone);
+	var idToClone = '#tLbl1'; //'#id_http://purl.org/podd/ns/poddScience_hasANZSRC'; //'#id_' + $(this).attr('property');
+	//console.debug('Requested cloning ' + idToClone);
 
-	var clonedField = $(idToClone).clone(true);
-	clonedField.attr('id', 'LABEL_cloned');
-	console.debug('Cloned: ' + clonedField.attr('id'));
-	
+	var clonedField = $(this).clone(true);
+//	clonedField.attr('id', 'LABEL_cloned');
+//	console.debug('Cloned: ' + clonedField.attr('id'));
 	$(this).append(clonedField);
 	console.debug('appended cloned field');
 	
-	var newObject = jQuery.extend(true, {}, $(idToClone));
-	console.debug('## SO clone: ' + newObject);
-	$(this).append(newObject);
+//	var newObject = jQuery.extend(true, {}, $(idToClone));
+//	console.debug('## SO clone: ' + JSON.stringify(newObject, null, 4));
+//	$(this).append(newObject);
 	
 	// debug - cloning
-	var p1Id = '#p1';
-	var cloned = $(p1Id).clone()
-	var oldId = cloned.attr('id');
-	cloned.attr('id', oldId + '_v1');
-	$(this).append(cloned);
+//	var p1Id = '#p1';
+//	var cloned = $(p1Id).clone()
+//	var oldId = cloned.attr('id');
+//	cloned.attr('id', oldId + '_v1');
+//	$(this).append(cloned);
 
 }
 
@@ -308,6 +306,11 @@ function addFieldInputText(nextField, inputType) {
 	    type: inputType,
 	    value: displayValue
 	});
+	
+	// add handler to process changes to this field
+	// - handler should have property URI
+	// - detect if value actually changed
+	// - if changed, update the "instance" databank and set dirty flag
 	
 	return input;
 }
