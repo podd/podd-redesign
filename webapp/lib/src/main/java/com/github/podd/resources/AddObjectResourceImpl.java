@@ -3,7 +3,9 @@ package com.github.podd.resources;
 import java.util.Collections;
 import java.util.Map;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryConnection;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -11,11 +13,17 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
+import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddObjectLabel;
+import com.github.podd.utils.PoddObjectLabelImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -62,12 +70,14 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                     Collections.singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
         }
         
+        final PoddObjectLabel objectTypeLabel = this.getObjectTypeLabel(artifactUri, objectType);        
+        final String title = "Add new " + objectTypeLabel.getLabel();
+        
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "add_object.html.ftl");
-        dataModel.put("pageTitle", "Add Object");
-        dataModel.put("objectType", objectType);
-        
-        dataModel.put("title", "Add Object");
+        dataModel.put("pageTitle", title);
+        dataModel.put("title", title);
+        dataModel.put("objectType", objectTypeLabel);
         
         if(artifactUri != null)
         {
@@ -78,6 +88,55 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
+    /*
+     * Internal helper method which encapsulates the creation of a RepositoryConnection before
+     * calling the SesameManager.
+     * 
+     * Can avoid dealing with RepositoryConnections here if this could be moved to somewhere in the
+     * API.
+     */
+    private PoddObjectLabel getObjectTypeLabel(String artifactUri, final String objectType)
+    {
+        PoddObjectLabel objectLabel;
+        try
+        {
+            RepositoryConnection conn = this.getPoddRepositoryManager().getRepository().getConnection();
+            conn.begin();
+            try
+            {
+                InferredOWLOntologyID ontologyID;
+                if (artifactUri == null)
+                {
+                    ontologyID =
+                            this.getPoddSchemaManager().getCurrentSchemaOntologyVersion(
+                                    IRI.create(PoddRdfConstants.PODD_SCIENCE.replace("#", "")));
+                }
+                else
+                {
+                    ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+                }
+                objectLabel =
+                        this.getPoddSesameManager().getObjectLabel(ontologyID,
+                                PoddRdfConstants.VALUE_FACTORY.createURI(objectType), conn);
+            }
+            finally
+            {
+                if(conn != null)
+                {
+                    conn.rollback(); // read only, nothing to commit
+                    conn.close();
+                }
+            }
+        }
+        catch(UnmanagedArtifactIRIException | UnmanagedSchemaIRIException | OpenRDFException e)
+        {
+            e.printStackTrace();
+            // failed to find Label
+            URI objectTypeUri = PoddRdfConstants.VALUE_FACTORY.createURI(objectType);
+            objectLabel = new PoddObjectLabelImpl(null, objectTypeUri, objectType);
+        }
+        return objectLabel;
+    }    
     
     /**
      * Build a PODD object using the incoming RDF
