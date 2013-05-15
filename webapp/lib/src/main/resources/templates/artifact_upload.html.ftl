@@ -28,10 +28,6 @@
 					<label for="user">Select file: </label> 
 					<input id="user" class="medium" name="artifact_file" type="file" value=""> 
 				</li> 
-				<li> 
-					<label for="user">Artifact details: </label> 
-					<input id="user" class="medium" name="artifact_details" type="text" value=""> 
-				</li> 
 	            <#if errorMessage?? && errorMessage?has_content>
 	                <li><h4 class="errorMsg">${errorMessage}</h4></li>
 	            </#if>
