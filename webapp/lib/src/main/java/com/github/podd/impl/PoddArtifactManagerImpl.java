@@ -220,31 +220,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             connection = this.getRepositoryManager().getRepository().getConnection();
             
-            List<URI> contexts = new ArrayList<URI>();
-            if(artifactID != null)
-            {
-                contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
-                
-                final Set<IRI> directImports = this.sesameManager.getDirectImports(artifactID, connection);
-                for(IRI directImport : directImports)
-                {
-                    contexts.add(directImport.toOpenRDFURI());
-                }
-            }
-            else
-            {
-                List<InferredOWLOntologyID> allSchemaOntologyVersions =
-                        this.sesameManager.getAllSchemaOntologyVersions(connection,
-                                this.repositoryManager.getSchemaManagementGraph());
-                for(InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
-                {
-                    contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
-                }
-            }
+            URI[] contexts = buildContextArray(artifactID, connection, this.repositoryManager.getSchemaManagementGraph());
             
             final Model model =
                     this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, connection,
-                            contexts.toArray(new URI[0]));
+                            contexts);
             
             Rio.write(model, outputStream, format);
         }
@@ -255,6 +235,47 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 connection.close();
             }
         }
+    }
+
+    /**
+     * Internal helper method to build an array of Contexts to search in. If a valid artifact ID is
+     * passed in, the artifact's concrete triples and its imported schema ontologies are assigned as
+     * the contexts to return. If the artifact ID is NULL, all schema ontologies currently
+     * configured in the PODD server are assigned into the returned array.
+     *
+     * TODO: Could this be moved into PoddSesameManager.java, possibly with the option to add
+     *  inferred statements also as contexts.
+     * 
+     * @param artifactID
+     * @param connection
+     * @param managementGraph
+     * @throws OpenRDFException
+     */
+    private URI[] buildContextArray(final InferredOWLOntologyID artifactID, final RepositoryConnection connection,
+            final URI managementGraph) throws OpenRDFException
+    {
+        final List<URI> contexts = new ArrayList<URI>();
+        if(artifactID != null)
+        {
+            contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
+            
+            final Set<IRI> directImports = this.sesameManager.getDirectImports(artifactID, connection);
+            for(IRI directImport : directImports)
+            {
+                contexts.add(directImport.toOpenRDFURI());
+            }
+        }
+        else
+        {
+            List<InferredOWLOntologyID> allSchemaOntologyVersions =
+                    this.sesameManager.getAllSchemaOntologyVersions(connection,
+                            managementGraph);
+            for(InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
+            {
+                contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
+            }
+        }
+        return contexts.toArray(new URI[0]);
     }
     
     @Override
