@@ -123,6 +123,15 @@ public interface PoddWebConstants
      */
     public static final String PATH_SEARCH = "search";
 
+    /**
+     * Path to create object service 
+     */
+    public static final String PATH_OBJECT_ADD = "artifact/addobject";
+    
+    /**
+     * Path to get metadata about a particular object type
+     */
+    public static final String PATH_GET_METADATA = "metadata";
     
     /**
      * Key used to represent user identifier part of a URL
@@ -196,5 +205,14 @@ public interface PoddWebConstants
      */
     public static final String KEY_SEARCH_TYPES = "searchtypes";
 
+    /**
+     * Key used in "create object" service to indicate the type of object to be generated.
+     */
+    public static final String KEY_OBJECT_TYPE_IDENTIFIER = "objecttypeuri";
+
+    /**
+     * Key used in "create object" service to indicate the type of object to be generated.
+     */
+    public static final String KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES = "includedndprops";
 
 }
