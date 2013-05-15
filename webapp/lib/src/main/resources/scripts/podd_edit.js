@@ -13,8 +13,9 @@ $(document).ready(
 		console.debug('initializing...');
 		console.debug('-------------------');
 
-		getPoddObjectForEdit(artifactUri, objectUri);
-
+		//getPoddObjectForEdit(artifactUri, objectUri);
+		getObjectTypeMetadata(podd.objectTypeUri);
+		
 		// use delegation for dynamically added .clonable anchors
 		$("#details").delegate(".clonable","click", cloneEmptyField);
 
@@ -29,6 +30,103 @@ var objectUri = 'http://purl.org/podd/basic-1-20130206/object:2966';
 
 // --------------------------------
 
+/*
+ * Retrieve metadata to render the fields to add a new object of the given type.
+ * 
+ * @param objectTypeUri - the type of Object to be added
+ */
+function getObjectTypeMetadata(/* String */ objectTypeUri) {
+	console.debug('[getMetadata]  "' + objectTypeUri + '" .');
+
+	requestUrl = podd.baseUrl + '/metadata';
+	console.debug('[getMetadata] Request (GET):  ' + requestUrl);
+
+	$.ajax({
+		url : requestUrl,
+		type : 'GET',
+		data : {objecttypeuri : objectTypeUri},
+		dataType : 'json', // what is expected back
+		success : callbackForGetMetadata,
+		error : function(xhr, status, error) {
+			console.debug('[getMetadata] $$$ ERROR $$$ ' + error);
+			console.debug(xhr.statusText);
+		}
+	});
+}
+
+/*
+* Callback function when RDF containing metadata is available
+* 
+* FIXME: Since the the metadata we get back does not contain Options for drop-down type
+* values, those have to be searched for using the Search Ontology Service.
+* 
+* Also, this returns weights that are given in the schemas. Since there can be properties
+* without weights, sorting them only by weight is insufficient. 
+* 
+*/
+function callbackForGetMetadata(resultData, status, xhr) {
+	console.debug('[getMetadata] ### SUCCESS ### ' + resultData);
+	
+	nextDatabank = nextDatabank.load(resultData);
+	console.debug('Databank size = ' + nextDatabank.size());
+	
+	// retrieve weighted property list
+	var myQuery = $.rdf({
+		databank : nextDatabank
+	})
+	.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+	.where('<http://purl.org/podd/ns/poddScience#Project> ?propertyUri ?pValueRange')
+	.optional('?propertyUri poddBase:weight ?weight')
+	.optional('?propertyUri <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel')
+	.optional('?propertyUri poddBase:hasDisplayType ?displayType')
+	.optional('?propertyUri poddBase:hasCardinality ?cardinality')
+	.filter(function(){ return this.propertyUri !== "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"; })
+	;
+	var bindings = myQuery.select();
+
+	var propertyList = [];
+	$.each(bindings, function(index, value) {
+		var nextChild = {};
+		nextChild.weight;
+		nextChild.propertyUri = value.propertyUri.value;
+		nextChild.propertyLabel;
+		nextChild.displayType;
+		nextChild.cardinality;
+		
+		if (typeof value.pLabel != 'undefined') {
+			nextChild.propertyLabel = value.pLabel.value;
+		}
+		if (typeof value.displayType != 'undefined') {
+			nextChild.displayType = value.displayType.value;
+		}
+		if (typeof value.weight != 'undefined') {
+			nextChild.weight = value.weight.value;	
+		} else {
+			nextChild.weight = 99;
+		}
+		
+		if (typeof value.cardinality != 'undefined') {
+			nextChild.cardinality = value.cardinality.value;
+		}
+		
+		nextChild.displayValue = '';
+		nextChild.valueUri = '';
+		
+		propertyList.push(nextChild);
+		console.debug(nextChild.weight + '] <' + nextChild.propertyUri + '> "' + nextChild.propertyLabel + '" <' +
+				nextChild.displayType + '> <' + nextChild.cardinality + '>');
+	});
+
+	
+	// sort property list
+	propertyList.sort(function(a, b) {
+		   var aID = a.weight;
+		   var bID = b.weight;
+		   return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
+		});
+	
+	$.each(propertyList, displayEditField);
+}
 
 /* 
  * Retrieve an RDF containing necessary data and meta-data to populate the Edit Artifact

@@ -45,6 +45,11 @@
 		     ***********************************************/
 		</script>
 
+		<script type="text/javascript">
+			podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
+		</script>
+
+
 <div id="title_pane">
     <h3>${title!""}</h3>
 </div>
@@ -62,11 +67,10 @@
     </#list>
 </ol>
 </#if>
-
-	<h3 class="underlined_heading">${objectType.label!""} Details
-		<a href="javascript:animatedcollapse.toggle('${objectType.label}_details')" icon="toggle" title="View Details"></a>
+	<h3 class="underlined_heading">${objectType.label!""} Details 
+		<a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 	</h3>	
-	<div id='${objectType.label}_details'>  <!-- Collapsible div -->
+	<div id='details'>  <!-- Collapsible div -->
 			<!-- standard attributes -->
 			<ol>
 				<!-- object name -->
@@ -108,7 +112,6 @@
 		</div>
 	<br><br>
 	
-
     </div>  <!-- details - Collapsible div -->
 
 
@@ -121,6 +124,6 @@
 		<br><br>
 		
     <script type="text/javascript">
-	    animatedcollapse.addDiv('${objectType.label}_details', 'fade=1,hide=0');
+	    animatedcollapse.addDiv('details', 'fade=1,hide=0');
     </script>
 		
