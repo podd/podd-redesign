@@ -68,7 +68,7 @@ public abstract class AbstractPoddClientTest
         if(model.size() != expectedStatements)
         {
             log.error("--- Regression ---");
-            log.error("Expected: {} Actual {}", expectedStatements, model.size());
+            log.error("Expected: {} Actual: {}", expectedStatements, model.size());
             DebugUtils.printContents(model);
         }
         
