@@ -1946,8 +1946,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         final String searchTerm = "ME";
         final URI[] searchTypes =
-                { PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
-                        PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "NamedIndividual") };
+                { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
+                        PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final Model result =
                 this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, 1000, 0,
                         this.testRepositoryConnection, searchTypes);
@@ -1957,9 +1957,9 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Not the expected number of search results", 9, result.size());
         
         Assert.assertEquals("Expected Platform SPAD Meter not found", 1,
-                result.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("SPAD Meter")).size());
+                result.filter(null, null, PoddRdfConstants.VF.createLiteral("SPAD Meter")).size());
         Assert.assertEquals("Expected Platform Pyrometer not found", 1,
-                result.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Pyrometer")).size());
+                result.filter(null, null, PoddRdfConstants.VF.createLiteral("Pyrometer")).size());
     }
     
     /**
@@ -1977,8 +1977,8 @@ public abstract class AbstractPoddSesameManagerTest
         
         final String searchTerm = "";
         final URI[] searchTypes =
-                { PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"),
-                        PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "NamedIndividual") };
+                { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"),
+                        PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final Model result =
                 this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, 1000, 0,
                         this.testRepositoryConnection, searchTypes);
@@ -1988,9 +1988,9 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Not the expected number of search results", 4, result.size());
         
         Assert.assertEquals("Expected Literal 'Not Applicable' not found", 1,
-                result.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Not Applicable")).size());
+                result.filter(null, null, PoddRdfConstants.VF.createLiteral("Not Applicable")).size());
         Assert.assertEquals("Expected Literal 'No' not found", 1,
-                result.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("No")).size());
+                result.filter(null, null, PoddRdfConstants.VF.createLiteral("No")).size());
     }
     
     /**

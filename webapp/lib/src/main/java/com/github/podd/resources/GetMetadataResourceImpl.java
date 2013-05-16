@@ -89,7 +89,7 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
                 artifactID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
             }
             
-            this.getPoddArtifactManager().exportObjectMetadata(PoddRdfConstants.VALUE_FACTORY.createURI(objectType),
+            this.getPoddArtifactManager().exportObjectMetadata(PoddRdfConstants.VF.createURI(objectType),
                     output, RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE),
                     includeDoNotDisplayProperties, artifactID);
         }

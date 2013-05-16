@@ -16,7 +16,7 @@ import org.openrdf.model.vocabulary.OWL;
  */
 public interface PoddRdfConstants
 {
-    public static final ValueFactory VALUE_FACTORY = ValueFactoryImpl.getInstance();
+    public static final ValueFactory VF = ValueFactoryImpl.getInstance();
     
     /** Path to default alias file */
     public static final String PATH_DEFAULT_ALIASES_FILE = "/com/github/podd/api/file/default-file-repositories.ttl";
@@ -65,6 +65,11 @@ public interface PoddRdfConstants
     public static final String FILE_REPOSITORY = "http://purl.org/podd/ns/fileRepository#";
     
     /**
+     * Namespace for Ontology used by the Metadata service.
+     */
+    public static final String PODD_METADATA = "http://purl.org/podd/ns/poddMetadata#";
+    
+    /**
      * An arbitrary prefix to use for automatically assigning ontology IRIs to inferred ontologies.
      * There are no versions delegated to inferred ontologies, and the ontology IRI is generated
      * using the version IRI of the original ontology, which must be unique.
@@ -72,43 +77,43 @@ public interface PoddRdfConstants
     public static final String INFERRED_PREFIX = "urn:podd:inferred:ontologyiriprefix:";
     
     /** Default value is urn:podd:default:artifactmanagementgraph: */
-    public static final URI DEFAULT_ARTIFACT_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
+    public static final URI DEFAULT_ARTIFACT_MANAGEMENT_GRAPH = PoddRdfConstants.VF
             .createURI("urn:podd:default:artifactmanagementgraph:");
     
     /** Default value is urn:podd:default:schemamanagementgraph */
-    public static final URI DEFAULT_SCHEMA_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
+    public static final URI DEFAULT_SCHEMA_MANAGEMENT_GRAPH = PoddRdfConstants.VF
             .createURI("urn:podd:default:schemamanagementgraph");
     
     /** Default value is urn:podd:default:usermanagementgraph: */
-    public static final URI DEF_USER_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
+    public static final URI DEF_USER_MANAGEMENT_GRAPH = PoddRdfConstants.VF
             .createURI("urn:podd:default:usermanagementgraph:");
     
-    public static final URI DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH = PoddRdfConstants.VALUE_FACTORY
+    public static final URI DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH = PoddRdfConstants.VF
             .createURI("urn:podd:default:filerepositorymanagementgraph:");
     
-    public static final URI OWL_MAX_QUALIFIED_CARDINALITY = PoddRdfConstants.VALUE_FACTORY
+    public static final URI OWL_MAX_QUALIFIED_CARDINALITY = PoddRdfConstants.VF
             .createURI("http://www.w3.org/2002/07/owl#maxQualifiedCardinality");
     
-    public static final URI OWL_MIN_QUALIFIED_CARDINALITY = PoddRdfConstants.VALUE_FACTORY
+    public static final URI OWL_MIN_QUALIFIED_CARDINALITY = PoddRdfConstants.VF
             .createURI("http://www.w3.org/2002/07/owl#minQualifiedCardinality");
     
-    public static final URI OWL_QUALIFIED_CARDINALITY = PoddRdfConstants.VALUE_FACTORY
+    public static final URI OWL_QUALIFIED_CARDINALITY = PoddRdfConstants.VF
             .createURI("http://www.w3.org/2002/07/owl#qualifiedCardinality");
     
-    public static final URI OWL_VERSION_IRI = PoddRdfConstants.VALUE_FACTORY.createURI(OWL.NAMESPACE, "versionIRI");
+    public static final URI OWL_VERSION_IRI = PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "versionIRI");
     
     /**
      * The OMV vocabulary defines a property for the current version of an ontology, so we are
      * reusing it here.
      */
-    public static final URI OMV_CURRENT_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
-            "http://omv.ontoware.org/ontology#", "currentVersion");
+    public static final URI OMV_CURRENT_VERSION = PoddRdfConstants.VF.createURI("http://omv.ontoware.org/ontology#",
+            "currentVersion");
     
     /**
      * Creating a property for PODD to track the currentInferredVersion for the inferred axioms
      * ontology when linking from the ontology IRI.
      */
-    public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_CURRENT_INFERRED_VERSION = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "currentInferredVersion");
     
     public static final String HTTP = "http://www.w3.org/2011/http#";
@@ -125,53 +130,51 @@ public interface PoddRdfConstants
      * Creating a property for PODD to track the inferredVersion for the inferred axioms ontology of
      * a particular versioned ontology.
      */
-    public static final URI PODD_BASE_INFERRED_VERSION = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "inferredVersion");
+    public static final URI PODD_BASE_INFERRED_VERSION = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "inferredVersion");
     
-    public static final URI PODD_BASE_HAS_PUBLICATION_STATUS = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_HAS_PUBLICATION_STATUS = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "hasPublicationStatus");
     
-    public static final URI PODD_BASE_HAS_TOP_OBJECT = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "artifactHasTopObject");
+    public static final URI PODD_BASE_HAS_TOP_OBJECT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "artifactHasTopObject");
     
-    public static final URI PODD_BASE_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "Published");
+    public static final URI PODD_BASE_PUBLISHED = PoddRdfConstants.VF
+            .createURI(PoddRdfConstants.PODD_BASE, "Published");
     
-    public static final URI PODD_BASE_NOT_PUBLISHED = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "NotPublished");
+    public static final URI PODD_BASE_NOT_PUBLISHED = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "NotPublished");
     
-    public static final URI PODD_BASE_WEIGHT = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "weight");
+    public static final URI PODD_BASE_WEIGHT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "weight");
     
-    public static final URI PODD_BASE_DO_NOT_DISPLAY = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "doNotDisplay");
+    public static final URI PODD_BASE_DO_NOT_DISPLAY = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "doNotDisplay");
     
-    public static final URI PODD_BASE_CONTAINS = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "contains");
+    public static final URI PODD_BASE_CONTAINS = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "contains");
     
     /** http://purl.org/podd/ns/poddBase#hasDisplayType */
-    public static final URI PODD_BASE_DISPLAY_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "hasDisplayType");
+    public static final URI PODD_BASE_DISPLAY_TYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasDisplayType");
     
     /** http://purl.org/podd/ns/poddBase#DisplayType_ShortText */
-    public static final URI PODD_BASE_DISPLAY_TYPE_SHORTTEXT = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_DISPLAY_TYPE_SHORTTEXT = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "DisplayType_ShortText");
     
     /** http://purl.org/podd/ns/poddBase#DisplayType_LongText */
-    public static final URI PODD_BASE_DISPLAY_TYPE_LONGTEXT = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "DisplayType_LongText");
+    public static final URI PODD_BASE_DISPLAY_TYPE_LONGTEXT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "DisplayType_LongText");
     
     /** http://purl.org/podd/ns/poddBase#DisplayType_DropDownList */
-    public static final URI PODD_BASE_DISPLAY_TYPE_DROPDOWN = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "DisplayType_DropDownList");
+    public static final URI PODD_BASE_DISPLAY_TYPE_DROPDOWN = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "DisplayType_DropDownList");
     
     /** http://purl.org/podd/ns/poddBase#DisplayType_CheckBox */
-    public static final URI PODD_BASE_DISPLAY_TYPE_CHECKBOX = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "DisplayType_CheckBox");
+    public static final URI PODD_BASE_DISPLAY_TYPE_CHECKBOX = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "DisplayType_CheckBox");
     
     /** http://purl.org/podd/ns/poddBase#DisplayType_Table */
-    public static final URI PODD_BASE_DISPLAY_TYPE_TABLE = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "DisplayType_Table");
+    public static final URI PODD_BASE_DISPLAY_TYPE_TABLE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "DisplayType_Table");
     
     /** http://purl.org/podd/ns/poddBase#hasAllowedValue */
     public static final URI PODD_BASE_ALLOWED_VALUE = ValueFactoryImpl.getInstance().createURI(
@@ -182,99 +185,107 @@ public interface PoddRdfConstants
     /**
      * http://purl.org/podd/ns/poddBase#hasCardinality. Represents a <b>hasCardinality</b> property.
      */
-    public static final URI PODD_BASE_HAS_CARDINALITY = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "hasCardinality");
+    public static final URI PODD_BASE_HAS_CARDINALITY = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasCardinality");
     
     /** http://purl.org/podd/ns/poddBase#Cardinality_Exactly_One */
-    public static final URI PODD_BASE_CARDINALITY_EXACTLY_ONE = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_CARDINALITY_EXACTLY_ONE = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "Cardinality_Exactly_One");
     
     /** http://purl.org/podd/ns/poddBase#Cardinality_One_Or_Many */
-    public static final URI PODD_BASE_CARDINALITY_ONE_OR_MANY = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_CARDINALITY_ONE_OR_MANY = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "Cardinality_One_Or_Many");
     
     /** http://purl.org/podd/ns/poddBase#Cardinality_Zero_Or_One */
-    public static final URI PODD_BASE_CARDINALITY_ZERO_OR_ONE = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_CARDINALITY_ZERO_OR_ONE = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "Cardinality_Zero_Or_One");
     
     /** http://purl.org/podd/ns/poddBase#Cardinality_Zero_Or_Many */
-    public static final URI PODD_BASE_CARDINALITY_ZERO_OR_MANY = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_CARDINALITY_ZERO_OR_MANY = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "Cardinality_Zero_Or_Many");
     
     // ----- file reference constants -----
     
     /** http://purl.org/podd/ns/poddBase#hasFileReference */
-    public static final URI PODD_BASE_HAS_FILE_REFERENCE = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "hasFileReference");
+    public static final URI PODD_BASE_HAS_FILE_REFERENCE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasFileReference");
     
     /** http://purl.org/podd/ns/poddBase#hasFileName */
-    public static final URI PODD_BASE_HAS_FILENAME = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "hasFileName");
+    public static final URI PODD_BASE_HAS_FILENAME = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasFileName");
     
     /** http://purl.org/podd/ns/poddBase#hasPath */
-    public static final URI PODD_BASE_HAS_FILE_PATH = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "hasPath");
+    public static final URI PODD_BASE_HAS_FILE_PATH = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasPath");
     
     /**
      * http://purl.org/podd/ns/poddBase#hasAlias.
      * 
      * This property is used to specify an "alias" value found inside a FileReference.
      */
-    public static final URI PODD_BASE_HAS_ALIAS = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_BASE,
-            "hasAlias");
+    public static final URI PODD_BASE_HAS_ALIAS = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "hasAlias");
     
     /** http://purl.org/podd/ns/poddBase#FileReference */
-    public static final URI PODD_BASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VALUE_FACTORY.createURI(
-            PoddRdfConstants.PODD_BASE, "FileReference");
+    public static final URI PODD_BASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "FileReference");
     
     /** http://purl.org/podd/ns/poddBase#SSHFileReference */
-    public static final URI PODD_BASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_BASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "SSHFileReference");
     
     // ----- file repository constants -----
     
     /** http://purl.org/podd/ns/poddBase#FileRepository */
-    public static final URI PODD_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.FILE_REPOSITORY, "FileRepository");
+    public static final URI PODD_FILE_REPOSITORY = PoddRdfConstants.VF.createURI(PoddRdfConstants.FILE_REPOSITORY,
+            "FileRepository");
     
     /** http://purl.org/podd/ns/poddBase#SSHFileRepository */
-    public static final URI PODD_SSH_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.FILE_REPOSITORY, "SSHFileRepository");
+    public static final URI PODD_SSH_FILE_REPOSITORY = PoddRdfConstants.VF.createURI(PoddRdfConstants.FILE_REPOSITORY,
+            "SSHFileRepository");
     
     /** http://purl.org/podd/ns/poddBase#HTTPFileRepository */
-    public static final URI PODD_HTTP_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.FILE_REPOSITORY, "HTTPFileRepository");
+    public static final URI PODD_HTTP_FILE_REPOSITORY = PoddRdfConstants.VF.createURI(PoddRdfConstants.FILE_REPOSITORY,
+            "HTTPFileRepository");
     
     /**
      * http://purl.org/podd/ns/poddBase#hasFileRepositoryAlias
      * 
      * This property is ONLY used in the File Repository management implementations.
      */
-    public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(
+    public static final URI PODD_FILE_REPOSITORY_ALIAS = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryAlias");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryProtocol */
-    public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(
+    public static final URI PODD_FILE_REPOSITORY_PROTOCOL = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryProtocol");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryHost */
-    public static final URI PODD_FILE_REPOSITORY_HOST = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryHost");
+    public static final URI PODD_FILE_REPOSITORY_HOST = PoddRdfConstants.VF.createURI(PoddRdfConstants.FILE_REPOSITORY,
+            "hasFileRepositoryHost");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryPort */
-    public static final URI PODD_FILE_REPOSITORY_PORT = ValueFactoryImpl.getInstance().createURI(
-            PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryPort");
+    public static final URI PODD_FILE_REPOSITORY_PORT = PoddRdfConstants.VF.createURI(PoddRdfConstants.FILE_REPOSITORY,
+            "hasFileRepositoryPort");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryFingerprint */
-    public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = ValueFactoryImpl.getInstance().createURI(
+    public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryFingerprint");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryUsername */
-    public static final URI PODD_FILE_REPOSITORY_USERNAME = ValueFactoryImpl.getInstance().createURI(
+    public static final URI PODD_FILE_REPOSITORY_USERNAME = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositoryUsername");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositorySecret */
-    public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(
+    public static final URI PODD_FILE_REPOSITORY_SECRET = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositorySecret");
+    
+    public static final URI PODD_METADATA_CLASS = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_METADATA,
+            "hasClass");
+    
+    public static final URI PODD_METADATA_PROPERTY = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_METADATA,
+            "hasProperty");
+    
+    public static final URI PODD_METADATA_RANGE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_METADATA,
+            "hasRange");
     
 }

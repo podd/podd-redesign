@@ -121,7 +121,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                 artifactUri, updatePolicy);
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                Collections.<URI> singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+                Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactUri)));
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
@@ -197,7 +197,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         this.log.info("requesting to edit artifact (HTML): {}, {}", artifactUri, objectUri);
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                Collections.singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+                Collections.singleton(PoddRdfConstants.VF.createURI(artifactUri)));
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
@@ -239,7 +239,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         this.log.info("requesting to populate edit artifact ({}): {}, ", variant.getMediaType().getName(), artifactUri);
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                Collections.singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+                Collections.singleton(PoddRdfConstants.VF.createURI(artifactUri)));
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);

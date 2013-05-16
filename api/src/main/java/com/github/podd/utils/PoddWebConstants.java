@@ -11,22 +11,22 @@ import org.openrdf.model.URI;
  */
 public interface PoddWebConstants
 {
-    public static final URI SCOPE_ARTIFACT = PoddRdfConstants.VALUE_FACTORY
+    public static final URI SCOPE_ARTIFACT = PoddRdfConstants.VF
             .createURI("http://purl.org/podd/poddBase#PoddArtifact");
     
-    public static final URI SCOPE_REPOSITORY = PoddRdfConstants.VALUE_FACTORY
+    public static final URI SCOPE_REPOSITORY = PoddRdfConstants.VF
             .createURI("http://purl.org/podd/poddBase#PoddRepository");
     
-    public static final URI PODD_ROLEMAPPEDOBJECT = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_ROLEMAPPEDOBJECT = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_USER, "roleMappedObject");
     
-    public static final URI PODD_USER_ORGANIZATION = PoddRdfConstants.VALUE_FACTORY.createURI(
+    public static final URI PODD_USER_ORGANIZATION = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_USER, "organization");
     
-    public static final URI PODD_USER_ORCID = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_USER,
+    public static final URI PODD_USER_ORCID = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER,
             "orcid");
     
-    public static final URI PODD_USER_HOMEPAGE = PoddRdfConstants.VALUE_FACTORY.createURI(PoddRdfConstants.PODD_USER,
+    public static final URI PODD_USER_HOMEPAGE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER,
             "uri");
     
     public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";

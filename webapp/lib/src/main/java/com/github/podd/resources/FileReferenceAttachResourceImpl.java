@@ -93,7 +93,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         }
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                Collections.singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+                Collections.singleton(PoddRdfConstants.VF.createURI(artifactUri)));
         
         // check mandatory parameter: artifact version IRI
         final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER);

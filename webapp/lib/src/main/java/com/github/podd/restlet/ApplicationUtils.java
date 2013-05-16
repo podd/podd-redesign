@@ -349,14 +349,14 @@ public class ApplicationUtils
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
         
-        final URI testUserHomePage = PoddRdfConstants.VALUE_FACTORY.createURI("http://www.example.com/testUser");
+        final URI testUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testUser");
         final PoddUser testUser =
                 new PoddUser("testUser", "testPassword".toCharArray(), "Test", "User", "test.user@example.com",
                         PoddUserStatus.ACTIVE, testUserHomePage, "CSIRO", "Orcid-Test-User");
         final URI testUserUri = nextRealm.addUser(testUser);
         nextRealm.map(testUser, PoddRoles.AUTHENTICATED.getRole());
         
-        final URI testAdminUserHomePage = PoddRdfConstants.VALUE_FACTORY.createURI("http://www.example.com/testAdmin");
+        final URI testAdminUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testAdmin");
         final PoddUser testAdminUser =
                 new PoddUser("testAdminUser", "testAdminPassword".toCharArray(), "Test Admin", "User",
                         "test.admin.user@example.com", PoddUserStatus.ACTIVE, testAdminUserHomePage, "UQ",
@@ -366,7 +366,7 @@ public class ApplicationUtils
         nextRealm.map(testAdminUser, PoddRoles.AUTHENTICATED.getRole());
         
         final URI testArtifactUri =
-                PoddRdfConstants.VALUE_FACTORY.createURI("http://purl.org/podd/ns/artifact/artifact89");
+                PoddRdfConstants.VF.createURI("http://purl.org/podd/ns/artifact/artifact89");
         nextRealm.map(testAdminUser, PoddRoles.PROJECT_ADMIN.getRole(), testArtifactUri);
         
         final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);

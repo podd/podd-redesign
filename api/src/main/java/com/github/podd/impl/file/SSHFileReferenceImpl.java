@@ -146,7 +146,7 @@ public class SSHFileReferenceImpl implements SSHFileReference
     @Override
     public Model toRDF()
     {
-        final ValueFactory vf = PoddRdfConstants.VALUE_FACTORY;
+        final ValueFactory vf = PoddRdfConstants.VF;
         final Model result = new LinkedHashModel();
         
         if(this.getArtifactID() != null)

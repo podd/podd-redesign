@@ -156,9 +156,9 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
         System.out.println(resultModel.toString());
         Assert.assertEquals("Expected Platform CabScan not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("CabScan")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("CabScan")).size());
         Assert.assertEquals("Expected Platform PlantScan not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("PlantScan")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("PlantScan")).size());
     }
     
     /**
@@ -175,11 +175,11 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         // verify:
         Assert.assertEquals("Not the expected number of results", 4, resultModel.size());
         Assert.assertEquals("Expected Assertion 'Yes' not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Yes")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Yes")).size());
         Assert.assertEquals("Expected Assertion 'Unknown' not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Unknown")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Unknown")).size());
         Assert.assertEquals("Expected Assertion 'Not Applicable' not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Not Applicable")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Not Applicable")).size());
     }
     
     /**
@@ -196,11 +196,11 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         // verify:
         Assert.assertEquals("Not the expected number of results", 9, resultModel.size());
         Assert.assertEquals("Expected Platform SPAD Meter not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("SPAD Meter")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("SPAD Meter")).size());
         Assert.assertEquals("Expected Platform Pyrometer not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Pyrometer")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Pyrometer")).size());
         Assert.assertEquals("Expected Platform SC1 Porometer not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("SC1 Porometer")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("SC1 Porometer")).size());
     }
     
     /**
@@ -221,9 +221,9 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         
         Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
         Assert.assertEquals("Value Hermaphrodite not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Hermaphrodite")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Hermaphrodite")).size());
         Assert.assertEquals("Value Male not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Male")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Male")).size());
     }
     
     /**
@@ -240,9 +240,9 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
         System.out.println(resultModel.toString());
         Assert.assertEquals("Expected Platform CabScan not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("CabScan")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("CabScan")).size());
         Assert.assertEquals("Expected Platform PlantScan not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("PlantScan")).size());
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("PlantScan")).size());
     }
     
 }

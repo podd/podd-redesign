@@ -139,7 +139,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private final ValueFactory vf = PoddRdfConstants.VALUE_FACTORY;
+    private final ValueFactory vf = PoddRdfConstants.VF;
     
     /**
      * Constructor
@@ -261,13 +261,13 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         final Value homePageVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_HOMEPAGE);
         if(homePageVal != null)
         {
-            result.setHomePage(PoddRdfConstants.VALUE_FACTORY.createURI(homePageVal.stringValue()));
+            result.setHomePage(PoddRdfConstants.VF.createURI(homePageVal.stringValue()));
         }
         
         final Value uriVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_URI);
         if(uriVal != null)
         {
-            result.setUri(PoddRdfConstants.VALUE_FACTORY.createURI(uriVal.stringValue()));
+            result.setUri(PoddRdfConstants.VF.createURI(uriVal.stringValue()));
         }
         
         return result;

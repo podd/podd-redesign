@@ -75,7 +75,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         this.log.info("requesting get artifact (HTML): {}", artifactUri);
         
         this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
-                Collections.<URI> singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+                Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactUri)));
         // completed checking authorization
         
         final User user = this.getRequest().getClientInfo().getUser();
@@ -129,7 +129,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.info("requesting get artifact ({}): {}", variant.getMediaType().getName(), artifactUri);
             
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
-                    Collections.<URI> singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+                    Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactUri)));
             // completed checking authorization
             
             final User user = this.getRequest().getClientInfo().getUser();

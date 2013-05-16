@@ -77,7 +77,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         else
         {
             this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                    Collections.singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
+                    Collections.singleton(PoddRdfConstants.VF.createURI(artifactUri)));
         }
         
         final PoddObjectLabel objectTypeLabel = this.getObjectTypeLabel(artifactUri, objectType);
@@ -127,7 +127,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 }
                 objectLabel =
                         this.getPoddSesameManager().getObjectLabel(ontologyID,
-                                PoddRdfConstants.VALUE_FACTORY.createURI(objectType), conn);
+                                PoddRdfConstants.VF.createURI(objectType), conn);
             }
             finally
             {
@@ -142,7 +142,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         {
             e.printStackTrace();
             // failed to find Label
-            final URI objectTypeUri = PoddRdfConstants.VALUE_FACTORY.createURI(objectType);
+            final URI objectTypeUri = PoddRdfConstants.VF.createURI(objectType);
             objectLabel = new PoddObjectLabelImpl(null, objectTypeUri, objectType);
         }
         return objectLabel;

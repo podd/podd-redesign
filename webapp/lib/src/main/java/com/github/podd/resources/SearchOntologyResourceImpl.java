@@ -116,7 +116,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         {
             for(final String searchType : searchTypes)
             {
-                set.add(PoddRdfConstants.VALUE_FACTORY.createURI(searchType));
+                set.add(PoddRdfConstants.VF.createURI(searchType));
             }
         }
         

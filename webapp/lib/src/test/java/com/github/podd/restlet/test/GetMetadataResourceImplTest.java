@@ -74,7 +74,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 55);
         
         Assert.assertEquals("Unexpected no. of properties", 11,
-                model.filter(PoddRdfConstants.VALUE_FACTORY.createURI(objectType), null, null).size() - 1);
+                model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
         Assert.assertEquals("Expected no Do-Not-Display properties", 1,
                 model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
     }
@@ -99,7 +99,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 107);
         
         Assert.assertEquals("Unexpected no. of properties", 22,
-                model.filter(PoddRdfConstants.VALUE_FACTORY.createURI(objectType), null, null).size() - 1);
+                model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
         Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                 model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
     }

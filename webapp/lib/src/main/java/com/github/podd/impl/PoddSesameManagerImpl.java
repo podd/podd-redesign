@@ -18,6 +18,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.EmptyModel;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -940,9 +941,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb1.append("CONSTRUCT { ");
         sb1.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
-        sb1.append(" ?poddObject ?propertyUri ?owlClass . ");
-        sb1.append(" ?poddObject ?propertyUri ?rangeClass . ");
-        sb1.append(" ?poddObject ?propertyUri ?valueRange . ");
+        sb1.append(" ?poddObject <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        sb1.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        sb1.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        sb1.append(" ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
+        sb1.append(" ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass . ");
+        sb1.append(" ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange . ");
         
         sb1.append("} WHERE {");
         
@@ -956,7 +960,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         if(!includeDoNotDisplayProperties)
         {
             sb1.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                    + "> true } ");
+                    + "> true . } ");
         }
         
         sb1.append("}");
@@ -964,60 +968,68 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb1.toString());
         graphQuery.setBinding("poddObject", objectType);
         
+        this.log.info("Created SPARQL {} \n   with poddObject bound to {}", sb1, objectType);
+        
         final Model queryResults1 = this.executeGraphQuery(graphQuery, contexts);
         results.addAll(queryResults1);
         
         // -- for each property, get meta-data about it
-        final Set<URI> properties = queryResults1.predicates();
-        for(final URI property : properties)
+        final Set<Value> properties = queryResults1.filter(null, OWL.ONPROPERTY, null).objects();
+        for(final Value property : properties)
         {
-            // - find property: type (e.g. object/datatype/annotation), label, display-type, weight
-            final StringBuilder sb2 = new StringBuilder();
-            
-            sb2.append("CONSTRUCT { ");
-            sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
-            sb2.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
-            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
-                    + "> ?propertyDisplayType . ");
-            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight . ");
-            
-            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                    + "> ?propertyDoNotDisplay . ");
-            
-            sb2.append("} WHERE {");
-            
-            sb2.append(" OPTIONAL {?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType } . ");
-            
-            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
-                    + "> ?propertyDisplayType } . ");
-            
-            sb2.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
-            
-            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue()
-                    + "> ?propertyWeight } . ");
-            
-            if(includeDoNotDisplayProperties)
+            if(property instanceof URI)
             {
-                sb2.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                        + "> ?propertyDoNotDisplay } . ");
-            }
-            
-            sb2.append("}");
-            
-            final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2.toString());
-            graphQuery2.setBinding("propertyUri", property);
-            
-            this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}", sb2, property);
-            
-            final Model queryResults2 = this.executeGraphQuery(graphQuery2, contexts);
-            results.addAll(queryResults2);
-            
-            // - add cardinality value
-            final URI cardinalityValue =
-                    this.getCardinalityValue(objectType, property, true, repositoryConnection, contexts);
-            if(cardinalityValue != null)
-            {
-                results.add(property, OWL.CARDINALITY, cardinalityValue);
+                // - find property: type (e.g. object/datatype/annotation), label, display-type,
+                // weight
+                final StringBuilder sb2 = new StringBuilder();
+                
+                sb2.append("CONSTRUCT { ");
+                sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+                sb2.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+                sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
+                        + "> ?propertyDisplayType . ");
+                sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight . ");
+                
+                sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                        + "> ?propertyDoNotDisplay . ");
+                
+                sb2.append("} WHERE {");
+                
+                sb2.append(" OPTIONAL {?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType } . ");
+                
+                sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
+                        + "> ?propertyDisplayType } . ");
+                
+                sb2.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
+                
+                sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue()
+                        + "> ?propertyWeight } . ");
+                
+                if(includeDoNotDisplayProperties)
+                {
+                    sb2.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                            + "> ?propertyDoNotDisplay } . ");
+                }
+                
+                sb2.append("}");
+                
+                final GraphQuery graphQuery2 =
+                        repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2.toString());
+                graphQuery2.setBinding("propertyUri", property);
+                
+                this.log.info("Created SPARQL {} \n   with propertyUri bound to {}", sb2, property);
+                
+                final Model queryResults2 = this.executeGraphQuery(graphQuery2, contexts);
+                results.addAll(queryResults2);
+                
+                // - add cardinality value
+                final URI cardinalityValue =
+                        this.getCardinalityValue(objectType, (URI)property, true, repositoryConnection, contexts);
+                if(cardinalityValue != null)
+                {
+                    results.add((URI)property, OWL.CARDINALITY, cardinalityValue);
+                }
+                
             }
         }
         
