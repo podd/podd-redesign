@@ -198,6 +198,19 @@ public abstract class AbstractPoddClientTest
             Assert.assertEquals(newArtifact.getOntologyIRI(), afterFileAttachment.getOntologyIRI());
             // Version should have been updated by the operation
             Assert.assertNotEquals(newArtifact.getVersionIRI(), afterFileAttachment.getVersionIRI());
+            
+            final ByteArrayOutputStream afterOutputStream = new ByteArrayOutputStream(8096);
+            this.testClient.downloadArtifact(newArtifact, afterOutputStream, RDFFormat.RDFJSON);
+            Model afterParseRdf =
+                    this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON,
+                            BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES);
+            
+            Model afterTopObject =
+                    afterParseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(),
+                            PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null);
+            
+            Assert.assertEquals("Did not find unique top object in artifact", 1, afterTopObject.size());
+            
         }
         finally
         {
