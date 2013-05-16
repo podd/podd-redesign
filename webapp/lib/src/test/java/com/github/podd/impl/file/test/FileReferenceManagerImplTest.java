@@ -25,7 +25,7 @@ public class FileReferenceManagerImplTest extends AbstractFileReferenceManagerTe
     @Override
     public FileReferenceManager getNewFileReferenceManager()
     {
-        FileReferenceManagerImpl fileRefManager = new FileReferenceManagerImpl();
+        final FileReferenceManagerImpl fileRefManager = new FileReferenceManagerImpl();
         return fileRefManager;
     }
     
@@ -38,9 +38,9 @@ public class FileReferenceManagerImplTest extends AbstractFileReferenceManagerTe
     @Override
     public FileReferenceProcessorFactoryRegistry getNewPoddFileReferenceProcessorFactoryRegistry()
     {
-        FileReferenceProcessorFactoryRegistry registry = new FileReferenceProcessorFactoryRegistry();
+        final FileReferenceProcessorFactoryRegistry registry = new FileReferenceProcessorFactoryRegistry();
         
-        // this should happen automatically 
+        // this should happen automatically
         // registry.add(new SSHFileReferenceProcessorFactoryImpl());
         
         return registry;

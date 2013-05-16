@@ -3,25 +3,16 @@
  */
 package com.github.podd.restlet.test;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.ext.html.FormData;
 import org.restlet.ext.html.FormDataSet;
-import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
@@ -88,6 +79,27 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
         }
+    }
+    
+    /**
+     * Test authenticated access to the upload Artifact page in HTML
+     */
+    @Test
+    public void testGetUploadArtifactPageBasicHtml() throws Exception
+    {
+        // prepare: add an artifact
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        Assert.assertTrue(body.contains("Upload new artifact"));
+        Assert.assertTrue(body.contains("type=\"file\""));
+        
+        this.assertFreemarker(body);
     }
     
     /**
@@ -193,33 +205,12 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         // verify: results (expecting the added artifact's ontology IRI)
         final String body = results.getText();
         
-        Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
+        final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
         
         Assert.assertNotNull("No ontology IDs in response", ontologyIDs);
         Assert.assertEquals("More than 1 ontology ID in response", 1, ontologyIDs.size());
         Assert.assertTrue("Ontology ID not of expected format",
                 ontologyIDs.iterator().next().toString().contains("artifact:1:version:1"));
-    }
-    
-    /**
-     * Test authenticated access to the upload Artifact page in HTML
-     */
-    @Test
-    public void testGetUploadArtifactPageBasicHtml() throws Exception
-    {
-        // prepare: add an artifact
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = results.getText();
-        Assert.assertTrue(body.contains("Upload new artifact"));
-        Assert.assertTrue(body.contains("type=\"file\""));
-        
-        this.assertFreemarker(body);
     }
     
 }

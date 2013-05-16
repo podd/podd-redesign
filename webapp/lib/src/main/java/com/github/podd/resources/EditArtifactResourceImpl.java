@@ -84,7 +84,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.error("Artifact ID not submitted");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
-
+        
         final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER);
         
         if(versionUri == null)
@@ -96,7 +96,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         // - optional parameter 'isreplace'
         UpdatePolicy updatePolicy = UpdatePolicy.REPLACE_EXISTING;
         final String isReplaceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_REPLACE);
-        if (isReplaceStr != null && (Boolean.valueOf(isReplaceStr) == false))
+        if(isReplaceStr != null && (Boolean.valueOf(isReplaceStr) == false))
         {
             updatePolicy = UpdatePolicy.MERGE_WITH_EXISTING;
         }
@@ -104,7 +104,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         // - optional parameter 'isforce'
         DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
         final String forceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_FORCE);
-        if (forceStr != null && Boolean.valueOf(forceStr))
+        if(forceStr != null && Boolean.valueOf(forceStr))
         {
             danglingObjectPolicy = DanglingObjectPolicy.FORCE_CLEAN;
         }
@@ -112,7 +112,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         // - optional parameter 'verifyfilerefs'
         FileReferenceVerificationPolicy fileRefVerificationPolicy = FileReferenceVerificationPolicy.DO_NOT_VERIFY;
         final String fileRefVerifyStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES);
-        if (fileRefVerifyStr != null && Boolean.valueOf(fileRefVerifyStr))
+        if(fileRefVerifyStr != null && Boolean.valueOf(fileRefVerifyStr))
         {
             fileRefVerificationPolicy = FileReferenceVerificationPolicy.VERIFY;
         }
@@ -132,26 +132,26 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             inputStream = entity.getStream();
         }
-        catch(IOException e)
+        catch(final IOException e)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
         }
-        RDFFormat inputFormat = Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
+        final RDFFormat inputFormat = Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
         
         // - prepare response
-        ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        RDFWriter writer =
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
+        final RDFWriter writer =
                 Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
                         output);
-
-        // - do the artifact update 
+        
+        // - do the artifact update
         try
         {
             final InferredOWLOntologyID ontologyID =
                     this.getPoddArtifactManager().updateArtifact(ValueFactoryImpl.getInstance().createURI(artifactUri),
-                            ValueFactoryImpl.getInstance().createURI(versionUri),
-                            inputStream, inputFormat, updatePolicy, danglingObjectPolicy, fileRefVerificationPolicy);
-            //TODO - send detailed errors for display where possible
+                            ValueFactoryImpl.getInstance().createURI(versionUri), inputStream, inputFormat,
+                            updatePolicy, danglingObjectPolicy, fileRefVerificationPolicy);
+            // TODO - send detailed errors for display where possible
             
             // FIXME Change response format so that it does not resemble an empty OWL Ontology
             // - write the artifact ID into response
@@ -218,12 +218,13 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-
+    
     /**
-     * Request for RDF data for building the "edit object" page. 
+     * Request for RDF data for building the "edit object" page.
      */
     @Get("rdf|rj|json|ttl")
-    public Representation getEditArtifactRdf(final Representation entity, final Variant variant) throws ResourceException
+    public Representation getEditArtifactRdf(final Representation entity, final Variant variant)
+        throws ResourceException
     {
         // the artifact in which editing is requested
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
@@ -235,7 +236,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         // Podd object to be edited. NULL indicates top object is to be edited.
         final String objectUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
         
-        this.log.info("requesting to populate edit artifact ({}): {}, ", variant.getMediaType().getName(), artifactUri);        
+        this.log.info("requesting to populate edit artifact ({}): {}, ", variant.getMediaType().getName(), artifactUri);
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
                 Collections.singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
@@ -253,24 +254,24 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
-    
+        
         final Model modelForEdit = this.getModelForEdit(ontologyID, objectUri);
-
+        
         // - prepare response
-        ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        RDFWriter writer =
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
+        final RDFWriter writer =
                 Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
                         output);
         try
         {
             writer.startRDF();
-            for(Statement st : modelForEdit)
+            for(final Statement st : modelForEdit)
             {
                 writer.handleStatement(st);
             }
             writer.endRDF();
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response", e);
         }
@@ -280,13 +281,14 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
-     * Get a {@link Model} containing all data and meta-data necessary to display the "edit object" page.
+     * Get a {@link Model} containing all data and meta-data necessary to display the "edit object"
+     * page.
      * 
      * @param ontologyID
      * @param objectToEdit
      * @return A Model containing all necessary statements
      */
-    private Model getModelForEdit(final InferredOWLOntologyID ontologyID, String objectToEdit)
+    private Model getModelForEdit(final InferredOWLOntologyID ontologyID, final String objectToEdit)
     {
         RepositoryConnection conn = null;
         try
@@ -305,7 +307,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
             }
             
-            List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
+            final List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
             if(objectTypes == null || objectTypes.isEmpty())
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
@@ -313,7 +315,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             
             return this.getPoddSesameManager().getObjectDetailsForEdit(ontologyID, objectUri, conn);
         }
-        catch(final OpenRDFException e) 
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
         }
@@ -327,7 +329,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                     conn.rollback();
                     conn.close();
                 }
-                catch(OpenRDFException e)
+                catch(final OpenRDFException e)
                 {
                     this.log.error("Failed to close RepositoryConnection", e);
                     // Should we do anything other than log an error?
@@ -335,7 +337,6 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             }
         }
     }
-
     
     /**
      * Internal method to populate the Freemarker Data Model for Get request
@@ -346,7 +347,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
      *            The specific PODD object to edit.
      * @return The populated data model
      */
-    private Map<String, Object> populateDataModelForGet(final InferredOWLOntologyID ontologyID, String objectToEdit)
+    private Map<String, Object> populateDataModelForGet(final InferredOWLOntologyID ontologyID,
+            final String objectToEdit)
     {
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "editObject.html.ftl");
@@ -359,9 +361,9 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("OWL_OBJECT_PROPERTY", OWL.OBJECTPROPERTY);
         dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
         dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
-//        dataModel.put("OWL_MAX_CARDINALITY", PoddRdfConstants.OWL_MAX_QUALIFIED_CARDINALITY);
-//        dataModel.put("OWL_MIN_CARDINALITY", PoddRdfConstants.OWL_MIN_QUALIFIED_CARDINALITY);
-//        dataModel.put("OWL_CARDINALITY", PoddRdfConstants.OWL_QUALIFIED_CARDINALITY);
+        // dataModel.put("OWL_MAX_CARDINALITY", PoddRdfConstants.OWL_MAX_QUALIFIED_CARDINALITY);
+        // dataModel.put("OWL_MIN_CARDINALITY", PoddRdfConstants.OWL_MIN_QUALIFIED_CARDINALITY);
+        // dataModel.put("OWL_CARDINALITY", PoddRdfConstants.OWL_QUALIFIED_CARDINALITY);
         dataModel.put("PODD_BASE_HAS_CARDINALITY", PoddRdfConstants.PODD_BASE_HAS_CARDINALITY);
         dataModel.put("PODD_BASE_DISPLAY_TYPE", PoddRdfConstants.PODD_BASE_DISPLAY_TYPE);
         dataModel.put("PODD_BASE_HAS_WEIGHT", PoddRdfConstants.PODD_BASE_WEIGHT);
@@ -370,7 +372,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         // Defaults to false. Set to true if multiple objects are being edited concurrently
         // TODO: investigate how to use this
-        boolean initialized = false;
+        final boolean initialized = false;
         
         RepositoryConnection conn = null;
         try
@@ -389,16 +391,16 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
             }
             
-            List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
+            final List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
             if(objectTypes == null || objectTypes.isEmpty())
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
             
             // Get label for the object type
-            PoddObjectLabel objectType =
+            final PoddObjectLabel objectType =
                     this.getPoddSesameManager().getObjectLabel(ontologyID, objectTypes.get(0), conn);
-            if (objectType == null || objectType.getLabel() == null)
+            if(objectType == null || objectType.getLabel() == null)
             {
                 dataModel.put("objectType", objectTypes.get(0));
             }
@@ -406,8 +408,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 dataModel.put("objectType", objectType.getLabel());
             }
-
-            PoddObjectLabel theObject = this.getPoddSesameManager().getObjectLabel(ontologyID, objectUri, conn);
+            
+            final PoddObjectLabel theObject = this.getPoddSesameManager().getObjectLabel(ontologyID, objectUri, conn);
             dataModel.put("poddObject", theObject);
             
             // an ordered-list of the properties about the object
@@ -422,18 +424,19 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             
             // identify Collection elements and add all their possible values to the data model
             // TODO: figure out a better way of doing this
-            Map<String, List<PoddObjectLabel>> membersMap = new HashMap<String, List<PoddObjectLabel>>();
-            for (URI prop : orderedProperties)
+            final Map<String, List<PoddObjectLabel>> membersMap = new HashMap<String, List<PoddObjectLabel>>();
+            for(final URI prop : orderedProperties)
             {
-                String displayTypeValue =
+                final String displayTypeValue =
                         allNeededStatementsForEdit.filter(prop, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE, null)
                                 .objectString();
                 
-                if (PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN.stringValue().equals(displayTypeValue))
+                if(PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN.stringValue().equals(displayTypeValue))
                 {
                     final List<PoddObjectLabel> memberList = new ArrayList<PoddObjectLabel>();
-                    List<URI> allValidMembers = this.getPoddSesameManager().getAllValidMembers(ontologyID, prop, conn);
-                    for (URI member : allValidMembers)
+                    final List<URI> allValidMembers =
+                            this.getPoddSesameManager().getAllValidMembers(ontologyID, prop, conn);
+                    for(final URI member : allValidMembers)
                     {
                         memberList.add(this.getPoddSesameManager().getObjectLabel(ontologyID, member, conn));
                     }
@@ -450,21 +453,24 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
              * 
              * @ftlvariable name="isAdmin" type="boolean"
              * 
-             * @ftlvariable name="canViewProjectParticipants" type="boolean" 
+             * @ftlvariable name="canViewProjectParticipants" type="boolean"
              * 
              * @ftlvariable name="postUrl" type="java.lang.String"
              * 
              * @ftlvariable name="objectPID" type="java.lang.String"
              * 
              * @ftlvariable name="objectType" type="java.lang.String"
-             *  
-             * @ftlvariable name="isProject" type="boolean" 
              * 
-             * @ftlvariable name="elementList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>"
+             * @ftlvariable name="isProject" type="boolean"
              * 
-             * @ftlvariable name="refersList" type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>"
+             * @ftlvariable name="elementList"
+             * type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>"
              * 
-             * @ftlvariable name="fileList" type="java.util.ArrayList<podd.resources.util.view.FileElement>"
+             * @ftlvariable name="refersList"
+             * type="java.util.ArrayList<podd.template.content.HTMLElementTemplate>"
+             * 
+             * @ftlvariable name="fileList"
+             * type="java.util.ArrayList<podd.resources.util.view.FileElement>"
              * 
              * @ftlvariable name="canComplete" type="boolean"
              * 
@@ -473,7 +479,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
              * @ftlvariable name="errorMessage" type="java.lang.String"
              * 
              * @ftlvariable name="objectNameError" type="java.lang.String"
-             *  
+             * 
              * @ftlvariable name="objectDescriptionError" type="java.lang.String"
              * 
              * @ftlvariable name="generalErrorList" type="java.util.ArrayList<java.lang.String>"
@@ -505,7 +511,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                     conn.rollback();
                     conn.close();
                 }
-                catch(OpenRDFException e)
+                catch(final OpenRDFException e)
                 {
                     this.log.error("Failed to close RepositoryConnection", e);
                     // Should we do anything other than log an error?

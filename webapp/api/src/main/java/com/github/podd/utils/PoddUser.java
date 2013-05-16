@@ -10,18 +10,18 @@ import com.github.ansell.restletutils.RestletUtilUser;
 /**
  * This class represents a PODD user.
  * 
- * In PODD, the unique "identifier" of a user is also the email address.  
- * The URI is also a unique identifier of a user.
+ * In PODD, the unique "identifier" of a user is also the email address. The URI is also a unique
+ * identifier of a user.
  * 
- * Equality between two users is computed in {@link RestletUtilUser} using
- * only the email, identifier, firstName and lastName fields.
+ * Equality between two users is computed in {@link RestletUtilUser} using only the email,
+ * identifier, firstName and lastName fields.
  * 
  * @author kutila
  */
 public class PoddUser extends RestletUtilUser
 {
-    /** 
-     * The ORCID (see {@link http://orcid.org}) identifier of the user. 
+    /**
+     * The ORCID (see {@link http://orcid.org}) identifier of the user.
      */
     private volatile String orcid;
     
@@ -85,7 +85,8 @@ public class PoddUser extends RestletUtilUser
      *            The ORCID identifier.
      */
     public PoddUser(final String identifier, final char[] secret, final String firstName, final String lastName,
-            final String email, final PoddUserStatus userStatus, final URI homePage, final String organization, final String orcid)
+            final String email, final PoddUserStatus userStatus, final URI homePage, final String organization,
+            final String orcid)
     {
         super(identifier, secret, firstName, lastName, email);
         this.userStatus = userStatus;
@@ -94,35 +95,28 @@ public class PoddUser extends RestletUtilUser
         this.orcid = orcid;
     }
     
-    
-    public String getOrcid()
-    {
-        return orcid;
-    }
-    
-    public String getOrganization()
-    {
-        return organization;
-    }
-    
-    public PoddUserStatus getUserStatus()
-    {
-        return userStatus;
-    }
-
     /**
-     * Get the URL of a home page containing details about the User.
-     * This value is set by the user.
+     * Get the URL of a home page containing details about the User. This value is set by the user.
+     * 
      * @return
      */
     public URI getHomePage()
     {
         return this.homePage;
     }
-
+    
+    public String getOrcid()
+    {
+        return this.orcid;
+    }
+    
+    public String getOrganization()
+    {
+        return this.organization;
+    }
+    
     /**
-     * Get the Unique URI allocated to each user. This value is 
-     * usually generated and set by PODD. 
+     * Get the Unique URI allocated to each user. This value is usually generated and set by PODD.
      * 
      * @return
      */
@@ -131,47 +125,51 @@ public class PoddUser extends RestletUtilUser
         return this.uri;
     }
     
-    public void setOrcid(String orcid)
+    public PoddUserStatus getUserStatus()
     {
-        this.orcid = orcid;
-    }
-    
-    public void setOrganization(String organization)
-    {
-        this.organization = organization;
-    }
-    
-    public void setUserStatus(PoddUserStatus userStatus)
-    {
-        this.userStatus = userStatus;
+        return this.userStatus;
     }
     
     /**
-     * Set the URL of a home page containing details about the User.
-     * This value is usually set by the user.
+     * Set the URL of a home page containing details about the User. This value is usually set by
+     * the user.
+     * 
      * @param homePage
      */
-    public void setHomePage(URI homePage)
+    public void setHomePage(final URI homePage)
     {
         this.homePage = homePage;
     }
     
+    public void setOrcid(final String orcid)
+    {
+        this.orcid = orcid;
+    }
+    
+    public void setOrganization(final String organization)
+    {
+        this.organization = organization;
+    }
+    
     /**
-     * Set the Unique URI allocated to each user. This value is 
-     * usually generated and set by PODD. 
+     * Set the Unique URI allocated to each user. This value is usually generated and set by PODD.
      * 
      * @param uri
      */
-    public void setUri(URI uri)
+    public void setUri(final URI uri)
     {
         this.uri = uri;
     }
     
+    public void setUserStatus(final PoddUserStatus userStatus)
+    {
+        this.userStatus = userStatus;
+    }
     
     @Override
     public String toString()
     {
-        StringBuilder b = new StringBuilder();
+        final StringBuilder b = new StringBuilder();
         b.append(super.toString());
         b.append(":");
         b.append(this.getUserStatus());

@@ -33,51 +33,6 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
     }
     
     @Test
-    public void testErrorEditArtifactRdfWithoutArtifactID() throws Exception
-    {
-        final ClientResource editArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
-        
-        // there is no need to authenticate, have a test artifact or send RDF to modify as the
-        // artifact is checked for first
-        try
-        {
-            editArtifactClientResource.post(null, MediaType.TEXT_PLAIN);
-        }
-        catch(final ResourceException e)
-        {
-            Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
-        }
-    }
-    
-    @Test
-    public void testErrorEditArtifactRdfWithoutAuthentication() throws Exception
-    {
-        // prepare: add an artifact
-        final String artifactUri = "urn:purl:dummy:artifact:uri:artifact:1";
-        
-        final ClientResource editArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
-        
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
-        
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
-                        MediaType.APPLICATION_RDF_XML);
-        
-        // invoke without authentication
-        try
-        {
-            editArtifactClientResource.post(input, MediaType.APPLICATION_RDF_XML);
-        }
-        catch(final ResourceException e)
-        {
-            Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
-        }
-    }
-    
-    @Test
     public void testEditArtifactBasicRdf() throws Exception
     {
         // prepare: add an artifact
@@ -208,8 +163,53 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
     }
     
+    @Test
+    public void testErrorEditArtifactRdfWithoutArtifactID() throws Exception
+    {
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
+        
+        // there is no need to authenticate, have a test artifact or send RDF to modify as the
+        // artifact is checked for first
+        try
+        {
+            editArtifactClientResource.post(null, MediaType.TEXT_PLAIN);
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+    }
+    
+    @Test
+    public void testErrorEditArtifactRdfWithoutAuthentication() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = "urn:purl:dummy:artifact:uri:artifact:1";
+        
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
+        
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                        MediaType.APPLICATION_RDF_XML);
+        
+        // invoke without authentication
+        try
+        {
+            editArtifactClientResource.post(input, MediaType.APPLICATION_RDF_XML);
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+    }
+    
     /**
-     * NOTE: The expected 500 error causes a stacktrace to be printed on the server 
+     * NOTE: The expected 500 error causes a stacktrace to be printed on the server
      */
     @Test
     public void testErrorEditArtifactTurtleWithReportDanglingObjects() throws Exception
@@ -239,13 +239,12 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
                     MediaType.APPLICATION_RDF_TURTLE, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
             Assert.fail("Should have failed when dangling objects were identified");
         }
-        catch (ResourceException e)
+        catch(final ResourceException e)
         {
             Assert.assertEquals(Status.SERVER_ERROR_INTERNAL, e.getStatus());
-            //the cause is not available to the client for verification
+            // the cause is not available to the client for verification
         }
     }
-    
     
     /**
      * Test viewing the edit HTML page for an internal PODD object.
@@ -300,7 +299,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         System.out.println(body);
         this.assertFreemarker(body);
     }
-
+    
     /**
      * Test getting a {@link Model} containing statements to display "edit object" page
      */
@@ -327,8 +326,6 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         
         this.assertFreemarker(body);
     }
-    
-    
     
     /**
      * Test posting to the edit HTML page modifying an internal PODD object.

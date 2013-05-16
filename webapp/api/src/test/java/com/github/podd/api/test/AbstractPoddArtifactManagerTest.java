@@ -47,12 +47,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.DanglingObjectPolicy;
+import com.github.podd.api.FileReferenceVerificationPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.FileReferenceVerificationPolicy;
 import com.github.podd.api.UpdatePolicy;
 import com.github.podd.api.file.FileReferenceManager;
 import com.github.podd.api.file.FileReferenceProcessorFactory;
@@ -88,6 +88,41 @@ public abstract class AbstractPoddArtifactManagerTest
     private URI schemaGraph;
     
     private URI artifactGraph;
+    
+    /**
+     * Write contents of specified context to a file
+     * 
+     * @param context
+     * @param filename
+     * @param writeFormat
+     * @throws IOException
+     * @throws OpenRDFException
+     */
+    public void dumpRdfToFile(final URI context, final String filename, final RDFFormat writeFormat)
+        throws IOException, OpenRDFException
+    {
+        final String outFilename = filename + "." + writeFormat.getFileExtensions().get(0);
+        
+        final RDFWriter writer = Rio.createWriter(writeFormat, new FileOutputStream(filename));
+        writer.handleNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+        writer.handleNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
+        writer.handleNamespace("owl", "http://www.w3.org/2002/07/owl#");
+        writer.handleNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        writer.handleNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+        
+        writer.handleNamespace("dc", "http://purl.org/podd/ns/dcTerms#");
+        
+        writer.startRDF();
+        
+        final List<Statement> inferredList =
+                Iterations.asList(this.testRepositoryConnection.getStatements(null, null, null, false, context));
+        for(final Statement s : inferredList)
+        {
+            writer.handleStatement(s);
+        }
+        writer.endRDF();
+        this.log.info("Wrote {} statements to file {}", inferredList.size(), outFilename);
+    }
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of PoddArtifactManager
@@ -201,6 +236,91 @@ public abstract class AbstractPoddArtifactManagerTest
      *         process UUID references.
      */
     protected abstract PoddPurlProcessorFactory getNewUUIDPurlProcessorFactory();
+    
+    private final void internalTestExportObjectmetadata(final InferredOWLOntologyID artifactID) throws Exception
+    {
+        
+        // Format: Object Type, includeDoNotDisplayProperties, expected model size,
+        // expected property count, do-not-display statement count
+        final Object[][] testData =
+                {
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
+                                107, 22, 0 },
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
+                                119, 24, 2 },
+                        
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
+                                50, 10, 0 },
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
+                                55, 11, 1 },
+                        
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),
+                                false, 27, 5, 0 },
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
+                                32, 6, 1 },
+                        
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
+                                false, 37, 7, 0 },
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
+                                true, 42, 8, 1 }, };
+        
+        for(final Object[] element : testData)
+        {
+            final ByteArrayOutputStream output = new ByteArrayOutputStream();
+            
+            this.testArtifactManager.exportObjectMetadata((URI)element[0], output, RDFFormat.TURTLE,
+                    (Boolean)element[1], artifactID);
+            
+            // parse output into a Model
+            final ByteArrayInputStream bin = new ByteArrayInputStream(output.toByteArray());
+            final RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE);
+            final Model model = new LinkedHashModel();
+            rdfParser.setRDFHandler(new StatementCollector(model));
+            rdfParser.parse(bin, "");
+            
+            // verify:
+            Assert.assertEquals("Not the expected statement count in Model", element[2], model.size());
+            Assert.assertEquals("Not the expected no. of properties", element[3],
+                    model.filter((URI)element[0], null, null).size() - 1);
+            Assert.assertEquals("Not the expected no. of non-displayable properties", element[4],
+                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        }
+    }
+    
+    /**
+     * Internal helper method to carry out invoking updateArtifact()
+     * 
+     * @param resourcePath
+     * @param resourceFormat
+     * @param mgtGraphSize
+     * @param assertedStatementCount
+     * @param inferredStatementCount
+     * @param isPublished
+     * @param fragmentPath
+     * @param fragmentFormat
+     * @return
+     * @throws Exception
+     */
+    private InferredOWLOntologyID internalTestUpdateArtifact(final String resourcePath, final RDFFormat resourceFormat,
+            final int mgtGraphSize, final long assertedStatementCount, final long inferredStatementCount,
+            final boolean isPublished, final String fragmentPath, final RDFFormat fragmentFormat,
+            final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectPolicy,
+            final FileReferenceVerificationPolicy verifyFileReferences) throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        
+        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, resourceFormat);
+        this.verifyLoadedArtifact(artifactId, mgtGraphSize, assertedStatementCount, inferredStatementCount, isPublished);
+        
+        final InputStream editInputStream = this.getClass().getResourceAsStream(fragmentPath);
+        final InferredOWLOntologyID updatedArtifact =
+                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
+                        .getVersionIRI().toOpenRDFURI(), editInputStream, fragmentFormat, updatePolicy,
+                        danglingObjectPolicy, verifyFileReferences);
+        return updatedArtifact;
+    }
     
     /**
      * Helper method which loads, infers and stores a given ontology using the PoddOWLManager.
@@ -523,7 +643,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
         this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
-
+        
         this.internalTestExportObjectmetadata(artifactIDv1);
     }
     
@@ -538,55 +658,6 @@ public abstract class AbstractPoddArtifactManagerTest
         this.loadSchemaOntologies();
         
         this.internalTestExportObjectmetadata(null);
-    }
-
-    private final void internalTestExportObjectmetadata(InferredOWLOntologyID artifactID) throws Exception{
-
-        // Format: Object Type, includeDoNotDisplayProperties, expected model size, 
-        // expected property count, do-not-display statement count
-        final Object[][] testData =
-            {
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"),false,
-                        107, 22, 0 },
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"),true,
-                    119, 24, 2 },
-                    
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"),false,
-                    50, 10, 0 },
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"),true,
-                    55, 11, 1 },
-                    
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),false,
-                    27, 5, 0 },
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),true,
-                    32, 6, 1 },
-                    
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),false,
-                    37, 7, 0 },
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),true,
-                    42, 8, 1 },
-            };        
-        
-        for (int i = 0; i < testData.length; i++)
-        {
-            final ByteArrayOutputStream output = new ByteArrayOutputStream();
-            
-            this.testArtifactManager.exportObjectMetadata((URI)testData[i][0], output, RDFFormat.TURTLE, (Boolean)testData[i][1], artifactID);
-
-            // parse output into a Model
-            ByteArrayInputStream bin = new ByteArrayInputStream(output.toByteArray());
-            RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE);
-            Model model = new LinkedHashModel();
-            rdfParser.setRDFHandler(new StatementCollector(model));
-            rdfParser.parse(bin, "");
-
-            // verify:
-            Assert.assertEquals("Not the expected statement count in Model", testData[i][2], model.size());
-            Assert.assertEquals("Not the expected no. of properties", testData[i][3],
-                    model.filter((URI)testData[i][0], null, null).size() - 1);
-            Assert.assertEquals("Not the expected no. of non-displayable properties", testData[i][4],
-                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
-        }        
     }
     
     @Test
@@ -873,32 +944,6 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      * 
-     * Tests loading an artifact where the source RDF statements do not contain a version IRI.
-     * 
-     */
-    @Test
-    public final void testLoadArtifactWithNoVersionIRIInSource() throws Exception
-    {
-        this.loadSchemaOntologies();
-        
-        // load artifact
-        final InputStream inputStream4FirstArtifact =
-                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_NO_VERSION_INFO);
-        final InferredOWLOntologyID firstArtifactId =
-                this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
-        
-        // verify
-        this.verifyLoadedArtifact(firstArtifactId, 7, TestConstants.TEST_ARTIFACT_NO_VERSION_INFO_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_NO_VERSION_INFO_INFERRED_TRIPLES, false);
-        Assert.assertEquals("Version IRI of loaded ontology not expected value", firstArtifactId.getOntologyIRI()
-                .toString().concat(":version:1"), firstArtifactId.getVersionIRI().toString());
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     * 
      * Tests loading an artifact which imports a previous version of a schema ontology (i.e.
      * poddScience v1)
      */
@@ -966,6 +1011,32 @@ public abstract class AbstractPoddArtifactManagerTest
             }
             nextRepositoryConnection = null;
         }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
+     * .
+     * 
+     * Tests loading an artifact where the source RDF statements do not contain a version IRI.
+     * 
+     */
+    @Test
+    public final void testLoadArtifactWithNoVersionIRIInSource() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // load artifact
+        final InputStream inputStream4FirstArtifact =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_NO_VERSION_INFO);
+        final InferredOWLOntologyID firstArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream4FirstArtifact, RDFFormat.RDFXML);
+        
+        // verify
+        this.verifyLoadedArtifact(firstArtifactId, 7, TestConstants.TEST_ARTIFACT_NO_VERSION_INFO_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_NO_VERSION_INFO_INFERRED_TRIPLES, false);
+        Assert.assertEquals("Version IRI of loaded ontology not expected value", firstArtifactId.getOntologyIRI()
+                .toString().concat(":version:1"), firstArtifactId.getVersionIRI().toString());
     }
     
     /**
@@ -1135,41 +1206,6 @@ public abstract class AbstractPoddArtifactManagerTest
     }
     
     /**
-     * Internal helper method to carry out invoking updateArtifact()
-     * 
-     * @param resourcePath
-     * @param resourceFormat
-     * @param mgtGraphSize
-     * @param assertedStatementCount
-     * @param inferredStatementCount
-     * @param isPublished
-     * @param fragmentPath
-     * @param fragmentFormat
-     * @return
-     * @throws Exception
-     */
-    private InferredOWLOntologyID internalTestUpdateArtifact(final String resourcePath, final RDFFormat resourceFormat,
-            final int mgtGraphSize, final long assertedStatementCount, final long inferredStatementCount,
-            final boolean isPublished, final String fragmentPath, final RDFFormat fragmentFormat,
-            final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectPolicy,
-            final FileReferenceVerificationPolicy verifyFileReferences) throws Exception
-    {
-        this.loadSchemaOntologies();
-        
-        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
-        
-        final InferredOWLOntologyID artifactId = this.testArtifactManager.loadArtifact(inputStream, resourceFormat);
-        this.verifyLoadedArtifact(artifactId, mgtGraphSize, assertedStatementCount, inferredStatementCount, isPublished);
-        
-        final InputStream editInputStream = this.getClass().getResourceAsStream(fragmentPath);
-        final InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
-                        .getVersionIRI().toOpenRDFURI(), editInputStream, fragmentFormat, updatePolicy,
-                        danglingObjectPolicy, verifyFileReferences);
-        return updatedArtifact;
-    }
-    
-    /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * . Tests adding a Podd Object inconsistent with the schema ontologies fails.
@@ -1187,7 +1223,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     FileReferenceVerificationPolicy.DO_NOT_VERIFY);
             Assert.fail("Should have thrown an InconsistentOntologyException");
         }
-        catch(InconsistentOntologyException e)
+        catch(final InconsistentOntologyException e)
         {
             Assert.assertEquals("Not the expected error message", "Ontology is inconsistent", e.getMessage());
         }
@@ -1412,7 +1448,7 @@ public abstract class AbstractPoddArtifactManagerTest
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, nextRepositoryConnection);
             
-            if(log.isDebugEnabled())
+            if(this.log.isDebugEnabled())
             {
                 DebugUtils.printContents(nextRepositoryConnection, updatedArtifact.getVersionIRI().toOpenRDFURI());
             }
@@ -1518,7 +1554,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     FileReferenceVerificationPolicy.DO_NOT_VERIFY);
             Assert.fail("Should have thrown an Exception to indicate that dangling objects will result");
         }
-        catch(DisconnectedObjectException e)
+        catch(final DisconnectedObjectException e)
         {
             Assert.assertEquals("Update leads to disconnected PODD objects", e.getMessage());
             Assert.assertEquals(4, e.getDisconnectedObjects().size());
@@ -1575,7 +1611,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     DanglingObjectPolicy.FORCE_CLEAN, FileReferenceVerificationPolicy.DO_NOT_VERIFY);
             Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
         }
-        catch(UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException e)
         {
             Assert.assertEquals("Exception not due to the expected artifact version", artifactIDv1.getVersionIRI(),
                     e.getOntologyID());
@@ -1641,41 +1677,6 @@ public abstract class AbstractPoddArtifactManagerTest
          * 
          * dumpRdfToFile(context, (path + fileNames[i]), writeFormat); }
          */
-    }
-    
-    /**
-     * Write contents of specified context to a file
-     * 
-     * @param context
-     * @param filename
-     * @param writeFormat
-     * @throws IOException
-     * @throws OpenRDFException
-     */
-    public void dumpRdfToFile(final URI context, final String filename, final RDFFormat writeFormat)
-        throws IOException, OpenRDFException
-    {
-        final String outFilename = filename + "." + writeFormat.getFileExtensions().get(0);
-        
-        final RDFWriter writer = Rio.createWriter(writeFormat, new FileOutputStream(filename));
-        writer.handleNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        writer.handleNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
-        writer.handleNamespace("owl", "http://www.w3.org/2002/07/owl#");
-        writer.handleNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        writer.handleNamespace("xml", "http://www.w3.org/XML/1998/namespace");
-        
-        writer.handleNamespace("dc", "http://purl.org/podd/ns/dcTerms#");
-        
-        writer.startRDF();
-        
-        final List<Statement> inferredList =
-                Iterations.asList(this.testRepositoryConnection.getStatements(null, null, null, false, context));
-        for(final Statement s : inferredList)
-        {
-            writer.handleStatement(s);
-        }
-        writer.endRDF();
-        this.log.info("Wrote {} statements to file {}", inferredList.size(), outFilename);
     }
     
     /**

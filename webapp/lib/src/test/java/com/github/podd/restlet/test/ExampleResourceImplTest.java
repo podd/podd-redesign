@@ -17,6 +17,8 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
+import com.github.ansell.restletutils.test.RestletTestUtils;
+
 /**
  * An example use of Restlet for testing.
  * 
@@ -59,7 +61,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testCreateUserPutValidAuthenticatedFull() throws Exception
     {
-        final ClientResource creationClientResource = new ClientResource(getUrl("/user/create"));
+        final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(false);
@@ -71,7 +73,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         form.getEntries().add(new FormData("firstName", "Mister"));
         
         final Representation results =
-                PoddRestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form,
+                RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
     }
@@ -83,7 +85,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testCreateUserPutValidAuthenticatedMinimal() throws Exception
     {
-        final ClientResource creationClientResource = new ClientResource(getUrl("/user/create"));
+        final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
         
         final FormDataSet form = new FormDataSet();
         form.setMultipart(false);
@@ -93,7 +95,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
         form.getEntries().add(new FormData("email", "test@email.com"));
         
         final Representation results =
-                PoddRestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form,
+                RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, form,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
     }
@@ -106,10 +108,10 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     {
         try
         {
-            final ClientResource creationClientResource = new ClientResource(getUrl("/user/create"));
+            final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
             
             final Representation results =
-                    PoddRestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null,
+                    RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null,
                             MediaType.MULTIPART_FORM_DATA, Status.SUCCESS_CREATED, this.testWithAdminPrivileges);
             
             Assert.fail("Did not receive expected exception");
@@ -128,7 +130,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     {
         try
         {
-            final ClientResource creationClientResource = new ClientResource(getUrl("/user/create"));
+            final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
             
             final FormDataSet form = new FormDataSet();
             form.setMultipart(true);
@@ -155,7 +157,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     {
         try
         {
-            final ClientResource creationClientResource = new ClientResource(getUrl("/user/create"));
+            final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
             
             final FormDataSet form = new FormDataSet();
             form.setMultipart(true);
@@ -164,7 +166,7 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
             form.getEntries().add(new FormData("email", "test@email.com"));
             
             final Representation results =
-                    PoddRestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null,
+                    RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.PUT, null,
                             MediaType.TEXT_HTML, Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
             
             Assert.fail("Did not receive expected exception");
@@ -182,10 +184,10 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetUserBasicAuthorised() throws Exception
     {
-        final ClientResource creationClientResource = new ClientResource(getUrl("/user/create"));
+        final ClientResource creationClientResource = new ClientResource(this.getUrl("/user/create"));
         
         final Representation results =
-                PoddRestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.GET, null,
+                RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
     }
@@ -197,10 +199,10 @@ public class ExampleResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetUserBasicAuthorisedNonAdmin() throws Exception
     {
-        final ClientResource creationClientResource = new ClientResource(getUrl("/user"));
+        final ClientResource creationClientResource = new ClientResource(this.getUrl("/user"));
         
         final Representation results =
-                PoddRestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.GET, null,
+                RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
         
     }

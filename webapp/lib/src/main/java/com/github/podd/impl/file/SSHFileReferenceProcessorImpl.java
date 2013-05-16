@@ -67,7 +67,7 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
             {
                 final Model model = rdfStatements.filter(fileRef, null, null);
                 
-                if(log.isDebugEnabled())
+                if(this.log.isDebugEnabled())
                 {
                     DebugUtils.printContents(model);
                 }
@@ -106,13 +106,13 @@ public class SSHFileReferenceProcessorImpl implements SSHFileReferenceProcessor
                     fileReference.setRepositoryAlias(alias.iterator().next().stringValue());
                 }
                 
-                Model linksToFileReference = rdfStatements.filter(null, null, fileRef);
+                final Model linksToFileReference = rdfStatements.filter(null, null, fileRef);
                 
                 // TODO: Need to use a SPARQL query to verify that the property is a sub-property of
                 // PODD Contains
                 if(!linksToFileReference.isEmpty())
                 {
-                    for(Resource nextResource : linksToFileReference.subjects())
+                    for(final Resource nextResource : linksToFileReference.subjects())
                     {
                         if(nextResource instanceof URI)
                         {

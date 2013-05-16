@@ -42,21 +42,15 @@ public abstract class AbstractPoddSchemaManagerTest
     
     /**
      * 
-     * @return A new instance of {@link PoddOWLManager}, for each call to this method.
-     */
-    protected abstract PoddOWLManager getNewPoddOwlManagerInstance();
-    
-    /**
-     * 
-     * @return A new empty instance of an implementation of {@link OWLReasonerFactory}.
-     */
-    protected abstract OWLReasonerFactory getNewReasonerFactory();
-    
-    /**
-     * 
      * @return A new instance of {@link OWLOntologyManager}, for each call to this method.
      */
     protected abstract OWLOntologyManager getNewOwlOntologyManagerInstance();
+    
+    /**
+     * 
+     * @return A new instance of {@link PoddOWLManager}, for each call to this method.
+     */
+    protected abstract PoddOWLManager getNewPoddOwlManagerInstance();
     
     /**
      * 
@@ -77,20 +71,54 @@ public abstract class AbstractPoddSchemaManagerTest
     protected abstract PoddSesameManager getNewPoddSesameManagerInstance();
     
     /**
+     * 
+     * @return A new empty instance of an implementation of {@link OWLReasonerFactory}.
+     */
+    protected abstract OWLReasonerFactory getNewReasonerFactory();
+    
+    /**
+     * Internal helper test method for
+     * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)}
+     * 
+     * @param inputVersionIri
+     *            The test input
+     * @param expectedOntologyIri
+     *            Ontology IRI of expected result
+     * @param expectedVersionIri
+     *            Version IRI of expected result
+     * @throws Exception
+     */
+    private final void internalTestGetSchemaOntologyVersion(final String inputVersionIri,
+            final String expectedOntologyIri, final String expectedVersionIri) throws Exception
+    {
+        // prepare: load schema ontologies into PODD
+        this.loadSchemaOntologies();
+        final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantV2.owl");
+        this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
+        
+        final InferredOWLOntologyID ontologyID =
+                this.testSchemaManager.getSchemaOntologyVersion(IRI.create(inputVersionIri));
+        Assert.assertEquals("Expected version IRI does not match received value", IRI.create(expectedVersionIri),
+                ontologyID.getVersionIRI());
+        Assert.assertEquals("Expected ontology IRI does not match received value", IRI.create(expectedOntologyIri),
+                ontologyID.getOntologyIRI());
+    }
+    
+    /**
      * This internal method loads schema ontologies to PODD. Should be used as a setUp() mechanism
-     * where needed. 
+     * where needed.
      */
     private void loadSchemaOntologies() throws Exception
     {
-        String[] schemaResourcePaths =
+        final String[] schemaResourcePaths =
                 { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
                         PoddRdfConstants.PATH_PODD_BASE, PoddRdfConstants.PATH_PODD_SCIENCE,
                         PoddRdfConstants.PATH_PODD_PLANT,
                 // PoddRdfConstants.PATH_PODD_ANIMAL,
                 };
-        for (int i = 0; i < schemaResourcePaths.length; i++)
+        for(final String schemaResourcePath : schemaResourcePaths)
         {
-            final InputStream in = this.getClass().getResourceAsStream(schemaResourcePaths[i]);
+            final InputStream in = this.getClass().getResourceAsStream(schemaResourcePath);
             this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
         }
     }
@@ -113,7 +141,7 @@ public abstract class AbstractPoddSchemaManagerTest
         this.testOwlManager.setReasonerFactory(this.getNewReasonerFactory());
         
         this.owlapiManager = this.getNewOwlOntologyManagerInstance();
-        this.testOwlManager.setOWLOntologyManager(owlapiManager);
+        this.testOwlManager.setOWLOntologyManager(this.owlapiManager);
         this.testSchemaManager.setOwlManager(this.testOwlManager);
     }
     
@@ -261,8 +289,7 @@ public abstract class AbstractPoddSchemaManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
-     * .
-     * Passes in an ontology IRI and retrieves the current version of the Ontology.
+     * . Passes in an ontology IRI and retrieves the current version of the Ontology.
      * 
      */
     @Test
@@ -273,26 +300,21 @@ public abstract class AbstractPoddSchemaManagerTest
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantV2.owl");
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
         
-        String[] testIRIs = {
-                "http://purl.org/podd/ns/poddUser", 
-                "http://purl.org/podd/ns/poddBase", 
-                "http://purl.org/podd/ns/poddScience",
-                "http://purl.org/podd/ns/poddPlant", 
-                };
+        final String[] testIRIs =
+                { "http://purl.org/podd/ns/poddUser", "http://purl.org/podd/ns/poddBase",
+                        "http://purl.org/podd/ns/poddScience", "http://purl.org/podd/ns/poddPlant", };
         
-        String[] expectedVersionIRIs = {
-                "http://purl.org/podd/ns/version/poddUser/1", 
-                "http://purl.org/podd/ns/version/poddBase/1", 
-                "http://purl.org/podd/ns/version/poddScience/1",
-                "http://purl.org/podd/ns/version/poddPlant/2", 
-                }; 
+        final String[] expectedVersionIRIs =
+                { "http://purl.org/podd/ns/version/poddUser/1", "http://purl.org/podd/ns/version/poddBase/1",
+                        "http://purl.org/podd/ns/version/poddScience/1", "http://purl.org/podd/ns/version/poddPlant/2", };
         
-        for (int i = 0; i < testIRIs.length; i++)
+        for(int i = 0; i < testIRIs.length; i++)
         {
             final IRI testIRI = IRI.create(testIRIs[i]);
-            InferredOWLOntologyID ontologyID = this.testSchemaManager.getCurrentSchemaOntologyVersion(testIRI);
-            Assert.assertEquals("Input IRI does not match ontology IRI of current version", testIRI, ontologyID.getOntologyIRI());
-            Assert.assertEquals("Expected Version IRI does not match current version", 
+            final InferredOWLOntologyID ontologyID = this.testSchemaManager.getCurrentSchemaOntologyVersion(testIRI);
+            Assert.assertEquals("Input IRI does not match ontology IRI of current version", testIRI,
+                    ontologyID.getOntologyIRI());
+            Assert.assertEquals("Expected Version IRI does not match current version",
                     IRI.create(expectedVersionIRIs[i]), ontologyID.getVersionIRI());
         }
     }
@@ -300,8 +322,8 @@ public abstract class AbstractPoddSchemaManagerTest
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
-     * .
-     * Passes in a version IRI (of the current version) and retrieves the current version of the Ontology.
+     * . Passes in a version IRI (of the current version) and retrieves the current version of the
+     * Ontology.
      */
     @Test
     public final void testGetCurrentSchemaOntologyVersionMatchesOntologyVersionIRICurrent() throws Exception
@@ -311,26 +333,24 @@ public abstract class AbstractPoddSchemaManagerTest
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantV2.owl");
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
         
-        String[] testIRIs = {
-                "http://purl.org/podd/ns/version/poddUser/1", 
-                "http://purl.org/podd/ns/version/poddBase/1", 
-                "http://purl.org/podd/ns/version/poddScience/1",
-                "http://purl.org/podd/ns/version/poddPlant/2", 
-                };
+        final String[] testIRIs =
+                { "http://purl.org/podd/ns/version/poddUser/1", "http://purl.org/podd/ns/version/poddBase/1",
+                        "http://purl.org/podd/ns/version/poddScience/1", "http://purl.org/podd/ns/version/poddPlant/2", };
         
-        for (int i = 0; i < testIRIs.length; i++)
+        for(final String testIRI2 : testIRIs)
         {
-            final IRI testIRI = IRI.create(testIRIs[i]);
-            InferredOWLOntologyID ontologyID = this.testSchemaManager.getCurrentSchemaOntologyVersion(testIRI);
-            Assert.assertEquals("Input IRI does not match Version IRI of current version", testIRI, ontologyID.getVersionIRI());
+            final IRI testIRI = IRI.create(testIRI2);
+            final InferredOWLOntologyID ontologyID = this.testSchemaManager.getCurrentSchemaOntologyVersion(testIRI);
+            Assert.assertEquals("Input IRI does not match Version IRI of current version", testIRI,
+                    ontologyID.getVersionIRI());
         }
     }
     
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#getCurrentSchemaOntologyVersion(org.semanticweb.owlapi.model.IRI)}
-     * .
-     * Passes in a version IRI (of an older version) and retrieves the current version of the Ontology.
+     * . Passes in a version IRI (of an older version) and retrieves the current version of the
+     * Ontology.
      */
     @Test
     public final void testGetCurrentSchemaOntologyVersionMatchesOntologyVersionIRINotCurrent() throws Exception
@@ -340,25 +360,30 @@ public abstract class AbstractPoddSchemaManagerTest
         final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantV2.owl");
         this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
         
-        String[] testIRIs = {
-                "http://purl.org/podd/ns/version/poddUser/1", 
-                "http://purl.org/podd/ns/version/poddBase/1", 
-                "http://purl.org/podd/ns/version/poddScience/1",
-                "http://purl.org/podd/ns/version/poddPlant/1",  //an older version of PODD:Plant
+        final String[] testIRIs =
+                { "http://purl.org/podd/ns/version/poddUser/1", "http://purl.org/podd/ns/version/poddBase/1",
+                        "http://purl.org/podd/ns/version/poddScience/1", "http://purl.org/podd/ns/version/poddPlant/1", // an
+                                                                                                                        // older
+                                                                                                                        // version
+                                                                                                                        // of
+                                                                                                                        // PODD:Plant
                 };
         
-        String[] expectedVersionIRIs = {
-                "http://purl.org/podd/ns/version/poddUser/1", 
-                "http://purl.org/podd/ns/version/poddBase/1", 
-                "http://purl.org/podd/ns/version/poddScience/1",
-                "http://purl.org/podd/ns/version/poddPlant/2", // expected current Version IRI of PODD:Plant
-                }; 
+        final String[] expectedVersionIRIs =
+                { "http://purl.org/podd/ns/version/poddUser/1", "http://purl.org/podd/ns/version/poddBase/1",
+                        "http://purl.org/podd/ns/version/poddScience/1", "http://purl.org/podd/ns/version/poddPlant/2", // expected
+                                                                                                                        // current
+                                                                                                                        // Version
+                                                                                                                        // IRI
+                                                                                                                        // of
+                                                                                                                        // PODD:Plant
+                };
         
-        for (int i = 0; i < testIRIs.length; i++)
+        for(int i = 0; i < testIRIs.length; i++)
         {
             final IRI testIRI = IRI.create(testIRIs[i]);
-            InferredOWLOntologyID ontologyID = this.testSchemaManager.getCurrentSchemaOntologyVersion(testIRI);
-            Assert.assertEquals("Expected current version IRI does not match received value", 
+            final InferredOWLOntologyID ontologyID = this.testSchemaManager.getCurrentSchemaOntologyVersion(testIRI);
+            Assert.assertEquals("Expected current version IRI does not match received value",
                     IRI.create(expectedVersionIRIs[i]), ontologyID.getVersionIRI());
         }
     }
@@ -371,13 +396,13 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testGetCurrentSchemaOntologyVersionNoMatches() throws Exception
     {
-        IRI testInputIri = IRI.create("http://purl.org/podd/noSuchSchema");
+        final IRI testInputIri = IRI.create("http://purl.org/podd/noSuchSchema");
         try
         {
             this.testSchemaManager.getCurrentSchemaOntologyVersion(testInputIri);
             Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
         }
-        catch(UnmanagedSchemaIRIException e)
+        catch(final UnmanagedSchemaIRIException e)
         {
             Assert.assertEquals("This IRI does not refer to a managed ontology", e.getMessage());
             Assert.assertEquals(testInputIri, e.getOntologyID());
@@ -397,12 +422,12 @@ public abstract class AbstractPoddSchemaManagerTest
             this.testSchemaManager.getCurrentSchemaOntologyVersion(null);
             Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
         }
-        catch(UnmanagedSchemaIRIException e)
+        catch(final UnmanagedSchemaIRIException e)
         {
             Assert.assertEquals("NULL is not a managed schema ontology", e.getMessage());
         }
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.IRI)}
@@ -555,7 +580,7 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testGetSchemaOntologyVersionNoMatches() throws Exception
     {
-        IRI inputVersionIri = IRI.create("http://purl.org/podd/ns/version/poddPlant/999");
+        final IRI inputVersionIri = IRI.create("http://purl.org/podd/ns/version/poddPlant/999");
         
         // prepare: load schema ontologies into PODD
         this.loadSchemaOntologies();
@@ -567,7 +592,7 @@ public abstract class AbstractPoddSchemaManagerTest
             this.testSchemaManager.getSchemaOntologyVersion(inputVersionIri);
             Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
         }
-        catch(UnmanagedSchemaIRIException e)
+        catch(final UnmanagedSchemaIRIException e)
         {
             Assert.assertEquals("This IRI does not refer to a managed ontology", e.getMessage());
             Assert.assertEquals(inputVersionIri, e.getOntologyID());
@@ -586,37 +611,10 @@ public abstract class AbstractPoddSchemaManagerTest
             this.testSchemaManager.getSchemaOntologyVersion(null);
             Assert.fail("Should have thrown an UnmanagedSchemaIRIException");
         }
-        catch(UnmanagedSchemaIRIException e)
+        catch(final UnmanagedSchemaIRIException e)
         {
             Assert.assertEquals("NULL is not a managed schema ontology", e.getMessage());
         }
-    }
-    
-    /**
-     * Internal helper test method for
-     * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntologyVersion(IRI)}
-     * 
-     * @param inputVersionIri
-     *            The test input
-     * @param expectedOntologyIri
-     *            Ontology IRI of expected result
-     * @param expectedVersionIri
-     *            Version IRI of expected result
-     * @throws Exception
-     */
-    private final void internalTestGetSchemaOntologyVersion(String inputVersionIri, String expectedOntologyIri,
-            String expectedVersionIri) throws Exception
-    {
-        // prepare: load schema ontologies into PODD
-        this.loadSchemaOntologies();
-        final InputStream in = this.getClass().getResourceAsStream("/test/ontologies/poddPlantV2.owl");
-        this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
-        
-        InferredOWLOntologyID ontologyID = this.testSchemaManager.getSchemaOntologyVersion(IRI.create(inputVersionIri));
-        Assert.assertEquals("Expected version IRI does not match received value", IRI.create(expectedVersionIri),
-                ontologyID.getVersionIRI());
-        Assert.assertEquals("Expected ontology IRI does not match received value", IRI.create(expectedOntologyIri),
-                ontologyID.getOntologyIRI());
     }
     
     /**
@@ -665,13 +663,13 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         try
         {
-            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
+            final InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
             
             this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
             
             Assert.fail("Did not receive expected exception");
         }
-        catch(EmptyOntologyException e)
+        catch(final EmptyOntologyException e)
         {
             Assert.assertEquals("Message was not as expected", "Loaded ontology is empty", e.getMessage());
         }
@@ -687,18 +685,18 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         try
         {
-            IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
-            IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
-            OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
+            final IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
+            final IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
+            final OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
             this.owlapiManager.createOntology(emptyOntologyID);
             
-            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
+            final InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/empty.owl");
             
             this.testSchemaManager.uploadSchemaOntology(emptyOntologyID, testInputStream, RDFFormat.RDFXML);
             
             Assert.fail("Did not receive expected exception");
         }
-        catch(EmptyOntologyException e)
+        catch(final EmptyOntologyException e)
         {
             Assert.assertEquals("Message was not as expected", "Loaded ontology is empty", e.getMessage());
         }
@@ -714,18 +712,19 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         try
         {
-            IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
-            IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
-            OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
+            final IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
+            final IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
+            final OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
             this.owlapiManager.createOntology(emptyOntologyID);
             
-            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/justatextfile.owl");
+            final InputStream testInputStream =
+                    this.getClass().getResourceAsStream("/test/ontologies/justatextfile.owl");
             
             this.testSchemaManager.uploadSchemaOntology(emptyOntologyID, testInputStream, RDFFormat.RDFXML);
             
             Assert.fail("Did not receive expected exception");
         }
-        catch(UnparsableOntologyException e)
+        catch(final UnparsableOntologyException e)
         {
             Assert.assertTrue("Message was not as expected", e.getMessage().startsWith("Problem parsing "));
         }
@@ -741,18 +740,19 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         try
         {
-            IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
-            IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
-            OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
+            final IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
+            final IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
+            final OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
             this.owlapiManager.createOntology(emptyOntologyID);
             
-            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/invalidturtle.ttl");
+            final InputStream testInputStream =
+                    this.getClass().getResourceAsStream("/test/ontologies/invalidturtle.ttl");
             
             this.testSchemaManager.uploadSchemaOntology(emptyOntologyID, testInputStream, RDFFormat.TURTLE);
             
             Assert.fail("Did not receive expected exception");
         }
-        catch(UnparsableOntologyException e)
+        catch(final UnparsableOntologyException e)
         {
             Assert.assertTrue("Message was not as expected", e.getMessage().startsWith("Problem parsing "));
         }
@@ -804,16 +804,16 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         try
         {
-            IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
-            IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
-            OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
+            final IRI emptyOntologyIRI = IRI.create("urn:test:empty:ontology:");
+            final IRI emptyVersionIRI = IRI.create("urn:test:empty:version:");
+            final OWLOntologyID emptyOntologyID = new OWLOntologyID(emptyOntologyIRI, emptyVersionIRI);
             this.owlapiManager.createOntology(emptyOntologyID);
             
             this.testSchemaManager.uploadSchemaOntology(emptyOntologyID, null, RDFFormat.RDFXML);
             
             Assert.fail("Did not receive expected exception");
         }
-        catch(NullPointerException e)
+        catch(final NullPointerException e)
         {
             Assert.assertEquals("Message was not as expected", "Schema Ontology input stream was null", e.getMessage());
         }
@@ -853,13 +853,14 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         try
         {
-            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/justatextfile.owl");
+            final InputStream testInputStream =
+                    this.getClass().getResourceAsStream("/test/ontologies/justatextfile.owl");
             
             this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
             
             Assert.fail("Did not receive expected exception");
         }
-        catch(UnparsableOntologyException e)
+        catch(final UnparsableOntologyException e)
         {
             Assert.assertTrue("Message was not as expected", e.getMessage().startsWith("Problem parsing "));
         }
@@ -875,13 +876,14 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         try
         {
-            InputStream testInputStream = this.getClass().getResourceAsStream("/test/ontologies/invalidturtle.ttl");
+            final InputStream testInputStream =
+                    this.getClass().getResourceAsStream("/test/ontologies/invalidturtle.ttl");
             
             this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
             
             Assert.fail("Did not receive expected exception");
         }
-        catch(UnparsableOntologyException e)
+        catch(final UnparsableOntologyException e)
         {
             Assert.assertTrue("Message was not as expected", e.getMessage().startsWith("Problem parsing "));
         }
@@ -937,7 +939,7 @@ public abstract class AbstractPoddSchemaManagerTest
             
             Assert.fail("Did not receive expected exception");
         }
-        catch(NullPointerException e)
+        catch(final NullPointerException e)
         {
             Assert.assertEquals("Message was not as expected", "Schema Ontology input stream was null", e.getMessage());
         }
@@ -963,13 +965,13 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testUploadSchemaOntologyWithOntologyIRIAndVersionIRI() throws Exception
     {
-        String[] resourcePaths =
+        final String[] resourcePaths =
                 { "/ontologies/dcTerms.owl", "/ontologies/foaf.owl", "/ontologies/poddUser.owl",
                         "/ontologies/poddBase.owl", };
         
-        for(String path : resourcePaths)
+        for(final String path : resourcePaths)
         {
-            InputStream testInputStream = this.getClass().getResourceAsStream(path);
+            final InputStream testInputStream = this.getClass().getResourceAsStream(path);
             
             this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
         }

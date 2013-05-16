@@ -82,6 +82,83 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     
     private OWLReasonerFactory reasonerFactory;
     
+    private List<InferredOWLOntologyID> buildDirectImportsList(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection conn, final URI context) throws OpenRDFException
+    {
+        final List<InferredOWLOntologyID> importsList = new ArrayList<InferredOWLOntologyID>();
+        
+        final String subject = ontologyID.getOntologyIRI().toQuotedString();
+        final String sparqlQuery =
+                "SELECT ?x ?xv ?xiv WHERE { " + subject + " <" + OWL.IMPORTS.stringValue() + "> ?xv ." + "?x <"
+                        + PoddRdfConstants.OWL_VERSION_IRI + "> ?xv ." + "?x <"
+                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION + "> ?xiv ." + " }";
+        this.log.debug("Generated SPARQL {}", sparqlQuery);
+        final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
+        
+        final DatasetImpl dataset = new DatasetImpl();
+        dataset.addDefaultGraph(context);
+        query.setDataset(dataset);
+        
+        final TupleQueryResult queryResults = query.evaluate();
+        while(queryResults.hasNext())
+        {
+            final BindingSet nextResult = queryResults.next();
+            final String ontologyIRI = nextResult.getValue("x").stringValue();
+            final String versionIRI = nextResult.getValue("xv").stringValue();
+            final String inferredIRI = nextResult.getValue("xiv").stringValue();
+            
+            final InferredOWLOntologyID inferredOntologyID =
+                    new InferredOWLOntologyID(IRI.create(ontologyIRI), IRI.create(versionIRI), IRI.create(inferredIRI));
+            
+            if(!importsList.contains(inferredOntologyID))
+            {
+                this.log.debug("Adding {} to imports list", ontologyIRI);
+                importsList.add(inferredOntologyID);
+            }
+        }
+        return importsList;
+    }
+    
+    private List<InferredOWLOntologyID> buildTwoLevelOrderedImportsList(final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection conn, final URI context) throws OpenRDFException
+    {
+        // -- find ontologies directly imported by this schema ontology
+        final List<InferredOWLOntologyID> directImports = this.buildDirectImportsList(ontologyID, conn, context);
+        
+        // -- find second level imports
+        final Set<InferredOWLOntologyID> secondLevelImports =
+                Collections.newSetFromMap(new ConcurrentHashMap<InferredOWLOntologyID, Boolean>());
+        for(final InferredOWLOntologyID inferredOntologyID : directImports)
+        {
+            final List<InferredOWLOntologyID> directImportsList =
+                    this.buildDirectImportsList(inferredOntologyID, conn, context);
+            secondLevelImports.addAll(directImportsList);
+            // TODO - support multiple levels by converting into a recursive implementation
+        }
+        
+        for(final InferredOWLOntologyID secondImport : secondLevelImports)
+        {
+            if(directImports.contains(secondImport))
+            {
+                directImports.remove(secondImport);
+            }
+        }
+        
+        final List<InferredOWLOntologyID> orderedResultsList = new ArrayList<InferredOWLOntologyID>();
+        // add any indirect imports first
+        for(final InferredOWLOntologyID inferredOntologyID : secondLevelImports)
+        {
+            this.log.debug("adding {} to results", inferredOntologyID);
+            orderedResultsList.add(inferredOntologyID);
+        }
+        for(final InferredOWLOntologyID inferredOntologyID : directImports)
+        {
+            this.log.debug("adding {} to results", inferredOntologyID);
+            orderedResultsList.add(inferredOntologyID);
+        }
+        return orderedResultsList;
+    }
+    
     @Override
     public void cacheSchemaOntology(final InferredOWLOntologyID ontologyID, final RepositoryConnection conn,
             final URI context) throws OpenRDFException, OWLException, IOException, PoddException
@@ -137,81 +214,60 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
     }
     
-    private List<InferredOWLOntologyID> buildTwoLevelOrderedImportsList(final InferredOWLOntologyID ontologyID,
-            final RepositoryConnection conn, final URI context) throws OpenRDFException
+    /**
+     * Computes the inferences using the given reasoner, which has previously been setup based on an
+     * ontology.
+     * 
+     * @param nextReasoner
+     *            The reasoner to use to compute the inferences.
+     * @param inferredOntologyID
+     *            The OWLOntologyID to use for the inferred ontology. This must be unique and not
+     *            previously used in either the repository or the OWLOntologyManager
+     * @return An OWLOntology instance containing the axioms that were inferred from the original
+     *         ontology.
+     * @throws ReasonerInterruptedException
+     * @throws TimeOutException
+     * @throws InconsistentOntologyException
+     * @throws OWLOntologyCreationException
+     * @throws OWLOntologyChangeException
+     */
+    private OWLOntology computeInferences(final OWLReasoner nextReasoner, final OWLOntologyID concreteOntologyID,
+            final OWLOntologyID inferredOntologyID) throws ReasonerInterruptedException, TimeOutException,
+        OWLOntologyCreationException, OWLOntologyChangeException
     {
-        // -- find ontologies directly imported by this schema ontology
-        final List<InferredOWLOntologyID> directImports = this.buildDirectImportsList(ontologyID, conn, context);
+        nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
         
-        // -- find second level imports
-        final Set<InferredOWLOntologyID> secondLevelImports =
-                Collections.newSetFromMap(new ConcurrentHashMap<InferredOWLOntologyID, Boolean>());
-        for(final InferredOWLOntologyID inferredOntologyID : directImports)
+        final List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators =
+                new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
+        axiomGenerators.add(new InferredClassAssertionAxiomGenerator());
+        axiomGenerators.add(new InferredDataPropertyCharacteristicAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentDataPropertiesAxiomGenerator());
+        axiomGenerators.add(new InferredEquivalentObjectPropertyAxiomGenerator());
+        axiomGenerators.add(new InferredInverseObjectPropertiesAxiomGenerator());
+        axiomGenerators.add(new InferredObjectPropertyCharacteristicAxiomGenerator());
+        
+        // NOTE: InferredPropertyAssertionGenerator significantly slows down inference computation
+        axiomGenerators.add(new org.semanticweb.owlapi.util.InferredPropertyAssertionGenerator());
+        
+        axiomGenerators.add(new InferredSubClassAxiomGenerator());
+        axiomGenerators.add(new InferredSubDataPropertyAxiomGenerator());
+        axiomGenerators.add(new InferredSubObjectPropertyAxiomGenerator());
+        
+        final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID);
+        
+        IRI importIRI = concreteOntologyID.getVersionIRI();
+        if(importIRI == null)
         {
-            final List<InferredOWLOntologyID> directImportsList =
-                    this.buildDirectImportsList(inferredOntologyID, conn, context);
-            secondLevelImports.addAll(directImportsList);
-            // TODO - support multiple levels by converting into a recursive implementation
+            importIRI = concreteOntologyID.getOntologyIRI();
         }
+        this.owlOntologyManager.applyChange(new AddImport(nextInferredAxiomsOntology, new OWLImportsDeclarationImpl(
+                importIRI)));
         
-        for(final InferredOWLOntologyID secondImport : secondLevelImports)
-        {
-            if(directImports.contains(secondImport))
-            {
-                directImports.remove(secondImport);
-            }
-        }
+        final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
+        iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
         
-        final List<InferredOWLOntologyID> orderedResultsList = new ArrayList<InferredOWLOntologyID>();
-        // add any indirect imports first
-        for(final InferredOWLOntologyID inferredOntologyID : secondLevelImports)
-        {
-            this.log.debug("adding {} to results", inferredOntologyID);
-            orderedResultsList.add(inferredOntologyID);
-        }
-        for(final InferredOWLOntologyID inferredOntologyID : directImports)
-        {
-            this.log.debug("adding {} to results", inferredOntologyID);
-            orderedResultsList.add(inferredOntologyID);
-        }
-        return orderedResultsList;
-    }
-    
-    private List<InferredOWLOntologyID> buildDirectImportsList(final InferredOWLOntologyID ontologyID,
-            final RepositoryConnection conn, final URI context) throws OpenRDFException
-    {
-        final List<InferredOWLOntologyID> importsList = new ArrayList<InferredOWLOntologyID>();
-        
-        final String subject = ontologyID.getOntologyIRI().toQuotedString();
-        final String sparqlQuery =
-                "SELECT ?x ?xv ?xiv WHERE { " + subject + " <" + OWL.IMPORTS.stringValue() + "> ?xv ." + "?x <"
-                        + PoddRdfConstants.OWL_VERSION_IRI + "> ?xv ." + "?x <"
-                        + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION + "> ?xiv ." + " }";
-        this.log.debug("Generated SPARQL {}", sparqlQuery);
-        final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
-        
-        final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(context);
-        query.setDataset(dataset);
-        
-        final TupleQueryResult queryResults = query.evaluate();
-        while(queryResults.hasNext())
-        {
-            final BindingSet nextResult = queryResults.next();
-            final String ontologyIRI = nextResult.getValue("x").stringValue();
-            final String versionIRI = nextResult.getValue("xv").stringValue();
-            final String inferredIRI = nextResult.getValue("xiv").stringValue();
-            
-            final InferredOWLOntologyID inferredOntologyID =
-                    new InferredOWLOntologyID(IRI.create(ontologyIRI), IRI.create(versionIRI), IRI.create(inferredIRI));
-            
-            if(!importsList.contains(inferredOntologyID))
-            {
-                this.log.debug("Adding {} to imports list", ontologyIRI);
-                importsList.add(inferredOntologyID);
-            }
-        }
-        return importsList;
+        return nextInferredAxiomsOntology;
     }
     
     @Override
@@ -223,6 +279,75 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
         
         return this.reasonerFactory.createReasoner(nextOntology);
+    }
+    
+    /**
+     * Dump the triples representing a given ontology into a Sesame Repository.
+     * 
+     * @param nextOntology
+     *            The ontology to dump into the repository.
+     * @param nextRepositoryConnection
+     *            The repository connection to dump the triples into.
+     * @throws IOException
+     * @throws RepositoryException
+     */
+    @Override
+    public void dumpOntologyToRepository(final OWLOntology nextOntology,
+            final RepositoryConnection nextRepositoryConnection, final URI... contexts) throws IOException,
+        RepositoryException
+    {
+        this.dumpOntologyToRepositoryWithoutDuplication(null, nextOntology, nextRepositoryConnection, contexts);
+    }
+    
+    /*
+     * @since 05/03/2013
+     */
+    @Override
+    public void dumpOntologyToRepositoryWithoutDuplication(final URI contextToCompareWith,
+            final OWLOntology nextOntology, final RepositoryConnection nextRepositoryConnection, final URI... contexts)
+        throws IOException, RepositoryException
+    {
+        IRI contextIRI = nextOntology.getOntologyID().getVersionIRI();
+        
+        if(contextIRI == null)
+        {
+            contextIRI = nextOntology.getOntologyID().getOntologyIRI();
+        }
+        
+        if(contextIRI == null)
+        {
+            throw new IllegalArgumentException("Cannot dump anonymous ontologies to repository");
+        }
+        
+        final URI context = contextIRI.toOpenRDFURI();
+        
+        // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
+        // into a specific context in the Sesame Repository
+        RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
+        if(contextToCompareWith != null)
+        {
+            repositoryHandler = new DeduplicatingRDFInserter(contextToCompareWith, nextRepositoryConnection);
+        }
+        
+        RioRenderer renderer;
+        
+        if(contexts == null || contexts.length == 0)
+        {
+            repositoryHandler.enforceContext(context);
+            // Render the triples out from OWLAPI into a Sesame Repository
+            renderer =
+                    new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
+                            context);
+        }
+        else
+        {
+            repositoryHandler.enforceContext(contexts);
+            // Render the triples out from OWLAPI into a Sesame Repository
+            renderer =
+                    new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
+                            contexts);
+        }
+        renderer.render();
     }
     
     @Override
@@ -281,62 +406,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         throw new RuntimeException("TODO: Implement getVersions");
     }
     
-    /**
-     * Computes the inferences using the given reasoner, which has previously been setup based on an
-     * ontology.
-     * 
-     * @param nextReasoner
-     *            The reasoner to use to compute the inferences.
-     * @param inferredOntologyID
-     *            The OWLOntologyID to use for the inferred ontology. This must be unique and not
-     *            previously used in either the repository or the OWLOntologyManager
-     * @return An OWLOntology instance containing the axioms that were inferred from the original
-     *         ontology.
-     * @throws ReasonerInterruptedException
-     * @throws TimeOutException
-     * @throws InconsistentOntologyException
-     * @throws OWLOntologyCreationException
-     * @throws OWLOntologyChangeException
-     */
-    private OWLOntology computeInferences(final OWLReasoner nextReasoner, final OWLOntologyID concreteOntologyID,
-            final OWLOntologyID inferredOntologyID) throws ReasonerInterruptedException, TimeOutException,
-        OWLOntologyCreationException, OWLOntologyChangeException
-    {
-        nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-        
-        final List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators =
-                new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
-        axiomGenerators.add(new InferredClassAssertionAxiomGenerator());
-        axiomGenerators.add(new InferredDataPropertyCharacteristicAxiomGenerator());
-        axiomGenerators.add(new InferredEquivalentClassAxiomGenerator());
-        axiomGenerators.add(new InferredEquivalentDataPropertiesAxiomGenerator());
-        axiomGenerators.add(new InferredEquivalentObjectPropertyAxiomGenerator());
-        axiomGenerators.add(new InferredInverseObjectPropertiesAxiomGenerator());
-        axiomGenerators.add(new InferredObjectPropertyCharacteristicAxiomGenerator());
-        
-        // NOTE: InferredPropertyAssertionGenerator significantly slows down inference computation
-        axiomGenerators.add(new org.semanticweb.owlapi.util.InferredPropertyAssertionGenerator());
-        
-        axiomGenerators.add(new InferredSubClassAxiomGenerator());
-        axiomGenerators.add(new InferredSubDataPropertyAxiomGenerator());
-        axiomGenerators.add(new InferredSubObjectPropertyAxiomGenerator());
-        
-        final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID);
-        
-        IRI importIRI = concreteOntologyID.getVersionIRI();
-        if (importIRI == null)
-        {
-            importIRI = concreteOntologyID.getOntologyIRI();
-        }
-        this.owlOntologyManager.applyChange(new AddImport(nextInferredAxiomsOntology, new OWLImportsDeclarationImpl(
-                importIRI)));
-        
-        final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
-        iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
-        
-        return nextInferredAxiomsOntology;
-    }
-    
     @Override
     public InferredOWLOntologyID inferStatements(final OWLOntology nextOntology,
             final RepositoryConnection nextRepositoryConnection) throws OWLRuntimeException, OWLException,
@@ -350,8 +419,8 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                         inferredOntologyID.getInferredOWLOntologyID());
         
         this.dumpOntologyToRepositoryWithoutDuplication(inferredOntologyID.getVersionIRI().toOpenRDFURI(),
-                nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology
-                .getOntologyID().getOntologyIRI().toOpenRDFURI());
+                nextInferredAxiomsOntology, nextRepositoryConnection, nextInferredAxiomsOntology.getOntologyID()
+                        .getOntologyIRI().toOpenRDFURI());
         
         return inferredOntologyID;
     }
@@ -445,77 +514,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     public void setReasonerFactory(final OWLReasonerFactory reasonerFactory)
     {
         this.reasonerFactory = reasonerFactory;
-    }
-
-    
-    
-    /**
-     * Dump the triples representing a given ontology into a Sesame Repository.
-     * 
-     * @param nextOntology
-     *            The ontology to dump into the repository.
-     * @param nextRepositoryConnection
-     *            The repository connection to dump the triples into.
-     * @throws IOException
-     * @throws RepositoryException
-     */
-    @Override
-    public void dumpOntologyToRepository(final OWLOntology nextOntology,
-            final RepositoryConnection nextRepositoryConnection, final URI... contexts) throws IOException,
-        RepositoryException
-    {
-        this.dumpOntologyToRepositoryWithoutDuplication(null, nextOntology, nextRepositoryConnection, contexts);
-    }
-     
-    /*
-     * @since 05/03/2013
-     */
-    @Override
-    public void dumpOntologyToRepositoryWithoutDuplication(final URI contextToCompareWith, final OWLOntology nextOntology,
-            final RepositoryConnection nextRepositoryConnection, final URI... contexts) throws IOException,
-        RepositoryException
-    {
-        IRI contextIRI = nextOntology.getOntologyID().getVersionIRI();
-        
-        if(contextIRI == null)
-        {
-            contextIRI = nextOntology.getOntologyID().getOntologyIRI();
-        }
-        
-        if(contextIRI == null)
-        {
-            throw new IllegalArgumentException("Cannot dump anonymous ontologies to repository");
-        }
-        
-        URI context = contextIRI.toOpenRDFURI();
-        
-        // Create an RDFHandler that will insert all triples after they are emitted from OWLAPI
-        // into a specific context in the Sesame Repository
-        RDFInserter repositoryHandler = new RDFInserter(nextRepositoryConnection);
-        if (contextToCompareWith != null)
-        {
-            repositoryHandler = new DeduplicatingRDFInserter(contextToCompareWith, nextRepositoryConnection);
-        }
-        
-        RioRenderer renderer;
-        
-        if(contexts == null || contexts.length == 0)
-        {
-            repositoryHandler.enforceContext(context);
-            // Render the triples out from OWLAPI into a Sesame Repository
-            renderer =
-                    new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
-                            context);
-        }
-        else
-        {
-            repositoryHandler.enforceContext(contexts);
-            // Render the triples out from OWLAPI into a Sesame Repository
-            renderer =
-                    new RioRenderer(nextOntology, nextOntology.getOWLOntologyManager(), repositoryHandler, null,
-                            contexts);
-        }
-        renderer.render();
     }
     
 }

@@ -24,56 +24,30 @@ import com.github.podd.utils.RdfUtility;
 
 /**
  * @author kutila
- *
+ * 
  */
 public class RdfUtilityTest
 {
-  
+    
     public static final String TEST_ARTIFACT_INVALID_3_TOP_OBJECTS = "/test/artifacts/bad-3-topobjects.ttl";
     
     private final Object[][] testDatas = new Object[][] {
-            {"/test/artifacts/basic-20130206.ttl", RDFFormat.TURTLE, true, 0},
+            { "/test/artifacts/basic-20130206.ttl", RDFFormat.TURTLE, true, 0 },
             
-            {"/test/artifacts/connected-1-object.rdf", RDFFormat.RDFXML, true, 0},
-
-            {"/test/artifacts/connected-cycle.rdf", RDFFormat.RDFXML, true, 0},
+            { "/test/artifacts/connected-1-object.rdf", RDFFormat.RDFXML, true, 0 },
+            
+            { "/test/artifacts/connected-cycle.rdf", RDFFormat.RDFXML, true, 0 },
             
             // an object has two links from its parent
-            {"/test/artifacts/connected-multiple-paths.ttl", RDFFormat.TURTLE, true, 0},
-
-            {"/test/artifacts/disconnected-1-object.rdf", RDFFormat.RDFXML, false, 2},
+            { "/test/artifacts/connected-multiple-paths.ttl", RDFFormat.TURTLE, true, 0 },
             
-            { "/test/artifacts/basic-1-internal-object.rdf", RDFFormat.RDFXML, true, 0},
-
+            { "/test/artifacts/disconnected-1-object.rdf", RDFFormat.RDFXML, false, 2 },
+            
+            { "/test/artifacts/basic-1-internal-object.rdf", RDFFormat.RDFXML, true, 0 },
+            
             // disconnected segment has cycles within it
-            {"/test/artifacts/disconnected-cycles.ttl", RDFFormat.TURTLE, false, 13},
-    };
+            { "/test/artifacts/disconnected-cycles.ttl", RDFFormat.TURTLE, false, 13 }, };
     
-
-    @Test
-    public void testisConnectedStructureWithMultipleTopObjects() throws Exception
-    {
-        final InputStream inputStream = this.getClass().getResourceAsStream(TEST_ARTIFACT_INVALID_3_TOP_OBJECTS);
-        Assert.assertNotNull("Null resource", inputStream);
-        
-        boolean isConnected = RdfUtility.isConnectedStructure(inputStream, RDFFormat.TURTLE);
-        Assert.assertEquals("Not the expected validity", false, isConnected);
-    }
-    
-    
-    @Test
-    public void testisConnectedStructure() throws Exception
-    {
-        for (int i = 0; i < testDatas.length; i++)
-        {
-            final InputStream inputStream = this.getClass().getResourceAsStream((String)testDatas[i][0]);
-            Assert.assertNotNull("Null resource", inputStream);
-            
-            boolean isConnected = RdfUtility.isConnectedStructure(inputStream, (RDFFormat)testDatas[i][1]);
-            Assert.assertEquals("Not the expected validity", testDatas[i][2], isConnected);
-        }
-    }
-
     @Test
     public void testFindDisconnectedNodes() throws Exception
     {
@@ -90,18 +64,18 @@ public class RdfUtilityTest
             connection = tempRepository.getConnection();
             connection.begin();
             
-            for (int i = 0; i < testDatas.length; i++)
+            for(final Object[] testData : this.testDatas)
             {
-                final InputStream inputStream = this.getClass().getResourceAsStream((String)testDatas[i][0]);
+                final InputStream inputStream = this.getClass().getResourceAsStream((String)testData[0]);
                 Assert.assertNotNull("Null resource", inputStream);
-
+                
                 // load artifact statements into repository
-                connection.add(inputStream, "", (RDFFormat)testDatas[i][1], context);
+                connection.add(inputStream, "", (RDFFormat)testData[1], context);
                 
                 URI root = null;
-                RepositoryResult<Statement> statements = connection.getStatements(null, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null,
-                        false, context);
-                if (statements.hasNext())
+                final RepositoryResult<Statement> statements =
+                        connection.getStatements(null, PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, null, false, context);
+                if(statements.hasNext())
                 {
                     root = (URI)statements.next().getSubject();
                 }
@@ -110,8 +84,8 @@ public class RdfUtilityTest
                     Assert.fail("Could not find root object");
                 }
                 
-                Set<URI> disconnectedObjects = RdfUtility.findDisconnectedNodes(root, connection, context);
-                Assert.assertEquals("Not the expected validity", testDatas[i][3], disconnectedObjects.size());
+                final Set<URI> disconnectedObjects = RdfUtility.findDisconnectedNodes(root, connection, context);
+                Assert.assertEquals("Not the expected validity", testData[3], disconnectedObjects.size());
                 
                 connection.clear();
             }
@@ -128,16 +102,40 @@ public class RdfUtilityTest
         }
         
     }
-
+    
     @Test
     public void testInputStreamToModel() throws Exception
     {
-        InputStream resourceStream = this.getClass().getResourceAsStream("/ontologies/poddScience.owl");
-        Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
+        final InputStream resourceStream = this.getClass().getResourceAsStream("/ontologies/poddScience.owl");
+        final Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
         
         Assert.assertNotNull("Model was NULL", model);
         Assert.assertFalse("Model was empty", model.isEmpty());
         Assert.assertEquals("Not the expected number of statements in the Model", 1228, model.size());
+    }
+    
+    @Test
+    public void testisConnectedStructure() throws Exception
+    {
+        for(final Object[] testData : this.testDatas)
+        {
+            final InputStream inputStream = this.getClass().getResourceAsStream((String)testData[0]);
+            Assert.assertNotNull("Null resource", inputStream);
+            
+            final boolean isConnected = RdfUtility.isConnectedStructure(inputStream, (RDFFormat)testData[1]);
+            Assert.assertEquals("Not the expected validity", testData[2], isConnected);
+        }
+    }
+    
+    @Test
+    public void testisConnectedStructureWithMultipleTopObjects() throws Exception
+    {
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream(RdfUtilityTest.TEST_ARTIFACT_INVALID_3_TOP_OBJECTS);
+        Assert.assertNotNull("Null resource", inputStream);
+        
+        final boolean isConnected = RdfUtility.isConnectedStructure(inputStream, RDFFormat.TURTLE);
+        Assert.assertEquals("Not the expected validity", false, isConnected);
     }
     
 }

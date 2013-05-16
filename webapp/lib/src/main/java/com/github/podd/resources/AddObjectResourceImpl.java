@@ -43,6 +43,16 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
+     * Build a PODD object using the incoming RDF
+     */
+    @Post(":rdf|rj|ttl")
+    public Representation createObjectRdf(final Representation entity, final Variant variant) throws ResourceException
+    {
+        this.log.warn("Not implemented! POST with RDF data to UploadArtifactResource for new Projects and EditArtifactResource for others");
+        return null;
+    }
+    
+    /**
      * Serve the "Add new object" HTML page
      */
     @Get("html")
@@ -70,7 +80,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                     Collections.singleton(PoddRdfConstants.VALUE_FACTORY.createURI(artifactUri)));
         }
         
-        final PoddObjectLabel objectTypeLabel = this.getObjectTypeLabel(artifactUri, objectType);        
+        final PoddObjectLabel objectTypeLabel = this.getObjectTypeLabel(artifactUri, objectType);
         final String title = "Add new " + objectTypeLabel.getLabel();
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
@@ -95,17 +105,17 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
      * Can avoid dealing with RepositoryConnections here if this could be moved to somewhere in the
      * API.
      */
-    private PoddObjectLabel getObjectTypeLabel(String artifactUri, final String objectType)
+    private PoddObjectLabel getObjectTypeLabel(final String artifactUri, final String objectType)
     {
         PoddObjectLabel objectLabel;
         try
         {
-            RepositoryConnection conn = this.getPoddRepositoryManager().getRepository().getConnection();
+            final RepositoryConnection conn = this.getPoddRepositoryManager().getRepository().getConnection();
             conn.begin();
             try
             {
                 InferredOWLOntologyID ontologyID;
-                if (artifactUri == null)
+                if(artifactUri == null)
                 {
                     ontologyID =
                             this.getPoddSchemaManager().getCurrentSchemaOntologyVersion(
@@ -132,20 +142,10 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         {
             e.printStackTrace();
             // failed to find Label
-            URI objectTypeUri = PoddRdfConstants.VALUE_FACTORY.createURI(objectType);
+            final URI objectTypeUri = PoddRdfConstants.VALUE_FACTORY.createURI(objectType);
             objectLabel = new PoddObjectLabelImpl(null, objectTypeUri, objectType);
         }
         return objectLabel;
-    }    
-    
-    /**
-     * Build a PODD object using the incoming RDF
-     */
-    @Post(":rdf|rj|ttl")
-    public Representation createObjectRdf(final Representation entity, final Variant variant) throws ResourceException
-    {
-        this.log.warn("Not implemented! POST with RDF data to UploadArtifactResource for new Projects and EditArtifactResource for others");
-        return null;
     }
     
 }

@@ -35,12 +35,11 @@ import freemarker.template.Configuration;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
- * Copied from https://github.com/ansell/oas
+ *         Copied from https://github.com/ansell/oas
  */
 public final class RestletUtils
 {
     private static final Logger log = LoggerFactory.getLogger(RestletUtils.class);
-    
     
     public static Map<String, Object> getBaseDataModel(final Request nextRequest)
     {
@@ -51,7 +50,7 @@ public final class RestletUtils
         dataModel.put("keywords", "podd, ontology, phenomics");
         
         String baseUrl = nextRequest.getRootRef().toString();
-        if (baseUrl.endsWith("/"))
+        if(baseUrl.endsWith("/"))
         {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
@@ -156,117 +155,89 @@ public final class RestletUtils
         return new TemplateRepresentation(templateName, freemarkerConfiguration, dataModel, mediaType);
     }
     
-/*    
-    
-    public static Representation getJsonRepresentation(final Annotation nextAnnotation, final Variant variant,
-            final Reference resourceReference) throws ResourceException, RepositoryException, RDFHandlerException
-    {
-        return RestletUtils.toRDFSerialisation(MediaType.APPLICATION_JSON.getName(),
-                SesameUtils.toRDFRepository(nextAnnotation, null, UriConstants.ANNOTATION_MANAGEMENT_GRAPH));
-    }
-    
-    public static Representation getJsonRepresentation(final Collection<Annotation> annotationSet,
-            final Variant variant, final Reference resourceReference) throws ResourceException, RepositoryException,
-        RDFHandlerException
-    {
-        final Repository myRepository = new SailRepository(new MemoryStore());
-        myRepository.initialize();
-        
-        // push each of the annotations into myRepository
-        for(final Annotation nextAnnotation : annotationSet)
-        {
-            SesameUtils.toRDFRepository(nextAnnotation, myRepository, UriConstants.ANNOTATION_MANAGEMENT_GRAPH);
-        }
-        
-        return RestletUtils.toRDFSerialisation(MediaType.APPLICATION_JSON.getName(), myRepository);
-    }
-    
-    public static Representation getJsonRepresentation(final Ontology nextOntology, final MediaType variant,
-            final Reference resourceReference) throws ResourceException, RepositoryException, RDFHandlerException
-    {
-        return RestletUtils.toRDFSerialisation(MediaType.APPLICATION_JSON.getName(),
-                SesameUtils.toRDFRepository(nextOntology, null));
-    }
-    
-    public static Representation getJsonRepresentation(final ResourceCount results, final Variant variant,
-            final Reference resourceRef) throws RepositoryException, RDFHandlerException
-    {
-        return RestletUtils.toRDFSerialisation(MediaType.APPLICATION_JSON.getName(),
-                SesameUtils.toRDFRepository(results, null));
-    }
-    
-    public static Representation getJsonRepresentationShortOntologies(final Collection<Ontology> ontologies,
-            final MediaType variant, final Reference resourceReference) throws ResourceException, RepositoryException,
-        RDFHandlerException
-    {
-        final Repository myRepository = new SailRepository(new MemoryStore());
-        myRepository.initialize();
-        
-        for(final Ontology nextOntology : ontologies)
-        {
-            SesameUtils.toRDFRepository(nextOntology, myRepository);
-        }
-        
-        return RestletUtils.toRDFSerialisation(variant.getName(), myRepository);
-    }
-    
-    public static Representation getRdfRepresentation(final Annotation nextAnnotation, final MediaType variant,
-            final Reference resourceReference) throws ResourceException, RepositoryException, RDFHandlerException
-    {
-        return RestletUtils.toRDFSerialisation(variant.getName(),
-                SesameUtils.toRDFRepository(nextAnnotation, null, UriConstants.ANNOTATION_MANAGEMENT_GRAPH));
-    }
-    
-    public static Representation getRdfRepresentation(final Collection<Annotation> annotationSet,
-            final MediaType mediaType, final Reference resourceReference) throws ResourceException,
-        RepositoryException, RDFHandlerException
-    {
-        final Repository myRepository = new SailRepository(new MemoryStore());
-        myRepository.initialize();
-        
-        // push each of the annotations into myRepository
-        for(final Annotation nextAnnotation : annotationSet)
-        {
-            SesameUtils.toRDFRepository(nextAnnotation, myRepository, UriConstants.ANNOTATION_MANAGEMENT_GRAPH);
-        }
-        
-        return RestletUtils.toRDFSerialisation(mediaType.getName(), myRepository);
-    }
-    
-    public static Representation getRdfRepresentation(final Ontology nextOntology, final MediaType variant,
-            final Reference resourceReference) throws ResourceException, RepositoryException, RDFHandlerException
-    {
-        return RestletUtils.toRDFSerialisation(variant.getName(), SesameUtils.toRDFRepository(nextOntology, null));
-    }
-    
-    public static Representation getRdfRepresentation(final ResourceCount results, final Variant variant,
-            final Reference resourceRef) throws RepositoryException, RDFHandlerException
-    {
-        return RestletUtils.toRDFSerialisation(variant.getMediaType().getName(),
-                SesameUtils.toRDFRepository(results, null));
-    }
-    
-    public static Representation getRdfRepresentationShortOntologies(final Collection<Ontology> ontologies,
-            final Map<URI, URI> latestOntologyVersionUris, final MediaType variant, final Reference resourceReference)
-        throws ResourceException, RepositoryException, RDFHandlerException
-    {
-        final Repository myRepository = new SailRepository(new MemoryStore());
-        myRepository.initialize();
-        
-        for(final Ontology nextOntology : ontologies)
-        {
-            SesameUtils.toRDFRepository(nextOntology, myRepository);
-            if(latestOntologyVersionUris.containsKey(nextOntology.getOntologyUri()))
-            {
-                SesameUtils.addLatestVersion(nextOntology.getOntologyUri(),
-                        latestOntologyVersionUris.get(nextOntology.getOntologyUri()), myRepository);
-            }
-        }
-        
-        return RestletUtils.toRDFSerialisation(variant.getName(), myRepository);
-    }
-  
-    */
+    /*
+     * 
+     * public static Representation getJsonRepresentation(final Annotation nextAnnotation, final
+     * Variant variant, final Reference resourceReference) throws ResourceException,
+     * RepositoryException, RDFHandlerException { return
+     * RestletUtils.toRDFSerialisation(MediaType.APPLICATION_JSON.getName(),
+     * SesameUtils.toRDFRepository(nextAnnotation, null, UriConstants.ANNOTATION_MANAGEMENT_GRAPH));
+     * }
+     * 
+     * public static Representation getJsonRepresentation(final Collection<Annotation>
+     * annotationSet, final Variant variant, final Reference resourceReference) throws
+     * ResourceException, RepositoryException, RDFHandlerException { final Repository myRepository =
+     * new SailRepository(new MemoryStore()); myRepository.initialize();
+     * 
+     * // push each of the annotations into myRepository for(final Annotation nextAnnotation :
+     * annotationSet) { SesameUtils.toRDFRepository(nextAnnotation, myRepository,
+     * UriConstants.ANNOTATION_MANAGEMENT_GRAPH); }
+     * 
+     * return RestletUtils.toRDFSerialisation(MediaType.APPLICATION_JSON.getName(), myRepository); }
+     * 
+     * public static Representation getJsonRepresentation(final Ontology nextOntology, final
+     * MediaType variant, final Reference resourceReference) throws ResourceException,
+     * RepositoryException, RDFHandlerException { return
+     * RestletUtils.toRDFSerialisation(MediaType.APPLICATION_JSON.getName(),
+     * SesameUtils.toRDFRepository(nextOntology, null)); }
+     * 
+     * public static Representation getJsonRepresentation(final ResourceCount results, final Variant
+     * variant, final Reference resourceRef) throws RepositoryException, RDFHandlerException {
+     * return RestletUtils.toRDFSerialisation(MediaType.APPLICATION_JSON.getName(),
+     * SesameUtils.toRDFRepository(results, null)); }
+     * 
+     * public static Representation getJsonRepresentationShortOntologies(final Collection<Ontology>
+     * ontologies, final MediaType variant, final Reference resourceReference) throws
+     * ResourceException, RepositoryException, RDFHandlerException { final Repository myRepository =
+     * new SailRepository(new MemoryStore()); myRepository.initialize();
+     * 
+     * for(final Ontology nextOntology : ontologies) { SesameUtils.toRDFRepository(nextOntology,
+     * myRepository); }
+     * 
+     * return RestletUtils.toRDFSerialisation(variant.getName(), myRepository); }
+     * 
+     * public static Representation getRdfRepresentation(final Annotation nextAnnotation, final
+     * MediaType variant, final Reference resourceReference) throws ResourceException,
+     * RepositoryException, RDFHandlerException { return
+     * RestletUtils.toRDFSerialisation(variant.getName(),
+     * SesameUtils.toRDFRepository(nextAnnotation, null, UriConstants.ANNOTATION_MANAGEMENT_GRAPH));
+     * }
+     * 
+     * public static Representation getRdfRepresentation(final Collection<Annotation> annotationSet,
+     * final MediaType mediaType, final Reference resourceReference) throws ResourceException,
+     * RepositoryException, RDFHandlerException { final Repository myRepository = new
+     * SailRepository(new MemoryStore()); myRepository.initialize();
+     * 
+     * // push each of the annotations into myRepository for(final Annotation nextAnnotation :
+     * annotationSet) { SesameUtils.toRDFRepository(nextAnnotation, myRepository,
+     * UriConstants.ANNOTATION_MANAGEMENT_GRAPH); }
+     * 
+     * return RestletUtils.toRDFSerialisation(mediaType.getName(), myRepository); }
+     * 
+     * public static Representation getRdfRepresentation(final Ontology nextOntology, final
+     * MediaType variant, final Reference resourceReference) throws ResourceException,
+     * RepositoryException, RDFHandlerException { return
+     * RestletUtils.toRDFSerialisation(variant.getName(), SesameUtils.toRDFRepository(nextOntology,
+     * null)); }
+     * 
+     * public static Representation getRdfRepresentation(final ResourceCount results, final Variant
+     * variant, final Reference resourceRef) throws RepositoryException, RDFHandlerException {
+     * return RestletUtils.toRDFSerialisation(variant.getMediaType().getName(),
+     * SesameUtils.toRDFRepository(results, null)); }
+     * 
+     * public static Representation getRdfRepresentationShortOntologies(final Collection<Ontology>
+     * ontologies, final Map<URI, URI> latestOntologyVersionUris, final MediaType variant, final
+     * Reference resourceReference) throws ResourceException, RepositoryException,
+     * RDFHandlerException { final Repository myRepository = new SailRepository(new MemoryStore());
+     * myRepository.initialize();
+     * 
+     * for(final Ontology nextOntology : ontologies) { SesameUtils.toRDFRepository(nextOntology,
+     * myRepository); if(latestOntologyVersionUris.containsKey(nextOntology.getOntologyUri())) {
+     * SesameUtils.addLatestVersion(nextOntology.getOntologyUri(),
+     * latestOntologyVersionUris.get(nextOntology.getOntologyUri()), myRepository); } }
+     * 
+     * return RestletUtils.toRDFSerialisation(variant.getName(), myRepository); }
+     */
     
     /**
      * Serialises part or all of a repository into RDF, depending on which contexts are provided.

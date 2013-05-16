@@ -46,6 +46,13 @@ public class SSHFileReferenceProcessorFactoryImpl implements SSHFileReferencePro
     }
     
     @Override
+    public String getParentSPARQLVariable()
+    {
+        // to find all file references directly under a given object, parent could be bound
+        return "parent";
+    }
+    
+    @Override
     public FileReferenceProcessor getProcessor()
     {
         return new SSHFileReferenceProcessorImpl();
@@ -64,14 +71,14 @@ public class SSHFileReferenceProcessorFactoryImpl implements SSHFileReferencePro
         
         // match all triples about a subject whose TYPE is poddBase:SSHFileReference
         builder.append(" ?")
-                .append(getSPARQLVariable())
+                .append(this.getSPARQLVariable())
                 .append(" <" + RDF.TYPE.stringValue() + "> <"
                         + PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH.stringValue() + "> . ");
         
-        builder.append(" ?").append(getSPARQLVariable()).append(" ?predicate ?object . ");
+        builder.append(" ?").append(this.getSPARQLVariable()).append(" ?predicate ?object . ");
         
-        builder.append(" ?").append(getParentSPARQLVariable()).append(" ?containsPredicate ").append(" ?")
-                .append(getSPARQLVariable());
+        builder.append(" ?").append(this.getParentSPARQLVariable()).append(" ?containsPredicate ").append(" ?")
+                .append(this.getSPARQLVariable());
         
         return builder.toString();
     }
@@ -88,13 +95,6 @@ public class SSHFileReferenceProcessorFactoryImpl implements SSHFileReferencePro
     {
         // to find ALL file references, subject should not be bound
         return "subject";
-    }
-    
-    @Override
-    public String getParentSPARQLVariable()
-    {
-        // to find all file references directly under a given object, parent could be bound
-        return "parent";
     }
     
     @Override

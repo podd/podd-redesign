@@ -34,7 +34,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
      * @param label
      *            The label for this ontology.
      */
-    public PoddObjectLabelImpl(InferredOWLOntologyID ontologyID, String label)
+    public PoddObjectLabelImpl(final InferredOWLOntologyID ontologyID, final String label)
     {
         this.ontologyID = ontologyID;
         this.label = label;
@@ -49,7 +49,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
      * @param label
      *            The label for this ontology.
      */
-    public PoddObjectLabelImpl(InferredOWLOntologyID ontologyID, String label, String description)
+    public PoddObjectLabelImpl(final InferredOWLOntologyID ontologyID, final String label, final String description)
     {
         this(ontologyID, label);
         this.description = description;
@@ -65,7 +65,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
      * @param label
      *            The label for this object.
      */
-    public PoddObjectLabelImpl(InferredOWLOntologyID ontologyID, URI object, String label)
+    public PoddObjectLabelImpl(final InferredOWLOntologyID ontologyID, final URI object, final String label)
     {
         this(ontologyID, label);
         this.objectID = object;
@@ -83,43 +83,11 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
      * @param description
      *            The description for this object.
      */
-    public PoddObjectLabelImpl(InferredOWLOntologyID parent, URI object, String label, String description)
+    public PoddObjectLabelImpl(final InferredOWLOntologyID parent, final URI object, final String label,
+            final String description)
     {
         this(parent, object, label);
         this.description = description;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.utils.PoddObjectLabel#getParentArtifactID()
-     */
-    @Override
-    public InferredOWLOntologyID getOntologyID()
-    {
-        return ontologyID;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.utils.PoddObjectLabel#getObjectID()
-     */
-    @Override
-    public URI getObjectURI()
-    {
-        return objectID;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.utils.PoddObjectLabel#getLabel()
-     */
-    @Override
-    public String getLabel()
-    {
-        return label;
     }
     
     /*
@@ -130,6 +98,39 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     @Override
     public String getDescription()
     {
-        return description;
+        return this.description;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.utils.PoddObjectLabel#getLabel()
+     */
+    @Override
+    public String getLabel()
+    {
+        return this.label;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.utils.PoddObjectLabel#getObjectID()
+     */
+    @Override
+    public URI getObjectURI()
+    {
+        return this.objectID;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.utils.PoddObjectLabel#getParentArtifactID()
+     */
+    @Override
+    public InferredOWLOntologyID getOntologyID()
+    {
+        return this.ontologyID;
     }
 }

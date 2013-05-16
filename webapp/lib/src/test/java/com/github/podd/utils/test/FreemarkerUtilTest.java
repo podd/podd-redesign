@@ -54,15 +54,8 @@ public class FreemarkerUtilTest
                         ValueFactoryImpl.getInstance().createLiteral(55),
                         ValueFactoryImpl.getInstance().createLiteral(55f),
                         ValueFactoryImpl.getInstance().createLiteral(55.5),
-                        ValueFactoryImpl.getInstance().createLiteral(new Date()),
-                };
-        final String[] expectedOutputs = { 
-                "xsd:boolean", 
-                "xsd:int",
-                "xsd:float",
-                "xsd:double", 
-                "xsd:dateTime", 
-                };
+                        ValueFactoryImpl.getInstance().createLiteral(new Date()), };
+        final String[] expectedOutputs = { "xsd:boolean", "xsd:int", "xsd:float", "xsd:double", "xsd:dateTime", };
         
         for(int i = 0; i < values.length; i++)
         {

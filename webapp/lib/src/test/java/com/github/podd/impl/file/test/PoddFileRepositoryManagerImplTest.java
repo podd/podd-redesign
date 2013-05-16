@@ -55,26 +55,19 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     
     private Path sshDir = null;
     
-    @Before
-    @Override
-    public void setUp() throws Exception
-    {
-        sshDir = tempDirectory.newFolder("podd-filerepository-manager-impl-test").toPath();
-        sshd = new SSHService();
-        sshd.startTestSSHServer(sshDir);
-        super.setUp();
-    }
-    
     @Override
     protected FileReference buildFileReference(final String alias, final String fileIdentifier)
     {
         try
         {
-            return SSHService.getNewFileReference(alias, fileIdentifier,
-                    tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
-                            .toPath());
+            return SSHService
+                    .getNewFileReference(
+                            alias,
+                            fileIdentifier,
+                            this.tempDirectory.newFolder(
+                                    "poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString()).toPath());
         }
-        catch(IOException e)
+        catch(final IOException e)
         {
             throw new RuntimeException(e);
         }
@@ -88,9 +81,21 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
             {
                 
                 @Override
+                public boolean canHandle(final FileReference reference)
+                {
+                    return false;
+                }
+                
+                @Override
                 public String getAlias()
                 {
                     return alias;
+                }
+                
+                @Override
+                public Model getAsModel()
+                {
+                    return model;
                 }
                 
                 @Override
@@ -104,18 +109,6 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
                     IOException
                 {
                     return false;
-                }
-                
-                @Override
-                public boolean canHandle(final FileReference reference)
-                {
-                    return false;
-                }
-                
-                @Override
-                public Model getAsModel()
-                {
-                    return model;
                 }
             };
     }
@@ -138,7 +131,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_HOST,
                 ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_HOST));
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PORT,
-                ValueFactoryImpl.getInstance().createLiteral(sshd.TEST_SSH_SERVICE_PORT));
+                ValueFactoryImpl.getInstance().createLiteral(this.sshd.TEST_SSH_SERVICE_PORT));
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance()
                 .createLiteral(SSHService.TEST_SSH_FINGERPRINT));
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, ValueFactoryImpl.getInstance()
@@ -175,6 +168,16 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         return testFileRepositoryManager;
     }
     
+    @Before
+    @Override
+    public void setUp() throws Exception
+    {
+        this.sshDir = this.tempDirectory.newFolder("podd-filerepository-manager-impl-test").toPath();
+        this.sshd = new SSHService();
+        this.sshd.startTestSSHServer(this.sshDir);
+        super.setUp();
+    }
+    
     @Override
     protected void startRepositorySource() throws Exception
     {
@@ -183,9 +186,9 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     @Override
     protected void stopRepositorySource() throws Exception
     {
-        if(sshd != null)
+        if(this.sshd != null)
         {
-            sshd.stopTestSSHServer(sshDir);
+            this.sshd.stopTestSSHServer(this.sshDir);
         }
     }
     

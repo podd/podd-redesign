@@ -20,8 +20,8 @@ import com.github.podd.api.purl.test.PoddPurlProcessorFactoryRegistryTest;
 /**
  * Tests functionality of the FileReferenceProcessorFactoryRegistry.
  * 
- * The test implementation is copied from {@link PoddPurlProcessorFactoryRegistryTest}
- * with PURL related references replaced by corresponding FileReference references.
+ * The test implementation is copied from {@link PoddPurlProcessorFactoryRegistryTest} with PURL
+ * related references replaced by corresponding FileReference references.
  * 
  * @author kutila
  * 

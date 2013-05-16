@@ -16,7 +16,8 @@ import org.openrdf.repository.RepositoryConnection;
 public interface FileReferenceManager
 {
     /**
-     * Extracts all file references found in the given RepositoryConnection within the given contexts.
+     * Extracts all file references found in the given RepositoryConnection within the given
+     * contexts.
      * 
      * @param conn
      *            The {@link RepositoryConnection} in which to search for file references

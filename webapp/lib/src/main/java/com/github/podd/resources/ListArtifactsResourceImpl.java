@@ -7,16 +7,11 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.Statement;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
@@ -37,7 +32,6 @@ import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
-import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -56,42 +50,9 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    /**
-     * Handle http GET request to serve the list artifacts page.
-     */
-    @Get(":html")
-    public Representation getListArtifactsPage(final Representation entity) throws ResourceException
-    {
-        this.log.info("@Get listArtifacts Page");
-        
-        Map<String, List<InferredOWLOntologyID>> artifactsInternal = getArtifactsInternal();
-        
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "projects.html.ftl");
-        dataModel.put("pageTitle", ListArtifactsResourceImpl.LIST_PAGE_TITLE_TEXT);
-        
-        // Disable currently unimplemented features
-        dataModel.put("canFilter", Boolean.FALSE);
-        dataModel.put("hasFilter", Boolean.FALSE);
-        dataModel.put("userCanCreate", Boolean.FALSE);
-        
-        this.log.info("artifacts: {}", artifactsInternal);
-        
-        for(String nextKey : artifactsInternal.keySet())
-        {
-            this.populateDataModelWithArtifactLists(dataModel, nextKey + "ArtifactsList",
-                    artifactsInternal.get(nextKey));
-        }
-        
-        // Output the base template, with contentTemplate from the dataModel defining the
-        // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
-    }
-    
     private Map<String, List<InferredOWLOntologyID>> getArtifactsInternal() throws ResourceException
     {
-        Map<String, List<InferredOWLOntologyID>> results = new HashMap<String, List<InferredOWLOntologyID>>();
+        final Map<String, List<InferredOWLOntologyID>> results = new HashMap<String, List<InferredOWLOntologyID>>();
         
         final String publishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_PUBLISHED);
         final String unpublishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_UNPUBLISHED);
@@ -107,11 +68,11 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         // If the user is authenticated, set unpublished to true before checking the query
         // parameters
-        //if(this.getClientInfo().isAuthenticated())
-        //{
-        //    this.log.info("User was logged in");
-        //    unpublished = true;
-        //}
+        // if(this.getClientInfo().isAuthenticated())
+        // {
+        // this.log.info("User was logged in");
+        // unpublished = true;
+        // }
         
         if(unpublishedString != null)
         {
@@ -139,7 +100,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         {
             if(published)
             {
-                List<InferredOWLOntologyID> publishedResults = new ArrayList<InferredOWLOntologyID>();
+                final List<InferredOWLOntologyID> publishedResults = new ArrayList<InferredOWLOntologyID>();
                 
                 final List<InferredOWLOntologyID> publishedArtifacts =
                         this.getPoddArtifactManager().listPublishedArtifacts();
@@ -165,7 +126,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 
                 this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST);
                 
-                List<InferredOWLOntologyID> unpublishedResults = new ArrayList<InferredOWLOntologyID>();
+                final List<InferredOWLOntologyID> unpublishedResults = new ArrayList<InferredOWLOntologyID>();
                 
                 final List<InferredOWLOntologyID> unpublishedArtifacts =
                         this.getPoddArtifactManager().listUnpublishedArtifacts();
@@ -182,7 +143,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 results.put(PoddWebConstants.KEY_UNPUBLISHED, unpublishedResults);
             }
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Database exception", e);
         }
@@ -190,13 +151,46 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         return results;
     }
     
+    /**
+     * Handle http GET request to serve the list artifacts page.
+     */
+    @Get(":html")
+    public Representation getListArtifactsPage(final Representation entity) throws ResourceException
+    {
+        this.log.info("@Get listArtifacts Page");
+        
+        final Map<String, List<InferredOWLOntologyID>> artifactsInternal = this.getArtifactsInternal();
+        
+        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
+        dataModel.put("contentTemplate", "projects.html.ftl");
+        dataModel.put("pageTitle", ListArtifactsResourceImpl.LIST_PAGE_TITLE_TEXT);
+        
+        // Disable currently unimplemented features
+        dataModel.put("canFilter", Boolean.FALSE);
+        dataModel.put("hasFilter", Boolean.FALSE);
+        dataModel.put("userCanCreate", Boolean.FALSE);
+        
+        this.log.info("artifacts: {}", artifactsInternal);
+        
+        for(final String nextKey : artifactsInternal.keySet())
+        {
+            this.populateDataModelWithArtifactLists(dataModel, nextKey + "ArtifactsList",
+                    artifactsInternal.get(nextKey));
+        }
+        
+        // Output the base template, with contentTemplate from the dataModel defining the
+        // template to use for the content in the body of the page
+        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+    }
+    
     @Get(":rdf|rj|json|ttl")
     public Representation getListArtifactsRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
-        Map<String, List<InferredOWLOntologyID>> artifactsInternal = getArtifactsInternal();
+        final Map<String, List<InferredOWLOntologyID>> artifactsInternal = this.getArtifactsInternal();
         
-        RDFFormat resultFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName());
+        final RDFFormat resultFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName());
         
         if(resultFormat == null)
         {
@@ -207,36 +201,36 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                             + variant.getMediaType().getName());
         }
         
-        MediaType resultMediaType = MediaType.valueOf(resultFormat.getDefaultMIMEType());
+        final MediaType resultMediaType = MediaType.valueOf(resultFormat.getDefaultMIMEType());
         
-        ByteArrayOutputStream out = new ByteArrayOutputStream(8096);
-        RDFWriter writer = Rio.createWriter(resultFormat, out);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(8096);
+        final RDFWriter writer = Rio.createWriter(resultFormat, out);
         
         try
         {
             writer.startRDF();
-            for(String nextKey : artifactsInternal.keySet())
+            for(final String nextKey : artifactsInternal.keySet())
             {
                 // log.info("nextArtifact: {}", nextKey);
                 OntologyUtils.ontologyIDsToHandler(artifactsInternal.get(nextKey), writer);
             }
             writer.endRDF();
         }
-        catch(RDFHandlerException e)
+        catch(final RDFHandlerException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not generate RDF output due to an exception in the writer", e);
         }
         
-        log.info(new String(out.toByteArray(), StandardCharsets.UTF_8));
+        this.log.info(new String(out.toByteArray(), StandardCharsets.UTF_8));
         
-        ByteArrayRepresentation result = new ByteArrayRepresentation(out.toByteArray(), resultMediaType);
+        final ByteArrayRepresentation result = new ByteArrayRepresentation(out.toByteArray(), resultMediaType);
         
         return result;
     }
     
     private void populateDataModelWithArtifactLists(final Map<String, Object> dataModel, final String key,
-            List<InferredOWLOntologyID> artifacts)
+            final List<InferredOWLOntologyID> artifacts)
     {
         final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
         for(final InferredOWLOntologyID artifactUri : artifacts)

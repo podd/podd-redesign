@@ -119,16 +119,16 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     @Test
     public void testIncrementVersion() throws Exception
     {
-        String artifactURI = "http://some/artifact:15";
-
+        final String artifactURI = "http://some/artifact:15";
+        
         final PoddArtifactManagerImpl testArtifactManager = new PoddArtifactManagerImpl();
         
         // increment the version number
-        String newIncrementedVersion = testArtifactManager.incrementVersion(artifactURI + ":version:1");
+        final String newIncrementedVersion = testArtifactManager.incrementVersion(artifactURI + ":version:1");
         Assert.assertEquals("Version not incremented as expected", artifactURI + ":version:2", newIncrementedVersion);
         
         // append a number when version number cannot be extracted
-        String newAppendedVersion = testArtifactManager.incrementVersion(artifactURI + ":v5");
+        final String newAppendedVersion = testArtifactManager.incrementVersion(artifactURI + ":v5");
         Assert.assertEquals("Version not incremented as expected", artifactURI + ":v51", newAppendedVersion);
     }
     

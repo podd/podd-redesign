@@ -25,6 +25,24 @@ import com.github.podd.impl.PoddSesameManagerImpl;
 public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
 {
     @Override
+    protected OWLOntologyManager getNewOwlOntologyManagerInstance()
+    {
+        return OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
+    }
+    
+    @Override
+    protected PoddOWLManager getNewPoddOwlManagerInstance()
+    {
+        return new PoddOWLManagerImpl();
+    }
+    
+    @Override
+    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance()
+    {
+        return new PoddRepositoryManagerImpl();
+    }
+    
+    @Override
     protected PoddSchemaManager getNewPoddSchemaManagerInstance()
     {
         return new PoddSchemaManagerImpl();
@@ -37,27 +55,9 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     }
     
     @Override
-    protected PoddOWLManager getNewPoddOwlManagerInstance()
-    {
-        return new PoddOWLManagerImpl();
-    }
-    
-    @Override
     protected OWLReasonerFactory getNewReasonerFactory()
     {
         return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
-    }
-    
-    @Override
-    protected OWLOntologyManager getNewOwlOntologyManagerInstance()
-    {
-        return OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
-    }
-    
-    @Override
-    protected PoddRepositoryManager getNewPoddRepositoryManagerInstance()
-    {
-        return new PoddRepositoryManagerImpl();
     }
     
 }

@@ -1,16 +1,15 @@
 package com.github.podd.restlet.test;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Collection;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -19,9 +18,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.Timeout;
-import org.openrdf.rio.RDFFormat;
 import org.openrdf.model.Model;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
@@ -35,7 +34,6 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Status;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,33 +105,29 @@ public class AbstractResourceImplTest
     }
     
     /**
-     * Copied from sshj net.schmizz.sshj.util.BasicFixture.java
+     * Utility method to verify that RDF documents can be parsed and the resulting number of
+     * statements is as expected.
      * 
+     * @param inputStream
+     * @param format
+     * @param expectedStatements
      * @return
+     * @throws RDFParseException
+     * @throws RDFHandlerException
+     * @throws IOException
      */
-    private int getFreePort()
+    protected Model assertRdf(final InputStream inputStream, final RDFFormat format, final int expectedStatements)
+        throws RDFParseException, RDFHandlerException, IOException
     {
-        try
-        {
-            ServerSocket s = null;
-            try
-            {
-                s = new ServerSocket(0);
-                s.setReuseAddress(true);
-                return s.getLocalPort();
-            }
-            finally
-            {
-                if(s != null)
-                {
-                    s.close();
-                }
-            }
-        }
-        catch(final IOException e)
-        {
-            throw new RuntimeException(e);
-        }
+        final Model model = new LinkedHashModel();
+        
+        final RDFParser parser = Rio.createParser(format);
+        parser.setRDFHandler(new StatementCollector(model));
+        parser.parse(inputStream, "http://test.podd.example.org/should/not/occur/in/a/real/graph/");
+        
+        Assert.assertEquals(expectedStatements, model.size());
+        
+        return model;
     }
     
     /**
@@ -147,7 +141,7 @@ public class AbstractResourceImplTest
     protected FileRepresentation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
         throws IOException
     {
-        Path target = testDir.resolve(Paths.get(resourcePath).getFileName());
+        final Path target = this.testDir.resolve(Paths.get(resourcePath).getFileName());
         
         try (final InputStream input = this.getClass().getResourceAsStream(resourcePath))
         {
@@ -183,29 +177,49 @@ public class AbstractResourceImplTest
     }
     
     /**
-     * Utility method to verify that RDF documents can be parsed and the resulting number of
-     * statements is as expected.
+     * Copied from sshj net.schmizz.sshj.util.BasicFixture.java
      * 
-     * @param inputStream
-     * @param format
-     * @param expectedStatements
      * @return
-     * @throws RDFParseException
-     * @throws RDFHandlerException
-     * @throws IOException
      */
-    protected Model assertRdf(final InputStream inputStream, RDFFormat format, int expectedStatements)
-        throws RDFParseException, RDFHandlerException, IOException
+    private int getFreePort()
     {
-        final Model model = new LinkedHashModel();
+        try
+        {
+            ServerSocket s = null;
+            try
+            {
+                s = new ServerSocket(0);
+                s.setReuseAddress(true);
+                return s.getLocalPort();
+            }
+            finally
+            {
+                if(s != null)
+                {
+                    s.close();
+                }
+            }
+        }
+        catch(final IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    /**
+     * Override this to change the test aliases for a given test.
+     * 
+     * @return A {@link Model} containing the statements relevant to test aliases.
+     * @throws IOException
+     * @throws UnsupportedRDFormatException
+     * @throws RDFParseException
+     */
+    protected Model getTestAliases() throws RDFParseException, UnsupportedRDFormatException, IOException
+    {
+        final String configuration =
+                IOUtils.toString(this.getClass().getResourceAsStream("/test/test-alias.ttl"), StandardCharsets.UTF_8);
         
-        final RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(model));
-        parser.parse(inputStream, "http://test.podd.example.org/should/not/occur/in/a/real/graph/");
-        
-        Assert.assertEquals(expectedStatements, model.size());
-        
-        return model;
+        return Rio.parse(new StringReader(configuration), "", RDFFormat.TURTLE);
     }
     
     /**
@@ -220,11 +234,11 @@ public class AbstractResourceImplTest
     {
         if(!path.startsWith("/"))
         {
-            return "http://localhost:" + TEST_PORT + "/podd/" + path;
+            return "http://localhost:" + this.TEST_PORT + "/podd/" + path;
         }
         else
         {
-            return "http://localhost:" + TEST_PORT + "/podd" + path;
+            return "http://localhost:" + this.TEST_PORT + "/podd" + path;
         }
     }
     
@@ -265,7 +279,7 @@ public class AbstractResourceImplTest
         final String body = results.getText();
         
         this.log.info(body);
-        assertFreemarker(body);
+        this.assertFreemarker(body);
         
         final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
         
@@ -285,10 +299,10 @@ public class AbstractResourceImplTest
     {
         this.component = new Component();
         
-        TEST_PORT = getFreePort();
+        this.TEST_PORT = this.getFreePort();
         
         // Add a new HTTP server listening on the given TEST_PORT.
-        this.component.getServers().add(Protocol.HTTP, TEST_PORT);
+        this.component.getServers().add(Protocol.HTTP, this.TEST_PORT);
         
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);
@@ -300,7 +314,7 @@ public class AbstractResourceImplTest
         // PropertyUtil.get(OasProps.PROP_WS_URI_PATH, OasProps.DEF_WS_URI_PATH),
                 "/podd/", nextApplication);
         
-        nextApplication.setAliasesConfiguration(getTestAliases());
+        nextApplication.setAliasesConfiguration(this.getTestAliases());
         
         // The application cannot be setup properly until it is attached, as it requires
         // Application.getContext() to not return null
@@ -309,23 +323,7 @@ public class AbstractResourceImplTest
         // Start the component.
         this.component.start();
         
-        testDir = tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
-    }
-    
-    /**
-     * Override this to change the test aliases for a given test.
-     * 
-     * @return A {@link Model} containing the statements relevant to test aliases.
-     * @throws IOException
-     * @throws UnsupportedRDFormatException
-     * @throws RDFParseException
-     */
-    protected Model getTestAliases() throws RDFParseException, UnsupportedRDFormatException, IOException
-    {
-        String configuration =
-                IOUtils.toString(this.getClass().getResourceAsStream("/test/test-alias.ttl"), StandardCharsets.UTF_8);
-        
-        return Rio.parse(new StringReader(configuration), "", RDFFormat.TURTLE);
+        this.testDir = this.tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
     }
     
     /**

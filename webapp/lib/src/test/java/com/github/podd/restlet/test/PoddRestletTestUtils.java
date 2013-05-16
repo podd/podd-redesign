@@ -3,7 +3,6 @@
  */
 package com.github.podd.restlet.test;
 
-
 import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -23,7 +22,7 @@ import com.github.ansell.restletutils.test.RestletTestUtils;
 public class PoddRestletTestUtils extends RestletTestUtils
 {
     private static final Logger log = LoggerFactory.getLogger(PoddRestletTestUtils.class);
-
+    
     public static Representation doTestUnAuthenticatedRequest(final ClientResource clientResource,
             final Method requestMethod, final Object inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus)
@@ -56,5 +55,4 @@ public class PoddRestletTestUtils extends RestletTestUtils
         return result;
     }
     
-
 }

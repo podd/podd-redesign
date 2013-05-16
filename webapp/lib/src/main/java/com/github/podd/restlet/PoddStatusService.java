@@ -43,8 +43,8 @@ import freemarker.template.Configuration;
  * 
  * TODO: create the templates used (i.e. PropertyUtils.PROPERTY_TEMPLATE...)
  * 
- * @author Peter Ansell p_ansell@yahoo.com
- * copied from the OAS project (https://github.com/ansell/oas)
+ * @author Peter Ansell p_ansell@yahoo.com copied from the OAS project
+ *         (https://github.com/ansell/oas)
  */
 public class PoddStatusService extends StatusService
 {
@@ -84,34 +84,64 @@ public class PoddStatusService extends StatusService
         float maxQuality = 0;
         final List<Preference<MediaType>> acceptedMediaTypes = request.getClientInfo().getAcceptedMediaTypes();
         
-        for (Preference<MediaType> pref : acceptedMediaTypes)
+        for(final Preference<MediaType> pref : acceptedMediaTypes)
         {
-            float quality = pref.getQuality();
-            if (quality > maxQuality)
+            final float quality = pref.getQuality();
+            if(quality > maxQuality)
             {
-                preferredMediaType = pref.getMetadata(); 
+                preferredMediaType = pref.getMetadata();
                 maxQuality = quality;
             }
         }
         
         Representation representation = null;
-        if (MediaType.APPLICATION_RDF_XML.equals(preferredMediaType))
+        if(MediaType.APPLICATION_RDF_XML.equals(preferredMediaType))
         {
             representation = this.getRepresentationRdf(status, request, response);
         }
-        else //if (MediaType.TEXT_HTML.equals(preferredMediaType))
+        else
+        // if (MediaType.TEXT_HTML.equals(preferredMediaType))
         {
             representation = this.getRepresentationHtml(status, request, response);
         }
- 
+        
         return representation;
+    }
+    
+    /**
+     * Returns an Error page representation in text/html.
+     * 
+     */
+    private Representation getRepresentationHtml(final Status status, final Request request, final Response response)
+    {
+        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(request);
+        
+        dataModel.put("contentTemplate", "error.html.ftl");
+        dataModel.put("pageTitle", "An error occurred : HTTP " + status.getCode());
+        dataModel.put("error_code", Integer.toString(status.getCode()));
+        
+        final StringBuilder message = new StringBuilder();
+        if(status.getDescription() != null)
+        {
+            message.append(status.getDescription());
+        }
+        if(status.getThrowable() != null && status.getThrowable().getMessage() != null)
+        {
+            message.append(" (");
+            message.append(status.getThrowable().getMessage());
+            message.append(")");
+        }
+        dataModel.put("message", message.toString());
+        
+        return RestletUtils.getHtmlRepresentation("poddBase.html.ftl", dataModel, MediaType.TEXT_HTML,
+                this.freemarkerConfiguration);
     }
     
     /**
      * Returns an Error page representation in RDF/XML.
      * 
      */
-    private Representation getRepresentationRdf(Status status, Request request, Response response)
+    private Representation getRepresentationRdf(final Status status, final Request request, final Response response)
     {
         final Model model = new LinkedHashModel();
         
@@ -151,7 +181,7 @@ public class PoddStatusService extends StatusService
             }
             writer.endRDF();
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             this.log.error("Error writing RDF content in status service", e);
             // We're already trying to send back an error. So ignore this?
@@ -159,34 +189,5 @@ public class PoddStatusService extends StatusService
         
         return new AppendableRepresentation(out.toString(), MediaType.APPLICATION_RDF_XML, Language.DEFAULT,
                 CharacterSet.UTF_8);
-    }
-
-    /**
-     * Returns an Error page representation in text/html.
-     * 
-     */
-    private Representation getRepresentationHtml(final Status status, final Request request, final Response response)
-    {
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(request);
-        
-        dataModel.put("contentTemplate", "error.html.ftl");
-        dataModel.put("pageTitle", "An error occurred : HTTP " + status.getCode());
-        dataModel.put("error_code", Integer.toString(status.getCode()));
-        
-        final StringBuilder message = new StringBuilder();
-        if(status.getDescription() != null)
-        {
-            message.append(status.getDescription());
-        }
-        if(status.getThrowable() != null && status.getThrowable().getMessage() != null)
-        {
-            message.append(" (");
-            message.append(status.getThrowable().getMessage());
-            message.append(")");
-        }
-        dataModel.put("message", message.toString());
-        
-        return RestletUtils.getHtmlRepresentation("poddBase.html.ftl", dataModel, MediaType.TEXT_HTML,
-                this.freemarkerConfiguration);
     }
 }

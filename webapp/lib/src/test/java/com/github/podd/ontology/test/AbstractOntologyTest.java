@@ -84,6 +84,11 @@ public class AbstractOntologyTest
         return conn;
     }
     
+    public List<URI> getSchemaOntologyGraphs()
+    {
+        return this.schemaOntologyGraphs;
+    }
+    
     /**
      * Initialize the test Repository by loading the schema ontologies and updating the management
      * graphs.
@@ -93,8 +98,7 @@ public class AbstractOntologyTest
      */
     private void initializeTestRepository()
     {
-        final FileReferenceProcessorFactoryRegistry nextFileRegistry =
-                new FileReferenceProcessorFactoryRegistry();
+        final FileReferenceProcessorFactoryRegistry nextFileRegistry = new FileReferenceProcessorFactoryRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
         // classpath
         nextFileRegistry.clear();
@@ -142,23 +146,23 @@ public class AbstractOntologyTest
          * Since the schema ontology upload feature is not yet supported, necessary schemas are
          * uploaded here at application starts up.
          */
-        String[] schemaPaths =
+        final String[] schemaPaths =
                 { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
                         PoddRdfConstants.PATH_PODD_BASE, PoddRdfConstants.PATH_PODD_SCIENCE,
                         PoddRdfConstants.PATH_PODD_PLANT };
         
-        for(String schemaPath : schemaPaths)
+        for(final String schemaPath : schemaPaths)
         {
             try
             {
                 // load a schema ontology
-                InferredOWLOntologyID ontologyID =
+                final InferredOWLOntologyID ontologyID =
                         this.poddSchemaManager.uploadSchemaOntology(this.getClass().getResourceAsStream(schemaPath),
                                 RDFFormat.RDFXML);
                 
                 // add graph names
-                schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
-                schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
+                this.schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
+                this.schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
             }
             catch(IOException | OpenRDFException | OWLException | PoddException e)
             {
@@ -259,11 +263,6 @@ public class AbstractOntologyTest
         }
         this.testRepository = null;
         
-    }
-    
-    public List<URI> getSchemaOntologyGraphs()
-    {
-        return this.schemaOntologyGraphs;
     }
     
 }

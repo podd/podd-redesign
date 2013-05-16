@@ -3,11 +3,7 @@
  */
 package com.github.podd.impl.file;
 
-import java.util.Arrays;
-import java.util.Set;
-
 import org.openrdf.model.Model;
-import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDFS;
@@ -93,7 +89,7 @@ public class SSHFileReferenceImpl implements SSHFileReference
     }
     
     @Override
-    public void setArtifactID(OWLOntologyID artifactID)
+    public void setArtifactID(final OWLOntologyID artifactID)
     {
         if(artifactID instanceof InferredOWLOntologyID)
         {
@@ -106,111 +102,111 @@ public class SSHFileReferenceImpl implements SSHFileReference
     }
     
     @Override
-    public void setFilename(String filename)
+    public void setFilename(final String filename)
     {
         this.filename = filename;
     }
     
     @Override
-    public void setLabel(String label)
+    public void setLabel(final String label)
     {
         this.label = label;
     }
     
     @Override
-    public void setObjectIri(IRI objectIri)
+    public void setObjectIri(final IRI objectIri)
     {
         this.objectIri = objectIri;
     }
     
     @Override
-    public void setParentIri(IRI parentIri)
+    public void setParentIri(final IRI parentIri)
     {
         this.parentIri = parentIri;
     }
     
     @Override
-    public void setParentPredicateIRI(IRI parentPredicateIRI)
+    public void setParentPredicateIRI(final IRI parentPredicateIRI)
     {
         this.parentPredicateIRI = parentPredicateIRI;
     }
     
     @Override
-    public void setPath(String path)
+    public void setPath(final String path)
     {
         this.path = path;
     }
     
     @Override
-    public void setRepositoryAlias(String repositoryAlias)
+    public void setRepositoryAlias(final String repositoryAlias)
     {
         this.repositoryAlias = repositoryAlias;
     }
     
     @Override
-    public String toString()
-    {
-        StringBuilder b = new StringBuilder();
-        b.append("[");
-        b.append(artifactID);
-        b.append(" , ");
-        b.append(parentIri);
-        b.append(" , ");
-        b.append(objectIri);
-        b.append(" , ");
-        b.append(label);
-        b.append(" , ");
-        b.append(filename);
-        b.append(" , ");
-        b.append(path);
-        b.append(" , ");
-        b.append(repositoryAlias);
-        b.append("]");
-        
-        return b.toString();
-    }
-    
-    @Override
     public Model toRDF()
     {
-        ValueFactory vf = PoddRdfConstants.VALUE_FACTORY;
-        Model result = new LinkedHashModel();
+        final ValueFactory vf = PoddRdfConstants.VALUE_FACTORY;
+        final Model result = new LinkedHashModel();
         
-        if(getArtifactID() != null)
+        if(this.getArtifactID() != null)
         {
-            OntologyUtils.ontologyIDToRDF(getArtifactID(), result);
+            OntologyUtils.ontologyIDToRDF(this.getArtifactID(), result);
         }
         
-        if(getFilename() != null)
+        if(this.getFilename() != null)
         {
             result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILENAME,
-                    vf.createLiteral(getFilename()));
+                    vf.createLiteral(this.getFilename()));
         }
         
-        if(getLabel() != null)
+        if(this.getLabel() != null)
         {
-            result.add(this.objectIri.toOpenRDFURI(), RDFS.LABEL, vf.createLiteral(getLabel()));
+            result.add(this.objectIri.toOpenRDFURI(), RDFS.LABEL, vf.createLiteral(this.getLabel()));
         }
         
-        if(getPath() != null)
+        if(this.getPath() != null)
         {
             result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILE_PATH,
-                    vf.createLiteral(getPath()));
+                    vf.createLiteral(this.getPath()));
         }
         
-        if(getRepositoryAlias() != null)
+        if(this.getRepositoryAlias() != null)
         {
             result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_ALIAS,
-                    vf.createLiteral(getRepositoryAlias()));
+                    vf.createLiteral(this.getRepositoryAlias()));
         }
         
-        if(getParentIri() != null && getParentPredicateIRI() != null)
+        if(this.getParentIri() != null && this.getParentPredicateIRI() != null)
         {
-            result.add(getParentIri().toOpenRDFURI(), getParentPredicateIRI().toOpenRDFURI(),
+            result.add(this.getParentIri().toOpenRDFURI(), this.getParentPredicateIRI().toOpenRDFURI(),
                     this.objectIri.toOpenRDFURI());
         }
         
         return result;
+    }
+    
+    @Override
+    public String toString()
+    {
+        final StringBuilder b = new StringBuilder();
+        b.append("[");
+        b.append(this.artifactID);
+        b.append(" , ");
+        b.append(this.parentIri);
+        b.append(" , ");
+        b.append(this.objectIri);
+        b.append(" , ");
+        b.append(this.label);
+        b.append(" , ");
+        b.append(this.filename);
+        b.append(" , ");
+        b.append(this.path);
+        b.append(" , ");
+        b.append(this.repositoryAlias);
+        b.append("]");
+        
+        return b.toString();
     }
     
 }

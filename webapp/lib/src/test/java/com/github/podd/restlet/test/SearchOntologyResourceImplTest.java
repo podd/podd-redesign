@@ -38,7 +38,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
         
         searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, searchTerm);
-        if (artifactUri != null)
+        if(artifactUri != null)
         {
             searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         }
@@ -167,7 +167,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testSearchRdfForANZSRCAssertion() throws Exception
     {
-        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#ANZSRCAssertion"};
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#ANZSRCAssertion" };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
         
         final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType, null);
@@ -181,7 +181,6 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("Expected Assertion 'Not Applicable' not found", 1,
                 resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Not Applicable")).size());
     }
-        
     
     /**
      * Test successful search for a Platform in RDF/XML
@@ -217,7 +216,8 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Sex" };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
         
-        final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType, testArtifact.getOntologyIRI().toString());
+        final Model resultModel =
+                this.internalTestSearchRdf("", searchTypes, requestMediaType, testArtifact.getOntologyIRI().toString());
         
         Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
         Assert.assertEquals("Value Hermaphrodite not found", 1,

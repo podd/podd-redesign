@@ -32,7 +32,8 @@ public class AboutResourceImpl extends AbstractPoddResourceImpl
     public Representation getAboutPageHtml(final Representation entity) throws ResourceException
     {
         // Enable the following to test authenticated access
-        //this.getPoddApplication().authenticate(PoddAction.ROLE_EDIT, getRequest(), getResponse());
+        // this.getPoddApplication().authenticate(PoddAction.ROLE_EDIT, getRequest(),
+        // getResponse());
         this.log.info("getAboutPageHtml");
         final User user = this.getRequest().getClientInfo().getUser();
         

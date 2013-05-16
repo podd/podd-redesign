@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
@@ -61,25 +60,9 @@ public interface PoddSchemaManager
      *         IRI, or the given IRI as the schema ontology version IRI.
      * @throws UnmanagedSchemaIRIException
      *             If the given schemaOntologyIRI is not recognised or managed.
-     * @throws OpenRDFException 
-     */
-    InferredOWLOntologyID getCurrentSchemaOntologyVersion(IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException, OpenRDFException;
-    
-    /**
-     * If the given IRI is the version IRI of a managed Schema Ontology, return its Ontology ID. If
-     * the given IRI is an ontology IRI of a managed Schema Ontology, return the Ontology ID of its
-     * most current version.
-     * 
-     * @param schemaVersionIRI
-     *            The Version IRI, or if no version IRIs match, the ontology IRI of a Schema
-     *            Ontology.
-     * @return
-     * @throws UnmanagedSchemaIRIException
      * @throws OpenRDFException
-     * 
-     * @since 04/03/2013
      */
-    InferredOWLOntologyID getSchemaOntologyVersion(IRI schemaVersionIRI) throws UnmanagedSchemaIRIException,
+    InferredOWLOntologyID getCurrentSchemaOntologyVersion(IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException,
         OpenRDFException;
     
     /**
@@ -114,6 +97,23 @@ public interface PoddSchemaManager
      *             If the given schemaOntologyID is not managed.
      */
     OWLOntology getSchemaOntology(OWLOntologyID schemaOntologyID) throws UnmanagedSchemaOntologyIDException;
+    
+    /**
+     * If the given IRI is the version IRI of a managed Schema Ontology, return its Ontology ID. If
+     * the given IRI is an ontology IRI of a managed Schema Ontology, return the Ontology ID of its
+     * most current version.
+     * 
+     * @param schemaVersionIRI
+     *            The Version IRI, or if no version IRIs match, the ontology IRI of a Schema
+     *            Ontology.
+     * @return
+     * @throws UnmanagedSchemaIRIException
+     * @throws OpenRDFException
+     * 
+     * @since 04/03/2013
+     */
+    InferredOWLOntologyID getSchemaOntologyVersion(IRI schemaVersionIRI) throws UnmanagedSchemaIRIException,
+        OpenRDFException;
     
     /**
      * Sets the given schemaOntologyID to be the most current version for all managed Schema
@@ -205,5 +205,5 @@ public interface PoddSchemaManager
      */
     InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
             RDFFormat fileFormat) throws OpenRDFException, IOException, OWLException, PoddException;
-
+    
 }

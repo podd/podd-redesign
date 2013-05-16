@@ -23,10 +23,25 @@ import org.openrdf.repository.RepositoryException;
 public class DebugUtils
 {
     
+    public static void printContents(final Model model)
+    {
+        System.out.println("==================================================");
+        System.out.println("Model Contents: ");
+        System.out.println();
+        final Statement[] allStatements = model.toArray(new Statement[0]);
+        
+        for(final Statement stmt : allStatements)
+        {
+            System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {" + stmt.getObject()
+                    + "}");
+        }
+        System.out.println("==================================================");
+    }
+    
     /**
      * Helper method prints the contents of the given context of a Repository
      */
-    public static void printContents(RepositoryConnection conn, final URI context) throws RepositoryException
+    public static void printContents(final RepositoryConnection conn, final URI context) throws RepositoryException
     {
         System.out.println("==================================================");
         System.out.println("Graph = " + context);
@@ -43,28 +58,13 @@ public class DebugUtils
     /**
      * Helper method prints the contents of the given context of a Repository
      */
-    public static void printContexts(RepositoryConnection conn) throws RepositoryException
+    public static void printContexts(final RepositoryConnection conn) throws RepositoryException
     {
         System.out.println("==================================================");
         System.out.println("Contexts in Repository:  ");
         for(final Resource context : Iterations.asSet(conn.getContextIDs()))
         {
             System.out.println(context);
-        }
-        System.out.println("==================================================");
-    }
-
-    public static void printContents(final Model model)
-    {
-        System.out.println("==================================================");
-        System.out.println("Model Contents: ");
-        System.out.println();
-        final Statement[] allStatements = model.toArray(new Statement[0]);
-        
-        for(final Statement stmt : allStatements)
-        {
-            System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {" + stmt.getObject()
-                    + "}");
         }
         System.out.println("==================================================");
     }

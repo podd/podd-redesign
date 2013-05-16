@@ -6,7 +6,6 @@ package com.github.podd.impl.purl.test;
 import java.util.Set;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;

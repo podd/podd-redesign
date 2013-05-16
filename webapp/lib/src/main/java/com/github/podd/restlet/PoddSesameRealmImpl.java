@@ -147,7 +147,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
      * @param repository
      * @param contexts
      */
-    public PoddSesameRealmImpl(Repository repository, URI... contexts)
+    public PoddSesameRealmImpl(final Repository repository, final URI... contexts)
     {
         super(repository, contexts);
         
@@ -166,7 +166,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     public URI addUser(final PoddUser nextUser)
     {
-        URI nextUserUUID = super.addUser(nextUser);
+        final URI nextUserUUID = super.addUser(nextUser);
         
         this.log.debug("adding org, orcid, uri");
         
@@ -241,30 +241,30 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         this.log.debug("Building RestletUtilUser from SPARQL results");
         
         final PoddUser result =
-                new PoddUser(userIdentifier, bindingSet.getValue(PARAM_USER_SECRET).stringValue().toCharArray(),
-                        bindingSet.getValue(PARAM_USER_FIRSTNAME).stringValue(), bindingSet.getValue(
-                                PARAM_USER_LASTNAME).stringValue(),
-                        bindingSet.getValue(PARAM_USER_EMAIL).stringValue(), PoddUserStatus.ACTIVE);
+                new PoddUser(userIdentifier, bindingSet.getValue(PoddSesameRealm.PARAM_USER_SECRET).stringValue()
+                        .toCharArray(), bindingSet.getValue(PoddSesameRealm.PARAM_USER_FIRSTNAME).stringValue(),
+                        bindingSet.getValue(PoddSesameRealm.PARAM_USER_LASTNAME).stringValue(), bindingSet.getValue(
+                                PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.ACTIVE);
         
-        Value organizationVal = bindingSet.getValue(PARAM_USER_ORGANIZATION);
+        final Value organizationVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         if(organizationVal != null)
         {
             result.setOrganization(organizationVal.stringValue());
         }
         
-        Value orcidVal = bindingSet.getValue(PARAM_USER_ORCID);
+        final Value orcidVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_ORCID);
         if(orcidVal != null)
         {
             result.setOrcid(orcidVal.stringValue());
         }
         
-        Value homePageVal = bindingSet.getValue(PARAM_USER_HOMEPAGE);
+        final Value homePageVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_HOMEPAGE);
         if(homePageVal != null)
         {
             result.setHomePage(PoddRdfConstants.VALUE_FACTORY.createURI(homePageVal.stringValue()));
         }
         
-        Value uriVal = bindingSet.getValue(PARAM_USER_URI);
+        final Value uriVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_URI);
         if(uriVal != null)
         {
             result.setUri(PoddRdfConstants.VALUE_FACTORY.createURI(uriVal.stringValue()));
@@ -282,7 +282,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     protected Role buildRoleFromSparqlResult(final BindingSet bindingSet)
     {
-        final URI roleUri = this.vf.createURI(bindingSet.getValue(PoddSesameRealmImpl.PARAM_ROLE).stringValue());
+        final URI roleUri = this.vf.createURI(bindingSet.getValue(PoddSesameRealm.PARAM_ROLE).stringValue());
         return PoddRoles.getRoleByUri(roleUri).getRole();
     }
     
@@ -313,14 +313,14 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
          */
         
         query.append(" SELECT ?");
-        query.append(PoddSesameRealmImpl.PARAM_ROLE);
+        query.append(PoddSesameRealm.PARAM_ROLE);
         query.append(" WHERE ");
         query.append(" { ");
         
         int i = 0;
-        for(URI objectUri : objectUris)
+        for(final URI objectUri : objectUris)
         {
-            String roleMappingVar = " ?_anyMapping" + i;
+            final String roleMappingVar = " ?_anyMapping" + i;
             i++;
             
             query.append(roleMappingVar);
@@ -332,7 +332,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             query.append(roleMappingVar);
             query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ");
             query.append(" ?");
-            query.append(PoddSesameRealmImpl.PARAM_ROLE);
+            query.append(PoddSesameRealm.PARAM_ROLE);
             query.append(" . ");
             
             query.append(roleMappingVar);
@@ -354,7 +354,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
      * @return A String representation of the SPARQL Select query
      */
     @Override
-    protected String buildSparqlQueryToFindUser(final String userIdentifier, boolean findAllUsers)
+    protected String buildSparqlQueryToFindUser(final String userIdentifier, final boolean findAllUsers)
     {
         this.log.debug("Building SPARQL query");
         
@@ -362,84 +362,84 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         query.append(" SELECT ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_SECRET);
+        query.append(PoddSesameRealm.PARAM_USER_SECRET);
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_FIRSTNAME);
+        query.append(PoddSesameRealm.PARAM_USER_FIRSTNAME);
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_LASTNAME);
+        query.append(PoddSesameRealm.PARAM_USER_LASTNAME);
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_EMAIL);
+        query.append(PoddSesameRealm.PARAM_USER_EMAIL);
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_STATUS);
+        query.append(PoddSesameRealm.PARAM_USER_STATUS);
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_ORGANIZATION);
+        query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_ORCID);
+        query.append(PoddSesameRealm.PARAM_USER_ORCID);
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_HOMEPAGE);
+        query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
         
         query.append(" WHERE ");
         query.append(" { ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" a <" + SesameRealmConstants.OAS_USER + "> . ");
         
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USERIDENTIFIER + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_IDENTIFIER);
+        query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
         query.append(" . ");
         
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddWebConstants.PODD_USER_ORCID + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_ORCID);
+        query.append(PoddSesameRealm.PARAM_USER_ORCID);
         query.append(" . ");
         
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USERSECRET + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_SECRET);
+        query.append(PoddSesameRealm.PARAM_USER_SECRET);
         query.append(" . ");
         
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddWebConstants.PODD_USER_HOMEPAGE + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_HOMEPAGE);
+        query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
         query.append(" . ");
         
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddWebConstants.PODD_USER_ORGANIZATION + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_ORGANIZATION);
+        query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         query.append(" . ");
         
         query.append(" OPTIONAL{ ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_FIRSTNAME);
+        query.append(PoddSesameRealm.PARAM_USER_FIRSTNAME);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USERLASTNAME + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_LASTNAME);
+        query.append(PoddSesameRealm.PARAM_USER_LASTNAME);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_URI);
+        query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + SesameRealmConstants.OAS_USEREMAIL + "> ");
         query.append(" ?");
-        query.append(PoddSesameRealmImpl.PARAM_USER_EMAIL);
+        query.append(PoddSesameRealm.PARAM_USER_EMAIL);
         query.append(" . } ");
         
         // TODO: firstname, lastname, email are mandatory. add optional parameters: ORCID,
@@ -451,6 +451,77 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         query.append(" } ");
         return query.toString();
+    }
+    
+    /**
+     * For a given User, this method finds Role Mappings common across ALL the given object URIs.
+     * 
+     * @param user
+     * @param objectUris
+     * @return A Collection of Roles that are common for ALL given object URIs
+     */
+    @Override
+    public Collection<Role> getCommonRolesForObjects(final User user, final Collection<URI> objectUris)
+    {
+        if(user == null)
+        {
+            throw new NullPointerException("User was null");
+        }
+        
+        final Collection<Role> roleCollection = new HashSet<Role>();
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepository().getConnection();
+            
+            final String query = this.buildSparqlQueryForCommonObjectRoles(user.getIdentifier(), objectUris);
+            
+            if(this.log.isDebugEnabled())
+            {
+                this.log.debug("getCommonRolesForObjects: query={}", query);
+            }
+            
+            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+            
+            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            
+            try
+            {
+                if(!queryResult.hasNext())
+                {
+                    this.log.warn("Could not find role with mappings for user: {}", user.getIdentifier());
+                }
+                
+                while(queryResult.hasNext())
+                {
+                    final Role role = this.buildRoleFromSparqlResult(queryResult.next());
+                    roleCollection.add(role);
+                }
+            }
+            finally
+            {
+                queryResult.close();
+            }
+            
+        }
+        catch(final RepositoryException | MalformedQueryException | QueryEvaluationException e)
+        {
+            throw new RuntimeException("Failure finding user in repository", e);
+        }
+        finally
+        {
+            try
+            {
+                conn.close();
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Failure to close connection", e);
+            }
+        }
+        
+        return roleCollection;
     }
     
     /**
@@ -487,7 +558,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
      * @param optionalObjectUri
      */
     @Override
-    public void map(User user, Role role, URI optionalObjectUri)
+    public void map(final User user, final Role role, final URI optionalObjectUri)
     {
         RepositoryConnection conn = null;
         try
@@ -524,7 +595,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 {
                     conn.rollback();
                 }
-                catch(RepositoryException e1)
+                catch(final RepositoryException e1)
                 {
                     // throw a RuntimeException to be consistent with the behaviour of
                     // super.map(user, role)
@@ -546,77 +617,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 }
             }
         }
-    }
-    
-    /**
-     * For a given User, this method finds Role Mappings common across ALL the given object URIs.
-     * 
-     * @param user
-     * @param objectUris
-     * @return A Collection of Roles that are common for ALL given object URIs
-     */
-    @Override
-    public Collection<Role> getCommonRolesForObjects(User user, Collection<URI> objectUris)
-    {
-        if(user == null)
-        {
-            throw new NullPointerException("User was null");
-        }
-        
-        Collection<Role> roleCollection = new HashSet<Role>();
-        
-        RepositoryConnection conn = null;
-        try
-        {
-            conn = this.getRepository().getConnection();
-            
-            final String query = this.buildSparqlQueryForCommonObjectRoles(user.getIdentifier(), objectUris);
-            
-            if(this.log.isDebugEnabled())
-            {
-                this.log.debug("getCommonRolesForObjects: query={}", query);
-            }
-            
-            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
-            
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
-            
-            try
-            {
-                if(!queryResult.hasNext())
-                {
-                    this.log.warn("Could not find role with mappings for user: {}", user.getIdentifier());
-                }
-                
-                while(queryResult.hasNext())
-                {
-                    Role role = this.buildRoleFromSparqlResult(queryResult.next());
-                    roleCollection.add(role);
-                }
-            }
-            finally
-            {
-                queryResult.close();
-            }
-            
-        }
-        catch(final RepositoryException | MalformedQueryException | QueryEvaluationException e)
-        {
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        finally
-        {
-            try
-            {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Failure to close connection", e);
-            }
-        }
-        
-        return roleCollection;
     }
     
 }

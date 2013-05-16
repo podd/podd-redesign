@@ -55,6 +55,31 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
+    @Get
+    public Representation attachFileReferencePageHtml(final Representation entity) throws ResourceException
+    {
+        // TODO: set required object URIs
+        final Collection<URI> objectUris = Collections.<URI> emptySet();
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, objectUris);
+        
+        this.log.info("attachFileRefHtml");
+        final User user = this.getRequest().getClientInfo().getUser();
+        
+        this.log.info("authenticated user: {}", user);
+        
+        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
+        dataModel.put("contentTemplate", "index.html.ftl");
+        dataModel.put("pageTitle", "TODO: Attach File Reference");
+        
+        final Map<String, Object> artifactDataMap = this.getRequestedArtifact();
+        dataModel.put("requestedArtifact", artifactDataMap);
+        
+        // Output the base template, with contentTemplate from the dataModel defining the
+        // template to use for the content in the body of the page
+        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+    }
+    
     @Post("rdf|rj|ttl")
     public Representation attachFileReferenceRdf(final Representation entity, final Variant variant)
         throws ResourceException
@@ -110,14 +135,14 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
                             ValueFactoryImpl.getInstance().createURI(versionUri), inputStream, inputFormat,
                             verificationPolicy);
         }
-        catch(FileReferenceVerificationFailureException e)
+        catch(final FileReferenceVerificationFailureException e)
         {
-            log.error("File reference validation errors: {}", e.getValidationFailures());
+            this.log.error("File reference validation errors: {}", e.getValidationFailures());
             throw new ResourceException(Status.SERVER_ERROR_BAD_GATEWAY, "File reference(s) failed verification", e);
         }
-        catch(OntologyNotInProfileException e)
+        catch(final OntologyNotInProfileException e)
         {
-            log.error("The ontology was not suitable for our reasoner after the changes: {}", e.getProfileReport());
+            this.log.error("The ontology was not suitable for our reasoner after the changes: {}", e.getProfileReport());
             throw new ResourceException(
                     Status.CLIENT_ERROR_BAD_REQUEST,
                     "Ontology was not consistent after the changes. Was the parent object correct before the submission.",
@@ -149,31 +174,6 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
                 .getDefaultMIMEType()));
-    }
-    
-    @Get
-    public Representation attachFileReferencePageHtml(final Representation entity) throws ResourceException
-    {
-        // TODO: set required object URIs
-        final Collection<URI> objectUris = Collections.<URI> emptySet();
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, objectUris);
-        
-        this.log.info("attachFileRefHtml");
-        final User user = this.getRequest().getClientInfo().getUser();
-        
-        this.log.info("authenticated user: {}", user);
-        
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "index.html.ftl");
-        dataModel.put("pageTitle", "TODO: Attach File Reference");
-        
-        final Map<String, Object> artifactDataMap = this.getRequestedArtifact();
-        dataModel.put("requestedArtifact", artifactDataMap);
-        
-        // Output the base template, with contentTemplate from the dataModel defining the
-        // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
     // FIXME: populating dummy info for test

@@ -17,11 +17,15 @@ public interface PoddRepositoryManager
 {
     /**
      * 
-     * @return A link to the initialised repository managed by this manager.
-     * @throws OpenRDFException
-     *             If there are any errors with the repository at this stage.
+     * @return The artifact management graph URI for this repository manager.
      */
-    Repository getRepository() throws OpenRDFException;
+    URI getArtifactManagementGraph();
+    
+    /**
+     * 
+     * @return The file repository management graph URI for this repository manager.
+     */
+    URI getFileRepositoryManagementGraph();
     
     /**
      * 
@@ -30,6 +34,34 @@ public interface PoddRepositoryManager
      * @throws OpenRDFException
      */
     Repository getNewTemporaryRepository() throws OpenRDFException;
+    
+    /**
+     * 
+     * @return A link to the initialised repository managed by this manager.
+     * @throws OpenRDFException
+     *             If there are any errors with the repository at this stage.
+     */
+    Repository getRepository() throws OpenRDFException;
+    
+    /**
+     * 
+     * @return The schema management graph URI for this repository manager.
+     */
+    URI getSchemaManagementGraph();
+    
+    /**
+     * Sets the artifact management graph URI for use with this repository manager.
+     * 
+     * @param artifactManagementGraph
+     */
+    void setArtifactManagementGraph(URI artifactManagementGraph);
+    
+    /**
+     * Sets the file repository management graph URI for use with this repository manager.
+     * 
+     * @param fileRepositoryManagementGraph
+     */
+    void setFileRepositoryManagementGraph(URI fileRepositoryManagementGraph);
     
     /**
      * Sets the repository for this repository manager.
@@ -42,42 +74,10 @@ public interface PoddRepositoryManager
     void setRepository(Repository repository) throws OpenRDFException;
     
     /**
-     * Sets the artifact management graph URI for use with this repository manager.
-     * 
-     * @param artifactManagementGraph
-     */
-    void setArtifactManagementGraph(URI artifactManagementGraph);
-    
-    /**
      * Sets the schema management graph URI for use with this repository manager.
      * 
      * @param schemaManagementGraph
      */
     void setSchemaManagementGraph(URI schemaManagementGraph);
     
-    /**
-     * Sets the file repository management graph URI for use with this repository manager.
-     * 
-     * @param fileRepositoryManagementGraph
-     */
-    void setFileRepositoryManagementGraph(URI fileRepositoryManagementGraph);
-    
-    /**
-     * 
-     * @return The schema management graph URI for this repository manager.
-     */
-    URI getSchemaManagementGraph();
-    
-    /**
-     * 
-     * @return The artifact management graph URI for this repository manager.
-     */
-    URI getArtifactManagementGraph();
-
-    /**
-     * 
-     * @return The file repository management graph URI for this repository manager.
-     */
-    URI getFileRepositoryManagementGraph();
-
 }

@@ -14,71 +14,31 @@ import org.openrdf.model.Value;
 public class FreemarkerUtil
 {
     
-    public boolean isUri(final Value value)
-    {
-        return value instanceof URI;
-    }
-    
-    public URI getUri(final Value value)
-    {
-        if(this.isUri(value))
-        {
-            return (URI)value;
-        }
-        return null;
-    }
-    
-    /**
-     * Rather hacky attempt to retrieve the datatype of a given Value object.
-     * TODO: Incomplete and needs to be fixed.
-     * 
-     * @param value
-     * @return
-     */
-    public String getDatatype(final Value value)
-    {
-        if (value instanceof Literal)
-        {
-            URI dataType = ((Literal)value).getDatatype();
-            if (dataType != null)
-            {
-                if (dataType.getNamespace().contains("http://www.w3.org/2001/XMLSchema#"))
-                {
-                    return "xsd:" + dataType.getLocalName();
-                }
-                
-                return dataType.stringValue();
-            }
-        }
-        return "TODO";
-    }
-    
-    
     /**
      * If the given object contains a URI with a protocol (scheme), clip it off.
      * 
      * @param object
      * @return
      */
-    public String clipProtocol(Object object)
+    public String clipProtocol(final Object object)
     {
-        if (object == null)
+        if(object == null)
         {
             return null;
         }
         
         // get String representation of input
         String result;
-        if (object instanceof Value)
+        if(object instanceof Value)
         {
-            Value v = (Value)object;
+            final Value v = (Value)object;
             result = v.stringValue();
         }
         else
         {
             result = object.toString();
         }
-
+        
         // clip the protocol part
         if(result.startsWith("mailto:") || result.startsWith("http://"))
         {
@@ -90,6 +50,45 @@ public class FreemarkerUtil
         }
         
         return result;
+    }
+    
+    /**
+     * Rather hacky attempt to retrieve the datatype of a given Value object. TODO: Incomplete and
+     * needs to be fixed.
+     * 
+     * @param value
+     * @return
+     */
+    public String getDatatype(final Value value)
+    {
+        if(value instanceof Literal)
+        {
+            final URI dataType = ((Literal)value).getDatatype();
+            if(dataType != null)
+            {
+                if(dataType.getNamespace().contains("http://www.w3.org/2001/XMLSchema#"))
+                {
+                    return "xsd:" + dataType.getLocalName();
+                }
+                
+                return dataType.stringValue();
+            }
+        }
+        return "TODO";
+    }
+    
+    public URI getUri(final Value value)
+    {
+        if(this.isUri(value))
+        {
+            return (URI)value;
+        }
+        return null;
+    }
+    
+    public boolean isUri(final Value value)
+    {
+        return value instanceof URI;
     }
     
 }

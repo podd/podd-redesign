@@ -12,8 +12,8 @@ import org.openrdf.model.URI;
 import com.github.podd.api.PoddRdfProcessor;
 
 /**
- * An interface that is instantiated by plugins to create file references for different types
- * of file references based on RDF triples.
+ * An interface that is instantiated by plugins to create file references for different types of
+ * file references based on RDF triples.
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  * 
@@ -21,15 +21,8 @@ import com.github.podd.api.PoddRdfProcessor;
 public interface FileReferenceProcessor<T extends FileReference> extends PoddRdfProcessor
 {
     /**
-     * 
-     * @return A Set of File Reference types that this Processor can handle.
-     */
-    Set<URI> getTypes();
-    
-    /**
      * Decides whether this File Reference Processor is able to extract references from the given
-     * input Model.
-     * <br>
+     * input Model. <br>
      * Returning true does not indicate that this processor is able to handle ALL file references
      * found in the Model, simply that it is able to examine the given Model and extract any file
      * references that matches types it knows of.
@@ -50,4 +43,10 @@ public interface FileReferenceProcessor<T extends FileReference> extends PoddRdf
      * @return A Collection of File References that were extracted from the given Model.
      */
     Collection<T> createReferences(Model rdfStatements);
+    
+    /**
+     * 
+     * @return A Set of File Reference types that this Processor can handle.
+     */
+    Set<URI> getTypes();
 }

@@ -90,40 +90,6 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public void init(final Model defaultAliasConfiguration) throws OpenRDFException, FileRepositoryException,
-        IOException
-    {
-        if(this.repositoryManager == null)
-        {
-            throw new NullPointerException("A RepositoryManager should be set before calling init()");
-        }
-        
-        if(this.getAllAliases().size() == 0)
-        {
-            this.log.warn("File Repository Graph is empty. Loading default configurations...");
-            
-            // validate the default alias file against the File Repository configuration schema
-            this.verifyFileRepositoryAgainstSchema(defaultAliasConfiguration);
-            
-            final Model allAliases =
-                    defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
-            
-            this.log.warn("Found {} default aliases to add", allAliases.size());
-            
-            for(final Statement stmt : allAliases)
-            {
-                final String alias = stmt.getObject().stringValue();
-                final Model model = defaultAliasConfiguration.filter(stmt.getSubject(), null, null);
-                
-                final PoddFileRepository<?> fileRepository =
-                        PoddFileRepositoryFactory.createFileRepository(alias, model);
-                
-                this.addRepositoryMapping(alias, fileRepository, false);
-            }
-        }
-    }
-    
-    @Override
     public void addRepositoryMapping(final String alias, final PoddFileRepository<?> repositoryConfiguration)
         throws OpenRDFException, FileRepositoryException
     {
@@ -237,12 +203,125 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
         }
     }
     
+    /**
+     * Helper method to verify that the statements of a given {@link Model} make up a consistent
+     * OWL-DL Ontology.
+     * 
+     * <br>
+     * 
+     * NOTES: Any ontologies imported must be already loaded into the OWLOntologyManager's memory
+     * before invoking this method. When this method returns, the ontology built from the input
+     * Model is in the OWLOntologyManager's memory.
+     * 
+     * @param model
+     *            A Model which should contain an Ontology
+     * @return The loaded Ontology if verification succeeds
+     * @throws FileRepositoryException
+     *             If verification fails
+     */
+    private OWLOntology checkForConsistentOwlDlOntology(final Model model) throws EmptyOntologyException,
+        OntologyNotInProfileException, InconsistentOntologyException
+    {
+        final RioRDFOntologyFormatFactory ontologyFormatFactory =
+                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
+                        RDFFormat.RDFXML.getDefaultMIMEType());
+        final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
+        
+        OWLOntology nextOntology = null;
+        
+        try
+        {
+            nextOntology = this.getOWLManager().getOWLOntologyManager().createOntology();
+            final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(model.iterator());
+            
+            owlParser.parse(owlSource, nextOntology);
+        }
+        catch(OWLOntologyCreationException | OWLParserException | IOException e)
+        {
+            // throwing up the original Exceptions is also a possibility here.
+            throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
+        }
+        
+        // Repository configuration can be an empty ontology
+        // if(nextOntology.isEmpty())
+        // {
+        // throw new EmptyOntologyException(nextOntology, "Ontology was empty");
+        // }
+        
+        // verify that the ontology in OWL-DL profile
+        final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(OWLProfile.OWL2_DL);
+        final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
+        if(!profileReport.isInProfile())
+        {
+            throw new OntologyNotInProfileException(nextOntology, profileReport, "Ontology not in OWL-DL profile");
+        }
+        
+        // check consistency
+        final OWLReasonerFactory reasonerFactory =
+                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+        final OWLReasoner reasoner = reasonerFactory.createReasoner(nextOntology);
+        
+        if(!reasoner.isConsistent())
+        {
+            this.getOWLManager().getOWLOntologyManager().removeOntology(nextOntology);
+            throw new InconsistentOntologyException(reasoner, "Ontology is inconsistent");
+        }
+        
+        return nextOntology;
+    }
+    
     @Override
     public void downloadFileReference(final FileReference nextFileReference, final OutputStream outputStream)
         throws PoddException, IOException
     {
         // TODO
         throw new RuntimeException("TODO: Implement me");
+    }
+    
+    /**
+     * Helper method to execute a given SPARQL Graph query.
+     * 
+     * @param sparqlQuery
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    private Model executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts) throws OpenRDFException
+    {
+        final DatasetImpl dataset = new DatasetImpl();
+        for(final URI uri : contexts)
+        {
+            dataset.addDefaultGraph(uri);
+        }
+        sparqlQuery.setDataset(dataset);
+        final Model results = new LinkedHashModel();
+        sparqlQuery.evaluate(new StatementCollector(results));
+        
+        return results;
+    }
+    
+    /**
+     * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
+     * 
+     * @param sparqlQuery
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    private QueryResultCollector executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
+        throws OpenRDFException
+    {
+        final DatasetImpl dataset = new DatasetImpl();
+        for(final URI uri : contexts)
+        {
+            dataset.addDefaultGraph(uri);
+        }
+        sparqlQuery.setDataset(dataset);
+        
+        final QueryResultCollector results = new QueryResultCollector();
+        QueryResults.report(sparqlQuery.evaluate(), results);
+        
+        return results;
     }
     
     @Override
@@ -288,6 +367,60 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
         }
         
         return results;
+    }
+    
+    @Override
+    public List<String> getEquivalentAliases(final String alias) throws FileRepositoryException, OpenRDFException
+    {
+        final List<String> results = new ArrayList<String>();
+        final String aliasInLowerCase = alias.toLowerCase();
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repositoryManager.getRepository().getConnection();
+            conn.begin();
+            
+            final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
+            
+            final StringBuilder sb = new StringBuilder();
+            
+            sb.append("SELECT ?otherAlias WHERE { ");
+            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?otherAlias .");
+            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
+            sb.append(" } ");
+            
+            this.log.debug("Created SPARQL {} with alias bound to '{}'", sb, aliasInLowerCase);
+            
+            final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+            query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase));
+            
+            final QueryResultCollector queryResults = this.executeSparqlQuery(query, context);
+            for(final BindingSet binding : queryResults.getBindingSets())
+            {
+                final Value member = binding.getValue("otherAlias");
+                results.add(member.stringValue());
+            }
+        }
+        finally
+        {
+            if(conn != null && conn.isActive())
+            {
+                conn.rollback();
+            }
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
+        
+        return results;
+    }
+    
+    @Override
+    public PoddOWLManager getOWLManager()
+    {
+        return this.owlManager;
     }
     
     @Override
@@ -368,63 +501,43 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public List<String> getEquivalentAliases(final String alias) throws FileRepositoryException, OpenRDFException
-    {
-        final List<String> results = new ArrayList<String>();
-        final String aliasInLowerCase = alias.toLowerCase();
-        
-        RepositoryConnection conn = null;
-        try
-        {
-            conn = this.repositoryManager.getRepository().getConnection();
-            conn.begin();
-            
-            final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
-            
-            final StringBuilder sb = new StringBuilder();
-            
-            sb.append("SELECT ?otherAlias WHERE { ");
-            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?otherAlias .");
-            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
-            sb.append(" } ");
-            
-            this.log.debug("Created SPARQL {} with alias bound to '{}'", sb, aliasInLowerCase);
-            
-            final TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-            query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase));
-            
-            final QueryResultCollector queryResults = this.executeSparqlQuery(query, context);
-            for(final BindingSet binding : queryResults.getBindingSets())
-            {
-                final Value member = binding.getValue("otherAlias");
-                results.add(member.stringValue());
-            }
-        }
-        finally
-        {
-            if(conn != null && conn.isActive())
-            {
-                conn.rollback();
-            }
-            if(conn != null && conn.isOpen())
-            {
-                conn.close();
-            }
-        }
-        
-        return results;
-    }
-    
-    @Override
-    public PoddOWLManager getOWLManager()
-    {
-        return this.owlManager;
-    }
-    
-    @Override
     public PoddRepositoryManager getRepositoryManager()
     {
         return this.repositoryManager;
+    }
+    
+    @Override
+    public void init(final Model defaultAliasConfiguration) throws OpenRDFException, FileRepositoryException,
+        IOException
+    {
+        if(this.repositoryManager == null)
+        {
+            throw new NullPointerException("A RepositoryManager should be set before calling init()");
+        }
+        
+        if(this.getAllAliases().size() == 0)
+        {
+            this.log.warn("File Repository Graph is empty. Loading default configurations...");
+            
+            // validate the default alias file against the File Repository configuration schema
+            this.verifyFileRepositoryAgainstSchema(defaultAliasConfiguration);
+            
+            final Model allAliases =
+                    defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
+            
+            this.log.warn("Found {} default aliases to add", allAliases.size());
+            
+            for(final Statement stmt : allAliases)
+            {
+                final String alias = stmt.getObject().stringValue();
+                final Model model = defaultAliasConfiguration.filter(stmt.getSubject(), null, null);
+                
+                final PoddFileRepository<?> fileRepository =
+                        PoddFileRepositoryFactory.createFileRepository(alias, model);
+                
+                this.addRepositoryMapping(alias, fileRepository, false);
+            }
+        }
     }
     
     @Override
@@ -590,119 +703,6 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                 this.getOWLManager().getOWLOntologyManager().removeOntology(fileRepositoryOntology);
             }
         }
-    }
-    
-    /**
-     * Helper method to verify that the statements of a given {@link Model} make up a consistent
-     * OWL-DL Ontology.
-     * 
-     * <br>
-     * 
-     * NOTES: Any ontologies imported must be already loaded into the OWLOntologyManager's memory
-     * before invoking this method. When this method returns, the ontology built from the input
-     * Model is in the OWLOntologyManager's memory.
-     * 
-     * @param model
-     *            A Model which should contain an Ontology
-     * @return The loaded Ontology if verification succeeds
-     * @throws FileRepositoryException
-     *             If verification fails
-     */
-    private OWLOntology checkForConsistentOwlDlOntology(final Model model) throws EmptyOntologyException,
-        OntologyNotInProfileException, InconsistentOntologyException
-    {
-        final RioRDFOntologyFormatFactory ontologyFormatFactory =
-                (RioRDFOntologyFormatFactory)OWLOntologyFormatFactoryRegistry.getInstance().getByMIMEType(
-                        RDFFormat.RDFXML.getDefaultMIMEType());
-        final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
-        
-        OWLOntology nextOntology = null;
-        
-        try
-        {
-            nextOntology = this.getOWLManager().getOWLOntologyManager().createOntology();
-            final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(model.iterator());
-            
-            owlParser.parse(owlSource, nextOntology);
-        }
-        catch(OWLOntologyCreationException | OWLParserException | IOException e)
-        {
-            // throwing up the original Exceptions is also a possibility here.
-            throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
-        }
-        
-        // Repository configuration can be an empty ontology
-        // if(nextOntology.isEmpty())
-        // {
-        // throw new EmptyOntologyException(nextOntology, "Ontology was empty");
-        // }
-        
-        // verify that the ontology in OWL-DL profile
-        final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(OWLProfile.OWL2_DL);
-        final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
-        if(!profileReport.isInProfile())
-        {
-            throw new OntologyNotInProfileException(nextOntology, profileReport, "Ontology not in OWL-DL profile");
-        }
-        
-        // check consistency
-        final OWLReasonerFactory reasonerFactory =
-                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
-        final OWLReasoner reasoner = reasonerFactory.createReasoner(nextOntology);
-        
-        if(!reasoner.isConsistent())
-        {
-            this.getOWLManager().getOWLOntologyManager().removeOntology(nextOntology);
-            throw new InconsistentOntologyException(reasoner, "Ontology is inconsistent");
-        }
-        
-        return nextOntology;
-    }
-    
-    /**
-     * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
-     * 
-     * @param sparqlQuery
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    private QueryResultCollector executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
-        throws OpenRDFException
-    {
-        final DatasetImpl dataset = new DatasetImpl();
-        for(final URI uri : contexts)
-        {
-            dataset.addDefaultGraph(uri);
-        }
-        sparqlQuery.setDataset(dataset);
-        
-        final QueryResultCollector results = new QueryResultCollector();
-        QueryResults.report(sparqlQuery.evaluate(), results);
-        
-        return results;
-    }
-    
-    /**
-     * Helper method to execute a given SPARQL Graph query.
-     * 
-     * @param sparqlQuery
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    private Model executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts) throws OpenRDFException
-    {
-        final DatasetImpl dataset = new DatasetImpl();
-        for(final URI uri : contexts)
-        {
-            dataset.addDefaultGraph(uri);
-        }
-        sparqlQuery.setDataset(dataset);
-        final Model results = new LinkedHashModel();
-        sparqlQuery.evaluate(new StatementCollector(results));
-        
-        return results;
     }
     
 }

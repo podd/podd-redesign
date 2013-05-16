@@ -24,6 +24,21 @@ import com.github.podd.utils.PoddWebConstants;
 public class AboutResourceImplTest extends AbstractResourceImplTest
 {
     /**
+     * Test authenticated access to /about
+     */
+    @Ignore
+    @Test
+    public void testGetAboutWithAuthentication() throws Exception
+    {
+        final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(aboutClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                        Status.SUCCESS_OK, this.testNoAdminPrivileges);
+        
+    }
+    
+    /**
      * Test unauthenticated access to /about
      */
     @Test
@@ -36,7 +51,7 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
                         MediaType.TEXT_HTML, Status.SUCCESS_OK);
         
         final String body = results.getText();
-        assertFreemarker(body);
+        this.assertFreemarker(body);
         Assert.assertTrue(body.contains("The University of Queensland"));
     }
     
@@ -64,21 +79,6 @@ public class AboutResourceImplTest extends AbstractResourceImplTest
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(creationClientResource, Method.POST, form,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
-        
-    }
-    
-    /**
-     * Test authenticated access to /about
-     */
-    @Ignore
-    @Test
-    public void testGetAboutWithAuthentication() throws Exception
-    {
-        final ClientResource aboutClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ABOUT));
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(aboutClientResource, Method.GET, null, MediaType.TEXT_HTML,
-                        Status.SUCCESS_OK, this.testNoAdminPrivileges);
         
     }
     

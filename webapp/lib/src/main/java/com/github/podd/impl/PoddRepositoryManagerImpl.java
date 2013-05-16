@@ -94,11 +94,11 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public void setFileRepositoryManagementGraph(URI fileRepositoryManagementGraph)
+    public void setFileRepositoryManagementGraph(final URI fileRepositoryManagementGraph)
     {
         this.fileRepositoryGraph = fileRepositoryManagementGraph;
     }
-
+    
     @Override
     public void setRepository(final Repository repository) throws OpenRDFException
     {
@@ -110,5 +110,5 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     {
         this.schemaGraph = schemaManagementGraph;
     }
-
+    
 }

@@ -22,7 +22,6 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.PoddRdfProcessor;
 import com.github.podd.api.PoddRdfProcessorFactory;
 import com.github.podd.api.file.FileReferenceProcessor;
 import com.github.podd.api.file.SSHFileReference;
@@ -93,7 +92,7 @@ public class SSHFileReferenceProcessorFactoryImplTest extends
             final Model model = QueryResults.asModel(query.evaluate());
             
             Assert.assertFalse("Empty Model, no file references found.", model.isEmpty());
-            Model type = model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE);
+            final Model type = model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE);
             Assert.assertEquals("Expected 2 file references", 2, type.size());
         }
         finally
@@ -151,7 +150,7 @@ public class SSHFileReferenceProcessorFactoryImplTest extends
             // verify SPARQL generated a graph as expected
             final Model model = QueryResults.asModel(query.evaluate());
             Assert.assertFalse("Empty Model, no file references found.", model.isEmpty());
-            Model type = model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE);
+            final Model type = model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE);
             Assert.assertEquals("Expected only 1 file reference", 1, type.size());
             Assert.assertEquals("Not the expected file reference", fileReference, type.subjects().iterator().next()
                     .stringValue());

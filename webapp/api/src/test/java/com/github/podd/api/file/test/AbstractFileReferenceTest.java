@@ -45,17 +45,17 @@ public abstract class AbstractFileReferenceTest
     }
     
     @Test
-    public void testGetObjectIRI() throws Exception
-    {
-        this.fileReference.getObjectIri();
-    }
-
-    @Test
     public void testGetLabel() throws Exception
     {
         this.fileReference.getLabel();
     }
-
+    
+    @Test
+    public void testGetObjectIRI() throws Exception
+    {
+        this.fileReference.getObjectIri();
+    }
+    
     @Test
     public void testGetRepositoryAlias() throws Exception
     {
@@ -65,32 +65,31 @@ public abstract class AbstractFileReferenceTest
     @Test
     public void testSetArtifactID() throws Exception
     {
-        InferredOWLOntologyID ontologyID = new InferredOWLOntologyID(
-                IRI.create("urn:test:ontologyiri:abc"), 
-                IRI.create("urn:test:versioniri:abc:version:44"),
-                IRI.create("urn:test:inferred:versioniri:abc:version:44")
-                );
+        final InferredOWLOntologyID ontologyID =
+                new InferredOWLOntologyID(IRI.create("urn:test:ontologyiri:abc"),
+                        IRI.create("urn:test:versioniri:abc:version:44"),
+                        IRI.create("urn:test:inferred:versioniri:abc:version:44"));
         
         this.fileReference.setArtifactID(ontologyID);
     }
     
     @Test
-    public void testSetObjectIRI() throws Exception
-    {
-        IRI objectIri = IRI.create("urn:test:objectiri:podd-object:4a");
-        this.fileReference.setObjectIri(objectIri);
-    }
-
-    @Test
     public void testSetLabel() throws Exception
     {
         this.fileReference.setLabel("Test Label");
     }
-
+    
+    @Test
+    public void testSetObjectIRI() throws Exception
+    {
+        final IRI objectIri = IRI.create("urn:test:objectiri:podd-object:4a");
+        this.fileReference.setObjectIri(objectIri);
+    }
+    
     @Test
     public void testSetRepositoryAlias() throws Exception
     {
         this.fileReference.setRepositoryAlias("Test Repository Alias");
     }
-
+    
 }

@@ -6,9 +6,8 @@ package com.github.podd.api.purl.test;
 import java.io.InputStream;
 import java.util.Set;
 
-import org.junit.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Statement;
@@ -53,6 +52,24 @@ public abstract class AbstractPoddPurlManagerTest
      * @return A new PurlProcessorFactory Registry for use by this test
      */
     public abstract PoddPurlProcessorFactoryRegistry getNewPoddPurlProcessorFactoryRegistry();
+    
+    /**
+     * Helper method loads RDF statements from a test resource into the test Repository.
+     * 
+     * @return The context into which the statements are loaded
+     * @throws Exception
+     */
+    protected URI loadTestResources() throws Exception
+    {
+        final String resourcePath = TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT;
+        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
+        Assert.assertNotNull("Could not find resource", inputStream);
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
+        
+        return context;
+    }
     
     @Before
     public void setUp() throws Exception
@@ -147,22 +164,6 @@ public abstract class AbstractPoddPurlManagerTest
         Assert.assertEquals("Repository Size should not have changed", repoSize, this.testRepositoryConnection.size());
     }
     
-    @Test
-    public void testConvertTemporaryUrisWithNullPurlSet() throws Exception
-    {
-        final URI context = this.loadTestResources();
-        try
-        {
-            this.testPurlManager.convertTemporaryUris(null, this.testRepositoryConnection, context);
-            Assert.fail("Should have thrown a NullPointerException");
-        }
-        catch(final NullPointerException e)
-        {
-            // this expected Exception is thrown without a message
-            Assert.assertEquals("A NULL message was expected", null, e.getMessage());
-        }
-    }
-    
     /**
      * Tests calling convertTemporaryUris() with a non-empty PurlSet on an empty Repository.
      * 
@@ -199,6 +200,22 @@ public abstract class AbstractPoddPurlManagerTest
             emptyRepositoryConnection.rollback();
             emptyRepositoryConnection.close();
             emptyRepository.shutDown();
+        }
+    }
+    
+    @Test
+    public void testConvertTemporaryUrisWithNullPurlSet() throws Exception
+    {
+        final URI context = this.loadTestResources();
+        try
+        {
+            this.testPurlManager.convertTemporaryUris(null, this.testRepositoryConnection, context);
+            Assert.fail("Should have thrown a NullPointerException");
+        }
+        catch(final NullPointerException e)
+        {
+            // this expected Exception is thrown without a message
+            Assert.assertEquals("A NULL message was expected", null, e.getMessage());
         }
     }
     
@@ -271,24 +288,6 @@ public abstract class AbstractPoddPurlManagerTest
         this.testPurlManager.setPurlProcessorFactoryRegistry(this.testRegistry);
         
         Assert.assertNotNull("getRegistry() returned null ", this.testPurlManager.getPurlProcessorFactoryRegistry());
-    }
-    
-    /**
-     * Helper method loads RDF statements from a test resource into the test Repository.
-     * 
-     * @return The context into which the statements are loaded
-     * @throws Exception
-     */
-    protected URI loadTestResources() throws Exception
-    {
-        final String resourcePath = TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT;
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
-        
-        final InputStream inputStream = this.getClass().getResourceAsStream(resourcePath);
-        Assert.assertNotNull("Could not find resource", inputStream);
-        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-        
-        return context;
     }
     
 }

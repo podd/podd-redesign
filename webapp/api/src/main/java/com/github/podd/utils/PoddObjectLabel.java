@@ -11,14 +11,9 @@ import org.openrdf.model.URI;
 public interface PoddObjectLabel
 {
     /**
-     * @return the parentArtifactID
+     * @return the description
      */
-    InferredOWLOntologyID getOntologyID();
-    
-    /**
-     * @return the objectID
-     */
-    URI getObjectURI();
+    String getDescription();
     
     /**
      * @return the label
@@ -26,7 +21,12 @@ public interface PoddObjectLabel
     String getLabel();
     
     /**
-     * @return the description
+     * @return the objectID
      */
-    String getDescription();
+    URI getObjectURI();
+    
+    /**
+     * @return the parentArtifactID
+     */
+    InferredOWLOntologyID getOntologyID();
 }

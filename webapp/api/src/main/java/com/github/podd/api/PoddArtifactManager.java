@@ -34,6 +34,13 @@ import com.github.podd.utils.InferredOWLOntologyID;
  */
 public interface PoddArtifactManager
 {
+    InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
+            FileReference fileReference) throws OpenRDFException, PoddException;
+    
+    InferredOWLOntologyID attachFileReferences(URI artifactUri, URI versionUri, InputStream inputStream,
+            RDFFormat format, FileReferenceVerificationPolicy fileReferenceVerificationPolicy) throws OpenRDFException,
+        IOException, OWLException, PoddException;
+    
     /**
      * Deletes the given artifact if and only if it is available and it is not currently published.
      * <p>
@@ -76,7 +83,7 @@ public interface PoddArtifactManager
      */
     void exportArtifact(InferredOWLOntologyID ontologyId, OutputStream outputStream, RDFFormat format,
             boolean includeInferred) throws OpenRDFException, PoddException, IOException;
-
+    
     /**
      * Exports metadata about the given object Type to the given output stream using an RDF Format.
      * This method is only to be used to obtain metadata for display purposes.
@@ -116,6 +123,12 @@ public interface PoddArtifactManager
      *         artifacts.
      */
     FileReferenceManager getFileReferenceManager();
+    
+    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId);
+    
+    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
+    
+    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
     
     /**
      * 
@@ -339,18 +352,5 @@ public interface PoddArtifactManager
      */
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
             Set<OWLOntologyID> oldSchemaOntologyIds, Set<OWLOntologyID> newSchemaOntologyIds);
-    
-    InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
-            FileReference fileReference) throws OpenRDFException, PoddException;
-    
-    InferredOWLOntologyID attachFileReferences(URI artifactUri, URI versionUri, InputStream inputStream,
-            RDFFormat format, FileReferenceVerificationPolicy fileReferenceVerificationPolicy) throws OpenRDFException,
-        IOException, OWLException, PoddException;
-    
-    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId);
-    
-    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
-    
-    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
     
 }

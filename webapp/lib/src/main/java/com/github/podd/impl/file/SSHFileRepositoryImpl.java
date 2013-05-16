@@ -138,7 +138,7 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
                     return false;
                 }
             }
-            catch (IOException e)
+            catch(final IOException e)
             {
                 // lstat() throws an IOException if the file does not exist
                 return false;

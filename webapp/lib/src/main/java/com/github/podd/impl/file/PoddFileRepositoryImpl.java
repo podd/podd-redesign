@@ -64,7 +64,7 @@ public abstract class PoddFileRepositoryImpl<T extends FileReference> implements
         
         // types
         final Set<Value> typeValues = model.filter(this.aliasUri, RDF.TYPE, null).objects();
-        for(Value value : typeValues)
+        for(final Value value : typeValues)
         {
             if(value instanceof URI)
             {

@@ -34,38 +34,78 @@ public class OntologyUtils
 {
     private static final Logger log = LoggerFactory.getLogger(OntologyUtils.class);
     
-    private OntologyUtils()
-    {
-    }
-    
     /**
-     * Serialises the given collection of {@link InferredOWLOntologyID} objects to RDF, adding the
-     * {@link Statement}s to the given {@link Model}, or creating a new Model if the given model is
-     * null.
-     * <p>
-     * This method wraps the serialisation from {@link InferredOWLOntologyID#toRDF()}.
+     * Extracts the {@link InferredOWLOntologyID} instances that are represented as RDF
+     * {@link Statement}s in the given {@link Model}.
      * 
      * @param input
-     *            The collection of {@link InferredOWLOntologyID} objects to render to RDF.
-     * @param result
-     *            The Model to contain the resulting statements, or null to have one created
-     *            internally
-     * @return A model containing the RDF statements about the given ontologies.
-     * @throws RDFHandlerException
-     *             If there is an error while handling the statements.
+     *            The input model containing RDF statements.
+     * @return A Collection of {@link InferredOWLOntologyID} instances derived from the statements
+     *         in the model.
      */
-    public static Model ontologyIDsToModel(Collection<InferredOWLOntologyID> input, Model result)
+    public static List<InferredOWLOntologyID> modelToOntologyIDs(final Model input)
     {
-        Model results = result;
+        final List<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
         
-        if(results == null)
-        {
-            results = new LinkedHashModel();
-        }
+        final Model typedOntologies = input.filter(null, RDF.TYPE, OWL.ONTOLOGY);
         
-        for(InferredOWLOntologyID nextOntology : input)
+        for(final Statement nextTypeStatement : typedOntologies)
         {
-            results.addAll(nextOntology.toRDF());
+            if(nextTypeStatement.getSubject() instanceof URI)
+            {
+                final Model versions = input.filter(nextTypeStatement.getSubject(), OWL.VERSIONIRI, null);
+                
+                for(final Statement nextVersion : versions)
+                {
+                    if(nextVersion.getObject() instanceof URI)
+                    {
+                        final Model inferredOntologies =
+                                input.filter((URI)nextVersion.getObject(), PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
+                                        null);
+                        
+                        if(inferredOntologies.isEmpty())
+                        {
+                            // If there were no poddBase#inferredVersion statements, backup by
+                            // trying to infer the versions using owl:imports
+                            final Model importsOntologies = input.filter(null, OWL.IMPORTS, nextVersion.getObject());
+                            
+                            if(importsOntologies.isEmpty())
+                            {
+                                results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
+                                        (URI)nextVersion.getObject(), null));
+                            }
+                            else
+                            {
+                                for(final Statement nextImportOntology : importsOntologies)
+                                {
+                                    if(nextImportOntology.getSubject() instanceof URI)
+                                    {
+                                        results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
+                                                (URI)nextVersion.getObject(), (URI)nextImportOntology.getSubject()));
+                                    }
+                                    else
+                                    {
+                                        OntologyUtils.log.error("Found a non-URI import statement: {}",
+                                                nextImportOntology);
+                                    }
+                                    
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for(final Statement nextInferredOntology : inferredOntologies)
+                            {
+                                if(nextInferredOntology.getObject() instanceof URI)
+                                {
+                                    results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
+                                            (URI)nextVersion.getObject(), (URI)nextInferredOntology.getObject()));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         
         return results;
@@ -84,12 +124,12 @@ public class OntologyUtils
      * @throws RDFHandlerException
      *             If there is an error while handling the statements.
      */
-    public static void ontologyIDsToHandler(Collection<InferredOWLOntologyID> input, RDFHandler handler)
+    public static void ontologyIDsToHandler(final Collection<InferredOWLOntologyID> input, final RDFHandler handler)
         throws RDFHandlerException
     {
-        for(InferredOWLOntologyID nextOntology : input)
+        for(final InferredOWLOntologyID nextOntology : input)
         {
-            for(Statement nextStatement : nextOntology.toRDF())
+            for(final Statement nextStatement : nextOntology.toRDF())
             {
                 handler.handleStatement(nextStatement);
             }
@@ -97,108 +137,41 @@ public class OntologyUtils
     }
     
     /**
-     * Extracts the {@link InferredOWLOntologyID} instances that are represented as RDF
-     * {@link Statement}s in the given {@link Model}.
+     * Serialises the given collection of {@link InferredOWLOntologyID} objects to RDF, adding the
+     * {@link Statement}s to the given {@link Model}, or creating a new Model if the given model is
+     * null.
+     * <p>
+     * This method wraps the serialisation from {@link InferredOWLOntologyID#toRDF()}.
      * 
      * @param input
-     *            The input model containing RDF statements.
-     * @return A Collection of {@link InferredOWLOntologyID} instances derived from the statements
-     *         in the model.
+     *            The collection of {@link InferredOWLOntologyID} objects to render to RDF.
+     * @param result
+     *            The Model to contain the resulting statements, or null to have one created
+     *            internally
+     * @return A model containing the RDF statements about the given ontologies.
+     * @throws RDFHandlerException
+     *             If there is an error while handling the statements.
      */
-    public static List<InferredOWLOntologyID> modelToOntologyIDs(Model input)
+    public static Model ontologyIDsToModel(final Collection<InferredOWLOntologyID> input, final Model result)
     {
-        List<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
+        Model results = result;
         
-        Model typedOntologies = input.filter(null, RDF.TYPE, OWL.ONTOLOGY);
-        
-        for(Statement nextTypeStatement : typedOntologies)
+        if(results == null)
         {
-            if(nextTypeStatement.getSubject() instanceof URI)
-            {
-                Model versions = input.filter((URI)nextTypeStatement.getSubject(), OWL.VERSIONIRI, null);
-                
-                for(Statement nextVersion : versions)
-                {
-                    if(nextVersion.getObject() instanceof URI)
-                    {
-                        Model inferredOntologies =
-                                input.filter((URI)nextVersion.getObject(), PoddRdfConstants.PODD_BASE_INFERRED_VERSION,
-                                        null);
-                        
-                        if(inferredOntologies.isEmpty())
-                        {
-                            // If there were no poddBase#inferredVersion statements, backup by
-                            // trying to infer the versions using owl:imports
-                            Model importsOntologies = input.filter(null, OWL.IMPORTS, (URI)nextVersion.getObject());
-                            
-                            if(importsOntologies.isEmpty())
-                            {
-                                results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
-                                        (URI)nextVersion.getObject(), null));
-                            }
-                            else
-                            {
-                                for(Statement nextImportOntology : importsOntologies)
-                                {
-                                    if(nextImportOntology.getSubject() instanceof URI)
-                                    {
-                                        results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
-                                                (URI)nextVersion.getObject(), (URI)nextImportOntology.getSubject()));
-                                    }
-                                    else
-                                    {
-                                        log.error("Found a non-URI import statement: {}", nextImportOntology);
-                                    }
-                                    
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for(Statement nextInferredOntology : inferredOntologies)
-                            {
-                                if(nextInferredOntology.getObject() instanceof URI)
-                                {
-                                    results.add(new InferredOWLOntologyID((URI)nextTypeStatement.getSubject(),
-                                            (URI)nextVersion.getObject(), (URI)nextInferredOntology.getObject()));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            results = new LinkedHashModel();
+        }
+        
+        for(final InferredOWLOntologyID nextOntology : input)
+        {
+            results.addAll(nextOntology.toRDF());
         }
         
         return results;
     }
     
-    /**
-     * Extracts the {@link InferredOWLOntologyID} instances that are represented as RDF
-     * {@link Statement}s in the given {@link String}.
-     * 
-     * @param string
-     *            The input string containing RDF statements.
-     * @param format
-     *            The format of RDF statements in the string  
-     * @return A Collection of {@link InferredOWLOntologyID} instances derived from the statements
-     *         in the string.
-     * @throws OpenRDFException
-     * @throws IOException
-     */
-    public static Collection<InferredOWLOntologyID> stringToOntologyID(String string, RDFFormat format)
-        throws OpenRDFException, IOException
+    public static Model ontologyIDToRDF(final OWLOntologyID ontology, final Model result)
     {
-        Model model = new LinkedHashModel();
-        RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(model));
-        parser.parse(new StringReader(string), "");
-        
-        return OntologyUtils.modelToOntologyIDs(model);
-    }
-
-    public static Model ontologyIDToRDF(OWLOntologyID ontology, Model result)
-    {
-        ValueFactory vf = ValueFactoryImpl.getInstance();
+        final ValueFactory vf = ValueFactoryImpl.getInstance();
         
         if(ontology.getOntologyIRI() != null)
         {
@@ -210,8 +183,8 @@ public class OntologyUtils
                         .getVersionIRI().toOpenRDFURI()));
                 if(ontology instanceof InferredOWLOntologyID)
                 {
-                    InferredOWLOntologyID inferredOntology = (InferredOWLOntologyID)ontology;
-                    if(((InferredOWLOntologyID)inferredOntology).getInferredOntologyIRI() != null)
+                    final InferredOWLOntologyID inferredOntology = (InferredOWLOntologyID)ontology;
+                    if(inferredOntology.getInferredOntologyIRI() != null)
                     {
                         result.add(vf.createStatement(inferredOntology.getInferredOntologyIRI().toOpenRDFURI(),
                                 RDF.TYPE, OWL.ONTOLOGY));
@@ -224,5 +197,33 @@ public class OntologyUtils
         }
         
         return result;
+    }
+    
+    /**
+     * Extracts the {@link InferredOWLOntologyID} instances that are represented as RDF
+     * {@link Statement}s in the given {@link String}.
+     * 
+     * @param string
+     *            The input string containing RDF statements.
+     * @param format
+     *            The format of RDF statements in the string
+     * @return A Collection of {@link InferredOWLOntologyID} instances derived from the statements
+     *         in the string.
+     * @throws OpenRDFException
+     * @throws IOException
+     */
+    public static Collection<InferredOWLOntologyID> stringToOntologyID(final String string, final RDFFormat format)
+        throws OpenRDFException, IOException
+    {
+        final Model model = new LinkedHashModel();
+        final RDFParser parser = Rio.createParser(format);
+        parser.setRDFHandler(new StatementCollector(model));
+        parser.parse(new StringReader(string), "");
+        
+        return OntologyUtils.modelToOntologyIDs(model);
+    }
+    
+    private OntologyUtils()
+    {
     }
 }

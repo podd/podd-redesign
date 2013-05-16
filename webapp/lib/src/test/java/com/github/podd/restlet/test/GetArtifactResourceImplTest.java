@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.rio.RDFFormat;
@@ -139,7 +138,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         this.assertFreemarker(body);
         
-        Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 14);
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 14);
         
         // RDFa generates spurious triples, use at your own risk
         // Only rely on numbers from actual RDF serialisations
@@ -147,31 +147,129 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals(12, model.predicates().size());
         Assert.assertEquals(14, model.objects().size());
         
-        if(log.isDebugEnabled())
+        if(this.log.isDebugEnabled())
         {
             DebugUtils.printContents(model);
         }
     }
     
     /**
-     * Test parsing a simple RDFa document
+     * Test authenticated access to get Artifact in RDF/JSON
      */
     @Test
-    public void testSimpleRDFaParse() throws Exception
+    public void testGetArtifactBasicJson() throws Exception
     {
-        StringBuilder sb = new StringBuilder();
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
-        sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML+RDFa 1.0//EN\" \"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd\">");
-        sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\"");
-        sb.append(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"");
-        sb.append(" version=\"XHTML+RDFa 1.0\">");
-        sb.append("<head>");
-        sb.append(" <link rel=\"stylesheet\" href=\"http://localhost:8080/test/styles/mystyle.css\" media=\"screen\" type=\"text/css\" />");
-        sb.append("</head>");
-        sb.append("<body>");
-        sb.append("</body>");
-        sb.append("</html>");
-        assertRdf(new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 1);
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        // System.out.println(body);
+        
+        // verify: received contents are in RDF/JSON
+        // Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));
+        
+        // verify: received contents have artifact's ontology and version IRIs
+        Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
+        
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFJSON, 28);
+        
+        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(15, model.predicates().size());
+        Assert.assertEquals(24, model.objects().size());
+        
+        if(this.log.isDebugEnabled())
+        {
+            DebugUtils.printContents(model);
+        }
+    }
+    
+    /**
+     * Test authenticated access to get Artifact in RDF/XML
+     */
+    @Test
+    public void testGetArtifactBasicRdf() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify: received contents are in RDF
+        Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
+        Assert.assertTrue("Result does not have RDF", body.endsWith("</rdf:RDF>"));
+        
+        // verify: received contents have artifact URI
+        Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
+        
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 28);
+        
+        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(15, model.predicates().size());
+        Assert.assertEquals(24, model.objects().size());
+        
+        if(this.log.isDebugEnabled())
+        {
+            DebugUtils.printContents(model);
+        }
+    }
+    
+    /**
+     * Test authenticated access to get Artifact in RDF/Turtle
+     */
+    @Test
+    public void testGetArtifactBasicTurtle() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify: received contents are in Turtle
+        Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));
+        
+        // verify: received contents have artifact's ontology and version IRIs
+        Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
+        
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 28);
+        
+        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(15, model.predicates().size());
+        Assert.assertEquals(24, model.objects().size());
+        
+        if(this.log.isDebugEnabled())
+        {
+            DebugUtils.printContents(model);
+        }
     }
     
     /**
@@ -243,119 +341,24 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
-     * Test authenticated access to get Artifact in RDF/XML
+     * Test parsing a simple RDFa document
      */
     @Test
-    public void testGetArtifactBasicRdf() throws Exception
+    public void testSimpleRDFaParse() throws Exception
     {
-        // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        final StringBuilder sb = new StringBuilder();
         
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = results.getText();
-        
-        // verify: received contents are in RDF
-        Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
-        Assert.assertTrue("Result does not have RDF", body.endsWith("</rdf:RDF>"));
-        
-        // verify: received contents have artifact URI
-        Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
-        
-        Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 28);
-        
-        Assert.assertEquals(5, model.subjects().size());
-        Assert.assertEquals(15, model.predicates().size());
-        Assert.assertEquals(24, model.objects().size());
-        
-        if(log.isDebugEnabled())
-        {
-            DebugUtils.printContents(model);
-        }
-    }
-    
-    /**
-     * Test authenticated access to get Artifact in RDF/Turtle
-     */
-    @Test
-    public void testGetArtifactBasicTurtle() throws Exception
-    {
-        // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = results.getText();
-        
-        // verify: received contents are in Turtle
-        Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));
-        
-        // verify: received contents have artifact's ontology and version IRIs
-        Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
-        
-        Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 28);
-        
-        Assert.assertEquals(5, model.subjects().size());
-        Assert.assertEquals(15, model.predicates().size());
-        Assert.assertEquals(24, model.objects().size());
-        
-        if(log.isDebugEnabled())
-        {
-            DebugUtils.printContents(model);
-        }
-    }
-    
-    /**
-     * Test authenticated access to get Artifact in RDF/JSON
-     */
-    @Test
-    public void testGetArtifactBasicJson() throws Exception
-    {
-        // prepare: add an artifact
-        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                        RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = results.getText();
-        // System.out.println(body);
-        
-        // verify: received contents are in RDF/JSON
-        // Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));
-        
-        // verify: received contents have artifact's ontology and version IRIs
-        Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
-        
-        Model model = assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFJSON, 28);
-        
-        Assert.assertEquals(5, model.subjects().size());
-        Assert.assertEquals(15, model.predicates().size());
-        Assert.assertEquals(24, model.objects().size());
-        
-        if(log.isDebugEnabled())
-        {
-            DebugUtils.printContents(model);
-        }
+        sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML+RDFa 1.0//EN\" \"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd\">");
+        sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\"");
+        sb.append(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"");
+        sb.append(" version=\"XHTML+RDFa 1.0\">");
+        sb.append("<head>");
+        sb.append(" <link rel=\"stylesheet\" href=\"http://localhost:8080/test/styles/mystyle.css\" media=\"screen\" type=\"text/css\" />");
+        sb.append("</head>");
+        sb.append("<body>");
+        sb.append("</body>");
+        sb.append("</html>");
+        this.assertRdf(new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 1);
     }
     
 }

@@ -93,19 +93,6 @@ public abstract class AbstractFileReferenceManagerTest
     }
     
     @Test
-    public void testExtractFileReferencesFromRepositoryWithoutFileReferences() throws Exception
-    {
-        final URI randomContext =
-                ValueFactoryImpl.getInstance().createURI("urn:random:" + UUID.randomUUID().toString());
-        final InputStream resourceStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        this.testRepositoryConnection.add(resourceStream, "", RDFFormat.TURTLE, randomContext);
-        
-        final Set<FileReference> extractedFileReferences =
-                this.testFileReferenceManager.extractFileReferences(this.testRepositoryConnection, randomContext);
-        Assert.assertTrue("Should not have found any file references", extractedFileReferences.isEmpty());
-    }
-    
-    @Test
     public void testExtractFileReferencesFromRepositoryWith1FileRef() throws Exception
     {
         final URI randomContext =
@@ -167,6 +154,19 @@ public abstract class AbstractFileReferenceManagerTest
                     expectedAliases.contains(fileReference.getRepositoryAlias()));
         }
         
+    }
+    
+    @Test
+    public void testExtractFileReferencesFromRepositoryWithoutFileReferences() throws Exception
+    {
+        final URI randomContext =
+                ValueFactoryImpl.getInstance().createURI("urn:random:" + UUID.randomUUID().toString());
+        final InputStream resourceStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        this.testRepositoryConnection.add(resourceStream, "", RDFFormat.TURTLE, randomContext);
+        
+        final Set<FileReference> extractedFileReferences =
+                this.testFileReferenceManager.extractFileReferences(this.testRepositoryConnection, randomContext);
+        Assert.assertTrue("Should not have found any file references", extractedFileReferences.isEmpty());
     }
     
     // TODO add more tests

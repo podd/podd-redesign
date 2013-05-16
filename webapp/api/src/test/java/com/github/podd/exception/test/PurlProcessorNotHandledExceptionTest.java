@@ -4,7 +4,6 @@
 package com.github.podd.exception.test;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.openrdf.model.URI;

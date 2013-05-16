@@ -122,9 +122,9 @@ public interface PoddWebConstants
      * Path to the ontology search service
      */
     public static final String PATH_SEARCH = "search";
-
+    
     /**
-     * Path to create object service 
+     * Path to create object service
      */
     public static final String PATH_OBJECT_ADD = "artifact/addobject";
     
@@ -157,7 +157,7 @@ public interface PoddWebConstants
      * Key used to represent the file reference verification policy to use
      */
     public static final String KEY_VERIFICATION_POLICY = "file_verification";
-
+    
     /**
      * Key used to represent a specific help page as part of a request
      */
@@ -177,42 +177,42 @@ public interface PoddWebConstants
      * Key used to select unpublished artifacts. Defaults to true for authenticated users.
      */
     public static final String KEY_UNPUBLISHED = "unpublished";
-
+    
     /**
      * Key used in "edit" artifact to indicate whether it should be a "merge" or "replace".
      */
     public static final String KEY_EDIT_WITH_REPLACE = "isreplace";
-
+    
     /**
      * Key used in "edit" artifact to indicate whether any internal object deletions should be
      * carried out without seeking user confirmation.
      */
     public static final String KEY_EDIT_WITH_FORCE = "isforce";
-
+    
     /**
-     * Key used in "edit" artifact to indicate whether any updated file references
-     * should be verified (for existence of the resource).
+     * Key used in "edit" artifact to indicate whether any updated file references should be
+     * verified (for existence of the resource).
      */
     public static final String KEY_EDIT_VERIFY_FILE_REFERENCES = "verifyfilerefs";
-
+    
     /**
      * Key used in "search" service to specify the term being searched for.
      */
     public static final String KEY_SEARCHTERM = "searchterm";
-
+    
     /**
      * Key used in "search" service to specify the RDF types of objects being searched for.
      */
     public static final String KEY_SEARCH_TYPES = "searchtypes";
-
+    
     /**
      * Key used in "create object" service to indicate the type of object to be generated.
      */
     public static final String KEY_OBJECT_TYPE_IDENTIFIER = "objecttypeuri";
-
+    
     /**
      * Key used in "create object" service to indicate the type of object to be generated.
      */
     public static final String KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES = "includedndprops";
-
+    
 }

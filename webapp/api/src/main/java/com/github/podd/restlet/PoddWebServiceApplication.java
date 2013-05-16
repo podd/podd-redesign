@@ -1,11 +1,9 @@
 package com.github.podd.restlet;
 
-import java.io.InputStream;
 import java.util.Collection;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.rio.RDFFormat;
 import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -50,6 +48,8 @@ public abstract class PoddWebServiceApplication extends Application
     public abstract boolean authenticate(PoddAction action, Request request, Response response,
             Collection<URI> optionalObjectUris);
     
+    public abstract Model getAliasesConfiguration();
+    
     /**
      * 
      * @return The ChallengeAuthenticator which is currently being used to respond to queries that
@@ -76,6 +76,8 @@ public abstract class PoddWebServiceApplication extends Application
      * @return
      */
     public abstract Configuration getTemplateConfiguration();
+    
+    public abstract void setAliasesConfiguration(Model aliasesConfiguration);
     
     /**
      * 
@@ -106,9 +108,5 @@ public abstract class PoddWebServiceApplication extends Application
      * @param nextFreemarkerConfiguration
      */
     public abstract void setTemplateConfiguration(Configuration nextFreemarkerConfiguration);
-    
-    public abstract Model getAliasesConfiguration();
-    
-    public abstract void setAliasesConfiguration(Model aliasesConfiguration);
     
 }

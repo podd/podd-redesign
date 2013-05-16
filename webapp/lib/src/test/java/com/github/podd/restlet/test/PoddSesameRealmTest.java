@@ -111,6 +111,30 @@ public class PoddSesameRealmTest
         }
     }
     
+    /**
+     * Test that a User can be added with PODD-specific attributes (Organization, ORCID, HomePage).
+     */
+    @Test
+    public void testAddUserSimple() throws Exception
+    {
+        final String testUserId1 = "john@example.com";
+        final PoddUser testUser = this.addTestUser(testUserId1);
+        
+        // - add a test user
+        this.testRealm.addUser(testUser);
+        
+        final RestletUtilUser retrievedUser = this.testRealm.findUser(testUserId1);
+        Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
+        Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
+        
+        final PoddUser recvdPoddUser = (PoddUser)retrievedUser;
+        Assert.assertEquals("Returned user ORCID different to original", "SOME_ORCID_ID", recvdPoddUser.getOrcid());
+        Assert.assertEquals("Returned user URI different to original", testUser.getHomePage(),
+                recvdPoddUser.getHomePage());
+        Assert.assertEquals("Returned user Organization different to original", "Some Organization",
+                recvdPoddUser.getOrganization());
+    }
+    
     @Test
     public void testGetCommonRolesForObjectsWithMiscCombinations() throws Exception
     {
@@ -364,30 +388,6 @@ public class PoddSesameRealmTest
         final List<Statement> list4 = this.getStatementList(null, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, null);
         Assert.assertFalse(list4.isEmpty());
         Assert.assertEquals(2, list4.size());
-    }
-    
-    /**
-     * Test that a User can be added with PODD-specific attributes (Organization, ORCID, HomePage).
-     */
-    @Test
-    public void testAddUserSimple() throws Exception
-    {
-        final String testUserId1 = "john@example.com";
-        final PoddUser testUser = this.addTestUser(testUserId1);
-        
-        // - add a test user
-        this.testRealm.addUser(testUser);
-        
-        final RestletUtilUser retrievedUser = this.testRealm.findUser(testUserId1);
-        Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
-        Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
-        
-        final PoddUser recvdPoddUser = (PoddUser)retrievedUser;
-        Assert.assertEquals("Returned user ORCID different to original", "SOME_ORCID_ID", recvdPoddUser.getOrcid());
-        Assert.assertEquals("Returned user URI different to original", testUser.getHomePage(),
-                recvdPoddUser.getHomePage());
-        Assert.assertEquals("Returned user Organization different to original", "Some Organization",
-                recvdPoddUser.getOrganization());
     }
     
     /**

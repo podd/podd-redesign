@@ -31,6 +31,12 @@ public abstract class AbstractFileReferenceProcessorTest<T extends FileReference
     protected FileReferenceProcessor<T> fileReferenceProcessor;
     
     /**
+     * 
+     * @return A set of URIs that are expected as the file reference types for this processor.
+     */
+    protected abstract Set<URI> getExpectedFileReferenceTypes();
+    
+    /**
      * @return A new FileReferenceProcessor instance for use by the test
      */
     protected abstract FileReferenceProcessor<T> getNewFileReferenceProcessor();
@@ -40,14 +46,6 @@ public abstract class AbstractFileReferenceProcessorTest<T extends FileReference
      *         matching the Processor.
      */
     protected abstract String getPathToResourceWith2FileReferences();
-    
-    /**
-     * 
-     * @return A set of URIs that are expected as the file reference types for this processor.
-     */
-    protected abstract Set<URI> getExpectedFileReferenceTypes();
-    
-    protected abstract void verify2FileReferences(Collection<T> fileReferences);
     
     @Before
     public void setUp() throws Exception
@@ -87,16 +85,6 @@ public abstract class AbstractFileReferenceProcessorTest<T extends FileReference
         Assert.assertFalse("Should not be able to handle a NULL model", this.fileReferenceProcessor.canHandle(null));
     }
     
-    /**
-     * Verify that the Processor supports at least one type of file reference
-     */
-    @Test
-    public void testGetTypes() throws Exception
-    {
-        final Set<URI> types = this.fileReferenceProcessor.getTypes();
-        Assert.assertFalse("No types found", types.isEmpty());
-    }
-    
     @Test
     public void testCreateReferences() throws Exception
     {
@@ -127,6 +115,16 @@ public abstract class AbstractFileReferenceProcessorTest<T extends FileReference
     }
     
     /**
+     * Verify that the Processor supports at least one type of file reference
+     */
+    @Test
+    public void testGetTypes() throws Exception
+    {
+        final Set<URI> types = this.fileReferenceProcessor.getTypes();
+        Assert.assertFalse("No types found", types.isEmpty());
+    }
+    
+    /**
      * Detailed test of getTypes() comparing the number of supported types and the types themselves
      */
     @Test
@@ -140,5 +138,7 @@ public abstract class AbstractFileReferenceProcessorTest<T extends FileReference
             Assert.assertTrue("Not the expected file reference type", types.contains(nextExpectedType));
         }
     }
+    
+    protected abstract void verify2FileReferences(Collection<T> fileReferences);
     
 }

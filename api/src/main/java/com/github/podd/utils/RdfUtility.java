@@ -43,7 +43,145 @@ public class RdfUtility
 {
     
     private final static Logger log = LoggerFactory.getLogger(RdfUtility.class);
-
+    
+    /**
+     * Given a set of RDF Statements, and a Root node, this method finds any nodes that are not
+     * connected to the Root node.
+     * 
+     * A <b>Node</b> is a Value that is of type URI (i.e. Literals are ignored).
+     * 
+     * A direct connection between two nodes exist if there is a Statement with the two nodes as the
+     * Subject and the Object.
+     * 
+     * @param root
+     *            The Root of the Graph, from which connectedness is calculated.
+     * @param connection
+     *            A RepositoryConnection
+     * @param context
+     *            The Graph containing statements.
+     * @return A <code>Set</code> containing any URIs that are not connected to the Root.
+     * @throws RepositoryException
+     */
+    public static Set<URI> findDisconnectedNodes(final URI root, final RepositoryConnection connection,
+            final URI... context) throws RepositoryException
+    {
+        final List<URI> exclusions =
+                Arrays.asList(new URI[] { root, OWL.THING, OWL.ONTOLOGY, OWL.INDIVIDUAL,
+                        ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#NamedIndividual"), });
+        
+        // - identify nodes that should be connected to the root
+        final Set<URI> nodesToCheck = new HashSet<URI>();
+        
+        final List<Statement> allStatements =
+                Iterations.asList(connection.getStatements(null, null, null, false, context));
+        for(final Statement s : allStatements)
+        {
+            final Value objectValue = s.getObject();
+            if(objectValue instanceof URI && !exclusions.contains(objectValue))
+            {
+                nodesToCheck.add((URI)objectValue);
+            }
+            
+            final Value subjectValue = s.getSubject();
+            if(subjectValue instanceof URI && !exclusions.contains(subjectValue))
+            {
+                nodesToCheck.add((URI)subjectValue);
+            }
+        }
+        
+        // RdfUtility.log.info("{} nodes to check for connectivity.", nodesToCheck.size());
+        // for(final URI u : objectsToCheck)
+        // {
+        // System.out.println("    " + u);
+        // }
+        
+        // - check for connectivity
+        final Queue<URI> queue = new LinkedList<URI>();
+        final Set<URI> visitedNodes = new HashSet<URI>(); // to handle cycles
+        queue.add(root);
+        visitedNodes.add(root);
+        
+        while(!queue.isEmpty())
+        {
+            final URI currentNode = queue.remove();
+            
+            final List<URI> children = RdfUtility.getImmediateChildren(currentNode, connection, context);
+            for(final URI child : children)
+            {
+                // visit child node
+                if(nodesToCheck.contains(child))
+                {
+                    nodesToCheck.remove(child);
+                    if(nodesToCheck.isEmpty())
+                    {
+                        // all identified nodes are connected.
+                        return nodesToCheck;
+                    }
+                }
+                if(!visitedNodes.contains(child))
+                {
+                    queue.add(child);
+                    visitedNodes.add(child);
+                }
+            }
+        }
+        RdfUtility.log.info("{} unconnected node(s). {}", nodesToCheck.size(), nodesToCheck);
+        return nodesToCheck;
+    }
+    
+    /**
+     * Internal helper method to retrieve the direct child objects of a given object.
+     * 
+     * @param node
+     * @param connection
+     * @param context
+     * @return
+     * @throws RepositoryException
+     */
+    private static List<URI> getImmediateChildren(final URI node, final RepositoryConnection connection,
+            final URI... context) throws RepositoryException
+    {
+        final List<URI> children = new ArrayList<URI>();
+        final List<Statement> childStatements =
+                Iterations.asList(connection.getStatements(node, null, null, false, context));
+        for(final Statement s : childStatements)
+        {
+            if(s.getObject() instanceof URI)
+            {
+                children.add((URI)s.getObject());
+            }
+        }
+        return children;
+    }
+    
+    /**
+     * Helper method to load an {@link InputStream} into an {@link Model}.
+     * 
+     * @param resourceStream
+     *            The input stream with RDF statements
+     * @param format
+     *            Format found in the input RDF data
+     * @return an {@link Model} populated with the statements from the input stream.
+     * 
+     * @throws OpenRDFException
+     * @throws IOException
+     */
+    public static Model inputStreamToModel(final InputStream resourceStream, final RDFFormat format)
+        throws OpenRDFException, IOException
+    {
+        if(resourceStream == null)
+        {
+            throw new IOException("Inputstream was null");
+        }
+        
+        final Model concreteModel = new LinkedHashModel();
+        final RDFParser parser = Rio.createParser(format);
+        parser.setRDFHandler(new StatementCollector(concreteModel));
+        parser.parse(resourceStream, "");
+        
+        return concreteModel;
+    }
+    
     /**
      * Given an artifact, this method evaluates whether all Objects within the artifact are
      * connected to the Top Object.
@@ -81,8 +219,8 @@ public class RdfUtility
             // load artifact statements into repository
             connection.add(inputStream, "", format, context);
             // DebugUtils.printContents(connection, context);
-
-            return isConnectedStructure(connection, context);
+            
+            return RdfUtility.isConnectedStructure(connection, context);
             
         }
         catch(final Exception e)
@@ -136,8 +274,8 @@ public class RdfUtility
         
         final URI artifactUri = (URI)topObjects.get(0).getSubject();
         
-        Set<URI> disconnectedNodes = findDisconnectedNodes(artifactUri, connection, context);
-        if (disconnectedNodes == null || disconnectedNodes.isEmpty())
+        final Set<URI> disconnectedNodes = RdfUtility.findDisconnectedNodes(artifactUri, connection, context);
+        if(disconnectedNodes == null || disconnectedNodes.isEmpty())
         {
             return true;
         }
@@ -145,148 +283,6 @@ public class RdfUtility
         {
             return false;
         }
-    }    
-    
-    /**
-     * Given a set of RDF Statements, and a Root node, this method finds any nodes that are not
-     * connected to the Root node.
-     * 
-     * A <b>Node</b> is a Value that is of type URI (i.e. Literals are ignored).
-     * 
-     * A direct connection between two nodes exist if there is a Statement with the two nodes as the
-     * Subject and the Object.
-     * 
-     * @param root
-     *            The Root of the Graph, from which connectedness is calculated.
-     * @param connection
-     *            A RepositoryConnection
-     * @param context
-     *            The Graph containing statements.
-     * @return A <code>Set</code> containing any URIs that are not connected to the Root.
-     * @throws RepositoryException
-     */
-    public static Set<URI> findDisconnectedNodes(final URI root, final RepositoryConnection connection,
-            final URI... context) throws RepositoryException
-    {
-        final List<URI> exclusions =
-                Arrays.asList(new URI[] { 
-                        root, 
-                        OWL.THING, 
-                        OWL.ONTOLOGY, 
-                        OWL.INDIVIDUAL,
-                        ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#NamedIndividual"),
-                        });
-        
-        // - identify nodes that should be connected to the root
-        final Set<URI> nodesToCheck = new HashSet<URI>();
-
-        List<Statement> allStatements = Iterations.asList(connection.getStatements(null, null, null, false, context));
-        for (Statement s: allStatements)
-        {
-            final Value objectValue = s.getObject();
-            if(objectValue instanceof URI && !exclusions.contains(objectValue))
-            {
-                nodesToCheck.add((URI)objectValue);
-            }
-            
-            final Value subjectValue = s.getSubject();
-            if(subjectValue instanceof URI && !exclusions.contains(subjectValue))
-            {
-                nodesToCheck.add((URI)subjectValue);
-            }
-        }
-        
-        // RdfUtility.log.info("{} nodes to check for connectivity.", nodesToCheck.size());
-        // for(final URI u : objectsToCheck)
-        // {
-        // System.out.println("    " + u);
-        // }
-        
-        // - check for connectivity
-        final Queue<URI> queue = new LinkedList<URI>();
-        final Set<URI> visitedNodes = new HashSet<URI>(); // to handle cycles
-        queue.add(root);
-        visitedNodes.add(root);
-        
-        while(!queue.isEmpty())
-        {
-            final URI currentNode = queue.remove();
-            
-            final List<URI> children = RdfUtility.getImmediateChildren(currentNode, connection, context);
-            for(final URI child : children)
-            {
-                // visit child node
-                if(nodesToCheck.contains(child))
-                {
-                    nodesToCheck.remove(child);
-                    if(nodesToCheck.isEmpty())
-                    {
-                        // all identified nodes are connected.
-                        return nodesToCheck;
-                    }
-                }
-                if (!visitedNodes.contains(child))
-                {
-                    queue.add(child);
-                    visitedNodes.add(child);
-                }
-            }
-        }
-        RdfUtility.log.info("{} unconnected node(s). {}", nodesToCheck.size(), nodesToCheck);
-        return nodesToCheck;
-    }
-    
-    /**
-     * Helper method to load an {@link InputStream} into an {@link Model}.
-     * 
-     * @param resourceStream
-     *            The input stream with RDF statements
-     * @param format
-     *            Format found in the input RDF data
-     * @return an {@link Model} populated with the statements from the input stream.
-     * 
-     * @throws OpenRDFException
-     * @throws IOException
-     */
-    public static Model inputStreamToModel(final InputStream resourceStream, final RDFFormat format)
-        throws OpenRDFException, IOException
-    {
-        if(resourceStream == null)
-        {
-            throw new IOException("Inputstream was null");
-        }
-        
-        final Model concreteModel = new LinkedHashModel();
-        final RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(concreteModel));
-        parser.parse(resourceStream, "");
-        
-        return concreteModel;
-    }
-    
-    /**
-     * Internal helper method to retrieve the direct child objects of a given object.
-     * 
-     * @param node
-     * @param connection
-     * @param context
-     * @return 
-     * @throws RepositoryException
-     */
-    private static List<URI> getImmediateChildren(final URI node, final RepositoryConnection connection, final URI... context)
-        throws RepositoryException
-    {
-        final List<URI> children = new ArrayList<URI>();
-        final List<Statement> childStatements =
-                Iterations.asList(connection.getStatements(node, null, null, false, context));
-        for(final Statement s : childStatements)
-        {
-            if(s.getObject() instanceof URI)
-            {
-                children.add((URI)s.getObject());
-            }
-        }
-        return children;
     }
     
 }

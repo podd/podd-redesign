@@ -9,15 +9,15 @@ import com.github.podd.impl.file.SSHFileReferenceImpl;
 
 /**
  * @author kutila
- *
+ * 
  */
 public class SSHFileReferenceImplTest extends AbstractSSHFileReferenceTest
 {
-
+    
     @Override
     protected SSHFileReference getNewSSHFileReference()
     {
-        SSHFileReference ref = new SSHFileReferenceImpl();
+        final SSHFileReference ref = new SSHFileReferenceImpl();
         return ref;
     }
     

@@ -63,7 +63,7 @@ public interface PoddSesameManager
      */
     List<InferredOWLOntologyID> getAllOntologyVersions(IRI ontologyIRI, RepositoryConnection connection,
             URI ontologyManagementGraph) throws OpenRDFException;
-
+    
     /**
      * Gets all schema ontology versions currently configured in this PODD server.
      * 
@@ -76,6 +76,19 @@ public interface PoddSesameManager
      */
     List<InferredOWLOntologyID> getAllSchemaOntologyVersions(RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
+    
+    List<URI> getAllValidMembers(InferredOWLOntologyID artifactID, URI conceptUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+    
+    /**
+     * TODO: remove this from the API once the other method is used successfully
+     * 
+     * @deprecated use
+     *             {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
+     */
+    @Deprecated
+    Model getCardinality(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     /**
      * Calculates the cardinality value for a given PODD object and property.
@@ -117,11 +130,9 @@ public interface PoddSesameManager
      */
     URI getCardinalityValue(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
-
     
-    URI getCardinalityValue(URI objectUri, URI propertyUri,
-            boolean findFromType, RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
-
+    URI getCardinalityValue(URI objectUri, URI propertyUri, boolean findFromType,
+            RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     /**
      * Returns current version details of an artifact ontology which has the given IRI as the
@@ -177,6 +188,8 @@ public interface PoddSesameManager
     Set<IRI> getDirectImports(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
         throws OpenRDFException;
     
+    Set<IRI> getDirectImports(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
+    
     /**
      * For a given PODD Object, this method finds all property values associated with it and also
      * links from others (e.g. parent objects) to this object. For example:
@@ -201,7 +214,16 @@ public interface PoddSesameManager
      */
     Model getObjectData(InferredOWLOntologyID artifactID, URI objectUri, RepositoryConnection repositoryConnection)
         throws OpenRDFException;
-
+    
+    Model getObjectDetailsForDisplay(InferredOWLOntologyID artifactID, URI objectUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+    
+    Model getObjectDetailsForEdit(InferredOWLOntologyID artifactID, URI objectUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+    
+    PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+    
     /**
      * <p>
      * For a given PODD Object type, this method returns meta-data about it which can be used to
@@ -223,7 +245,10 @@ public interface PoddSesameManager
      */
     Model getObjectTypeMetadata(URI objectType, boolean includeDoNotDisplayProperties,
             RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
-
+    
+    List<URI> getObjectTypes(InferredOWLOntologyID ontologyID, URI objectUri, RepositoryConnection repositoryConnection)
+        throws OpenRDFException;
+    
     /**
      * Returns a collection of ontologies managed in the given graph, optionally only returning the
      * current version.
@@ -288,6 +313,12 @@ public interface PoddSesameManager
     InferredOWLOntologyID getSchemaVersion(IRI schemaVersionIRI, RepositoryConnection conn, URI schemaManagementGraph)
         throws OpenRDFException, UnmanagedSchemaIRIException;
     
+    URI getTopObjectIRI(InferredOWLOntologyID ontologyIRI, RepositoryConnection repositoryConnection)
+        throws OpenRDFException;
+    
+    List<URI> getTopObjects(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection)
+        throws OpenRDFException;
+    
     /**
      * Retrieve a list of <b>asserted</b> properties about the given object. The list is ordered
      * based on property weights and secondarily based on property labels.
@@ -310,7 +341,8 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      */
     List<URI> getWeightedProperties(final InferredOWLOntologyID artifactID, final URI objectUri,
-            final boolean excludeContainsProperties, final RepositoryConnection repositoryConnection) throws OpenRDFException;
+            final boolean excludeContainsProperties, final RepositoryConnection repositoryConnection)
+        throws OpenRDFException;
     
     /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
@@ -347,7 +379,7 @@ public interface PoddSesameManager
      */
     Model searchOntologyLabels(String searchTerm, InferredOWLOntologyID artifactID, int limit, int offset,
             final RepositoryConnection repositoryConnection, URI... searchTypes) throws OpenRDFException;
-
+    
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
      * is carried out in the specified contexts. An optional array of URIs can be used to limit the
@@ -420,36 +452,4 @@ public interface PoddSesameManager
     void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrentAndRemovePrevious,
             RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
     
-    List<URI> getObjectTypes(InferredOWLOntologyID ontologyID, URI objectUri, RepositoryConnection repositoryConnection)
-        throws OpenRDFException;
-    
-    URI getTopObjectIRI(InferredOWLOntologyID ontologyIRI, RepositoryConnection repositoryConnection)
-        throws OpenRDFException;
-    
-    List<URI> getTopObjects(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection)
-        throws OpenRDFException;
-    
-    List<URI> getAllValidMembers(InferredOWLOntologyID artifactID, URI conceptUri,
-            RepositoryConnection repositoryConnection) throws OpenRDFException;
-    
-    /**
-     * TODO: remove this from the API once the other method is used successfully
-     * 
-     * @deprecated use
-     *             {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
-     */
-    Model getCardinality(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
-            RepositoryConnection repositoryConnection) throws OpenRDFException;
-    
-    Model getObjectDetailsForDisplay(InferredOWLOntologyID artifactID, URI objectUri,
-            RepositoryConnection repositoryConnection) throws OpenRDFException;
-    
-    Model getObjectDetailsForEdit(InferredOWLOntologyID artifactID, URI objectUri,
-            RepositoryConnection repositoryConnection) throws OpenRDFException;
-    
-    Set<IRI> getDirectImports(RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
-
-    PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
-            RepositoryConnection repositoryConnection) throws OpenRDFException;
-
 }

@@ -6,7 +6,6 @@ package com.github.podd.impl.purl.test;
 import java.io.InputStream;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;

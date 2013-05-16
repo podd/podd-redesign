@@ -14,7 +14,6 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +37,41 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
+    @Delete
+    public void deleteArtifact(final Representation entity) throws ResourceException
+    {
+        boolean result;
+        try
+        {
+            final String artifactId = this.getQueryValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+            
+            if(artifactId == null)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                        "Did not find an artifacturi parameter in the request");
+            }
+            final InferredOWLOntologyID currentVersion =
+                    this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactId));
+            
+            result = this.getPoddApplication().getPoddArtifactManager().deleteArtifact(currentVersion);
+            
+            if(result)
+            {
+                this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+            }
+            else
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
+            }
+        }
+        catch(final PoddException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
+                    "Could not delete artifact due to an internal error", e);
+        }
+        
+    }
+    
     @Get
     public Representation editArtifactPageHtml(final Representation entity) throws ResourceException
     {
@@ -59,41 +93,6 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
-    }
-    
-    @Delete
-    public void deleteArtifact(final Representation entity) throws ResourceException
-    {
-        boolean result;
-        try
-        {
-            String artifactId = this.getQueryValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
-            
-            if(artifactId == null)
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
-                        "Did not find an artifacturi parameter in the request");
-            }
-            InferredOWLOntologyID currentVersion =
-                    this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactId));
-            
-            result = this.getPoddApplication().getPoddArtifactManager().deleteArtifact(currentVersion);
-            
-            if(result)
-            {
-                this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
-            }
-            else
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
-            }
-        }
-        catch(PoddException e)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
-                    "Could not delete artifact due to an internal error", e);
-        }
-        
     }
     
     // FIXME: populating dummy info for test

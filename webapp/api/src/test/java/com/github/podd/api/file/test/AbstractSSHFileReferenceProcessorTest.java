@@ -26,12 +26,24 @@ public abstract class AbstractSSHFileReferenceProcessorTest extends
         AbstractFileReferenceProcessorTest<SSHFileReference>
 {
     @Override
+    protected Set<URI> getExpectedFileReferenceTypes()
+    {
+        return Collections.singleton(PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
+    }
+    
+    @Override
     protected final FileReferenceProcessor<SSHFileReference> getNewFileReferenceProcessor()
     {
         return this.getNewSSHFileReferenceProcessor();
     }
     
     protected abstract SSHFileReferenceProcessor getNewSSHFileReferenceProcessor();
+    
+    @Override
+    protected String getPathToResourceWith2FileReferences()
+    {
+        return TestConstants.TEST_ARTIFACT_PURLS_2_FILE_REFS;
+    }
     
     @Override
     protected void verify2FileReferences(final Collection<SSHFileReference> fileReferences)
@@ -56,18 +68,6 @@ public abstract class AbstractSSHFileReferenceProcessorTest extends
             Assert.assertTrue("Label is not an expected one", labelList.contains(sshFileReference.getLabel()));
             Assert.assertTrue("File name is not an expected one", filenameList.contains(sshFileReference.getFilename()));
         }
-    }
-    
-    @Override
-    protected String getPathToResourceWith2FileReferences()
-    {
-        return TestConstants.TEST_ARTIFACT_PURLS_2_FILE_REFS;
-    }
-    
-    @Override
-    protected Set<URI> getExpectedFileReferenceTypes()
-    {
-        return Collections.singleton(PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
     }
     
 }

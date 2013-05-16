@@ -38,14 +38,10 @@ public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
     protected abstract Collection<URI> getExpectedTypes() throws Exception;
     
     /**
-     * @return A new {@link PoddFileRepository} instance for use by the test
+     * @return A Collection of Models that do not contain sufficient information to create a
+     *         FileRepository object
      */
-    protected abstract PoddFileRepository<T> getNewPoddFileRepository() throws Exception;
-    
-    /**
-     * @return A new {@link PoddFileRepository} instance for use by the test
-     */
-    protected abstract PoddFileRepository<T> getNewPoddFileRepository(final Model model) throws Exception;
+    protected abstract Collection<Model> getIncompleteModels();
     
     /**
      * @param alias
@@ -57,10 +53,20 @@ public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
     protected abstract T getNewFileReference(String alias, String fileIdentifier);
     
     /**
-     * @return A Collection of Models that do not contain sufficient information to create a
-     *         FileRepository object
+     * @return A new {@link PoddFileRepository} instance for use by the test
      */
-    protected abstract Collection<Model> getIncompleteModels();
+    protected abstract PoddFileRepository<T> getNewPoddFileRepository() throws Exception;
+    
+    /**
+     * @return A new {@link PoddFileRepository} instance for use by the test
+     */
+    protected abstract PoddFileRepository<T> getNewPoddFileRepository(final Model model) throws Exception;
+    
+    @Before
+    public void setUp() throws Exception
+    {
+        this.testFileRepository = this.getNewPoddFileRepository();
+    }
     
     /**
      * Start a File Repository source for test
@@ -71,12 +77,6 @@ public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
      * Stop the test File Repository source
      */
     protected abstract void stopRepositorySource() throws Exception;
-    
-    @Before
-    public void setUp() throws Exception
-    {
-        this.testFileRepository = this.getNewPoddFileRepository();
-    }
     
     @After
     public void tearDown() throws Exception

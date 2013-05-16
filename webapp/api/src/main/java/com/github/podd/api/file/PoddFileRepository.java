@@ -19,7 +19,26 @@ import com.github.podd.exception.FileReferenceNotSupportedException;
  */
 public interface PoddFileRepository<T extends FileReference>
 {
+    /**
+     * Checks whether this File Repository instance is capable of "handling" (i.e. validating) the
+     * given File Reference.
+     * 
+     * This decision is made by checking that the aliases and types match.
+     * 
+     * @param reference
+     * @return
+     */
+    boolean canHandle(T reference);
+    
     String getAlias();
+    
+    /**
+     * Retrieve a Model representation of all this FileRepository. This should contain sufficient
+     * information to reconstruct this FileRepository object.
+     * 
+     * @return A Model representation containing all configurations of this FileRepository.
+     */
+    Model getAsModel();
     
     /**
      * 
@@ -38,24 +57,5 @@ public interface PoddFileRepository<T extends FileReference>
      * @throws IOException
      */
     boolean validate(T reference) throws FileReferenceNotSupportedException, IOException;
-    
-    /**
-     * Checks whether this File Repository instance is capable of "handling" (i.e. validating) the
-     * given File Reference.
-     * 
-     * This decision is made by checking that the aliases and types match.
-     * 
-     * @param reference
-     * @return
-     */
-    boolean canHandle(T reference);
-
-    /**
-     * Retrieve a Model representation of all this FileRepository. This should contain sufficient
-     * information to reconstruct this FileRepository object.
-     * 
-     * @return A Model representation containing all configurations of this FileRepository.
-     */
-    Model getAsModel();
     
 }

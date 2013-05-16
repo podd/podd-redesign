@@ -162,6 +162,52 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         return new ByteArrayRepresentation(stream.toByteArray());
     }
     
+    /*
+     * private List<Object> getDummyReferredObjects() { final List<Object> list = new
+     * ArrayList<Object>(); for(int i = 0; i < 2; i++) { final Map<String, Object> anObject = new
+     * HashMap<String, Object>(); anObject.put("isSelected", true); anObject.put("state", "A");
+     * anObject.put("type", "IntrnalObject"); anObject.put("uri", "object:34343");
+     * anObject.put("title", "Object " + i); anObject.put("description",
+     * "This is a simple object within an artifact");
+     * 
+     * list.add(anObject); }
+     * 
+     * return list; }
+     * 
+     * // FIXME: cannot work until Schema Manager is implemented protected List<URI>
+     * getSchemaOntologyGraphs() throws UnmanagedSchemaIRIException { String[] schemaOntologies = {
+     * PoddRdfConstants.PODD_DCTERMS, PoddRdfConstants.PODD_FOAF, PoddRdfConstants.PODD_USER,
+     * PoddRdfConstants.PODD_BASE, PoddRdfConstants.PODD_SCIENCE, PoddRdfConstants.PODD_PLANT };
+     * 
+     * final List<URI> schemaOntologyGraphs = new ArrayList<URI>();
+     * 
+     * for(String schema : schemaOntologies) { InferredOWLOntologyID ontologyID =
+     * this.getPoddApplication().getPoddSchemaManager()
+     * .getCurrentSchemaOntologyVersion(IRI.create(schema));
+     * schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
+     * schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI()); } return
+     * schemaOntologyGraphs; }
+     */
+    /**
+     * Populates the data model with necessary constant values and Utility classes.
+     * 
+     * NOTE: If these are common across multiple ResourceImpls, this method could be moved to the
+     * parent.
+     * 
+     * @param dataModel
+     */
+    protected void loadConstantsAndUtilsToDataModel(final Map<String, Object> dataModel)
+    {
+        dataModel.put("RDFS_LABEL", RDFS.LABEL);
+        dataModel.put("RDFS_RANGE", RDFS.RANGE);
+        dataModel.put("RDF_TYPE", RDF.TYPE);
+        dataModel.put("OWL_OBJECT_PROPERTY", OWL.OBJECTPROPERTY);
+        dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
+        dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
+        
+        dataModel.put("util", new FreemarkerUtil());
+    }
+    
     /**
      * This method retrieves necessary info about the object being viewed via SPARQL queries and
      * populates the data model.
@@ -204,15 +250,15 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("poddObject", theObject);
             
             // find the object's type
-            List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
+            final List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
             if(objectTypes == null || objectTypes.isEmpty())
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
-
+            
             // Get label for the object type
-            URI objectType = objectTypes.get(0);
-            PoddObjectLabel label = this.getPoddSesameManager().getObjectLabel(ontologyID, objectType, conn);
+            final URI objectType = objectTypes.get(0);
+            final PoddObjectLabel label = this.getPoddSesameManager().getObjectLabel(ontologyID, objectType, conn);
             dataModel.put("objectType", label.getLabel());
             
             // populate the properties of the object
@@ -257,65 +303,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         dataModel.put("selectedObjectCount", 0);
         dataModel.put("childHierarchyList", Collections.emptyList());
-    }
-    
-/*    private List<Object> getDummyReferredObjects()
-    {
-        final List<Object> list = new ArrayList<Object>();
-        for(int i = 0; i < 2; i++)
-        {
-            final Map<String, Object> anObject = new HashMap<String, Object>();
-            anObject.put("isSelected", true);
-            anObject.put("state", "A");
-            anObject.put("type", "IntrnalObject");
-            anObject.put("uri", "object:34343");
-            anObject.put("title", "Object " + i);
-            anObject.put("description", "This is a simple object within an artifact");
-            
-            list.add(anObject);
-        }
-        
-        return list;
-    }
-    
-    // FIXME: cannot work until Schema Manager is implemented
-    protected List<URI> getSchemaOntologyGraphs() throws UnmanagedSchemaIRIException
-    {
-        String[] schemaOntologies =
-                { PoddRdfConstants.PODD_DCTERMS, PoddRdfConstants.PODD_FOAF, PoddRdfConstants.PODD_USER,
-                        PoddRdfConstants.PODD_BASE, PoddRdfConstants.PODD_SCIENCE, PoddRdfConstants.PODD_PLANT };
-        
-        final List<URI> schemaOntologyGraphs = new ArrayList<URI>();
-        
-        for(String schema : schemaOntologies)
-        {
-            InferredOWLOntologyID ontologyID =
-                    this.getPoddApplication().getPoddSchemaManager()
-                            .getCurrentSchemaOntologyVersion(IRI.create(schema));
-            schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
-            schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI());
-        }
-        return schemaOntologyGraphs;
-    }
-*/    
-    /**
-     * Populates the data model with necessary constant values and Utility classes.
-     * 
-     * NOTE: If these are common across multiple ResourceImpls, this method could be
-     * moved to the parent.
-     * 
-     * @param dataModel
-     */
-    protected void loadConstantsAndUtilsToDataModel(final Map<String, Object> dataModel)
-    {
-        dataModel.put("RDFS_LABEL", RDFS.LABEL);
-        dataModel.put("RDFS_RANGE", RDFS.RANGE);
-        dataModel.put("RDF_TYPE", RDF.TYPE);
-        dataModel.put("OWL_OBJECT_PROPERTY", OWL.OBJECTPROPERTY);
-        dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
-        dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
-        
-        dataModel.put("util", new FreemarkerUtil());
     }
     
 }

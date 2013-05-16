@@ -15,11 +15,9 @@ import com.github.podd.api.PoddProcessorStage;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class FileReferenceProcessorFactoryRegistry extends
-        AbstractServiceLoader<String, FileReferenceProcessorFactory>
+public class FileReferenceProcessorFactoryRegistry extends AbstractServiceLoader<String, FileReferenceProcessorFactory>
 {
-    private static final FileReferenceProcessorFactoryRegistry instance =
-            new FileReferenceProcessorFactoryRegistry();
+    private static final FileReferenceProcessorFactoryRegistry instance = new FileReferenceProcessorFactoryRegistry();
     
     /**
      * @return A static instance of this registry.

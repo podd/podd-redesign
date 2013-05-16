@@ -141,6 +141,16 @@ public class InferredOWLOntologyID extends OWLOntologyID
         return new OWLOntologyID(this.getInferredOntologyIRI());
     }
     
+    public Model toRDF()
+    {
+        return this.toRDF(new LinkedHashModel());
+    }
+    
+    public Model toRDF(final Model result)
+    {
+        return OntologyUtils.ontologyIDToRDF(this, result);
+    }
+    
     @Override
     public String toString()
     {
@@ -152,16 +162,6 @@ public class InferredOWLOntologyID extends OWLOntologyID
         {
             return super.toString() + this.inferredOntologyIRI.toQuotedString();
         }
-    }
-    
-    public Model toRDF()
-    {
-        return toRDF(new LinkedHashModel());
-    }
-    
-    public Model toRDF(Model result)
-    {
-        return OntologyUtils.ontologyIDToRDF(this, result);
     }
     
 }

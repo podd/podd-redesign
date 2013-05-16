@@ -42,13 +42,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.DanglingObjectPolicy;
+import com.github.podd.api.FileReferenceVerificationPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.UpdatePolicy;
-import com.github.podd.api.FileReferenceVerificationPolicy;
 import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.FileReferenceManager;
 import com.github.podd.api.file.PoddFileRepositoryManager;
@@ -94,6 +94,72 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     public PoddArtifactManagerImpl()
     {
+    }
+    
+    @Override
+    public InferredOWLOntologyID attachFileReference(final InferredOWLOntologyID artifactId, final URI objectUri,
+            final FileReference fileReference) throws OpenRDFException, PoddException
+    {
+        throw new RuntimeException("TODO: Implement attachFileReference");
+    }
+    
+    @Override
+    public InferredOWLOntologyID attachFileReferences(final URI artifactUri, final URI versionUri,
+            final InputStream inputStream, final RDFFormat format,
+            final FileReferenceVerificationPolicy fileReferenceVerificationPolicy) throws OpenRDFException,
+        IOException, OWLException, PoddException
+    {
+        final Model model = Rio.parse(inputStream, "", format);
+        
+        model.removeAll(model.filter(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
+        
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(8192);
+        
+        Rio.write(model, output, RDFFormat.RDFJSON);
+        
+        return this.updateArtifact(artifactUri, versionUri, new ByteArrayInputStream(output.toByteArray()),
+                RDFFormat.RDFJSON, UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.REPORT,
+                fileReferenceVerificationPolicy);
+    }
+    
+    /**
+     * Internal helper method to build an array of Contexts to search in. If a valid artifact ID is
+     * passed in, the artifact's concrete triples and its imported schema ontologies are assigned as
+     * the contexts to return. If the artifact ID is NULL, all schema ontologies currently
+     * configured in the PODD server are assigned into the returned array.
+     * 
+     * TODO: Could this be moved into PoddSesameManager.java, possibly with the option to add
+     * inferred statements also as contexts.
+     * 
+     * @param artifactID
+     * @param connection
+     * @param managementGraph
+     * @throws OpenRDFException
+     */
+    private URI[] buildContextArray(final InferredOWLOntologyID artifactID, final RepositoryConnection connection,
+            final URI managementGraph) throws OpenRDFException
+    {
+        final List<URI> contexts = new ArrayList<URI>();
+        if(artifactID != null)
+        {
+            contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
+            
+            final Set<IRI> directImports = this.sesameManager.getDirectImports(artifactID, connection);
+            for(final IRI directImport : directImports)
+            {
+                contexts.add(directImport.toOpenRDFURI());
+            }
+        }
+        else
+        {
+            final List<InferredOWLOntologyID> allSchemaOntologyVersions =
+                    this.sesameManager.getAllSchemaOntologyVersions(connection, managementGraph);
+            for(final InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
+            {
+                contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
+            }
+        }
+        return contexts.toArray(new URI[0]);
     }
     
     @Override
@@ -220,7 +286,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             connection = this.getRepositoryManager().getRepository().getConnection();
             
-            URI[] contexts = buildContextArray(artifactID, connection, this.repositoryManager.getSchemaManagementGraph());
+            final URI[] contexts =
+                    this.buildContextArray(artifactID, connection, this.repositoryManager.getSchemaManagementGraph());
             
             final Model model =
                     this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, connection,
@@ -235,47 +302,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 connection.close();
             }
         }
-    }
-
-    /**
-     * Internal helper method to build an array of Contexts to search in. If a valid artifact ID is
-     * passed in, the artifact's concrete triples and its imported schema ontologies are assigned as
-     * the contexts to return. If the artifact ID is NULL, all schema ontologies currently
-     * configured in the PODD server are assigned into the returned array.
-     *
-     * TODO: Could this be moved into PoddSesameManager.java, possibly with the option to add
-     *  inferred statements also as contexts.
-     * 
-     * @param artifactID
-     * @param connection
-     * @param managementGraph
-     * @throws OpenRDFException
-     */
-    private URI[] buildContextArray(final InferredOWLOntologyID artifactID, final RepositoryConnection connection,
-            final URI managementGraph) throws OpenRDFException
-    {
-        final List<URI> contexts = new ArrayList<URI>();
-        if(artifactID != null)
-        {
-            contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
-            
-            final Set<IRI> directImports = this.sesameManager.getDirectImports(artifactID, connection);
-            for(IRI directImport : directImports)
-            {
-                contexts.add(directImport.toOpenRDFURI());
-            }
-        }
-        else
-        {
-            List<InferredOWLOntologyID> allSchemaOntologyVersions =
-                    this.sesameManager.getAllSchemaOntologyVersions(connection,
-                            managementGraph);
-            for(InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
-            {
-                contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
-            }
-        }
-        return contexts.toArray(new URI[0]);
     }
     
     @Override
@@ -319,6 +345,27 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public FileReferenceManager getFileReferenceManager()
     {
         return this.fileReferenceManager;
+    }
+    
+    @Override
+    public Set<FileReference> getFileReferences(final InferredOWLOntologyID artifactId)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public Set<FileReference> getFileReferences(final InferredOWLOntologyID artifactId, final String alias)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public Set<FileReference> getFileReferences(final InferredOWLOntologyID artifactId, final URI objectUri)
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
     
     /*
@@ -373,6 +420,154 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /**
+     * Helper method to cache schema ontologies in memory before loading statements into OWLAPI
+     */
+    private void handleCacheSchemasInMemory(final RepositoryConnection permanentRepositoryConnection,
+            final RepositoryConnection tempRepositoryConnection, final URI tempContext) throws OpenRDFException,
+        OWLException, IOException, PoddException
+    {
+        final Set<IRI> importedSchemas =
+                this.getSesameManager().getDirectImports(tempRepositoryConnection, tempContext);
+        
+        for(final IRI importedSchemaIRI : importedSchemas)
+        {
+            final InferredOWLOntologyID ontologyVersion =
+                    this.getSesameManager().getSchemaVersion(importedSchemaIRI, permanentRepositoryConnection,
+                            this.getRepositoryManager().getSchemaManagementGraph());
+            
+            this.getOWLManager().cacheSchemaOntology(ontologyVersion, permanentRepositoryConnection,
+                    this.getRepositoryManager().getSchemaManagementGraph());
+        }
+    }
+    
+    /**
+     * Checks for dangling objects that are not linked to the artifact and deletes them if
+     * <i>force</i> is true.
+     * 
+     * @param artifactID
+     * @param repositoryConnection
+     * @param context
+     * @param force
+     *            If true, deletes any dangling objects. If false, throws a
+     *            DisconnectedObjectException if any dangling objects are found.
+     * @throws RepositoryException
+     * @throws DisconnectedObjectException
+     */
+    private void handleDanglingObjects(final IRI artifactID, final RepositoryConnection repositoryConnection,
+            final URI context, final DanglingObjectPolicy policy) throws RepositoryException,
+        DisconnectedObjectException
+    {
+        final Set<URI> danglingObjects =
+                RdfUtility.findDisconnectedNodes(artifactID.toOpenRDFURI(), repositoryConnection, context);
+        this.log.info("Found {} dangling object(s). \n {}", danglingObjects.size(), danglingObjects);
+        
+        if(danglingObjects.isEmpty())
+        {
+            return;
+        }
+        
+        if(policy.equals(DanglingObjectPolicy.REPORT))
+        {
+            throw new DisconnectedObjectException(danglingObjects, "Update leads to disconnected PODD objects");
+        }
+        else if(policy.equals(DanglingObjectPolicy.FORCE_CLEAN))
+        {
+            for(final URI danglingObject : danglingObjects)
+            {
+                repositoryConnection.remove(danglingObject, null, null, context);
+                repositoryConnection.remove(null, null, (Value)danglingObject, context);
+            }
+        }
+    }
+    
+    /**
+     * Helper method to handle File References in a newly loaded/updated set of statements.
+     * 
+     * TODO: Optionally remove invalid file references or mark them as invalid using RDF
+     * statements/OWL Classes
+     * 
+     * @param repositoryConnection
+     * @param context
+     * @param policy
+     *            If true, verifies that FileReference objects are accessible from their respective
+     *            remote File Repositories
+     * 
+     * @throws OpenRDFException
+     * @throws PoddException
+     */
+    private void handleFileReferences(final RepositoryConnection repositoryConnection,
+            final FileReferenceVerificationPolicy policy, final URI... contexts) throws OpenRDFException, PoddException
+    {
+        if(this.getFileReferenceManager() == null)
+        {
+            return;
+        }
+        
+        this.log.info("Handling File reference validation");
+        
+        final Set<FileReference> fileReferenceResults =
+                this.getFileReferenceManager().extractFileReferences(repositoryConnection, contexts);
+        
+        if(FileReferenceVerificationPolicy.VERIFY.equals(policy))
+        {
+            try
+            {
+                this.fileRepositoryManager.verifyFileReferences(fileReferenceResults);
+            }
+            catch(final FileReferenceVerificationFailureException e)
+            {
+                this.log.warn("From " + fileReferenceResults.size() + " file references, "
+                        + e.getValidationFailures().size() + " failed validation.");
+                throw e;
+            }
+        }
+    }
+    
+    /**
+     * Helper method to handle File References in a newly loaded/updated set of statements
+     */
+    private void handlePurls(final RepositoryConnection repositoryConnection, final URI context)
+        throws PurlProcessorNotHandledException, OpenRDFException
+    {
+        if(this.getPurlManager() != null)
+        {
+            this.log.info("Handling Purl generation");
+            final Set<PoddPurlReference> purlResults =
+                    this.getPurlManager().extractPurlReferences(repositoryConnection, context);
+            
+            this.getPurlManager().convertTemporaryUris(purlResults, repositoryConnection, context);
+        }
+    }
+    
+    /**
+     * Helper method to check schema ontology imports and update use of ontology IRIs to version
+     * IRIs.
+     */
+    private void handleSchemaImports(final IRI ontologyIRI, final RepositoryConnection permanentRepositoryConnection,
+            final RepositoryConnection tempRepositoryConnection, final URI tempContext) throws OpenRDFException,
+        UnmanagedSchemaIRIException
+    {
+        final Set<IRI> importedSchemas =
+                this.getSesameManager().getDirectImports(tempRepositoryConnection, tempContext);
+        for(final IRI importedSchemaIRI : importedSchemas)
+        {
+            final InferredOWLOntologyID schemaOntologyID =
+                    this.getSesameManager().getSchemaVersion(importedSchemaIRI, permanentRepositoryConnection,
+                            this.getRepositoryManager().getSchemaManagementGraph());
+            
+            if(!importedSchemaIRI.equals(schemaOntologyID.getVersionIRI()))
+            {
+                // modify import to be a specific version of the schema
+                this.log.info("Updating import to version <{}>", schemaOntologyID.getVersionIRI());
+                tempRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), OWL.IMPORTS,
+                        importedSchemaIRI.toOpenRDFURI(), tempContext);
+                tempRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.IMPORTS, schemaOntologyID.getVersionIRI()
+                        .toOpenRDFURI(), tempContext);
+            }
+        }
+    }
+    
+    /**
      * This is not an API method. QUESTION: Should this be moved to a separate utility class?
      * 
      * This method takes a String terminating with a colon (":") followed by an integer and
@@ -408,39 +603,28 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         return oldVersion.concat("1");
     }
     
-    @Override
-    public List<InferredOWLOntologyID> listPublishedArtifacts() throws OpenRDFException
-    {
-        return listArtifacts(true, false);
-    }
-    
-    @Override
-    public List<InferredOWLOntologyID> listUnpublishedArtifacts() throws OpenRDFException
-    {
-        return listArtifacts(false, true);
-    }
-    
-    private List<InferredOWLOntologyID> listArtifacts(boolean published, boolean unpublished) throws OpenRDFException
+    private List<InferredOWLOntologyID> listArtifacts(final boolean published, final boolean unpublished)
+        throws OpenRDFException
     {
         if(!published && !unpublished)
         {
             throw new IllegalArgumentException("Cannot choose to exclude both published and unpublished artifacts");
         }
         
-        List<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
+        final List<InferredOWLOntologyID> results = new ArrayList<InferredOWLOntologyID>();
         
         RepositoryConnection conn = null;
         
         try
         {
             conn = this.getRepositoryManager().getRepository().getConnection();
-            Collection<InferredOWLOntologyID> ontologies =
+            final Collection<InferredOWLOntologyID> ontologies =
                     this.getSesameManager().getOntologies(true, conn,
                             this.getRepositoryManager().getArtifactManagementGraph());
             
-            for(InferredOWLOntologyID nextOntology : ontologies)
+            for(final InferredOWLOntologyID nextOntology : ontologies)
             {
-                boolean isPublished =
+                final boolean isPublished =
                         this.getSesameManager().isPublished(nextOntology, conn,
                                 this.getRepositoryManager().getArtifactManagementGraph());
                 
@@ -465,6 +649,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
         return results;
+    }
+    
+    @Override
+    public List<InferredOWLOntologyID> listPublishedArtifacts() throws OpenRDFException
+    {
+        return this.listArtifacts(true, false);
+    }
+    
+    @Override
+    public List<InferredOWLOntologyID> listUnpublishedArtifacts() throws OpenRDFException
+    {
+        return this.listArtifacts(false, true);
     }
     
     /*
@@ -627,6 +823,73 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
     }
     
+    /**
+     * Helper method to load the artifact into OWLAPI from a temporary location, perform reasoning
+     * and store in permanent repository.
+     * 
+     * @param fileReferencePolicy
+     */
+    private InferredOWLOntologyID loadInferStoreArtifact(final RepositoryConnection tempRepositoryConnection,
+            final RepositoryConnection permanentRepositoryConnection, final URI tempContext,
+            final FileReferenceVerificationPolicy fileReferencePolicy) throws OpenRDFException, OWLException,
+        IOException, PoddException, OntologyNotInProfileException, InconsistentOntologyException
+    {
+        // load into OWLAPI
+        this.log.debug("Loading podd artifact from temp repository: {}", tempContext);
+        final List<Statement> statements =
+                Iterations.asList(tempRepositoryConnection.getStatements(null, null, null, true, tempContext));
+        
+        final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
+        
+        owlSource.setNamespaces(tempRepositoryConnection.getNamespaces());
+        
+        final OWLOntology nextOntology = this.getOWLManager().loadOntology(owlSource);
+        
+        // Check the OWLAPI OWLOntology against an OWLProfile to make sure it is in profile
+        final OWLProfileReport profileReport = this.getOWLManager().getReasonerProfile().checkOntology(nextOntology);
+        if(!profileReport.isInProfile())
+        {
+            this.getOWLManager().removeCache(nextOntology.getOntologyID());
+            throw new OntologyNotInProfileException(nextOntology, profileReport,
+                    "Ontology is not in required OWL Profile");
+        }
+        
+        // Use the OWLManager to create a reasoner over the ontology
+        final OWLReasoner nextReasoner = this.getOWLManager().createReasoner(nextOntology);
+        
+        // Test that the ontology was consistent with this reasoner
+        // This ensures in the case of Pellet that it is in the OWL2-DL profile
+        if(!nextReasoner.isConsistent())
+        {
+            this.getOWLManager().removeCache(nextOntology.getOntologyID());
+            throw new InconsistentOntologyException(nextReasoner, "Ontology is inconsistent");
+        }
+        
+        // Copy the statements to permanentRepositoryConnection
+        this.getOWLManager().dumpOntologyToRepository(nextOntology, permanentRepositoryConnection,
+                nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
+        
+        // NOTE: At this stage, a client could be notified, and the artifact could be streamed
+        // back to them from permanentRepositoryConnection
+        
+        // Use an OWLAPI InferredAxiomGenerator together with the reasoner to create inferred
+        // axioms to store in the database.
+        // Serialise the inferred statements back to a different context in the permanent
+        // repository connection.
+        // The contexts to use within the permanent repository connection are all encapsulated
+        // in the InferredOWLOntologyID object.
+        final InferredOWLOntologyID inferredOWLOntologyID =
+                this.getOWLManager().inferStatements(nextOntology, permanentRepositoryConnection);
+        
+        // Check file references after inferencing to accurately identify the parent object
+        this.handleFileReferences(permanentRepositoryConnection, fileReferencePolicy, inferredOWLOntologyID
+                .getVersionIRI().toOpenRDFURI(), inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI());
+        
+        this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true,
+                permanentRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
+        return inferredOWLOntologyID;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -731,7 +994,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * .PoddFileRepositoryManager)
      */
     @Override
-    public void setFileRepositoryManager(PoddFileRepositoryManager fileRepositoryManager)
+    public void setFileRepositoryManager(final PoddFileRepositoryManager fileRepositoryManager)
     {
         this.fileRepositoryManager = fileRepositoryManager;
     }
@@ -810,10 +1073,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             artifactID = this.getArtifactByIRI(IRI.create(versionUri));
         }
-        catch(UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException e)
         {
             // if the version IRI is not the most current, it is unmanaged
-            InferredOWLOntologyID currentArtifactID = this.getArtifactByIRI(IRI.create(artifactUri));
+            final InferredOWLOntologyID currentArtifactID = this.getArtifactByIRI(IRI.create(artifactUri));
             this.log.error(
                     "Attempting to update from an older version of an artifact. <{}> has been succeeded by <{}>",
                     versionUri, currentArtifactID.getVersionIRI().toString());
@@ -957,272 +1220,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
     }
     
-    /**
-     * Helper method to cache schema ontologies in memory before loading statements into OWLAPI
-     */
-    private void handleCacheSchemasInMemory(final RepositoryConnection permanentRepositoryConnection,
-            final RepositoryConnection tempRepositoryConnection, final URI tempContext) throws OpenRDFException,
-        OWLException, IOException, PoddException
-    {
-        final Set<IRI> importedSchemas =
-                this.getSesameManager().getDirectImports(tempRepositoryConnection, tempContext);
-        
-        for(final IRI importedSchemaIRI : importedSchemas)
-        {
-            final InferredOWLOntologyID ontologyVersion =
-                    this.getSesameManager().getSchemaVersion(importedSchemaIRI, permanentRepositoryConnection,
-                            this.getRepositoryManager().getSchemaManagementGraph());
-            
-            this.getOWLManager().cacheSchemaOntology(ontologyVersion, permanentRepositoryConnection,
-                    this.getRepositoryManager().getSchemaManagementGraph());
-        }
-    }
-    
-    /**
-     * Checks for dangling objects that are not linked to the artifact and deletes them if
-     * <i>force</i> is true.
-     * 
-     * @param artifactID
-     * @param repositoryConnection
-     * @param context
-     * @param force
-     *            If true, deletes any dangling objects. If false, throws a
-     *            DisconnectedObjectException if any dangling objects are found.
-     * @throws RepositoryException
-     * @throws DisconnectedObjectException
-     */
-    private void handleDanglingObjects(final IRI artifactID, final RepositoryConnection repositoryConnection,
-            final URI context, DanglingObjectPolicy policy) throws RepositoryException, DisconnectedObjectException
-    {
-        final Set<URI> danglingObjects =
-                RdfUtility.findDisconnectedNodes(artifactID.toOpenRDFURI(), repositoryConnection, context);
-        this.log.info("Found {} dangling object(s). \n {}", danglingObjects.size(), danglingObjects);
-        
-        if(danglingObjects.isEmpty())
-        {
-            return;
-        }
-        
-        if(policy.equals(DanglingObjectPolicy.REPORT))
-        {
-            throw new DisconnectedObjectException(danglingObjects, "Update leads to disconnected PODD objects");
-        }
-        else if(policy.equals(DanglingObjectPolicy.FORCE_CLEAN))
-        {
-            for(URI danglingObject : danglingObjects)
-            {
-                repositoryConnection.remove(danglingObject, null, null, context);
-                repositoryConnection.remove(null, null, (Value)danglingObject, context);
-            }
-        }
-    }
-    
-    /**
-     * Helper method to handle File References in a newly loaded/updated set of statements.
-     * 
-     * TODO: Optionally remove invalid file references or mark them as invalid using RDF
-     * statements/OWL Classes
-     * 
-     * @param repositoryConnection
-     * @param context
-     * @param policy
-     *            If true, verifies that FileReference objects are accessible from their respective
-     *            remote File Repositories
-     * 
-     * @throws OpenRDFException
-     * @throws PoddException
-     */
-    private void handleFileReferences(final RepositoryConnection repositoryConnection,
-            FileReferenceVerificationPolicy policy, final URI... contexts) throws OpenRDFException, PoddException
-    {
-        if(this.getFileReferenceManager() == null)
-        {
-            return;
-        }
-        
-        this.log.info("Handling File reference validation");
-        
-        final Set<FileReference> fileReferenceResults =
-                this.getFileReferenceManager().extractFileReferences(repositoryConnection, contexts);
-        
-        if(FileReferenceVerificationPolicy.VERIFY.equals(policy))
-        {
-            try
-            {
-                this.fileRepositoryManager.verifyFileReferences(fileReferenceResults);
-            }
-            catch(FileReferenceVerificationFailureException e)
-            {
-                this.log.warn("From " + fileReferenceResults.size() + " file references, "
-                        + e.getValidationFailures().size() + " failed validation.");
-                throw e;
-            }
-        }
-    }
-    
-    /**
-     * Helper method to handle File References in a newly loaded/updated set of statements
-     */
-    private void handlePurls(final RepositoryConnection repositoryConnection, final URI context)
-        throws PurlProcessorNotHandledException, OpenRDFException
-    {
-        if(this.getPurlManager() != null)
-        {
-            this.log.info("Handling Purl generation");
-            final Set<PoddPurlReference> purlResults =
-                    this.getPurlManager().extractPurlReferences(repositoryConnection, context);
-            
-            this.getPurlManager().convertTemporaryUris(purlResults, repositoryConnection, context);
-        }
-    }
-    
-    /**
-     * Helper method to check schema ontology imports and update use of ontology IRIs to version
-     * IRIs.
-     */
-    private void handleSchemaImports(final IRI ontologyIRI, final RepositoryConnection permanentRepositoryConnection,
-            final RepositoryConnection tempRepositoryConnection, final URI tempContext) throws OpenRDFException,
-        UnmanagedSchemaIRIException
-    {
-        final Set<IRI> importedSchemas =
-                this.getSesameManager().getDirectImports(tempRepositoryConnection, tempContext);
-        for(final IRI importedSchemaIRI : importedSchemas)
-        {
-            final InferredOWLOntologyID schemaOntologyID =
-                    this.getSesameManager().getSchemaVersion(importedSchemaIRI, permanentRepositoryConnection,
-                            this.getRepositoryManager().getSchemaManagementGraph());
-            
-            if(!importedSchemaIRI.equals(schemaOntologyID.getVersionIRI()))
-            {
-                // modify import to be a specific version of the schema
-                this.log.info("Updating import to version <{}>", schemaOntologyID.getVersionIRI());
-                tempRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), OWL.IMPORTS,
-                        importedSchemaIRI.toOpenRDFURI(), tempContext);
-                tempRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.IMPORTS, schemaOntologyID.getVersionIRI()
-                        .toOpenRDFURI(), tempContext);
-            }
-        }
-    }
-    
-    /**
-     * Helper method to load the artifact into OWLAPI from a temporary location, perform reasoning
-     * and store in permanent repository.
-     * 
-     * @param fileReferencePolicy
-     */
-    private InferredOWLOntologyID loadInferStoreArtifact(final RepositoryConnection tempRepositoryConnection,
-            final RepositoryConnection permanentRepositoryConnection, final URI tempContext,
-            FileReferenceVerificationPolicy fileReferencePolicy) throws OpenRDFException, OWLException, IOException,
-        PoddException, OntologyNotInProfileException, InconsistentOntologyException
-    {
-        // load into OWLAPI
-        this.log.debug("Loading podd artifact from temp repository: {}", tempContext);
-        final List<Statement> statements =
-                Iterations.asList(tempRepositoryConnection.getStatements(null, null, null, true, tempContext));
-        
-        final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
-        
-        owlSource.setNamespaces(tempRepositoryConnection.getNamespaces());
-        
-        final OWLOntology nextOntology = this.getOWLManager().loadOntology(owlSource);
-        
-        // Check the OWLAPI OWLOntology against an OWLProfile to make sure it is in profile
-        final OWLProfileReport profileReport = this.getOWLManager().getReasonerProfile().checkOntology(nextOntology);
-        if(!profileReport.isInProfile())
-        {
-            this.getOWLManager().removeCache(nextOntology.getOntologyID());
-            throw new OntologyNotInProfileException(nextOntology, profileReport,
-                    "Ontology is not in required OWL Profile");
-        }
-        
-        // Use the OWLManager to create a reasoner over the ontology
-        final OWLReasoner nextReasoner = this.getOWLManager().createReasoner(nextOntology);
-        
-        // Test that the ontology was consistent with this reasoner
-        // This ensures in the case of Pellet that it is in the OWL2-DL profile
-        if(!nextReasoner.isConsistent())
-        {
-            this.getOWLManager().removeCache(nextOntology.getOntologyID());
-            throw new InconsistentOntologyException(nextReasoner, "Ontology is inconsistent");
-        }
-        
-        // Copy the statements to permanentRepositoryConnection
-        this.getOWLManager().dumpOntologyToRepository(nextOntology, permanentRepositoryConnection,
-                nextOntology.getOntologyID().getVersionIRI().toOpenRDFURI());
-        
-        // NOTE: At this stage, a client could be notified, and the artifact could be streamed
-        // back to them from permanentRepositoryConnection
-        
-        // Use an OWLAPI InferredAxiomGenerator together with the reasoner to create inferred
-        // axioms to store in the database.
-        // Serialise the inferred statements back to a different context in the permanent
-        // repository connection.
-        // The contexts to use within the permanent repository connection are all encapsulated
-        // in the InferredOWLOntologyID object.
-        final InferredOWLOntologyID inferredOWLOntologyID =
-                this.getOWLManager().inferStatements(nextOntology, permanentRepositoryConnection);
-        
-        // Check file references after inferencing to accurately identify the parent object
-        this.handleFileReferences(permanentRepositoryConnection, fileReferencePolicy, inferredOWLOntologyID
-                .getVersionIRI().toOpenRDFURI(), inferredOWLOntologyID.getInferredOntologyIRI().toOpenRDFURI());
-        
-        this.getSesameManager().updateManagedPoddArtifactVersion(inferredOWLOntologyID, true,
-                permanentRepositoryConnection, this.getRepositoryManager().getArtifactManagementGraph());
-        return inferredOWLOntologyID;
-    }
-    
     @Override
     public InferredOWLOntologyID updateSchemaImports(final InferredOWLOntologyID artifactId,
-            Set<OWLOntologyID> oldSchemaOntologyIds, final Set<OWLOntologyID> schemaOntologyId)
+            final Set<OWLOntologyID> oldSchemaOntologyIds, final Set<OWLOntologyID> schemaOntologyId)
     {
         throw new RuntimeException("TODO: Implement updateSchemaImport");
     }
     
-    @Override
-    public InferredOWLOntologyID attachFileReferences(final URI artifactUri, final URI versionUri,
-            final InputStream inputStream, RDFFormat format,
-            final FileReferenceVerificationPolicy fileReferenceVerificationPolicy) throws OpenRDFException,
-        IOException, OWLException, PoddException
-    {
-        Model model = Rio.parse(inputStream, "", format);
-        
-        model.removeAll(model.filter(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
-        
-        ByteArrayOutputStream output = new ByteArrayOutputStream(8192);
-        
-        Rio.write(model, output, RDFFormat.RDFJSON);
-        
-        return this.updateArtifact(artifactUri, versionUri, new ByteArrayInputStream(output.toByteArray()),
-                RDFFormat.RDFJSON, UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.REPORT,
-                fileReferenceVerificationPolicy);
-    }
-    
-    @Override
-    public InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
-            FileReference fileReference) throws OpenRDFException, PoddException
-    {
-        throw new RuntimeException("TODO: Implement attachFileReference");
-    }
-    
-    @Override
-    public Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    @Override
-    public Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    @Override
-    public Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

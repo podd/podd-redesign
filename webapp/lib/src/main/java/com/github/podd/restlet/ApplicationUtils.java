@@ -4,7 +4,6 @@
 package com.github.podd.restlet;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +16,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.Rio;
 import org.openrdf.sail.memory.MemoryStore;
 import org.restlet.Context;
 import org.restlet.ext.crypto.DigestAuthenticator;
@@ -243,7 +241,7 @@ public class ApplicationUtils
         roles.clear();
         roles.addAll(PoddRoles.getRoles());
         
-        Repository nextRepository = getNewRepository();
+        final Repository nextRepository = ApplicationUtils.getNewRepository();
         
         application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextRepository));
         application.getPoddRepositoryManager().setSchemaManagementGraph(PoddWebServiceApplicationImpl.SCHEMA_MGT_GRAPH);
@@ -280,7 +278,7 @@ public class ApplicationUtils
         final OWLOntologyManager nextOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         if(nextOWLOntologyManager == null)
         {
-            log.error("OWLOntologyManager was null");
+            ApplicationUtils.log.error("OWLOntologyManager was null");
         }
         nextOWLManager.setOWLOntologyManager(nextOWLOntologyManager);
         
@@ -290,12 +288,12 @@ public class ApplicationUtils
         nextFileRepositoryManager.setOWLManager(nextOWLManager);
         try
         {
-            Model aliasConfiguration = application.getAliasesConfiguration();
+            final Model aliasConfiguration = application.getAliasesConfiguration();
             nextFileRepositoryManager.init(application.getAliasesConfiguration());
         }
         catch(PoddException | IOException e)
         {
-            log.error("Fatal Error!!! Could not initialize File Repository Manager", e);
+            ApplicationUtils.log.error("Fatal Error!!! Could not initialize File Repository Manager", e);
         }
         
         final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
@@ -335,7 +333,7 @@ public class ApplicationUtils
         }
         catch(IOException | OpenRDFException | OWLException | PoddException e)
         {
-            log.error("Fatal Error!!! Could not load schema ontologies", e);
+            ApplicationUtils.log.error("Fatal Error!!! Could not load schema ontologies", e);
         }
         
         // FIXME: Stub implementation in memory, based on the example restlet MemoryRealm class,

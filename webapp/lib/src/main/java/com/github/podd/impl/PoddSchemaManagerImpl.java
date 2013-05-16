@@ -86,7 +86,20 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
     }
-
+    
+    @Override
+    public OWLOntology getSchemaOntology(final IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException
+    {
+        throw new RuntimeException("TODO: Implement getSchemaOntology(IRI)");
+    }
+    
+    @Override
+    public OWLOntology getSchemaOntology(final OWLOntologyID schemaOntologyID)
+        throws UnmanagedSchemaOntologyIDException
+    {
+        throw new RuntimeException("TODO: Implement getSchemaOntology(OWLOntologyID)");
+    }
+    
     @Override
     public InferredOWLOntologyID getSchemaOntologyVersion(final IRI schemaVersionIRI)
         throws UnmanagedSchemaIRIException, OpenRDFException
@@ -116,19 +129,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 conn.close();
             }
         }
-    }        
-    
-    @Override
-    public OWLOntology getSchemaOntology(final IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException
-    {
-        throw new RuntimeException("TODO: Implement getSchemaOntology(IRI)");
-    }
-    
-    @Override
-    public OWLOntology getSchemaOntology(final OWLOntologyID schemaOntologyID)
-        throws UnmanagedSchemaOntologyIDException
-    {
-        throw new RuntimeException("TODO: Implement getSchemaOntology(OWLOntologyID)");
     }
     
     @Override
@@ -176,8 +176,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             throw new NullPointerException("Schema Ontology input stream was null");
         }
         
-        OWLOntologyDocumentSource owlSource = new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
-        OWLOntology ontology = this.owlManager.loadOntology(owlSource);
+        final OWLOntologyDocumentSource owlSource =
+                new StreamDocumentSource(inputStream, fileFormat.getDefaultMIMEType());
+        final OWLOntology ontology = this.owlManager.loadOntology(owlSource);
         
         if(ontology.isEmpty())
         {
@@ -233,5 +234,4 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
     }
     
-     
 }

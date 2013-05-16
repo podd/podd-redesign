@@ -19,17 +19,19 @@ public abstract class AbstractSSHFileReferenceTest extends AbstractFileReference
 {
     protected SSHFileReference sshFileReference;
     
+    @Override
+    protected final FileReference getNewFileReference()
+    {
+        return this.getNewSSHFileReference();
+    }
+    
     /**
      * 
      * @return A new SSHFileReference instance for use by the test
      */
     protected abstract SSHFileReference getNewSSHFileReference();
     
-    protected final FileReference getNewFileReference() 
-    {
-        return this.getNewSSHFileReference();
-    }
-    
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -37,6 +39,7 @@ public abstract class AbstractSSHFileReferenceTest extends AbstractFileReference
         this.sshFileReference = this.getNewSSHFileReference();
     }
     
+    @Override
     @After
     public void tearDown() throws Exception
     {
@@ -55,7 +58,7 @@ public abstract class AbstractSSHFileReferenceTest extends AbstractFileReference
     {
         this.sshFileReference.getPath();
     }
-
+    
     @Test
     public void testSetFilename() throws Exception
     {

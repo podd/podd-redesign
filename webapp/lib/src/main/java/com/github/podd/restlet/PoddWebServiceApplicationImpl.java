@@ -34,11 +34,11 @@ import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.AddObjectResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
-import com.github.podd.resources.GetMetadataResourceImpl;
 import com.github.podd.resources.DeleteArtifactResourceImpl;
 import com.github.podd.resources.EditArtifactResourceImpl;
 import com.github.podd.resources.FileReferenceAttachResourceImpl;
 import com.github.podd.resources.GetArtifactResourceImpl;
+import com.github.podd.resources.GetMetadataResourceImpl;
 import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.ListArtifactsResourceImpl;
@@ -304,12 +304,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String getMetadataService = PoddWebConstants.PATH_GET_METADATA;
         this.log.debug("attaching Metadata service to path={}", getMetadataService);
         router.attach(getMetadataService, GetMetadataResourceImpl.class);
-
+        
         // Add a route for the Add Object service.
         final String addObjectService = PoddWebConstants.PATH_OBJECT_ADD;
         this.log.debug("attaching Add Object service to path={}", addObjectService);
         router.attach(addObjectService, AddObjectResourceImpl.class);
-
         
         // Add a route for Logout service
         // final String logout = "logout";
@@ -331,6 +330,27 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         corsFilter.setNext(authenticator);
         
         return corsFilter;
+    }
+    
+    @Override
+    public Model getAliasesConfiguration()
+    {
+        // If the aliasConfiguration is empty then populate it with the default aliases here
+        if(this.aliasesConfiguration.isEmpty())
+        {
+            try (final InputStream input =
+                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE))
+            {
+                this.setAliasesConfiguration(Rio.parse(input, "", RDFFormat.TURTLE));
+            }
+            catch(IOException | RDFParseException | UnsupportedRDFormatException e)
+            {
+                this.log.error("Could not load default aliases");
+                throw new PoddRuntimeException("Could not load default aliases", e);
+            }
+        }
+        
+        return this.aliasesConfiguration;
     }
     
     /**
@@ -382,6 +402,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     public Configuration getTemplateConfiguration()
     {
         return this.freemarkerConfiguration;
+    }
+    
+    @Override
+    public void setAliasesConfiguration(final Model aliasesConfiguration)
+    {
+        this.aliasesConfiguration = aliasesConfiguration;
     }
     
     /**
@@ -459,33 +485,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         super.stop();
         this.cleanUpResources();
         this.log.info("== Shutting down PODD Web Application ==");
-    }
-    
-    @Override
-    public Model getAliasesConfiguration()
-    {
-        // If the aliasConfiguration is empty then populate it with the default aliases here
-        if(aliasesConfiguration.isEmpty())
-        {
-            try (final InputStream input =
-                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE))
-            {
-                setAliasesConfiguration(Rio.parse(input, "", RDFFormat.TURTLE));
-            }
-            catch(IOException | RDFParseException | UnsupportedRDFormatException e)
-            {
-                this.log.error("Could not load default aliases");
-                throw new PoddRuntimeException("Could not load default aliases", e);
-            }
-        }
-        
-        return this.aliasesConfiguration;
-    }
-    
-    @Override
-    public void setAliasesConfiguration(Model aliasesConfiguration)
-    {
-        this.aliasesConfiguration = aliasesConfiguration;
     }
     
 }

@@ -7,8 +7,6 @@ import org.openrdf.model.Model;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
-import com.github.podd.utils.InferredOWLOntologyID;
-
 /**
  * Encapsulates File References that are tracked inside of PODD Artifacts.
  * 
@@ -63,8 +61,7 @@ public interface FileReference
     /**
      * 
      * @param artifactId
-     *            The {@link OWLOntologyID} for the Artifact that includes this file
-     *            reference.
+     *            The {@link OWLOntologyID} for the Artifact that includes this file reference.
      */
     void setArtifactID(OWLOntologyID artifactId);
     

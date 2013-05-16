@@ -3,14 +3,12 @@
  */
 package com.github.podd.impl.file.test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -42,16 +40,6 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     
     private Path sshDir = null;
     
-    @Before
-    @Override
-    public void setUp() throws Exception
-    {
-        sshDir = tempDirectory.newFolder("podd-filerepository-manager-impl-test").toPath();
-        this.sshd = new SSHService();
-        this.sshd.startTestSSHServer(sshDir);
-        super.setUp();
-    }
-    
     @Override
     protected Collection<URI> getExpectedTypes() throws Exception
     {
@@ -59,55 +47,6 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         types.add(PoddRdfConstants.PODD_FILE_REPOSITORY);
         types.add(PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
         return types;
-    }
-    
-    /*
-     * Create a {@link Model} containing configuration details for an SSH File Repository.
-     * 
-     * (non-Javadoc)
-     * 
-     * @see com.github.podd.api.file.test.AbstractPoddFileRepositoryTest#getNewPoddFileRepository()
-     */
-    @Override
-    protected PoddFileRepository<SSHFileReference> getNewPoddFileRepository() throws Exception
-    {
-        final Model model = new LinkedHashModel();
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
-                        AbstractPoddFileRepositoryTest.TEST_ALIAS)));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_FILE_REPOSITORY));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_SSH_FILE_REPOSITORY));
-        
-        // ssh specific attributes
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHFileRepositoryImpl.PROTOCOL_SSH)));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHService.TEST_SSH_HOST)));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
-                        sshd.TEST_SSH_SERVICE_PORT)));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHService.TEST_SSH_FINGERPRINT)));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHService.TEST_SSH_USERNAME)));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHService.TEST_SSH_SECRET)));
-        
-        return this.getNewPoddFileRepository(model);
-    }
-    
-    @Override
-    protected PoddFileRepository<SSHFileReference> getNewPoddFileRepository(final Model model) throws Exception
-    {
-        final PoddFileRepository result = new SSHFileRepositoryImpl(model);
-        return result;
     }
     
     @Override
@@ -130,7 +69,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                         SSHService.TEST_SSH_HOST)));
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
-                        sshd.TEST_SSH_SERVICE_PORT)));
+                        this.sshd.TEST_SSH_SERVICE_PORT)));
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_FINGERPRINT)));
@@ -158,7 +97,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                         SSHFileRepositoryImpl.PROTOCOL_SSH)));
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
-                        sshd.TEST_SSH_SERVICE_PORT)));
+                        this.sshd.TEST_SSH_SERVICE_PORT)));
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_FINGERPRINT)));
@@ -189,7 +128,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                         SSHService.TEST_SSH_HOST)));
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
-                        sshd.TEST_SSH_SERVICE_PORT)));
+                        this.sshd.TEST_SSH_SERVICE_PORT)));
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_USERNAME)));
@@ -219,13 +158,72 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         try
         {
             return SSHService.getNewFileReference(alias, fileIdentifier,
-                    tempDirectory.newFolder("sshfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                    this.tempDirectory.newFolder("sshfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
                             .toPath());
         }
-        catch(IOException e)
+        catch(final IOException e)
         {
             throw new RuntimeException(e);
         }
+    }
+    
+    /*
+     * Create a {@link Model} containing configuration details for an SSH File Repository.
+     * 
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.api.file.test.AbstractPoddFileRepositoryTest#getNewPoddFileRepository()
+     */
+    @Override
+    protected PoddFileRepository<SSHFileReference> getNewPoddFileRepository() throws Exception
+    {
+        final Model model = new LinkedHashModel();
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
+                PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
+                        AbstractPoddFileRepositoryTest.TEST_ALIAS)));
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
+                PoddRdfConstants.PODD_FILE_REPOSITORY));
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
+                PoddRdfConstants.PODD_SSH_FILE_REPOSITORY));
+        
+        // ssh specific attributes
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
+                PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
+                        SSHFileRepositoryImpl.PROTOCOL_SSH)));
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
+                PoddRdfConstants.PODD_FILE_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral(
+                        SSHService.TEST_SSH_HOST)));
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
+                PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
+                        this.sshd.TEST_SSH_SERVICE_PORT)));
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
+                PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(
+                        SSHService.TEST_SSH_FINGERPRINT)));
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
+                PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, ValueFactoryImpl.getInstance().createLiteral(
+                        SSHService.TEST_SSH_USERNAME)));
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
+                PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET, ValueFactoryImpl.getInstance().createLiteral(
+                        SSHService.TEST_SSH_SECRET)));
+        
+        return this.getNewPoddFileRepository(model);
+    }
+    
+    @Override
+    protected PoddFileRepository<SSHFileReference> getNewPoddFileRepository(final Model model) throws Exception
+    {
+        final PoddFileRepository result = new SSHFileRepositoryImpl(model);
+        return result;
+    }
+    
+    @Before
+    @Override
+    public void setUp() throws Exception
+    {
+        this.sshDir = this.tempDirectory.newFolder("podd-filerepository-manager-impl-test").toPath();
+        this.sshd = new SSHService();
+        this.sshd.startTestSSHServer(this.sshDir);
+        super.setUp();
     }
     
     @Override
@@ -238,7 +236,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     {
         if(this.sshd != null)
         {
-            this.sshd.stopTestSSHServer(sshDir);
+            this.sshd.stopTestSSHServer(this.sshDir);
         }
     }
     

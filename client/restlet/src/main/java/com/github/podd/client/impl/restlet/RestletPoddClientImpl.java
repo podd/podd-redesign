@@ -31,7 +31,6 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
-import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,6 @@ import com.github.podd.api.file.FileReference;
 import com.github.podd.api.file.FileReferenceConstants;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
-import com.github.podd.impl.file.SSHFileReferenceImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddWebConstants;
@@ -89,15 +87,15 @@ public class RestletPoddClientImpl implements PoddClient
                 .getVersionIRI().toString());
         resource.addQueryParameter(FileReferenceConstants.KEY_OBJECT_URI, ref.getObjectIri().toString());
         
-        Model rdf = ref.toRDF();
+        final Model rdf = ref.toRDF();
         
-        StringWriter writer = new StringWriter();
+        final StringWriter writer = new StringWriter();
         
         try
         {
             Rio.write(rdf, writer, RDFFormat.RDFJSON);
         }
-        catch(RDFHandlerException e)
+        catch(final RDFHandlerException e)
         {
             throw new PoddClientException("Could not generate RDF from file reference", e);
         }
@@ -105,7 +103,7 @@ public class RestletPoddClientImpl implements PoddClient
         final Representation rep =
                 new ReaderRepresentation(new StringReader(writer.toString()), RestletUtilMediaType.APPLICATION_RDF_JSON);
         
-        log.info("Attach file reference triples: {}", writer);
+        this.log.info("Attach file reference triples: {}", writer);
         
         final Representation post = resource.post(rep, RestletUtilMediaType.APPLICATION_RDF_JSON);
         

@@ -6,15 +6,15 @@ package com.github.podd.exception;
 import org.openrdf.model.Model;
 
 /**
- * An exception that is thrown to indicate that there was insufficient information to construct a file repository
- * configuration from given data.
+ * An exception that is thrown to indicate that there was insufficient information to construct a
+ * file repository configuration from given data.
  * 
  * @author kutila
  */
 public class FileRepositoryIncompleteException extends FileRepositoryException
 {
     private static final long serialVersionUID = -689252740293644258L;
-
+    
     private final Model model;
     
     /**
