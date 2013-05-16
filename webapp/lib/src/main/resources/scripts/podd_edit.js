@@ -75,12 +75,13 @@ function callbackForGetMetadata(resultData, status, xhr) {
 		databank : nextDatabank
 	})
 	.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+    // FIXME: The following line is going to be very difficult to maintain in the long run, so need to redesign the triple format
 	.where('<http://purl.org/podd/ns/poddScience#Project> ?propertyUri ?pValueRange')
 	.optional('?propertyUri poddBase:weight ?weight')
 	.optional('?propertyUri <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel')
 	.optional('?propertyUri poddBase:hasDisplayType ?displayType')
 	.optional('?propertyUri poddBase:hasCardinality ?cardinality')
-	.filter(function(){ return this.propertyUri !== "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"; })
+	.filter(function(){ return this.propertyUri.value != "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"; })
 	;
 	var bindings = myQuery.select();
 
@@ -168,12 +169,16 @@ function loadEditDataCallback(resultData, status, xhr) {
 		databank : nextDatabank
 	})
 	.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+	// FIXME: The following line is going to be very difficult to maintain in the long run, so need to redesign the triple format
 	.where('?objectUri ?propertyUri ?pValue')
 	.where('?propertyUri poddBase:weight ?weight')
 	.optional('?propertyUri <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel')
 	.optional('?propertyUri poddBase:hasDisplayType ?displayType')
 	.optional('?propertyUri poddBase:hasCardinality ?cardinality')
 	.optional('?pValue <http://www.w3.org/2000/01/rdf-schema#label> ?pValueLabel')
+	  .filter(function () {
+            return this.displayType.value != "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+          })
 	;
 	var bindings = myQuery.select();
 
