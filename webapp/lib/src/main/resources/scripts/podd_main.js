@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - 2010. School of Information Technology and Electrical
+ * Copyright (c) 2009 - 2013. School of Information Technology and Electrical
  * Engineering, The University of Queensland.  This software is being developed
  * for the "Phenomics Ontoogy Driven Data Management Project (PODD)" project.
  * PODD is a National e-Research Architecture Taskforce (NeAT) project
@@ -20,7 +20,7 @@
  */
 
 /*
- * We will display an alert if the user is accessing PODD with IE6 or below */
+ * We will display an alert if the user is accessing PODD with IE7 or below */
 function displayBrowserAlert() {
     var browserVersion = getInternetExplorerVersion();
     if (navigator.appName == "Microsoft Internet Explorer" && browserVersion <= 7) {
