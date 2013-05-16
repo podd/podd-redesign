@@ -32,7 +32,9 @@ import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.resources.AboutResourceImpl;
+import com.github.podd.resources.AddObjectResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
+import com.github.podd.resources.GetMetadataResourceImpl;
 import com.github.podd.resources.DeleteArtifactResourceImpl;
 import com.github.podd.resources.EditArtifactResourceImpl;
 import com.github.podd.resources.FileReferenceAttachResourceImpl;
@@ -297,6 +299,17 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String searchService = PoddWebConstants.PATH_SEARCH;
         this.log.debug("attaching Search Ontology service to path={}", searchService);
         router.attach(searchService, SearchOntologyResourceImpl.class);
+        
+        // Add a route for the Meta-data retrieval service.
+        final String getMetadataService = PoddWebConstants.PATH_GET_METADATA;
+        this.log.debug("attaching Metadata service to path={}", getMetadataService);
+        router.attach(getMetadataService, GetMetadataResourceImpl.class);
+
+        // Add a route for the Add Object service.
+        final String addObjectService = PoddWebConstants.PATH_OBJECT_ADD;
+        this.log.debug("attaching Add Object service to path={}", addObjectService);
+        router.attach(addObjectService, AddObjectResourceImpl.class);
+
         
         // Add a route for Logout service
         // final String logout = "logout";

@@ -19,6 +19,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -182,12 +183,146 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
+    public List<InferredOWLOntologyID> getAllSchemaOntologyVersions(final RepositoryConnection repositoryConnection,
+            final URI schemaManagementGraph) throws OpenRDFException
+    {
+        final List<InferredOWLOntologyID> returnList = new ArrayList<InferredOWLOntologyID>();
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?ontologyIri ?cv ?civ WHERE { ");
+        
+        sb.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
+        sb.append(" ?ontologyIri <" + PoddRdfConstants.OMV_CURRENT_VERSION.stringValue() + "> ?cv . ");
+        sb.append(" ?ontologyIri <" + PoddRdfConstants.PODD_BASE_CURRENT_INFERRED_VERSION.stringValue() + "> ?civ . ");
+        
+        sb.append(" }");
+        
+        this.log.debug("Generated SPARQL {} ", sb);
+        
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        final QueryResultCollector queryResults = this.executeSparqlQuery(query, schemaManagementGraph);
+        
+        for(BindingSet nextResult : queryResults.getBindingSets())
+        {
+            final String nextOntologyIRI = nextResult.getValue("ontologyIri").stringValue();
+            final String nextVersionIRI = nextResult.getValue("cv").stringValue();
+            final String nextInferredIRI = nextResult.getValue("civ").stringValue();
+            
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), IRI
+                    .create(nextInferredIRI)));
+        }
+        return returnList;
+    }
+
+    @Override
     public List<InferredOWLOntologyID> getAllOntologyVersions(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI ontologyManagementGraph) throws OpenRDFException
     {
         // FIXME: This implementation doesn't seem correct. Verify with tests.
         return this.getCurrentVersionsInternal(ontologyIRI, repositoryConnection, ontologyManagementGraph);
     }
+    
+    @Override
+    public URI getCardinalityValue(final InferredOWLOntologyID artifactID, final URI objectUri, final URI propertyUri,
+            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        return this.getCardinalityValue(objectUri, propertyUri, false,
+                repositoryConnection, this.versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
+    }
+    
+    @Override
+    public URI getCardinalityValue(URI objectUri, URI propertyUri, boolean findFromType,
+            RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException
+    {
+        /*
+         * Example of how a qualified cardinality statement appears in RDF triples
+         * 
+         * {poddBase:PoddTopObject} <rdfs:subClassOf> {_:node17l3l94qux1}
+         * 
+         * {_:node17l3l94qux1} <rdf:type> {owl:Restriction}
+         * 
+         * {_:node17l3l94qux1} <owl#onProperty> {poddBase:hasLeadInstitution}
+         * 
+         * {_:node17l3l94qux1} <owl:qualifiedCardinality> {"1"^^<xsd:nonNegativeInteger>}
+         * 
+         * {_:node17l3l94qux1} <owl:onDataRange> {xsd:string}
+         */
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?qualifiedCardinality ?minQualifiedCardinality ?maxQualifiedCardinality ");
+        sb.append(" WHERE { ");
+        
+        if (!findFromType)
+        {
+            sb.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> ?somePoddConcept . ");
+        }
+        
+        sb.append(" ?somePoddConcept <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        sb.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxQualifiedCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minQualifiedCardinality } . ");
+        sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality } . ");
+        
+        sb.append(" } ");
+        
+        this.log.debug("Created SPARQL {} with propertyUri {} and poddObject {}", sb, propertyUri, objectUri);
+        
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        query.setBinding("propertyUri", propertyUri);
+        if (findFromType)
+        {
+            query.setBinding("somePoddConcept", objectUri);
+        }
+        else
+        {
+            query.setBinding("poddObject", objectUri);
+        }
+        
+        final QueryResultCollector queryResults =
+                this.executeSparqlQuery(query, contexts);
+        
+        for(BindingSet next : queryResults.getBindingSets())
+        {
+            final Value qualifiedCardinalityValue = next.getValue("qualifiedCardinality");
+            if(qualifiedCardinalityValue != null)
+            {
+                return PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE;
+            }
+            
+            int minCardinality = -1;
+            int maxCardinality = -1;
+            
+            final Value minCardinalityValue = next.getValue("minQualifiedCardinality");
+            if(minCardinalityValue != null && minCardinalityValue instanceof LiteralImpl)
+            {
+                minCardinality = ((LiteralImpl)minCardinalityValue).intValue();
+            }
+            
+            final Value maxCardinalityValue = next.getValue("maxQualifiedCardinality");
+            if(maxCardinalityValue != null && maxCardinalityValue instanceof LiteralImpl)
+            {
+                maxCardinality = ((LiteralImpl)maxCardinalityValue).intValue();
+            }
+
+            if (maxCardinality == 1 && minCardinality < 1)
+            {
+                return PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE;
+            }
+            else if (minCardinality == 1 && maxCardinality != 1)
+            {
+                return PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY;
+            }
+            else //default rule
+            {
+                return PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY;
+            }
+        }
+
+        return null;
+    }
+
     
     /*
      * (non-Javadoc)
@@ -1164,6 +1299,139 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return results;
     }
     
+    @Override
+    public Model getObjectData(final InferredOWLOntologyID artifactID, final URI objectUri,
+    final RepositoryConnection repositoryConnection) throws OpenRDFException
+    {
+        if (objectUri == null)
+        {
+            return new LinkedHashModel();
+        }
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?parent ?somePropertyUri ?poddObject . ");
+        
+        sb.append("} WHERE {");
+        
+        sb.append(" ?poddObject ?propertyUri ?value . ");
+        sb.append(" ?parent ?somePropertyUri ?poddObject . ");
+        
+        sb.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectUri);
+        
+        final Model queryResults =
+                this.executeGraphQuery(graphQuery,
+                        versionAndSchemaContexts(artifactID, repositoryConnection));
+        
+        return queryResults;
+    }
+    
+    @Override
+    public Model getObjectTypeMetadata(final URI objectType, final boolean includeDoNotDisplayProperties,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
+    {
+        final Model results = new LinkedHashModel();
+        if (objectType == null)
+        {
+            return results;
+        }
+     
+        // - find all Properties and their ranges
+        /*
+         * NOTE: This SPARQL query only finds properties defined as OWL restrictions in the given
+         * Object Type and its ancestors.
+         */
+        final StringBuilder sb1 = new StringBuilder();
+        
+        sb1.append("CONSTRUCT { ");
+        sb1.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
+        sb1.append(" ?poddObject ?propertyUri ?owlClass . ");
+        sb1.append(" ?poddObject ?propertyUri ?rangeClass . ");
+        sb1.append(" ?poddObject ?propertyUri ?valueRange . ");
+        
+        sb1.append("} WHERE {");
+        
+        sb1.append(" ?poddObject <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        sb1.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        sb1.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        sb1.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
+        sb1.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass } . ");
+        sb1.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange } . ");
+        
+        if (!includeDoNotDisplayProperties)
+        {
+            sb1.append(" FILTER NOT EXISTS { ?propertyUri <"
+                    + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true } ");
+        }
+
+        sb1.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb1.toString());
+        graphQuery.setBinding("poddObject", objectType);
+        
+        final Model queryResults1 = this.executeGraphQuery(graphQuery, contexts);
+        results.addAll(queryResults1);
+        
+        // -- for each property, get meta-data about it
+        final Set<URI> properties = queryResults1.predicates();
+        for (URI property : properties)
+        {
+            // - find property: type (e.g. object/datatype/annotation), label, display-type, weight
+            final StringBuilder sb2 = new StringBuilder();
+            
+            sb2.append("CONSTRUCT { ");
+            sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+            sb2.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
+                    + "> ?propertyDisplayType . ");
+            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight . ");
+
+            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> ?propertyDoNotDisplay . ");
+            
+            sb2.append("} WHERE {");
+            
+            sb2.append(" OPTIONAL {?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType } . ");
+            
+            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
+                    + "> ?propertyDisplayType } . ");
+            
+            sb2.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
+
+            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight } . ");
+            
+            if(includeDoNotDisplayProperties)
+            {
+                sb2.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                        + "> ?propertyDoNotDisplay } . ");
+            }
+            
+            sb2.append("}");
+            
+            final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2.toString());
+            graphQuery2.setBinding("propertyUri", property);
+            
+            this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}", sb2, property);
+
+            final Model queryResults2 = this.executeGraphQuery(graphQuery2, contexts);
+            results.addAll(queryResults2);
+            
+            
+            // - add cardinality value
+            final URI cardinalityValue = this.getCardinalityValue(objectType, property, true, repositoryConnection, contexts);
+            if (cardinalityValue != null)
+            {
+                results.add(property, OWL.CARDINALITY, cardinalityValue);
+            }
+        }
+        
+        return results;
+    }
+    
     /**
      * The result of this method is a Model containing all data required for displaying the details
      * of the object in HTML+RDFa.
@@ -1221,20 +1489,30 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     /**
-     * Work in progress [25/02/2013]
-     * 
-     * Attempting to retrieve sufficient triples to display the object_edit page
+     * This method returns a {@link Model} containing sufficient triples to construct the HTML page for
+     * editing an object.
      * 
      * @param objectUri
      * @param repositoryConnection
      * @param contexts
-     * @return
+     * @return A Model containing necessary triples
      * @throws OpenRDFException
      */
     @Override
     public Model getObjectDetailsForEdit(final InferredOWLOntologyID artifactID, final URI objectUri,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
+        final Model resultModel = new LinkedHashModel();
+
+        // --- add object type
+        final List<URI> objectTypes = this.getObjectTypes(artifactID, objectUri, repositoryConnection);
+        if (objectTypes != null && objectTypes.size() > 0)
+        {
+            resultModel.add(objectUri, RDF.TYPE, objectTypes.get(0));
+        }
+        
+        
+        // --- add displayable property values, details of properties, and value labels if present
         final StringBuilder sb = new StringBuilder();
         
         sb.append("CONSTRUCT { ");
@@ -1256,21 +1534,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         // property may not have a Label
         sb.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
-        
+
         // value may not have a Label
         sb.append(" OPTIONAL {?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
-        
-        // cardinality
-        // sb.append(" OPTIONAL { ?value <" + RDF.TYPE.stringValue() + "> ?poddConcept } . ");
-        // sb.append(" OPTIONAL { ?poddConcept <" + RDFS.SUBCLASSOF.stringValue() + "> ?b01 } . ");
-        // sb.append(" OPTIONAL { ?b01 <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri } . ");
-        // sb.append(" OPTIONAL { ?b01 <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxCardinality } . ");
-        // sb.append(" OPTIONAL { ?b01 <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minCardinality } . ");
-        // sb.append(" OPTIONAL { ?b01 <http://www.w3.org/2002/07/owl#qualifiedCardinality> ?qualifiedCardinality } . ");
         
         // avoid non-displayable properties (e.g. PoddInternalObject which is an "abstract" concept)
         sb.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
                 + "> true } ");
+        
+        // avoid, since we add object type and label to the Model up front
+        sb.append(" FILTER (?propertyUri != <" + RDF.TYPE.stringValue() + ">) ");
         
         sb.append(" FILTER (?value != <" + OWL.THING.stringValue() + ">) ");
         sb.append(" FILTER (?value != <" + OWL.INDIVIDUAL.stringValue() + ">) ");
@@ -1288,7 +1561,45 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 this.executeGraphQuery(graphQuery,
                         versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
         
-        return queryResults;
+        resultModel.addAll(queryResults);
+        
+        final boolean excludeContainsProperties = true;
+        final List<URI> allProperties = this.getWeightedProperties(artifactID, objectUri, excludeContainsProperties, repositoryConnection);
+        for (int i = 0; i < allProperties.size(); i++)
+        {
+            URI propertyUri = allProperties.get(i);
+            // ---- add property displaying order as "weight"
+            resultModel.add(propertyUri, PoddRdfConstants.PODD_BASE_WEIGHT, ValueFactoryImpl.getInstance().createLiteral(i));
+            
+            // --- add cardinality for each displayable property
+            final URI cardinalityValue = this.getCardinalityValue(artifactID, objectUri, propertyUri, repositoryConnection);
+            if (cardinalityValue != null)
+            {
+                resultModel.add(propertyUri, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
+            }
+            
+            // --- for 'drop-down' type properties, add all possible options into Model
+            final Model filter = resultModel.filter(propertyUri, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE, null);
+            if(filter.size() == 1 && PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN.equals(filter.objectURI()))
+            {
+                final URI propertyValue = resultModel.filter(objectUri, propertyUri, null).objectURI();
+                
+                final List<URI> valueTypes = this.getObjectTypes(artifactID, propertyValue, repositoryConnection);
+                if(valueTypes.size() > 0)
+                {
+                    final Model allPossibleValues =
+                            this.searchOntologyLabels("", artifactID, 1000, 0, repositoryConnection, valueTypes.get(0));
+                    
+                    for(Statement s : allPossibleValues)
+                    {
+                        resultModel.add(propertyUri, PoddRdfConstants.PODD_BASE_ALLOWED_VALUE, s.getSubject());
+                        resultModel.add(s);
+                    }
+                }
+            }
+        }
+        
+        return resultModel;
     }
     
     /*
@@ -1311,9 +1622,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         // for ORDER BY
         sb.append(" OPTIONAL { ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
-        
-        // value may not have a Label
-        sb.append(" OPTIONAL { ?value <" + RDFS.LABEL.stringValue() + "> ?valueLabel } . ");
         
         // for ORDER BY
         sb.append("OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?weight } . ");
@@ -1366,11 +1674,19 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         throws OpenRDFException
     {
         final URI[] contexts = this.versionAndSchemaContexts(artifactID, repositoryConnection);
+        return this.searchOntologyLabels(searchTerm, searchTypes, limit, offset, repositoryConnection, contexts);
+    }
+    
+    @Override
+    public Model searchOntologyLabels(final String searchTerm, URI[] searchTypes, final int limit,
+                final int offset, final RepositoryConnection repositoryConnection, URI... contexts)
+            throws OpenRDFException
+        {
         
         final StringBuilder sb = new StringBuilder();
         
         sb.append("CONSTRUCT { ");
-        sb.append(" ?uri <" + RDF.TYPE.stringValue() + "> ?label ");
+        sb.append(" ?uri <" + RDFS.LABEL.stringValue() + "> ?label ");
         sb.append(" } WHERE { ");
         
         // limit the "types" of objects to search for

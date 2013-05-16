@@ -123,6 +123,15 @@ public interface PoddWebConstants
      */
     public static final String PATH_SEARCH = "search";
 
+    /**
+     * Path to create object service 
+     */
+    public static final String PATH_OBJECT_ADD = "artifact/addobject";
+    
+    /**
+     * Path to get metadata about a particular object type
+     */
+    public static final String PATH_GET_METADATA = "metadata";
     
     /**
      * Key used to represent user identifier part of a URL
@@ -181,6 +190,12 @@ public interface PoddWebConstants
     public static final String KEY_EDIT_WITH_FORCE = "isforce";
 
     /**
+     * Key used in "edit" artifact to indicate whether any updated file references
+     * should be verified (for existence of the resource).
+     */
+    public static final String KEY_EDIT_VERIFY_FILE_REFERENCES = "verifyfilerefs";
+
+    /**
      * Key used in "search" service to specify the term being searched for.
      */
     public static final String KEY_SEARCHTERM = "searchterm";
@@ -189,5 +204,15 @@ public interface PoddWebConstants
      * Key used in "search" service to specify the RDF types of objects being searched for.
      */
     public static final String KEY_SEARCH_TYPES = "searchtypes";
+
+    /**
+     * Key used in "create object" service to indicate the type of object to be generated.
+     */
+    public static final String KEY_OBJECT_TYPE_IDENTIFIER = "objecttypeuri";
+
+    /**
+     * Key used in "create object" service to indicate the type of object to be generated.
+     */
+    public static final String KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES = "includedndprops";
 
 }

@@ -1,0 +1,77 @@
+
+<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-smoothness.css" media="screen" type="text/css" />
+		
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
+
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.core.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.widget.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.core.js"></script>
+
+		<!-- Dependencies for rdfquery -->
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdfquery.rules-1.1-SNAPSHOT.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdf.turtle.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.bounce.js"></script>
+		
+		<!-- Dependencies for autocomplete -->
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.mouse.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.position.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.selectable.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.resizable.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.sortable.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.button.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.dialog.js"></script>
+	    
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.autocomplete.js"></script>
+
+		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script>
+
+		<!-- Dependencies for jstree -->
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.hotkeys.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.cookie.js"></script>
+	    
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.jstree.js"></script>
+
+	    <h3>Test Auto Complete Functionality</h3>
+		<br>
+		<br>
+		<div>
+			Project (Artifact) IRI: <input class='noaction' id='podd_artifact' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1'><br>
+			<button id="btn2">Retrieve Artifact</button><br>
+		</div>
+		<br><br>
+		
+		<div class='podd_artifact' resource='http://purl.org/podd/basic-2-20130206/artifact:1'>The artifact contains
+			<span property="http://purl.org/podd/ns/poddBase#artifactHasTopObject">
+				<span class='podd_object' resource='http://purl.org/podd/basic-1-20130206/object:2966'>the PODD object 
+					<span value='http://www.w3.org/2000/01/rdf-schema#label'>Project#2012-0006_ Cotton Leaf Morphology</span>.
+				</span>
+			</span>
+		</div> 
+		<br>
+		
+		<div>
+		Version URI: <input class='noaction' id='podd_artifact_version' type='hidden' value='Version should come here'><br>
+		Object URI:&nbsp; <input class='noaction' id='podd_object' cols='90' value='http://purl.org/podd/basic-1-20130206/object:2966'><br>
+		</div>
+		<br><br>
+		
+		<span property=''>Edit Project Title: <input class="short_text autoupdate"
+			property="http://www.w3.org/2000/01/rdf-schema#label" id="in1" type="text" cols="60" value="Enter Project Title">
+			<input class='noaction' id='in1Hidden' type='hidden' value=''>	
+		</span>
+		<br>
+		
+		<!-- Random:   <input class="short_text" id="in2Random" type="text" cols="30" value="">-->
+		<br>
+		 
+		<span id='podd_type' value='http://purl.org/podd/ns/poddScience#Platform'>Add Platform:</span>
+		  <input class="autocomplete autoupdate" property="http://purl.org/podd/ns/poddScience#hasPlatform" id="in4" type="text" cols="30" value="">
+		<input class='noaction' id="in4Hidden" type="hidden" value=""><br>
+		<br>
+    	<br>
+    	<div>
+			<p id="message1">Message should come here</p><br>
+			<button id="btn4">Clear Message</button>
+			<button id="btn1">Test Button</button>
+		</div>

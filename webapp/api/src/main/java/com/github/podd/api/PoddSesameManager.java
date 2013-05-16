@@ -18,6 +18,7 @@ import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Manages interactions with Sesame Repositories for PODD.
@@ -62,6 +63,65 @@ public interface PoddSesameManager
      */
     List<InferredOWLOntologyID> getAllOntologyVersions(IRI ontologyIRI, RepositoryConnection connection,
             URI ontologyManagementGraph) throws OpenRDFException;
+
+    /**
+     * Gets all schema ontology versions currently configured in this PODD server.
+     * 
+     * @param repositoryConnection
+     * @param schemaManagementGraph
+     * @return
+     * @throws OpenRDFException
+     * 
+     * @since 14/05/2013
+     */
+    List<InferredOWLOntologyID> getAllSchemaOntologyVersions(RepositoryConnection repositoryConnection,
+            URI schemaManagementGraph) throws OpenRDFException;
+    
+    /**
+     * Calculates the cardinality value for a given PODD object and property.
+     * 
+     * Possible output URIs represent the following cardinalities:
+     * <ul>
+     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE} (Mandatory)</li>
+     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY} (Mandatory, can have multiple
+     * values)</li>
+     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY} (Optional, can have multiple
+     * values)</li>
+     * <li>{@link PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE} (Optional, the default)</li>
+     * </ul>
+     * 
+     * <p>
+     * For example, passing in <i>PoddTopObject</i> and property <i>hasLeadInstitution</i>, will
+     * return {@link PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE}.
+     * </p>
+     * <br>
+     * <p>
+     * <b>NOTE:</b> This method currently handles only Qualified Cardinality statements, which are
+     * the only type found in PODD schema ontologies at present. However, as the property's value
+     * type is ignored, the output is incomplete if a property has more than one type of possible
+     * value with different cardinalities.
+     * </p>
+     * 
+     * @param artifactID
+     *            The artifact to which the object under consideration belongs
+     * @param objectUri
+     *            The object under consideration
+     * @param propertyUri
+     *            The property under consideration
+     * @param repositoryConnection
+     * @return a URI representing the cardinality value or NULL if no cardinality statements were
+     *         found
+     * @throws OpenRDFException
+     * 
+     * @since 03/05/2013
+     */
+    URI getCardinalityValue(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+
+    
+    URI getCardinalityValue(URI objectUri, URI propertyUri,
+            boolean findFromType, RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
+
     
     /**
      * Returns current version details of an artifact ontology which has the given IRI as the
@@ -117,6 +177,53 @@ public interface PoddSesameManager
     Set<IRI> getDirectImports(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection)
         throws OpenRDFException;
     
+    /**
+     * For a given PODD Object, this method finds all property values associated with it and also
+     * links from others (e.g. parent objects) to this object. For example:
+     * <ul>
+     * <li>&lt;pObj_x&gt; rdfs:label "X" .</li>
+     * <li>&lt;pObj_x&gt; rdfs:comment "This is a PODD process object" .</li>
+     * <li>&lt;pObj_x&gt; poddScience:hasInvestigation &lt;pChild_y&gt; .</li>
+     * <li>&lt;pArent&gt; poddScience:hasProcess &lt;pObj_x&gt; .</li>
+     * </ul>
+     * <br>
+     * If the object URI is null, an empty {@link Model} is returned.
+     * 
+     * @param artifactID
+     *            The PODD artifact to which this object belongs
+     * @param objectUri
+     *            The object whose details are sought.
+     * @param repositoryConnection
+     * @return A {@link Model} containing all statements about the object.
+     * @throws OpenRDFException
+     * 
+     * @since 10/05/2013
+     */
+    Model getObjectData(InferredOWLOntologyID artifactID, URI objectUri, RepositoryConnection repositoryConnection)
+        throws OpenRDFException;
+
+    /**
+     * <p>
+     * For a given PODD Object type, this method returns meta-data about it which can be used to
+     * render the object.
+     * </p>
+     * 
+     * @param objectType
+     *            The object type whose details are sought
+     * @param includeDoNotDisplayProperties
+     *            If true, properties that have been annotated as "Do Not Display" are also included
+     * @param repositoryConnection
+     * @param contexts
+     *            The contexts from which metadata is to be retrieved
+     * @return A {@link Model} containing statements which are useful for displaying this Object
+     *         Type
+     * @throws OpenRDFException
+     * 
+     * @since 10/05/2013
+     */
+    Model getObjectTypeMetadata(URI objectType, boolean includeDoNotDisplayProperties,
+            RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
+
     /**
      * Returns a collection of ontologies managed in the given graph, optionally only returning the
      * current version.
@@ -219,9 +326,12 @@ public interface PoddSesameManager
     
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
-     * is carried out in are the specified artifact's concrete triples and the ontologies imported
-     * by that artifact. An optional array of URIs can be used to limit the RDF types of objects to
+     * is carried out in the specified artifact's concrete triples and the ontologies imported by
+     * that artifact. An optional array of URIs can be used to limit the RDF types of objects to
      * match. <br>
+     * 
+     * TODO: Replace all invocations of this method with the overloaded method which takes in an
+     * array of contexts instead of an artifact ID.
      * 
      * @param searchTerm
      *            A String term which is searched for in the RDF:Labels
@@ -237,6 +347,25 @@ public interface PoddSesameManager
      */
     Model searchOntologyLabels(String searchTerm, InferredOWLOntologyID artifactID, int limit, int offset,
             final RepositoryConnection repositoryConnection, URI... searchTypes) throws OpenRDFException;
+
+    /**
+     * Carries out a case-insensitive search for objects whose labels match a given term. The search
+     * is carried out in the specified contexts. An optional array of URIs can be used to limit the
+     * RDF types of objects to match. <br>
+     * 
+     * @param searchTerm
+     *            A String term which is searched for in the RDF:Labels
+     * @param searchTypes
+     *            The types (i.e. RDF:Type) of results to match with the search term
+     * @param limit
+     * @param offset
+     * @param repositoryConnection
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    Model searchOntologyLabels(String searchTerm, URI[] searchTypes, int limit, int offset,
+            RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     /**
      * Sets the given Ontology IRI to be published. This restricts the ability to publish the
@@ -303,6 +432,12 @@ public interface PoddSesameManager
     List<URI> getAllValidMembers(InferredOWLOntologyID artifactID, URI conceptUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
+    /**
+     * TODO: remove this from the API once the other method is used successfully
+     * 
+     * @deprecated use
+     *             {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
+     */
     Model getCardinality(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     

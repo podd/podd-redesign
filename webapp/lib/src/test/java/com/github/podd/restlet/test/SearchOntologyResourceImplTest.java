@@ -33,17 +33,15 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
 {
     
     private Model internalTestSearchRdf(final String searchTerm, final String[] searchTypes,
-            final MediaType requestMediaType) throws Exception
+            final MediaType requestMediaType, final String artifactUri) throws Exception
     {
-        // prepare: add an artifact
-        final InferredOWLOntologyID testArtifact =
-                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
-        
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
         
         searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, searchTerm);
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
-                .toString());
+        if (artifactUri != null)
+        {
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        }
         
         for(final String searchType : searchTypes)
         {
@@ -153,7 +151,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform", OWL.THING.stringValue() };
         final MediaType requestMediaType = MediaType.APPLICATION_JSON;
         
-        final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType);
+        final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType, null);
         
         Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
         System.out.println(resultModel.toString());
@@ -164,6 +162,28 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
+     * Test successful search for a FOR Codes in RDF/XML
+     */
+    @Test
+    public void testSearchRdfForANZSRCAssertion() throws Exception
+    {
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#ANZSRCAssertion"};
+        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
+        
+        final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType, null);
+        
+        // verify:
+        Assert.assertEquals("Not the expected number of results", 4, resultModel.size());
+        Assert.assertEquals("Expected Assertion 'Yes' not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Yes")).size());
+        Assert.assertEquals("Expected Assertion 'Unknown' not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Unknown")).size());
+        Assert.assertEquals("Expected Assertion 'Not Applicable' not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VALUE_FACTORY.createLiteral("Not Applicable")).size());
+    }
+        
+    
+    /**
      * Test successful search for a Platform in RDF/XML
      */
     @Test
@@ -172,7 +192,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform", OWL.THING.stringValue() };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
         
-        final Model resultModel = this.internalTestSearchRdf("me", searchTypes, requestMediaType);
+        final Model resultModel = this.internalTestSearchRdf("me", searchTypes, requestMediaType, null);
         
         // verify:
         Assert.assertEquals("Not the expected number of results", 9, resultModel.size());
@@ -190,10 +210,14 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testSearchRdfForSex() throws Exception
     {
+        // prepare: add an artifact
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
         final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Sex" };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
         
-        final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType);
+        final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType, testArtifact.getOntologyIRI().toString());
         
         Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
         Assert.assertEquals("Value Hermaphrodite not found", 1,
@@ -211,7 +235,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform", OWL.THING.stringValue() };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_TURTLE;
         
-        final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType);
+        final Model resultModel = this.internalTestSearchRdf("Scan", searchTypes, requestMediaType, null);
         
         Assert.assertEquals("Not the expected number of results", 5, resultModel.size());
         System.out.println(resultModel.toString());
