@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.file.FileReference;
 import com.github.podd.client.api.PoddClient;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -64,6 +65,13 @@ public abstract class AbstractPoddClientTest
         throws RDFParseException, RDFHandlerException, IOException
     {
         final Model model = Rio.parse(inputStream, "", format);
+        if(model.size() != expectedStatements)
+        {
+            log.error("--- Regression ---");
+            log.error("Expected: {} Actual {}", expectedStatements, model.size());
+            DebugUtils.printContents(model);
+        }
+        
         Assert.assertEquals(expectedStatements, model.size());
         return model;
     }
