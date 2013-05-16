@@ -474,7 +474,6 @@ Input is the property URI.
     </#if>
 </#macro>
 
-<script type="text/javascript" src="${baseUrl}/scripts/jquery.tablesorter.js"></script>
 <script type="text/javascript">
     $.tablesorter.addParser( {
         id: "checkbox",
@@ -551,7 +550,6 @@ Input is the property URI.
     });
 </script>
 
-<script type="text/javascript" src="${baseUrl}/scripts/jquery.autocomplete.js"></script>
 <script type="text/javascript">
     $(document).ready(function(){
 

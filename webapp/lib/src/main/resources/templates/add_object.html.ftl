@@ -1,50 +1,6 @@
 <#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="objectType" type="java.lang.String" -->
 
-<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-smoothness.css" media="screen" type="text/css" />
-		
-    	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
-
- 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.core.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.widget.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.core.js"></script>
-
-		<!-- Dependencies for rdfquery -->
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdfquery.rules-1.1-SNAPSHOT.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdf.turtle.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.bounce.js"></script>
-		
-		<!-- Dependencies for autocomplete -->
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.mouse.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.position.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.selectable.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.resizable.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.sortable.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.button.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.dialog.js"></script>
-	    
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.autocomplete.js"></script>
-
-		<!-- Dependencies for jstree -->
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.hotkeys.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.cookie.js"></script>
-	    
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.jstree.js"></script>
- 
- 		<!-- Dependencies for PODD -->
-		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script>
-		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
-
-		<script type="text/javascript" src="${baseUrl}/resources/scripts/animatedcollapse.js">
-		    /* this needs to be placed at the top of the file so that we can add divs as they are created !!!! */
-		    /***********************************************
-		     * Animated Collapsible DIV v2.4- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
-		     * This notice MUST stay intact for legal use
-		     * Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
-		     ***********************************************/
-		</script>
-
 		<script type="text/javascript">
 			podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
 		</script>
