@@ -65,8 +65,8 @@ function getObjectTypeMetadata(/* String */ objectTypeUri) {
 * 
 */
 function callbackForGetMetadata(resultData, status, xhr) {
-	console.debug('[getMetadata] ### SUCCESS ### ' + resultData);
-	
+	console.debug('[getMetadata] ### SUCCESS ### ');
+	console.debug(resultData);
 	nextDatabank = nextDatabank.load(resultData);
 	console.debug('Databank size = ' + nextDatabank.size());
 	
@@ -275,7 +275,7 @@ function displayEditField(index, nextField) {
 	li2.attr('id', 'id_li_' + nextField.propertyUri);
 	
 	if (nextField.displayType == DISPLAY_LongText) {
-		li2.append(addFieldInputText(input, 'textarea'));
+		li2.append(addFieldInputText(nextField, 'textarea'));
 		
 	} else if (nextField.displayType == DISPLAY_ShortText) {
 		li2.append(addFieldInputText(nextField, 'text'));
