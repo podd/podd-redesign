@@ -33,15 +33,15 @@
 
 
     <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
-    <script type="text/javascript" src="${baseUrl}/resources/scripts/podd_main.js"></script>
     <script type="text/javascript">
-        // display an alert if the browser is IE6 or older
+        // display an alert if the browser is IE7 or older
         displayBrowserAlert();
     </script>
 
     <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
     <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdfquery.rules-1.1-SNAPSHOT.js"></script>
-    <script type="text/javascript" src="${baseUrl}/resources/scripts/oas-rdf.js"></script>
+    
+    <script type="text/javascript" src="${baseUrl}/resources/scripts/podd_main.js"></script>
     
     <link rel="stylesheet" href="${baseUrl}/resources/styles/podd.css" media="screen" type="text/css" />
     <link rel="stylesheet" href="${baseUrl}/resources/styles/podd-colours.css" media="screen" type="text/css" />
