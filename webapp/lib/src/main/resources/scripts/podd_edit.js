@@ -178,34 +178,34 @@ function loadEditDataCallback(resultData, status, xhr) {
 	var bindings = myQuery.select();
 
 	var propertyList = [];
-	$.each(bindings, function(index, value) {
+	$.each(bindings, function(index, nextBinding) {
 		var nextChild = {};
 		nextChild.weight;
-		nextChild.propertyUri = value.propertyUri.value;
+		nextChild.propertyUri = nextBinding.propertyUri.value;
 		nextChild.propertyLabel;
 		nextChild.displayType;
 		nextChild.cardinality;
 		
-		if (typeof value.pLabel != 'undefined') {
-			nextChild.propertyLabel = value.pLabel.value;
+		if (typeof nextBinding.pLabel != 'undefined') {
+			nextChild.propertyLabel = nextBinding.pLabel.value;
 		}
-		if (typeof value.displayType != 'undefined') {
-			nextChild.displayType = value.displayType.value;
+		if (typeof nextBinding.displayType != 'undefined') {
+			nextChild.displayType = nextBinding.displayType.value;
 		}
-		if (typeof value.weight != 'undefined') {
-			nextChild.weight = value.weight.value;	
-		}
-		
-		if (typeof value.cardinality != 'undefined') {
-			nextChild.cardinality = value.cardinality.value;
+		if (typeof nextBinding.weight != 'undefined') {
+			nextChild.weight = nextBinding.weight.value;	
 		}
 		
-		if (typeof value.pValueLabel != 'undefined') {
-			nextChild.displayValue = value.pValueLabel.value;
-			nextChild.valueUri = value.pValue.value;
+		if (typeof nextBinding.cardinality != 'undefined') {
+			nextChild.cardinality = nextBinding.cardinality.value;
+		}
+		
+		if (typeof nextBinding.pValueLabel != 'undefined') {
+			nextChild.displayValue = nextBinding.pValueLabel.value;
+			nextChild.valueUri = nextBinding.pValue.value;
 		} else {
-			nextChild.displayValue = value.pValue.value;
-			nextChild.valueUri = value.pValue.value;
+			nextChild.displayValue = nextBinding.pValue.value;
+			nextChild.valueUri = nextBinding.pValue.value;
 		}
 		
 		propertyList.push(nextChild);
