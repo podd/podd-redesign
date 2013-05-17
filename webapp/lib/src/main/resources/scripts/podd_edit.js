@@ -89,11 +89,11 @@ nextDatabank) {
         url : requestUrl,
         type : 'GET',
         data : {
-            objecttypeuri : podd.objectTypeUri
+            objecttypeuri : objectTypeUri
         },
         dataType : 'json', // what is expected back
         success : function(resultData, status, xhr) {
-            successCallback(resultData, status, xhr, nextDatabank);
+            successCallback(resultData, status, xhr, objectTypeUri, nextDatabank);
         },
         error : function(xhr, status, error) {
             if (typeof console !== "undefined" && console.debug) {
@@ -115,7 +115,7 @@ nextDatabank) {
  * properties without weights, sorting them only by weight is insufficient.
  * 
  */
-podd.callbackForGetMetadata = function(resultData, status, xhr, nextDatabank) {
+podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, nextDatabank) {
     if (typeof console !== "undefined" && console.debug) {
         console.debug('[getMetadata] ### SUCCESS ### ');
         console.debug(resultData);
@@ -133,12 +133,26 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, nextDatabank) {
     })
     // FIXME: The following line is going to be very difficult to maintain in
     // the long run, so need to redesign the triple format
-    .where('<http://purl.org/podd/ns/poddScience#Project> ?propertyUri ?pValueRange').optional(
-            '?propertyUri poddBase:weight ?weight').optional('?propertyUri rdfs:label ?pLabel').optional(
-            '?propertyUri poddBase:hasDisplayType ?displayType').optional(
-            '?propertyUri poddBase:hasCardinality ?cardinality').filter(function() {
-        return this.propertyUri.value != "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>";
-    });
+    // Desired type a OWL:Class
+    .where('<' + objectType + '> rdf:type owl:Class')
+    // Desired type has rdfs:subClassOf
+    .where('<' + objectType + '> rdfs:subClassOf ?x')
+    // Subclass is an owl:Restriction
+    .where('?x rdf:type owl:Restriction')
+    // Restriction has a linked property, which is the minimum we require
+    .where('?x owl:onProperty ?propertyUri')
+    // Optional, though recommended, rdfs:label annotation on property
+    .optional('?propertyUri rdfs:label ?pLabel')
+    // Optional, though recommended, display type to customise the HTML
+    // interface for this property
+    .optional('?propertyUri poddBase:hasDisplayType ?displayType')
+    // Optional, though recommended, cardinality to specify how many of this
+    // property can be linked to this class
+    .optional('?propertyUri poddBase:hasCardinality ?cardinality')
+    // Optional, weight given for property when used with this class to order
+    // the interface consistently
+    .optional('?propertyUri poddBase:weight ?weight');
+
     var bindings = myQuery.select();
 
     var propertyList = [];
@@ -184,7 +198,9 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, nextDatabank) {
         return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
     });
 
-    $.each(propertyList, podd.displayEditField);
+    $.each(propertyList, function(index, value) {
+        podd.displayEditField(index, value, nextDatabank)
+    });
 }
 
 /*
@@ -244,9 +260,7 @@ podd.loadEditDataCallback = function(resultData, status, xhr, nextDatabank) {
             '?propertyUri <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel').optional(
             '?propertyUri poddBase:hasDisplayType ?displayType').optional(
             '?propertyUri poddBase:hasCardinality ?cardinality').optional(
-            '?pValue <http://www.w3.org/2000/01/rdf-schema#label> ?pValueLabel').filter(function() {
-        return this.displayType.value != "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-    });
+            '?pValue <http://www.w3.org/2000/01/rdf-schema#label> ?pValueLabel');
     var bindings = myQuery.select();
 
     var propertyList = [];
@@ -303,7 +317,7 @@ podd.loadEditDataCallback = function(resultData, status, xhr, nextDatabank) {
 /*
  * Display the given field on page
  */
-podd.displayEditField = function(index, nextField) {
+podd.displayEditField = function(index, nextField, nextDatabank) {
     if (typeof console !== "undefined" && console.debug) {
         // console.debug('[' + nextField.weight + '] <' + nextField.propertyUri
         // + '>
@@ -351,7 +365,7 @@ podd.displayEditField = function(index, nextField) {
 
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
-        li2.append(podd.addFieldDropDownList(nextField));
+        li2.append(podd.addFieldDropDownList(nextField, nextDatabank));
 
     }
     else if (nextField.displayType == DISPLAY_CheckBox) {
@@ -491,7 +505,7 @@ podd.addFieldInputText = function(nextField, inputType) {
 /*
  * Construct an HTML drop-down list for the given field.
  */
-podd.addFieldDropDownList = function(nextField) {
+podd.addFieldDropDownList = function(nextField, nextDatabank) {
     var select = $('<select>', {
         id : 'id_' + nextField.propertyUri,
         name : 'name_' + nextField.propertyLabel,
@@ -539,11 +553,11 @@ podd.searchOntologyService = function(
 
     requestUrl = podd.baseUrl + '/search';
 
-    if(console && console.debug) {
+    if (console && console.debug) {
         console.debug('Searching artifact: "' + artifactUri.toString() + '" in searchTypes: "' + request.searchTypes
                 + '" for terms matching "' + request.term + '".');
     }
-    
+
     queryParams = {
         searchterm : request.term,
         artifacturi : artifactUri.toString(),
@@ -551,11 +565,11 @@ podd.searchOntologyService = function(
     };
 
     $.get(requestUrl, queryParams, function(data) {
-        if(console && console.debug) {
+        if (console && console.debug) {
             console.debug('Response: ' + data.toString());
         }
         var formattedData = parsesearchresults(requestUrl, data);
-        if(console && console.debug) {
+        if (console && console.debug) {
             console.debug('No. of search results = ' + formattedData.length);
         }
         callbackFunction(formattedData);
