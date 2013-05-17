@@ -156,8 +156,6 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
     var myQuery = $.rdf({
         databank : nextDatabank
     })
-    // FIXME: The following line is going to be very difficult to maintain in
-    // the long run, so need to redesign the triple format
     // Desired type a OWL:Class
     .where('<' + objectType + '> rdf:type owl:Class')
     // Desired type has rdfs:subClassOf
@@ -167,7 +165,7 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
     // Restriction has a linked property, which is the minimum we require
     .where('?x owl:onProperty ?propertyUri')
     // Optional, though recommended, rdfs:label annotation on property
-    .optional('?propertyUri rdfs:label ?pLabel')
+    .optional('?propertyUri rdfs:label ?propertyLabel')
     // Optional, though recommended, display type to customise the HTML
     // interface for this property
     .optional('?propertyUri poddBase:hasDisplayType ?displayType')
@@ -181,29 +179,34 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
     var bindings = myQuery.select();
 
     var propertyList = [];
-    $.each(bindings, function(index, value) {
+    $.each(bindings, function(index, nextBinding) {
         var nextChild = {};
         nextChild.weight;
-        nextChild.propertyUri = value.propertyUri.value;
+        nextChild.propertyUri = nextBinding.propertyUri.value;
         nextChild.propertyLabel;
         nextChild.displayType;
         nextChild.cardinality;
 
-        if (typeof value.pLabel != 'undefined') {
-            nextChild.propertyLabel = value.pLabel.value;
+        if (typeof nextBinding.propertyLabel != 'undefined') {
+            nextChild.propertyLabel = nextBinding.propertyLabel.value;
         }
-        if (typeof value.displayType != 'undefined') {
-            nextChild.displayType = value.displayType.value;
+        else {
+            nextChild.propertyLabel = nextBinding.propertyUri.value;
         }
-        if (typeof value.weight != 'undefined') {
-            nextChild.weight = value.weight.value;
+
+        if (typeof nextBinding.displayType != 'undefined') {
+            nextChild.displayType = nextBinding.displayType.value;
+        }
+
+        if (typeof nextBinding.weight != 'undefined') {
+            nextChild.weight = nextBinding.weight.value;
         }
         else {
             nextChild.weight = 99;
         }
 
-        if (typeof value.cardinality != 'undefined') {
-            nextChild.cardinality = value.cardinality.value;
+        if (typeof nextBinding.cardinality != 'undefined') {
+            nextChild.cardinality = nextBinding.cardinality.value;
         }
 
         nextChild.displayValue = '';
@@ -301,11 +304,19 @@ podd.loadEditDataCallback = function(resultData, status, xhr, nextDatabank) {
         if (typeof nextBinding.pLabel != 'undefined') {
             nextChild.propertyLabel = nextBinding.pLabel.value;
         }
+        else {
+            nextChild.propertyLabel = nextBinding.propertyUri.value;
+        }
+
         if (typeof nextBinding.displayType != 'undefined') {
             nextChild.displayType = nextBinding.displayType.value;
         }
+
         if (typeof nextBinding.weight != 'undefined') {
             nextChild.weight = nextBinding.weight.value;
+        }
+        else {
+            nextChild.weight = 99;
         }
 
         if (typeof nextBinding.cardinality != 'undefined') {
@@ -354,15 +365,15 @@ podd.displayEditField = function(index, nextField, nextDatabank) {
     // field name
     var span = $('<span>');
     span.attr('class', 'bold');
-    span.attr('property', nextField.propertyUri);
-    span.attr('title', nextField.propertyUri);
+    span.attr('property', nextField.propertyUri.toString());
+    span.attr('title', nextField.propertyUri.toString());
     // Make sure that in the case that the label was not found that we give it
     // the URI as a last resort label
     if (typeof nextField.propertyLabel !== "undefined") {
         span.html(nextField.propertyLabel);
     }
     else {
-        span.html(nextField.propertyUri);
+        span.html(nextField.propertyUri.toString());
     }
 
     var li = $("<li>")
@@ -382,7 +393,7 @@ podd.displayEditField = function(index, nextField, nextDatabank) {
         link.attr('icon', 'addField');
         link.attr('title', 'Add ' + nextField.propertyLabel);
         link.attr('class', 'clonable');
-        link.attr('id', 'cid_' + nextField.propertyUri);
+        // link.attr('id', 'cid_' + nextField.propertyUri);
         link.attr('property', nextField.propertyUri);
         li.append(link);
     }
