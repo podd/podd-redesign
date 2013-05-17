@@ -995,20 +995,20 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 
                 sb2.append("} WHERE {");
                 
-                sb2.append(" OPTIONAL {?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType } . ");
+                sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
                 
                 sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
-                        + "> ?propertyDisplayType } . ");
+                        + "> ?propertyDisplayType . }  ");
                 
-                sb2.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel } . ");
+                sb2.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . } ");
                 
                 sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue()
-                        + "> ?propertyWeight } . ");
+                        + "> ?propertyWeight . } ");
                 
                 if(includeDoNotDisplayProperties)
                 {
                     sb2.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                            + "> ?propertyDoNotDisplay } . ");
+                            + "> ?propertyDoNotDisplay . } ");
                 }
                 
                 sb2.append("}");
