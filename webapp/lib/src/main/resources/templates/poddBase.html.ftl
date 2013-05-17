@@ -37,12 +37,6 @@
     <link rel="stylesheet" href="${baseUrl}/resources/styles/podd-colours.css" media="screen" type="text/css" />
 	<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-smoothness.css" media="screen" type="text/css" />
 
-    <script type="text/javascript">
-		// setup the global PODD object
-		podd = {};
-		podd.baseUrl = "${baseUrl}";
-	</script>
-    
     	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
 
  	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.core.js"></script>
@@ -67,10 +61,6 @@
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.autocomplete.js"></script>
 
  		<!-- Dependencies for PODD -->
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/podd_main.js"></script>
-		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script>
-		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
-	    
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.metadata.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.inputlimiter.1.2.js"></script>
 		<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.tablesorter.js"></script>
@@ -89,6 +79,16 @@
 	    $(document).ready(displayBrowserAlert);
     </script>
     
+		<script type="text/javascript">
+			// setup the global PODD object
+			podd = {};
+			podd.baseUrl = "${baseUrl}";
+		</script>
+    
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/podd_main.js"></script>
+		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script>
+		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
+	    
 </head>
 
 <body>
