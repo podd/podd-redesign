@@ -1,9 +1,9 @@
 <#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="objectType" type="java.lang.String" -->
 
-		<script type="text/javascript">
-			podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
-		</script>
+<script type="text/javascript">
+	podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
+</script>
 
 
 <div id="title_pane">

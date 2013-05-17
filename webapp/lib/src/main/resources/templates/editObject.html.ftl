@@ -20,6 +20,10 @@
 <#-- @ftlvariable name="generalErrorList" type="java.util.ArrayList<java.lang.String>" -->
 <#-- @ftlvariable name="objectErrorList" type="java.util.ArrayList<java.lang.String>" -->
 
+<script type="text/javascript">
+	podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
+</script>
+
 <script type="text/javascript" src="${baseUrl}/scripts/animatedcollapse.js">
     /* this needs to be placed at the top of the file so that we can add divs as they are created !!!! */
     /***********************************************
