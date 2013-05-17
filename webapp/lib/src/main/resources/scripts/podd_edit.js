@@ -184,7 +184,7 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, nextDatabank) {
         return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
     });
 
-    $.each(propertyList, displayEditField);
+    $.each(propertyList, podd.displayEditField);
 }
 
 /*
@@ -297,7 +297,7 @@ podd.loadEditDataCallback = function(resultData, status, xhr, nextDatabank) {
         return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
     });
 
-    $.each(propertyList, displayEditField);
+    $.each(propertyList, podd.displayEditField);
 }
 
 /*
@@ -343,19 +343,19 @@ podd.displayEditField = function(index, nextField) {
     li2.attr('id', 'id_li_' + nextField.propertyUri);
 
     if (nextField.displayType == DISPLAY_LongText) {
-        li2.append(addFieldInputText(nextField, 'textarea'));
+        li2.append(podd.addFieldInputText(nextField, 'textarea'));
 
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
-        li2.append(addFieldInputText(nextField, 'text'));
+        li2.append(podd.addFieldInputText(nextField, 'text'));
 
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
-        li2.append(addFieldDropDownList(nextField));
+        li2.append(podd.addFieldDropDownList(nextField));
 
     }
     else if (nextField.displayType == DISPLAY_CheckBox) {
-        var input = addFieldInputText(nextField, 'checkbox')
+        var input = podd.addFieldInputText(nextField, 'checkbox')
         var label = '<label>' + nextField.displayValue + '</label>';
         li2.append(input.after(label));
 
@@ -375,7 +375,7 @@ podd.displayEditField = function(index, nextField) {
 
     }
     else { // default
-        li2.append(addFieldInputText(nextField, 'text'));
+        li2.append(podd.addFieldInputText(nextField, 'text'));
     }
 
     var subList = $('<ul>').append(li2);
