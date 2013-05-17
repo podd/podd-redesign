@@ -74,11 +74,6 @@
 		     ***********************************************/
 		</script>
 
-    <script type="text/javascript">
-	    // display an alert if the browser is IE7 or older
-	    $(document).ready(displayBrowserAlert);
-    </script>
-    
 		<script type="text/javascript">
 			// setup the global PODD object
 			podd = {};
@@ -89,6 +84,11 @@
 		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_autocomplete.js"></script>
 		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
 	    
+    <script type="text/javascript">
+	    // display an alert if the browser is IE7 or older
+	    $(document).ready(podd.displayBrowserAlert);
+    </script>
+    
 </head>
 
 <body>
