@@ -67,6 +67,18 @@ podd.newDatabank = function() {
     return nextDatabank;
 }
 
+/**
+ * DEBUG-ONLY : Prints the contents of the given databank to the console
+ */
+podd.debugPrintDatabank = function(databank, message) {
+    var triples = $.toJSON(databank.dump({
+        format : 'application/json'
+    }));
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug(message + ': (' + databank.size() + ') ' + triples);
+    }
+}
+
 /*
  * Retrieve metadata to render the fields to add a new object of the given type.
  * 
