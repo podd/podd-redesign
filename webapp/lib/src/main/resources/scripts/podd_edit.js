@@ -715,8 +715,10 @@ podd.updatePoddObject = function(
 
     requestUrl = podd.baseUrl + '/artifact/edit';
 
-    console.debug('[updatePoddObject]  "' + objectUri + '" of artifact (' + versionIri + ') .');
-
+    console.debug('[updatePoddObject]  "' + objectUri);
+    if (typeof versionIri !== "undefined") {
+        console.debug(' of artifact (' + versionIri + ').');
+    }
     $.each(attributes, function(index, attribute) {
         console.debug('[updatePoddObject] handling property: ' + attribute.property);
         if (!attribute.isNew) {
