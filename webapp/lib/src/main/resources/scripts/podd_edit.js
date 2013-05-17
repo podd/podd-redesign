@@ -12,8 +12,8 @@ $(document).ready(function() {
     console.debug('initializing...');
     console.debug('-------------------');
 
-    podd.artifactDatabank = podd.rdf.newDatabank();
-    podd.schemaDatabank = podd.rdf.newDatabank();
+    podd.artifactDatabank = podd.newDatabank();
+    podd.schemaDatabank = podd.newDatabank();
 
     // getPoddObjectForEdit(artifactUri, objectUri);
     getObjectTypeMetadata(podd.objectTypeUri, callbackForGetMetadata, podd.schemaDatabank);
@@ -48,7 +48,7 @@ var DISPLAY_Table = 'http://purl.org/podd/ns/poddBase#DisplayType_Table';
  * Creates a new rdfquery.js databank, adds common prefixes to it, and then
  * returns the databank to the caller.
  */
-podd.rdf.newDatabank = function() {
+podd.newDatabank = function() {
     var nextDatabank = $.rdf.databank();
     // TODO: Is base useful to us?
     // nextDatabank.base("http://www.example.org/")
