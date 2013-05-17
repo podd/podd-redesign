@@ -400,22 +400,22 @@ podd.displayEditField = function(index, nextField, nextDatabank) {
 
     var li2 = $("<li>");
     li2.attr('id', 'id_li_' + nextField.propertyUri);
-    
+
     if (nextField.displayType == DISPLAY_LongText) {
         var input = podd.addFieldInputText(nextField, 'textarea');
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
-        var input = podd.addFieldInputText(nextField, 'text')
+        var input = podd.addFieldInputText(nextField, 'text');
         podd.addShortTextBlurHandler(input);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
-        var input = podd.addFieldDropDownList(nextField, nextDatabank));
+        var input = podd.addFieldDropDownList(nextField, nextDatabank);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_CheckBox) {
-        var input = podd.addFieldInputText(nextField, 'checkbox')
+        var input = podd.addFieldInputText(nextField, 'checkbox');
         var label = '<label>' + nextField.displayValue + '</label>';
         li2.append(input.after(label));
     }
@@ -432,7 +432,9 @@ podd.displayEditField = function(index, nextField, nextDatabank) {
         li2.append(checkBox);
     }
     else { // default
-        li2.append(podd.addFieldInputText(nextField, 'text'));
+        var input = podd.addFieldInputText(nextField, 'text');
+        podd.addShortTextBlurHandler(input);
+        li2.append(input);
     }
 
     var subList = $('<ul>').append(li2);
@@ -619,7 +621,7 @@ podd.searchOntologyService = function(
     }, 'json');
 };
 
-//--------------------------------
+// --------------------------------
 /* Manually created fragment for submission into edit artifact service */
 // var nextDatabank = $.rdf.databank();
 // .base('http://purl.org/podd/basic-2-20130206/artifact:1')
@@ -910,27 +912,26 @@ podd.addAutoCompleteHandler = function(/* object */autoComplete) {
 // Update for short text
 podd.addShortTextBlurHandler = function(/* object */shortText) {
     // $(".short_text")
-    shortText.blur(
-            function(event) {
-                console.debug("shorttext blur event");
-                console.debug(event);
+    shortText.blur(function(event) {
+        console.debug("shorttext blur event");
+        console.debug(event);
 
-                var objectUri = podd.getCurrentPoddObjectUri();
+        var objectUri = podd.getCurrentObjectUri();
 
-                var attributes = [];
-                var nextAttribute = {};
-                nextAttribute.isNew = false;
-                nextAttribute.property = '<' + $(this).attr('property') + '>';
-                nextAttribute.newValue = '"' + $(this).val() + '"';
-                nextAttribute.oldValue = '"' + $('#in1Hidden').val() + '"';
+        var attributes = [];
+        var nextAttribute = {};
+        nextAttribute.isNew = false;
+        nextAttribute.property = '<' + $(this).attr('property') + '>';
+        nextAttribute.newValue = '"' + $(this).val() + '"';
+        nextAttribute.oldValue = '"' + $('#in1Hidden').val() + '"';
 
-                attributes.push(nextAttribute);
+        attributes.push(nextAttribute);
 
-                console.debug('Change property: ' + nextAttribute.property + ' from ' + nextAttribute.oldValue + ' to '
-                        + nextAttribute.newValue + '.');
+        console.debug('Change property: ' + nextAttribute.property + ' from ' + nextAttribute.oldValue + ' to '
+                + nextAttribute.newValue + '.');
 
-                podd.updatePoddObject(objectUri, attributes, podd.artifactDatabank);
-            });
+        podd.updatePoddObject(objectUri, attributes, podd.artifactDatabank);
+    });
 };
 
 // Update for autocomplete
@@ -939,7 +940,7 @@ podd.addAutoCompleteBlurHandler = function(/* object */autoComplete) {
     autoComplete.blur(function(event) {
         console.debug("autocomplete blur event");
         console.debug(event);
-        var objectUri = podd.getCurrentPoddObjectUri();
+        var objectUri = podd.getCurrentObjectUri();
 
         var attributes = [];
         var nextAttribute = {};
@@ -953,4 +954,3 @@ podd.addAutoCompleteBlurHandler = function(/* object */autoComplete) {
         podd.updatePoddObject(objectUri, attributes, podd.artifactDatabank);
     });
 };
-
