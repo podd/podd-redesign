@@ -211,8 +211,9 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
 
         propertyList.push(nextChild);
         if (typeof console !== "undefined" && console.debug) {
-            console.debug(nextChild.weight + '] <' + nextChild.propertyUri + '> "' + nextChild.propertyLabel + '" <'
-                    + nextChild.displayType + '> <' + nextChild.cardinality + '>');
+            console.debug("[" + nextChild.weight + "] propertyUri=<" + nextChild.propertyUri + "> label=\""
+                    + nextChild.propertyLabel + "\" displayType=<" + nextChild.displayType + "> card=<"
+                    + nextChild.cardinality + ">");
         }
     });
 
@@ -354,7 +355,15 @@ podd.displayEditField = function(index, nextField, nextDatabank) {
     var span = $('<span>');
     span.attr('class', 'bold');
     span.attr('property', nextField.propertyUri);
-    span.html(nextField.propertyLabel);
+    span.attr('title', nextField.propertyUri);
+    // Make sure that in the case that the label was not found that we give it
+    // the URI as a last resort label
+    if (typeof nextField.propertyLabel !== "undefined") {
+        span.html(nextField.propertyLabel);
+    }
+    else {
+        span.html(nextField.propertyUri);
+    }
 
     var li = $("<li>")
     li.append(span);
