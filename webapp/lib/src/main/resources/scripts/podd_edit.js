@@ -8,20 +8,23 @@
 // invoked when page is "ready"
 // --------------------------------
 $(document).ready(function() {
-    console.debug('-------------------');
-    console.debug('initializing...');
-    console.debug('-------------------');
-
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('-------------------');
+        console.debug('initializing...');
+        console.debug('-------------------');
+    }
     podd.artifactDatabank = podd.newDatabank();
     podd.schemaDatabank = podd.newDatabank();
 
     // getPoddObjectForEdit(artifactUri, objectUri);
-    getObjectTypeMetadata(podd.objectTypeUri, callbackForGetMetadata, podd.schemaDatabank);
+    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.callbackForGetMetadata, podd.schemaDatabank);
 
     // use delegation for dynamically added .clonable anchors
-    $("#details").delegate(".clonable", "click", cloneEmptyField);
+    $("#details").delegate(".clonable", "click", podd.cloneEmptyField);
 
-    console.debug('### initialization complete ###');
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('### initialization complete ###');
+    }
 });
 
 // --------------------- Constants ----------------------------
@@ -72,10 +75,15 @@ podd.newDatabank = function() {
  */
 podd.getObjectTypeMetadata = function(/* String */objectTypeUri, /* function */successCallback, /* object */
 nextDatabank) {
-    console.debug('[getMetadata]  "' + objectTypeUri + '" .');
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('[getMetadata]  "' + objectTypeUri + '" .');
+    }
 
     requestUrl = podd.baseUrl + '/metadata';
-    console.debug('[getMetadata] Request (GET):  ' + requestUrl);
+
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('[getMetadata] Request (GET):  ' + requestUrl);
+    }
 
     $.ajax({
         url : requestUrl,
@@ -88,8 +96,10 @@ nextDatabank) {
             successCallback(resultData, status, xhr, nextDatabank);
         },
         error : function(xhr, status, error) {
-            console.debug('[getMetadata] $$$ ERROR $$$ ' + error);
-            console.debug(xhr.statusText);
+            if (typeof console !== "undefined" && console.debug) {
+                console.debug('[getMetadata] $$$ ERROR $$$ ' + error);
+                console.debug(xhr.statusText);
+            }
         }
     });
 }
@@ -106,10 +116,16 @@ nextDatabank) {
  * 
  */
 podd.callbackForGetMetadata = function(resultData, status, xhr, nextDatabank) {
-    console.debug('[getMetadata] ### SUCCESS ### ');
-    console.debug(resultData);
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('[getMetadata] ### SUCCESS ### ');
+        console.debug(resultData);
+    }
+
     nextDatabank.load(resultData);
-    console.debug('Databank size = ' + nextDatabank.size());
+
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('Databank size = ' + nextDatabank.size());
+    }
 
     // retrieve weighted property list
     var myQuery = $.rdf({
@@ -155,8 +171,10 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, nextDatabank) {
         nextChild.valueUri = '';
 
         propertyList.push(nextChild);
-        console.debug(nextChild.weight + '] <' + nextChild.propertyUri + '> "' + nextChild.propertyLabel + '" <'
-                + nextChild.displayType + '> <' + nextChild.cardinality + '>');
+        if (typeof console !== "undefined" && console.debug) {
+            console.debug(nextChild.weight + '] <' + nextChild.propertyUri + '> "' + nextChild.propertyLabel + '" <'
+                    + nextChild.displayType + '> <' + nextChild.cardinality + '>');
+        }
     });
 
     // sort property list
@@ -177,10 +195,15 @@ podd.getPoddObjectForEdit = function(
 /* String */artifactUri,
 /* String */objectUri) {
 
-    console.debug('[getPoddObjectForEdit]  "' + objectUri + '" of artifact (' + artifactUri + ') .');
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('[getPoddObjectForEdit]  "' + objectUri + '" of artifact (' + artifactUri + ') .');
+    }
 
     requestUrl = podd.baseUrl + '/artifact/edit';
-    console.debug('[getPoddObjectForEdit] Request (GET):  ' + requestUrl);
+
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('[getPoddObjectForEdit] Request (GET):  ' + requestUrl);
+    }
 
     $.ajax({
         url : requestUrl,
@@ -192,8 +215,10 @@ podd.getPoddObjectForEdit = function(
         dataType : 'json', // what is expected back
         success : loadEditDataCallback,
         error : function(xhr, status, error) {
-            console.debug('[getPoddObjectForEdit] $$$ ERROR $$$ ' + error);
-            console.debug(xhr.statusText);
+            if (typeof console !== "undefined" && console.debug) {
+                console.debug('[getPoddObjectForEdit] $$$ ERROR $$$ ' + error);
+                console.debug(xhr.statusText);
+            }
         }
     });
 }
@@ -201,16 +226,18 @@ podd.getPoddObjectForEdit = function(
 /*
  * Callback function when RDF containing Edit data is available
  */
-podd.loadEditDataCallback = function(resultData, status, xhr) {
-    console.debug('[getPoddObjectForEdit] ### SUCCESS ### ' + resultData);
-
-    nextDatabank = nextDatabank.load(resultData);
-    console.debug('Databank size = ' + nextDatabank.size());
-
+podd.loadEditDataCallback = function(resultData, status, xhr, nextDatabank) {
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('[getPoddObjectForEdit] ### SUCCESS ### ' + resultData);
+    }
+    nextDatabank.load(resultData);
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('Databank size = ' + nextDatabank.size());
+    }
     // retrieve weighted property list
     var myQuery = $.rdf({
         databank : nextDatabank
-    }).prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+    })
     // FIXME: The following line is going to be very difficult to maintain in
     // the long run, so need to redesign the triple format
     .where('?objectUri ?propertyUri ?pValue').where('?propertyUri poddBase:weight ?weight').optional(
@@ -255,9 +282,12 @@ podd.loadEditDataCallback = function(resultData, status, xhr) {
         }
 
         propertyList.push(nextChild);
-        // console.debug(nextChild.weight + '] <' + nextChild.propertyUri + '>
-        // "' + nextChild.propertyLabel + '" <' +
-        // nextChild.displayType + '> <' + nextChild.cardinality + '>');
+        if (typeof console !== "undefined" && console.debug) {
+            // console.debug(nextChild.weight + '] <' + nextChild.propertyUri +
+            // '>
+            // "' + nextChild.propertyLabel + '" <' +
+            // nextChild.displayType + '> <' + nextChild.cardinality + '>');
+        }
     });
 
     // sort property list
@@ -274,9 +304,12 @@ podd.loadEditDataCallback = function(resultData, status, xhr) {
  * Display the given field on page
  */
 podd.displayEditField = function(index, nextField) {
-    // console.debug('[' + nextField.weight + '] <' + nextField.propertyUri + '>
-    // "' + nextField.propertyLabel + '" <' +
-    // nextField.displayType + '> <' + nextField.cardinality + '>');
+    if (typeof console !== "undefined" && console.debug) {
+        // console.debug('[' + nextField.weight + '] <' + nextField.propertyUri
+        // + '>
+        // "' + nextField.propertyLabel + '" <' +
+        // nextField.displayType + '> <' + nextField.cardinality + '>');
+    }
 
     // field name
     var span = $('<span>');
@@ -352,7 +385,9 @@ podd.displayEditField = function(index, nextField) {
 
 podd.cloneEmptyField = function() {
     var thisId = $(this).attr('id');
-    console.debug('Clicked clonable: ' + thisId);
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('Clicked clonable: ' + thisId);
+    }
 
     var idToClone = '#tLbl1'; // '#id_http://purl.org/podd/ns/poddScience_hasANZSRC';
     // //'#id_' + $(this).attr('property');
@@ -362,7 +397,9 @@ podd.cloneEmptyField = function() {
     // clonedField.attr('id', 'LABEL_cloned');
     // console.debug('Cloned: ' + clonedField.attr('id'));
     $(this).append(clonedField);
-    console.debug('appended cloned field');
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('appended cloned field');
+    }
 
     // var newObject = jQuery.extend(true, {}, $(idToClone));
     // console.debug('## SO clone: ' + JSON.stringify(newObject, null, 4));
@@ -385,22 +422,26 @@ podd.cloneEmptyField = function() {
  * 
  * toClone.append(clonedField);
  * 
- * console.debug('Cloning completed');
- *  }
+ * console.debug('Cloning completed'); }
  */
 
 // simply copied from PODD-1, does not work
 podd.addNewEmptyField = function(id) {
-    console.debug('Add new Empty field for "' + id + '"');
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('Add new Empty field for "' + id + '"');
+    }
 
     var parentId = 'id_li' + id;
-    console.debug('Add after parent with id: ' + $('"#' + parentId + '"').attr('id'));
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('Add after parent with id: ' + $('"#' + parentId + '"').attr('id'));
+    }
 
     var clonableId = 'id_' + id;
     // var clonedField = $('"#' + clonableId + '"').clone();
     var clonedField = $('#p1').clone();
-    console.debug('Cloned field of type: ' + clonedField.attr('type'));
-
+    if (typeof console !== "undefined" && console.debug) {
+        console.debug('Cloned field of type: ' + clonedField.attr('type'));
+    }
     // $(parentId).append(clonedField);
     $('#id_http://purl.org/podd/ns/poddScience#hasANZSRC').append(clonedField);
 
@@ -498,9 +539,11 @@ podd.searchOntologyService = function(
 
     requestUrl = podd.baseUrl + '/search';
 
-    console.debug('Searching artifact: "' + artifactUri.toString() + '" in searchTypes: "' + request.searchTypes
-            + '" for terms matching "' + request.term + '".');
-
+    if(console && console.debug) {
+        console.debug('Searching artifact: "' + artifactUri.toString() + '" in searchTypes: "' + request.searchTypes
+                + '" for terms matching "' + request.term + '".');
+    }
+    
     queryParams = {
         searchterm : request.term,
         artifacturi : artifactUri.toString(),
@@ -508,9 +551,13 @@ podd.searchOntologyService = function(
     };
 
     $.get(requestUrl, queryParams, function(data) {
-        console.debug('Response: ' + data.toString());
+        if(console && console.debug) {
+            console.debug('Response: ' + data.toString());
+        }
         var formattedData = parsesearchresults(requestUrl, data);
-        console.debug('No. of search results = ' + formattedData.length);
-        // callbackFunction(formattedData);
+        if(console && console.debug) {
+            console.debug('No. of search results = ' + formattedData.length);
+        }
+        callbackFunction(formattedData);
     }, 'json');
 }
