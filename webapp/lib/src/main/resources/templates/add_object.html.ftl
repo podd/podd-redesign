@@ -27,6 +27,7 @@
 		<a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 	</h3>	
 	<div id='details'>  <!-- Collapsible div -->
+			<!-- TODO: Generate these using javascript -->
 			<!-- standard attributes -->
 			<ol>
 				<!-- object name -->
@@ -53,22 +54,7 @@
 
             </ol>
 
-			<br>
-			<label id="tLbl1">Hello there</label><br>
-			<p id="p1">Message</p><br>
-			<br>
-			
-			<button id='btn9' class='clonable'>Test</button>
-
-		<p>Artifact URI: ${artifactUri!""}</p>
-		<br>
-
-		<div>
-			Project (Artifact) IRI: <input class='noaction' id='podd_artifact' cols='60' value='http://purl.org/podd/basic-2-20130206/artifact:1'><br>
-		</div>
-	<br><br>
-	
-    </div>  <!-- details - Collapsible div -->
+	    </div>  <!-- details - Collapsible div -->
 
 
 		
