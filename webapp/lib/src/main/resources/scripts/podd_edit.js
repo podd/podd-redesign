@@ -65,7 +65,20 @@ podd.newDatabank = function() {
     nextDatabank.prefix("tagging", "http://www.holygoat.co.uk/owl/redwood/0.1/tags/");
 
     return nextDatabank;
-}
+};
+
+podd.getCurrentObjectUri = function() {
+    var objectUri = '<' + podd.objectUri + '>';
+
+    if (typeof podd.objectUri === 'undefined') {
+        // hardcoded blank node for new objects
+        // this will be replaced after the first valid submission of the
+        // object to the server
+        objectUri = "_:a1";
+    }
+
+    return objectUri;
+};
 
 /**
  * DEBUG-ONLY : Prints the contents of the given databank to the console
@@ -77,7 +90,7 @@ podd.debugPrintDatabank = function(databank, message) {
     if (typeof console !== "undefined" && console.debug) {
         console.debug(message + ': (' + databank.size() + ') ' + triples);
     }
-}
+};
 
 /*
  * Retrieve metadata to render the fields to add a new object of the given type.
@@ -114,7 +127,7 @@ nextDatabank) {
             }
         }
     });
-}
+};
 
 /*
  * Callback function when RDF containing metadata is available
@@ -213,7 +226,7 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
     $.each(propertyList, function(index, value) {
         podd.displayEditField(index, value, nextDatabank)
     });
-}
+};
 
 /*
  * Retrieve an RDF containing necessary data and meta-data to populate the Edit
@@ -249,7 +262,7 @@ podd.getPoddObjectForEdit = function(
             }
         }
     });
-}
+};
 
 /*
  * Callback function when RDF containing Edit data is available
@@ -324,7 +337,7 @@ podd.loadEditDataCallback = function(resultData, status, xhr, nextDatabank) {
     });
 
     $.each(propertyList, podd.displayEditField);
-}
+};
 
 /*
  * Display the given field on page
@@ -407,7 +420,7 @@ podd.displayEditField = function(index, nextField, nextDatabank) {
     var subList = $('<ul>').append(li2);
     li.append(subList);
     $("#details ol").append(li);
-}
+};
 
 podd.cloneEmptyField = function() {
     var thisId = $(this).attr('id');
@@ -438,7 +451,7 @@ podd.cloneEmptyField = function() {
     // cloned.attr('id', oldId + '_v1');
     // $(this).append(cloned);
 
-}
+};
 
 /**
  * function old() {
@@ -484,7 +497,7 @@ podd.addNewEmptyField = function(id) {
     // var li = document.createElement("li");
     // li.appendChild(element);
     // document.getElementById('add_' + id).appendChild(li);
-}
+};
 
 /*
  * Construct an HTML input field of a given type.
@@ -512,7 +525,7 @@ podd.addFieldInputText = function(nextField, inputType) {
     // - if changed, update the "instance" databank and set dirty flag
 
     return input;
-}
+};
 
 /*
  * Construct an HTML drop-down list for the given field.
@@ -553,7 +566,7 @@ podd.addFieldDropDownList = function(nextField, nextDatabank) {
         select.append(option);
     });
     return select;
-}
+};
 
 /*
  * Search Ontology Resource Service using AJAX, convert the RDF response to a
@@ -586,4 +599,4 @@ podd.searchOntologyService = function(
         }
         callbackFunction(formattedData);
     }, 'json');
-}
+};

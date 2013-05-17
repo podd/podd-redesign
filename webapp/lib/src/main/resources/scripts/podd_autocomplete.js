@@ -4,209 +4,7 @@
  * resulting information
  */
 
-if (typeof oas === 'undefined') {
-    oas = {};
-}
-
-if (typeof oas['autocomplete'] == 'undefined') {
-    oas.autocomplete = {};
-}
-
-$.widget("custom.catcomplete", $.ui.autocomplete, {
-    _renderMenu : function(ul, items) {
-        var self = this, currentCategory = "";
-        $.each(items, function(index, item) {
-            if (item.category != currentCategory) {
-                ul.append("<li class='ui-autocomplete-category'>" + item.category + "</li>");
-                currentCategory = item.category;
-            }
-            self._renderItem(ul, item);
-        });
-    }
-});
-
-oas.autocomplete.constructAutocomplete = function() {
-    // used to prevent race conditions between autocomplete requests
-    var requestIndex = 0;
-
-    // TODO: Load this list dynamically
-    var ontologies = [ {
-        value : "po",
-        label : "Plant Ontology",
-        desc : "Ontology about plants",
-        icon : "plant_ontology.gif"
-    }, {
-        value : "go",
-        label : "Gene Ontology",
-        desc : "Ontology about genes",
-        icon : "GO-head.gif"
-    }, {
-        value : "obi",
-        label : "Ontology for Biomedical Investigations",
-        desc : "Ontology used to describe biomedical investigations",
-        icon : "obi-blue-236x65.png"
-    } ];
-
-    // TODO: remove hardcoded element ID's here
-    $("#ontology").autocomplete({
-        serviceUrl : oas.baseUrl + 'search/ontologylabels/?searchterm=',
-        minChars : 3,
-        width : 300,
-        delimiter : /(,|;)\s*/,
-        deferRequestBy : 500, // miliseconds
-        focus : function(event, ui) {
-            $("#ontology").val(ui.item.label);
-            // $( "#ontology-icon" ).attr( "src",
-            // oas.baseUrl+"resources/static/images/" + ui.item.icon );
-            return false;
-        },
-        source : function(request, response) {
-            // console.debug("in source function");
-            // console.debug(this.options.serviceUrl);
-            // console.debug(request);
-            if (self.xhr) {
-                self.xhr.abort();
-            }
-            self.xhr = $.ajax({
-                url : this.options.serviceUrl + request.term,
-                // data: request,
-                dataType : "json",
-                autocompleteRequest : ++requestIndex,
-                success : function(data, status) {
-                    // console.debug("found success");
-                    // console.debug(data);
-                    // console.debug(status);
-                    if (this.autocompleteRequest === requestIndex) {
-                        // console.debug("response function");
-                        // console.debug(response);
-                        // TODO: make sure that the data here is filtered as
-                        // specified in
-                        // http://api.jqueryui.com/autocomplete/#option-source
-                        // Understanding the response function may also be
-                        // useful in understanding why nothing is happening here
-                        // http://api.jqueryui.com/autocomplete/#event-response
-                        response(oas.rdf.parsesearchresults(this.url, data));
-                    }
-                    // else
-                    // {
-                    // console.debug("ignored success callback because
-                    // autocompleteRequest=("+this.autocompleteRequest+") did
-                    // not equal requestIndex=("+requestIndex+")");
-                    // }
-                },
-                error : function(xhr, ajaxOptions, thrownError) {
-                    // console.debug("found error");
-                    // console.debug(xhr);
-                    // console.debug(ajaxOptions);
-                    // console.debug(thrownError);
-                    // console.debug(xhr.getResponseHeader());
-                    if (this.autocompleteRequest === requestIndex) {
-                        response([]);
-                    }
-                }
-            });
-        },
-        select : function(event, ui) {
-            $("#ontology").val(ui.item.label);
-            $("#ontology-id").val(ui.item.value.toString());
-            // $( "#ontology-description" ).html( ui.item.desc );
-            // $( "#ontology-icon" ).attr( "src", "images/" + ui.item.icon );
-            return false;
-        }
-    });
-
-    $("#ontology").data("autocomplete")._renderItem = function(ul, item) {
-        return $("<li></li>").data("item.autocomplete", item)
-                .append("<a>" + item.label + "<br />" + item.desc + "</a>").appendTo(ul);
-    };
-
-    $('#ontologytermlabel').autocomplete({
-        serviceUrl : oas.baseUrl + 'search/ontologies/?searchterm=',
-        minChars : 3,
-        width : 300,
-        delimiter : /(,|;)\s*/,
-        deferRequestBy : 500, // miliseconds
-        // search: function( event, ui ){
-        // var originalUrl = this.url;
-        // console.debug("search event triggered");
-        // / console.debug(event);
-        // console.debug(ui);
-        // console.debug(event.target.value);
-        // url = serviceUrl+event.target.value;
-        // },
-        source : function(request, response) {
-            // console.debug("in source function");
-            // console.debug(this.options.serviceUrl);
-            // console.debug(request);
-            if (self.xhr) {
-                self.xhr.abort();
-            }
-
-            // console.debug("current ontology id");
-            // console.debug($( "#ontology-id" ));
-            // console.debug($( "#ontology-id" ).val());
-
-            var ontologyUri = $.trim($("#ontology-id").val());
-
-            var requestUrl = this.options.serviceUrl + request.term;
-
-            if (ontologyUri.length > 0) {
-                requestUrl = requestUrl + "&ontologyUri=" + ontologyUri;
-            }
-
-            self.xhr = $.ajax({
-                url : requestUrl,
-                // data: request,
-                dataType : "json",
-                autocompleteRequest : ++requestIndex,
-                success : function(data, status) {
-                    // console.debug("found success");
-                    // console.debug(data);
-                    // console.debug(status);
-                    if (this.autocompleteRequest === requestIndex) {
-                        // console.debug("response function");
-                        // console.debug(response);
-                        // NOTE: make sure that the data here is filtered as
-                        // specified in
-                        // http://api.jqueryui.com/autocomplete/#option-source
-                        // Understanding the response function may also be
-                        // useful in understanding why nothing is happening here
-                        // http://api.jqueryui.com/autocomplete/#event-response
-                        response(oas.rdf.parsesearchresults(this.url, data));
-                    }
-                    // else
-                    // {
-                    // console.debug("ignored success callback because
-                    // autocompleteRequest=("+this.autocompleteRequest+") did
-                    // not equal requestIndex=("+requestIndex+")");
-                    // }
-                },
-                error : function(xhr, ajaxOptions, thrownError) {
-                    // console.debug("found error");
-                    // console.debug(xhr);
-                    // console.debug(ajaxOptions);
-                    // console.debug(thrownError);
-                    // console.debug(xhr.getResponseHeader());
-                    if (this.autocompleteRequest === requestIndex) {
-                        response([]);
-                    }
-                }
-            });
-        },
-        select : function(event, ui) {
-            console.debug("Option selected");
-            console.debug(event);
-            console.debug(ui);
-            $("#ontologytermlabel").val(ui.item.label);
-            $("#ontologytermuri").val(ui.item.value.toString());
-            return false;
-        }
-    });
-
-};
-
 // --------------------------------
-
 /* Manually created fragment for submission into edit artifact service */
 // var nextDatabank = $.rdf.databank();
 // .base('http://purl.org/podd/basic-2-20130206/artifact:1')
@@ -221,12 +19,6 @@ oas.autocomplete.constructAutocomplete = function() {
 // .add(
 // '<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material>
 // poddScience:hasGenotype <genotype33> .')
-var artifactIri;
-
-var versionIri;
-
-var theMessageBox = '#message1';
-
 /* Display a Message */
 podd.displayMessage = function(event) {
     var messageBox = event.data.param1;
@@ -235,6 +27,19 @@ podd.displayMessage = function(event) {
     console.debug(messageBox);
     $(messageBox).html('<i>' + message + '</i>');
 }
+
+/**
+ * DEBUG-ONLY : retrieve artifact and load it to databank
+ */
+podd.debugAddDownloadArtifactHandler = function(/* string */buttonPath, /* string */inputPath) {
+    // $('#btn2')
+    $(path).click(function() {
+        // var artifactUri = $('#podd_artifact').val();
+        var artifactUri = $(inputPath).val();
+        podd.getArtifact(artifactUri);
+        // removeTriple();
+    });
+};
 
 /* Display a message on leaving text field */
 podd.doBlur = function(theMessageBox) {
@@ -495,7 +300,7 @@ podd.addShortTextBlurHandlers = function(/* string */shortTextPath) {
                 console.debug("shorttext blur event");
                 console.debug(event);
 
-                var objectUri = '<' + $('#podd_object').val() + '>';
+                var objectUri = podd.getCurrentPoddObjectUri();
 
                 var attributes = [];
                 var nextAttribute = {};
@@ -519,14 +324,7 @@ podd.addAutoCompleteBlurHandlers = function(/* string */autoCompletePath) {
     $(autoCompletePath).blur(function(event) {
         console.debug("autocomplete blur event");
         console.debug(event);
-        var objectUri = '<' + podd.objectUri + '>';
-
-        if (typeof podd.objectUri === 'undefined') {
-            // hardcoded blank node for new objects
-            // this will be replaced after the first valid submission of the
-            // object to the server
-            objectUri = "_:a1";
-        }
+        var objectUri = podd.getCurrentPoddObjectUri();
 
         var attributes = [];
         var nextAttribute = {};
@@ -540,13 +338,3 @@ podd.addAutoCompleteBlurHandlers = function(/* string */autoCompletePath) {
         podd.updatePoddObject(objectUri, attributes, podd.artifactDatabank);
     });
 };
-
-$(document).ready(function() {
-
-    // DEBUG ONLY : retrieve artifact and load it to databank
-    $('#btn2').click(function() {
-        var artifactUri = $('#podd_artifact').val();
-        podd.getArtifact(artifactUri);
-        // removeTriple();
-    });
-});
