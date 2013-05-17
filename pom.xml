@@ -426,7 +426,7 @@
 			<dependency>
 				<groupId>com.github.ansell.semargl</groupId>
 				<artifactId>semargl-sesame</artifactId>
-				<version>0.5-SNAPSHOT</version>
+				<version>0.6-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
