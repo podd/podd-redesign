@@ -117,7 +117,7 @@ oas.autocomplete.constructAutocomplete = function() {
 
     $("#ontology").data("autocomplete")._renderItem = function(ul, item) {
         return $("<li></li>").data("item.autocomplete", item)
-        .append("<a>" + item.label + "<br />" + item.desc + "</a>").appendTo(ul);
+                .append("<a>" + item.label + "<br />" + item.desc + "</a>").appendTo(ul);
     };
 
     $('#ontologytermlabel').autocomplete({
@@ -205,23 +205,22 @@ oas.autocomplete.constructAutocomplete = function() {
 
 };
 
-//--------------------------------
+// --------------------------------
 
 /* Manually created fragment for submission into edit artifact service */
-var nextDatabank = $.rdf.databank();
-//.base('http://purl.org/podd/basic-2-20130206/artifact:1')
-//.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
-//.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-//.prefix('owl', 'http://www.w3.org/2002/07/owl#')
-//.prefix('poddScience', 'http://purl.org/podd/ns/poddScience#')
-//.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
-//.add('<genotype33> rdf:type poddScience:Genotype .')
-//.add('<genotype33> rdf:type owl:NamedIndividual .')
-//.add('<genotype33> rdfs:label "Genotype 33" .')
-//.add(
-//'<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material>
-//poddScience:hasGenotype <genotype33> .')
-
+// var nextDatabank = $.rdf.databank();
+// .base('http://purl.org/podd/basic-2-20130206/artifact:1')
+// .prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
+// .prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+// .prefix('owl', 'http://www.w3.org/2002/07/owl#')
+// .prefix('poddScience', 'http://purl.org/podd/ns/poddScience#')
+// .prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
+// .add('<genotype33> rdf:type poddScience:Genotype .')
+// .add('<genotype33> rdf:type owl:NamedIndividual .')
+// .add('<genotype33> rdfs:label "Genotype 33" .')
+// .add(
+// '<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material>
+// poddScience:hasGenotype <genotype33> .')
 var artifactIri;
 
 var versionIri;
@@ -240,7 +239,7 @@ podd.displayMessage = function(event) {
 /* Display a message on leaving text field */
 podd.doBlur = function(theMessageBox) {
     $(theMessageBox)
-    .html('The value of field "' + $(this).attr('id') + '" was set to: "<b>' + $(this).val() + '</b>".');
+            .html('The value of field "' + $(this).attr('id') + '" was set to: "<b>' + $(this).val() + '</b>".');
 }
 
 /* Retrieve the current version of an artifact and populate the databank */
@@ -288,9 +287,9 @@ podd.getArtifact = function(artifactUri, nextDatabank) {
  * a String literal) }
  */
 podd.updatePoddObject = function(
-        /* String */objectUri,
-        /* array of objects */attributes,
-        /* object */nextDatabank) {
+/* String */objectUri,
+/* array of objects */attributes,
+/* object */nextDatabank) {
 
     requestUrl = podd.baseUrl + '/artifact/edit';
 
@@ -311,7 +310,7 @@ podd.updatePoddObject = function(
     // set query parameters in the URI as setting them under data failed, mostly
     // leading to a 415 error
     requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri) + '&versionuri='
-    + encodeURIComponent(versionIri) + '&isforce=true';
+            + encodeURIComponent(versionIri) + '&isforce=true';
     console.debug('[updatePoddObject] Request (POST):  ' + requestUrl);
 
     $.ajax({
@@ -350,9 +349,9 @@ podd.autoCompleteCallback = function(/* object with 'search term' */request, /* 
             + '" for terms matching "' + request.term + '".');
 
     queryParams = {
-            searchterm : request.term,
-            artifacturi : artifactIri.toString(),
-            searchtypes : searchTypes
+        searchterm : request.term,
+        artifacturi : artifactIri.toString(),
+        searchtypes : searchTypes
     };
 
     $.get(requestUrl, queryParams, function(data) {
@@ -420,8 +419,8 @@ podd.getOntologyID = function(nextDatabank) {
 };
 
 /*
- * Parse the given Databank and extract the Project title of the artifact
- * contained within.
+ * Parse the given Databank and extract the rdfs:label of the top object of the
+ * artifact contained within contained within.
  */
 podd.getProjectTitle = function(nextDatabank) {
     console.debug("[getProjectTitle] start");
@@ -459,74 +458,95 @@ podd.deleteTriples = function(nextDatabank, subject, property) {
     });
 }
 
-//--------------------------------
-//everything needs to come in here
-//--------------------------------
-$(document).ready(
-        function() {
+// Add autocompleteHandlers
+podd.addAutoCompleteHandlers = function(/* string */autoCompletePath) {
+    // $(".autocomplete")
+    $(autoCompletePath).autocomplete({
+        delay : 500, // milliseconds
+        minLength : 2, // minimum length to trigger
+        // autocomplete
+        source : podd.autoCompleteCallback,
 
-            // auto complete 1
-            $(".autocomplete").autocomplete({
-                delay : 500, // milliseconds
-                minLength : 2, // minimum length to trigger
-                // autocomplete
-                source : podd.autoCompleteCallback,
+        focus : function(event, ui) {
+            // prevent ui.item.value from appearing in the textbox
+            // FIXME: Remove hardcoded path here
+            $('#in4').val(ui.item.label);
+            return false;
+        },
 
-                focus : function(event, ui) {
-                    // prevent ui.item.value from appearing in the textbox
-                    $('#in4').val(ui.item.label);
-                    return false;
-                },
+        select : function(event, ui) {
+            console.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
+            // FIXME: Remove hardcoded path here
+            $('#in4Hidden').val(ui.item.value);
+            // FIXME: Remove hardcoded path here
+            $('#in4').val(ui.item.label);
+            // FIXME: Remove hardcoded path here
+            $('#message1').html('Selected : ' + ui.item.value);
+            return false;
+        }
+    });
+};
 
-                select : function(event, ui) {
-                    console.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
-                    $('#in4Hidden').val(ui.item.value);
-                    $('#in4').val(ui.item.label);
-                    $('#message1').html('Selected : ' + ui.item.value);
-                    return false;
-                }
-            });
+// Update for short text
+podd.addShortTextBlurHandlers = function(/* string */shortTextPath) {
+    // $(".short_text")
+    $(shortTextPath).blur(
+            function(event) {
+                console.debug("shorttext blur event");
+                console.debug(event);
 
-            // Update for short text
-            $(".short_text").blur(
-                    function() {
-                        var objectUri = '<' + $('#podd_object').val() + '>';
-
-                        var attributes = [];
-                        var nextAttribute = {};
-                        nextAttribute.isNew = false;
-                        nextAttribute.property = '<' + $(this).attr('property') + '>';
-                        nextAttribute.newValue = '"' + $(this).val() + '"';
-                        nextAttribute.oldValue = '"' + $('#in1Hidden').val() + '"';
-
-                        attributes.push(nextAttribute);
-
-                        console.debug('Change property: ' + nextAttribute.property + ' from ' + nextAttribute.oldValue
-                                + ' to ' + nextAttribute.newValue + '.');
-
-                        podd.updatePoddObject(objectUri, attributes, podd.artifactDatabank);
-                    });
-
-            // Update for autocomplete
-            $(".autocomplete").blur(function() {
                 var objectUri = '<' + $('#podd_object').val() + '>';
 
                 var attributes = [];
                 var nextAttribute = {};
-                nextAttribute.isNew = true;
+                nextAttribute.isNew = false;
                 nextAttribute.property = '<' + $(this).attr('property') + '>';
-                nextAttribute.newValue = '<' + $('#' + $(this).attr('id') + 'Hidden').val() + '>';
+                nextAttribute.newValue = '"' + $(this).val() + '"';
+                nextAttribute.oldValue = '"' + $('#in1Hidden').val() + '"';
+
                 attributes.push(nextAttribute);
 
-                console.debug('Add new property: <' + nextAttribute.property + '> <' + nextAttribute.newValue + '>');
+                console.debug('Change property: ' + nextAttribute.property + ' from ' + nextAttribute.oldValue + ' to '
+                        + nextAttribute.newValue + '.');
 
                 podd.updatePoddObject(objectUri, attributes, podd.artifactDatabank);
             });
+};
 
-            // DEBUG ONLY : retrieve artifact and load it to databank
-            $('#btn2').click(function() {
-                var artifactUri = $('#podd_artifact').val();
-                podd.getArtifact(artifactUri);
-                // removeTriple();
-            });
-        });
+// Update for autocomplete
+podd.addAutoCompleteBlurHandlers = function(/* string */autoCompletePath) {
+    // $(".autocomplete")
+    $(autoCompletePath).blur(function(event) {
+        console.debug("autocomplete blur event");
+        console.debug(event);
+        var objectUri = '<' + podd.objectUri + '>';
+
+        if (typeof podd.objectUri === 'undefined') {
+            // hardcoded blank node for new objects
+            // this will be replaced after the first valid submission of the
+            // object to the server
+            objectUri = "_:a1";
+        }
+
+        var attributes = [];
+        var nextAttribute = {};
+        nextAttribute.isNew = true;
+        nextAttribute.property = '<' + $(this).attr('property') + '>';
+        nextAttribute.newValue = '<' + $('#' + $(this).attr('id') + 'Hidden').val() + '>';
+        attributes.push(nextAttribute);
+
+        console.debug('Add new property: <' + nextAttribute.property + '> <' + nextAttribute.newValue + '>');
+
+        podd.updatePoddObject(objectUri, attributes, podd.artifactDatabank);
+    });
+};
+
+$(document).ready(function() {
+
+    // DEBUG ONLY : retrieve artifact and load it to databank
+    $('#btn2').click(function() {
+        var artifactUri = $('#podd_artifact').val();
+        podd.getArtifact(artifactUri);
+        // removeTriple();
+    });
+});

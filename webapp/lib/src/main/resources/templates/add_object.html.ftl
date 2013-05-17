@@ -3,6 +3,11 @@
 
 <script type="text/javascript">
 	podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
+	// FIXME: Insert the parent URI using freemarker
+	podd.parentUri = undefined;
+	// The object URI is always undefined for a new object initially,
+	// until the first valid save event to the server
+	podd.objectUri = undefined;
 </script>
 
 
