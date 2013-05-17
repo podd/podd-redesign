@@ -21,7 +21,7 @@
 
 /*
  * We will display an alert if the user is accessing PODD with IE7 or below */
-podd.displayBrowserAlert() {
+podd.displayBrowserAlert = function() {
     var browserVersion = getInternetExplorerVersion();
     if (navigator.appName == "Microsoft Internet Explorer" && browserVersion <= 7) {
       alert("PODD does not support Internet Explorer version 7 or below ! \n\n" +
