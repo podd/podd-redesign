@@ -257,9 +257,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<parallel>both</parallel>
-					<threadCount>3</threadCount>
-					<forkCount>2</forkCount>
+<!-- Switch off parallel features for now until we resolve where things are breaking down.
+					<parallel>classes</parallel>
+					<threadCount>1</threadCount>
+-->
+					<forkCount>4</forkCount>
 					<reuseForks>false</reuseForks>
 					<argLine>-Xmx1024M -XX:MaxPermSize=512M</argLine>
 				</configuration>
