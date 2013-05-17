@@ -89,7 +89,7 @@ nextDatabank) {
         url : requestUrl,
         type : 'GET',
         data : {
-            objecttypeuri : objectTypeUri
+            objecttypeuri : podd.objectTypeUri
         },
         dataType : 'json', // what is expected back
         success : function(resultData, status, xhr) {
