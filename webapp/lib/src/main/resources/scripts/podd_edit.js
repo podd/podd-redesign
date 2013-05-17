@@ -400,38 +400,36 @@ podd.displayEditField = function(index, nextField, nextDatabank) {
 
     var li2 = $("<li>");
     li2.attr('id', 'id_li_' + nextField.propertyUri);
-
+    
     if (nextField.displayType == DISPLAY_LongText) {
-        li2.append(podd.addFieldInputText(nextField, 'textarea'));
-
+        var input = podd.addFieldInputText(nextField, 'textarea');
+        li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
-        li2.append(podd.addFieldInputText(nextField, 'text'));
-        li2.blur(podd.)
+        var input = podd.addFieldInputText(nextField, 'text')
+        podd.addShortTextBlurHandler(input);
+        li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
-        li2.append(podd.addFieldDropDownList(nextField, nextDatabank));
-
+        var input = podd.addFieldDropDownList(nextField, nextDatabank));
+        li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_CheckBox) {
         var input = podd.addFieldInputText(nextField, 'checkbox')
         var label = '<label>' + nextField.displayValue + '</label>';
         li2.append(input.after(label));
-
     }
     else if (nextField.displayType == DISPLAY_Table) {
         var checkBox = $('<p>');
         checkBox.text('Table here please');
 
         li2.append(checkBox);
-
     }
     else if (nextField.displayType == DISPLAY_AutoComplete) {
         var checkBox = $('<p>');
         checkBox.text('Auto complete please');
 
         li2.append(checkBox);
-
     }
     else { // default
         li2.append(podd.addFieldInputText(nextField, 'text'));
@@ -881,9 +879,9 @@ podd.deleteTriples = function(nextDatabank, subject, property) {
 }
 
 // Add autocompleteHandlers
-podd.addAutoCompleteHandlers = function(/* string */autoCompletePath) {
+podd.addAutoCompleteHandler = function(/* object */autoComplete) {
     // $(".autocomplete")
-    $(autoCompletePath).autocomplete({
+    autoComplete.autocomplete({
         delay : 500, // milliseconds
         minLength : 2, // minimum length to trigger
         // autocomplete
@@ -910,9 +908,9 @@ podd.addAutoCompleteHandlers = function(/* string */autoCompletePath) {
 };
 
 // Update for short text
-podd.addShortTextBlurHandlers = function(/* string */shortTextPath) {
+podd.addShortTextBlurHandler = function(/* object */shortText) {
     // $(".short_text")
-    $(shortTextPath).blur(
+    shortText.blur(
             function(event) {
                 console.debug("shorttext blur event");
                 console.debug(event);
@@ -936,9 +934,9 @@ podd.addShortTextBlurHandlers = function(/* string */shortTextPath) {
 };
 
 // Update for autocomplete
-podd.addAutoCompleteBlurHandlers = function(/* string */autoCompletePath) {
+podd.addAutoCompleteBlurHandler = function(/* object */autoComplete) {
     // $(".autocomplete")
-    $(autoCompletePath).blur(function(event) {
+    autoComplete.blur(function(event) {
         console.debug("autocomplete blur event");
         console.debug(event);
         var objectUri = podd.getCurrentPoddObjectUri();
