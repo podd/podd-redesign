@@ -30,7 +30,8 @@
 	    //$("#details").delegate(".clonable", "click", podd.cloneEmptyField);
 	
 		// Add form submission handler
-		$("#editObjectForm").submit(function() {
+		$("#editObjectForm").submit(function(event) {
+			event.preventDefault();
 			console.debug("Attempting to submit update query to server");
 			podd.submitPoddObjectUpdate(podd.getCurrentObjectUri(), podd.artifactDatabank);
 			return false;
