@@ -8,9 +8,9 @@
 // invoked when page is "ready"
 // --------------------------------
 // --------------------- Constants ----------------------------
-var artifactUri = 'http://purl.org/podd/basic-2-20130206/artifact:1';
+//var artifactUri = 'http://purl.org/podd/basic-2-20130206/artifact:1';
 
-var objectUri = 'http://purl.org/podd/basic-1-20130206/object:2966';
+//var objectUri = 'http://purl.org/podd/basic-1-20130206/object:2966';
 
 // TODO: these can be loaded via freemarker
 var CARD_ExactlyOne = 'http://purl.org/podd/ns/poddBase#Cardinality_Exactly_One';
@@ -47,16 +47,19 @@ podd.newDatabank = function() {
 };
 
 podd.getCurrentObjectUri = function() {
-    var objectUri = '<' + podd.objectUri + '>';
+    var nextObjectUri;
 
     if (typeof podd.objectUri === 'undefined') {
         // hardcoded blank node for new objects
         // this will be replaced after the first valid submission of the
         // object to the server
-        objectUri = "_:a1";
+        nextObjectUri = "_:a1";
+    }
+    else {
+        nextObjectUri = '<' + podd.objectUri + '>';
     }
 
-    return objectUri;
+    return nextObjectUri;
 };
 
 /**
@@ -901,7 +904,7 @@ podd.addAutoCompleteHandler = function(/* object */autoComplete) {
 
 // Update for short text
 podd.addShortTextBlurHandler = function(/* object */shortText, /* object */propertyUri, /* object */originalValue, /* object */
-        nextArtifactDatabank, /* boolean */isNew) {
+nextArtifactDatabank, /* boolean */isNew) {
     var nextOriginalValue = '"' + originalValue + '"';
 
     // $(".short_text")
@@ -914,6 +917,7 @@ podd.addShortTextBlurHandler = function(/* object */shortText, /* object */prope
         var attributes = [];
         var nextAttribute = {};
         nextAttribute.isNew = isNew;
+        nextAttribute.objectUri = objectUri;
         nextAttribute.property = '<' + propertyUri + '>';
         nextAttribute.newValue = '"' + $(this).val() + '"';
         nextAttribute.oldValue = nextOriginalValue;
@@ -950,6 +954,7 @@ isNew) {
         var attributes = [];
         var nextAttribute = {};
         nextAttribute.isNew = true;
+        nextAttribute.objectUri = objectUri;
         nextAttribute.property = '<' + $(this).attr('property') + '>';
         nextAttribute.newValue = '<' + $('#' + $(this).attr('id') + 'Hidden').val() + '>';
         attributes.push(nextAttribute);
@@ -968,8 +973,8 @@ podd.updateArtifactDatabank = function(/* object */attributes, /* object */nextA
     $.each(attributes, function(index, attribute) {
         console.debug('[updatePoddObject] handling property: ' + attribute.property);
         if (!attribute.isNew) {
-            podd.deleteTriples(nextArtifactDatabank, objectUri, attribute.property);
+            podd.deleteTriples(nextArtifactDatabank, attribute.objectUri, attribute.property);
         }
-        nextArtifactDatabank.add(objectUri + ' ' + attribute.property + ' ' + attribute.newValue);
+        nextArtifactDatabank.add(attribute.objectUri + ' ' + attribute.property + ' ' + attribute.newValue);
     });
 };
