@@ -65,11 +65,6 @@ public interface PoddRdfConstants
     public static final String FILE_REPOSITORY = "http://purl.org/podd/ns/fileRepository#";
     
     /**
-     * Namespace for Ontology used by the Metadata service.
-     */
-    public static final String PODD_METADATA = "http://purl.org/podd/ns/poddMetadata#";
-    
-    /**
      * An arbitrary prefix to use for automatically assigning ontology IRIs to inferred ontologies.
      * There are no versions delegated to inferred ontologies, and the ontology IRI is generated
      * using the version IRI of the original ontology, which must be unique.
@@ -278,14 +273,5 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/poddBase#hasFileRepositorySecret */
     public static final URI PODD_FILE_REPOSITORY_SECRET = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositorySecret");
-    
-    public static final URI PODD_METADATA_CLASS = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_METADATA,
-            "hasClass");
-    
-    public static final URI PODD_METADATA_PROPERTY = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_METADATA,
-            "hasProperty");
-    
-    public static final URI PODD_METADATA_RANGE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_METADATA,
-            "hasRange");
     
 }
