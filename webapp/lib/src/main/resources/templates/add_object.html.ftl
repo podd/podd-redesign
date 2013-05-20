@@ -9,6 +9,7 @@
 	        console.debug('-------------------');
 	    }
 		podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
+		podd.artifactIri = undefined;
 		// FIXME: Insert the parent URI using freemarker
 		podd.parentUri = undefined;
 		// The object URI is always undefined for a new object initially,
@@ -33,7 +34,7 @@
 		$("#editObjectForm").submit(function(event) {
 			event.preventDefault();
 			console.debug("Attempting to submit update query to server");
-			podd.submitPoddObjectUpdate(podd.getCurrentObjectUri(), podd.artifactDatabank);
+			podd.submitPoddObjectUpdate(podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.artifactDatabank);
 			return false;
 		});
 	

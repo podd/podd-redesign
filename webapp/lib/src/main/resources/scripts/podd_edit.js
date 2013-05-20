@@ -60,6 +60,22 @@ podd.getCurrentObjectUri = function() {
     return nextObjectUri;
 };
 
+podd.getCurrentArtifactUri = function() {
+    var nextArtifactIri;
+
+    if (typeof podd.artifactIri === 'undefined') {
+        // hardcoded blank node for new objects
+        // this will be replaced after the first valid submission of the
+        // object to the server
+        nextArtifactIri = "_:a1";
+    }
+    else {
+        nextArtifactIri = '<' + podd.artifactIri + '>';
+    }
+
+    return nextArtifactIri;
+};
+
 /**
  * DEBUG-ONLY : Prints the contents of the given databank to the console
  */
@@ -702,6 +718,7 @@ podd.getArtifact = function(artifactUri, nextDatabank) {
  * a String literal) }
  */
 podd.submitPoddObjectUpdate = function(
+/* String */artifactIri,
 /* String */objectUri,
 /* object */nextArtifactDatabank) {
 
