@@ -42,12 +42,12 @@
 
 <div id="content_pane">
 <#if errorMessage?? && errorMessage != "">
-<h4 class="errorMsg">${errorMessage!""}</h4>
+<h4 id="errorMsgHeader" class="errorMsg">${errorMessage!""}</h4>
 </#if>
 
 <#-- add general error messages -->
 <#if generalErrorList?? && generalErrorList?has_content>
-<ol>
+<ol id="errorMsgList">
     <#list generalErrorList as errorMsg>
     <li class="errorMsg">${errorMsg}</li>
     </#list>
@@ -88,12 +88,10 @@
 
 
 		
-		<div id="header">
+		<div>
 		<ul id='list_attributes'>
 		</ul>
 		</div>
-		
-		<br><br>
 		
     <script type="text/javascript">
 	    animatedcollapse.addDiv('details', 'fade=1,hide=0');
