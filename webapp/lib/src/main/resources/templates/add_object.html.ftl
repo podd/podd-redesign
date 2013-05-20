@@ -32,6 +32,7 @@
 		// Add form submission handler
 		$("#editObjectForm").submit(function() {
 			console.debug("Attempting to submit update query to server");
+			podd.submitPoddObjectUpdate(podd.getCurrentObjectUri(), podd.artifactDatabank);
 			return false;
 		});
 	
