@@ -7,9 +7,7 @@
 // --------------------------------
 // invoked when page is "ready"
 // --------------------------------
-
 // --------------------- Constants ----------------------------
-
 var artifactUri = 'http://purl.org/podd/basic-2-20130206/artifact:1';
 
 var objectUri = 'http://purl.org/podd/basic-1-20130206/object:2966';
@@ -209,7 +207,7 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
     });
 
     $.each(propertyList, function(index, value) {
-        podd.displayEditField(index, value, nextDatabank)
+        podd.createEditField(index, value, nextDatabank)
     });
 };
 
@@ -329,13 +327,15 @@ podd.loadEditDataCallback = function(resultData, status, xhr, nextDatabank) {
         return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
     });
 
-    $.each(propertyList, podd.displayEditField);
+    $.each(propertyList, function(index, value) {
+        $("#details ol").append(podd.createEditField(index, value, nextDatabank));
+    });
 };
 
 /*
  * Display the given field on page
  */
-podd.displayEditField = function(index, nextField, nextDatabank) {
+podd.createEditField = function(index, nextField, nextDatabank) {
     if (typeof console !== "undefined" && console.debug) {
         // console.debug('[' + nextField.weight + '] <' + nextField.propertyUri
         // + '>
@@ -380,7 +380,7 @@ podd.displayEditField = function(index, nextField, nextDatabank) {
     }
 
     var li2 = $("<li>");
-    li2.attr('id', 'id_li_' + nextField.propertyUri);
+    // li2.attr('id', 'id_li_' + nextField.propertyUri);
 
     if (nextField.displayType == DISPLAY_LongText) {
         var input = podd.addFieldInputText(nextField, 'textarea');
@@ -420,16 +420,24 @@ podd.displayEditField = function(index, nextField, nextDatabank) {
 
     var subList = $('<ul>').append(li2);
     li.append(subList);
-    $("#details ol").append(li);
+    return li;
 };
 
+/**
+ * FIXME: Convert the following to a range of functions that work for each
+ * object type.
+ * 
+ * This function must be able to reset the value consistently and attach
+ * handlers that know the field has not been saved before this point.
+ */
 podd.cloneEmptyField = function() {
-    var thisId = $(this).attr('id');
+    var thisProperty = $(this).attr('property');
     if (typeof console !== "undefined" && console.debug) {
-        console.debug('Clicked clonable: ' + thisId);
+        console.debug('Clicked clonable: ' + thisProperty);
     }
 
-    var idToClone = '#tLbl1'; // '#id_http://purl.org/podd/ns/poddScience_hasANZSRC';
+    // var idToClone = '#tLbl1'; //
+    // '#id_http://purl.org/podd/ns/poddScience_hasANZSRC';
     // //'#id_' + $(this).attr('property');
     // console.debug('Requested cloning ' + idToClone);
 
@@ -466,7 +474,7 @@ podd.cloneEmptyField = function() {
  */
 
 // simply copied from PODD-1, does not work
-podd.addNewEmptyField = function(id) {
+podd.broken_AddNewEmptyField = function(id) {
     if (typeof console !== "undefined" && console.debug) {
         console.debug('Add new Empty field for "' + id + '"');
     }
