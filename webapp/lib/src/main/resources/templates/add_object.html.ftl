@@ -29,6 +29,12 @@
 	    // FIXME: This doesn't seem to be the right strategy, although it may work for short-text
 	    //$("#details").delegate(".clonable", "click", podd.cloneEmptyField);
 	
+		// Add form submission handler
+		$("#editObjectForm").submit(function() {
+			console.debug("Attempting to submit update query to server");
+			return false;
+		});
+	
 	    if (typeof console !== "undefined" && console.debug) {
 	        console.debug('### initialization complete ###');
 	    }
@@ -56,7 +62,8 @@
 	<h3 class="underlined_heading">${objectType.label!""} Details 
 		<a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 	</h3>	
-	<div id='details'>  <!-- Collapsible div -->
+	<form id="editObjectForm">
+		<div id='details'>  <!-- Collapsible div -->
 			<!-- TODO: Generate these using javascript -->
 			<!-- standard attributes -->
 			<ol>
@@ -83,15 +90,14 @@
 			<!--  other attributes -->
 
             </ol>
-
+		
 	    </div>  <!-- details - Collapsible div -->
+	    
+	    <input type="submit">Save object</input>
+	</form>
 
 
 		
-		<div>
-		<ul id='list_attributes'>
-		</ul>
-		</div>
 		
     <script type="text/javascript">
 	    animatedcollapse.addDiv('details', 'fade=1,hide=0');

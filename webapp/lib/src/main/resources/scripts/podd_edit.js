@@ -8,10 +8,8 @@
 // invoked when page is "ready"
 // --------------------------------
 // --------------------- Constants ----------------------------
-//var artifactUri = 'http://purl.org/podd/basic-2-20130206/artifact:1';
-
-//var objectUri = 'http://purl.org/podd/basic-1-20130206/object:2966';
-
+// var artifactUri = 'http://purl.org/podd/basic-2-20130206/artifact:1';
+// var objectUri = 'http://purl.org/podd/basic-1-20130206/object:2966';
 // TODO: these can be loaded via freemarker
 var CARD_ExactlyOne = 'http://purl.org/podd/ns/poddBase#Cardinality_Exactly_One';
 var CARD_OneOrMany = 'http://purl.org/podd/ns/poddBase#Cardinality_One_Or_Many';
@@ -86,7 +84,7 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
         console.debug('[getMetadata]  "' + objectTypeUri + '" .');
     }
 
-    requestUrl = podd.baseUrl + '/metadata';
+    var requestUrl = podd.baseUrl + '/metadata';
 
     if (typeof console !== "undefined" && console.debug) {
         console.debug('[getMetadata] Request (GET):  ' + requestUrl);
@@ -226,7 +224,7 @@ podd.getPoddObjectForEdit = function(
         console.debug('[getPoddObjectForEdit]  "' + objectUri + '" of artifact (' + artifactUri + ') .');
     }
 
-    requestUrl = podd.baseUrl + '/artifact/edit';
+    var requestUrl = podd.baseUrl + '/artifact/edit';
 
     if (typeof console !== "undefined" && console.debug) {
         console.debug('[getPoddObjectForEdit] Request (GET):  ' + requestUrl);
@@ -592,7 +590,7 @@ podd.searchOntologyService = function(
 /* object with 'search term' */request,
 /* function */callbackFunction) {
 
-    requestUrl = podd.baseUrl + '/search';
+    var requestUrl = podd.baseUrl + '/search';
 
     if (console && console.debug) {
         console.debug('Searching artifact: "' + artifactUri.toString() + '" in searchTypes: "' + request.searchTypes
@@ -696,10 +694,6 @@ podd.getArtifact = function(artifactUri, nextDatabank) {
 
 };
 
-podd.processLocalUpdate = function(objectUri, oldTriples, newTriples) {
-
-};
-
 /*
  * Invoke the Edit Artifact Service to update the artifact with changed object
  * attributes. { isNew: boolean, property: String value of predicate URI
@@ -708,24 +702,29 @@ podd.processLocalUpdate = function(objectUri, oldTriples, newTriples) {
  * String, (Should be surrounded by angle brackets if a URI, or double quotes if
  * a String literal) }
  */
-podd.updatePoddObject = function(
+podd.submitPoddObjectUpdate = function(
 /* String */objectUri,
 /* object */nextArtifactDatabank) {
 
-    requestUrl = podd.baseUrl + '/artifact/edit';
+    var requestUrl = podd.baseUrl + '/artifact/edit';
 
-    console.debug('[updatePoddObject]  "' + objectUri);
-    if (typeof versionIri !== "undefined") {
-        console.debug(' of artifact (' + versionIri + ').');
-    }
     var modifiedTriples = $.toJSON(nextArtifactDatabank.dump({
         format : 'application/json'
     }));
 
-    // set query parameters in the URI as setting them under data failed, mostly
-    // leading to a 415 error
-    requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri) + '&versionuri='
-            + encodeURIComponent(versionIri) + '&isforce=true';
+    console.debug('[updatePoddObject]  "' + objectUri);
+    if (typeof versionIri !== "undefined") {
+        console.debug(' of artifact (' + versionIri + ').');
+        // FIXME: Why is the parameter isForce hardcoded to true?
+        // set query parameters in the URI as setting them under data failed,
+        // mostly leading to a 415 error
+        requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri) + '&versionuri='
+                + encodeURIComponent(versionIri) + '&isforce=true';
+    }
+    else {
+        // FIXME: Why is the parameter isForce hardcoded to true?
+        requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri) + '&isforce=true';
+    }
     console.debug('[updatePoddObject] Request (POST):  ' + requestUrl);
 
     $.ajax({
@@ -737,9 +736,18 @@ podd.updatePoddObject = function(
         success : function(resultData, status, xhr) {
             console.debug('[updatePoddObject] ### SUCCESS ### ' + resultData);
             // console.debug('[updatePoddObject] ' + xhr.responseText);
-            $(theMessageBox).html('<i>Successfully edited artifact.</i><br><p>' + xhr.responseText + '</p><br>');
+            $(theMessageBox).html('<i>Successfully edited artifact.</i><br><pre>' + xhr.responseText + '</pre><br>');
 
             // FIXME: Should we be wiping out the databank before doing this?
+
+            $.each(attributes, function(index, attribute) {
+                console.debug('[updatePoddObject] handling property: ' + attribute.property);
+                if (!attribute.isNew) {
+                    podd.deleteTriples(nextArtifactDatabank, attribute.objectUri, attribute.property);
+                }
+                nextArtifactDatabank.add(attribute.objectUri + ' ' + attribute.property + ' ' + attribute.newValue);
+            });
+
             // FIXME: Should we be parsing resultData before doing this?
             podd.getArtifact(artifactIri, nextArtifactDatabank);
         },
@@ -756,7 +764,7 @@ podd.updatePoddObject = function(
  */
 podd.autoCompleteCallback = function(/* object with 'search term' */request, /* function */response) {
 
-    requestUrl = podd.baseUrl + '/search';
+    var requestUrl = podd.baseUrl + '/search';
 
     var searchTypes = $('#podd_type').attr('value');
 
@@ -871,7 +879,7 @@ podd.deleteTriples = function(nextDatabank, subject, property) {
         console.debug('[deleteTriple] object to delete = ' + tripleArray[0]);
         nextDatabank.remove(tripleArray[0]);
     });
-}
+};
 
 // Add autocompleteHandlers
 podd.addAutoCompleteHandler = function(/* object */autoComplete) {
@@ -953,7 +961,7 @@ isNew) {
 
         var attributes = [];
         var nextAttribute = {};
-        nextAttribute.isNew = true;
+        nextAttribute.isNew = isNew;
         nextAttribute.objectUri = objectUri;
         nextAttribute.property = '<' + $(this).attr('property') + '>';
         nextAttribute.newValue = '<' + $('#' + $(this).attr('id') + 'Hidden').val() + '>';
