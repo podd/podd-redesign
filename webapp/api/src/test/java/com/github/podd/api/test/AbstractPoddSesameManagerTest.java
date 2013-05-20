@@ -1201,9 +1201,9 @@ public abstract class AbstractPoddSesameManagerTest
         final Object[][] testData =
                 {
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                177, 23, 0 },
+                                156, 20, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                195, 25, 2 },
+                                201, 25, 5 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
                                 80, 10, 0 },
