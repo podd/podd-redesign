@@ -47,18 +47,16 @@
 </div>
 
 <div id="content_pane">
-<#if errorMessage?? && errorMessage != "">
 <h4 id="errorMsgHeader" class="errorMsg">${errorMessage!""}</h4>
-</#if>
 
 <#-- add general error messages -->
-<#if generalErrorList?? && generalErrorList?has_content>
 <ol id="errorMsgList">
-    <#list generalErrorList as errorMsg>
-    <li class="errorMsg">${errorMsg}</li>
-    </#list>
+	<#if generalErrorList?? && generalErrorList?has_content>
+	    <#list generalErrorList as errorMsg>
+	    <li class="errorMsg">${errorMsg}</li>
+	    </#list>
+	</#if>
 </ol>
-</#if>
 	<h3 class="underlined_heading">${objectType.label!""} Details 
 		<a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 	</h3>	

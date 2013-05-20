@@ -653,9 +653,8 @@ podd.debugAddDownloadArtifactHandler = function(/* string */buttonPath, /* strin
 };
 
 /* Display a message on leaving text field */
-podd.doBlur = function(theMessageBox) {
-    $(theMessageBox)
-            .html('The value of field "' + $(this).attr('id') + '" was set to: "<b>' + $(this).val() + '</b>".');
+podd.updateErrorMessageHeader = function(theMessage) {
+    $("#errorMsgHeader").html(theMessage);
 }
 
 /* Retrieve the current version of an artifact and populate the databank */
@@ -684,7 +683,7 @@ podd.getArtifact = function(artifactUri, nextDatabank) {
             $('#in1').val(title.value);
             $('#in1Hidden').val(title.value);
 
-            $(theMessageBox).html('<i>Successfully retrieved artifact version: ' + versionIri + '</i><br>');
+            podd.updateErrorMessageHeader('<i>Successfully retrieved artifact version: ' + versionIri + '</i><br>');
         },
         error : function(xhr, status, error) {
             console.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
@@ -736,17 +735,12 @@ podd.submitPoddObjectUpdate = function(
         success : function(resultData, status, xhr) {
             console.debug('[updatePoddObject] ### SUCCESS ### ' + resultData);
             // console.debug('[updatePoddObject] ' + xhr.responseText);
-            $(theMessageBox).html('<i>Successfully edited artifact.</i><br><pre>' + xhr.responseText + '</pre><br>');
+            var message = '<div>Successfully edited artifact.<pre>' + xhr.responseText + '</pre></div>';
+            podd.updateErrorMessageHeader(message);
 
             // FIXME: Should we be wiping out the databank before doing this?
-
-            $.each(attributes, function(index, attribute) {
-                console.debug('[updatePoddObject] handling property: ' + attribute.property);
-                if (!attribute.isNew) {
-                    podd.deleteTriples(nextArtifactDatabank, attribute.objectUri, attribute.property);
-                }
-                nextArtifactDatabank.add(attribute.objectUri + ' ' + attribute.property + ' ' + attribute.newValue);
-            });
+            // podd.deleteTriples(nextArtifactDatabank, attribute.objectUri,
+            // attribute.property);
 
             // FIXME: Should we be parsing resultData before doing this?
             podd.getArtifact(artifactIri, nextArtifactDatabank);
