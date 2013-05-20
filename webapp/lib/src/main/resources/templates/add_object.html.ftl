@@ -18,8 +18,12 @@
 	    podd.artifactDatabank = podd.newDatabank();
 	    podd.schemaDatabank = podd.newDatabank();
 	
+		// TODO: Preload artifactDatabank before this point in general (do not fail for new object URIs) and only load the schemaDatabank after that is 
+		// loaded so that we can immediately add the fields and handlers when we receive the schema data
+	
 	    // getPoddObjectForEdit(artifactUri, objectUri);
-	    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.callbackForGetMetadata, podd.schemaDatabank);
+	    // Get Metadata and create fields for either new data or data that exists in artifactDatabank at this point
+	    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.callbackForGetMetadata, podd.schemaDatabank, podd.artifactDatabank);
 	
 	    // use delegation for dynamically added .clonable anchors
 	    // FIXME: This doesn't seem to be the right strategy, although it may work for short-text

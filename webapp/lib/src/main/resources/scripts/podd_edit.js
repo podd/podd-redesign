@@ -78,7 +78,7 @@ podd.debugPrintDatabank = function(databank, message) {
  * where to send the results
  */
 podd.getObjectTypeMetadata = function(/* String */objectTypeUri, /* function */successCallback, /* object */
-nextDatabank) {
+nextSchemaDatabank, /* object */nextArtifactDatabank) {
     if (typeof console !== "undefined" && console.debug) {
         console.debug('[getMetadata]  "' + objectTypeUri + '" .');
     }
@@ -97,7 +97,7 @@ nextDatabank) {
         },
         dataType : 'json', // what is expected back
         success : function(resultData, status, xhr) {
-            successCallback(resultData, status, xhr, objectTypeUri, nextDatabank);
+            successCallback(resultData, status, xhr, objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
             if (typeof console !== "undefined" && console.debug) {
@@ -119,21 +119,21 @@ nextDatabank) {
  * properties without weights, sorting them only by weight is insufficient.
  * 
  */
-podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, nextDatabank) {
+podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, nextSchemaDatabank, nextArtifactDatabank) {
     if (typeof console !== "undefined" && console.debug) {
         console.debug('[getMetadata] ### SUCCESS ### ');
         console.debug(resultData);
     }
 
-    nextDatabank.load(resultData);
+    nextSchemaDatabank.load(resultData);
 
     if (typeof console !== "undefined" && console.debug) {
-        console.debug('Databank size = ' + nextDatabank.size());
+        console.debug('Schema Databank size = ' + nextSchemaDatabank.size());
     }
 
     // retrieve weighted property list
     var myQuery = $.rdf({
-        databank : nextDatabank
+        databank : nextSchemaDatabank
     })
     // Desired type a OWL:Class
     .where('<' + objectType + '> rdf:type owl:Class')
@@ -207,7 +207,7 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
     });
 
     $.each(propertyList, function(index, value) {
-        podd.createEditField(index, value, nextDatabank)
+        $("#details ol").append(podd.createEditField(index, value, nextSchemaDatabank, nextArtifactDatabank, true));
     });
 };
 
@@ -250,17 +250,17 @@ podd.getPoddObjectForEdit = function(
 /*
  * Callback function when RDF containing Edit data is available
  */
-podd.loadEditDataCallback = function(resultData, status, xhr, nextDatabank) {
+podd.loadEditDataCallback = function(resultData, status, xhr, nextSchemaDatabank, nextArtifactDatabank) {
     if (typeof console !== "undefined" && console.debug) {
         console.debug('[getPoddObjectForEdit] ### SUCCESS ### ' + resultData);
     }
     nextDatabank.load(resultData);
     if (typeof console !== "undefined" && console.debug) {
-        console.debug('Databank size = ' + nextDatabank.size());
+        console.debug('Schema Databank size = ' + nextSchemaDatabank.size());
     }
     // retrieve weighted property list
     var myQuery = $.rdf({
-        databank : nextDatabank
+        databank : nextSchemaDatabank
     })
     // FIXME: The following line is going to be very difficult to maintain in
     // the long run, so need to redesign the triple format
@@ -328,14 +328,14 @@ podd.loadEditDataCallback = function(resultData, status, xhr, nextDatabank) {
     });
 
     $.each(propertyList, function(index, value) {
-        $("#details ol").append(podd.createEditField(index, value, nextDatabank));
+        $("#details ol").append(podd.createEditField(index, value, nextSchemaDatabank, nextArtifactDatabank, false));
     });
 };
 
 /*
  * Display the given field on page
  */
-podd.createEditField = function(index, nextField, nextDatabank) {
+podd.createEditField = function(index, nextField, nextSchemaDatabank, nextArtifactDatabank, isNew) {
     if (typeof console !== "undefined" && console.debug) {
         // console.debug('[' + nextField.weight + '] <' + nextField.propertyUri
         // + '>
@@ -383,20 +383,21 @@ podd.createEditField = function(index, nextField, nextDatabank) {
     // li2.attr('id', 'id_li_' + nextField.propertyUri);
 
     if (nextField.displayType == DISPLAY_LongText) {
-        var input = podd.addFieldInputText(nextField, 'textarea');
+        var input = podd.addFieldInputText(nextField, 'textarea', nextSchemaDatabank);
+        podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
-        var input = podd.addFieldInputText(nextField, 'text');
-        podd.addShortTextBlurHandler(input);
+        var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
+        podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
-        var input = podd.addFieldDropDownList(nextField, nextDatabank);
+        var input = podd.addFieldDropDownList(nextField, nextSchemaDatabank, isNew);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_CheckBox) {
-        var input = podd.addFieldInputText(nextField, 'checkbox');
+        var input = podd.addFieldInputText(nextField, 'checkbox', nextSchemaDatabank);
         var label = '<label>' + nextField.displayValue + '</label>';
         li2.append(input.after(label));
     }
@@ -413,8 +414,8 @@ podd.createEditField = function(index, nextField, nextDatabank) {
         li2.append(checkBox);
     }
     else { // default
-        var input = podd.addFieldInputText(nextField, 'text');
-        podd.addShortTextBlurHandler(input);
+        var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
+        podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
         li2.append(input);
     }
 
@@ -511,18 +512,20 @@ podd.broken_AddNewEmptyField = function(id) {
 /*
  * Construct an HTML input field of a given type.
  */
-podd.addFieldInputText = function(nextField, inputType) {
+podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
 
     var displayValue = nextField.displayValue;
     if (inputType == 'checkbox') {
         displayValue = nextField.valueUri;
     }
 
-    var idString = 'id_' + nextField.propertyUri;
-    idString = idString.replace("#", "_");
+    // FIXME: id is useless here as it doesn't preserve the URI, and it will
+    // never be unique for more than one element
+    // var idString = 'id_' + nextField.propertyUri;
+    // idString = idString.replace("#", "_");
 
     var input = $('<input>', {
-        id : idString,
+        // id : idString,
         name : 'name_' + nextField.propertyLabel,
         type : inputType,
         value : displayValue
@@ -539,10 +542,10 @@ podd.addFieldInputText = function(nextField, inputType) {
 /*
  * Construct an HTML drop-down list for the given field.
  */
-podd.addFieldDropDownList = function(nextField, nextDatabank) {
+podd.addFieldDropDownList = function(nextField, nextDatabank, isNew) {
     var select = $('<select>', {
-        id : 'id_' + nextField.propertyUri,
-        name : 'name_' + nextField.propertyLabel,
+        // id : 'id_' + nextField.propertyUri,
+        name : 'name_' + encodeURIComponent(nextField.propertyLabel),
     });
 
     var myQuery = $.rdf({
@@ -550,7 +553,8 @@ podd.addFieldDropDownList = function(nextField, nextDatabank) {
     }).where('<' + nextField.propertyUri + '> poddBase:hasAllowedValue ?pValue').optional(
             '?pValue rdfs:label ?pDisplayValue');
     var bindings = myQuery.select();
-    // console.debug('Found ' + bindings.length + ' bindings for query');
+    console.debug('Found ' + bindings.length + ' bindings for query');
+    console.debug(bindings);
     $.each(bindings, function(index, value) {
 
         var optionValue = value.pValue.value;
@@ -687,7 +691,11 @@ podd.getArtifact = function(artifactUri, nextDatabank) {
         }
     });
 
-}
+};
+
+podd.processLocalUpdate = function(objectUri, oldTriples, newTriples) {
+
+};
 
 /*
  * Invoke the Edit Artifact Service to update the artifact with changed object
@@ -699,8 +707,7 @@ podd.getArtifact = function(artifactUri, nextDatabank) {
  */
 podd.updatePoddObject = function(
 /* String */objectUri,
-/* array of objects */attributes,
-/* object */nextDatabank) {
+/* object */nextArtifactDatabank) {
 
     requestUrl = podd.baseUrl + '/artifact/edit';
 
@@ -708,15 +715,7 @@ podd.updatePoddObject = function(
     if (typeof versionIri !== "undefined") {
         console.debug(' of artifact (' + versionIri + ').');
     }
-    $.each(attributes, function(index, attribute) {
-        console.debug('[updatePoddObject] handling property: ' + attribute.property);
-        if (!attribute.isNew) {
-            podd.deleteTriples(nextDatabank, objectUri, attribute.property);
-        }
-        nextDatabank.add(objectUri + ' ' + attribute.property + ' ' + attribute.newValue);
-    });
-
-    var modifiedTriples = $.toJSON(nextDatabank.dump({
+    var modifiedTriples = $.toJSON(nextArtifactDatabank.dump({
         format : 'application/json'
     }));
 
@@ -739,14 +738,14 @@ podd.updatePoddObject = function(
 
             // FIXME: Should we be wiping out the databank before doing this?
             // FIXME: Should we be parsing resultData before doing this?
-            podd.getArtifact(artifactIri, nextDatabank);
+            podd.getArtifact(artifactIri, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
             console.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
             console.debug(xhr.statusText);
         }
     });
-}
+};
 
 /*
  * Call Search Ontology Resource Service using AJAX, convert the RDF response to
@@ -773,7 +772,7 @@ podd.autoCompleteCallback = function(/* object with 'search term' */request, /* 
         // console.debug(formattedData);
         response(formattedData);
     }, 'json');
-}
+};
 
 /*
  * Parse the RDF received from the server and create a JSON array. Modified
@@ -901,7 +900,10 @@ podd.addAutoCompleteHandler = function(/* object */autoComplete) {
 };
 
 // Update for short text
-podd.addShortTextBlurHandler = function(/* object */shortText) {
+podd.addShortTextBlurHandler = function(/* object */shortText, /* object */propertyUri, /* object */originalValue, /* object */
+        nextArtifactDatabank, /* boolean */isNew) {
+    var nextOriginalValue = '"' + originalValue + '"';
+
     // $(".short_text")
     shortText.blur(function(event) {
         console.debug("shorttext blur event");
@@ -911,22 +913,34 @@ podd.addShortTextBlurHandler = function(/* object */shortText) {
 
         var attributes = [];
         var nextAttribute = {};
-        nextAttribute.isNew = false;
-        nextAttribute.property = '<' + $(this).attr('property') + '>';
+        nextAttribute.isNew = isNew;
+        nextAttribute.property = '<' + propertyUri + '>';
         nextAttribute.newValue = '"' + $(this).val() + '"';
-        nextAttribute.oldValue = '"' + $('#in1Hidden').val() + '"';
+        nextAttribute.oldValue = nextOriginalValue;
 
         attributes.push(nextAttribute);
 
-        console.debug('Change property: ' + nextAttribute.property + ' from ' + nextAttribute.oldValue + ' to '
-                + nextAttribute.newValue + '.');
+        console.debug('Update property : ' + propertyUri + ' from ' + nextAttribute.oldValue + ' to '
+                + nextAttribute.newValue + ' (isNew=' + isNew + ')');
 
-        podd.updatePoddObject(objectUri, attributes, podd.artifactDatabank);
+        podd.updateArtifactDatabank(attributes, nextArtifactDatabank, isNew);
+
+        // Unbind this handler and create a new one with the new value as the
+        // original value
+        $(this).unbind("blur");
+        var newValue = '"' + $(this).val() + '"';
+        // NOTE: isNew is always false after the first time through this method
+        podd.addShortTextBlurHandler(shortText, propertyUri, newValue, nextArtifactDatabank, false);
+
+        // FIXME: Cannot call update to the server after each edit, as some
+        // fields may have invalid values at this point.
+        // podd.updatePoddObject(objectUri, attributes, nextArtifactDatabank);
     });
 };
 
 // Update for autocomplete
-podd.addAutoCompleteBlurHandler = function(/* object */autoComplete) {
+podd.addAutoCompleteBlurHandler = function(/* object */autoComplete, /* object */nextArtifactDatabank, /* boolean */
+isNew) {
     // $(".autocomplete")
     autoComplete.blur(function(event) {
         console.debug("autocomplete blur event");
@@ -940,8 +954,22 @@ podd.addAutoCompleteBlurHandler = function(/* object */autoComplete) {
         nextAttribute.newValue = '<' + $('#' + $(this).attr('id') + 'Hidden').val() + '>';
         attributes.push(nextAttribute);
 
-        console.debug('Add new property: <' + nextAttribute.property + '> <' + nextAttribute.newValue + '>');
+        console.debug('Add new autocomplete property: <' + nextAttribute.property + '> <' + nextAttribute.newValue
+                + '>');
 
-        podd.updatePoddObject(objectUri, attributes, podd.artifactDatabank);
+        podd.updateArtifactDatabank(attributes, nextArtifactDatabank, isNew);
+        // FIXME: Cannot call update to the server after each edit, as some
+        // fields may have invalid values at this point.
+        // podd.updatePoddObject(objectUri, attributes, nextArtifactDatabank);
+    });
+};
+
+podd.updateArtifactDatabank = function(/* object */attributes, /* object */nextArtifactDatabank, /* boolean */isNew) {
+    $.each(attributes, function(index, attribute) {
+        console.debug('[updatePoddObject] handling property: ' + attribute.property);
+        if (!attribute.isNew) {
+            podd.deleteTriples(nextArtifactDatabank, objectUri, attribute.property);
+        }
+        nextArtifactDatabank.add(objectUri + ' ' + attribute.property + ' ' + attribute.newValue);
     });
 };
