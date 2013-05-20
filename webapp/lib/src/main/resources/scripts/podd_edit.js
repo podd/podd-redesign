@@ -7,25 +7,6 @@
 // --------------------------------
 // invoked when page is "ready"
 // --------------------------------
-$(document).ready(function() {
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('-------------------');
-        console.debug('initializing...');
-        console.debug('-------------------');
-    }
-    podd.artifactDatabank = podd.newDatabank();
-    podd.schemaDatabank = podd.newDatabank();
-
-    // getPoddObjectForEdit(artifactUri, objectUri);
-    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.callbackForGetMetadata, podd.schemaDatabank);
-
-    // use delegation for dynamically added .clonable anchors
-    $("#details").delegate(".clonable", "click", podd.cloneEmptyField);
-
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('### initialization complete ###');
-    }
-});
 
 // --------------------- Constants ----------------------------
 

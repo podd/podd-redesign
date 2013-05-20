@@ -2,12 +2,33 @@
 <#-- @ftlvariable name="objectType" type="java.lang.String" -->
 
 <script type="text/javascript">
-	podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
-	// FIXME: Insert the parent URI using freemarker
-	podd.parentUri = undefined;
-	// The object URI is always undefined for a new object initially,
-	// until the first valid save event to the server
-	podd.objectUri = undefined;
+	$(document).ready(function() {
+	    if (typeof console !== "undefined" && console.debug) {
+	        console.debug('-------------------');
+	        console.debug('initializing...');
+	        console.debug('-------------------');
+	    }
+		podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
+		// FIXME: Insert the parent URI using freemarker
+		podd.parentUri = undefined;
+		// The object URI is always undefined for a new object initially,
+		// until the first valid save event to the server
+		podd.objectUri = undefined;
+	
+	    podd.artifactDatabank = podd.newDatabank();
+	    podd.schemaDatabank = podd.newDatabank();
+	
+	    // getPoddObjectForEdit(artifactUri, objectUri);
+	    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.callbackForGetMetadata, podd.schemaDatabank);
+	
+	    // use delegation for dynamically added .clonable anchors
+	    // FIXME: This doesn't seem to be the right strategy, although it may work for short-text
+	    //$("#details").delegate(".clonable", "click", podd.cloneEmptyField);
+	
+	    if (typeof console !== "undefined" && console.debug) {
+	        console.debug('### initialization complete ###');
+	    }
+	});
 </script>
 
 
