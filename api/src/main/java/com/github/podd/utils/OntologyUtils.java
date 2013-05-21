@@ -215,10 +215,7 @@ public class OntologyUtils
     public static Collection<InferredOWLOntologyID> stringToOntologyID(final String string, final RDFFormat format)
         throws OpenRDFException, IOException
     {
-        final Model model = new LinkedHashModel();
-        final RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(model));
-        parser.parse(new StringReader(string), "");
+        final Model model = Rio.parse(new StringReader(string), "", format);
         
         return OntologyUtils.modelToOntologyIDs(model);
     }
