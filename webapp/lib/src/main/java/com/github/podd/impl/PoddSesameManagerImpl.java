@@ -472,6 +472,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedArtifactIRIException
     {
+        if(ontologyIRI.toString().startsWith("_:"))
+        {
+            throw new UnmanagedArtifactIRIException(ontologyIRI,
+                    "This IRI does not refer to a managed ontology (blank node)");
+        }
+        
         final InferredOWLOntologyID inferredOntologyID =
                 this.getCurrentVersionInternal(ontologyIRI, repositoryConnection, managementGraph);
         
@@ -1173,7 +1179,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     {
         // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
         final String sparqlQuery =
-                "SELECT ?x WHERE { ?x <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue() + ">  . " + " ?x <"
+                "SELECT ?nextOntology WHERE { ?nextOntology <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue() + ">  . " + " ?nextOntology <"
                         + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT + "> ?y " + " }";
         this.log.debug("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
@@ -1189,7 +1195,15 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         if(queryResults.hasNext())
         {
             final BindingSet nextResult = queryResults.next();
-            ontologyIRI = IRI.create(nextResult.getValue("x").stringValue());
+            Value nextOntology = nextResult.getValue("nextOntology");
+            if(nextOntology instanceof URI)
+            {
+                ontologyIRI = IRI.create(nextOntology.stringValue());
+            }
+            else
+            {
+                ontologyIRI = IRI.create("_:" + nextOntology.stringValue());
+            }
         }
         return ontologyIRI;
     }
