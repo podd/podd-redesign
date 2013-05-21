@@ -148,7 +148,7 @@ public class InferredOWLOntologyID extends OWLOntologyID
     
     public Model toRDF(final Model result)
     {
-        return OntologyUtils.ontologyIDToRDF(this, result);
+        return OntologyUtils.ontologyIDToRDF(this, result, true);
     }
     
     @Override
@@ -163,5 +163,4 @@ public class InferredOWLOntologyID extends OWLOntologyID
             return super.toString() + this.inferredOntologyIRI.toQuotedString();
         }
     }
-    
 }

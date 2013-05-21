@@ -16,12 +16,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
@@ -48,6 +55,7 @@ import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -204,7 +212,25 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             writer.startRDF();
-            OntologyUtils.ontologyIDsToHandler(Arrays.asList(artifactMap), writer);
+            Model model = OntologyUtils.ontologyIDsToModel(Arrays.asList(artifactMap), new LinkedHashModel(), false);
+            Set<Resource> ontologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
+            
+            for(Resource nextOntology : ontologies)
+            {
+                writer.handleStatement(PoddRdfConstants.VF.createStatement(nextOntology, RDF.TYPE, OWL.ONTOLOGY));
+                
+                Set<Value> versions = model.filter(nextOntology, OWL.VERSIONIRI, null).objects();
+                
+                if(!versions.isEmpty())
+                {
+                    for(Value nextVersion : versions)
+                    {
+                        writer.handleStatement(PoddRdfConstants.VF.createStatement(nextOntology, OWL.VERSIONIRI,
+                                nextVersion));
+                    }
+                }
+            }
+            
             writer.endRDF();
         }
         catch(final RDFHandlerException e)

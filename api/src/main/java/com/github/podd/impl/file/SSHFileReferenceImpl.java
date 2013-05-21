@@ -151,7 +151,7 @@ public class SSHFileReferenceImpl implements SSHFileReference
         
         if(this.getArtifactID() != null)
         {
-            OntologyUtils.ontologyIDToRDF(this.getArtifactID(), result);
+            OntologyUtils.ontologyIDToRDF(this.getArtifactID(), result, false);
         }
         
         if(this.getFilename() != null)

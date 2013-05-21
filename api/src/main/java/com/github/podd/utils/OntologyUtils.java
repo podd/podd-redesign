@@ -148,11 +148,13 @@ public class OntologyUtils
      * @param result
      *            The Model to contain the resulting statements, or null to have one created
      *            internally
+     * @param includeInferredOntologyStatements
      * @return A model containing the RDF statements about the given ontologies.
      * @throws RDFHandlerException
      *             If there is an error while handling the statements.
      */
-    public static Model ontologyIDsToModel(final Collection<InferredOWLOntologyID> input, final Model result)
+    public static Model ontologyIDsToModel(final Collection<InferredOWLOntologyID> input, final Model result,
+            boolean includeInferredOntologyStatements)
     {
         Model results = result;
         
@@ -163,13 +165,14 @@ public class OntologyUtils
         
         for(final InferredOWLOntologyID nextOntology : input)
         {
-            results.addAll(nextOntology.toRDF());
+            ontologyIDToRDF(nextOntology, results, includeInferredOntologyStatements);
         }
         
         return results;
     }
     
-    public static Model ontologyIDToRDF(final OWLOntologyID ontology, final Model result)
+    public static Model ontologyIDToRDF(final OWLOntologyID ontology, final Model result,
+            boolean includeInferredOntologyStatements)
     {
         final ValueFactory vf = ValueFactoryImpl.getInstance();
         
@@ -181,7 +184,7 @@ public class OntologyUtils
                 result.add(vf.createStatement(ontology.getVersionIRI().toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY));
                 result.add(vf.createStatement(ontology.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, ontology
                         .getVersionIRI().toOpenRDFURI()));
-                if(ontology instanceof InferredOWLOntologyID)
+                if(includeInferredOntologyStatements && ontology instanceof InferredOWLOntologyID)
                 {
                     final InferredOWLOntologyID inferredOntology = (InferredOWLOntologyID)ontology;
                     if(inferredOntology.getInferredOntologyIRI() != null)
@@ -222,5 +225,10 @@ public class OntologyUtils
     
     private OntologyUtils()
     {
+    }
+    
+    public static Model ontologyIDsToModel(List<InferredOWLOntologyID> input, Model result)
+    {
+        return ontologyIDsToModel(input, result, true);
     }
 }
