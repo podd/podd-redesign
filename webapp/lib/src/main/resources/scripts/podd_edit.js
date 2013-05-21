@@ -60,7 +60,7 @@ podd.getCurrentObjectUri = function() {
     return nextObjectUri;
 };
 
-podd.getCurrentArtifactUri = function() {
+podd.getCurrentArtifactIri = function() {
     var nextArtifactIri;
 
     if (typeof podd.artifactIri === 'undefined') {
