@@ -52,7 +52,7 @@ podd.getCurrentObjectUri = function() {
         // hardcoded blank node for new objects
         // this will be replaced after the first valid submission of the
         // object to the server
-        nextObjectUri = "<urn:temp:uuid:newobject1>";
+        nextObjectUri = "<urn:temp:uuid:object>";
     }
     else {
         nextObjectUri = '<' + podd.objectUri + '>';
@@ -68,7 +68,7 @@ podd.getCurrentArtifactIri = function() {
         // hardcoded blank node for new artifacts
         // this will be replaced after the first valid submission of the
         // artifact to the server
-        nextArtifactIri = "<urn:temp:uuid:newartifact1>";
+        nextArtifactIri = "<urn:temp:uuid:artifact>";
     }
     else {
         nextArtifactIri = '<' + podd.artifactIri + '>';
@@ -731,7 +731,7 @@ podd.submitPoddObjectUpdate = function(
 
     console.debug('[updatePoddObject]  "' + objectUri);
     if (typeof artifactIri === 'undefined') {
-        artifactIri = '<urn:temp:uuid:newartifact1>';
+        artifactIri = '<urn:temp:uuid:artifact>';
     }
 
     if (typeof artifactIri !== "undefined" && artifactIri.lastIndexOf('<urn:temp:uuid:', 0) === 0) {
