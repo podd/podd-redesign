@@ -168,7 +168,7 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
     .optional('?propertyUri poddBase:hasDisplayType ?displayType')
     // Optional, though recommended, cardinality to specify how many of this
     // property can be linked to this class
-    .optional('?propertyUri owl:cardinality ?cardinality')
+    .optional('?propertyUri poddBase:hasCardinality ?cardinality')
     // Optional, weight given for property when used with this class to order
     // the interface consistently
     .optional('?propertyUri poddBase:weight ?weight');
@@ -432,9 +432,10 @@ podd.createEditField = function(index, nextField, nextSchemaDatabank, nextArtifa
         li2.append(checkBox);
     }
     else { // default
-        var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
-        podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
-        li2.append(input);
+        podd.updateErrorMessageList("TODO: Support property : "+nextField.propertyUri + " ("+nextField.displayValue+")");
+        //var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
+        //podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
+        //li2.append(input);
     }
 
     var subList = $('<ul>').append(li2);
