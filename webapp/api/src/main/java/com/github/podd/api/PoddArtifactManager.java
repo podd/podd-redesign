@@ -6,6 +6,7 @@ package com.github.podd.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -301,6 +302,11 @@ public interface PoddArtifactManager
      *            The URI of the artifact to be updated. This should be an already managed artifact.
      * @param versionUri
      *            The Version URI of the artifact to be updated.
+     * @param objectUris
+     *            A collection of object URIs to be merged in. If updatePolicy is
+     *            {@link UpdatePolicy#REPLACE_EXISTING}, only these object URIs will be updated.
+     *            This allows for the new object to be linked to its parent within this update
+     *            operation.
      * @param inputStream
      *            The RDF statements that need to be updated. It is not necessary to send the
      *            complete artifact here, only sending the affected statements is sufficient.
@@ -323,10 +329,10 @@ public interface PoddArtifactManager
      * @throws IOException
      * @throws OWLException
      */
-    InferredOWLOntologyID updateArtifact(final URI artifactUri, URI versionUri, final InputStream inputStream,
-            final RDFFormat format, final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectPolicy,
-            final FileReferenceVerificationPolicy fileReferencePolicy) throws OpenRDFException, PoddException,
-        IOException, OWLException;
+    InferredOWLOntologyID updateArtifact(final URI artifactUri, URI versionUri, final Collection<URI> objectUris,
+            final InputStream inputStream, final RDFFormat format, final UpdatePolicy updatePolicy,
+            final DanglingObjectPolicy danglingObjectPolicy, final FileReferenceVerificationPolicy fileReferencePolicy)
+        throws OpenRDFException, PoddException, IOException, OWLException;
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.
