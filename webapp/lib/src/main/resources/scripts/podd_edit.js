@@ -385,6 +385,8 @@ podd.createEditField = function(index, nextField, nextSchemaDatabank, nextArtifa
         li.append(spanRequired);
     }
 
+    var link = undefined;
+
     // display (+) icon to add extra values
     if (nextField.cardinality == CARD_ZeroOrMany || nextField.cardinality == CARD_OneOrMany) {
         link = $('<a>');
@@ -403,6 +405,13 @@ podd.createEditField = function(index, nextField, nextSchemaDatabank, nextArtifa
     if (nextField.displayType == DISPLAY_LongText) {
         var input = podd.addFieldInputText(nextField, 'textarea', nextSchemaDatabank);
         podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
+        if (typeof link !== 'undefined') {
+            link.click(function() {
+                var clonedField = $(this).clone(true);
+                podd.addShortTextBlurHandler(clonedField, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, true);
+                li.append(clonedField);
+            });
+        }
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
@@ -432,10 +441,13 @@ podd.createEditField = function(index, nextField, nextSchemaDatabank, nextArtifa
         li2.append(checkBox);
     }
     else { // default
-        podd.updateErrorMessageList("TODO: Support property : "+nextField.propertyUri + " ("+nextField.displayValue+")");
-        //var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
-        //podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
-        //li2.append(input);
+        podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + nextField.displayValue
+                + ")");
+        // var input = podd.addFieldInputText(nextField, 'text',
+        // nextSchemaDatabank);
+        // podd.addShortTextBlurHandler(input, nextField.propertyUri,
+        // nextField.displayValue, nextArtifactDatabank, isNew);
+        // li2.append(input);
     }
 
     var subList = $('<ul>').append(li2);
@@ -451,10 +463,10 @@ podd.createEditField = function(index, nextField, nextSchemaDatabank, nextArtifa
  * handlers that know the field has not been saved before this point.
  */
 podd.cloneEmptyField = function() {
-    var thisProperty = $(this).attr('property');
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('Clicked clonable: ' + thisProperty);
-    }
+    // var thisProperty = $(this).attr('property');
+    // if (typeof console !== "undefined" && console.debug) {
+    // console.debug('Clicked clonable: ' + thisProperty);
+    // }
 
     // var idToClone = '#tLbl1'; //
     // '#id_http://purl.org/podd/ns/poddScience_hasANZSRC';
@@ -464,10 +476,10 @@ podd.cloneEmptyField = function() {
     var clonedField = $(this).clone(true);
     // clonedField.attr('id', 'LABEL_cloned');
     // console.debug('Cloned: ' + clonedField.attr('id'));
-    $(this).append(clonedField);
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('appended cloned field');
-    }
+    // $(this).append(clonedField);
+    // if (typeof console !== "undefined" && console.debug) {
+    // console.debug('appended cloned field');
+    // }
 
     // var newObject = jQuery.extend(true, {}, $(idToClone));
     // console.debug('## SO clone: ' + JSON.stringify(newObject, null, 4));
