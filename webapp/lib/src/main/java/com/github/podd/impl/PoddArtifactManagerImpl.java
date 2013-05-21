@@ -736,6 +736,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 // check for managed version from artifact graph
                 OWLOntologyID currentManagedArtifactID = null;
+                
                 try
                 {
                     currentManagedArtifactID =
@@ -746,7 +747,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 catch(final UnmanagedArtifactIRIException e)
                 {
                     // ignore. indicates a new artifact is being uploaded
-                    this.log.debug("This is an unmanaged artifact IRI {}", ontologyIRI);
+                    this.log.info("This is an unmanaged artifact IRI {}", ontologyIRI);
                 }
                 
                 IRI newVersionIRI = null;
