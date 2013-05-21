@@ -760,7 +760,9 @@ podd.submitPoddObjectUpdate = function(
         type : 'POST',
         data : modifiedTriples,
         contentType : 'application/rdf+json', // what we're sending
-        dataType : 'json', // what is expected back
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
         success : function(resultData, status, xhr) {
             console.debug('[updatePoddObject] ### SUCCESS ### ' + resultData);
             // console.debug('[updatePoddObject] ' + xhr.responseText);

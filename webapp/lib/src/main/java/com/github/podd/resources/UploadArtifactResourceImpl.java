@@ -183,13 +183,13 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    @Post(":rdf|rj|ttl")
+    @Post(":rdf|rj|json|ttl")
     public Representation uploadArtifactToRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
         
-        this.log.info("@Post uploadArtifactFile ({})", variant.getMediaType().getName());
+        this.log.info("@Post uploadArtifactFile RDF ({})", variant.getMediaType().getName());
         
         final InferredOWLOntologyID artifactMap = this.doUpload(entity);
         
