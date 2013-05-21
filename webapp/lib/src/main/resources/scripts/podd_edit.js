@@ -716,7 +716,6 @@ podd.submitPoddObjectUpdate = function(
 /* String */objectUri,
 /* object */nextArtifactDatabank) {
 
-    
     var requestUrl = podd.baseUrl + '/artifact/edit';
 
     var modifiedTriples = $.toJSON(nextArtifactDatabank.dump({
@@ -724,20 +723,24 @@ podd.submitPoddObjectUpdate = function(
     }));
 
     console.debug('[updatePoddObject]  "' + objectUri);
-    if(typeof artifactIri === "undefined") {
+    if (typeof artifactIri === "undefined") {
+        // Create a new object if it wasn't defined
+        // To succeed this will require the object to be a valid PoddTopObject
         requestUrl = podd.baseUrl + '/artifact/new';
-    }
-    else if (typeof versionIri !== "undefined") {
-        console.debug(' of artifact (' + versionIri + ').');
-        // FIXME: Why is the parameter isForce hardcoded to true?
-        // set query parameters in the URI as setting them under data failed,
-        // mostly leading to a 415 error
-        requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri) + '&versionuri='
-                + encodeURIComponent(versionIri) + '&isforce=true';
     }
     else {
         // FIXME: Why is the parameter isForce hardcoded to true?
         requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri) + '&isforce=true';
+        if (typeof versionIri !== "undefined") {
+            console.debug(' of artifact (' + versionIri + ').');
+            // set query parameters in the URI as setting them under data
+            // failed, mostly leading to a 415 error
+            +'&versionuri=' + encodeURIComponent(versionIri);
+        }
+        if (typeof objectUri !== 'undefined') {
+            console.debug(' on object (' + objectUri + ').');
+            requestUrl = requestUrl + '&objectUri=' + encodeURIComponent(objectUri);
+        }
     }
     console.debug('[updatePoddObject] Request (POST):  ' + requestUrl);
 
