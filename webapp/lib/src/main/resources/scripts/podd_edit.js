@@ -168,7 +168,7 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
     .optional('?propertyUri poddBase:hasDisplayType ?displayType')
     // Optional, though recommended, cardinality to specify how many of this
     // property can be linked to this class
-    .optional('?propertyUri poddBase:hasCardinality ?cardinality')
+    .optional('?propertyUri owl:cardinality ?cardinality')
     // Optional, weight given for property when used with this class to order
     // the interface consistently
     .optional('?propertyUri poddBase:weight ?weight');
