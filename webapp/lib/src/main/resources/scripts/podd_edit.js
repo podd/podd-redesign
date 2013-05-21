@@ -670,9 +670,11 @@ podd.debugAddDownloadArtifactHandler = function(/* string */buttonPath, /* strin
 };
 
 /* Display a message on leaving text field */
-podd.updateErrorMessageHeader = function(theMessage) {
-    $("#errorMsgHeader").html(theMessage);
-}
+podd.updateErrorMessageList = function(theMessage) {
+    var li = $("<li>")
+    li.html(theMessage);
+    $("#errorMsgList").append(li);
+};
 
 /* Retrieve the current version of an artifact and populate the databank */
 podd.getArtifact = function(artifactUri, nextArtifactDatabank) {
@@ -692,7 +694,7 @@ podd.getArtifact = function(artifactUri, nextArtifactDatabank) {
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
 
-            podd.updateErrorMessageHeader('<i>Successfully retrieved artifact version: ' + versionIri + '</i><br>');
+            podd.updateErrorMessageList('<i>Successfully retrieved artifact version: ' + podd.versionIri + '</i><br>');
         },
         error : function(xhr, status, error) {
             console.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
@@ -759,7 +761,7 @@ podd.submitPoddObjectUpdate = function(
             console.debug('[updatePoddObject] ### SUCCESS ### ' + resultData);
             // console.debug('[updatePoddObject] ' + xhr.responseText);
             var message = '<div>Successfully edited artifact.<pre>' + xhr.responseText + '</pre></div>';
-            podd.updateErrorMessageHeader(message);
+            podd.updateErrorMessageList(message);
 
             var tempDatabank = podd.newDatabank();
             tempDatabank.load(resultData);
