@@ -675,7 +675,7 @@ podd.updateErrorMessageHeader = function(theMessage) {
 }
 
 /* Retrieve the current version of an artifact and populate the databank */
-podd.getArtifact = function(artifactUri, nextDatabank) {
+podd.getArtifact = function(artifactUri, nextArtifactDatabank) {
     var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
     console.debug('[getArtifact] Request to: ' + requestUrl);
@@ -684,21 +684,13 @@ podd.getArtifact = function(artifactUri, nextDatabank) {
         type : 'GET',
         // dataType : 'application/rdf+xml', // what is expected back
         success : function(resultData, status, xhr) {
-            nextDatabank.load(resultData);
-            console.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextDatabank.size());
+            nextArtifactDatabank.load(resultData);
+            console.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextArtifactDatabank.size());
 
             // update variables and page contents with retrieved artifact info
-            var artifactId = podd.getOntologyID(nextDatabank);
-            artifactIri = artifactId[0].artifactIri;
-            versionIri = artifactId[0].versionIri;
-
-            $('#podd_artifact').val(artifactIri);
-            $('#podd_artifact_version').val(versionIri);
-
-            // update project title on page
-            var title = podd.getProjectTitle(nextDatabank);
-            $('#in1').val(title.value);
-            $('#in1Hidden').val(title.value);
+            var artifactId = podd.getOntologyID(nextArtifactDatabank);
+            podd.artifactIri = artifactId[0].artifactIri;
+            podd.versionIri = artifactId[0].versionIri;
 
             podd.updateErrorMessageHeader('<i>Successfully retrieved artifact version: ' + versionIri + '</i><br>');
         },
@@ -769,12 +761,15 @@ podd.submitPoddObjectUpdate = function(
             var message = '<div>Successfully edited artifact.<pre>' + xhr.responseText + '</pre></div>';
             podd.updateErrorMessageHeader(message);
 
-            // FIXME: Should we be wiping out the databank before doing this?
-            // podd.deleteTriples(nextArtifactDatabank, attribute.objectUri,
-            // attribute.property);
+            var tempDatabank = podd.newDatabank();
+            tempDatabank.load(resultData);
+            var artifactId = podd.getOntologyID(tempDatabank);
+            podd.artifactIri = artifactId[0].artifactIri;
+            podd.versionIri = artifactId[0].versionIri;
 
-            // FIXME: Update artifactIri and versionIri before doing this
-            podd.getArtifact(artifactIri, nextArtifactDatabank);
+            // Wipe out databank so it contains the most current copy
+            podd.deleteTriples(nextArtifactDatabank, "?subject", "?predicate");
+            podd.getArtifact(podd.artifactIri, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
             console.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);

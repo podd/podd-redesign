@@ -10,6 +10,7 @@
 	    }
 		podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
 		podd.artifactIri = undefined;
+		podd.versionIri = undefined;
 		// FIXME: Insert the parent URI using freemarker
 		podd.parentUri = undefined;
 		// The object URI is always undefined for a new object initially,
