@@ -33,10 +33,11 @@ podd.newDatabank = function() {
     // TODO: Is base useful to us?
     // nextDatabank.base("http://www.example.org/")
     nextDatabank.prefix("dcterms", "http://purl.org/dc/terms/");
-    nextDatabank.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
-    nextDatabank.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-    nextDatabank.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
-    nextDatabank.prefix('owl', 'http://www.w3.org/2002/07/owl#')
+    nextDatabank.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#');
+    nextDatabank.prefix('poddUser', 'http://purl.org/podd/ns/poddUser#');
+    nextDatabank.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+    nextDatabank.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#');
+    nextDatabank.prefix('owl', 'http://www.w3.org/2002/07/owl#');
     nextDatabank.prefix("foaf", "http://xmlns.com/foaf/0.1/");
     nextDatabank.prefix("moat", "http://moat-project.org/ns#");
     nextDatabank.prefix("tagging", "http://www.holygoat.co.uk/owl/redwood/0.1/tags/");
@@ -51,7 +52,7 @@ podd.getCurrentObjectUri = function() {
         // hardcoded blank node for new objects
         // this will be replaced after the first valid submission of the
         // object to the server
-        nextObjectUri = "_:a1";
+        nextObjectUri = "_:newobject1";
     }
     else {
         nextObjectUri = '<' + podd.objectUri + '>';
@@ -61,9 +62,15 @@ podd.getCurrentObjectUri = function() {
 };
 
 podd.getCurrentArtifactIri = function() {
-    var nextArtifactIri = undefined;
+    var nextArtifactIri;
 
-    if (typeof podd.artifactIri !== 'undefined') {
+    if (typeof podd.artifactIri === 'undefined') {
+        // hardcoded blank node for new artifacts
+        // this will be replaced after the first valid submission of the
+        // artifact to the server
+        nextArtifactIri = "_:newartifact1";
+    }
+    else {
         nextArtifactIri = '<' + podd.artifactIri + '>';
     }
 
@@ -723,7 +730,11 @@ podd.submitPoddObjectUpdate = function(
     }));
 
     console.debug('[updatePoddObject]  "' + objectUri);
-    if (typeof artifactIri === "undefined") {
+    if (typeof artifactIri === 'undefined') {
+        artifactIri = '_:newartifact1';
+    }
+
+    if (typeof artifactIri !== "undefined" && artifactIri.lastIndexOf('_:', 0) === 0) {
         // Create a new object if it wasn't defined
         // To succeed this will require the object to be a valid PoddTopObject
         requestUrl = podd.baseUrl + '/artifact/new';

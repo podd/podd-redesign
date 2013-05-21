@@ -18,7 +18,28 @@
 	
 	    podd.artifactDatabank = podd.newDatabank();
 	    podd.schemaDatabank = podd.newDatabank();
-	
+		
+		podd.artifactDatabank.add(podd.getCurrentObjectUri() + ' rdf:type <' + podd.objectTypeUri + '> ');
+		
+		console.debug("artifact IRI");
+		console.debug(podd.getCurrentArtifactIri());
+		console.debug("object IRI");
+		console.debug(podd.getCurrentObjectUri());
+			
+		if(typeof podd.parentUri === 'undefined')
+		{
+			// FIXME: Encapsulate this in a initializeNewTopObject method
+			podd.artifactDatabank.add(podd.getCurrentArtifactIri() + ' rdf:type owl:Ontology ');
+			podd.artifactDatabank.add(podd.getCurrentArtifactIri() + ' poddBase:artifactHasTopObject '+podd.getCurrentObjectUri());
+			podd.artifactDatabank.add('<mailto:${user.email}> rdf:type poddUser:User');
+			
+			podd.artifactDatabank.add(podd.getCurrentArtifactIri() + ' owl:imports <http://purl.org/podd/ns/version/dcTerms/1>');
+			podd.artifactDatabank.add(podd.getCurrentArtifactIri() + ' owl:imports <http://purl.org/podd/ns/version/poddBase/1>');
+			podd.artifactDatabank.add(podd.getCurrentArtifactIri() + ' owl:imports <http://purl.org/podd/ns/version/poddScience/1>');
+			podd.artifactDatabank.add(podd.getCurrentArtifactIri() + ' owl:imports <http://purl.org/podd/ns/version/poddPlant/1>');
+			podd.artifactDatabank.add(podd.getCurrentArtifactIri() + ' owl:imports <http://purl.org/podd/ns/version/poddUser/1>');
+		}
+				
 		// TODO: Preload artifactDatabank before this point in general (do not fail for new object URIs) and only load the schemaDatabank after that is 
 		// loaded so that we can immediately add the fields and handlers when we receive the schema data
 	
