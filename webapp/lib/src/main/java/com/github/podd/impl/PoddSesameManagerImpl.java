@@ -1033,7 +1033,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                         this.getCardinalityValue(objectType, (URI)property, true, repositoryConnection, contexts);
                 if(cardinalityValue != null)
                 {
-                    results.add((URI)property, OWL.CARDINALITY, cardinalityValue);
+                    results.add((URI)property, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
                 }
                 
             }
@@ -1179,8 +1179,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     {
         // get ontology IRI from the RepositoryConnection using a SPARQL SELECT query
         final String sparqlQuery =
-                "SELECT ?nextOntology WHERE { ?nextOntology <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue() + ">  . " + " ?nextOntology <"
-                        + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT + "> ?y " + " }";
+                "SELECT ?nextOntology WHERE { ?nextOntology <" + RDF.TYPE + "> <" + OWL.ONTOLOGY.stringValue()
+                        + ">  . " + " ?nextOntology <" + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT + "> ?y " + " }";
         this.log.debug("Generated SPARQL {}", sparqlQuery);
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
         

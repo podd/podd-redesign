@@ -273,5 +273,5 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/poddBase#hasFileRepositorySecret */
     public static final URI PODD_FILE_REPOSITORY_SECRET = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.FILE_REPOSITORY, "hasFileRepositorySecret");
-    
+
 }
