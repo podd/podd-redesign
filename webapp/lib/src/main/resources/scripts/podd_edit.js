@@ -225,6 +225,9 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
     });
 
     $.each(propertyList, function(index, value) {
+        // TODO: Search through nextArtifactDatabank to find if there are any
+        // values in it for this property and display them instead of displaying
+        // an empty box
         $("#details ol").append(podd.createEditField(index, value, nextSchemaDatabank, nextArtifactDatabank, true));
     });
 };
@@ -262,91 +265,6 @@ podd.getPoddObjectForEdit = function(
                 console.debug(xhr.statusText);
             }
         }
-    });
-};
-
-/*
- * Callback function when RDF containing Edit data is available
- */
-podd.loadEditDataCallback = function(resultData, status, xhr, nextSchemaDatabank, nextArtifactDatabank) {
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('[getPoddObjectForEdit] ### SUCCESS ### ' + resultData);
-    }
-    nextDatabank.load(resultData);
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('Schema Databank size = ' + nextSchemaDatabank.size());
-    }
-    // retrieve weighted property list
-    var myQuery = $.rdf({
-        databank : nextSchemaDatabank
-    })
-    // FIXME: The following line is going to be very difficult to maintain in
-    // the long run, so need to redesign the triple format
-    .where('?objectUri ?propertyUri ?pValue').where('?propertyUri poddBase:weight ?weight').optional(
-            '?propertyUri <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel').optional(
-            '?propertyUri poddBase:hasDisplayType ?displayType').optional(
-            '?propertyUri poddBase:hasCardinality ?cardinality').optional(
-            '?pValue <http://www.w3.org/2000/01/rdf-schema#label> ?pValueLabel');
-    var bindings = myQuery.select();
-
-    var propertyList = [];
-    $.each(bindings, function(index, nextBinding) {
-        var nextChild = {};
-        nextChild.weight;
-        nextChild.propertyUri = nextBinding.propertyUri.value;
-        nextChild.propertyLabel;
-        nextChild.displayType;
-        nextChild.cardinality;
-
-        if (typeof nextBinding.pLabel != 'undefined') {
-            nextChild.propertyLabel = nextBinding.pLabel.value;
-        }
-        else {
-            nextChild.propertyLabel = nextBinding.propertyUri.value;
-        }
-
-        if (typeof nextBinding.displayType != 'undefined') {
-            nextChild.displayType = nextBinding.displayType.value;
-        }
-
-        if (typeof nextBinding.weight != 'undefined') {
-            nextChild.weight = nextBinding.weight.value;
-        }
-        else {
-            nextChild.weight = 99;
-        }
-
-        if (typeof nextBinding.cardinality != 'undefined') {
-            nextChild.cardinality = nextBinding.cardinality.value;
-        }
-
-        if (typeof nextBinding.pValueLabel != 'undefined') {
-            nextChild.displayValue = nextBinding.pValueLabel.value;
-            nextChild.valueUri = nextBinding.pValue.value;
-        }
-        else {
-            nextChild.displayValue = nextBinding.pValue.value;
-            nextChild.valueUri = nextBinding.pValue.value;
-        }
-
-        propertyList.push(nextChild);
-        if (typeof console !== "undefined" && console.debug) {
-            // console.debug(nextChild.weight + '] <' + nextChild.propertyUri +
-            // '>
-            // "' + nextChild.propertyLabel + '" <' +
-            // nextChild.displayType + '> <' + nextChild.cardinality + '>');
-        }
-    });
-
-    // sort property list
-    propertyList.sort(function(a, b) {
-        var aID = a.weight;
-        var bID = b.weight;
-        return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
-    });
-
-    $.each(propertyList, function(index, value) {
-        $("#details ol").append(podd.createEditField(index, value, nextSchemaDatabank, nextArtifactDatabank, false));
     });
 };
 
@@ -408,7 +326,8 @@ podd.createEditField = function(index, nextField, nextSchemaDatabank, nextArtifa
         if (typeof link !== 'undefined') {
             link.click(function() {
                 var clonedField = input.clone(true);
-                podd.addShortTextBlurHandler(clonedField, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, true);
+                podd.addShortTextBlurHandler(clonedField, nextField.propertyUri, nextField.displayValue,
+                        nextArtifactDatabank, true);
                 // FIXME: Determine correct place to append this to
                 li.append(clonedField);
             });
