@@ -61,15 +61,9 @@ podd.getCurrentObjectUri = function() {
 };
 
 podd.getCurrentArtifactIri = function() {
-    var nextArtifactIri;
+    var nextArtifactIri = undefined;
 
-    if (typeof podd.artifactIri === 'undefined') {
-        // hardcoded blank node for new objects
-        // this will be replaced after the first valid submission of the
-        // object to the server
-        nextArtifactIri = "_:a1";
-    }
-    else {
+    if (typeof podd.artifactIri !== 'undefined') {
         nextArtifactIri = '<' + podd.artifactIri + '>';
     }
 
@@ -722,6 +716,7 @@ podd.submitPoddObjectUpdate = function(
 /* String */objectUri,
 /* object */nextArtifactDatabank) {
 
+    
     var requestUrl = podd.baseUrl + '/artifact/edit';
 
     var modifiedTriples = $.toJSON(nextArtifactDatabank.dump({
@@ -729,7 +724,10 @@ podd.submitPoddObjectUpdate = function(
     }));
 
     console.debug('[updatePoddObject]  "' + objectUri);
-    if (typeof versionIri !== "undefined") {
+    if(typeof artifactIri === "undefined") {
+        requestUrl = podd.baseUrl + '/artifact/new';
+    }
+    else if (typeof versionIri !== "undefined") {
         console.debug(' of artifact (' + versionIri + ').');
         // FIXME: Why is the parameter isForce hardcoded to true?
         // set query parameters in the URI as setting them under data failed,
@@ -759,7 +757,7 @@ podd.submitPoddObjectUpdate = function(
             // podd.deleteTriples(nextArtifactDatabank, attribute.objectUri,
             // attribute.property);
 
-            // FIXME: Should we be parsing resultData before doing this?
+            // FIXME: Update artifactIri and versionIri before doing this
             podd.getArtifact(artifactIri, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {

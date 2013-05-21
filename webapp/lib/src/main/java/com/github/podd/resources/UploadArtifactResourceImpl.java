@@ -233,7 +233,6 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("Successfully loaded artifact {}", artifactMap.getOntologyIRI().toString());
         
-        // FIXME: Structure this response as RDF, as they may have asked for it in RDF.
         return new StringRepresentation(artifactMap.getOntologyIRI().toString());
     }
     

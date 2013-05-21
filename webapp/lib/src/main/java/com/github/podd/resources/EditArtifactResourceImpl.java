@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +78,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     public Representation editArtifactToRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         
         if(artifactUri == null)
         {
@@ -85,7 +86,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
         
-        final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER);
+        final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
         
         if(versionUri == null)
         {
@@ -93,9 +94,12 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
         }
         
+        // optional multiple parameter 'objectUri'
+        String[] objectURIStrings = this.getQuery().getValuesArray(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
+        
         // - optional parameter 'isreplace'
         UpdatePolicy updatePolicy = UpdatePolicy.REPLACE_EXISTING;
-        final String isReplaceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_REPLACE);
+        final String isReplaceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_REPLACE, true);
         if(isReplaceStr != null && (Boolean.valueOf(isReplaceStr) == false))
         {
             updatePolicy = UpdatePolicy.MERGE_WITH_EXISTING;
@@ -103,7 +107,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         // - optional parameter 'isforce'
         DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
-        final String forceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_FORCE);
+        final String forceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_FORCE, true);
         if(forceStr != null && Boolean.valueOf(forceStr))
         {
             danglingObjectPolicy = DanglingObjectPolicy.FORCE_CLEAN;
@@ -111,10 +115,17 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         // - optional parameter 'verifyfilerefs'
         FileReferenceVerificationPolicy fileRefVerificationPolicy = FileReferenceVerificationPolicy.DO_NOT_VERIFY;
-        final String fileRefVerifyStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES);
+        final String fileRefVerifyStr =
+                this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES, true);
         if(fileRefVerifyStr != null && Boolean.valueOf(fileRefVerifyStr))
         {
             fileRefVerificationPolicy = FileReferenceVerificationPolicy.VERIFY;
+        }
+        
+        Collection<URI> objectUris = new ArrayList<URI>(objectURIStrings.length);
+        for(String nextObjectURIString : objectURIStrings)
+        {
+            objectUris.add(PoddRdfConstants.VF.createURI(nextObjectURIString));
         }
         
         this.log.info("requesting edit artifact ({}): {}, with isReplace {}", variant.getMediaType().getName(),
@@ -148,8 +159,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             final InferredOWLOntologyID ontologyID =
-                    this.getPoddArtifactManager().updateArtifact(ValueFactoryImpl.getInstance().createURI(artifactUri),
-                            ValueFactoryImpl.getInstance().createURI(versionUri), inputStream, inputFormat,
+                    this.getPoddArtifactManager().updateArtifact(PoddRdfConstants.VF.createURI(artifactUri),
+                            PoddRdfConstants.VF.createURI(versionUri), objectUris, inputStream, inputFormat,
                             updatePolicy, danglingObjectPolicy, fileRefVerificationPolicy);
             // TODO - send detailed errors for display where possible
             

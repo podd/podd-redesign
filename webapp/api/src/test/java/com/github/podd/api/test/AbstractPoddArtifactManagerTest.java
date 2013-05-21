@@ -10,7 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -291,6 +293,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * @param isPublished
      * @param fragmentPath
      * @param fragmentFormat
+     * @param updateObjectUris
      * @return
      * @throws Exception
      */
@@ -298,7 +301,8 @@ public abstract class AbstractPoddArtifactManagerTest
             final int mgtGraphSize, final long assertedStatementCount, final long inferredStatementCount,
             final boolean isPublished, final String fragmentPath, final RDFFormat fragmentFormat,
             final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectPolicy,
-            final FileReferenceVerificationPolicy verifyFileReferences) throws Exception
+            final FileReferenceVerificationPolicy verifyFileReferences, Collection<URI> updateObjectUris)
+        throws Exception
     {
         this.loadSchemaOntologies();
         
@@ -310,8 +314,8 @@ public abstract class AbstractPoddArtifactManagerTest
         final InputStream editInputStream = this.getClass().getResourceAsStream(fragmentPath);
         final InferredOWLOntologyID updatedArtifact =
                 this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
-                        .getVersionIRI().toOpenRDFURI(), editInputStream, fragmentFormat, updatePolicy,
-                        danglingObjectPolicy, verifyFileReferences);
+                        .getVersionIRI().toOpenRDFURI(), updateObjectUris, editInputStream, fragmentFormat,
+                        updatePolicy, danglingObjectPolicy, verifyFileReferences);
         return updatedArtifact;
     }
     
@@ -1213,7 +1217,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                     TestConstants.TEST_ARTIFACT_FRAGMENT_INCONSISTENT_OBJECT, RDFFormat.TURTLE,
                     UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                    FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                    FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
             Assert.fail("Should have thrown an InconsistentOntologyException");
         }
         catch(final InconsistentOntologyException e)
@@ -1239,7 +1243,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT, RDFFormat.RDFXML,
                         UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1290,7 +1294,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT, RDFFormat.TURTLE,
                         UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1346,9 +1350,9 @@ public abstract class AbstractPoddArtifactManagerTest
         
         try
         {
-            this.testArtifactManager.updateArtifact(nonExistentArtifactURI, nonExistentArtifactURI, editInputStream,
-                    RDFFormat.TURTLE, UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                    FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+            this.testArtifactManager.updateArtifact(nonExistentArtifactURI, nonExistentArtifactURI,
+                    Collections.<URI> emptyList(), editInputStream, RDFFormat.TURTLE, UpdatePolicy.REPLACE_EXISTING,
+                    DanglingObjectPolicy.FORCE_CLEAN, FileReferenceVerificationPolicy.DO_NOT_VERIFY);
             Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
         }
         catch(final UnmanagedArtifactIRIException e)
@@ -1372,7 +1376,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT, RDFFormat.TURTLE,
                         UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1429,7 +1433,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION, RDFFormat.TURTLE,
                         UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1487,7 +1491,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE,
                         UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1544,7 +1548,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                     TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE,
                     UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.REPORT,
-                    FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                    FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
             Assert.fail("Should have thrown an Exception to indicate that dangling objects will result");
         }
         catch(final DisconnectedObjectException e)
@@ -1600,8 +1604,9 @@ public abstract class AbstractPoddArtifactManagerTest
         try
         {
             this.testArtifactManager.updateArtifact(artifactIDv1.getOntologyIRI().toOpenRDFURI(), artifactIDv1
-                    .getVersionIRI().toOpenRDFURI(), editInputStream, RDFFormat.TURTLE, UpdatePolicy.REPLACE_EXISTING,
-                    DanglingObjectPolicy.FORCE_CLEAN, FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                    .getVersionIRI().toOpenRDFURI(), Collections.<URI> emptyList(), editInputStream, RDFFormat.TURTLE,
+                    UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
+                    FileReferenceVerificationPolicy.DO_NOT_VERIFY);
             Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
         }
         catch(final UnmanagedArtifactIRIException e)

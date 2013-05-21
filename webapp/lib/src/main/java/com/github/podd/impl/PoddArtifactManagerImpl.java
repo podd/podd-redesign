@@ -25,6 +25,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -113,13 +114,28 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         model.removeAll(model.filter(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
         
+        Set<Resource> fileReferences =
+                model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE).subjects();
+        Collection<URI> fileReferenceObjects = new ArrayList<URI>(fileReferences.size());
+        for(Resource nextFileReference : fileReferences)
+        {
+            if(nextFileReference instanceof URI)
+            {
+                fileReferenceObjects.add((URI)nextFileReference);
+            }
+            else
+            {
+                log.warn("Will not be updating file reference for blank node reference, will instead be creating a new file reference for it.");
+            }
+        }
+        
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8192);
         
         Rio.write(model, output, RDFFormat.RDFJSON);
         
-        return this.updateArtifact(artifactUri, versionUri, new ByteArrayInputStream(output.toByteArray()),
-                RDFFormat.RDFJSON, UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.REPORT,
-                fileReferenceVerificationPolicy);
+        return this.updateArtifact(artifactUri, versionUri, fileReferenceObjects,
+                new ByteArrayInputStream(output.toByteArray()), RDFFormat.RDFJSON, UpdatePolicy.MERGE_WITH_EXISTING,
+                DanglingObjectPolicy.REPORT, fileReferenceVerificationPolicy);
     }
     
     /**
@@ -1053,9 +1069,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public InferredOWLOntologyID updateArtifact(final URI artifactUri, final URI versionUri,
-            final InputStream inputStream, RDFFormat format, final UpdatePolicy updatePolicy,
-            final DanglingObjectPolicy danglingObjectAction, final FileReferenceVerificationPolicy fileReferenceAction)
-        throws OpenRDFException, IOException, OWLException, PoddException
+            final Collection<URI> objectUris, final InputStream inputStream, RDFFormat format,
+            final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectAction,
+            final FileReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException,
+        OWLException, PoddException
     {
         if(inputStream == null)
         {
@@ -1109,19 +1126,40 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             if(UpdatePolicy.REPLACE_EXISTING.equals(updatePolicy))
             {
                 // create an intermediate context and add "edit" statements to it
-                final URI intContext = IRI.create("urn:intermediate:" + UUID.randomUUID().toString()).toOpenRDFURI();
+                final URI intContext = PoddRdfConstants.VF.createURI("urn:intermediate:", UUID.randomUUID().toString());
                 
                 tempRepositoryConnection.add(inputStream, "", format, intContext);
                 
-                // get all Subjects in "edit" statements
-                final RepositoryResult<Statement> statements =
-                        tempRepositoryConnection.getStatements(null, null, null, false, intContext);
-                final List<Statement> allEditStatements = Iterations.addAll(statements, new ArrayList<Statement>());
+                Collection<URI> replaceableObjects = new ArrayList<URI>(objectUris);
                 
-                // remove all references to these Subjects in "main" context
-                for(final Statement statement : allEditStatements)
+                // If they did not send a list, we create one ourselves.
+                if(replaceableObjects.isEmpty())
                 {
-                    tempRepositoryConnection.remove(statement.getSubject(), null, null, tempContext);
+                    // get all Subjects in "edit" statements
+                    final RepositoryResult<Statement> statements =
+                            tempRepositoryConnection.getStatements(null, null, null, false, intContext);
+                    final List<Statement> allEditStatements = Iterations.addAll(statements, new ArrayList<Statement>());
+                    
+                    // remove all references to these Subjects in "main" context
+                    for(final Statement statement : allEditStatements)
+                    {
+                        if(statement.getSubject() instanceof URI)
+                        {
+                            replaceableObjects.add((URI)statement.getSubject());
+                        }
+                        else
+                        {
+                            // We do not support replacing objects that are not referenced using
+                            // URIs, so they must stay for REPLACE_EXISTING
+                            // To remove blank node subject statements, replace the entire object
+                            // using REPLACE_ALL
+                        }
+                    }
+                }
+                
+                for(URI nextReplaceableObject : replaceableObjects)
+                {
+                    tempRepositoryConnection.remove(nextReplaceableObject, null, null, tempContext);
                 }
                 
                 // copy the "edit" statements from intermediate context into our "main" context
