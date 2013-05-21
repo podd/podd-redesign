@@ -407,8 +407,9 @@ podd.createEditField = function(index, nextField, nextSchemaDatabank, nextArtifa
         podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
         if (typeof link !== 'undefined') {
             link.click(function() {
-                var clonedField = $(this).clone(true);
+                var clonedField = input.clone(true);
                 podd.addShortTextBlurHandler(clonedField, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, true);
+                // FIXME: Determine correct place to append this to
                 li.append(clonedField);
             });
         }
