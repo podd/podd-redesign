@@ -115,7 +115,18 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
         },
         dataType : 'json', // what is expected back
         success : function(resultData, status, xhr) {
-            successCallback(resultData, status, xhr, objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
+            if (typeof console !== "undefined" && console.debug) {
+                console.debug('[getObjectTypeMetadata] ### SUCCESS ### ');
+                console.debug(resultData);
+            }
+
+            nextSchemaDatabank.load(resultData);
+
+            if (typeof console !== "undefined" && console.debug) {
+                console.debug('Schema Databank size = ' + nextSchemaDatabank.size());
+            }
+
+            successCallback(objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
             if (typeof console !== "undefined" && console.debug) {
@@ -131,24 +142,15 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
  * 
  * FIXME: Since the the metadata we get back does not contain Options for
  * drop-down type values, those have to be searched for using the Search
- * Ontology Service.
+ * Ontology Service. This should be done for autocomplete handlers in
+ * addAutoCompleteBlurHandler
  * 
  * Also, this returns weights that are given in the schemas. Since there can be
  * properties without weights, sorting them only by weight is insufficient.
- * 
+ * FIXME: Any properties without weights should have them added, just as any
+ * properties without labels should have them added.
  */
-podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, nextSchemaDatabank, nextArtifactDatabank) {
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('[getMetadata] ### SUCCESS ### ');
-        console.debug(resultData);
-    }
-
-    nextSchemaDatabank.load(resultData);
-
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('Schema Databank size = ' + nextSchemaDatabank.size());
-    }
-
+podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
     // retrieve weighted property list
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
@@ -188,6 +190,7 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
             nextChild.propertyLabel = nextBinding.propertyLabel.value;
         }
         else {
+            console.debug("Did not find a label for property: " + nextBinding.propertyUri.value);
             nextChild.propertyLabel = nextBinding.propertyUri.value;
         }
 
@@ -224,67 +227,34 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
         return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
     });
 
-    $.each(propertyList,
-            function(index, value) {
-                var nextArtifactQuery = $.rdf({
-                    databank : nextArtifactDatabank
-                })
-                // Desired object a objectType
-                .where(podd.getCurrentObjectUri() + ' rdf:type <' + objectType + '>')
-                // Restriction has a linked property, which is the minimum we
-                // require
-                .where(podd.getCurrentObjectUri() + ' <' + propertyUri + '> ?propertyValue ');
+    // Reset the details list
+    $("#details ol").empty();
 
-                var nextArtifactBindings = nextArtifactQuery.select();
+    $.each(propertyList, function(index, value) {
+        var nextArtifactQuery = $.rdf({
+            databank : nextArtifactDatabank
+        })
+        // Desired object a objectType
+        .where(podd.getCurrentObjectUri() + ' rdf:type <' + objectType + '>')
+        // Restriction has a linked property, which is the minimum we
+        // require
+        .where(podd.getCurrentObjectUri() + ' <' + value.propertyUri + '> ?propertyValue ');
 
-                // If there are values for the property in the artifact
-                // databank, display them instead of showing an empty field
-                if (nextArtifactBindings.length > 0) {
-                    $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
-                        value.displayValue = nextArtifactValue.propertyValue.value;
-                        $("#details ol").append(
-                                podd.createEditField(index, value, nextSchemaDatabank, nextArtifactDatabank, true));
-                    });
-                }
-                else {
-                    $("#details ol").append(
-                            podd.createEditField(index, value, nextSchemaDatabank, nextArtifactDatabank, true));
-                }
+        var nextArtifactBindings = nextArtifactQuery.select();
+
+        // If there are values for the property in the artifact
+        // databank, display them instead of showing an empty field
+        if (nextArtifactBindings.length > 0) {
+            $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
+                // found existing value for property
+                value.displayValue = nextArtifactValue.propertyValue.value;
+                console.debug("Found existing value for property <" + value.propertyUri + "> value="
+                        + value.displayValue);
+                $("#details ol").append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
             });
-};
-
-/*
- * Retrieve an RDF containing necessary data and meta-data to populate the Edit
- * Artifact page.
- */
-podd.getPoddObjectForEdit = function(
-/* String */artifactUri,
-/* String */objectUri) {
-
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('[getPoddObjectForEdit]  "' + objectUri + '" of artifact (' + artifactUri + ') .');
-    }
-
-    var requestUrl = podd.baseUrl + '/artifact/edit';
-
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('[getPoddObjectForEdit] Request (GET):  ' + requestUrl);
-    }
-
-    $.ajax({
-        url : requestUrl,
-        type : 'GET',
-        data : {
-            artifacturi : artifactUri,
-            objecturi : objectUri
-        },
-        dataType : 'json', // what is expected back
-        success : loadEditDataCallback,
-        error : function(xhr, status, error) {
-            if (typeof console !== "undefined" && console.debug) {
-                console.debug('[getPoddObjectForEdit] $$$ ERROR $$$ ' + error);
-                console.debug(xhr.statusText);
-            }
+        }
+        else {
+            $("#details ol").append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
         }
     });
 };
@@ -292,7 +262,7 @@ podd.getPoddObjectForEdit = function(
 /*
  * Display the given field on page
  */
-podd.createEditField = function(index, nextField, nextSchemaDatabank, nextArtifactDatabank, isNew) {
+podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatabank, isNew) {
     if (typeof console !== "undefined" && console.debug) {
         // console.debug('[' + nextField.weight + '] <' + nextField.propertyUri
         // + '>
@@ -610,19 +580,6 @@ podd.displayMessage = function(event) {
     $(messageBox).html('<i>' + message + '</i>');
 }
 
-/**
- * DEBUG-ONLY : retrieve artifact and load it to databank
- */
-podd.debugAddDownloadArtifactHandler = function(/* string */buttonPath, /* string */inputPath) {
-    // $('#btn2')
-    $(path).click(function() {
-        // var artifactUri = $('#podd_artifact').val();
-        var artifactUri = $(inputPath).val();
-        podd.getArtifact(artifactUri);
-        // removeTriple();
-    });
-};
-
 /* Display a message on leaving text field */
 podd.updateErrorMessageList = function(theMessage) {
     var li = $("<li>")
@@ -631,7 +588,7 @@ podd.updateErrorMessageList = function(theMessage) {
 };
 
 /* Retrieve the current version of an artifact and populate the databank */
-podd.getArtifact = function(artifactUri, nextArtifactDatabank) {
+podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, callbackFunction) {
     var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
     console.debug('[getArtifact] Request to: ' + requestUrl);
@@ -649,6 +606,7 @@ podd.getArtifact = function(artifactUri, nextArtifactDatabank) {
             podd.versionIri = artifactId[0].versionIri;
 
             podd.updateErrorMessageList('<i>Successfully retrieved artifact version: ' + podd.versionIri + '</i><br>');
+            callbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
             console.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
@@ -669,7 +627,9 @@ podd.getArtifact = function(artifactUri, nextArtifactDatabank) {
 podd.submitPoddObjectUpdate = function(
 /* String */artifactIri,
 /* String */objectUri,
-/* object */nextArtifactDatabank) {
+/* object */nextSchemaDatabank,
+/* object */nextArtifactDatabank,
+/* function */updateCallback) {
 
     var requestUrl = podd.baseUrl + '/artifact/edit';
 
@@ -725,7 +685,7 @@ podd.submitPoddObjectUpdate = function(
 
             // Wipe out databank so it contains the most current copy
             podd.deleteTriples(nextArtifactDatabank, "?subject", "?predicate");
-            podd.getArtifact(podd.artifactIri, nextArtifactDatabank);
+            podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, updateCallback);
         },
         error : function(xhr, status, error) {
             console.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
@@ -889,7 +849,7 @@ podd.addAutoCompleteHandler = function(/* object */autoComplete) {
 // Update for short text
 podd.addShortTextBlurHandler = function(/* object */shortText, /* object */propertyUri, /* object */originalValue, /* object */
 nextArtifactDatabank, /* boolean */isNew) {
-    var nextOriginalValue = '"' + originalValue + '"';
+    var nextOriginalValue = '' + originalValue;
 
     // $(".short_text")
     shortText.blur(function(event) {
@@ -898,31 +858,41 @@ nextArtifactDatabank, /* boolean */isNew) {
 
         var objectUri = podd.getCurrentObjectUri();
 
-        var attributes = [];
-        var nextAttribute = {};
-        nextAttribute.isNew = isNew;
-        nextAttribute.objectUri = objectUri;
-        nextAttribute.property = '<' + propertyUri + '>';
-        nextAttribute.newValue = '"' + $(this).val() + '"';
-        nextAttribute.oldValue = nextOriginalValue;
+        var changesets = [];
 
-        attributes.push(nextAttribute);
+        var newValue = '' + $(this).val();
 
-        console.debug('Update property : ' + propertyUri + ' from ' + nextAttribute.oldValue + ' to '
-                + nextAttribute.newValue + ' (isNew=' + isNew + ')');
+        if (newValue !== nextOriginalValue) {
+            var nextChangeset = {};
+            nextChangeset.isNew = isNew;
+            nextChangeset.objectUri = objectUri;
+            nextChangeset.newTriples = [];
+            nextChangeset.oldTriples = [];
 
-        podd.updateArtifactDatabank(attributes, nextArtifactDatabank, isNew);
+            // Short-text always generates strings
+            nextChangeset.oldTriples.push(objectUri + ' <' + propertyUri + '> "' + nextOriginalValue + '"');
+            nextChangeset.newTriples.push(objectUri + ' <' + propertyUri + '> "' + newValue + '"');
 
-        // Unbind this handler and create a new one with the new value as the
-        // original value
-        $(this).unbind("blur");
-        var newValue = '"' + $(this).val() + '"';
-        // NOTE: isNew is always false after the first time through this method
-        podd.addShortTextBlurHandler(shortText, propertyUri, newValue, nextArtifactDatabank, false);
+            changesets.push(nextChangeset);
 
-        // FIXME: Cannot call update to the server after each edit, as some
-        // fields may have invalid values at this point.
-        // podd.updatePoddObject(objectUri, attributes, nextArtifactDatabank);
+            console.debug('Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue
+                    + ' (isNew=' + isNew + ')');
+
+            podd.updateArtifactDatabank(changesets, nextArtifactDatabank, isNew);
+
+            // Unbind this handler and create a new one with the new value as
+            // the original value
+            $(this).unbind("blur");
+            // NOTE: isNew is always false after the first time through this
+            // method
+            podd.addShortTextBlurHandler(shortText, propertyUri, newValue, nextArtifactDatabank, false);
+        }
+        else {
+            console.debug("No change on blur for value for property=" + propertyUri + " original=" + nextOriginalValue
+                    + " newValue=" + newValue);
+        }
+        // NOTE: Cannot call update to the server after each edit, as some
+        // fields may have incomplete/invalid values at this point.
     });
 };
 
@@ -953,12 +923,17 @@ isNew) {
     });
 };
 
-podd.updateArtifactDatabank = function(/* object */attributes, /* object */nextArtifactDatabank, /* boolean */isNew) {
-    $.each(attributes, function(index, attribute) {
-        console.debug('[updatePoddObject] handling property: ' + attribute.property);
-        if (!attribute.isNew) {
-            podd.deleteTriples(nextArtifactDatabank, attribute.objectUri, attribute.property);
+podd.updateArtifactDatabank = function(/* object */changesets, /* object */nextArtifactDatabank, /* boolean */isNew) {
+    $.each(changesets, function(index, changeset) {
+        if (!changeset.isNew) {
+            $.each(changeset.oldTriples, function(nextOldTripleIndex, nextOldTriple) {
+                console.debug('[updatePoddObject] remove oldTriple: ' + nextOldTriple);
+                nextArtifactDatabank.remove(nextOldTriple);
+            });
         }
-        nextArtifactDatabank.add(attribute.objectUri + ' ' + attribute.property + ' ' + attribute.newValue);
+        $.each(changeset.newTriples, function(nextNewTripleIndex, nextNewTriple) {
+            console.debug('[updatePoddObject] add newTriple: ' + nextNewTriple);
+            nextArtifactDatabank.add(nextNewTriple);
+        });
     });
 };

@@ -48,7 +48,7 @@
 	
 	    // getPoddObjectForEdit(artifactUri, objectUri);
 	    // Get Metadata and create fields for either new data or data that exists in artifactDatabank at this point
-	    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.callbackForGetMetadata, podd.schemaDatabank, podd.artifactDatabank);
+	    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.updateInterface, podd.schemaDatabank, podd.artifactDatabank);
 	
 	    // use delegation for dynamically added .clonable anchors
 	    // FIXME: This doesn't seem to be the right strategy, although it may work for short-text
@@ -58,7 +58,7 @@
 		$("#editObjectForm").submit(function(event) {
 			event.preventDefault();
 			console.debug("Attempting to submit update query to server");
-			podd.submitPoddObjectUpdate(podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.artifactDatabank);
+			podd.submitPoddObjectUpdate(podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.schemaDatabank, podd.artifactDatabank, podd.updateInterface);
 			return false;
 		});
 	
@@ -88,8 +88,8 @@
 		<a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 	</h3>	
 	<form id="editObjectForm">
-		<div id='details'>  <!-- Collapsible div -->
-			<!-- TODO: Generate these using javascript -->
+		<!-- FIXME: These are not populated or handled by Javascript yet. Ideally rdfs:label and rdfs:comment should be in the property list, but it appears they are not. -->
+		<div id='basicdetails'>  <!-- Collapsible div -->
 			<!-- standard attributes -->
 			<ol>
 				<!-- object name -->
@@ -112,10 +112,13 @@
 	                <span id="object_desc_text_limit"></span>
 	                <h6 class="errorMsg">${objectDescriptionError!""}</h6>
 				</li>
-			<!--  other attributes -->
 
             </ol>
 		
+		<!--  other attributes -->
+		<div id='details'>  <!-- Collapsible div -->
+			<ol>
+            </ol>
 	    </div>  <!-- details - Collapsible div -->
 	    
 	    <input type="submit">Save object</input>
