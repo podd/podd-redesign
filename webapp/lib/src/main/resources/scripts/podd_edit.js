@@ -245,15 +245,17 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         // If there are values for the property in the artifact
         // databank, display them instead of showing an empty field
         if (nextArtifactBindings.length > 0) {
+            console.debug("Found existing values for " + podd.getCurrentObjectUri() + " property <" + value.propertyUri
+                    + "> value=" + nextArtifactBindings);
             $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
                 // found existing value for property
                 value.displayValue = nextArtifactValue.propertyValue.value;
-                console.debug("Found existing value for property <" + value.propertyUri + "> value="
-                        + value.displayValue);
                 $("#details ol").append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
             });
         }
         else {
+            console.debug("Found no existing values for " + podd.getCurrentObjectUri() + " property <"
+                    + value.propertyUri + "> value=" + nextArtifactBindings);
             $("#details ol").append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
         }
     });
@@ -588,7 +590,7 @@ podd.updateErrorMessageList = function(theMessage) {
 };
 
 /* Retrieve the current version of an artifact and populate the databank */
-podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, callbackFunction) {
+podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, updateDisplayCallbackFunction) {
     var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
     console.debug('[getArtifact] Request to: ' + requestUrl);
@@ -604,9 +606,12 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
             var artifactId = podd.getOntologyID(nextArtifactDatabank);
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
+            // FIXME: May not always want to do this
+            podd.parentUri = artifactId[0].parentUri;
+            podd.objectUri = artifactId[0].objectUri;
 
             podd.updateErrorMessageList('<i>Successfully retrieved artifact version: ' + podd.versionIri + '</i><br>');
-            callbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
+            updateDisplayCallbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
             console.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
@@ -682,6 +687,9 @@ podd.submitPoddObjectUpdate = function(
             var artifactId = podd.getOntologyID(tempDatabank);
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
+            // FIXME: May not always want to do this
+            podd.parentUri = artifactId[0].parentUri;
+            podd.objectUri = artifactId[0].objectUri;
 
             // Wipe out databank so it contains the most current copy
             podd.deleteTriples(nextArtifactDatabank, "?subject", "?predicate");
@@ -751,8 +759,11 @@ podd.parsesearchresults = function(/* string */searchURL, /* rdf/json */data) {
 };
 
 /*
- * Parse the given Databank and extract the artifact IRI and version IRI of the
- * ontology/artifact contained within.
+ * Parse the given temporary Databank and extract the artifact IRI and version
+ * IRI of the ontology/artifact contained within.
+ * 
+ * Also extracts and updates the parent URI and the current Object URI if they
+ * are temporary URIs or unknown.
  */
 podd.getOntologyID = function(nextDatabank) {
 
@@ -762,16 +773,57 @@ podd.getOntologyID = function(nextDatabank) {
     var bindings = myQuery.select();
 
     var nodeChildren = [];
-    $.each(bindings, function(index, value) {
-        var nextChild = {};
-        nextChild.artifactIri = value.artifactIri.value;
-        nextChild.versionIri = value.versionIri.value;
+    $.each(bindings,
+            function(index, value) {
+                var nextChild = {};
+                nextChild.artifactIri = value.artifactIri.value;
+                nextChild.versionIri = value.versionIri.value;
 
-        nodeChildren.push(nextChild);
-    });
+                // If the current object URI is empty and the parent URI is
+                // empty, then we bootstrap the current object URI based on
+                // artifactHasTopObject as it is a top object
+                if (typeof podd.parentUri === 'undefined'
+                        && podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
+                    var myQuery = $.rdf({
+                        databank : nextDatabank
+                    }).where('?artifactIri poddBase:artifactHasTopObject ?topObject');
+                    var innerBindings = myQuery.select();
+
+                    $.each(innerBindings, function(index, value) {
+                        nextChild.parentUri = value.topObject.value;
+                        nextChild.objectUri = value.topObject.value;
+                    });
+
+                    if (nodeChildren.length > 1) {
+                        console.debug('[getVersion] ERROR - More than 1 artifact top object statement found!!!');
+                        console.debug(bindings);
+                    }
+                }
+                else if (podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
+                    // NOTE: The results must contain only one triple linking
+                    // the known parent URI to the current object for this to
+                    // work.
+                    var myQuery = $.rdf({
+                        databank : nextDatabank
+                    }).where('<' + podd.parentUri + '> ?property ?currentObject').where(
+                            '?currentObject rdf:type <' + podd.objectTypeUri + '> ');
+                    var innerBindings = myQuery.select();
+
+                    $.each(innerBindings, function(index, value) {
+                        nextChild.objectUri = value.currentObject.value;
+                    });
+
+                    if (nodeChildren.length > 1) {
+                        console.debug('[getVersion] ERROR - More than 1 artifact top object statement found!!!');
+                        console.debug(bindings);
+                    }
+                }
+                nodeChildren.push(nextChild);
+            });
 
     if (nodeChildren.length > 1) {
         console.debug('[getVersion] ERROR - More than 1 version IRI statement found!!!');
+        console.debug(bindings);
     }
 
     return nodeChildren;

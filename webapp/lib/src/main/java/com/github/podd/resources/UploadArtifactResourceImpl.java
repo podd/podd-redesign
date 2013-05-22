@@ -3,6 +3,8 @@
  */
 package com.github.podd.resources;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,11 +26,14 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
@@ -231,6 +236,42 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 }
             }
             
+            RepositoryConnection conn = null;
+            
+            try
+            {
+                conn = this.getPoddRepositoryManager().getRepository().getConnection();
+                URI topObjectIRI = this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactMap, conn);
+                
+                writer.handleStatement(PoddRdfConstants.VF.createStatement(artifactMap.getOntologyIRI().toOpenRDFURI(),
+                        PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, topObjectIRI));
+                Set<Statement> topObjectTypes =
+                        Iterations.asSet(conn.getStatements(topObjectIRI, RDF.TYPE, null, true, artifactMap
+                                .getVersionIRI().toOpenRDFURI()));
+                
+                for(Statement nextTopObjectType : topObjectTypes)
+                {
+                    writer.handleStatement(nextTopObjectType);
+                }
+            }
+            catch(OpenRDFException e)
+            {
+                this.log.error("Failed to get top object URI", e);
+            }
+            finally
+            {
+                if(conn != null)
+                {
+                    try
+                    {
+                        conn.close();
+                    }
+                    catch(RepositoryException e)
+                    {
+                        this.log.error("Failed to close connection", e);
+                    }
+                }
+            }
             writer.endRDF();
         }
         catch(final RDFHandlerException e)
