@@ -799,7 +799,7 @@ podd.getOntologyID = function(nextDatabank) {
                         console.debug(bindings);
                     }
                 }
-                else if (podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
+                else {
                     // NOTE: The results must contain only one triple linking
                     // the known parent URI to the current object for this to
                     // work.
