@@ -224,12 +224,33 @@ podd.callbackForGetMetadata = function(resultData, status, xhr, objectType, next
         return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
     });
 
-    $.each(propertyList, function(index, value) {
-        // TODO: Search through nextArtifactDatabank to find if there are any
-        // values in it for this property and display them instead of displaying
-        // an empty box
-        $("#details ol").append(podd.createEditField(index, value, nextSchemaDatabank, nextArtifactDatabank, true));
-    });
+    $.each(propertyList,
+            function(index, value) {
+                var nextArtifactQuery = $.rdf({
+                    databank : nextArtifactDatabank
+                })
+                // Desired object a objectType
+                .where(podd.getCurrentObjectUri() + ' rdf:type <' + objectType + '>')
+                // Restriction has a linked property, which is the minimum we
+                // require
+                .where(podd.getCurrentObjectUri() + ' <' + propertyUri + '> ?propertyValue ');
+
+                var nextArtifactBindings = nextArtifactQuery.select();
+
+                // If there are values for the property in the artifact
+                // databank, display them instead of showing an empty field
+                if (nextArtifactBindings.length > 0) {
+                    $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
+                        value.displayValue = nextArtifactValue.propertyValue.value;
+                        $("#details ol").append(
+                                podd.createEditField(index, value, nextSchemaDatabank, nextArtifactDatabank, true));
+                    });
+                }
+                else {
+                    $("#details ol").append(
+                            podd.createEditField(index, value, nextSchemaDatabank, nextArtifactDatabank, true));
+                }
+            });
 };
 
 /*
