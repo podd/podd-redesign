@@ -625,6 +625,9 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
         type : 'GET',
         // dataType : 'application/rdf+xml', // what is expected back
         success : function(resultData, status, xhr) {
+            // Wipe out databank so it contains the most current copy after this
+            // point, since we succeeded in our quest to get the current version
+            podd.deleteTriples(nextArtifactDatabank, "?subject", "?predicate");
             nextArtifactDatabank.load(resultData);
             console.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextArtifactDatabank.size());
 
@@ -637,6 +640,8 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
             podd.objectUri = artifactId[0].objectUri;
 
             podd.updateErrorMessageList('<i>Successfully retrieved artifact version: ' + podd.versionIri + '</i><br>');
+            // The following may update the interface, redirect the user to
+            // another page, or so anything it likes really
             updateDisplayCallbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
@@ -708,6 +713,7 @@ podd.submitPoddObjectUpdate = function(
             var message = '<div>Successfully edited artifact.<pre>' + xhr.responseText + '</pre></div>';
             podd.updateErrorMessageList(message);
 
+            // The results of an update query are minimal
             var tempDatabank = podd.newDatabank();
             tempDatabank.load(resultData);
             var artifactId = podd.getOntologyID(tempDatabank);
@@ -720,8 +726,10 @@ podd.submitPoddObjectUpdate = function(
             podd.parentUri = artifactId[0].parentUri;
             podd.objectUri = artifactId[0].objectUri;
 
-            // Wipe out databank so it contains the most current copy
-            podd.deleteTriples(nextArtifactDatabank, "?subject", "?predicate");
+            // After the update is complete we try to fetch the complete content
+            // before calling updateCallback again, to make sure that all of the
+            // temporary URIs in nextArtifactDatabank are replaced with their
+            // PURL versions
             podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, updateCallback);
         },
         error : function(xhr, status, error) {
