@@ -262,12 +262,19 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         var nextArtifactBindings = nextArtifactQuery.select();
 
         // If there are values for the property in the artifact
-        // databank, display them instead of showing an empty field
+        // databank, display them instead of showing a single new empty field
         if (nextArtifactBindings.length > 0) {
             console.debug("Found existing values for " + podd.getCurrentObjectUri() + " property <" + value.propertyUri
                     + "> value=" + nextArtifactBindings);
             $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
                 // found existing value for property
+
+                // for URIs populate the valueUri property with the value so we
+                // have the option to put a human readable label in displayValue
+                if (nextArtifactValue.propertyValue.type === 'uri') {
+                    // TODO: Fetch label here for the URI
+                    value.valueUri = nextArtifactValue.propertyValue.value;
+                }
                 value.displayValue = nextArtifactValue.propertyValue.value;
                 $("#details ol").append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
             });
@@ -704,8 +711,11 @@ podd.submitPoddObjectUpdate = function(
             var tempDatabank = podd.newDatabank();
             tempDatabank.load(resultData);
             var artifactId = podd.getOntologyID(tempDatabank);
+            // Reset the artifact and version URIs based on what came back
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
+            // Also setup the parent URI and object URI as they may be empty
+            // before this point or may have changed as part of the update
             // FIXME: May not always want to do this
             podd.parentUri = artifactId[0].parentUri;
             podd.objectUri = artifactId[0].objectUri;
@@ -717,6 +727,8 @@ podd.submitPoddObjectUpdate = function(
         error : function(xhr, status, error) {
             console.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
             console.debug(xhr.statusText);
+            var message = '<div>Failed to store artifact.<pre>' + xhr.responseText + '</pre></div>';
+            podd.updateErrorMessageList(message);
         }
     });
 };
