@@ -45,6 +45,25 @@ podd.newDatabank = function() {
     return nextDatabank;
 };
 
+/**
+ * Add triples to the given databank to initialise the top object using the PODD
+ * Plant ontologies.
+ * 
+ * TODO: At some stage in the future make the list of ontologies configurable.
+ * 
+ * IMPORTANT: When the versions change, this method must be updated to the
+ * current versions.
+ */
+podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
+    nextDatabank.add(artifactUri + ' rdf:type owl:Ontology ');
+    nextDatabank.add(artifactUri + ' poddBase:artifactHasTopObject ' + objectUri);
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/dcTerms/1>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddBase/1>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddScience/1>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddPlant/1>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddUser/1>');
+};
+
 podd.getCurrentObjectUri = function() {
     var nextObjectUri;
 
