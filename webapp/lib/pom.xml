@@ -261,7 +261,7 @@
 					<parallel>classes</parallel>
 					<threadCount>1</threadCount>
 -->
-					<forkCount>4</forkCount>
+					<forkCount>2</forkCount>
 					<reuseForks>false</reuseForks>
 					<argLine>-Xmx1024M -XX:MaxPermSize=512M</argLine>
 				</configuration>
