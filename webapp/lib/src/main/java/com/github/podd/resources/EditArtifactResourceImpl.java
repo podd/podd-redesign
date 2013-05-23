@@ -86,6 +86,10 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
         
+        // Once we find the artifact URI, check authentication for it immediately
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
+                Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactUri)));
+        
         final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
         
         if(versionUri == null)
@@ -130,9 +134,6 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("requesting edit artifact ({}): {}, with isReplace {}", variant.getMediaType().getName(),
                 artifactUri, updatePolicy);
-        
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactUri)));
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
