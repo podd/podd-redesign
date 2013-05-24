@@ -848,6 +848,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
             
             // --- for 'drop-down' type properties, add all possible options into Model
+            // FIXME: This algorithm seems to rely on the property having a value
+            // The algorithm should work regardless of whether the user has assigned a value yet to
+            // the property
             final Model filter = resultModel.filter(propertyUri, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE, null);
             if(filter.size() == 1 && PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN.equals(filter.objectURI()))
             {
