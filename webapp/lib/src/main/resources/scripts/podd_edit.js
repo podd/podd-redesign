@@ -616,7 +616,7 @@ podd.searchOntologyService = function(
         if (console && console.debug) {
             console.debug('Response: ' + data.toString());
         }
-        var formattedData = parsesearchresults(requestUrl, data);
+        var formattedData = podd.parseSearchResults(requestUrl, data);
         if (console && console.debug) {
             console.debug('No. of search results = ' + formattedData.length);
         }
@@ -802,17 +802,16 @@ podd.autoCompleteCallback = function(/* object with 'search term' */request, /* 
 
     $.get(requestUrl, queryParams, function(data) {
         console.debug('Response: ' + data.toString());
-        var formattedData = podd.parsesearchresults(requestUrl, data);
+        var formattedData = podd.parseSearchResults(requestUrl, data);
         // console.debug(formattedData);
         response(formattedData);
     }, 'json');
 };
 
-/*
- * Parse the RDF received from the server and create a JSON array. Modified
- * Query from oas.rdf.parsesearchresults()
+/**
+ * Parse the RDF received from the server and create a JSON array.
  */
-podd.parsesearchresults = function(/* string */searchURL, /* rdf/json */data) {
+podd.parseSearchResults = function(/* string */searchURL, /* rdf/json */data) {
     // console.debug("Parsing search results");
     var nextDatabank = $.rdf.databank();
 
@@ -837,7 +836,7 @@ podd.parsesearchresults = function(/* string */searchURL, /* rdf/json */data) {
     return nodeChildren;
 };
 
-/*
+/**
  * Parse the given temporary Databank and extract the artifact IRI and version
  * IRI of the ontology/artifact contained within.
  * 
@@ -908,7 +907,9 @@ podd.getOntologyID = function(nextDatabank) {
     return nodeChildren;
 };
 
-/*
+/**
+ * DEBUG-ONLY : Could be more generic, but right now only used for debugging.
+ * 
  * Parse the given Databank and extract the rdfs:label of the top object of the
  * artifact contained within contained within.
  */
@@ -936,7 +937,8 @@ podd.getProjectTitle = function(nextDatabank) {
 };
 
 // Add autocompleteHandlers
-podd.addAutoCompleteHandler = function(/* object */autoComplete) {
+podd.addAutoCompleteHandler = function(/* object */autoComplete, /* object */nextArtifactDatabank, /* boolean */
+isNew) {
     // $(".autocomplete")
     autoComplete.autocomplete({
         delay : 500, // milliseconds
@@ -948,8 +950,7 @@ podd.addAutoCompleteHandler = function(/* object */autoComplete) {
 
         focus : function(event, ui) {
             // prevent ui.item.value from appearing in the textbox
-            // FIXME: Remove hardcoded path here
-            $('#in4').val(ui.item.label);
+            $(this).val(ui.item.label);
             return false;
         },
 
@@ -958,10 +959,31 @@ podd.addAutoCompleteHandler = function(/* object */autoComplete) {
             // FIXME: Remove hardcoded path here
             $('#in4Hidden').val(ui.item.value);
             // FIXME: Remove hardcoded path here
-            $('#in4').val(ui.item.label);
-            // FIXME: Remove hardcoded path here
-            $('#message1').html('Selected : ' + ui.item.value);
+            $(this).val(ui.item.label);
+            // $('#message1').html('Selected : ' + ui.item.value);
             return false;
+        },
+
+        blur : function(event, ui) {
+            console.debug("autocomplete blur event");
+            console.debug(event);
+            console.debug(ui);
+            var objectUri = podd.getCurrentObjectUri();
+
+            var attributes = [];
+            var nextAttribute = {};
+            nextAttribute.isNew = isNew;
+            nextAttribute.objectUri = objectUri;
+            nextAttribute.property = '<' + $(this).attr('property') + '>';
+            nextAttribute.newValue = '<' + $('#' + $(this).attr('id') + 'Hidden').val() + '>';
+            attributes.push(nextAttribute);
+
+            console.debug('Add new autocomplete property: <' + nextAttribute.property + '> <' + nextAttribute.newValue
+                    + '>');
+
+            podd.updateDatabank(attributes, nextArtifactDatabank);
+            // NOTE: Cannot call update to the server after each edit, as some
+            // fields may have invalid values at this point.
         }
     });
 };
@@ -1004,7 +1026,7 @@ nextArtifactDatabank, /* boolean */isNew) {
             // the original value
             $(this).unbind("blur");
             // NOTE: isNew is always false after the first time through this
-            // method
+            // method with a non-empty/non-default value
             podd.addShortTextBlurHandler(shortText, propertyUri, newValue, nextArtifactDatabank, false);
         }
         else {
@@ -1013,31 +1035,5 @@ nextArtifactDatabank, /* boolean */isNew) {
         }
         // NOTE: Cannot call update to the server after each edit, as some
         // fields may have incomplete/invalid values at this point.
-    });
-};
-
-// Update for autocomplete
-podd.addAutoCompleteBlurHandler = function(/* object */autoComplete, /* object */nextArtifactDatabank, /* boolean */
-isNew) {
-    // $(".autocomplete")
-    autoComplete.blur(function(event) {
-        console.debug("autocomplete blur event");
-        console.debug(event);
-        var objectUri = podd.getCurrentObjectUri();
-
-        var attributes = [];
-        var nextAttribute = {};
-        nextAttribute.isNew = isNew;
-        nextAttribute.objectUri = objectUri;
-        nextAttribute.property = '<' + $(this).attr('property') + '>';
-        nextAttribute.newValue = '<' + $('#' + $(this).attr('id') + 'Hidden').val() + '>';
-        attributes.push(nextAttribute);
-
-        console.debug('Add new autocomplete property: <' + nextAttribute.property + '> <' + nextAttribute.newValue
-                + '>');
-
-        podd.updateDatabank(attributes, nextArtifactDatabank);
-        // NOTE: Cannot call update to the server after each edit, as some
-        // fields may have invalid values at this point.
     });
 };
