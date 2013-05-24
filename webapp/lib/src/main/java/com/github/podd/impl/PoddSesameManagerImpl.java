@@ -1064,7 +1064,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
-        sb.append("SELECT ?poddTypeUri ");
+        sb.append("SELECT DISTINCT ?poddTypeUri ");
         sb.append(" WHERE { ");
         sb.append(" ?objectUri <" + RDF.TYPE + "> ?poddTypeUri . ");
         
