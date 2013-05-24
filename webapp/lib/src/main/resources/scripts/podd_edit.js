@@ -542,7 +542,8 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
 
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
-    }).where('<' + nextField.propertyUri + '> poddBase:hasAllowedValue ?pValue').optional(
+    }).where('?restriction owl:onProperty <' + nextField.propertyUri + '> ').where(
+            '?restriction owl:allValuesFrom ?class').where('?pValue rdf:type ?class').optional(
             '?pValue rdfs:label ?pDisplayValue');
     var bindings = myQuery.select();
     console.debug('Found ' + bindings.length + ' bindings for query');
@@ -565,6 +566,7 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
         var option = $('<option>', {
             value : optionValue,
             text : optionDisplayValue,
+            // TODO: Does the following need to be "selected: selected"?
             selected : selectedVal
         });
 
