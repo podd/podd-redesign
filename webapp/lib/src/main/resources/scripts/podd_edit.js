@@ -4,17 +4,15 @@
  * resulting information
  */
 
-// --------------------------------
-// invoked when page is "ready"
-// --------------------------------
 // --------------------- Constants ----------------------------
-// var artifactUri = 'http://purl.org/podd/basic-2-20130206/artifact:1';
-// var objectUri = 'http://purl.org/podd/basic-1-20130206/object:2966';
-// TODO: these can be loaded via freemarker
+// These are used to define the expected cardinalities, so that the server knows
+// whether to offer or accept properties with a given number of values.
 var CARD_ExactlyOne = 'http://purl.org/podd/ns/poddBase#Cardinality_Exactly_One';
 var CARD_OneOrMany = 'http://purl.org/podd/ns/poddBase#Cardinality_One_Or_Many';
 var CARD_ZeroOrMany = 'http://purl.org/podd/ns/poddBase#Cardinality_Zero_Or_Many'
 
+// These are used to define the expected input control types, so that the client
+// knows which method to use in each case.
 var DISPLAY_LongText = 'http://purl.org/podd/ns/poddBase#DisplayType_LongText';
 var DISPLAY_ShortText = 'http://purl.org/podd/ns/poddBase#DisplayType_ShortText';
 var DISPLAY_CheckBox = 'http://purl.org/podd/ns/poddBase#DisplayType_CheckBox';
@@ -64,6 +62,13 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddUser/1>');
 };
 
+/**
+ * If podd.objectUri exists, it returns that, wrapped in braces to look like a
+ * URI ready for rdfquery.js.
+ * 
+ * Otherwise, it returns a fixed temporary URI that is recognised by the server
+ * as such, and replaced with a PURL when it is first submitted.
+ */
 podd.getCurrentObjectUri = function() {
     var nextObjectUri;
 
@@ -80,6 +85,13 @@ podd.getCurrentObjectUri = function() {
     return nextObjectUri;
 };
 
+/**
+ * If artifactIri exists, it returns that, wrapped in braces to look like a URI
+ * ready for rdfquery.js.
+ * 
+ * Otherwise, it returns a fixed temporary URI that is recognised by the server
+ * as such, and replaced with a PURL when it is first submitted.
+ */
 podd.getCurrentArtifactIri = function() {
     var nextArtifactIri;
 
@@ -134,6 +146,17 @@ podd.deleteTriples = function(nextDatabank, subject, property) {
         console.debug('[deleteTriples] object to delete = ' + tripleArray[0]);
         nextDatabank.remove(tripleArray[0]);
     });
+};
+
+/**
+ * Display a message on leaving text field
+ * 
+ * This is mostly used for DEBUG.
+ */
+podd.updateErrorMessageList = function(theMessage) {
+    var li = $("<li>")
+    li.html(theMessage);
+    $("#errorMsgList").append(li);
 };
 
 /**
@@ -399,7 +422,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
-        var input = podd.addFieldDropDownList(nextField, nextSchemaDatabank, isNew);
+        var input = podd.addFieldDropDownListNonAutoComplete(nextField, nextSchemaDatabank, isNew);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_CheckBox) {
@@ -474,53 +497,7 @@ podd.cloneEmptyField = function() {
 };
 
 /**
- * function old() {
- * 
- * var toClone = $(idToClone); var clonedField = toClone.clone();
- * clonedField.attr('id', idToClone + '_some_random_val'); clonedField.val('');
- * 
- * toClone.append(clonedField);
- * 
- * console.debug('Cloning completed'); }
- */
-
-// simply copied from PODD-1, does not work
-podd.broken_AddNewEmptyField = function(id) {
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('Add new Empty field for "' + id + '"');
-    }
-
-    var parentId = 'id_li' + id;
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('Add after parent with id: ' + $('"#' + parentId + '"').attr('id'));
-    }
-
-    var clonableId = 'id_' + id;
-    // var clonedField = $('"#' + clonableId + '"').clone();
-    var clonedField = $('#p1').clone();
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('Cloned field of type: ' + clonedField.attr('type'));
-    }
-    // $(parentId).append(clonedField);
-    $('#id_http://purl.org/podd/ns/poddScience#hasANZSRC').append(clonedField);
-
-    // var cloned = $('#p1').clone()
-    // var oldId = cloned.attr('id');
-    // cloned.attr('id', oldId + '_v1');
-
-    // $('#tLbl1').append(clonedField);
-    $('#p1').html('button clicked');
-
-    // var element = document.createElement(type);
-    // element.setAttribute('id', id);
-    // element.setAttribute('name', id);
-    // var li = document.createElement("li");
-    // li.appendChild(element);
-    // document.getElementById('add_' + id).appendChild(li);
-};
-
-/*
- * Construct an HTML input field of a given type.
+ * Construct an HTML input field of a type text or checkbox.
  */
 podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
 
@@ -549,17 +526,21 @@ podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
     return input;
 };
 
-/*
- * Construct an HTML drop-down list for the given field.
+/**
+ * Construct an HTML drop-down list for the given field without using
+ * autocomplete or search services.
+ * 
+ * In these cases, the relevant options for this property must have been loaded
+ * into the schema databank prior to calling this method.
  */
-podd.addFieldDropDownList = function(nextField, nextDatabank, isNew) {
+podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDatabank, isNew) {
     var select = $('<select>', {
         // id : 'id_' + nextField.propertyUri,
         name : 'name_' + encodeURIComponent(nextField.propertyLabel),
     });
 
     var myQuery = $.rdf({
-        databank : nextDatabank
+        databank : nextSchemaDatabank
     }).where('<' + nextField.propertyUri + '> poddBase:hasAllowedValue ?pValue').optional(
             '?pValue rdfs:label ?pDisplayValue');
     var bindings = myQuery.select();
@@ -622,37 +603,6 @@ podd.searchOntologyService = function(
         }
         callbackFunction(formattedData);
     }, 'json');
-};
-
-// --------------------------------
-/* Manually created fragment for submission into edit artifact service */
-// var nextDatabank = $.rdf.databank();
-// .base('http://purl.org/podd/basic-2-20130206/artifact:1')
-// .prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#')
-// .prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-// .prefix('owl', 'http://www.w3.org/2002/07/owl#')
-// .prefix('poddScience', 'http://purl.org/podd/ns/poddScience#')
-// .prefix('poddBase', 'http://purl.org/podd/ns/poddBase#')
-// .add('<genotype33> rdf:type poddScience:Genotype .')
-// .add('<genotype33> rdf:type owl:NamedIndividual .')
-// .add('<genotype33> rdfs:label "Genotype 33" .')
-// .add(
-// '<http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material>
-// poddScience:hasGenotype <genotype33> .')
-/* Display a Message */
-podd.displayMessage = function(event) {
-    var messageBox = event.data.param1;
-    var message = event.data.param2;
-    console.debug(message);
-    console.debug(messageBox);
-    $(messageBox).html('<i>' + message + '</i>');
-}
-
-/* Display a message on leaving text field */
-podd.updateErrorMessageList = function(theMessage) {
-    var li = $("<li>")
-    li.html(theMessage);
-    $("#errorMsgList").append(li);
 };
 
 /* Retrieve the current version of an artifact and populate the databank */
@@ -937,7 +887,8 @@ podd.getProjectTitle = function(nextDatabank) {
 };
 
 // Add autocompleteHandlers
-podd.addAutoCompleteHandler = function(/* object */autoComplete, /*object*/hiddenValueElement, /* object */nextArtifactDatabank, /* boolean */
+podd.addAutoCompleteHandler = function(/* object */autoComplete, /* object */hiddenValueElement, /* object */
+nextArtifactDatabank, /* boolean */
 isNew) {
     // $(".autocomplete")
     autoComplete.autocomplete({
