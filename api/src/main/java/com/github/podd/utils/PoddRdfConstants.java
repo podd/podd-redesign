@@ -172,7 +172,7 @@ public interface PoddRdfConstants
             "DisplayType_Table");
     
     /** http://purl.org/podd/ns/poddBase#hasAllowedValue */
-    public static final URI PODD_BASE_ALLOWED_VALUE = ValueFactoryImpl.getInstance().createURI(
+    public static final URI PODD_BASE_HAS_ALLOWED_VALUE = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasAllowedValue");
     
     // ----- custom representation of cardinalities -----

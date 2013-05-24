@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -864,7 +865,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     
                     for(final Statement s : allPossibleValues)
                     {
-                        resultModel.add(propertyUri, PoddRdfConstants.PODD_BASE_ALLOWED_VALUE, s.getSubject());
+                        resultModel.add(propertyUri, PoddRdfConstants.PODD_BASE_HAS_ALLOWED_VALUE, s.getSubject());
                         resultModel.add(s);
                     }
                 }
@@ -942,48 +943,92 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         
         // - find all Properties and their ranges
+        
+        final Set<Value> properties = new HashSet<Value>();
+        
         /*
          * NOTE: This SPARQL query only finds properties defined as OWL restrictions in the given
          * Object Type and its ancestors.
          */
-        final StringBuilder sb1 = new StringBuilder();
+        final StringBuilder owlRestrictionQuery = new StringBuilder();
         
-        sb1.append("CONSTRUCT { ");
-        sb1.append(" ?objectType <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
-        sb1.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
-        sb1.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
-        sb1.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
-        sb1.append(" ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
-        sb1.append(" ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass . ");
-        sb1.append(" ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange . ");
+        owlRestrictionQuery.append("CONSTRUCT { ");
+        owlRestrictionQuery
+                .append(" ?objectType <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
+        owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        owlRestrictionQuery.append(" ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
+        owlRestrictionQuery.append(" ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass . ");
+        owlRestrictionQuery.append(" ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange . ");
         
-        sb1.append("} WHERE {");
+        owlRestrictionQuery.append("} WHERE {");
         
-        sb1.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
-        sb1.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
-        sb1.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
-        sb1.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
-        sb1.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass } . ");
-        sb1.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange } . ");
+        owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        owlRestrictionQuery.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
+        owlRestrictionQuery.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass } . ");
+        owlRestrictionQuery.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange } . ");
         
         if(!includeDoNotDisplayProperties)
         {
-            sb1.append(" FILTER NOT EXISTS { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                    + "> true . } ");
+            owlRestrictionQuery.append(" FILTER NOT EXISTS { ?propertyUri <"
+                    + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
         }
         
-        sb1.append("}");
+        owlRestrictionQuery.append("}");
         
-        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb1.toString());
+        final GraphQuery graphQuery =
+                repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, owlRestrictionQuery.toString());
         graphQuery.setBinding("objectType", objectType);
         
-        this.log.info("Created SPARQL {} \n   with poddObject bound to {}", sb1, objectType);
+        this.log.info("Created SPARQL {} \n   with objectType bound to {}", owlRestrictionQuery, objectType);
         
-        final Model queryResults1 = this.executeGraphQuery(graphQuery, contexts);
-        results.addAll(queryResults1);
+        final Model restrictionQueryResults = this.executeGraphQuery(graphQuery, contexts);
+        results.addAll(restrictionQueryResults);
+        
+        properties.addAll(restrictionQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
+        
+        /*
+         * This query maps RDFS:Domain and RDFS:Range to OWL:Restriction/SubClassOf so that we get a
+         * homgeneous set of results.
+         */
+        final StringBuilder rdfsQuery = new StringBuilder();
+        
+        rdfsQuery.append("CONSTRUCT { ");
+        owlRestrictionQuery
+                .append(" ?objectType <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
+        owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
+        owlRestrictionQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        owlRestrictionQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        owlRestrictionQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
+        
+        rdfsQuery.append("} WHERE {");
+        rdfsQuery.append(" ?propertyUri <" + RDFS.DOMAIN.stringValue() + "> ?objectType . ");
+        rdfsQuery.append(" ?propertyUri <" + RDFS.RANGE.stringValue() + "> ?rangeClass . ");
+        
+        if(!includeDoNotDisplayProperties)
+        {
+            rdfsQuery.append(" FILTER NOT EXISTS { ?propertyUri <"
+                    + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
+        }
+        
+        rdfsQuery.append("}");
+        
+        final GraphQuery rdfsGraphQuery =
+                repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, rdfsQuery.toString());
+        rdfsGraphQuery.setBinding("objectType", objectType);
+        
+        this.log.info("Created SPARQL {} \n   with objectType bound to {}", rdfsQuery, objectType);
+        
+        final Model rdfsQueryResults = this.executeGraphQuery(rdfsGraphQuery, contexts);
+        results.addAll(rdfsQueryResults);
+        
+        properties.addAll(rdfsQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
         
         // -- for each property, get meta-data about it
-        final Set<Value> properties = queryResults1.filter(null, OWL.ONPROPERTY, null).objects();
+        
         for(final Value property : properties)
         {
             if(property instanceof URI)
