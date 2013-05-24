@@ -949,8 +949,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final StringBuilder sb1 = new StringBuilder();
         
         sb1.append("CONSTRUCT { ");
-        sb1.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
-        sb1.append(" ?poddObject <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        sb1.append(" ?objectType <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
+        sb1.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
         sb1.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
         sb1.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
         sb1.append(" ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
@@ -959,7 +959,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb1.append("} WHERE {");
         
-        sb1.append(" ?poddObject <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        sb1.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
         sb1.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
         sb1.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
         sb1.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
@@ -975,7 +975,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb1.append("}");
         
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb1.toString());
-        graphQuery.setBinding("poddObject", objectType);
+        graphQuery.setBinding("objectType", objectType);
         
         this.log.info("Created SPARQL {} \n   with poddObject bound to {}", sb1, objectType);
         
