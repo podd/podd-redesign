@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -29,6 +30,7 @@ import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
+import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResults;
 import org.openrdf.query.TupleQuery;
@@ -36,6 +38,7 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -997,12 +1000,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final StringBuilder rdfsQuery = new StringBuilder();
         
         rdfsQuery.append("CONSTRUCT { ");
-        owlRestrictionQuery
-                .append(" ?objectType <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
-        owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
-        owlRestrictionQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
-        owlRestrictionQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
-        owlRestrictionQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
+        rdfsQuery.append(" ?objectType <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
+        rdfsQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
+        rdfsQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        rdfsQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        rdfsQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
         
         rdfsQuery.append("} WHERE {");
         rdfsQuery.append(" ?propertyUri <" + RDFS.DOMAIN.stringValue() + "> ?objectType . ");
@@ -1084,10 +1086,53 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     results.add((URI)property, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
                 }
                 
+                // --- for 'drop-down' type properties, add all possible options into Model
+                if(results.contains((URI)property, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE,
+                        PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN))
+                {
+                    for(Resource nextRestriction : results.filter(null, OWL.ONPROPERTY, property).subjects())
+                    {
+                        Set<Value> nextRangeTypes = results.filter(nextRestriction, OWL.ALLVALUESFROM, null).objects();
+                        for(Value nextRangeType : nextRangeTypes)
+                        {
+                            if(nextRangeType instanceof URI)
+                            {
+                                results.addAll(this.getInstancesOf((URI)nextRangeType, repositoryConnection, contexts));
+                            }
+                        }
+                    }
+                }
+                
             }
         }
         
         return results;
+    }
+    
+    private Model getInstancesOf(URI nextRangeType, RepositoryConnection repositoryConnection, URI[] contexts)
+        throws OpenRDFException
+    {
+        /*
+         * This query maps RDFS:Domain and RDFS:Range to OWL:Restriction/SubClassOf so that we get a
+         * homgeneous set of results.
+         */
+        final StringBuilder instanceQuery = new StringBuilder();
+        
+        instanceQuery.append("CONSTRUCT { ");
+        instanceQuery.append(" ?instanceUri <" + RDF.TYPE.stringValue() + "> ?rangeClass . ");
+        
+        instanceQuery.append("} WHERE {");
+        instanceQuery.append(" ?instanceUri <" + RDF.TYPE.stringValue() + "> ?rangeClass . ");
+        
+        instanceQuery.append("}");
+        
+        final GraphQuery rdfsGraphQuery =
+                repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, instanceQuery.toString());
+        rdfsGraphQuery.setBinding("rangeClass", nextRangeType);
+        
+        this.log.info("Created SPARQL {} \n   with nextRangeType bound to {}", instanceQuery, nextRangeType);
+        
+        return this.executeGraphQuery(rdfsGraphQuery, contexts);
     }
     
     /**
