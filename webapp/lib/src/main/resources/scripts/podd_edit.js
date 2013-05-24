@@ -785,7 +785,7 @@ podd.submitPoddObjectUpdate = function(
  * Call Search Ontology Resource Service using AJAX, convert the RDF response to
  * a JSON array and set to the array as autocomplete data.
  */
-podd.autoCompleteCallback = function(/* object with 'search term' */request, /* function */response) {
+podd.autoCompleteSource = function(/* object with 'search term' */request, /* function */response) {
 
     var requestUrl = podd.baseUrl + '/search';
 
@@ -946,7 +946,15 @@ isNew) {
         // autocomplete
         // FIXME: The following needs to be called with the current context to
         // know what to update when it succeeds
-        source : podd.autoCompleteCallback,
+        source : function(param1, param2, param3) {
+            console.debug("source for autocomplete");
+            console.debug(param1);
+            console.debug(param2);
+            console.debug(param3);
+            console.debug(this);
+            console.debug($(this));
+            podd.autoCompleteSource();
+        },
 
         focus : function(event, ui) {
             // prevent ui.item.value from appearing in the textbox
