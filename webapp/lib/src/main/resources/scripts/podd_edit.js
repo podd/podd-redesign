@@ -534,6 +534,7 @@ podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
  * into the schema databank prior to calling this method.
  */
 podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDatabank, isNew) {
+    console.debug("addFieldDropDownListNonAutoComplete");
     var select = $('<select>', {
         // id : 'id_' + nextField.propertyUri,
         name : 'name_' + encodeURIComponent(nextField.propertyLabel),
