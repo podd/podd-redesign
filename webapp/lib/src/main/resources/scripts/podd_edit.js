@@ -937,7 +937,7 @@ podd.getProjectTitle = function(nextDatabank) {
 };
 
 // Add autocompleteHandlers
-podd.addAutoCompleteHandler = function(/* object */autoComplete, /* object */nextArtifactDatabank, /* boolean */
+podd.addAutoCompleteHandler = function(/* object */autoComplete, /*object*/hiddenValueElement, /* object */nextArtifactDatabank, /* boolean */
 isNew) {
     // $(".autocomplete")
     autoComplete.autocomplete({
@@ -965,7 +965,7 @@ isNew) {
         select : function(event, ui) {
             console.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
             // FIXME: Remove hardcoded path here
-            $('#in4Hidden').val(ui.item.value);
+            hiddenValueElement.val(ui.item.value);
             // FIXME: Remove hardcoded path here
             $(this).val(ui.item.label);
             // $('#message1').html('Selected : ' + ui.item.value);
@@ -983,7 +983,7 @@ isNew) {
             nextAttribute.isNew = isNew;
             nextAttribute.objectUri = objectUri;
             nextAttribute.property = '<' + $(this).attr('property') + '>';
-            nextAttribute.newValue = '<' + $('#' + $(this).attr('id') + 'Hidden').val() + '>';
+            nextAttribute.newValue = '<' + hiddenValueElement.val() + '>';
             attributes.push(nextAttribute);
 
             console.debug('Add new autocomplete property: <' + nextAttribute.property + '> <' + nextAttribute.newValue
