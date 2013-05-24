@@ -97,6 +97,46 @@ podd.getCurrentArtifactIri = function() {
 };
 
 /**
+ * Updates the given databank using the given changesets to identify old and new
+ * triples.
+ * 
+ * The changesets are each checked to see if they are new, and if so, whether
+ * they contain any oldTriples, and if so those triples are all deleted.
+ * 
+ * Then we back through the changesets to see if they contain any newTriples,
+ * which are then added into the databank.
+ */
+podd.updateDatabank = function(/* object */changesets, /* object */nextDatabank) {
+    $.each(changesets, function(index, changeset) {
+        if (!changeset.isNew) {
+            $.each(changeset.oldTriples, function(nextOldTripleIndex, nextOldTriple) {
+                console.debug('[updateDatabank] remove oldTriple: ' + nextOldTriple);
+                nextDatabank.remove(nextOldTriple);
+            });
+        }
+    });
+    $.each(changesets, function(index, changeset) {
+        $.each(changeset.newTriples, function(nextNewTripleIndex, nextNewTriple) {
+            console.debug('[updateDatabank] add newTriple: ' + nextNewTriple);
+            nextDatabank.add(nextNewTriple);
+        });
+    });
+};
+
+/**
+ * Removes triples in the given databank that match the specified subject and
+ * property. All parameters are mandatory.
+ */
+podd.deleteTriples = function(nextDatabank, subject, property) {
+    $.rdf({
+        databank : nextDatabank
+    }).where(subject + ' ' + property + ' ?object').sources().each(function(index, tripleArray) {
+        console.debug('[deleteTriples] object to delete = ' + tripleArray[0]);
+        nextDatabank.remove(tripleArray[0]);
+    });
+};
+
+/**
  * DEBUG-ONLY : Prints the contents of the given databank to the console
  */
 podd.debugPrintDatabank = function(databank, message) {
@@ -895,19 +935,6 @@ podd.getProjectTitle = function(nextDatabank) {
     return nodeChildren[0];
 };
 
-/*
- * Removes triples in the given databank that match the specified subject and
- * property. All parameters are mandatory.
- */
-podd.deleteTriples = function(nextDatabank, subject, property) {
-    $.rdf({
-        databank : nextDatabank
-    }).where(subject + ' ' + property + ' ?object').sources().each(function(index, tripleArray) {
-        console.debug('[deleteTriple] object to delete = ' + tripleArray[0]);
-        nextDatabank.remove(tripleArray[0]);
-    });
-};
-
 // Add autocompleteHandlers
 podd.addAutoCompleteHandler = function(/* object */autoComplete) {
     // $(".autocomplete")
@@ -915,6 +942,8 @@ podd.addAutoCompleteHandler = function(/* object */autoComplete) {
         delay : 500, // milliseconds
         minLength : 2, // minimum length to trigger
         // autocomplete
+        // FIXME: The following needs to be called with the current context to
+        // know what to update when it succeeds
         source : podd.autoCompleteCallback,
 
         focus : function(event, ui) {
@@ -969,7 +998,7 @@ nextArtifactDatabank, /* boolean */isNew) {
             console.debug('Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue
                     + ' (isNew=' + isNew + ')');
 
-            podd.updateArtifactDatabank(changesets, nextArtifactDatabank, isNew);
+            podd.updateDatabank(changesets, nextArtifactDatabank);
 
             // Unbind this handler and create a new one with the new value as
             // the original value
@@ -1007,24 +1036,8 @@ isNew) {
         console.debug('Add new autocomplete property: <' + nextAttribute.property + '> <' + nextAttribute.newValue
                 + '>');
 
-        podd.updateArtifactDatabank(attributes, nextArtifactDatabank, isNew);
-        // FIXME: Cannot call update to the server after each edit, as some
+        podd.updateDatabank(attributes, nextArtifactDatabank);
+        // NOTE: Cannot call update to the server after each edit, as some
         // fields may have invalid values at this point.
-        // podd.updatePoddObject(objectUri, attributes, nextArtifactDatabank);
-    });
-};
-
-podd.updateArtifactDatabank = function(/* object */changesets, /* object */nextArtifactDatabank, /* boolean */isNew) {
-    $.each(changesets, function(index, changeset) {
-        if (!changeset.isNew) {
-            $.each(changeset.oldTriples, function(nextOldTripleIndex, nextOldTriple) {
-                console.debug('[updatePoddObject] remove oldTriple: ' + nextOldTriple);
-                nextArtifactDatabank.remove(nextOldTriple);
-            });
-        }
-        $.each(changeset.newTriples, function(nextNewTripleIndex, nextNewTriple) {
-            console.debug('[updatePoddObject] add newTriple: ' + nextNewTriple);
-            nextArtifactDatabank.add(nextNewTriple);
-        });
     });
 };
