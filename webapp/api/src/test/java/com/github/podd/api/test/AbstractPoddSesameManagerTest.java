@@ -1201,14 +1201,14 @@ public abstract class AbstractPoddSesameManagerTest
         final Object[][] testData =
                 {
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                156, 20, 0 },
+                                160, 21, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                201, 25, 5 },
+                                205, 26, 5 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                80, 10, 0 },
+                                84, 11, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                88, 11, 1 },
+                                92, 12, 1 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),
                                 false, 42, 5, 0 },
@@ -1225,6 +1225,11 @@ public abstract class AbstractPoddSesameManagerTest
             final Model model =
                     this.testPoddSesameManager.getObjectTypeMetadata((URI)element[0], (Boolean)element[1],
                             this.testRepositoryConnection, contexts.toArray(new URI[0]));
+            
+            if((int)element[2] != model.size())
+            {
+            	DebugUtils.printContents(model);
+            }
             
             // verify:
             Assert.assertEquals("Not the expected statement count in Model", element[2], model.size());
