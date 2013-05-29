@@ -319,6 +319,11 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
             }
             
+            if(objectUri == null)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not recognise the request");
+            }
+            
             final List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
             if(objectTypes == null || objectTypes.isEmpty())
             {
