@@ -42,6 +42,7 @@ import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.PoddWebServiceApplicationImpl;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddWebConstants;
@@ -124,6 +125,13 @@ public class AbstractResourceImplTest
         final RDFParser parser = Rio.createParser(format);
         parser.setRDFHandler(new StatementCollector(model));
         parser.parse(inputStream, "http://test.podd.example.org/should/not/occur/in/a/real/graph/");
+        
+        if(expectedStatements != model.size())
+        {
+            System.out.println("Number of statements was not as expected found:" + model.size() + " expected:"
+                    + expectedStatements);
+            DebugUtils.printContents(model);
+        }
         
         Assert.assertEquals(expectedStatements, model.size());
         
