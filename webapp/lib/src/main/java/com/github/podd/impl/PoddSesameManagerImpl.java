@@ -1404,7 +1404,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     {
         final StringBuilder sb = new StringBuilder();
         
-        sb.append("SELECT ?topObjectUri ?artifactUri ");
+        sb.append("SELECT DISTINCT ?topObjectUri ");
         
         sb.append(" WHERE { ");
         
