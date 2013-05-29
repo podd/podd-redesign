@@ -71,7 +71,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         
         if(artifactUri == null)
         {
-            // looks like adding a new Project
+            // looks like adding a new Artifact (ie, a new Project)
             this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
         }
         else
@@ -117,6 +117,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 InferredOWLOntologyID ontologyID;
                 if(artifactUri == null)
                 {
+                    // FIXME: Why is there a hack here???
                     ontologyID =
                             this.getPoddSchemaManager().getCurrentSchemaOntologyVersion(
                                     IRI.create(PoddRdfConstants.PODD_SCIENCE.replace("#", "")));
