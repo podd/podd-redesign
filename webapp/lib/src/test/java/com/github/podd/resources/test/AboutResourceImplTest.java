@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.podd.restlet.test;
+package com.github.podd.resources.test;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -15,6 +15,7 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.restlet.test.PoddRestletTestUtils;
 import com.github.podd.utils.PoddWebConstants;
 
 /**

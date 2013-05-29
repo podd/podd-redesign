@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.podd.restlet.test;
+package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;

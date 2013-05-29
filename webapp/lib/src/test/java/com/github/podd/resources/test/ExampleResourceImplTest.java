@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.podd.restlet.test;
+package com.github.podd.resources.test;
 
 import org.junit.After;
 import org.junit.Assert;
