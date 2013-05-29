@@ -42,16 +42,6 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
-     * Build a PODD object using the incoming RDF
-     */
-    @Post(":rdf|rj|ttl")
-    public Representation createObjectRdf(final Representation entity, final Variant variant) throws ResourceException
-    {
-        this.log.warn("Not implemented! POST with RDF data to UploadArtifactResource for new Projects and EditArtifactResource for others");
-        return null;
-    }
-    
-    /**
      * Return meta-data about an object.
      */
     @Get("rdf|rj|json|ttl")
