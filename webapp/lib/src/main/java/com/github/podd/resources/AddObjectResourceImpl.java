@@ -84,7 +84,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         final String title = "Add new " + objectTypeLabel.getLabel();
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "add_object.html.ftl");
+        dataModel.put("contentTemplate", "modify_object.html.ftl");
         dataModel.put("pageTitle", title);
         dataModel.put("title", title);
         dataModel.put("objectType", objectTypeLabel);

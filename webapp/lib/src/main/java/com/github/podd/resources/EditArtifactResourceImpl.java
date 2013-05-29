@@ -363,7 +363,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             final String objectToEdit)
     {
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "editObject.html.ftl");
+        dataModel.put("contentTemplate", "modify_object.html.ftl");
         dataModel.put("pageTitle", "Edit Artifact");
         
         // add required constants and methods to data model
