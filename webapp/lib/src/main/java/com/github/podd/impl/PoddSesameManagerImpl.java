@@ -1564,7 +1564,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             for(final URI type : searchTypes)
             {
-                sb.append(" ?uri <" + RDF.TYPE.stringValue() + "> <" + type.stringValue() + "> . ");
+                sb.append(" ?uri a ?type . ");
+                sb.append(" ?type rdfs:subClassOf+ <" + type.stringValue() + "> . ");
             }
         }
         
