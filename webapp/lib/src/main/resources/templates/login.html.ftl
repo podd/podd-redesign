@@ -12,12 +12,12 @@
 </div>
 
 <div id="content_pane">
-	<#if shibbolethEnabled>
 	<table style="width: 100%; margin:10px 10px 15px">
+		<#if shibbolethEnabled>
 		<tr>
 			<td style="width: 400px">
 				<div>
-					PODD user are required to authenticate via an<br/>
+					PODD users are required to authenticate via an<br/>
 					Australian Access Federation Identity Provider<br />
 					organisation <br /> 
 				</div>
@@ -32,7 +32,9 @@
 				</div>
 			</td>	
 		</tr>
+		</#if>
 		<tr>
+			<#if shibbolethEnabled>
 			<td style="width: 400px">
 			    <form name="aaf" action="${baseUrl}/aaf" method="POST">
 				    <div class="fieldset" id="login" style="width: 340px; height: 180px; text-align: center">
@@ -44,6 +46,7 @@
 			</td>
 			<td>
 			</td>
+			</#if>
 			<td style="width: 400px">
 			    <form name="f" action="${baseUrl}/login" method="POST">
 				    <div class="fieldset" id="login" style="width: 327px; height: 180px; text-align: centre">
@@ -83,6 +86,7 @@
 			</td>
 		</tr>
 		<tr>
+			<#if shibbolethEnabled>
 			<td style="width: 400px">
 				<div>
 					If you do not remember your identity provider username or<br/>
@@ -101,6 +105,7 @@
 			<td>
 			
 			</td>
+           	</#if>
 			<td style="width: 400px" valign="top">
 				<div>
 					If you do not remember your PODD username or password <br />
@@ -122,48 +127,5 @@
 			</td>	
 		</tr>
 	</table>
-	<#else>
-    <form name="f" action="${baseUrl}/j_spring_security_check" method="POST">
-    <div class="fieldset" id="login">
-		<div class="legend">Login with PODD username and password</div>
-		<ol> 
-			<li> 
-				<label for="user">User: </label> 
-				<input id="user" class="medium" name="j_username" type="text" value=""> 
-			</li> 
-			<li> 
-				<label for="password">Password:</label> 
-				<input id="password" class="medium" name="j_password" type="password">
-			</li>
-            <#if errorMessage?? && errorMessage?has_content>
-                <li><h4 class="errorMsg">${errorMessage}</h4></li>
-            </#if>
-            <#if message?? && message?has_content>
-                <li><h4>${message!""}</h4></li>
-            </#if>
-            <#if detailedMessage?? && detailedMessage?has_content>
-                <li><p>${detailedMessage}</p></li>
-            </#if>
-			<li> 
-				<div class="radioGroup">
-				    <label id="rememberMeLabel" for="_spring_security_remember_me">Remember me on this computer.</label>
-				    <input id="_spring_security_remember_me" class="narrow" name="_spring_security_remember_me" type="checkbox" value="true">
-				</div>
-	        </li>
-            <li>
-                <#if  springRedirect?? && springRedirect !="">
-                    <input type="hidden" name="spring-security-redirect" value="${springRedirect}"/>
-                </#if>
-            </li>
-        </ol>
-    </div>
 	
-	<div id="buttonwrapper">
-		<button type="submit">login</button>
-        <#if selfRegistrationEnabled?? && selfRegistrationEnabled>
-        <a href="${baseUrl}/admin/user/create?init=true">Register</a>
-        </#if>
-	</div>
-    </form>	
-	</#if>
 </div>  <!-- content pane -->
