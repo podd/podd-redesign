@@ -1784,6 +1784,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
     }
     
+    /**
+     * Return an array of URIs representing contexts that can be used to access the version and
+     * inferred contexts for the given {@link InferredOWLOntologyID}, along with all of its imported
+     * schema ontologies, which are derived using
+     * {@link #getDirectImports(InferredOWLOntologyID, RepositoryConnection)}.
+     * 
+     * @param ontologyID
+     * @param repositoryConnection
+     * @return
+     * @throws OpenRDFException
+     */
     private URI[] versionAndInferredAndSchemaContexts(final InferredOWLOntologyID ontologyID,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
     {
@@ -1801,6 +1812,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return results.toArray(new URI[0]);
     }
     
+    /**
+     * Return an array of URIs representing contexts that can be used to access the version and
+     * inferred contexts for the given {@link InferredOWLOntologyID}.
+     * 
+     * @param ontologyID
+     * @return
+     */
     private URI[] versionAndInferredContexts(final InferredOWLOntologyID ontologyID)
     {
         if(ontologyID.getInferredOntologyIRI() != null)
@@ -1815,8 +1833,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     /**
-     * Intentionally not include the inferred ontology IRI here so that we can search for concrete
-     * triples specifically.
+     * Return an array of URIs representing contexts that can be used to access the version and
+     * inferred contexts for the given {@link InferredOWLOntologyID}, along with all of its imported
+     * schema ontologies, which are derived using
+     * {@link #getDirectImports(InferredOWLOntologyID, RepositoryConnection)}.
+     * <p>
+     * NOTE: This method intentionally does not include the inferred ontology IRI here so that we
+     * can search for concrete triples specifically.
      * 
      * @param ontologyID
      * @param repositoryConnection
