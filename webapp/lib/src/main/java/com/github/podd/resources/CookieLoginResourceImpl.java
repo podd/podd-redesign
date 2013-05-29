@@ -47,7 +47,7 @@ public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements
             final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
             dataModel.put("contentTemplate", "login.html.ftl");
             
-            dataModel.put("shibbolethEnabled", Boolean.valueOf("true"));
+            dataModel.put("shibbolethEnabled", Boolean.valueOf("false"));
             dataModel.put("invalidDomain", Boolean.valueOf("false"));
             
             dataModel.put("pageTitle", "PODD Login Page");
