@@ -219,7 +219,16 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
     });
 };
 
-/*
+/**
+ * Callback function that redirects to the artifact when submitPoddObjectUpdate
+ * is successful.
+ */
+podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
+    window.location.href = podd.baseUrl + '/artifact/base?artifacturi='
+            + encodeURIComponent(podd.artifactIri);
+};
+
+/**
  * Callback function when RDF containing metadata is available
  * 
  * FIXME: Since the the metadata we get back does not contain Options for

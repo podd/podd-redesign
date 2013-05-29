@@ -41,14 +41,15 @@
 	    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.updateInterface, podd.schemaDatabank, podd.artifactDatabank);
 	
 	    // use delegation for dynamically added .clonable anchors
-	    // FIXME: This doesn't seem to be the right strategy, although it may work for short-text
+	    // FIXME: This doesn't seem to be the right strategy with respect to handlers, 
+	    // as each handler contains the current value of the field to detect whether it has changed.
 	    //$("#details").delegate(".clonable", "click", podd.cloneEmptyField);
 	
 		// Add form submission handler
 		$("#editObjectForm").submit(function(event) {
 			event.preventDefault();
 			console.debug("Attempting to submit update query to server");
-			podd.submitPoddObjectUpdate(podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.schemaDatabank, podd.artifactDatabank, podd.updateInterface);
+			podd.submitPoddObjectUpdate(podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.schemaDatabank, podd.artifactDatabank, podd.redirectToGetArtifact);
 			return false;
 		});
 	
