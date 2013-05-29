@@ -13,6 +13,7 @@
 		podd.versionIri = undefined;
 		// FIXME: Insert the parent URI using freemarker
 		podd.parentUri = '${parentUri!"undefined"}';
+		podd.parentPredicateUri = '${parentPredicateUri!"undefined"}'; 
 		// The object URI is undefined for a new object initially,
 		// until the first valid save event to the server
 		podd.objectUri = '${objectUri!"undefined"}';
@@ -30,15 +31,16 @@
 		console.debug(podd.getCurrentArtifactIri());
 		console.debug("object IRI");
 		console.debug(podd.getCurrentObjectUri());
-			
-		if(typeof podd.parentUri === 'undefined' || podd.parentUri === 'undefined') {
-			podd.initialiseNewTopObject(podd.artifactDatabank, podd.getCurrentArtifactIri(), podd.getCurrentObjectUri());
+		
+		if(typeof podd.objectUri === 'undefined' || podd.objectUri === 'undefined') {
+			if(typeof podd.parentUri === 'undefined' || podd.parentUri === 'undefined') {
+				podd.initialiseNewTopObject(podd.artifactDatabank, podd.getCurrentArtifactIri(), podd.getCurrentObjectUri());
+			}
+			else {
+				podd.initialiseNewObject(podd.artifactDatabank, podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.parentUri, podd.parentPredicateUri);
+			}
 		}
 				
-		// TODO: Preload artifactDatabank before this point in general (do not fail for new object URIs) and only load the schemaDatabank after that is 
-		// loaded so that we can immediately add the fields and handlers when we receive the schema data
-	
-	    // getPoddObjectForEdit(artifactUri, objectUri);
 	    // Get Metadata and create fields for either new data or data that exists in artifactDatabank at this point
 	    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.updateInterface, podd.schemaDatabank, podd.artifactDatabank);
 	

@@ -63,6 +63,15 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
 };
 
 /**
+ * Add triples to the given databank to initialise a new non-TopObject with the
+ * given relationship to an existing parent.
+ * 
+ */
+podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri, parentUri, parentPredicateUri) {
+    nextDatabank.add(parentUri + ' ' + parentPredicateUri + ' ' + objectUri);
+};
+
+/**
  * If podd.objectUri exists, it returns that, wrapped in braces to look like a
  * URI ready for rdfquery.js.
  * 
