@@ -72,7 +72,7 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
 podd.getCurrentObjectUri = function() {
     var nextObjectUri;
 
-    if (typeof podd.objectUri === 'undefined') {
+    if (typeof podd.objectUri === 'undefined' || podd.objectUri === 'undefined') {
         // hardcoded blank node for new objects
         // this will be replaced after the first valid submission of the
         // object to the server
@@ -95,7 +95,7 @@ podd.getCurrentObjectUri = function() {
 podd.getCurrentArtifactIri = function() {
     var nextArtifactIri;
 
-    if (typeof podd.artifactIri === 'undefined') {
+    if (typeof podd.artifactIri === 'undefined' || podd.artifactIri === 'undefined') {
         // hardcoded blank node for new artifacts
         // this will be replaced after the first valid submission of the
         // artifact to the server
@@ -224,8 +224,7 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
  * is successful.
  */
 podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
-    window.location.href = podd.baseUrl + '/artifact/base?artifacturi='
-            + encodeURIComponent(podd.artifactIri);
+    window.location.href = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(podd.artifactIri);
 };
 
 /**

@@ -2,7 +2,7 @@
 <#-- @ftlvariable name="pageTitle" type="java.lang.String" -->
 <#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
 <#-- @ftlvariable name="contentTemplate" type="java.lang.String" -->
-<#-- @ftlvariable name="user" type="podd.model.user.User" -->
+<#-- @ftlvariable name="user" type="org.restlet.security.User" -->
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">

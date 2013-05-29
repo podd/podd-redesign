@@ -12,24 +12,26 @@
 		podd.artifactIri = undefined;
 		podd.versionIri = undefined;
 		// FIXME: Insert the parent URI using freemarker
-		podd.parentUri = undefined;
-		// The object URI is always undefined for a new object initially,
+		podd.parentUri = '${parentUri!"undefined"}';
+		// The object URI is undefined for a new object initially,
 		// until the first valid save event to the server
-		podd.objectUri = undefined;
+		podd.objectUri = '${objectUri!"undefined"}';
 	
 	    podd.artifactDatabank = podd.newDatabank();
 	    podd.schemaDatabank = podd.newDatabank();
 		
 		podd.artifactDatabank.add(podd.getCurrentObjectUri() + ' rdf:type <' + podd.objectTypeUri + '> ');
-		podd.artifactDatabank.add(podd.getCurrentObjectUri() + ' dcterms:creator <mailto:${user.email}> ');
-		podd.artifactDatabank.add('<mailto:${user.email}> rdf:type poddUser:User');
+		<#if user?? && user.email??>
+		podd.artifactDatabank.add(podd.getCurrentObjectUri() + ' dcterms:creator <mailto:${user.email!'unknown'}> ');
+		podd.artifactDatabank.add('<mailto:${user.email!'unknown'}> rdf:type poddUser:User');
+		</#if>
 		
 		console.debug("artifact IRI");
 		console.debug(podd.getCurrentArtifactIri());
 		console.debug("object IRI");
 		console.debug(podd.getCurrentObjectUri());
 			
-		if(typeof podd.parentUri === 'undefined') {
+		if(typeof podd.parentUri === 'undefined' || podd.parentUri === 'undefined') {
 			podd.initialiseNewTopObject(podd.artifactDatabank, podd.getCurrentArtifactIri(), podd.getCurrentObjectUri());
 		}
 				
