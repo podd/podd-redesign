@@ -376,6 +376,8 @@ public interface PoddSesameManager
      *            The types (i.e. RDF:Type) of results to match with the search term
      * @return A {@link Model} containing the URI and Label of each matching object.
      * 
+     *         FIXME: Why is this method duplicates with two semantically different varargs of the
+     *         same type, with the only difference being another parameter?
      */
     Model searchOntologyLabels(String searchTerm, InferredOWLOntologyID artifactID, int limit, int offset,
             final RepositoryConnection repositoryConnection, URI... searchTypes) throws OpenRDFException;
