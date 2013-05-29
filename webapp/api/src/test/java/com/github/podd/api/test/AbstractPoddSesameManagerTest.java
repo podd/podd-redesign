@@ -1228,7 +1228,7 @@ public abstract class AbstractPoddSesameManagerTest
             
             if((int)element[2] != model.size())
             {
-            	DebugUtils.printContents(model);
+                DebugUtils.printContents(model);
             }
             
             // verify:
@@ -1954,11 +1954,14 @@ public abstract class AbstractPoddSesameManagerTest
                 { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
                         PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final Model result =
-                this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, 1000, 0,
-                        this.testRepositoryConnection, searchTypes);
+                this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, searchTypes, 1000, 0,
+                        this.testRepositoryConnection);
         
         // verify:
         Assert.assertNotNull("NULL result", result);
+        
+        DebugUtils.printContents(result);
+        
         Assert.assertEquals("Not the expected number of search results", 9, result.size());
         
         Assert.assertEquals("Expected Platform SPAD Meter not found", 1,
@@ -1985,8 +1988,8 @@ public abstract class AbstractPoddSesameManagerTest
                 { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"),
                         PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final Model result =
-                this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, 1000, 0,
-                        this.testRepositoryConnection, searchTypes);
+                this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, searchTypes, 1000, 0,
+                        this.testRepositoryConnection);
         
         // verify:
         Assert.assertNotNull("NULL result", result);

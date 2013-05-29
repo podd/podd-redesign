@@ -379,13 +379,14 @@ public interface PoddSesameManager
      *         FIXME: Why is this method duplicates with two semantically different varargs of the
      *         same type, with the only difference being another parameter?
      */
-    Model searchOntologyLabels(String searchTerm, InferredOWLOntologyID artifactID, int limit, int offset,
-            final RepositoryConnection repositoryConnection, URI... searchTypes) throws OpenRDFException;
+    Model searchOntologyLabels(String searchTerm, InferredOWLOntologyID artifactID, URI[] searchTypes, int limit,
+            int offset, final RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
-     * is carried out in the specified contexts. An optional array of URIs can be used to limit the
-     * RDF types of objects to match. <br>
+     * is carried out in the specified contexts.
+     * <p>
+     * An optional array of URIs can be used to limit the RDF types of objects to match. <br>
      * 
      * @param searchTerm
      *            A String term which is searched for in the RDF:Labels

@@ -864,7 +864,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 if(valueTypes.size() > 0)
                 {
                     final Model allPossibleValues =
-                            this.searchOntologyLabels("", artifactID, 1000, 0, repositoryConnection, valueTypes.get(0));
+                            this.searchOntologyLabels("", artifactID, new URI[] { valueTypes.get(0) }, 1000, 0,
+                                    repositoryConnection);
                     
                     for(final Statement s : allPossibleValues)
                     {
@@ -1539,8 +1540,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public Model searchOntologyLabels(final String searchTerm, final InferredOWLOntologyID artifactID, final int limit,
-            final int offset, final RepositoryConnection repositoryConnection, final URI... searchTypes)
+    public Model searchOntologyLabels(final String searchTerm, final InferredOWLOntologyID artifactID,
+            final URI[] searchTypes, final int limit, final int offset, final RepositoryConnection repositoryConnection)
         throws OpenRDFException
     {
         final URI[] contexts = this.versionAndSchemaContexts(artifactID, repositoryConnection);
@@ -1564,8 +1565,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             for(final URI type : searchTypes)
             {
-                sb.append(" ?uri a ?type . ");
-                sb.append(" ?type rdfs:subClassOf+ <" + type.stringValue() + "> . ");
+                sb.append(" ?uri a <" + type.stringValue() + "> . ");
+                // sb.append(" ?uri a ?type . ");
+                // sb.append(" ?type rdfs:subClassOf+ <" + type.stringValue() + "> . ");
             }
         }
         
