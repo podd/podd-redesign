@@ -519,14 +519,31 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 try
                 {
-                    // This is a Get request, therefore nothing to commit
-                    conn.rollback();
-                    conn.close();
+                    if(conn.isActive())
+                    {
+                        // This is a Get request, therefore nothing to commit
+                        conn.rollback();
+                    }
                 }
                 catch(final OpenRDFException e)
                 {
-                    this.log.error("Failed to close RepositoryConnection", e);
+                    this.log.error("Failed to rollback RepositoryConnection", e);
                     // Should we do anything other than log an error?
+                }
+                finally
+                {
+                    try
+                    {
+                        if(conn.isOpen())
+                        {
+                            conn.close();
+                        }
+                    }
+                    catch(final OpenRDFException e)
+                    {
+                        this.log.error("Failed to close RepositoryConnection", e);
+                        // Should we do anything other than log an error?
+                    }
                 }
             }
         }
