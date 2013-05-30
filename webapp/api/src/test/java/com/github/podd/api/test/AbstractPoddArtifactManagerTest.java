@@ -245,8 +245,8 @@ public abstract class AbstractPoddArtifactManagerTest
         // expected property count, do-not-display statement count
         final Object[][] testData =
                 {
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, 160, 21, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true, 205, 26, 5 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, 151, 20, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true, 206, 26, 6 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false, 84, 11, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true, 92, 12, 1 },

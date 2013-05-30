@@ -1013,8 +1013,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 42, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 17,
+        Assert.assertEquals("Display Model not of expected size", 39, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 16,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals(
@@ -1069,8 +1069,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 90, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 20,
+        Assert.assertEquals("Display Model not of expected size", 78, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 19,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals("Object not typed as a Project", "http://purl.org/podd/ns/poddScience#Project",
@@ -1204,9 +1204,9 @@ public abstract class AbstractPoddSesameManagerTest
         final Object[][] testData =
                 {
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                160, 21, 0 },
+                                151, 20, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                205, 26, 5 },
+                                206, 26, 6 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
                                 84, 11, 0 },
@@ -1805,7 +1805,7 @@ public abstract class AbstractPoddSesameManagerTest
                         this.testRepositoryConnection, contexts);
         
         // verify:
-        Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
+        Assert.assertEquals("Incorrect number of statements about Top Object", 12, orderedPropertyUris.size());
         
         final String[] expectedUris =
                 { "http://purl.org/podd/ns/poddScience#hasANZSRC", "http://purl.org/podd/ns/poddBase#createdAt",
@@ -1856,7 +1856,7 @@ public abstract class AbstractPoddSesameManagerTest
                         this.testRepositoryConnection, contexts);
         
         // verify:
-        Assert.assertEquals("Incorrect number of statements about Top Object", 8, orderedPropertyUris.size());
+        Assert.assertEquals("Incorrect number of statements about Top Object", 7, orderedPropertyUris.size());
         
         final String[] expectedUris =
                 { "http://purl.org/podd/ns/poddScience#hasANZSRC", "http://purl.org/podd/ns/poddBase#createdAt",
