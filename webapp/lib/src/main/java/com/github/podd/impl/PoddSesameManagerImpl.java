@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1845,27 +1846,42 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * can search for concrete triples specifically.
      * 
      * @param ontologyID
+     *            An InferredOWLOntologyID which can be used to identify which schemas are relevant.
+     *            If it is null all of the current schema contexts will be returned.
      * @param repositoryConnection
-     * @return
+     *            The repository connection which is to be used to source the contexts from.
+     * @param schemaManagementGraph
+     *            If ontologyID is null, this parameter is used instead to source all of the current
+     *            schema ontology versions.
+     * @return An array of {@link URI}s that can be passed into the {@link RepositoryConnection}
+     *         varargs methods to define which contexts are relevant to queries, or used to define
+     *         the default graphs for SPARQL queries.
      * @throws OpenRDFException
      */
     private URI[] versionAndSchemaContexts(final InferredOWLOntologyID ontologyID,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+            final RepositoryConnection repositoryConnection, URI schemaManagementGraph) throws OpenRDFException
     {
-        
-        final Set<IRI> directImports = this.getDirectImports(ontologyID, repositoryConnection);
-        
-        final List<URI> results = new ArrayList<URI>(directImports.size() + 2);
-        
-        results.add(ontologyID.getVersionIRI().toOpenRDFURI());
-        
-        for(final IRI nextDirectImport : directImports)
+        final Set<URI> contexts = new LinkedHashSet<URI>();
+        if(ontologyID != null)
         {
-            results.add(nextDirectImport.toOpenRDFURI());
+            contexts.add(ontologyID.getVersionIRI().toOpenRDFURI());
+            
+            final Set<IRI> directImports = this.getDirectImports(ontologyID, repositoryConnection);
+            for(final IRI directImport : directImports)
+            {
+                contexts.add(directImport.toOpenRDFURI());
+            }
         }
-        
-        return results.toArray(new URI[0]);
-        
+        else
+        {
+            final List<InferredOWLOntologyID> allSchemaOntologyVersions =
+                    this.getAllSchemaOntologyVersions(repositoryConnection, schemaManagementGraph);
+            for(final InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
+            {
+                contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
+            }
+        }
+        return contexts.toArray(new URI[0]);
     }
     
 }
