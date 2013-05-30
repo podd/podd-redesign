@@ -32,6 +32,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -114,10 +115,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         model.removeAll(model.filter(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
         
-        Set<Resource> fileReferences =
+        final Set<Resource> fileReferences =
                 model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE).subjects();
-        Collection<URI> fileReferenceObjects = new ArrayList<URI>(fileReferences.size());
-        for(Resource nextFileReference : fileReferences)
+        final Collection<URI> fileReferenceObjects = new ArrayList<URI>(fileReferences.size());
+        for(final Resource nextFileReference : fileReferences)
         {
             if(nextFileReference instanceof URI)
             {
@@ -125,7 +126,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             else
             {
-                log.warn("Will not be updating file reference for blank node reference, will instead be creating a new file reference for it.");
+                this.log.warn("Will not be updating file reference for blank node reference, will instead be creating a new file reference for it.");
             }
         }
         
@@ -136,46 +137,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         return this.updateArtifact(artifactUri, versionUri, fileReferenceObjects,
                 new ByteArrayInputStream(output.toByteArray()), RDFFormat.RDFJSON, UpdatePolicy.MERGE_WITH_EXISTING,
                 DanglingObjectPolicy.REPORT, fileReferenceVerificationPolicy);
-    }
-    
-    /**
-     * Internal helper method to build an array of Contexts to search in. If a valid artifact ID is
-     * passed in, the artifact's concrete triples and its imported schema ontologies are assigned as
-     * the contexts to return. If the artifact ID is NULL, all schema ontologies currently
-     * configured in the PODD server are assigned into the returned array.
-     * 
-     * TODO: Could this be moved into PoddSesameManager.java, possibly with the option to add
-     * inferred statements also as contexts.
-     * 
-     * @param artifactID
-     * @param connection
-     * @param managementGraph
-     * @throws OpenRDFException
-     */
-    private URI[] buildContextArray(final InferredOWLOntologyID artifactID, final RepositoryConnection connection,
-            final URI managementGraph) throws OpenRDFException
-    {
-        final List<URI> contexts = new ArrayList<URI>();
-        if(artifactID != null)
-        {
-            contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
-            
-            final Set<IRI> directImports = this.sesameManager.getDirectImports(artifactID, connection);
-            for(final IRI directImport : directImports)
-            {
-                contexts.add(directImport.toOpenRDFURI());
-            }
-        }
-        else
-        {
-            final List<InferredOWLOntologyID> allSchemaOntologyVersions =
-                    this.sesameManager.getAllSchemaOntologyVersions(connection, managementGraph);
-            for(final InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
-            {
-                contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
-            }
-        }
-        return contexts.toArray(new URI[0]);
     }
     
     @Override
@@ -227,6 +188,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             catch(final RepositoryException e1)
             {
+                this.log.error("Found error rolling back repository connection", e1);
             }
             
             throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
@@ -303,7 +265,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             connection = this.getRepositoryManager().getRepository().getConnection();
             
             final URI[] contexts =
-                    this.buildContextArray(artifactID, connection, this.repositoryManager.getSchemaManagementGraph());
+                    this.sesameManager.versionAndSchemaContexts(artifactID, connection,
+                            this.repositoryManager.getSchemaManagementGraph());
             
             final Model model =
                     this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, connection,
@@ -991,6 +954,60 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /*
+     * Internal helper method which encapsulates the creation of a RepositoryConnection before
+     * calling the SesameManager.
+     * 
+     * Can avoid dealing with RepositoryConnections here if this could be moved to somewhere in the
+     * API.
+     */
+    @Override
+    public Model searchForOntologyLabels(final InferredOWLOntologyID ontologyID, final String searchTerm,
+            final URI[] searchTypes) throws OpenRDFException, ResourceException
+    {
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            final URI[] contexts =
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                            this.getRepositoryManager().getSchemaManagementGraph());
+            return this.getSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, conn, contexts);
+        }
+        catch(final OpenRDFException e)
+        {
+            try
+            {
+                if(conn != null && conn.isActive())
+                {
+                    conn.rollback();
+                }
+            }
+            catch(final RepositoryException e1)
+            {
+                this.log.error("Found error rolling back repository connection", e1);
+            }
+            
+            throw e;
+        }
+        finally
+        {
+            try
+            {
+                if(conn != null && conn.isOpen())
+                {
+                    conn.close();
+                }
+            }
+            catch(final RepositoryException e)
+            {
+                throw e;
+            }
+        }
+        
+    }
+    
+    /*
      * (non-Javadoc)
      * 
      * @see
@@ -1131,7 +1148,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 
                 tempRepositoryConnection.add(inputStream, "", format, intContext);
                 
-                Collection<URI> replaceableObjects = new ArrayList<URI>(objectUris);
+                final Collection<URI> replaceableObjects = new ArrayList<URI>(objectUris);
                 
                 // If they did not send a list, we create one ourselves.
                 if(replaceableObjects.isEmpty())
@@ -1158,7 +1175,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     }
                 }
                 
-                for(URI nextReplaceableObject : replaceableObjects)
+                for(final URI nextReplaceableObject : replaceableObjects)
                 {
                     tempRepositoryConnection.remove(nextReplaceableObject, null, null, tempContext);
                 }

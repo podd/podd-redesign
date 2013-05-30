@@ -217,18 +217,19 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             writer.startRDF();
-            Model model = OntologyUtils.ontologyIDsToModel(Arrays.asList(artifactMap), new LinkedHashModel(), false);
-            Set<Resource> ontologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
+            final Model model =
+                    OntologyUtils.ontologyIDsToModel(Arrays.asList(artifactMap), new LinkedHashModel(), false);
+            final Set<Resource> ontologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
             
-            for(Resource nextOntology : ontologies)
+            for(final Resource nextOntology : ontologies)
             {
                 writer.handleStatement(PoddRdfConstants.VF.createStatement(nextOntology, RDF.TYPE, OWL.ONTOLOGY));
                 
-                Set<Value> versions = model.filter(nextOntology, OWL.VERSIONIRI, null).objects();
+                final Set<Value> versions = model.filter(nextOntology, OWL.VERSIONIRI, null).objects();
                 
                 if(!versions.isEmpty())
                 {
-                    for(Value nextVersion : versions)
+                    for(final Value nextVersion : versions)
                     {
                         writer.handleStatement(PoddRdfConstants.VF.createStatement(nextOntology, OWL.VERSIONIRI,
                                 nextVersion));
@@ -241,20 +242,21 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             try
             {
                 conn = this.getPoddRepositoryManager().getRepository().getConnection();
-                URI topObjectIRI = this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactMap, conn);
+                final URI topObjectIRI =
+                        this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactMap, conn);
                 
                 writer.handleStatement(PoddRdfConstants.VF.createStatement(artifactMap.getOntologyIRI().toOpenRDFURI(),
                         PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, topObjectIRI));
-                Set<Statement> topObjectTypes =
+                final Set<Statement> topObjectTypes =
                         Iterations.asSet(conn.getStatements(topObjectIRI, RDF.TYPE, null, true, artifactMap
                                 .getVersionIRI().toOpenRDFURI()));
                 
-                for(Statement nextTopObjectType : topObjectTypes)
+                for(final Statement nextTopObjectType : topObjectTypes)
                 {
                     writer.handleStatement(nextTopObjectType);
                 }
             }
-            catch(OpenRDFException e)
+            catch(final OpenRDFException e)
             {
                 this.log.error("Failed to get top object URI", e);
             }
@@ -266,7 +268,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                     {
                         conn.close();
                     }
-                    catch(RepositoryException e)
+                    catch(final RepositoryException e)
                     {
                         this.log.error("Failed to close connection", e);
                     }

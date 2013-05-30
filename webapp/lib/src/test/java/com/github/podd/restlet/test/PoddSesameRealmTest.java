@@ -39,8 +39,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class PoddSesameRealmTest
 {
-    private static final URI userMgtContext = PoddRdfConstants.VF
-            .createURI("urn:context:usermanagement:graph");
+    private static final URI userMgtContext = PoddRdfConstants.VF.createURI("urn:context:usermanagement:graph");
     
     private Repository testRepository;
     private PoddSesameRealmImpl testRealm;

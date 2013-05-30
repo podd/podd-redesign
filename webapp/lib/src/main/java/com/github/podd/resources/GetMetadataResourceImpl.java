@@ -12,7 +12,6 @@ import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
-import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
@@ -79,8 +78,8 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
                 artifactID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
             }
             
-            this.getPoddArtifactManager().exportObjectMetadata(PoddRdfConstants.VF.createURI(objectType),
-                    output, RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE),
+            this.getPoddArtifactManager().exportObjectMetadata(PoddRdfConstants.VF.createURI(objectType), output,
+                    RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE),
                     includeDoNotDisplayProperties, artifactID);
         }
         catch(final UnmanagedArtifactIRIException e)

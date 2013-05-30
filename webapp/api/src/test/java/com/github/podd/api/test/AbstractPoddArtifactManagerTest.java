@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -301,7 +300,7 @@ public abstract class AbstractPoddArtifactManagerTest
             final int mgtGraphSize, final long assertedStatementCount, final long inferredStatementCount,
             final boolean isPublished, final String fragmentPath, final RDFFormat fragmentFormat,
             final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectPolicy,
-            final FileReferenceVerificationPolicy verifyFileReferences, Collection<URI> updateObjectUris)
+            final FileReferenceVerificationPolicy verifyFileReferences, final Collection<URI> updateObjectUris)
         throws Exception
     {
         this.loadSchemaOntologies();

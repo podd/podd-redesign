@@ -47,45 +47,12 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    /**
-     * @param artifactID
-     * @param connection
-     * @throws OpenRDFException
-     */
-    private URI[] buildContextArray(final InferredOWLOntologyID artifactID, final RepositoryConnection connection)
-        throws OpenRDFException
-    {
-        final List<URI> contexts = new ArrayList<URI>();
-        if(artifactID != null)
-        {
-            contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
-            
-            final Set<IRI> directImports = this.getPoddSesameManager().getDirectImports(artifactID, connection);
-            for(final IRI directImport : directImports)
-            {
-                contexts.add(directImport.toOpenRDFURI());
-            }
-        }
-        else
-        {
-            final List<InferredOWLOntologyID> allSchemaOntologyVersions =
-                    this.getPoddSesameManager().getAllSchemaOntologyVersions(connection,
-                            this.getPoddRepositoryManager().getSchemaManagementGraph());
-            for(final InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
-            {
-                contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
-            }
-        }
-        return contexts.toArray(new URI[0]);
-    }
-    
     @Get("rdf|rj|json|ttl")
     public Representation getRdf(final Variant variant) throws ResourceException
     {
         this.log.info("searchRdf");
         
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        RDFWriter writer = null;
         
         // search term - mandatory parameter
         final String searchTerm = this.getQuery().getFirstValue(PoddWebConstants.KEY_SEARCHTERM);
@@ -131,7 +98,9 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         Model results = null;
         try
         {
-            results = this.searchForOntologyLabels(ontologyID, searchTerm, set.toArray(new URI[0]));
+            results =
+                    this.getPoddArtifactManager().searchForOntologyLabels(ontologyID, searchTerm,
+                            set.toArray(new URI[0]));
         }
         catch(final OpenRDFException e)
         {
@@ -139,55 +108,19 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         }
         this.log.info("Found {} matches for this search term", results.size());
         
+        RDFFormat resultFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         // - prepare response
         try
         {
-            writer =
-                    Rio.createWriter(
-                            Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML), output);
             
-            writer.startRDF();
-            for(final Statement st : results)
-            {
-                writer.handleStatement(st);
-            }
-            writer.endRDF();
+            Rio.write(results, output, resultFormat);
         }
         catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Error while preparing response", e);
         }
         
-        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
-                .getDefaultMIMEType()));
-    }
-    
-    /*
-     * Internal helper method which encapsulates the creation of a RepositoryConnection before
-     * calling the SesameManager.
-     * 
-     * Can avoid dealing with RepositoryConnections here if this could be moved to somewhere in the
-     * API.
-     */
-    private Model searchForOntologyLabels(final InferredOWLOntologyID ontologyID, final String searchTerm,
-            final URI[] searchTypes) throws OpenRDFException, ResourceException
-    {
-        
-        final RepositoryConnection conn = this.getPoddRepositoryManager().getRepository().getConnection();
-        conn.begin();
-        try
-        {
-            final URI[] contexts = this.buildContextArray(ontologyID, conn);
-            return this.getPoddSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, conn, contexts);
-        }
-        finally
-        {
-            if(conn != null)
-            {
-                conn.rollback(); // read only, nothing to commit
-                conn.close();
-            }
-        }
+        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(resultFormat.getDefaultMIMEType()));
     }
     
 }
