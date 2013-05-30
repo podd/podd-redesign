@@ -60,14 +60,14 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("getArtifactHtml");
         
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         
         if(artifactUri == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
         }
         
-        final String objectToView = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
+        final String objectToView = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
         
         // URI objectToView = topObject URI by default
         // optional parameter for inner objects
@@ -226,7 +226,12 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      * @param dataModel
      *            Freemarker data model to be populated
      * @throws OpenRDFException
+     * @deprecated This needs to be restructured so that it uses methods in PoddArtifactManager so
+     *             they can easily be independently tested. Warning sign is that we need to create a
+     *             RepositoryConnection here and go directly into the PoddSesameManager which should
+     *             be wrapped up in all normal cases.
      */
+    @Deprecated
     private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
             final Map<String, Object> dataModel) throws OpenRDFException
     {
