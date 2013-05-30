@@ -949,6 +949,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
             else
             {
+                // FIXME: This method may be worse than showing them a URI
                 label = objectUri.getLocalName();
             }
             
