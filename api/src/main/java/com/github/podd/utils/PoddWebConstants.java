@@ -17,17 +17,15 @@ public interface PoddWebConstants
     public static final URI SCOPE_REPOSITORY = PoddRdfConstants.VF
             .createURI("http://purl.org/podd/poddBase#PoddRepository");
     
-    public static final URI PODD_ROLEMAPPEDOBJECT = PoddRdfConstants.VF.createURI(
-            PoddRdfConstants.PODD_USER, "roleMappedObject");
+    public static final URI PODD_ROLEMAPPEDOBJECT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER,
+            "roleMappedObject");
     
-    public static final URI PODD_USER_ORGANIZATION = PoddRdfConstants.VF.createURI(
-            PoddRdfConstants.PODD_USER, "organization");
+    public static final URI PODD_USER_ORGANIZATION = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER,
+            "organization");
     
-    public static final URI PODD_USER_ORCID = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER,
-            "orcid");
+    public static final URI PODD_USER_ORCID = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER, "orcid");
     
-    public static final URI PODD_USER_HOMEPAGE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER,
-            "uri");
+    public static final URI PODD_USER_HOMEPAGE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER, "uri");
     
     public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";
     
@@ -214,5 +212,11 @@ public interface PoddWebConstants
      * Key used in "create object" service to indicate the type of object to be generated.
      */
     public static final String KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES = "includedndprops";
+    
+    /**
+     * Key used in "get artifact" service to indicate whether inferred axioms should be included in
+     * the results.
+     */
+    public static final String KEY_INCLUDE_INFERRED = "includeInferred";
     
 }

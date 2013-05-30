@@ -170,7 +170,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             // use this instead of ../base/ ../inferred/.. in the Prototype. Change documentation
             // too.
             final String includeInferredString =
-                    this.getRequest().getResourceRef().getQueryAsForm().getFirstValue("includeInferred", true);
+                    this.getRequest().getResourceRef().getQueryAsForm().getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
             final boolean includeInferred = Boolean.valueOf(includeInferredString);
             
             this.getPoddApplication()
