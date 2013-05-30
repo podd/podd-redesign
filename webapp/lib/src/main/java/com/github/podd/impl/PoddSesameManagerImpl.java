@@ -949,8 +949,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
             else
             {
+                // Disabled this method as it produces worse than useless results for the typical
+                // URIs that end in /UUID/object, and "object" is literally the word "object" and is
+                // displayed as such.
                 // FIXME: This method may be worse than showing them a URI
-                label = objectUri.getLocalName();
+                // label = objectUri.getLocalName();
+                label = objectUri.stringValue();
             }
             
             if(next.getValue("description") != null)
