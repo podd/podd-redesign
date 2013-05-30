@@ -112,16 +112,8 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         // - prepare response
         try
         {
-            writer =
-                    Rio.createWriter(
-                            Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML), output);
-            
-            writer.startRDF();
-            for(final Statement st : results)
-            {
-                writer.handleStatement(st);
-            }
-            writer.endRDF();
+            Rio.write(results, output,
+                    Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML));
         }
         catch(final OpenRDFException e)
         {
