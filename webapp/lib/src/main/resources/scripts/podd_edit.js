@@ -67,7 +67,7 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
  * given relationship to an existing parent.
  * 
  */
-podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri, parentUri, parentPredicateUri) {
+podd.initialiseNewObject = function(nextDatabank, artifactUri, objectUri, parentUri, parentPredicateUri) {
     nextDatabank.add(parentUri + ' ' + parentPredicateUri + ' ' + objectUri);
 };
 
