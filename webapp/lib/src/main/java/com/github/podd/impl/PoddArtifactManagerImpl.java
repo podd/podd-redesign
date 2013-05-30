@@ -139,52 +139,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 DanglingObjectPolicy.REPORT, fileReferenceVerificationPolicy);
     }
     
-    /**
-     * Internal helper method to build an array of Contexts to search in. If a valid artifact ID is
-     * passed in, the artifact's concrete triples and its imported schema ontologies are assigned as
-     * the contexts to return. If the artifact ID is NULL, all schema ontologies currently
-     * configured in the PODD server are assigned into the returned array.
-     * 
-     * TODO: Could this be moved into PoddSesameManager.java, possibly with the option to add
-     * inferred statements also as contexts.
-     * 
-     * FIXME: This is already implemented in PoddSesameManager. Don't be afraid to make things
-     * public instead of copy-pasting them around the place just to avoid adding a method to an API
-     * if it is used alot!
-     * 
-     * @param artifactID
-     * @param connection
-     * @param managementGraph
-     * @throws OpenRDFException
-     * @deprecated Use PoddSesameManager implementation instead.
-     */
-    @Deprecated
-    private URI[] buildContextArray(final InferredOWLOntologyID artifactID, final RepositoryConnection connection,
-            final URI managementGraph) throws OpenRDFException
-    {
-        final List<URI> contexts = new ArrayList<URI>();
-        if(artifactID != null)
-        {
-            contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
-            
-            final Set<IRI> directImports = this.sesameManager.getDirectImports(artifactID, connection);
-            for(final IRI directImport : directImports)
-            {
-                contexts.add(directImport.toOpenRDFURI());
-            }
-        }
-        else
-        {
-            final List<InferredOWLOntologyID> allSchemaOntologyVersions =
-                    this.sesameManager.getAllSchemaOntologyVersions(connection, managementGraph);
-            for(final InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
-            {
-                contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
-            }
-        }
-        return contexts.toArray(new URI[0]);
-    }
-    
     @Override
     public boolean deleteArtifact(final InferredOWLOntologyID artifactId) throws PoddException
     {
@@ -311,7 +265,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             connection = this.getRepositoryManager().getRepository().getConnection();
             
             final URI[] contexts =
-                    this.buildContextArray(artifactID, connection, this.repositoryManager.getSchemaManagementGraph());
+                    this.sesameManager.versionAndSchemaContexts(artifactID, connection,
+                            this.repositoryManager.getSchemaManagementGraph());
             
             final Model model =
                     this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, connection,
