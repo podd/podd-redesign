@@ -69,6 +69,8 @@ import com.github.podd.exception.PurlProcessorNotHandledException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddObjectLabel;
+import com.github.podd.utils.PoddObjectLabelImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.RdfUtility;
 
@@ -396,6 +398,29 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public PoddSesameManager getSesameManager()
     {
         return this.sesameManager;
+    }
+    
+    @Override
+    public List<PoddObjectLabel> getTopObjectLabels(final List<InferredOWLOntologyID> artifacts)
+        throws OpenRDFException
+    {
+        final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            for(final InferredOWLOntologyID artifactId : artifacts)
+            {
+                URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, conn);
+                results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, conn));
+            }
+        }
+        finally
+        {
+            conn.close();
+        }
+        return results;
     }
     
     /**

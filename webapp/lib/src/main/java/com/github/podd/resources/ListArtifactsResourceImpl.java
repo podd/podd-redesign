@@ -180,8 +180,17 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         for(final String nextKey : artifactsInternal.keySet())
         {
-            this.populateDataModelWithArtifactLists(dataModel, nextKey + "ArtifactsList",
-                    artifactsInternal.get(nextKey));
+            try
+            {
+                List<PoddObjectLabel> results =
+                        this.getPoddArtifactManager().getTopObjectLabels(artifactsInternal.get(nextKey));
+                dataModel.put(nextKey + "ArtifactsList", results);
+            }
+            catch(OpenRDFException e)
+            {
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find labels for " + nextKey
+                        + " artifacts", e);
+            }
         }
         
         // Output the base template, with contentTemplate from the dataModel defining the
@@ -233,22 +242,6 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         final ByteArrayRepresentation result = new ByteArrayRepresentation(out.toByteArray(), resultMediaType);
         
         return result;
-    }
-    
-    private void populateDataModelWithArtifactLists(final Map<String, Object> dataModel, final String key,
-            final List<InferredOWLOntologyID> artifacts)
-    {
-        final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
-        for(final InferredOWLOntologyID artifactUri : artifacts)
-        {
-            // FIXME: This does not actually find the real labels
-            final PoddObjectLabel artifact =
-                    new PoddObjectLabelImpl(artifactUri, "The title " + artifactUri,
-                            "The Artifact is really exciting. It could lead to unbelievable productivity in agriculture");
-            results.add(artifact);
-        }
-        dataModel.put(key, results);
-        
     }
     
 }

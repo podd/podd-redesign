@@ -28,6 +28,7 @@ import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddObjectLabel;
 
 /**
  * Manages PODD Artifacts, including loading and retrieving the ontologies representing the
@@ -172,6 +173,16 @@ public interface PoddArtifactManager
      * @return The {@link PoddSesameManager} used to perform operations on a Sesame Repository
      */
     PoddSesameManager getSesameManager();
+    
+    /**
+     * A list of labels for the top objects in the given artifacts.
+     * 
+     * @param artifacts
+     *            A sorted list of artifact identifiers that require labels.
+     * @return A list of labels in the same order as the artifacts.
+     * @throws OpenRDFException
+     */
+    List<PoddObjectLabel> getTopObjectLabels(List<InferredOWLOntologyID> artifacts) throws OpenRDFException;
     
     /**
      * 
