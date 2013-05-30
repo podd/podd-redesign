@@ -78,6 +78,12 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         {
             unpublished = Boolean.parseBoolean(unpublishedString);
         }
+        else
+        {
+            // Default to showing unpublished artifacts to authenticated users if they did not
+            // specify anything in their query parameters
+            unpublished = this.getRequest().getClientInfo().isAuthenticated();
+        }
         
         if(published)
         {
