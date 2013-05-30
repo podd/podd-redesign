@@ -963,7 +963,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
         }
         
-        return new PoddObjectLabelImpl(null, objectUri, label, description);
+        return new PoddObjectLabelImpl(ontologyID, objectUri, label, description);
     }
     
     @Override
