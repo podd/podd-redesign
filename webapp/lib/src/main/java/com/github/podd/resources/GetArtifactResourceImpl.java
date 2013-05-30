@@ -112,6 +112,11 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get(":rdf|rj|ttl")
     public Representation getArtifactRdf(final Representation entity, final Variant variant) throws ResourceException
     {
+        // FIXME: Some Firefox requests get sent with Accept: */*, and Restlet chooses this method
+        // instead of HTML as default
+        // To fix this we need to check whether Accept is exactly "*/*" and response with HTML
+        // variant instead of an RDF variant
+        
         this.log.info("getArtifactRdf");
         
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
