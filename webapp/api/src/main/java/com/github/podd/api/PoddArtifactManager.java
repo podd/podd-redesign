@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.rio.RDFFormat;
+import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -222,6 +224,9 @@ public interface PoddArtifactManager
      */
     InferredOWLOntologyID publishArtifact(InferredOWLOntologyID ontologyId) throws PublishArtifactException,
         OpenRDFException, UnmanagedArtifactIRIException;
+    
+    Model searchForOntologyLabels(InferredOWLOntologyID ontologyID, String searchTerm, URI[] searchTypes)
+        throws OpenRDFException, ResourceException;
     
     /**
      * Sets the {@link FileReferenceManager} to use for verifying file references for PODD

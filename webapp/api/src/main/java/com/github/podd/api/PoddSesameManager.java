@@ -212,14 +212,14 @@ public interface PoddSesameManager
      * 
      * @since 10/05/2013
      */
-    Model getObjectData(InferredOWLOntologyID artifactID, URI objectUri, RepositoryConnection repositoryConnection)
-        throws OpenRDFException;
+    Model getObjectData(InferredOWLOntologyID artifactID, URI objectUri, RepositoryConnection repositoryConnection,
+            URI... contexts) throws OpenRDFException;
     
     Model getObjectDetailsForDisplay(InferredOWLOntologyID artifactID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     Model getObjectDetailsForEdit(InferredOWLOntologyID artifactID, URI objectUri,
-            RepositoryConnection repositoryConnection) throws OpenRDFException;
+            RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
@@ -341,8 +341,8 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      */
     List<URI> getWeightedProperties(final InferredOWLOntologyID artifactID, final URI objectUri,
-            final boolean excludeContainsProperties, final RepositoryConnection repositoryConnection)
-        throws OpenRDFException;
+            final boolean excludeContainsProperties, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException;
     
     /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
@@ -358,49 +358,20 @@ public interface PoddSesameManager
     
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
-     * is carried out in the specified artifact's concrete triples and the ontologies imported by
-     * that artifact. An optional array of URIs can be used to limit the RDF types of objects to
-     * match. <br>
-     * 
-     * TODO: Replace all invocations of this method with the overloaded method which takes in an
-     * array of contexts instead of an artifact ID.
+     * is carried out in the specified contexts. An optional array of URIs can be used to limit the
+     * RDF types of objects to match. <br>
      * 
      * @param searchTerm
      *            A String term which is searched for in the RDF:Labels
-     * @param artifactID
-     *            The artifact whose concrete graph and its imported ontologies are searched
      * @param limit
      * @param offset
      * @param repositoryConnection
      * @param searchTypes
      *            The types (i.e. RDF:Type) of results to match with the search term
      * @return A {@link Model} containing the URI and Label of each matching object.
-     * 
-     *         FIXME: Why is this method duplicates with two semantically different varargs of the
-     *         same type, with the only difference being another parameter?
-     */
-    Model searchOntologyLabels(String searchTerm, InferredOWLOntologyID artifactID, URI[] searchTypes, int limit,
-            int offset, final RepositoryConnection repositoryConnection) throws OpenRDFException;
-    
-    /**
-     * Carries out a case-insensitive search for objects whose labels match a given term. The search
-     * is carried out in the specified contexts.
-     * <p>
-     * An optional array of URIs can be used to limit the RDF types of objects to match. <br>
-     * 
-     * @param searchTerm
-     *            A String term which is searched for in the RDF:Labels
-     * @param searchTypes
-     *            The types (i.e. RDF:Type) of results to match with the search term
-     * @param limit
-     * @param offset
-     * @param repositoryConnection
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
      */
     Model searchOntologyLabels(String searchTerm, URI[] searchTypes, int limit, int offset,
-            RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
+            final RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     /**
      * Sets the given Ontology IRI to be published. This restricts the ability to publish the
@@ -454,5 +425,13 @@ public interface PoddSesameManager
      */
     void updateManagedPoddArtifactVersion(InferredOWLOntologyID nextOntologyID, boolean updateCurrentAndRemovePrevious,
             RepositoryConnection repositoryConnection, URI context) throws OpenRDFException;
+    
+    URI[] versionAndInferredAndSchemaContexts(InferredOWLOntologyID ontologyID,
+            RepositoryConnection repositoryConnection) throws OpenRDFException;
+    
+    URI[] versionAndInferredContexts(InferredOWLOntologyID ontologyID);
+    
+    URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
+            URI schemaManagementGraph) throws OpenRDFException;
     
 }

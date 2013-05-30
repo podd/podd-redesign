@@ -131,7 +131,9 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         Model results = null;
         try
         {
-            results = this.searchForOntologyLabels(ontologyID, searchTerm, set.toArray(new URI[0]));
+            results =
+                    this.getPoddArtifactManager().searchForOntologyLabels(ontologyID, searchTerm,
+                            set.toArray(new URI[0]));
         }
         catch(final OpenRDFException e)
         {
@@ -160,34 +162,6 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
                 .getDefaultMIMEType()));
-    }
-    
-    /*
-     * Internal helper method which encapsulates the creation of a RepositoryConnection before
-     * calling the SesameManager.
-     * 
-     * Can avoid dealing with RepositoryConnections here if this could be moved to somewhere in the
-     * API.
-     */
-    private Model searchForOntologyLabels(final InferredOWLOntologyID ontologyID, final String searchTerm,
-            final URI[] searchTypes) throws OpenRDFException, ResourceException
-    {
-        
-        final RepositoryConnection conn = this.getPoddRepositoryManager().getRepository().getConnection();
-        conn.begin();
-        try
-        {
-            final URI[] contexts = this.buildContextArray(ontologyID, conn);
-            return this.getPoddSesameManager().searchOntologyLabels(searchTerm, searchTypes, 1000, 0, conn, contexts);
-        }
-        finally
-        {
-            if(conn != null)
-            {
-                conn.rollback(); // read only, nothing to commit
-                conn.close();
-            }
-        }
     }
     
 }

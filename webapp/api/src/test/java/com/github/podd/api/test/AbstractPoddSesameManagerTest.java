@@ -1059,9 +1059,12 @@ public abstract class AbstractPoddSesameManagerTest
         final URI objectUri =
                 ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966");
         
+        final URI[] contexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
+                        this.schemaGraph);
         final Model displayModel =
-                this.testPoddSesameManager
-                        .getObjectDetailsForEdit(ontologyID, objectUri, this.testRepositoryConnection);
+                this.testPoddSesameManager.getObjectDetailsForEdit(ontologyID, objectUri,
+                        this.testRepositoryConnection, contexts);
         
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
@@ -1482,11 +1485,19 @@ public abstract class AbstractPoddSesameManagerTest
         {
             final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
             
+            final URI[] contexts =
+                    this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
+                            this.schemaGraph);
+            
             final Model model =
-                    this.testPoddSesameManager.getObjectData(ontologyID, objectUri, this.testRepositoryConnection);
+                    this.testPoddSesameManager.getObjectData(ontologyID, objectUri, this.testRepositoryConnection,
+                            contexts);
             
             // verify: statement count
             Assert.assertNotNull("NULL model as result", model);
+            
+            DebugUtils.printContents(model);
+            
             Assert.assertEquals("Not the expected no. of statements in model", expectedResults[i][0], model.size());
             
             // verify: parent object
@@ -1745,9 +1756,12 @@ public abstract class AbstractPoddSesameManagerTest
                 ValueFactoryImpl.getInstance().createURI(
                         "http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
         
+        final URI[] contexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
+                        this.schemaGraph);
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager.getWeightedProperties(nextOntologyID, internalObjectUri, false,
-                        this.testRepositoryConnection);
+                        this.testRepositoryConnection, contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Internal Object", 6, orderedPropertyUris.size());
@@ -1783,9 +1797,12 @@ public abstract class AbstractPoddSesameManagerTest
         final URI topObjectUri =
                 this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, this.testRepositoryConnection);
         
+        final URI[] contexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
+                        this.schemaGraph);
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager.getWeightedProperties(nextOntologyID, topObjectUri, false,
-                        this.testRepositoryConnection);
+                        this.testRepositoryConnection, contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 13, orderedPropertyUris.size());
@@ -1831,9 +1848,12 @@ public abstract class AbstractPoddSesameManagerTest
         final URI topObjectUri =
                 this.testPoddSesameManager.getTopObjectIRI(nextOntologyID, this.testRepositoryConnection);
         
+        final URI[] contexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
+                        this.schemaGraph);
         final List<URI> orderedPropertyUris =
                 this.testPoddSesameManager.getWeightedProperties(nextOntologyID, topObjectUri, true,
-                        this.testRepositoryConnection);
+                        this.testRepositoryConnection, contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 8, orderedPropertyUris.size());
@@ -1953,9 +1973,12 @@ public abstract class AbstractPoddSesameManagerTest
         final URI[] searchTypes =
                 { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
                         PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
+        final URI[] contexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
+                        this.schemaGraph);
         final Model result =
-                this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, searchTypes, 1000, 0,
-                        this.testRepositoryConnection);
+                this.testPoddSesameManager.searchOntologyLabels(searchTerm, searchTypes, 1000, 0,
+                        this.testRepositoryConnection, contexts);
         
         // verify:
         Assert.assertNotNull("NULL result", result);
@@ -1987,9 +2010,12 @@ public abstract class AbstractPoddSesameManagerTest
         final URI[] searchTypes =
                 { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"),
                         PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
+        final URI[] contexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
+                        this.schemaGraph);
         final Model result =
-                this.testPoddSesameManager.searchOntologyLabels(searchTerm, ontologyID, searchTypes, 1000, 0,
-                        this.testRepositoryConnection);
+                this.testPoddSesameManager.searchOntologyLabels(searchTerm, searchTypes, 1000, 0,
+                        this.testRepositoryConnection, contexts);
         
         // verify:
         Assert.assertNotNull("NULL result", result);
