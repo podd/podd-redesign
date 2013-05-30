@@ -53,7 +53,6 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         this.log.info("searchRdf");
         
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        RDFWriter writer = null;
         
         // search term - mandatory parameter
         final String searchTerm = this.getQuery().getFirstValue(PoddWebConstants.KEY_SEARCHTERM);
@@ -109,19 +108,19 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         }
         this.log.info("Found {} matches for this search term", results.size());
         
+        RDFFormat resultFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         // - prepare response
         try
         {
-            Rio.write(results, output,
-                    Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML));
+            
+            Rio.write(results, output, resultFormat);
         }
         catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Error while preparing response", e);
         }
         
-        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
-                .getDefaultMIMEType()));
+        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(resultFormat.getDefaultMIMEType()));
     }
     
 }
