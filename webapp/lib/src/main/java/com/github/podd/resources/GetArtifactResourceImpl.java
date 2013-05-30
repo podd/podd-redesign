@@ -55,7 +55,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    @Get("html")
+    @Get(":html")
     public Representation getArtifactHtml(final Representation entity) throws ResourceException
     {
         this.log.info("getArtifactHtml");
@@ -109,7 +109,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    @Get("rdf|rj|ttl")
+    @Get(":rdf|rj|ttl")
     public Representation getArtifactRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         this.log.info("getArtifactRdf");
