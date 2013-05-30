@@ -47,38 +47,6 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    /**
-     * @param artifactID
-     * @param connection
-     * @throws OpenRDFException
-     */
-    private URI[] buildContextArray(final InferredOWLOntologyID artifactID, final RepositoryConnection connection)
-        throws OpenRDFException
-    {
-        final List<URI> contexts = new ArrayList<URI>();
-        if(artifactID != null)
-        {
-            contexts.add(artifactID.getVersionIRI().toOpenRDFURI());
-            
-            final Set<IRI> directImports = this.getPoddSesameManager().getDirectImports(artifactID, connection);
-            for(final IRI directImport : directImports)
-            {
-                contexts.add(directImport.toOpenRDFURI());
-            }
-        }
-        else
-        {
-            final List<InferredOWLOntologyID> allSchemaOntologyVersions =
-                    this.getPoddSesameManager().getAllSchemaOntologyVersions(connection,
-                            this.getPoddRepositoryManager().getSchemaManagementGraph());
-            for(final InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
-            {
-                contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());
-            }
-        }
-        return contexts.toArray(new URI[0]);
-    }
-    
     @Get("rdf|rj|json|ttl")
     public Representation getRdf(final Variant variant) throws ResourceException
     {
