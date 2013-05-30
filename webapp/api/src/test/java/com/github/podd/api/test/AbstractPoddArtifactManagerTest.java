@@ -609,7 +609,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         try
         {
-            this.testArtifactManager.getArtifactByIRI(resultArtifactId.getOntologyIRI());
+            this.testArtifactManager.getArtifact(resultArtifactId.getOntologyIRI());
             
             Assert.fail("Current contract is to throw an exception when someone tries to get an artifact that does not exist");
         }

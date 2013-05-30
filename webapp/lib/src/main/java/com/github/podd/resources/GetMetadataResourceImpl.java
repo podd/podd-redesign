@@ -75,7 +75,7 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
             InferredOWLOntologyID artifactID = null;
             if(artifactUri != null)
             {
-                artifactID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+                artifactID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             }
             
             this.getPoddArtifactManager().exportObjectMetadata(PoddRdfConstants.VF.createURI(objectType), output,

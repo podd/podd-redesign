@@ -218,7 +218,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         InferredOWLOntologyID ontologyID;
         try
         {
-            ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+            ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
         }
         catch(final UnmanagedArtifactIRIException e)
         {
@@ -260,7 +260,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         InferredOWLOntologyID ontologyID;
         try
         {
-            ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+            ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
         }
         catch(final UnmanagedArtifactIRIException e)
         {

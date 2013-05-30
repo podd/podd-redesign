@@ -286,7 +286,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public InferredOWLOntologyID getArtifactByIRI(final IRI artifactIRI) throws UnmanagedArtifactIRIException
+    public InferredOWLOntologyID getArtifact(final IRI artifactIRI) throws UnmanagedArtifactIRIException
+    {
+        return getArtifact(artifactIRI, null);
+    }
+    
+    @Override
+    public InferredOWLOntologyID getArtifact(final IRI artifactIRI, final IRI versionIRI)
+        throws UnmanagedArtifactIRIException
     {
         RepositoryConnection repositoryConnection = null;
         
@@ -294,8 +301,34 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             repositoryConnection = this.getRepositoryManager().getRepository().getConnection();
             
-            return this.getSesameManager().getCurrentArtifactVersion(artifactIRI, repositoryConnection,
-                    this.getRepositoryManager().getArtifactManagementGraph());
+            InferredOWLOntologyID result = null;
+            
+            if(versionIRI != null)
+            {
+                result =
+                        this.getSesameManager().getOntologyVersion(versionIRI, repositoryConnection,
+                                this.getRepositoryManager().getArtifactManagementGraph());
+            }
+            
+            if(result == null)
+            {
+                result =
+                        this.getSesameManager().getCurrentArtifactVersion(artifactIRI, repositoryConnection,
+                                this.getRepositoryManager().getArtifactManagementGraph());
+            }
+            
+            if(result != null)
+            {
+                // If the result that was returned contained a different artifact IRI then throw an
+                // exception early instead of returning inconsistent results
+                if(!result.getOntologyIRI().equals(artifactIRI) && !result.getVersionIRI().equals(artifactIRI))
+                {
+                    throw new UnmanagedArtifactIRIException(artifactIRI,
+                            "Artifact IRI and Version IRI combination did not match");
+                }
+            }
+            
+            return result;
         }
         catch(final OpenRDFException e)
         {
@@ -1131,12 +1164,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         InferredOWLOntologyID artifactID = null;
         try
         {
-            artifactID = this.getArtifactByIRI(IRI.create(versionUri));
+            artifactID = this.getArtifact(IRI.create(versionUri));
         }
         catch(final UnmanagedArtifactIRIException e)
         {
             // if the version IRI is not the most current, it is unmanaged
-            final InferredOWLOntologyID currentArtifactID = this.getArtifactByIRI(IRI.create(artifactUri));
+            final InferredOWLOntologyID currentArtifactID = this.getArtifact(IRI.create(artifactUri));
             this.log.error(
                     "Attempting to update from an older version of an artifact. <{}> has been succeeded by <{}>",
                     versionUri, currentArtifactID.getVersionIRI().toString());

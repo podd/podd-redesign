@@ -85,7 +85,7 @@ No artifacts found
 
 <#macro addArtifactDetails aArtifact>
     <p>
-    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getObjectURI())!"unknown-pid"}"> ${aArtifact.getLabel()!" - "}</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getOntologyID().getVersionIRI().toString())!""}"> ${aArtifact.getLabel()!" - "}</a>
 <#-- 
 	These should be uncommented and displayed.
 	
@@ -106,7 +106,7 @@ No artifacts found
     <script type="text/javascript">
         writeAbstractWholeWords("${(aArtifact.getDescription())!" - "}", 200);
     </script>
-    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getObjectURI())!"unknown-pid"}">Browse Artifact</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getOntologyID().getVersionIRI().toString())!""}&amp;objectUri=${(aArtifact.getObjectURI())!""}">Browse Artifact</a>
     </p>
 </#macro>
 

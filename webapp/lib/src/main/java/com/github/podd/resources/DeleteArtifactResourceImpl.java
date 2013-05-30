@@ -51,7 +51,7 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
                         "Did not find an artifacturi parameter in the request");
             }
             final InferredOWLOntologyID currentVersion =
-                    this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactId));
+                    this.getPoddArtifactManager().getArtifact(IRI.create(artifactId));
             
             result = this.getPoddApplication().getPoddArtifactManager().deleteArtifact(currentVersion);
             

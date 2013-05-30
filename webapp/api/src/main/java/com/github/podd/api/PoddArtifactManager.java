@@ -119,7 +119,24 @@ public interface PoddArtifactManager
      * @throws UnmanagedArtifactIRIException
      *             If the artifact is not managed.
      */
-    InferredOWLOntologyID getArtifactByIRI(IRI artifactIRI) throws UnmanagedArtifactIRIException;
+    InferredOWLOntologyID getArtifact(IRI artifactIRI) throws UnmanagedArtifactIRIException;
+    
+    /**
+     * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI and
+     * version IRI.
+     * <p>
+     * If versionIRI is null, or the exact version is not available, then null is returned. In these
+     * cases, {@link #getArtifact(IRI)} can be used as a backup to attempt to get the most current
+     * version.
+     * 
+     * @param artifactIRI
+     *            The IRI of the Artifact to fetch. Can be either the version or the ontology IRI.
+     * @return An {@link InferredOWLOntologyID} containing the full details for the artifact or null
+     *         if it was not found.
+     * @throws UnmanagedArtifactIRIException
+     *             If the artifact is not managed.
+     */
+    InferredOWLOntologyID getArtifact(IRI artifactIRI, IRI versionIRI) throws UnmanagedArtifactIRIException;
     
     /**
      * 

@@ -60,31 +60,43 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("getArtifactHtml");
         
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
+        final String artifactString = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         
-        if(artifactUri == null)
+        if(artifactString == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
         }
+        
+        final String versionString =
+                this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
         
         final String objectToView = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
         
         // URI objectToView = topObject URI by default
         // optional parameter for inner objects
         
-        this.log.info("requesting get artifact (HTML): {}", artifactUri);
+        this.log.info("requesting get artifact (HTML): {}", artifactString);
         
         this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
-                Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactUri)));
+                Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactString)));
         // completed checking authorization
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
-        InferredOWLOntologyID ontologyID;
+        InferredOWLOntologyID ontologyID = null;
         try
         {
-            ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+            if(versionString == null)
+            {
+                ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactString));
+            }
+            else
+            {
+                ontologyID =
+                        this.getPoddArtifactManager()
+                                .getArtifact(IRI.create(artifactString), IRI.create(versionString));
+            }
         }
         catch(final UnmanagedArtifactIRIException e)
         {
@@ -102,7 +114,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final OpenRDFException e)
         {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
         
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
@@ -123,7 +135,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
-            final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+            final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
             
             if(artifactUri == null)
             {
@@ -141,7 +153,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             this.log.info("authenticated user: {}", user);
             
             final InferredOWLOntologyID ontologyID =
-                    this.getPoddApplication().getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+                    this.getPoddApplication().getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             
             // FIXME: support prototype method for this
             // use this instead of ../base/ ../inferred/.. in the Prototype. Change documentation
@@ -250,7 +262,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             // the object to display (default is Top Object)
             URI objectUri = topObjectList.get(0);
             
-            if(objectToView != null)
+            if(objectToView != null && !objectToView.trim().isEmpty())
             {
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToView);
             }

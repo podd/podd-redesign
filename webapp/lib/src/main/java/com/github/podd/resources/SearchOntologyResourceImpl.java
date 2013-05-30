@@ -68,7 +68,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         {
             try
             {
-                ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+                ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             }
             catch(final UnmanagedArtifactIRIException e)
             {

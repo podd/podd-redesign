@@ -124,7 +124,7 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
                 }
                 else
                 {
-                    ontologyID = this.getPoddArtifactManager().getArtifactByIRI(IRI.create(artifactUri));
+                    ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
                 }
                 objectLabel =
                         this.getPoddSesameManager().getObjectLabel(ontologyID,
