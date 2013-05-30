@@ -135,26 +135,37 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
-            final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
+            final String artifactString = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
             
-            if(artifactUri == null)
+            if(artifactString == null)
             {
                 this.log.error("Artifact ID not submitted");
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
             }
             
-            this.log.info("requesting get artifact ({}): {}", variant.getMediaType().getName(), artifactUri);
+            final String versionString =
+                    this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
+            
+            this.log.info("requesting get artifact ({}): {}", variant.getMediaType().getName(), artifactString);
             
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
-                    Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactUri)));
+                    Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactString)));
             // completed checking authorization
             
             final User user = this.getRequest().getClientInfo().getUser();
             this.log.info("authenticated user: {}", user);
             
-            final InferredOWLOntologyID ontologyID =
-                    this.getPoddApplication().getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-            
+            InferredOWLOntologyID ontologyID = null;
+            if(versionString == null)
+            {
+                ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactString));
+            }
+            else
+            {
+                ontologyID =
+                        this.getPoddArtifactManager()
+                                .getArtifact(IRI.create(artifactString), IRI.create(versionString));
+            }
             // FIXME: support prototype method for this
             // use this instead of ../base/ ../inferred/.. in the Prototype. Change documentation
             // too.
