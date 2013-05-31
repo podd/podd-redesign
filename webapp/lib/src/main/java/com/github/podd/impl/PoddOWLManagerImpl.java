@@ -174,11 +174,14 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
         final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
         
-        // -- check if already cached and silently return.
-        if(this.owlOntologyManager.contains(baseOntologyIRI)
-                || this.owlOntologyManager.contains(baseOntologyVersionIRI))
+        synchronized(owlOntologyManager)
         {
-            return;
+            // -- check if already cached and silently return.
+            if(this.owlOntologyManager.contains(baseOntologyIRI)
+                    || this.owlOntologyManager.contains(baseOntologyVersionIRI))
+            {
+                return;
+            }
         }
         
         // Only direct imports and first-level indirect imports are identified. This works for the
@@ -254,20 +257,25 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         axiomGenerators.add(new InferredSubDataPropertyAxiomGenerator());
         axiomGenerators.add(new InferredSubObjectPropertyAxiomGenerator());
         
-        final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID);
-        
         IRI importIRI = concreteOntologyID.getVersionIRI();
         if(importIRI == null)
         {
             importIRI = concreteOntologyID.getOntologyIRI();
         }
-        this.owlOntologyManager.applyChange(new AddImport(nextInferredAxiomsOntology, new OWLImportsDeclarationImpl(
-                importIRI)));
         
         final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
-        iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
         
-        return nextInferredAxiomsOntology;
+        synchronized(owlOntologyManager)
+        {
+            final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID);
+            
+            this.owlOntologyManager.applyChange(new AddImport(nextInferredAxiomsOntology,
+                    new OWLImportsDeclarationImpl(importIRI)));
+            
+            iog.fillOntology(nextInferredAxiomsOntology.getOWLOntologyManager(), nextInferredAxiomsOntology);
+            
+            return nextInferredAxiomsOntology;
+        }
     }
     
     @Override
@@ -366,12 +374,19 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     @Override
     public OWLOntology getOntology(final OWLOntologyID ontologyID) throws IllegalArgumentException, OWLException
     {
-        return this.owlOntologyManager.getOntology(ontologyID);
+        synchronized(owlOntologyManager)
+        {
+            return this.owlOntologyManager.getOntology(ontologyID);
+        }
     }
     
     @Override
     public OWLOntologyManager getOWLOntologyManager()
     {
+        // TODO: Remove this method so that we can synchronize every access to OWLOntologyManager
+        // locally for threadsafety
+        // TODO: Also do not let OWLOntology objects escape as they contains references to
+        // OWLOntologyManager that can also be used in the same way
         return this.owlOntologyManager;
     }
     
@@ -437,13 +452,19 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                             "application/rdf+xml");
             final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
             
-            nextOntology = this.owlOntologyManager.createOntology();
-            
-            owlParser.parse(owlSource, nextOntology);
+            synchronized(owlOntologyManager)
+            {
+                nextOntology = this.owlOntologyManager.createOntology();
+                
+                owlParser.parse(owlSource, nextOntology);
+            }
         }
         else
         {
-            nextOntology = this.owlOntologyManager.loadOntologyFromOntologyDocument(owlSource);
+            synchronized(owlOntologyManager)
+            {
+                nextOntology = this.owlOntologyManager.loadOntologyFromOntologyDocument(owlSource);
+            }
         }
         
         if(nextOntology.isEmpty())
@@ -462,38 +483,44 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         final RioParserImpl owlParser = new RioParserImpl(null);
         
-        final OWLOntology nextOntology = this.owlOntologyManager.createOntology();
-        
-        if(conn.size(contexts) == 0)
+        synchronized(owlOntologyManager)
         {
-            throw new EmptyOntologyException(nextOntology, "No statements to create an ontology");
+            final OWLOntology nextOntology = this.owlOntologyManager.createOntology();
+            
+            if(conn.size(contexts) == 0)
+            {
+                throw new EmptyOntologyException(nextOntology, "No statements to create an ontology");
+            }
+            
+            owlParser.parse(owlSource, nextOntology);
+            if(nextOntology.isEmpty())
+            {
+                throw new EmptyOntologyException(nextOntology, "Loaded ontology is empty");
+            }
+            
+            return nextOntology.getOntologyID();
         }
-        
-        owlParser.parse(owlSource, nextOntology);
-        if(nextOntology.isEmpty())
-        {
-            throw new EmptyOntologyException(nextOntology, "Loaded ontology is empty");
-        }
-        
-        return nextOntology.getOntologyID();
     }
     
     @Override
     public boolean removeCache(final OWLOntologyID ontologyID) throws OWLException
     {
-        // TODO: Verify that this .contains method matches our desired semantics
-        final boolean containsOntology = this.owlOntologyManager.contains(ontologyID);
-        
-        if(containsOntology)
+        synchronized(owlOntologyManager)
         {
-            this.owlOntologyManager.removeOntology(ontologyID);
+            // TODO: Verify that this .contains method matches our desired semantics
+            final boolean containsOntology = this.owlOntologyManager.contains(ontologyID);
             
-            // return true if the ontology manager does not contain the ontology at this point
-            return !this.owlOntologyManager.contains(ontologyID);
-        }
-        else
-        {
-            return false;
+            if(containsOntology)
+            {
+                this.owlOntologyManager.removeOntology(ontologyID);
+                
+                // return true if the ontology manager does not contain the ontology at this point
+                return !this.owlOntologyManager.contains(ontologyID);
+            }
+            else
+            {
+                return false;
+            }
         }
     }
     

@@ -40,6 +40,7 @@ import org.semanticweb.owlapi.formats.RioRDFOntologyFormatFactory;
 import org.semanticweb.owlapi.io.OWLParserException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.profiles.OWLProfile;
 import org.semanticweb.owlapi.profiles.OWLProfileRegistry;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
@@ -227,44 +228,48 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                         RDFFormat.RDFXML.getDefaultMIMEType());
         final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
         
+        OWLOntologyManager manager = this.getOWLManager().getOWLOntologyManager();
         OWLOntology nextOntology = null;
         
-        try
+        synchronized(manager)
         {
-            nextOntology = this.getOWLManager().getOWLOntologyManager().createOntology();
-            final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(model.iterator());
+            try
+            {
+                nextOntology = manager.createOntology();
+                final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(model.iterator());
+                
+                owlParser.parse(owlSource, nextOntology);
+            }
+            catch(OWLOntologyCreationException | OWLParserException | IOException e)
+            {
+                // throwing up the original Exceptions is also a possibility here.
+                throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
+            }
             
-            owlParser.parse(owlSource, nextOntology);
-        }
-        catch(OWLOntologyCreationException | OWLParserException | IOException e)
-        {
-            // throwing up the original Exceptions is also a possibility here.
-            throw new EmptyOntologyException(nextOntology, "Error parsing Model to create an Ontology");
-        }
-        
-        // Repository configuration can be an empty ontology
-        // if(nextOntology.isEmpty())
-        // {
-        // throw new EmptyOntologyException(nextOntology, "Ontology was empty");
-        // }
-        
-        // verify that the ontology in OWL-DL profile
-        final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(OWLProfile.OWL2_DL);
-        final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
-        if(!profileReport.isInProfile())
-        {
-            throw new OntologyNotInProfileException(nextOntology, profileReport, "Ontology not in OWL-DL profile");
-        }
-        
-        // check consistency
-        final OWLReasonerFactory reasonerFactory =
-                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
-        final OWLReasoner reasoner = reasonerFactory.createReasoner(nextOntology);
-        
-        if(!reasoner.isConsistent())
-        {
-            this.getOWLManager().getOWLOntologyManager().removeOntology(nextOntology);
-            throw new InconsistentOntologyException(reasoner, "Ontology is inconsistent");
+            // Repository configuration can be an empty ontology
+            // if(nextOntology.isEmpty())
+            // {
+            // throw new EmptyOntologyException(nextOntology, "Ontology was empty");
+            // }
+            
+            // verify that the ontology in OWL-DL profile
+            final OWLProfile nextProfile = OWLProfileRegistry.getInstance().getProfile(OWLProfile.OWL2_DL);
+            final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
+            if(!profileReport.isInProfile())
+            {
+                throw new OntologyNotInProfileException(nextOntology, profileReport, "Ontology not in OWL-DL profile");
+            }
+            
+            // check consistency
+            final OWLReasonerFactory reasonerFactory =
+                    OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+            final OWLReasoner reasoner = reasonerFactory.createReasoner(nextOntology);
+            
+            if(!reasoner.isConsistent())
+            {
+                this.getOWLManager().getOWLOntologyManager().removeOntology(nextOntology);
+                throw new InconsistentOntologyException(reasoner, "Ontology is inconsistent");
+            }
         }
         
         return nextOntology;
@@ -693,14 +698,19 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
         }
         finally
         {
-            // clear OWLAPI memory
-            if(defaultAliasOntology != null)
+            OWLOntologyManager manager = this.getOWLManager().getOWLOntologyManager();
+            
+            synchronized(manager)
             {
-                this.getOWLManager().getOWLOntologyManager().removeOntology(defaultAliasOntology);
-            }
-            if(fileRepositoryOntology != null)
-            {
-                this.getOWLManager().getOWLOntologyManager().removeOntology(fileRepositoryOntology);
+                // clear OWLAPI memory
+                if(defaultAliasOntology != null)
+                {
+                    manager.removeOntology(defaultAliasOntology);
+                }
+                if(fileRepositoryOntology != null)
+                {
+                    manager.removeOntology(fileRepositoryOntology);
+                }
             }
         }
     }
