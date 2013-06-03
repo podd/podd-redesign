@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -42,6 +43,7 @@ import com.github.podd.utils.PoddWebConstants;
  * @author kutila
  * 
  */
+@Ignore("Tests fail sometimes with the SSH Service timing out due to lack of entropy. Should be run before releases.")
 public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTest
 {
     /** SSH File Repository server for tests */
