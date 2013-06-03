@@ -141,34 +141,22 @@ public abstract class AbstractPoddSesameManagerTest
     }
     
     /**
-     * This method loads all PODD schema ontologies and their pre-computed inferred statements into
-     * the test repository.
+     * This method loads all PODD schema ontologies.
      */
     private List<InferredOWLOntologyID> loadSchemaOntologies() throws Exception
     {
-        final String[] schemaResourcePaths =
-                { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
-                        PoddRdfConstants.PATH_PODD_BASE, PoddRdfConstants.PATH_PODD_SCIENCE,
-                        PoddRdfConstants.PATH_PODD_PLANT,
-                // PoddRdfConstants.PATH_PODD_ANIMAL,
-                };
-        
-        final String[] schemaInferredResourcePaths =
-                { "/test/ontologies/dcTermsInferred.rdf", "/test/ontologies/foafInferred.rdf",
-                        "/test/ontologies/poddUserInferred.rdf", "/test/ontologies/poddBaseInferred.rdf",
-                        "/test/ontologies/poddScienceInferred.rdf", "/test/ontologies/poddPlantInferred.rdf", };
-        
-        final List<InferredOWLOntologyID> schemaList = new ArrayList<InferredOWLOntologyID>();
-        for(int i = 0; i < schemaResourcePaths.length; i++)
-        {
-            this.log.debug("Next paths: {} {}", schemaResourcePaths[i], schemaInferredResourcePaths[i]);
-            final InferredOWLOntologyID ontologyID =
-                    this.loadOntologyFromResource(schemaResourcePaths[i], schemaInferredResourcePaths[i],
-                            RDFFormat.RDFXML);
-            schemaList.add(ontologyID);
-        }
-        return schemaList;
+        return this.loadSchemaOntologies(testRepositoryConnection);
     }
+
+    /**
+     * Load all PODD schema ontologies and their inferred statements into the given
+     * RepositoryConnection.
+     * 
+     * @param conn
+     * @return
+     * @throws Exception
+     */
+    protected abstract List<InferredOWLOntologyID> loadSchemaOntologies(RepositoryConnection conn) throws Exception;
     
     /**
      * Helper method which populates a graph with artifact management triples.
