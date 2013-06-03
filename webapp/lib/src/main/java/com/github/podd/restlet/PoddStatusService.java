@@ -7,17 +7,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-import org.openrdf.OpenRDFException;
+import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -32,6 +28,9 @@ import org.restlet.service.StatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.restletutils.RestletUtilMediaType;
+import com.github.podd.exception.InconsistentOntologyException;
+import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.utils.PoddRdfConstants;
 
 import freemarker.template.Configuration;
@@ -95,9 +94,11 @@ public class PoddStatusService extends StatusService
         }
         
         Representation representation = null;
-        if(MediaType.APPLICATION_RDF_XML.equals(preferredMediaType))
+        if(MediaType.APPLICATION_RDF_XML.equals(preferredMediaType)
+                || RestletUtilMediaType.APPLICATION_RDF_JSON.equals(preferredMediaType)
+                || MediaType.APPLICATION_JSON.equals(preferredMediaType))
         {
-            representation = this.getRepresentationRdf(status, request, response);
+            representation = this.getRepresentationRdf(status, request, response, preferredMediaType);
         }
         else
         // if (MediaType.TEXT_HTML.equals(preferredMediaType))
@@ -140,51 +141,58 @@ public class PoddStatusService extends StatusService
     /**
      * Returns an Error page representation in RDF/XML.
      * 
+     * @param preferredMediaType
+     * 
      */
-    private Representation getRepresentationRdf(final Status status, final Request request, final Response response)
+    private Representation getRepresentationRdf(final Status status, final Request request, final Response response,
+            MediaType preferredMediaType)
     {
         final Model model = new LinkedHashModel();
-        
-        final URI errorUri =
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/error#", UUID.randomUUID().toString());
+        final BNode errorUri = PoddRdfConstants.VF.createBNode();
         model.add(errorUri, PoddRdfConstants.HTTP_STATUS_CODE_VALUE,
-                ValueFactoryImpl.getInstance().createLiteral(status.getCode()));
+                PoddRdfConstants.VF.createLiteral(status.getCode()));
         model.add(errorUri, PoddRdfConstants.HTTP_REASON_PHRASE,
-                ValueFactoryImpl.getInstance().createLiteral(status.getReasonPhrase()));
+                PoddRdfConstants.VF.createLiteral(status.getReasonPhrase()));
         
-        if(status.getThrowable() != null && status.getThrowable().getMessage() != null)
-        {
-            model.add(errorUri, RDFS.LABEL,
-                    ValueFactoryImpl.getInstance().createLiteral(status.getThrowable().getMessage()));
-        }
         String errorDescription = status.getDescription();
         if(status.getThrowable() != null)
         {
+            if(status.getThrowable().getMessage() != null)
+            {
+                model.add(errorUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(status.getThrowable().getMessage()));
+            }
+            
+            // TODO: Handle Ontology Not Consistent exceptions here and map the reasons specifically
+            // so that web interface and client can describe to users why the ontology save failed
+            if(status.getThrowable() instanceof OntologyNotInProfileException)
+            {
+                //.....
+            }
+            else if(status.getThrowable() instanceof InconsistentOntologyException)
+            {
+                //.....
+            }
+            //.....
+            
             final StringWriter sw = new StringWriter();
             final PrintWriter writer = new PrintWriter(sw);
             status.getThrowable().printStackTrace(writer);
             errorDescription = sw.toString();
         }
-        model.add(errorUri, RDFS.COMMENT, ValueFactoryImpl.getInstance().createLiteral(errorDescription));
+        model.add(errorUri, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(errorDescription));
         
         // get a String representation of the statements in the Model
         final StringWriter out = new StringWriter();
-        final RDFWriter writer = Rio.createWriter(RDFFormat.RDFXML, out);
         try
         {
-            // writer.handleNamespace("http", PoddRdfConstants.HTTP);
-            // writer.handleNamespace("rdfs", RDFS.NAMESPACE);
-            writer.startRDF();
-            for(final Statement st : model)
-            {
-                writer.handleStatement(st);
-            }
-            writer.endRDF();
+            Rio.write(model, out, Rio.getWriterFormatForMIMEType(preferredMediaType.getName(), RDFFormat.RDFJSON));
         }
-        catch(final OpenRDFException e)
+        catch(RDFHandlerException e)
         {
             this.log.error("Error writing RDF content in status service", e);
             // We're already trying to send back an error. So ignore this?
+            // FIXME: The error may mean that the error message is not syntactically valid at this
+            // point, so may need to overwrite it with a hardcoded string
         }
         
         return new AppendableRepresentation(out.toString(), MediaType.APPLICATION_RDF_XML, Language.DEFAULT,
