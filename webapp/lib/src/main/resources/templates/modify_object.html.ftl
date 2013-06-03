@@ -21,6 +21,7 @@
 	    podd.artifactDatabank = podd.newDatabank();
 	    podd.schemaDatabank = podd.newDatabank();
 		
+		// FIXME: Are the following always necessary? Should they only be added for new objects?
 		podd.artifactDatabank.add(podd.getCurrentObjectUri() + ' rdf:type <' + podd.objectTypeUri + '> ');
 		<#if user?? && user.email??>
 		podd.artifactDatabank.add(podd.getCurrentObjectUri() + ' dcterms:creator <mailto:${user.email!'unknown'}> ');

@@ -356,7 +356,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
                     value.valueUri = nextArtifactValue.propertyValue.value;
                 }
                 value.displayValue = nextArtifactValue.propertyValue.value;
-                $("#details ol").append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
+                $("#details ol").append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
             });
         }
         else {
@@ -559,9 +559,15 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
 
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
-    }).where('?restriction owl:onProperty <' + nextField.propertyUri + '> ').where(
-            '?restriction owl:allValuesFrom ?class').where('?pValue rdf:type ?class').optional(
-            '?pValue rdfs:label ?pDisplayValue');
+    })
+    // Find all display values for this property
+    .where('?restriction owl:onProperty <' + nextField.propertyUri + '> ')
+    //
+    .where('?restriction owl:allValuesFrom ?class')
+    // 
+    .where('?pValue rdf:type ?class')
+    //
+    .optional('?pValue rdfs:label ?pDisplayValue');
     var bindings = myQuery.select();
     console.debug('Found ' + bindings.length + ' bindings for query');
     console.debug(bindings);
@@ -637,6 +643,7 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
         success : function(resultData, status, xhr) {
             // Wipe out databank so it contains the most current copy after this
             // point, since we succeeded in our quest to get the current version
+        	// FIXME: have a separate method which deletes everything
             podd.deleteTriples(nextArtifactDatabank, "?subject", "?predicate");
             nextArtifactDatabank.load(resultData);
             console.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextArtifactDatabank.size());
@@ -677,7 +684,7 @@ podd.submitPoddObjectUpdate = function(
 /* object */nextArtifactDatabank,
 /* function */updateCallback) {
 
-    var requestUrl = podd.baseUrl + '/artifact/edit';
+    var requestUrl;
 
     var modifiedTriples = $.toJSON(nextArtifactDatabank.dump({
         format : 'application/json'
@@ -694,13 +701,14 @@ podd.submitPoddObjectUpdate = function(
         requestUrl = podd.baseUrl + '/artifact/new';
     }
     else {
-        // FIXME: Why is the parameter isForce hardcoded to true?
+    	requestUrl = podd.baseUrl + '/artifact/edit'
+    	// FIXME: Why is the parameter isForce hardcoded to true?
         requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri) + '&isforce=true';
         if (typeof versionIri !== "undefined") {
             console.debug(' of artifact (' + versionIri + ').');
             // set query parameters in the URI as setting them under data
             // failed, mostly leading to a 415 error
-            +'&versionuri=' + encodeURIComponent(versionIri);
+            requestUrl = requestUrl + '&versionuri=' + encodeURIComponent(versionIri);
         }
         if (typeof objectUri !== 'undefined') {
             console.debug(' on object (' + objectUri + ').');
@@ -755,7 +763,7 @@ podd.submitPoddObjectUpdate = function(
  * Call Search Ontology Resource Service using AJAX, convert the RDF response to
  * a JSON array and set to the array as autocomplete data.
  */
-podd.autoCompleteSource = function(/* object with 'search term' */request, /* function */response) {
+podd.autoCompleteSource = function(/* object with 'search term' */request, /* function */responseCallback) {
 
     var requestUrl = podd.baseUrl + '/search';
 
@@ -774,7 +782,7 @@ podd.autoCompleteSource = function(/* object with 'search term' */request, /* fu
         console.debug('Response: ' + data.toString());
         var formattedData = podd.parseSearchResults(requestUrl, data);
         // console.debug(formattedData);
-        response(formattedData);
+        responseCallback(formattedData);
     }, 'json');
 };
 
@@ -935,9 +943,7 @@ isNew) {
 
         select : function(event, ui) {
             console.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
-            // FIXME: Remove hardcoded path here
             hiddenValueElement.val(ui.item.value);
-            // FIXME: Remove hardcoded path here
             $(this).val(ui.item.label);
             // $('#message1').html('Selected : ' + ui.item.value);
             return false;
