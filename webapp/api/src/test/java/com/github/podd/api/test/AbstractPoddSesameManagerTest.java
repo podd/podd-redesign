@@ -28,9 +28,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
-import org.openrdf.rio.helpers.StatementCollector;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -111,22 +109,16 @@ public abstract class AbstractPoddSesameManagerTest
         final InputStream resourceStream = this.getClass().getResourceAsStream(resourcePath);
         Assert.assertNotNull("Resource was null", resourceStream);
         
-        // load statements into a Model
-        final Model concreteModel = new LinkedHashModel();
-        final RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(concreteModel));
-        parser.parse(resourceStream, "");
+        final Model concreteModel = Rio.parse(resourceStream, "", format);
         
-        final Model inferredModel = new LinkedHashModel();
+        Model inferredModel = new LinkedHashModel();
         if(inferredResourcePath != null)
         {
             final InputStream inferredResourceStream = this.getClass().getResourceAsStream(inferredResourcePath);
             Assert.assertNotNull("Inferred resource was null", inferredResourceStream);
             
             // load inferred statements into a Model
-            final RDFParser inferredParser = Rio.createParser(format);
-            inferredParser.setRDFHandler(new StatementCollector(inferredModel));
-            inferredParser.parse(inferredResourceStream, "");
+            inferredModel = Rio.parse(inferredResourceStream, "", format);
             
             // extract version IRI which is also the inferred IRI
             this.testRepositoryConnection.add(inferredModel,
