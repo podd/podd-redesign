@@ -674,16 +674,17 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             final URI[] contexts) throws OpenRDFException
     {
         /*
-         * This query maps RDFS:Domain and RDFS:Range to OWL:Restriction/SubClassOf so that we get a
-         * homogeneous set of results.
+         * This query gets the instances and their RDFS:labels for that are of the given type.
          */
         final StringBuilder instanceQuery = new StringBuilder();
         
         instanceQuery.append("CONSTRUCT { ");
         instanceQuery.append(" ?instanceUri <" + RDF.TYPE.stringValue() + "> ?rangeClass . ");
+        instanceQuery.append(" ?instanceUri <" + RDFS.LABEL.stringValue() + "> ?label . ");
         
         instanceQuery.append("} WHERE {");
         instanceQuery.append(" ?instanceUri <" + RDF.TYPE.stringValue() + "> ?rangeClass . ");
+        instanceQuery.append(" OPTIONAL { ?instanceUri <" + RDFS.LABEL.stringValue() + "> ?label . } ");
         
         instanceQuery.append("}");
         
@@ -989,7 +990,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         owlRestrictionQuery.append("CONSTRUCT { ");
         owlRestrictionQuery
                 .append(" ?objectType <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
-        owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
         owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
         owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
         owlRestrictionQuery.append(" ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
@@ -1038,7 +1039,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         rdfsQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
         
         rdfsQuery.append("} WHERE {");
-        rdfsQuery.append(" ?propertyUri <" + RDFS.DOMAIN.stringValue() + "> ?objectType . ");
+        rdfsQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?actualObjectType . ");
+        rdfsQuery.append(" ?propertyUri <" + RDFS.DOMAIN.stringValue() + "> ?actualObjectType . ");
         rdfsQuery.append(" ?propertyUri <" + RDFS.RANGE.stringValue() + "> ?rangeClass . ");
         
         if(!includeDoNotDisplayProperties)
@@ -1125,6 +1127,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     {
                         final Set<Value> nextRangeTypes =
                                 results.filter(nextRestriction, OWL.ALLVALUESFROM, null).objects();
+                        
+                        if (nextRangeTypes.size() == 0)
+                        {
+                            URI owlOnClass = PoddRdfConstants.VF.createURI("http://www.w3.org/2002/07/owl#onClass");
+                            nextRangeTypes.addAll(results.filter(nextRestriction, owlOnClass, null).objects());
+                        }
+                        
                         for(final Value nextRangeType : nextRangeTypes)
                         {
                             if(nextRangeType instanceof URI)
