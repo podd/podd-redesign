@@ -56,10 +56,11 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
     nextDatabank.add(artifactUri + ' rdf:type owl:Ontology ');
     nextDatabank.add(artifactUri + ' poddBase:artifactHasTopObject ' + objectUri);
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/dcTerms/1>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/foaf/1>');
+    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddUser/1>');
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddBase/1>');
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddScience/1>');
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddPlant/1>');
-    nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddUser/1>');
 };
 
 /**
@@ -180,11 +181,15 @@ podd.debugPrintDatabank = function(databank, message) {
     }
 };
 
-/*
+/**
  * Retrieve metadata to render the fields to add a new object of the given type.
  * 
- * @param objectTypeUri - the type of Object to be added @param successCallback -
- * where to send the results
+ * @param objectTypeUri -
+ *            the type of Object to be added
+ * @param successCallback -
+ *            where to send the results
+ * @param nextSchemaDatabank -
+ * @param nextArtifactDatabank -
  */
 podd.getObjectTypeMetadata = function(/* String */objectTypeUri, /* function */successCallback, /* object */
 nextSchemaDatabank, /* object */nextArtifactDatabank) {
