@@ -675,7 +675,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     {
         /*
          * This query maps RDFS:Domain and RDFS:Range to OWL:Restriction/SubClassOf so that we get a
-         * homgeneous set of results.
+         * homogeneous set of results.
          */
         final StringBuilder instanceQuery = new StringBuilder();
         
@@ -1026,7 +1026,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         /*
          * This query maps RDFS:Domain and RDFS:Range to OWL:Restriction/SubClassOf so that we get a
-         * homgeneous set of results.
+         * homogeneous set of results.
          */
         final StringBuilder rdfsQuery = new StringBuilder();
         
