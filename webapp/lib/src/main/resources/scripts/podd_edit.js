@@ -581,7 +581,7 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
         var optionValue = value.pValue.value;
 
         var optionDisplayValue = value.pValue.value;
-        if (value.pDisplayValue != 'undefined') {
+        if (typeof value.pDisplayValue != 'undefined') {
             optionDisplayValue = value.pDisplayValue.value;
         }
 
