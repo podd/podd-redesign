@@ -1128,12 +1128,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                         final Set<Value> nextRangeTypes =
                                 results.filter(nextRestriction, OWL.ALLVALUESFROM, null).objects();
                         
-                        if (nextRangeTypes.size() == 0)
-                        {
-                            URI owlOnClass = PoddRdfConstants.VF.createURI("http://www.w3.org/2002/07/owl#onClass");
-                            nextRangeTypes.addAll(results.filter(nextRestriction, owlOnClass, null).objects());
-                        }
-                        
                         for(final Value nextRangeType : nextRangeTypes)
                         {
                             if(nextRangeType instanceof URI)
