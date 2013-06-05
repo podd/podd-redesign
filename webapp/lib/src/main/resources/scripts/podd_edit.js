@@ -282,6 +282,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
     var bindings = myQuery.select();
 
     var propertyList = [];
+    var propertyUris = [];
     $.each(bindings, function(index, nextBinding) {
         var nextChild = {};
         nextChild.weight;
@@ -316,21 +317,36 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         nextChild.displayValue = '';
         nextChild.valueUri = '';
 
-        propertyList.push(nextChild);
-        if (typeof console !== "undefined" && console.debug) {
-            console.debug("[" + nextChild.weight + "] propertyUri=<" + nextChild.propertyUri + "> label=\""
-                    + nextChild.propertyLabel + "\" displayType=<" + nextChild.displayType + "> card=<"
-                    + nextChild.cardinality + ">");
+        // Avoid duplicates, which are occurring due to multiple ways of specifying ranges/etc., in OWL
+        if($.inArray(nextChild.propertyUri, propertyUris) === -1)
+       	{
+            propertyUris.push(nextChild.propertyUri);
+            propertyList.push(nextChild);
+            if (typeof console !== "undefined" && console.debug) {
+                console.debug("[" + nextChild.weight + "] propertyUri=<" + nextChild.propertyUri + "> label=\""
+                        + nextChild.propertyLabel + "\" displayType=<" + nextChild.displayType + "> card=<"
+                        + nextChild.cardinality + ">");
+            }
+       	}
+        else
+        {
+            if (typeof console !== "undefined" && console.debug) {
+            	console.debug("Duplicate property found: "+nextChild.propertyUri);
+        	}
         }
     });
 
+    //propertyList = $.unique(propertyList);
+    
     // sort property list
     propertyList.sort(function(a, b) {
         var aID = a.weight;
         var bID = b.weight;
+        
+        //TODO: on equal weights sort by label/property URI to get a consistent order
+        
         return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
     });
-
     // Reset the details list
     $("#details ol").empty();
 
