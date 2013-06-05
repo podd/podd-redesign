@@ -20,6 +20,8 @@ var DISPLAY_DropDown = 'http://purl.org/podd/ns/poddBase#DisplayType_DropDownLis
 var DISPLAY_AutoComplete = 'http://purl.org/podd/ns/poddBase#DisplayType_AutoComplete';
 var DISPLAY_Table = 'http://purl.org/podd/ns/poddBase#DisplayType_Table';
 
+var DETAILS_LIST_Selector = '#details ol';
+
 // --------------------------------
 
 /**
@@ -354,7 +356,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
     });
     // Reset the details list
-    $("#details ol").empty();
+    $(DETAILS_LIST_Selector).empty();
 
     $.each(propertyList, function(index, value) {
         var nextArtifactQuery = $.rdf({
@@ -383,13 +385,13 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
                     value.valueUri = nextArtifactValue.propertyValue.value;
                 }
                 value.displayValue = nextArtifactValue.propertyValue.value;
-                $("#details ol").append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
+                $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
             });
         }
         else {
             console.debug("Found no existing values for " + podd.getCurrentObjectUri() + " property <"
                     + value.propertyUri + "> value=" + nextArtifactBindings);
-            $("#details ol").append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
+            $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
         }
     });
 };
@@ -399,11 +401,10 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
  */
 podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatabank, isNew) {
     if (typeof console !== "undefined" && console.debug) {
-        // console.debug('[' + nextField.weight + '] <' + nextField.propertyUri
-        // + '>
-        // "' + nextField.propertyLabel + '" <' +
-        // nextField.displayType + '> <' + nextField.cardinality + '>');
-    }
+		// console.debug('[' + nextField.weight + '] <' + nextField.propertyUri
+		// + '> "' + nextField.propertyLabel + '" <' +
+		// nextField.displayType + '> <' + nextField.cardinality + '>');
+	}
 
     // field name
     var span = $('<span>');
