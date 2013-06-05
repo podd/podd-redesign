@@ -475,10 +475,24 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         li2.append(checkBox);
     }
     else if (nextField.displayType == DISPLAY_AutoComplete) {
-        var checkBox = $('<p>');
-        checkBox.text('Auto complete please');
-
-        li2.append(checkBox);
+    	console.debug('**** version A ****');
+    	
+    	//FIXME: should not hard code, handle multi-valued parameters correctly
+    	var searchTypes = 'http://purl.org/podd/ns/poddScience#Platform';
+    	
+    	var artifactUri;
+    	if (typeof podd.artifactIri != 'undefined' && podd.artifactIri != 'undefined')
+    	{
+    		artifactUri = podd.artifactIri;
+    		console.debug('Artifact URI was set to : ' + artifactUri);
+    	}
+    	
+        var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
+        var hiddenValueElement =  podd.addFieldInputText(nextField, 'hidden', nextSchemaDatabank);
+        podd.addAutoCompleteHandler(input, hiddenValueElement, nextArtifactDatabank, searchTypes, artifactUri, isNew);
+        
+        li2.append(input);
+        li2.append(hiddenValueElement);
     }
     else { // default
         podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + nextField.displayValue
@@ -619,9 +633,15 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
     return select;
 };
 
-/*
- * Search Ontology Resource Service using AJAX, convert the RDF response to a
- * JSON array and invoke the callback function.
+/**
+ * Call Search Ontology Resource Service using AJAX, convert the RDF response to
+ * a JSON array and invoke the specified callback function.
+ * 
+ * @param request
+ *            Object containing the 'search term', 'search types' and artifact
+ *            URI to search in
+ * @param callbackFunction
+ *            Function to be invoked on completion of the search request
  */
 podd.searchOntologyService = function(
 /* object with 'search term' */request,
@@ -630,13 +650,13 @@ podd.searchOntologyService = function(
     var requestUrl = podd.baseUrl + '/search';
 
     if (console && console.debug) {
-        console.debug('Searching artifact: "' + artifactUri.toString() + '" in searchTypes: "' + request.searchTypes
+        console.debug('Searching artifact: "' + request.artifactUri + '" in searchTypes: "' + request.searchTypes
                 + '" for terms matching "' + request.term + '".');
     }
 
     queryParams = {
         searchterm : request.term,
-        artifacturi : artifactUri.toString(),
+        artifacturi : request.artifactUri,
         searchtypes : request.searchTypes
     };
 
@@ -780,33 +800,6 @@ podd.submitPoddObjectUpdate = function(
     });
 };
 
-/*
- * Call Search Ontology Resource Service using AJAX, convert the RDF response to
- * a JSON array and set to the array as autocomplete data.
- */
-podd.autoCompleteSource = function(/* object with 'search term' */request, /* function */responseCallback) {
-
-    var requestUrl = podd.baseUrl + '/search';
-
-    var searchTypes = $('#podd_type').attr('value');
-
-    console.debug('Searching artifact: "' + artifactIri.toString() + '" in searchTypes: "' + searchTypes
-            + '" for terms matching "' + request.term + '".');
-
-    queryParams = {
-        searchterm : request.term,
-        artifacturi : artifactIri.toString(),
-        searchtypes : searchTypes
-    };
-
-    $.get(requestUrl, queryParams, function(data) {
-        console.debug('Response: ' + data.toString());
-        var formattedData = podd.parseSearchResults(requestUrl, data);
-        // console.debug(formattedData);
-        responseCallback(formattedData);
-    }, 'json');
-};
-
 /**
  * Parse the RDF received from the server and create a JSON array.
  */
@@ -935,25 +928,36 @@ podd.getProjectTitle = function(nextDatabank) {
     return nodeChildren[0];
 };
 
-// Add autocompleteHandlers
-podd.addAutoCompleteHandler = function(/* object */autoComplete, /* object */hiddenValueElement, /* object */
-nextArtifactDatabank, /* boolean */
-isNew) {
-    // $(".autocomplete")
+/**
+ * Add autocompleteHandlers
+ * 
+ * @param autoComplete
+ *            object to have auto completion
+ * @param hiddenValueElement
+ *            a hidden element where the URI value of the auto completion object
+ *            is to be saved
+ * @param nextArtifactDatabank
+ *            databank
+ * @param searchTypes
+ * @param artifactUri           
+ * @param isNew
+ *            boolean
+ */
+podd.addAutoCompleteHandler = function(/* object */autoComplete, /* object */
+		hiddenValueElement, /* object */
+		nextArtifactDatabank,
+		/* object */searchTypes,
+		/* object */artifactUri,
+		/* boolean */isNew) {
+
     autoComplete.autocomplete({
         delay : 500, // milliseconds
-        minLength : 2, // minimum length to trigger
-        // autocomplete
-        // FIXME: The following needs to be called with the current context to
-        // know what to update when it succeeds
-        source : function(param1, param2, param3) {
-            console.debug("source for autocomplete");
-            console.debug(param1);
-            console.debug(param2);
-            console.debug(param3);
-            console.debug(this);
-            console.debug($(this));
-            podd.autoCompleteSource();
+        minLength : 2, // min length to trigger
+        
+        source : function(request, callbackFunction) {
+            request.searchTypes = searchTypes;
+            request.artifactUri = artifactUri;
+            podd.searchOntologyService(request, callbackFunction);
         },
 
         focus : function(event, ui) {
