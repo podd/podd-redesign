@@ -23,6 +23,12 @@ var DISPLAY_Table = 'http://purl.org/podd/ns/poddBase#DisplayType_Table';
 // --------------------------------
 
 /**
+ * Set this to have multiple 'searchtypes' query parameters sent to the
+ * SearchOntologyService
+ */
+jQuery.ajaxSettings.traditional = true;
+
+/**
  * Creates a new rdfquery.js databank, adds common prefixes to it, and then
  * returns the databank to the caller.
  */
@@ -475,16 +481,28 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         li2.append(checkBox);
     }
     else if (nextField.displayType == DISPLAY_AutoComplete) {
-    	console.debug('**** version A ****');
+
+		// - set search Types
+		var searchTypes = [ 'http://www.w3.org/2002/07/owl#Thing' ];
+		var nextSchemaQuery = $.rdf({
+			databank : nextSchemaDatabank
+		})
+		//
+		.where(' ?x owl:onProperty <' + nextField.propertyUri + '> ')
+		// 
+		.where(' ?x owl:allValuesFrom ?rangeClass');
+        var nextSchemaBindings = nextSchemaQuery.select();
+        if (nextSchemaBindings.length > 0) {
+			$.each(nextSchemaBindings, function(nextIndex, nextValue) {
+				searchTypes.push(nextValue.rangeClass.value);
+			});
+		}
     	
-    	//FIXME: should not hard code, handle multi-valued parameters correctly
-    	var searchTypes = 'http://purl.org/podd/ns/poddScience#Platform';
-    	
+        // - set artifact URI
     	var artifactUri;
     	if (typeof podd.artifactIri != 'undefined' && podd.artifactIri != 'undefined')
     	{
     		artifactUri = podd.artifactIri;
-    		console.debug('Artifact URI was set to : ' + artifactUri);
     	}
     	
         var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
@@ -939,18 +957,19 @@ podd.getProjectTitle = function(nextDatabank) {
  * @param nextArtifactDatabank
  *            databank
  * @param searchTypes
- * @param artifactUri           
+ * @param artifactUri
  * @param isNew
  *            boolean
  */
-podd.addAutoCompleteHandler = function(/* object */autoComplete, /* object */
-		hiddenValueElement, /* object */
-		nextArtifactDatabank,
-		/* object */searchTypes,
-		/* object */artifactUri,
-		/* boolean */isNew) {
+podd.addAutoCompleteHandler = function(
+/* object */autoComplete,
+/* object */hiddenValueElement,
+/* object */nextArtifactDatabank,
+/* object array */searchTypes,
+/* object */artifactUri,
+/* boolean */isNew) {
 
-    autoComplete.autocomplete({
+	autoComplete.autocomplete({
         delay : 500, // milliseconds
         minLength : 2, // min length to trigger
         
