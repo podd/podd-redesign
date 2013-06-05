@@ -407,8 +407,8 @@ public abstract class AbstractPoddSesameManagerTest
                         ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasPublicationStatus"),
                         ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasControl"),
                         ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasWildType"),
-                // ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                // "ANZSRCAssertion"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
                 };
         
         final URI[][] expectedMembers =
@@ -450,14 +450,16 @@ public abstract class AbstractPoddSesameManagerTest
                                         "WildType_NotApplicable"),
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
                                         "WildType_Unknown") },
-                        
+                                        
                         {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC_Yes"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC_No"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "ANZSRC_NotApplicable"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "ANZSRC_Unknown") }, };
+                            ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "ANZSRC-NotApplicable"),
+                            ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "ANZSRC06-Biological-Sciences"),
+                            ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT,
+                                    "ANZSRC07-Agriculture-and-Veterinary-Sciences") },
+                                    
+                        {}, // IMPORTANT: <poddScience:Platform> is not a Collection
+                                    
+                        };
         
         // iterate through test data
         for(int i = 0; i < collectionsToTest.length; i++)
@@ -1184,24 +1186,25 @@ public abstract class AbstractPoddSesameManagerTest
         final Object[][] testData =
                 {
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                151, 20, 0 },
+                                161, 21, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                206, 26, 6 },
+                                251, 32, 9 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                84, 11, 0 },
+                                86, 11, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                92, 12, 1 },
+                                112, 15, 3 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),
-                                false, 42, 5, 0 },
+                                false, 48, 6, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                50, 6, 1 },
+                                74, 10, 3 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
-                                false, 58, 7, 0 },
+                                false, 64, 8, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
-                                true, 66, 8, 1 }, };
+                                true, 90, 12, 3 }, 
+                                };
         
         for(final Object[] element : testData)
         {
