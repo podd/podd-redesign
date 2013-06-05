@@ -237,6 +237,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * @return A List of URIs representing all valid members of the given Collection, or an empty
      *         list if the property does not have a pre-defined set of possible members.
      * @throws OpenRDFException
+     * 
+     * @deprecated Unused. Somewhat similar functionality is available in {@link getInstancesOf()}.
      */
     @Override
     public List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI propertyUri,
