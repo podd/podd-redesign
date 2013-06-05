@@ -32,8 +32,16 @@ public class DebugUtils
         
         for(final Statement stmt : allStatements)
         {
-            System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {" + stmt.getObject()
-                    + "}");
+            if(stmt.getContext() == null)
+            {
+                System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {"
+                        + stmt.getObject() + "}");
+            }
+            else
+            {
+                System.out.println("   {" + stmt.getSubject() + "}   <" + stmt.getPredicate() + ">  {"
+                        + stmt.getObject() + "} [" + stmt.getContext() + "]");
+            }
         }
         System.out.println("==================================================");
     }
