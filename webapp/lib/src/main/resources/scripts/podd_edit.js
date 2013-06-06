@@ -330,11 +330,11 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
        	{
             propertyUris.push(nextChild.propertyUri);
             propertyList.push(nextChild);
-            if (typeof console !== "undefined" && console.debug) {
-                console.debug("[" + nextChild.weight + "] propertyUri=<" + nextChild.propertyUri + "> label=\""
-                        + nextChild.propertyLabel + "\" displayType=<" + nextChild.displayType + "> card=<"
-                        + nextChild.cardinality + ">");
-            }
+//            if (typeof console !== "undefined" && console.debug) {
+//                console.debug("[" + nextChild.weight + "] propertyUri=<" + nextChild.propertyUri + "> label=\""
+//                        + nextChild.propertyLabel + "\" displayType=<" + nextChild.displayType + "> card=<"
+//                        + nextChild.cardinality + ">");
+//            }
        	}
         else
         {
@@ -346,14 +346,17 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
 
     //propertyList = $.unique(propertyList);
     
-    // sort property list
+    // sort property list in ascending order of weight
     propertyList.sort(function(a, b) {
         var aID = a.weight;
         var bID = b.weight;
         
-        //TODO: on equal weights sort by label/property URI to get a consistent order
-        
-        return (aID == bID) ? 0 : (aID > bID) ? 1 : -1;
+        if (aID == bID) {
+        	// on equal weights sort by property label
+        	return (a.propertyLabel > b.propertyLabel) ? 1: -1;
+        } else {
+        	return (aID - bID);
+        }
     });
     // Reset the details list
     $(DETAILS_LIST_Selector).empty();
@@ -623,8 +626,7 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
     //
     .optional('?pValue rdfs:label ?pDisplayValue');
     var bindings = myQuery.select();
-    console.debug('Found ' + bindings.length + ' bindings for query');
-    console.debug(bindings);
+
     $.each(bindings, function(index, value) {
 
         var optionValue = value.pValue.value;
