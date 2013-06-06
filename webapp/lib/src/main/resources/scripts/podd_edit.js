@@ -257,8 +257,6 @@ podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifa
  * Ontology Service. This should be done for autocomplete handlers in
  * addAutoCompleteBlurHandler
  * 
- * Also, this returns weights that are given in the schemas. Since there can be
- * properties without weights, sorting them only by weight is insufficient.
  * FIXME: Any properties without weights should have them added, just as any
  * properties without labels should have them added.
  */
