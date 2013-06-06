@@ -948,8 +948,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 15, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 7,
+        Assert.assertEquals("Display Model not of expected size", 19, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 9,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals(
@@ -995,8 +995,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 39, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 16,
+        Assert.assertEquals("Display Model not of expected size", 43, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 18,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals(
@@ -1051,7 +1051,7 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 78, displayModel.size());
+        Assert.assertEquals("Display Model not of expected size", 82, displayModel.size());
         Assert.assertEquals("Not the expected no. of statements about object", 19,
                 displayModel.filter(objectUri, null, null).size());
         
@@ -1185,25 +1185,28 @@ public abstract class AbstractPoddSesameManagerTest
         // expected property count, do-not-display statement count
         final Object[][] testData =
                 {
+                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"),
+                                false, 0, -1, 0 },                
+                
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                162, 21, 0 },
+                                179, 23, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                252, 32, 9 },
+                                269, 34, 9 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                86, 11, 0 },
+                                103, 13, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                112, 15, 3 },
+                                129, 17, 3 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),
-                                false, 48, 6, 0 },
+                                false, 65, 8, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                74, 10, 3 },
+                                91, 12, 3 },
                         
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
-                                false, 64, 8, 0 },
+                                false, 81, 10, 0 },
                         { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
-                                true, 90, 12, 3 }, 
+                                true, 107, 14, 3 }, 
                                 };
         
         for(final Object[] element : testData)
