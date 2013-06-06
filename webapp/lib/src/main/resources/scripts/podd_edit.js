@@ -344,8 +344,6 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         }
     });
 
-    //propertyList = $.unique(propertyList);
-    
     // sort property list in ascending order of weight
     propertyList.sort(function(a, b) {
         var aID = a.weight;
