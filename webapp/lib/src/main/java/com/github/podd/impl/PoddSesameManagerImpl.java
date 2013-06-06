@@ -1063,6 +1063,47 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         results.addAll(rdfsQueryResults);
         
         properties.addAll(rdfsQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
+
+        /*
+         * If no properties could be found so far, return the empty Model. Continuing further
+         * results in erroneously adding statements about RDFS:Label and RDFS:Comment.
+         */
+        if (properties.isEmpty())
+        {
+            return results;
+        }
+        
+        /*
+         * add statements for annotation properties RDFS:Label and RDFS:Comment
+         */
+        final URI[] commonAnnotationProperties = { RDFS.LABEL, RDFS.COMMENT };
+        for(URI annotationProperty : commonAnnotationProperties)
+        {
+            final StringBuilder annotationQuery = new StringBuilder();
+            
+            annotationQuery.append("CONSTRUCT { ");
+            annotationQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
+            annotationQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+            annotationQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?annotationProperty . ");
+            annotationQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
+            
+            annotationQuery.append("} WHERE {");
+            annotationQuery.append(" ?annotationProperty <" + RDFS.RANGE.stringValue() + "> ?rangeClass . ");
+            annotationQuery.append("}");
+            
+            final GraphQuery annotationGraphQuery =
+                    repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, annotationQuery.toString());
+            annotationGraphQuery.setBinding("objectType", objectType);
+            annotationGraphQuery.setBinding("annotationProperty", annotationProperty);
+            
+            this.log.info("Created SPARQL {} \n   with objectType bound to {} and annotationProperty {}",
+                    annotationQuery, objectType, annotationProperty);
+            
+            final Model annotationQueryResults = this.executeGraphQuery(annotationGraphQuery, contexts);
+            
+            results.addAll(annotationQueryResults);
+            properties.addAll(annotationQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
+        }
         
         // -- for each property, get meta-data about it
         
@@ -1120,7 +1161,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 {
                     results.add((URI)property, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
                 }
-                
+                else if(property.equals(RDFS.LABEL))
+                {
+                    results.add((URI)property, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY,
+                            PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE);
+                }
+                    
                 // --- for 'drop-down' type properties, add all possible options into Model
                 if(results.contains((URI)property, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE,
                         PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN))

@@ -84,34 +84,7 @@
 		<a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 	</h3>	
 	<form id="editObjectForm">
-		<!-- FIXME: These are not populated or handled by Javascript yet. Ideally rdfs:label and rdfs:comment should be in the property list, but it appears they are not. -->
-		<div id='basicdetails'>  <!-- Collapsible div -->
-			<!-- standard attributes -->
-			<ol>
-				<!-- object name -->
-	        	<li>
-		            <label for="object_name" class="bold">Title:
-						<span icon="required"></span>
-					</label>
-                </li>
-                <li>
-	                <input id="object_name" name="object_name" type="text" value="">
-	                <h6 class="errorMsg">${objectNameError!""}</h6>
-	            </li>
-	            
-	            <!-- object description -->
-	            <li>
-		            <label for="object_description" class="bold">Description:</label>
-                </li>
-                <li>
-					<textarea id="object_description" name="object_description" cols="30" rows="2"></textarea>
-	                <span id="object_desc_text_limit"></span>
-	                <h6 class="errorMsg">${objectDescriptionError!""}</h6>
-				</li>
-
-            </ol>
-		
-		<!--  other attributes -->
+		<!--  all attributes -->
 		<div id='details'>  <!-- Collapsible div -->
 			<ol>
             </ol>
