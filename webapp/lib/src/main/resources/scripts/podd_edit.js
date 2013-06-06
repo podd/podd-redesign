@@ -447,7 +447,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     // li2.attr('id', 'id_li_' + nextField.propertyUri);
 
     if (nextField.displayType == DISPLAY_LongText) {
-        var input = podd.addFieldInputText(nextField, 'textarea', nextSchemaDatabank);
+        var input = podd.addFieldTextArea(nextField, 30, 2, nextSchemaDatabank);
         podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
         if (typeof link !== 'undefined') {
             link.click(function() {
@@ -595,6 +595,36 @@ podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
 
     return input;
 };
+
+/**
+ * Construct an HTML TextArea element.
+ * 
+ * @param nextField
+ * 			Object containing values and meta-data of the current property
+ * @param noOfColumns
+ * 			number of columns in the TextArea
+ * @param noOfRows
+ * 			number of rows in the TextArea
+ * @param nextSchemaDatabank
+ * 			Databank containing all meta-data
+ */
+podd.addFieldTextArea = function(nextField, noOfColumns, noOfRows, nextSchemaDatabank) {
+
+    var textarea = $('<textarea>', {
+        name : 'name_' + nextField.propertyLabel,
+        cols : noOfColumns,
+        rows : noOfRows,
+        value : nextField.displayValue
+    });
+
+    // add handler to process changes to this field
+    // - handler should have property URI
+    // - detect if value actually changed
+    // - if changed, update the "instance" databank and set dirty flag
+
+    return textarea;
+};
+
 
 /**
  * Construct an HTML drop-down list for the given field without using
