@@ -20,10 +20,10 @@ public interface TestConstants
     public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE = 341;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED = 71;
     
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE = 1270;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE = 1272;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED = 215;
     
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE = 239;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE = 242;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED = 350;
     
     /** Test resource: artifact with no internal objects */
