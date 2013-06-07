@@ -90,10 +90,14 @@
             </ol>
 	    </div>  <!-- details - Collapsible div -->
 	    
-	    <input type="submit">Save object</input>
+		<h3 class="underlined_heading"> </h3> <!-- just want the line -->
+		<div id="buttonwrapper">
+	    	<button type="submit" name="createObject" value="createObject">Submit</button>
+	    	<button type="reset" name="reset" value="reset">Reset</button>
+	        <button type="submit" name="cancel" value="cancel">Cancel</button>
+	        <button type="submit" name="reinitialize" value="reinitialize">ReInitialize</button>
+	    </div>
 	</form>
-
-
 		
 		
     <script type="text/javascript">
