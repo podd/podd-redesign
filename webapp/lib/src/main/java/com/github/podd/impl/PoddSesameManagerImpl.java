@@ -1041,7 +1041,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         rdfsQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
         
         rdfsQuery.append("} WHERE {");
-        rdfsQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?actualObjectType . ");
+        rdfsQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">* ?actualObjectType . ");
         rdfsQuery.append(" ?propertyUri <" + RDFS.DOMAIN.stringValue() + "> ?actualObjectType . ");
         rdfsQuery.append(" ?propertyUri <" + RDFS.RANGE.stringValue() + "> ?rangeClass . ");
         
