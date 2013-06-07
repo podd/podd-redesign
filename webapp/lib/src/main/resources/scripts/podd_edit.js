@@ -140,14 +140,14 @@ podd.updateDatabank = function(/* object */changesets, /* object */nextDatabank)
     $.each(changesets, function(index, changeset) {
         if (!changeset.isNew) {
             $.each(changeset.oldTriples, function(nextOldTripleIndex, nextOldTriple) {
-                console.debug('[updateDatabank] remove oldTriple: ' + nextOldTriple);
+                podd.debug('[updateDatabank] remove oldTriple: ' + nextOldTriple);
                 nextDatabank.remove(nextOldTriple);
             });
         }
     });
     $.each(changesets, function(index, changeset) {
         $.each(changeset.newTriples, function(nextNewTripleIndex, nextNewTriple) {
-            console.debug('[updateDatabank] add newTriple: ' + nextNewTriple);
+            podd.debug('[updateDatabank] add newTriple: ' + nextNewTriple);
             nextDatabank.add(nextNewTriple);
         });
     });
@@ -161,7 +161,7 @@ podd.deleteTriples = function(nextDatabank, subject, property) {
     $.rdf({
         databank : nextDatabank
     }).where(subject + ' ' + property + ' ?object').sources().each(function(index, tripleArray) {
-        console.debug('[deleteTriples] object to delete = ' + tripleArray[0]);
+        podd.debug('[deleteTriples] object to delete = ' + tripleArray[0]);
         nextDatabank.remove(tripleArray[0]);
     });
 };
@@ -184,8 +184,15 @@ podd.debugPrintDatabank = function(databank, message) {
     var triples = $.toJSON(databank.dump({
         format : 'application/json'
     }));
+    podd.debug(message + ': (' + databank.size() + ') ' + triples);
+};
+
+/**
+ * Print debug message to console.
+ */
+podd.debug = function(message) {
     if (typeof console !== "undefined" && console.debug) {
-        console.debug(message + ': (' + databank.size() + ') ' + triples);
+        console.debug('[DEBUG] ' + message);
     }
 };
 
@@ -201,15 +208,12 @@ podd.debugPrintDatabank = function(databank, message) {
  */
 podd.getObjectTypeMetadata = function(/* String */objectTypeUri, /* function */successCallback, /* object */
 nextSchemaDatabank, /* object */nextArtifactDatabank) {
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('[getMetadata]  "' + objectTypeUri + '" .');
-    }
+
+	podd.debug('[getMetadata]  "' + objectTypeUri + '" .');
 
     var requestUrl = podd.baseUrl + '/metadata';
 
-    if (typeof console !== "undefined" && console.debug) {
-        console.debug('[getMetadata] Request (GET):  ' + requestUrl);
-    }
+    podd.debug('[getMetadata] Request (GET):  ' + requestUrl);
 
     $.ajax({
         url : requestUrl,
@@ -219,24 +223,18 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
         },
         dataType : 'json', // what is expected back
         success : function(resultData, status, xhr) {
-            if (typeof console !== "undefined" && console.debug) {
-                console.debug('[getObjectTypeMetadata] ### SUCCESS ### ');
-                console.debug(resultData);
-            }
+            podd.debug('[getObjectTypeMetadata] ### SUCCESS ### ');
+			podd.debug(resultData);
 
             nextSchemaDatabank.load(resultData);
 
-            if (typeof console !== "undefined" && console.debug) {
-                console.debug('Schema Databank size = ' + nextSchemaDatabank.size());
-            }
+            podd.debug('Schema Databank size = ' + nextSchemaDatabank.size());
 
             successCallback(objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
-            if (typeof console !== "undefined" && console.debug) {
-                console.debug('[getMetadata] $$$ ERROR $$$ ' + error);
-                console.debug(xhr.statusText);
-            }
+            podd.debug('[getMetadata] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
         }
     });
 };
@@ -251,11 +249,6 @@ podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifa
 
 /**
  * Callback function when RDF containing metadata is available
- * 
- * FIXME: Since the the metadata we get back does not contain Options for
- * drop-down type values, those have to be searched for using the Search
- * Ontology Service. This should be done for autocomplete handlers in
- * addAutoCompleteBlurHandler
  * 
  * FIXME: Any properties without weights should have them added, just as any
  * properties without labels should have them added.
@@ -301,7 +294,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
             nextChild.propertyLabel = nextBinding.propertyLabel.value;
         }
         else {
-            console.debug("Did not find a label for property: " + nextBinding.propertyUri.value);
+            podd.debug("Did not find a label for property: " + nextBinding.propertyUri.value);
             nextChild.propertyLabel = nextBinding.propertyUri.value;
         }
 
@@ -328,17 +321,13 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
        	{
             propertyUris.push(nextChild.propertyUri);
             propertyList.push(nextChild);
-//            if (typeof console !== "undefined" && console.debug) {
-//                console.debug("[" + nextChild.weight + "] propertyUri=<" + nextChild.propertyUri + "> label=\""
+//                podd.debug("[" + nextChild.weight + "] propertyUri=<" + nextChild.propertyUri + "> label=\""
 //                        + nextChild.propertyLabel + "\" displayType=<" + nextChild.displayType + "> card=<"
 //                        + nextChild.cardinality + ">");
-//            }
        	}
         else
         {
-            if (typeof console !== "undefined" && console.debug) {
-            	console.debug("Duplicate property found: "+nextChild.propertyUri);
-        	}
+            podd.debug("Duplicate property found: "+nextChild.propertyUri);
         }
     });
 
@@ -354,6 +343,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         	return (aID - bID);
         }
     });
+    
     // Reset the details list
     $(DETAILS_LIST_Selector).empty();
 
@@ -372,7 +362,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         // If there are values for the property in the artifact
         // databank, display them instead of showing a single new empty field
         if (nextArtifactBindings.length > 0) {
-            console.debug("Found existing values for " + podd.getCurrentObjectUri() + " property <" + value.propertyUri
+            podd.debug("Found existing values for " + podd.getCurrentObjectUri() + " property <" + value.propertyUri
                     + "> value=" + nextArtifactBindings);
             $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
                 // found existing value for property
@@ -388,22 +378,30 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
             });
         }
         else {
-            console.debug("Found no existing values for " + podd.getCurrentObjectUri() + " property <"
+            podd.debug("Found no existing values for " + podd.getCurrentObjectUri() + " property <"
                     + value.propertyUri + "> value=" + nextArtifactBindings);
             $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
         }
     });
 };
 
-/*
+/**
  * Display the given field on page
+ * 
+ * @param nextField
+ *            Object containing details of field to be displayed
+ * @param nextSchemaDatabank
+ *            Databank containing schema triples
+ * @param nextArtifactDatabank
+ *            Databank containing artifact triples
+ * @param isNew
+ *            Boolean value indicating whether this field is new or a value
+ *            exists
  */
 podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatabank, isNew) {
-    if (typeof console !== "undefined" && console.debug) {
-		// console.debug('[' + nextField.weight + '] <' + nextField.propertyUri
-		// + '> "' + nextField.propertyLabel + '" <' +
-		// nextField.displayType + '> <' + nextField.cardinality + '>');
-	}
+	// podd.debug('[' + nextField.weight + '] <' + nextField.propertyUri
+	// + '> "' + nextField.propertyLabel + '" <' +
+	// nextField.displayType + '> <' + nextField.cardinality + '>');
 
     // field name
     var span = $('<span>');
@@ -634,7 +632,7 @@ podd.addFieldTextArea = function(nextField, noOfColumns, noOfRows, nextSchemaDat
  * into the schema databank prior to calling this method.
  */
 podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDatabank, isNew) {
-    console.debug("addFieldDropDownListNonAutoComplete");
+    podd.debug("addFieldDropDownListNonAutoComplete");
     var select = $('<select>', {
         // id : 'id_' + nextField.propertyUri,
         name : 'name_' + encodeURIComponent(nextField.propertyLabel),
@@ -664,7 +662,7 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
 
         var selectedVal = false;
         if (nextField.valueUri == optionValue) {
-            console.debug('SELECTED option = ' + optionValue);
+            podd.debug('SELECTED option = ' + optionValue);
             selectedVal = true;
         }
 
@@ -696,10 +694,8 @@ podd.searchOntologyService = function(
 
     var requestUrl = podd.baseUrl + '/search';
 
-    if (console && console.debug) {
-        console.debug('Searching artifact: "' + request.artifactUri + '" in searchTypes: "' + request.searchTypes
-                + '" for terms matching "' + request.term + '".');
-    }
+    podd.debug('Searching artifact: "' + request.artifactUri + '" in searchTypes: "' + request.searchTypes
+            + '" for terms matching "' + request.term + '".');
 
     queryParams = {
         searchterm : request.term,
@@ -708,13 +704,9 @@ podd.searchOntologyService = function(
     };
 
     $.get(requestUrl, queryParams, function(data) {
-        if (console && console.debug) {
-            console.debug('Response: ' + data.toString());
-        }
+        podd.debug('Response: ' + data.toString());
         var formattedData = podd.parseSearchResults(requestUrl, data);
-        if (console && console.debug) {
-            console.debug('No. of search results = ' + formattedData.length);
-        }
+        podd.debug('No. of search results = ' + formattedData.length);
         callbackFunction(formattedData);
     }, 'json');
 };
@@ -723,7 +715,7 @@ podd.searchOntologyService = function(
 podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, updateDisplayCallbackFunction) {
     var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
-    console.debug('[getArtifact] Request to: ' + requestUrl);
+    podd.debug('[getArtifact] Request to: ' + requestUrl);
     $.ajax({
         url : requestUrl,
         type : 'GET',
@@ -734,7 +726,7 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
         	// FIXME: have a separate method which deletes everything
             podd.deleteTriples(nextArtifactDatabank, "?subject", "?predicate");
             nextArtifactDatabank.load(resultData);
-            console.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextArtifactDatabank.size());
+            podd.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextArtifactDatabank.size());
 
             // update variables and page contents with retrieved artifact info
             var artifactId = podd.getOntologyID(nextArtifactDatabank);
@@ -750,8 +742,8 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
             updateDisplayCallbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
-            console.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
-            // console.debug(xhr.statusText);
+            podd.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
+            // podd.debug(xhr.statusText);
         }
     });
 
@@ -778,7 +770,7 @@ podd.submitPoddObjectUpdate = function(
         format : 'application/json'
     }));
 
-    console.debug('[updatePoddObject]  "' + objectUri);
+    podd.debug('[updatePoddObject]  "' + objectUri);
     if (typeof artifactIri === 'undefined') {
         artifactIri = '<urn:temp:uuid:artifact>';
     }
@@ -793,17 +785,17 @@ podd.submitPoddObjectUpdate = function(
     	// FIXME: Why is the parameter isForce hardcoded to true?
         requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri) + '&isforce=true';
         if (typeof versionIri !== "undefined") {
-            console.debug(' of artifact (' + versionIri + ').');
+            podd.debug(' of artifact (' + versionIri + ').');
             // set query parameters in the URI as setting them under data
             // failed, mostly leading to a 415 error
             requestUrl = requestUrl + '&versionuri=' + encodeURIComponent(versionIri);
         }
         if (typeof objectUri !== 'undefined') {
-            console.debug(' on object (' + objectUri + ').');
+            podd.debug(' on object (' + objectUri + ').');
             requestUrl = requestUrl + '&objectUri=' + encodeURIComponent(objectUri);
         }
     }
-    console.debug('[updatePoddObject] Request (POST):  ' + requestUrl);
+    podd.debug('[updatePoddObject] Request (POST):  ' + requestUrl);
 
     $.ajax({
         url : requestUrl,
@@ -814,8 +806,8 @@ podd.submitPoddObjectUpdate = function(
             xhr.setRequestHeader("Accept", "application/rdf+json");
         },
         success : function(resultData, status, xhr) {
-            console.debug('[updatePoddObject] ### SUCCESS ### ' + resultData);
-            // console.debug('[updatePoddObject] ' + xhr.responseText);
+            podd.debug('[updatePoddObject] ### SUCCESS ### ' + resultData);
+            // podd.debug('[updatePoddObject] ' + xhr.responseText);
             var message = '<div>Successfully edited artifact.<pre>' + xhr.responseText + '</pre></div>';
             podd.updateErrorMessageList(message);
 
@@ -839,8 +831,8 @@ podd.submitPoddObjectUpdate = function(
             podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, updateCallback);
         },
         error : function(xhr, status, error) {
-            console.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
-            console.debug(xhr.statusText);
+            podd.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
             var message = '<div>Failed to store artifact.<pre>' + xhr.responseText + '</pre></div>';
             podd.updateErrorMessageList(message);
         }
@@ -851,12 +843,12 @@ podd.submitPoddObjectUpdate = function(
  * Parse the RDF received from the server and create a JSON array.
  */
 podd.parseSearchResults = function(/* string */searchURL, /* rdf/json */data) {
-    // console.debug("Parsing search results");
+    // podd.debug("Parsing search results");
     var nextDatabank = $.rdf.databank();
 
     var rdfSearchResults = nextDatabank.load(data);
 
-    // console.debug("About to create query");
+    // podd.debug("About to create query");
     var myQuery = $.rdf({
         databank : nextDatabank
     }).where('?pUri <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel');
@@ -912,8 +904,8 @@ podd.getOntologyID = function(nextDatabank) {
                     });
 
                     if (nodeChildren.length > 1) {
-                        console.debug('[getVersion] ERROR - More than 1 artifact top object statement found!!!');
-                        console.debug(bindings);
+                        podd.debug('[getVersion] ERROR - More than 1 artifact top object statement found!!!');
+                        podd.debug(bindings);
                     }
                 }
                 else {
@@ -931,16 +923,16 @@ podd.getOntologyID = function(nextDatabank) {
                     });
 
                     if (nodeChildren.length > 1) {
-                        console.debug('[getVersion] ERROR - More than 1 artifact top object statement found!!!');
-                        console.debug(bindings);
+                        podd.debug('[getVersion] ERROR - More than 1 artifact top object statement found!!!');
+                        podd.debug(bindings);
                     }
                 }
                 nodeChildren.push(nextChild);
             });
 
     if (nodeChildren.length > 1) {
-        console.debug('[getVersion] ERROR - More than 1 version IRI statement found!!!');
-        console.debug(bindings);
+        podd.debug('[getVersion] ERROR - More than 1 version IRI statement found!!!');
+        podd.debug(bindings);
     }
 
     return nodeChildren;
@@ -953,7 +945,7 @@ podd.getOntologyID = function(nextDatabank) {
  * artifact contained within contained within.
  */
 podd.getProjectTitle = function(nextDatabank) {
-    console.debug("[getProjectTitle] start");
+    podd.debug("[getProjectTitle] start");
 
     var myQuery = $.rdf({
         databank : nextDatabank
@@ -969,7 +961,7 @@ podd.getProjectTitle = function(nextDatabank) {
     });
 
     if (nodeChildren.length > 1) {
-        console.debug('[getProjectTitle] ERROR - More than 1 Project Title found!!!');
+        podd.debug('[getProjectTitle] ERROR - More than 1 Project Title found!!!');
     }
 
     return nodeChildren[0];
@@ -1015,7 +1007,7 @@ podd.addAutoCompleteHandler = function(
         },
 
         select : function(event, ui) {
-            console.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
+            podd.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
             hiddenValueElement.val(ui.item.value);
             $(this).val(ui.item.label);
             // $('#message1').html('Selected : ' + ui.item.value);
@@ -1023,9 +1015,9 @@ podd.addAutoCompleteHandler = function(
         },
 
         blur : function(event, ui) {
-            console.debug("autocomplete blur event");
-            console.debug(event);
-            console.debug(ui);
+            podd.debug("autocomplete blur event");
+            podd.debug(event);
+            podd.debug(ui);
             var objectUri = podd.getCurrentObjectUri();
 
             var attributes = [];
@@ -1036,7 +1028,7 @@ podd.addAutoCompleteHandler = function(
             nextAttribute.newValue = '<' + hiddenValueElement.val() + '>';
             attributes.push(nextAttribute);
 
-            console.debug('Add new autocomplete property: <' + nextAttribute.property + '> <' + nextAttribute.newValue
+            podd.debug('Add new autocomplete property: <' + nextAttribute.property + '> <' + nextAttribute.newValue
                     + '>');
 
             podd.updateDatabank(attributes, nextArtifactDatabank);
@@ -1053,8 +1045,8 @@ nextArtifactDatabank, /* boolean */isNew) {
 
     // $(".short_text")
     shortText.blur(function(event) {
-        console.debug("shorttext blur event");
-        console.debug(event);
+        podd.debug("shorttext blur event");
+        podd.debug(event);
 
         var objectUri = podd.getCurrentObjectUri();
 
@@ -1075,7 +1067,7 @@ nextArtifactDatabank, /* boolean */isNew) {
 
             changesets.push(nextChangeset);
 
-            console.debug('Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue
+            podd.debug('Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue
                     + ' (isNew=' + isNew + ')');
 
             podd.updateDatabank(changesets, nextArtifactDatabank);
@@ -1088,7 +1080,7 @@ nextArtifactDatabank, /* boolean */isNew) {
             podd.addShortTextBlurHandler(shortText, propertyUri, newValue, nextArtifactDatabank, false);
         }
         else {
-            console.debug("No change on blur for value for property=" + propertyUri + " original=" + nextOriginalValue
+            podd.debug("No change on blur for value for property=" + propertyUri + " original=" + nextOriginalValue
                     + " newValue=" + newValue);
         }
         // NOTE: Cannot call update to the server after each edit, as some
