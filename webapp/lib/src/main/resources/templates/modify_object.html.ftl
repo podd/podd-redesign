@@ -3,11 +3,10 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-	    if (typeof console !== "undefined" && console.debug) {
-	        console.debug('-------------------');
-	        console.debug('initializing...');
-	        console.debug('-------------------');
-	    }
+        podd.debug('-------------------');
+        podd.debug('initializing...');
+        podd.debug('-------------------');
+
 		podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
 		podd.artifactIri = undefined;
 		podd.versionIri = undefined;
@@ -28,10 +27,8 @@
 		podd.artifactDatabank.add('<mailto:${user.email!'unknown'}> rdf:type poddUser:User');
 		</#if>
 		
-		console.debug("artifact IRI");
-		console.debug(podd.getCurrentArtifactIri());
-		console.debug("object IRI");
-		console.debug(podd.getCurrentObjectUri());
+		podd.debug("artifact IRI: " + podd.getCurrentArtifactIri());
+		podd.debug("object IRI: " + podd.getCurrentObjectUri());
 		
 		if(typeof podd.objectUri === 'undefined' || podd.objectUri === 'undefined') {
 			if(typeof podd.parentUri === 'undefined' || podd.parentUri === 'undefined') {
@@ -53,14 +50,12 @@
 		// Add form submission handler
 		$("#editObjectForm").submit(function(event) {
 			event.preventDefault();
-			console.debug("Attempting to submit update query to server");
+			podd.debug("Attempting to submit update query to server");
 			podd.submitPoddObjectUpdate(podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.schemaDatabank, podd.artifactDatabank, podd.redirectToGetArtifact);
 			return false;
 		});
 	
-	    if (typeof console !== "undefined" && console.debug) {
-	        console.debug('### initialization complete ###');
-	    }
+        podd.debug('### initialization complete ###');
 	});
 </script>
 
