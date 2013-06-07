@@ -1160,7 +1160,7 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(URI, boolean, RepositoryConnection, URI...)}
+     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(URI, boolean, boolean, RepositoryConnection, URI...)}
      * .
      */
     @Test
@@ -1181,50 +1181,59 @@ public abstract class AbstractPoddSesameManagerTest
             contexts.add(nextDirectImport.toOpenRDFURI());
         }
         
-        // Format: Object Type, includeDoNotDisplayProperties, expected model size,
-        // expected property count, do-not-display statement count
+        
+        // Format: Object Type, includeDoNotDisplayProperties, includeContainsSubProperties,
+        // expected model size, expected property count, do-not-display statement count
         final Object[][] testData =
                 {
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"),
-                                false, 0, -1, 0 },                
-                
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                191, 24, 0 },
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                281, 35, 9 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false, true,
+                                0, -1, 0 },
                         
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                107, 14, 0 },
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                133, 18, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, true, 191,
+                                24, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, false, 141,
+                                17, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true, true, 281, 35,
+                                9 },
                         
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"),
-                                false, 65, 8, 0 },
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                91, 12, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false, true, 107,
+                                14, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true, true, 133,
+                                18, 3 },
                         
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
-                                false, 81, 10, 0 },
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
-                                true, 107, 14, 3 }, 
-                                };
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false, true, 65,
+                                8, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true, true, 91,
+                                12, 3 },
+                        
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false, true,
+                                81, 10, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true, true,
+                                107, 14, 3 },                                };
         
         for(final Object[] element : testData)
         {
-            final Model model =
-                    this.testPoddSesameManager.getObjectTypeMetadata((URI)element[0], (Boolean)element[1],
-                            this.testRepositoryConnection, contexts.toArray(new URI[0]));
+            final URI objectType = (URI)element[0];
+            final boolean includeDoNotDisplayProperties = (Boolean)element[1];
+            final boolean includeContainsProperties = (Boolean)element[2];
+            final int expectedTripleCount = (int)element[3];
+            final int expectedPropertyCount = (int)element[4];
+            final int expectedNonDisplayablePropertyCount = (int)element[5];
             
-            if((int)element[2] != model.size())
+            final Model model =
+                    this.testPoddSesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties,
+                            includeContainsProperties, this.testRepositoryConnection, contexts.toArray(new URI[0]));
+            
+            if(expectedTripleCount != model.size())
             {
                 DebugUtils.printContents(model);
             }
             
             // verify:
-            Assert.assertEquals("Not the expected statement count in Model", element[2], model.size());
-            Assert.assertEquals("Not the expected no. of properties", element[3],
-                    model.filter((URI)element[0], null, null).size() - 1);
-            Assert.assertEquals("Not the expected no. of non-displayable properties", element[4],
+            Assert.assertEquals("Not the expected statement count in Model", expectedTripleCount, model.size());
+            Assert.assertEquals("Not the expected no. of properties", expectedPropertyCount,
+                    model.filter(objectType, null, null).size() - 1);
+            Assert.assertEquals("Not the expected no. of non-displayable properties", expectedNonDisplayablePropertyCount,
                     model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
     }

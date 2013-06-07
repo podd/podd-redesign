@@ -971,7 +971,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     
     @Override
     public Model getObjectTypeMetadata(final URI objectType, final boolean includeDoNotDisplayProperties,
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
+            boolean includeContainsProperties, final RepositoryConnection repositoryConnection, final URI... contexts)
+        throws OpenRDFException
     {
         final Model results = new LinkedHashModel();
         if(objectType == null)
@@ -1014,6 +1015,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
         }
         
+        if(!includeContainsProperties)
+        {
+            owlRestrictionQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                    + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+        }        
+        
         owlRestrictionQuery.append("}");
         
         final GraphQuery graphQuery =
@@ -1051,6 +1058,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
         }
         
+        if(!includeContainsProperties)
+        {
+            owlRestrictionQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                    + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+        }        
+
         rdfsQuery.append("}");
         
         final GraphQuery rdfsGraphQuery =

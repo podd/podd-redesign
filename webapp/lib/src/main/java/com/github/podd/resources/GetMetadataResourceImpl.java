@@ -61,6 +61,11 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, true);
         final boolean includeDoNotDisplayProperties = Boolean.valueOf(includeDoNotDisplayPropertiesString);
         
+        // - include sub-properties of PoddBase:contains (optional, defaults to false)
+        final String includeContainsPropertiesString =
+                this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_CONTAINS_SUB_PROPERTIES, true);
+        final boolean includeContainsProperties = Boolean.valueOf(includeContainsPropertiesString);
+        
         this.log.info("@Get Metadata: {} ({})", objectType, variant.getMediaType().getName());
         
         this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
@@ -80,7 +85,7 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
             
             this.getPoddArtifactManager().exportObjectMetadata(PoddRdfConstants.VF.createURI(objectType), output,
                     RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE),
-                    includeDoNotDisplayProperties, artifactID);
+                    includeDoNotDisplayProperties, includeContainsProperties, artifactID);
         }
         catch(final UnmanagedArtifactIRIException e)
         {

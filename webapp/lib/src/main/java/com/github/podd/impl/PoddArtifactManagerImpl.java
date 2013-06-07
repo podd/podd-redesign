@@ -257,7 +257,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public void exportObjectMetadata(final URI objectType, final OutputStream outputStream, final RDFFormat format,
-            final boolean includeDoNotDisplayProperties, final InferredOWLOntologyID artifactID)
+            final boolean includeDoNotDisplayProperties, boolean includeContainsProperties, final InferredOWLOntologyID artifactID)
         throws OpenRDFException, PoddException, IOException
     {
         RepositoryConnection connection = null;
@@ -271,8 +271,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             this.repositoryManager.getSchemaManagementGraph());
             
             final Model model =
-                    this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, connection,
-                            contexts);
+                    this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, includeContainsProperties,
+                            connection, contexts);
             
             Rio.write(model, outputStream, format);
         }

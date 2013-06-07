@@ -214,6 +214,13 @@ public interface PoddWebConstants
     public static final String KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES = "includedndprops";
     
     /**
+     * Key used in "create object" service to indicate whether sub-properties of poddBase:contains are
+     * to be included.
+     */
+    public static final String KEY_INCLUDE_CONTAINS_SUB_PROPERTIES = "includecontainsprops";
+    
+    
+    /**
      * Key used in "get artifact" service to indicate whether inferred axioms should be included in
      * the results.
      */

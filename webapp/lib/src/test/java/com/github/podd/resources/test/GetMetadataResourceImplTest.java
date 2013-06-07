@@ -58,6 +58,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         final String objectType = PoddRdfConstants.PODD_SCIENCE + "Genotype";
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, "true");
+        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_CONTAINS_SUB_PROPERTIES, "true");
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         
         final Representation results =
@@ -88,6 +89,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         final String objectType = PoddRdfConstants.PODD_SCIENCE + "Project";
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
         
+        // include-do-not-display-properties defaults to false
+        // include-contains-sub-properties defaults to false
+        
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
@@ -96,9 +100,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         
         // verify:
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 191);
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 141);
         
-        Assert.assertEquals("Unexpected no. of properties", 24,
+        Assert.assertEquals("Unexpected no. of properties", 17,
                 model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
         Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                 model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());

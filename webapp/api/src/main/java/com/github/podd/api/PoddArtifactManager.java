@@ -96,6 +96,8 @@ public interface PoddArtifactManager
      * @param outputStream
      * @param format
      * @param includeDoNotDisplayProperties
+     * @param includeContainsProperties
+     *            If true, includes sub-properties of poddBase:contains
      * @param artifactID
      *            If present, the artifact ID is used to select the schema ontologies from which
      *            necessary metadata is to be extracted
@@ -104,8 +106,8 @@ public interface PoddArtifactManager
      * @throws IOException
      */
     void exportObjectMetadata(URI objectType, OutputStream outputStream, RDFFormat format,
-            boolean includeDoNotDisplayProperties, final InferredOWLOntologyID artifactID) throws OpenRDFException,
-        PoddException, IOException;
+            boolean includeDoNotDisplayProperties, boolean includeContainsProperties,
+            final InferredOWLOntologyID artifactID) throws OpenRDFException, PoddException, IOException;
     
     /**
      * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI.
