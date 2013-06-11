@@ -313,7 +313,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
             nextChild.cardinality = nextBinding.cardinality.value;
         }
 
-        nextChild.displayValue = '';
+        nextChild.displayValue; //undefined to indicate there is NO value
         nextChild.valueUri = '';
 
         // Avoid duplicates, which are occurring due to multiple ways of specifying ranges/etc., in OWL
@@ -403,6 +403,11 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 	// + '> "' + nextField.propertyLabel + '" <' +
 	// nextField.displayType + '> <' + nextField.cardinality + '>');
 
+	// XXX: extract and add field range. Should do this when creating nextField
+	var range = podd.getPropertyRange(nextField.propertyUri, nextSchemaDatabank);
+	podd.debug('<<<<< [' + nextField.propertyUri + '] has range [' + range + '] >>>>>');
+	nextField.propertyRange = range;
+	
     // field name
     var span = $('<span>');
     span.attr('class', 'bold');
@@ -436,21 +441,19 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         link.attr('icon', 'addField');
         link.attr('title', 'Add ' + nextField.propertyLabel);
         link.attr('class', 'clonable');
-        // link.attr('id', 'cid_' + nextField.propertyUri);
         link.attr('property', nextField.propertyUri);
         li.append(link);
     }
 
     var li2 = $("<li>");
-    // li2.attr('id', 'id_li_' + nextField.propertyUri);
 
     if (nextField.displayType == DISPLAY_LongText) {
         var input = podd.addFieldTextArea(nextField, 30, 2, nextSchemaDatabank);
-        podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
+        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
         if (typeof link !== 'undefined') {
             link.click(function() {
                 var clonedField = input.clone(true);
-                podd.addShortTextBlurHandler(clonedField, nextField.propertyUri, nextField.displayValue,
+                podd.addTextFieldBlurHandler(clonedField, nextField.propertyUri, nextField.displayValue,
                         nextArtifactDatabank, true);
                 // FIXME: Determine correct place to append this to
                 li.append(clonedField);
@@ -460,7 +463,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
         var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
-        podd.addShortTextBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
+        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
@@ -515,7 +518,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
                 + ")");
         // var input = podd.addFieldInputText(nextField, 'text',
         // nextSchemaDatabank);
-        // podd.addShortTextBlurHandler(input, nextField.propertyUri,
+        // podd.addTextFieldBlurHandler(input, nextField.propertyUri,
         // nextField.displayValue, nextArtifactDatabank, isNew);
         // li2.append(input);
     }
@@ -586,6 +589,8 @@ podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
         value : displayValue
     });
 
+    input.attr('datatype', nextField.propertyRange);
+    
     // add handler to process changes to this field
     // - handler should have property URI
     // - detect if value actually changed
@@ -615,6 +620,8 @@ podd.addFieldTextArea = function(nextField, noOfColumns, noOfRows, nextSchemaDat
         value : nextField.displayValue
     });
 
+    textarea.attr('datatype', nextField.propertyRange);
+
     // add handler to process changes to this field
     // - handler should have property URI
     // - detect if value actually changed
@@ -638,6 +645,8 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
         name : 'name_' + encodeURIComponent(nextField.propertyLabel),
     });
 
+    select.attr('datatype', nextField.propertyRange);
+    
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
     })
@@ -1038,15 +1047,31 @@ podd.addAutoCompleteHandler = function(
     });
 };
 
-// Update for short text
-podd.addShortTextBlurHandler = function(/* object */shortText, /* object */propertyUri, /* object */originalValue, /* object */
-nextArtifactDatabank, /* boolean */isNew) {
+/**
+ * On leaving a text field (short/long), check if the contents of the field have
+ * changed and if so, request the artifact databank to be updated.
+ * 
+ * @param textField
+ *            reference to the text field that has been 'blurred'
+ * @param propertyUri
+ *            property/predicate representing this field
+ * @param originalValue
+ *            the original value that is recorded against this field. can be 'undefined'
+ * @param nextArtifactDatabank
+ *            databank containing artifact triples
+ * @param isNew
+ *            boolean indicating whether this field did not previously have a
+ *            value
+ * 
+ */
+podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
+		propertyUri, /* object */originalValue, /* object */
+		nextArtifactDatabank, /* boolean */isNew) {
+	
     var nextOriginalValue = '' + originalValue;
 
-    // $(".short_text")
-    shortText.blur(function(event) {
-        podd.debug("shorttext blur event");
-        podd.debug(event);
+    textField.blur(function(event) {
+        podd.debug("text field blur event");
 
         var objectUri = podd.getCurrentObjectUri();
 
@@ -1054,6 +1079,8 @@ nextArtifactDatabank, /* boolean */isNew) {
 
         var newValue = '' + $(this).val();
 
+        var propertyDatatype = $(this).attr('datatype');
+        
         if (newValue !== nextOriginalValue) {
             var nextChangeset = {};
             nextChangeset.isNew = isNew;
@@ -1061,10 +1088,12 @@ nextArtifactDatabank, /* boolean */isNew) {
             nextChangeset.newTriples = [];
             nextChangeset.oldTriples = [];
 
-            // Short-text always generates strings
-            nextChangeset.oldTriples.push(objectUri + ' <' + propertyUri + '> "' + nextOriginalValue + '"');
-            nextChangeset.newTriples.push(objectUri + ' <' + propertyUri + '> "' + newValue + '"');
-
+            // add old triple ONLY if there originally was a value
+            if (typeof originalValue !== 'undefined') {
+            	nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyDatatype));
+            }
+            nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyDatatype));
+            
             changesets.push(nextChangeset);
 
             podd.debug('Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue
@@ -1077,7 +1106,7 @@ nextArtifactDatabank, /* boolean */isNew) {
             $(this).unbind("blur");
             // NOTE: isNew is always false after the first time through this
             // method with a non-empty/non-default value
-            podd.addShortTextBlurHandler(shortText, propertyUri, newValue, nextArtifactDatabank, false);
+            podd.addTextFieldBlurHandler(textField, propertyUri, newValue, nextArtifactDatabank, false);
         }
         else {
             podd.debug("No change on blur for value for property=" + propertyUri + " original=" + nextOriginalValue
@@ -1087,3 +1116,70 @@ nextArtifactDatabank, /* boolean */isNew) {
         // fields may have incomplete/invalid values at this point.
     });
 };
+
+/**
+ * Build an RDF triple from the given subject, property and object.
+ * 
+ * @param subjectUri
+ * @param propertyUri
+ * @param objectValue
+ * @param objectDatatype
+ *            Specifies the datatype of the object
+ * @return The constructed triple
+ */
+podd.buildTriple = function(subjectUri, propertyUri, objectValue,
+		objectDatatype) {
+
+	podd.debug('buildTriple(' + subjectUri + ', ' + propertyUri + ', '
+			+ objectValue + ' [' + objectDatatype + ']');
+
+	var objectLiteral;
+
+	if (typeof objectDatatype !== 'undefined') {
+		objectLiteral = $.rdf.literal(objectValue, {
+			datatype : objectDatatype
+		});
+	} else {
+		objectLiteral = $.rdf.literal(objectValue);
+	}
+
+	return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectLiteral);
+};
+
+/**
+ * For the given property URI, extract the data range from the schema databank.
+ * 
+ * @param propertyUri
+ *            The property whose range is requested
+ * @param nextSchemaDatabank
+ *            Databank containing meta-data
+ * @return The data range type or 'Not Found' if range could not be extracted.
+ */
+podd.getPropertyRange = function(propertyUri, nextSchemaDatabank) {
+	
+	var nextSchemaQuery = $.rdf({
+        databank : nextSchemaDatabank
+    })
+    // Find range for this property
+    .where('?restriction owl:onProperty <' + propertyUri + '> ')
+    //
+    .optional('?restriction owl:allValuesFrom ?allValuesClass')
+    //
+    .optional('?restriction owl:onDataRange ?rangeClass')
+    //
+    .optional('?restriction owl:onClass ?onClass');
+	
+    var nextSchemaBindings = nextSchemaQuery.select();
+    var rangeValue = 'Not Found';
+    $.each(nextSchemaBindings, function(nextIndex, nextValue) {
+    	if (typeof nextValue.allValuesClass !== 'undefined') {
+    		rangeValue = nextValue.allValuesClass.value;
+    	} else if (typeof nextValue.rangeClass !== 'undefined') {
+    		rangeValue = nextValue.rangeClass.value;
+    	} else if (typeof nextValue.onClass !== 'undefined') {
+    		rangeValue = nextValue.onClass.value;
+    	}
+    });
+
+    return rangeValue;
+}
