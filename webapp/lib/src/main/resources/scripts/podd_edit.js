@@ -21,6 +21,7 @@ var DISPLAY_AutoComplete = 'http://purl.org/podd/ns/poddBase#DisplayType_AutoCom
 var DISPLAY_Table = 'http://purl.org/podd/ns/poddBase#DisplayType_Table';
 
 var OBJECT_PROPERTY = 'http://www.w3.org/2002/07/owl#ObjectProperty';
+var OWL_THING = 'http://www.w3.org/2002/07/owl#Thing';
 
 var DETAILS_LIST_Selector = '#details ol';
 
@@ -511,34 +512,31 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     else if (nextField.displayType == DISPLAY_AutoComplete) {
 
 		// - set search Types
-		var searchTypes = [ 'http://www.w3.org/2002/07/owl#Thing' ];
-		var nextSchemaQuery = $.rdf({
-			databank : nextSchemaDatabank
-		})
-		//
-		.where(' ?x owl:onProperty <' + nextField.propertyUri + '> ')
-		// 
-		.where(' ?x owl:allValuesFrom ?rangeClass');
-        var nextSchemaBindings = nextSchemaQuery.select();
-        if (nextSchemaBindings.length > 0) {
-			$.each(nextSchemaBindings, function(nextIndex, nextValue) {
-				searchTypes.push(nextValue.rangeClass.value);
-			});
+		var searchTypes = [ OWL_THING ];
+		if (typeof nextField.propertyRange != 'undefined'
+				&& nextField.propertyRange != 'Not Found') {
+			searchTypes.push(nextField.propertyRange);
 		}
-    	
-        // - set artifact URI
-    	var artifactUri;
-    	if (typeof podd.artifactIri != 'undefined' && podd.artifactIri != 'undefined')
-    	{
-    		artifactUri = podd.artifactIri;
-    	}
-    	
-        var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
-        var hiddenValueElement =  podd.addFieldInputText(nextField, 'hidden', nextSchemaDatabank);
-        podd.addAutoCompleteHandler(input, hiddenValueElement, nextArtifactDatabank, searchTypes, artifactUri, isNew);
-        
-        li2.append(input);
-        li2.append(hiddenValueElement);
+
+		// - set artifact URI
+		var artifactUri;
+		if (typeof podd.artifactIri != 'undefined'
+				&& podd.artifactIri != 'undefined') {
+			artifactUri = podd.artifactIri;
+		}
+
+		var input = podd.addFieldInputText(nextField, 'text',
+				nextSchemaDatabank);
+		var hiddenValueElement = podd.addFieldInputText(nextField, 'hidden',
+				nextSchemaDatabank);
+		podd.addAutoCompleteHandler(input, hiddenValueElement,
+				nextArtifactDatabank, searchTypes, artifactUri, isNew);
+		podd.addTextFieldBlurHandler(input, nextField.propertyUri,
+				nextField.displayValue, nextField.propertyType,
+				nextArtifactDatabank, isNew);
+
+		li2.append(input);
+		li2.append(hiddenValueElement);
     }
     else { // default
         podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + nextField.displayValue
