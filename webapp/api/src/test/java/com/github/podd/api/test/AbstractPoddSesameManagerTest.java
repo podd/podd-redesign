@@ -948,8 +948,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 19, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 9,
+        Assert.assertEquals("Display Model not of expected size", 17, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 8,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals(
@@ -995,8 +995,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 43, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 18,
+        Assert.assertEquals("Display Model not of expected size", 40, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 16,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals(
@@ -1051,8 +1051,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 90, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 19,
+        Assert.assertEquals("Display Model not of expected size", 86, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 17,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals("Object not typed as a Project", "http://purl.org/podd/ns/poddScience#Project",
