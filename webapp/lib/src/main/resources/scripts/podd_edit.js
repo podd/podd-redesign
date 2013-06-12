@@ -266,6 +266,12 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
     .where('?x rdf:type owl:Restriction')
     // Restriction has a linked property, which is the minimum we require
     .where('?x owl:onProperty ?propertyUri')
+    // Optional, one way of specifying Range
+    .optional('?x owl:allValuesFrom ?allValuesClass')
+    // Optional, one way of specifying Range
+    .optional('?x owl:onDataRange ?rangeClass')
+    // Optional, one way of specifying Range
+    .optional('?x owl:onClass ?onClass')
     // Optional, though recommended, rdfs:label annotation on property
     .optional('?propertyUri rdfs:label ?propertyLabel')
     // Optional, though recommended, display type to customise the HTML
@@ -289,6 +295,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         nextChild.propertyLabel;
         nextChild.displayType;
         nextChild.cardinality;
+        nextChild.propertyRange;
 
         if (typeof nextBinding.propertyLabel != 'undefined') {
             nextChild.propertyLabel = nextBinding.propertyLabel.value;
@@ -313,6 +320,18 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
             nextChild.cardinality = nextBinding.cardinality.value;
         }
 
+        // set Range of the property
+        if (typeof nextBinding.allValuesClass !== 'undefined') {
+    		nextChild.propertyRange = nextBinding.allValuesClass.value;
+    	} else if (typeof nextBinding.rangeClass !== 'undefined') {
+    		nextChild.propertyRange = nextBinding.rangeClass.value;
+    	} else if (typeof nextBinding.onClass !== 'undefined') {
+    		nextChild.propertyRange = nextBinding.onClass.value;
+    	} else {
+    		nextChild.propertyRange = 'Not Found';
+    	}
+        
+        
         nextChild.displayValue; //undefined to indicate there is NO value
         nextChild.valueUri = '';
 
@@ -403,10 +422,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 	// + '> "' + nextField.propertyLabel + '" <' +
 	// nextField.displayType + '> <' + nextField.cardinality + '>');
 
-	// XXX: extract and add field range. Should do this when creating nextField
-	var range = podd.getPropertyRange(nextField.propertyUri, nextSchemaDatabank);
-	podd.debug('<<<<< [' + nextField.propertyUri + '] has range [' + range + '] >>>>>');
-	nextField.propertyRange = range;
+	// podd.debug('<<<<< [' + nextField.propertyUri + '] has range [' + nextField.propertyRange + '] >>>>>');
 	
     // field name
     var span = $('<span>');
@@ -1145,41 +1161,3 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue,
 
 	return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectLiteral);
 };
-
-/**
- * For the given property URI, extract the data range from the schema databank.
- * 
- * @param propertyUri
- *            The property whose range is requested
- * @param nextSchemaDatabank
- *            Databank containing meta-data
- * @return The data range type or 'Not Found' if range could not be extracted.
- */
-podd.getPropertyRange = function(propertyUri, nextSchemaDatabank) {
-	
-	var nextSchemaQuery = $.rdf({
-        databank : nextSchemaDatabank
-    })
-    // Find range for this property
-    .where('?restriction owl:onProperty <' + propertyUri + '> ')
-    //
-    .optional('?restriction owl:allValuesFrom ?allValuesClass')
-    //
-    .optional('?restriction owl:onDataRange ?rangeClass')
-    //
-    .optional('?restriction owl:onClass ?onClass');
-	
-    var nextSchemaBindings = nextSchemaQuery.select();
-    var rangeValue = 'Not Found';
-    $.each(nextSchemaBindings, function(nextIndex, nextValue) {
-    	if (typeof nextValue.allValuesClass !== 'undefined') {
-    		rangeValue = nextValue.allValuesClass.value;
-    	} else if (typeof nextValue.rangeClass !== 'undefined') {
-    		rangeValue = nextValue.rangeClass.value;
-    	} else if (typeof nextValue.onClass !== 'undefined') {
-    		rangeValue = nextValue.onClass.value;
-    	}
-    });
-
-    return rangeValue;
-}
