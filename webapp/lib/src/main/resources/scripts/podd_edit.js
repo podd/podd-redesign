@@ -20,6 +20,8 @@ var DISPLAY_DropDown = 'http://purl.org/podd/ns/poddBase#DisplayType_DropDownLis
 var DISPLAY_AutoComplete = 'http://purl.org/podd/ns/poddBase#DisplayType_AutoComplete';
 var DISPLAY_Table = 'http://purl.org/podd/ns/poddBase#DisplayType_Table';
 
+var OBJECT_PROPERTY = 'http://www.w3.org/2002/07/owl#ObjectProperty';
+
 var DETAILS_LIST_Selector = '#details ol';
 
 // --------------------------------
@@ -280,6 +282,8 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
     // Optional, though recommended, cardinality to specify how many of this
     // property can be linked to this class
     .optional('?propertyUri poddBase:hasCardinality ?cardinality')
+    // Optional, to figure out if values are Literals or Resources
+    .optional('?propertyUri rdf:type ?propertyType')
     // Optional, weight given for property when used with this class to order
     // the interface consistently
     .optional('?propertyUri poddBase:weight ?weight');
@@ -296,6 +300,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         nextChild.displayType;
         nextChild.cardinality;
         nextChild.propertyRange;
+        nextChild.propertyType;
 
         if (typeof nextBinding.propertyLabel != 'undefined') {
             nextChild.propertyLabel = nextBinding.propertyLabel.value;
@@ -331,6 +336,10 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
     		nextChild.propertyRange = 'Not Found';
     	}
         
+        if (typeof nextBinding.propertyType != 'undefined') {
+            nextChild.propertyType = nextBinding.propertyType.value;
+        }
+
         
         nextChild.displayValue; //undefined to indicate there is NO value
         nextChild.valueUri = '';
@@ -465,11 +474,11 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 
     if (nextField.displayType == DISPLAY_LongText) {
         var input = podd.addFieldTextArea(nextField, 30, 2, nextSchemaDatabank);
-        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
+        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
         if (typeof link !== 'undefined') {
             link.click(function() {
                 var clonedField = input.clone(true);
-                podd.addTextFieldBlurHandler(clonedField, nextField.propertyUri, nextField.displayValue,
+                podd.addTextFieldBlurHandler(clonedField, nextField.propertyUri, nextField.displayValue, nextField.propertyType, 
                         nextArtifactDatabank, true);
                 // FIXME: Determine correct place to append this to
                 li.append(clonedField);
@@ -479,16 +488,18 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
         var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
-        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextArtifactDatabank, isNew);
+        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
         var input = podd.addFieldDropDownListNonAutoComplete(nextField, nextSchemaDatabank, isNew);
+        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_CheckBox) {
         var input = podd.addFieldInputText(nextField, 'checkbox', nextSchemaDatabank);
         var label = '<label>' + nextField.displayValue + '</label>';
+        // TODO: add blur handler
         li2.append(input.after(label));
     }
     else if (nextField.displayType == DISPLAY_Table) {
@@ -535,7 +546,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         // var input = podd.addFieldInputText(nextField, 'text',
         // nextSchemaDatabank);
         // podd.addTextFieldBlurHandler(input, nextField.propertyUri,
-        // nextField.displayValue, nextArtifactDatabank, isNew);
+        // nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
         // li2.append(input);
     }
 
@@ -1081,7 +1092,7 @@ podd.addAutoCompleteHandler = function(
  * 
  */
 podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
-		propertyUri, /* object */originalValue, /* object */
+		propertyUri, /* object */originalValue, /* object */propertyType, /* object */
 		nextArtifactDatabank, /* boolean */isNew) {
 	
     var nextOriginalValue = '' + originalValue;
@@ -1106,9 +1117,9 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
 
             // add old triple ONLY if there originally was a value
             if (typeof originalValue !== 'undefined') {
-            	nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyDatatype));
+            	nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType, propertyDatatype));
             }
-            nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyDatatype));
+            nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
             
             changesets.push(nextChangeset);
 
@@ -1122,7 +1133,7 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
             $(this).unbind("blur");
             // NOTE: isNew is always false after the first time through this
             // method with a non-empty/non-default value
-            podd.addTextFieldBlurHandler(textField, propertyUri, newValue, nextArtifactDatabank, false);
+            podd.addTextFieldBlurHandler(textField, propertyUri, newValue, propertyType, nextArtifactDatabank, false);
         }
         else {
             podd.debug("No change on blur for value for property=" + propertyUri + " original=" + nextOriginalValue
@@ -1139,25 +1150,38 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
  * @param subjectUri
  * @param propertyUri
  * @param objectValue
+ * @param propertyType
+ *            Identifies the type of this property (e.g. object property, data
+ *            property)
  * @param objectDatatype
  *            Specifies the datatype of the object
  * @return The constructed triple
  */
-podd.buildTriple = function(subjectUri, propertyUri, objectValue,
+podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType,
 		objectDatatype) {
 
 	podd.debug('buildTriple(' + subjectUri + ', ' + propertyUri + ', '
 			+ objectValue + ' [' + objectDatatype + ']');
 
-	var objectLiteral;
+	var objectPart;
 
 	if (typeof objectDatatype !== 'undefined') {
-		objectLiteral = $.rdf.literal(objectValue, {
-			datatype : objectDatatype
-		});
+
+		// TODO: is there a better way of figuring out if the object is a
+		// Resource or a Literal?
+		if (typeof propertyType !== 'undefined'
+				&& propertyType.toString() === OBJECT_PROPERTY) {
+
+			objectPart = $.rdf.resource('<' + objectValue + '>');
+		} else {
+
+			objectPart = $.rdf.literal(objectValue, {
+				datatype : objectDatatype
+			});
+		}
 	} else {
-		objectLiteral = $.rdf.literal(objectValue);
+		objectPart = $.rdf.literal(objectValue);
 	}
 
-	return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectLiteral);
+	return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectPart);
 };
