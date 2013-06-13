@@ -1286,6 +1286,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 tempRepositoryConnection.add(inputStream, "", format, tempContext);
             }
             
+            // check and update statements with default timestamp values
+            final Value now = PoddRdfConstants.VF.createLiteral(new Date());
+            this.handleTimestamps(tempRepositoryConnection, PoddRdfConstants.PODD_BASE_CREATED_AT, now, tempContext);
+            this.handleTimestamps(tempRepositoryConnection, PoddRdfConstants.PODD_BASE_LAST_MODIFIED, now, tempContext);
+            
             this.handleDanglingObjects(artifactID.getOntologyIRI(), tempRepositoryConnection, tempContext,
                     danglingObjectAction);
             
