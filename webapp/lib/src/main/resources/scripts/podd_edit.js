@@ -1165,8 +1165,7 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType,
 
 	if (typeof objectDatatype !== 'undefined') {
 
-		// TODO: is there a better way of figuring out if the object is a
-		// Resource or a Literal?
+		// figure out if the object is a Resource or a Literal
 		if (typeof propertyType !== 'undefined'
 				&& propertyType.toString() === OBJECT_PROPERTY) {
 
