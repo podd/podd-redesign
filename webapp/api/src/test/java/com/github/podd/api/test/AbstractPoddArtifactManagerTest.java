@@ -248,12 +248,12 @@ public abstract class AbstractPoddArtifactManagerTest
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false, true,
                                 0, -1, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, true, 183,
-                                23, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, false, 133,
-                                16, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true, true, 282, 35,
-                                10 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, true, 175,
+                                22, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, false, 125,
+                                15, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true, true, 283, 35,
+                                11 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false, true, 107,
                                 14, 0 },
