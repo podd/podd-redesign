@@ -13,11 +13,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -68,9 +70,9 @@ import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.PurlProcessorNotHandledException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddObjectLabelImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.RdfUtility;
 
@@ -605,6 +607,37 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /**
+     * This helper method checks for statements with the given property and having
+     * a date-time value with the year 1970 and updates their date-time with the given {@link Value}.
+     * 
+     * @param repositoryConnection
+     * @param propertyUri
+     * @param newTimestamp
+     * @param context
+     * @throws OpenRDFException
+     */
+    private void handleTimestamps(final RepositoryConnection repositoryConnection, final URI propertyUri, final Value newTimestamp,
+            final URI context) throws OpenRDFException
+    {
+        final List<Statement> statements =
+                Iterations.asList(repositoryConnection.getStatements(null, propertyUri, null, false, context));
+        
+        for(Statement s : statements)
+        {
+            final Value object = s.getObject();
+            if(object instanceof Literal)
+            {
+                final int year = ((Literal)object).calendarValue().getYear();
+                if(year == 1970)
+                {
+                    repositoryConnection.remove(s, context);
+                    repositoryConnection.add(s.getSubject(), s.getPredicate(), newTimestamp, context);
+                }
+            }
+        }
+    }
+    
+    /**
      * This is not an API method. QUESTION: Should this be moved to a separate utility class?
      * 
      * This method takes a String terminating with a colon (":") followed by an integer and
@@ -793,16 +826,22 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 throw new EmptyOntologyException(null, "Loaded ontology is empty");
             }
+            
+            // check and update statements with default timestamp values
+            final Value now = PoddRdfConstants.VF.createLiteral(new Date());
+            this.handleTimestamps(temporaryRepositoryConnection, PoddRdfConstants.PODD_BASE_CREATED_AT, now, randomContext);
+            this.handleTimestamps(temporaryRepositoryConnection, PoddRdfConstants.PODD_BASE_LAST_MODIFIED, now, randomContext);
+            
             this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext,
                     DanglingObjectPolicy.REPORT);
-            
+
             // check and ensure schema ontology imports are for version IRIs
             this.handleSchemaImports(ontologyIRI, permanentRepositoryConnection, temporaryRepositoryConnection,
                     randomContext);
             
             // ensure schema ontologies are cached in memory before loading statements into OWLAPI
             this.handleCacheSchemasInMemory(permanentRepositoryConnection, permanentRepositoryConnection, randomContext);
-            
+
             // TODO: This web service could be used accidentally to insert invalid file references
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(temporaryRepositoryConnection, permanentRepositoryConnection,

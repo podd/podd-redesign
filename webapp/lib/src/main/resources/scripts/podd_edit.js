@@ -21,10 +21,13 @@ var DISPLAY_AutoComplete = 'http://purl.org/podd/ns/poddBase#DisplayType_AutoCom
 var DISPLAY_Table = 'http://purl.org/podd/ns/poddBase#DisplayType_Table';
 
 var OBJECT_PROPERTY = 'http://www.w3.org/2002/07/owl#ObjectProperty';
+var DATATYPE_PROPERTY = 'http://www.w3.org/2002/07/owl#DatatypeProperty';
 var OWL_THING = 'http://www.w3.org/2002/07/owl#Thing';
+var XSD_DATETIME = 'http://www.w3.org/2001/XMLSchema#dateTime';
 
 var DETAILS_LIST_Selector = '#details ol';
 
+var DUMMY_Datetime = '1970-01-01T00:00:00';
 // --------------------------------
 
 /**
@@ -72,6 +75,18 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddBase/1>');
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddScience/1>');
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddPlant/1>');
+    
+    // add createdAt statement with dummy value
+	nextDatabank.add(
+		podd.buildTriple(objectUri,	'<http://purl.org/podd/ns/poddBase#createdAt>',
+			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME)
+	);
+
+    // add lastModified statement with dummy value
+	nextDatabank.add(
+		podd.buildTriple(objectUri,	'<http://purl.org/podd/ns/poddBase#lastModified>',
+			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME)
+	);
 };
 
 /**
@@ -81,6 +96,18 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
  */
 podd.initialiseNewObject = function(nextDatabank, artifactUri, objectUri, parentUri, parentPredicateUri) {
     nextDatabank.add(parentUri + ' ' + parentPredicateUri + ' ' + objectUri);
+    
+    // add createdAt statement with default value
+	nextDatabank.add(
+		podd.buildTriple(objectUri,	'<http://purl.org/podd/ns/poddBase#createdAt>',
+			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME)
+	);
+
+    // add lastModified statement with dummy value
+	nextDatabank.add(
+		podd.buildTriple(objectUri,	'<http://purl.org/podd/ns/poddBase#lastModified>',
+			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME)
+	);
 };
 
 /**

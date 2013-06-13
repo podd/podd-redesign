@@ -147,6 +147,14 @@ public interface PoddRdfConstants
     
     public static final URI PODD_BASE_CONTAINS = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "contains");
     
+    /** http://purl.org/podd/ns/poddBase#lastModified */
+    public static final URI PODD_BASE_LAST_MODIFIED = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "lastModified");    
+    
+    /** http://purl.org/podd/ns/poddBase#createdAt */
+    public static final URI PODD_BASE_CREATED_AT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "createdAt");    
+
     /** http://purl.org/podd/ns/poddBase#hasDisplayType */
     public static final URI PODD_BASE_DISPLAY_TYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
             "hasDisplayType");
