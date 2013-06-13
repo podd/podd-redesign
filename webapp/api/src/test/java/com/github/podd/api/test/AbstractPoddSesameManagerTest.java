@@ -995,8 +995,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 40, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 16,
+        Assert.assertEquals("Display Model not of expected size", 38, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 15,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals(
@@ -1051,8 +1051,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 86, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 17,
+        Assert.assertEquals("Display Model not of expected size", 80, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 16,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals("Object not typed as a Project", "http://purl.org/podd/ns/poddScience#Project",
@@ -1189,12 +1189,12 @@ public abstract class AbstractPoddSesameManagerTest
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false, true,
                                 0, -1, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, true, 191,
-                                24, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, false, 141,
-                                17, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true, true, 281, 35,
-                                9 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, true, 183,
+                                23, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, false, 133,
+                                16, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true, true, 282, 35,
+                                10 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false, true, 107,
                                 14, 0 },
@@ -1800,11 +1800,10 @@ public abstract class AbstractPoddSesameManagerTest
                         this.testRepositoryConnection, contexts);
         
         // verify:
-        Assert.assertEquals("Incorrect number of statements about Top Object", 12, orderedPropertyUris.size());
+        Assert.assertEquals("Incorrect number of statements about Top Object", 11, orderedPropertyUris.size());
         
         final String[] expectedUris =
                 { "http://purl.org/podd/ns/poddBase#createdAt", "http://purl.org/dc/terms/creator",
-                        "http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator",
                         "http://purl.org/podd/ns/poddScience#hasAnalysis",
                         "http://purl.org/podd/ns/poddScience#hasInvestigation",
                         "http://purl.org/podd/ns/poddScience#hasProcess",
@@ -1850,11 +1849,10 @@ public abstract class AbstractPoddSesameManagerTest
                         this.testRepositoryConnection, contexts);
         
         // verify:
-        Assert.assertEquals("Incorrect number of statements about Top Object", 7, orderedPropertyUris.size());
+        Assert.assertEquals("Incorrect number of statements about Top Object", 6, orderedPropertyUris.size());
         
         final String[] expectedUris =
                 { "http://purl.org/podd/ns/poddBase#createdAt", "http://purl.org/dc/terms/creator",
-                        "http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator",
                         "http://purl.org/podd/ns/poddBase#hasPublicationStatus",
                         "http://purl.org/podd/ns/poddScience#hasANZSRC",
                         "http://purl.org/podd/ns/poddBase#hasLeadInstitution",

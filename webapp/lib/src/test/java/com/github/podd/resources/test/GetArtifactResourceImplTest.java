@@ -139,13 +139,13 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         this.assertFreemarker(body);
         
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 15);
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 14);
         
         // RDFa generates spurious triples, use at your own risk
         // Only rely on numbers from actual RDF serialisations
-        Assert.assertEquals(6, model.subjects().size());
-        Assert.assertEquals(12, model.predicates().size());
-        Assert.assertEquals(14, model.objects().size());
+        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(11, model.predicates().size());
+        Assert.assertEquals(13, model.objects().size());
         
         if(this.log.isDebugEnabled())
         {
