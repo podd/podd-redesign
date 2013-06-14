@@ -132,8 +132,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             objectUris.add(PoddRdfConstants.VF.createURI(nextObjectURIString));
         }
         
-        this.log.info("requesting edit artifact ({}): {}, with isReplace {}", variant.getMediaType().getName(),
-                artifactUri, updatePolicy);
+        this.log.info("requesting edit artifact ({}): {}, {} with isReplace {}", variant.getMediaType().getName(),
+                artifactUri, versionUri, updatePolicy);
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
