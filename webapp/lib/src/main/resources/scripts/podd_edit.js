@@ -157,6 +157,15 @@ podd.getCurrentArtifactIri = function() {
 };
 
 /**
+ * Getter method for Version IRI.
+ * 
+ * @return the Version IRI or 'undefined' if it is not defined.
+ */
+podd.getCurrentVersionIri = function() {
+	return podd.versionIri;
+};
+
+/**
  * Updates the given databank using the given changesets to identify old and new
  * triples.
  * 
@@ -276,6 +285,14 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
 podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
     window.location.href = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(podd.artifactIri);
 };
+
+/**
+ * 
+ */
+podd.emptyUpdateDisplayCallback = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
+    podd.debug('Empty Callback');
+};
+
 
 /**
  * Callback function when RDF containing metadata is available
@@ -810,7 +827,7 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
 
 };
 
-/*
+/**
  * Invoke the Edit Artifact Service to update the artifact with changed object
  * attributes. { isNew: boolean, property: String value of predicate URI
  * surrounded by angle brackets, newValue: String, (Should be surrounded by
@@ -820,6 +837,7 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
  */
 podd.submitPoddObjectUpdate = function(
 /* String */artifactIri,
+/* String */versionIri,
 /* String */objectUri,
 /* object */nextSchemaDatabank,
 /* object */nextArtifactDatabank,

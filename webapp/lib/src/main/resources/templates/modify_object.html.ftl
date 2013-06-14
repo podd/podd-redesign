@@ -1,5 +1,10 @@
 <#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
-<#-- @ftlvariable name="objectType" type="java.lang.String" -->
+<#-- @ftlvariable name="title" type="java.lang.String" -->
+<#-- @ftlvariable name="user" type="" -->
+<#-- @ftlvariable name="objectType" type="com.github.podd.utils.PoddObjectLabel" -->
+<#-- @ftlvariable name="parentUri" type="java.lang.String" -->
+<#-- @ftlvariable name="parentPredicateUri" type="java.lang.String" -->
+<#-- @ftlvariable name="objectUri" type="java.lang.String" -->
 
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -8,11 +13,13 @@
         podd.debug('-------------------');
 
 		podd.objectTypeUri = '${objectType.objectURI!"Not Found"}';
-		podd.artifactIri = undefined;
-		podd.versionIri = undefined;
+		podd.artifactIri = '${artifactIri!"undefined"}';
+		podd.versionIri = '${versionIri!"undefined"}';
+		
 		// FIXME: Insert the parent URI using freemarker
 		podd.parentUri = '${parentUri!"undefined"}';
 		podd.parentPredicateUri = '${parentPredicateUri!"undefined"}'; 
+		
 		// The object URI is undefined for a new object initially,
 		// until the first valid save event to the server
 		podd.objectUri = '${objectUri!"undefined"}';
@@ -37,6 +44,9 @@
 			else {
 				podd.initialiseNewObject(podd.artifactDatabank, podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.parentUri, podd.parentPredicateUri);
 			}
+		} else {
+			podd.debug('About to call getArtifact and populate databank');
+			podd.getArtifact(podd.artifactIri, podd.schemaDatabank, podd.artifactDatabank, podd.emptyUpdateDisplayCallback);
 		}
 				
 	    // Get Metadata and create fields for either new data or data that exists in artifactDatabank at this point
@@ -51,7 +61,8 @@
 		$("#editObjectForm").submit(function(event) {
 			event.preventDefault();
 			podd.debug("Attempting to submit update query to server");
-			podd.submitPoddObjectUpdate(podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.schemaDatabank, podd.artifactDatabank, podd.redirectToGetArtifact);
+			podd.submitPoddObjectUpdate(podd.getCurrentArtifactIri(), podd.getCurrentVersionIri(), podd.getCurrentObjectUri(),  
+					podd.schemaDatabank, podd.artifactDatabank, podd.redirectToGetArtifact);
 			return false;
 		});
 	

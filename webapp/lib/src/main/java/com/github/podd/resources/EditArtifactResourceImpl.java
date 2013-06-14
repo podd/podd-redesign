@@ -371,20 +371,6 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("contentTemplate", "modify_object.html.ftl");
         dataModel.put("pageTitle", "Edit Artifact");
         
-        // add required constants and methods to data model
-        dataModel.put("RDFS_LABEL", RDFS.LABEL);
-        dataModel.put("RDFS_RANGE", RDFS.RANGE);
-        dataModel.put("RDF_TYPE", RDF.TYPE);
-        dataModel.put("OWL_OBJECT_PROPERTY", OWL.OBJECTPROPERTY);
-        dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
-        dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
-        // dataModel.put("OWL_MAX_CARDINALITY", PoddRdfConstants.OWL_MAX_QUALIFIED_CARDINALITY);
-        // dataModel.put("OWL_MIN_CARDINALITY", PoddRdfConstants.OWL_MIN_QUALIFIED_CARDINALITY);
-        // dataModel.put("OWL_CARDINALITY", PoddRdfConstants.OWL_QUALIFIED_CARDINALITY);
-        dataModel.put("PODD_BASE_HAS_CARDINALITY", PoddRdfConstants.PODD_BASE_HAS_CARDINALITY);
-        dataModel.put("PODD_BASE_DISPLAY_TYPE", PoddRdfConstants.PODD_BASE_DISPLAY_TYPE);
-        dataModel.put("PODD_BASE_HAS_WEIGHT", PoddRdfConstants.PODD_BASE_WEIGHT);
-        
         dataModel.put("util", new FreemarkerUtil());
         
         // Defaults to false. Set to true if multiple objects are being edited concurrently
@@ -405,7 +391,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             else
             {
-                objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
+                objectUri = PoddRdfConstants.VF.createURI(objectToEdit);
             }
             
             final List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
@@ -417,20 +403,18 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             // Get label for the object type
             final PoddObjectLabel objectType =
                     this.getPoddSesameManager().getObjectLabel(ontologyID, objectTypes.get(0), conn);
-            if(objectType == null || objectType.getLabel() == null)
-            {
-                dataModel.put("objectType", objectTypes.get(0));
-            }
-            else
-            {
-                dataModel.put("objectType", objectType.getLabel());
-            }
+            dataModel.put("objectType", objectType);
             
-            final PoddObjectLabel theObject = this.getPoddSesameManager().getObjectLabel(ontologyID, objectUri, conn);
-            dataModel.put("poddObject", theObject);
+            dataModel.put("objectUri", objectUri.toString());
+            dataModel.put("parentUri", ontologyID.getOntologyIRI().toString());
+            
+            // FIXME - hard coded
+            dataModel.put("parentPredicateUri", "http://purl.org/podd/ns/poddBase#artifactHasTopObject");
+            
+            dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
+            dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
             
             dataModel.put("stopRefreshKey", "Stop Refresh Key");
-            
         }
         catch(final OpenRDFException e) // should be OpenRDFException
         {
