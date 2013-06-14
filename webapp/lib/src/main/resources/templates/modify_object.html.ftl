@@ -44,13 +44,11 @@
 			else {
 				podd.initialiseNewObject(podd.artifactDatabank, podd.getCurrentArtifactIri(), podd.getCurrentObjectUri(), podd.parentUri, podd.parentPredicateUri);
 			}
-		} else {
-			podd.debug('About to call getArtifact and populate databank');
-			podd.getArtifact(podd.artifactIri, podd.schemaDatabank, podd.artifactDatabank, podd.emptyUpdateDisplayCallback);
 		}
 				
-	    // Get Metadata and create fields for either new data or data that exists in artifactDatabank at this point
-	    podd.getObjectTypeMetadata(podd.objectTypeUri, podd.updateInterface, podd.schemaDatabank, podd.artifactDatabank);
+	    // Get Metadata and invoke the callback function which will continue to update the interface
+	    podd.getObjectTypeMetadata(podd.artifactIri, podd.objectTypeUri, podd.callbackFromGetMetadata, podd.schemaDatabank, podd.artifactDatabank);
+	
 	
 	    // use delegation for dynamically added .clonable anchors
 	    // FIXME: This doesn't seem to be the right strategy with respect to handlers, 

@@ -245,7 +245,7 @@ podd.debug = function(message) {
  * @param nextSchemaDatabank -
  * @param nextArtifactDatabank -
  */
-podd.getObjectTypeMetadata = function(/* String */objectTypeUri, /* function */successCallback, /* object */
+podd.getObjectTypeMetadata = function(/* String */artifactUri, /* String */objectTypeUri, /* function */successCallback, /* object */
 nextSchemaDatabank, /* object */nextArtifactDatabank) {
 
 	podd.debug('[getMetadata]  "' + objectTypeUri + '" .');
@@ -269,7 +269,7 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
 
             podd.debug('Schema Databank size = ' + nextSchemaDatabank.size());
 
-            successCallback(objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
+            successCallback(artifactUri, objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
             podd.debug('[getMetadata] $$$ ERROR $$$ ' + error);
@@ -279,20 +279,30 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
 };
 
 /**
+ * Continue updating interface after schemaDatabank is populated with metadata.
+ * If an existing artifact is being updated, populates the artifactDatabank.
+ */
+podd.callbackFromGetMetadata = function(artifactUri, objectTypeUri, nextSchemaDatabank, nextArtifactDatabank) {
+	
+	podd.debug('[callbackFromGetMetadata] artifactUri=' + artifactUri + ' objectType=' + objectTypeUri);
+	
+	// TODO: are these two conditions sufficient to ensure it is a new artifact?
+	if (typeof artifactUri !== 'undefined' && artifactUri !== 'undefined') {
+		podd.debug('[callbackFromGetMetadata] first try to get artifact');
+		podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, podd.updateInterface, objectTypeUri);
+	} else {
+		podd.debug('[callbackFromGetMetadata] new artifact. just update interface');
+		podd.updateInterface(objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
+	}
+}
+
+/**
  * Callback function that redirects to the artifact when submitPoddObjectUpdate
  * is successful.
  */
 podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
     window.location.href = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(podd.artifactIri);
 };
-
-/**
- * 
- */
-podd.emptyUpdateDisplayCallback = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
-    podd.debug('Empty Callback');
-};
-
 
 /**
  * Callback function when RDF containing metadata is available
@@ -790,7 +800,7 @@ podd.searchOntologyService = function(
 };
 
 /* Retrieve the current version of an artifact and populate the databank */
-podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, updateDisplayCallbackFunction) {
+podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, updateDisplayCallbackFunction, callbackParam) {
     var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
     podd.debug('[getArtifact] Request to: ' + requestUrl);
@@ -817,7 +827,13 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
             podd.updateErrorMessageList('<i>Successfully retrieved artifact version: ' + podd.versionIri + '</i><br>');
             // The following may update the interface, redirect the user to
             // another page, or so anything it likes really
-            updateDisplayCallbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
+            if (typeof callbackParam === 'undefined') {
+            	podd.debug('[getArtifact] invoke callback with 3 parameters')
+            	updateDisplayCallbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
+            } else {
+            	podd.debug('[getArtifact] invoke callback with 4 parameters')
+            	updateDisplayCallbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank, callbackParam);
+            }
         },
         error : function(xhr, status, error) {
             podd.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
@@ -907,7 +923,8 @@ podd.submitPoddObjectUpdate = function(
             // before calling updateCallback again, to make sure that all of the
             // temporary URIs in nextArtifactDatabank are replaced with their
             // PURL versions
-            podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, updateCallback);
+            var emptyParam;
+            podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, updateCallback, emptyParam);
         },
         error : function(xhr, status, error) {
             podd.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
