@@ -862,16 +862,16 @@ podd.submitPoddObjectUpdate = function(
     else {
     	requestUrl = podd.baseUrl + '/artifact/edit'
     	// FIXME: Why is the parameter isForce hardcoded to true?
-        requestUrl = requestUrl + '?artifacturi=' + encodeURIComponent(artifactIri) + '&isforce=true';
+        requestUrl = requestUrl + '?artifacturi=' + podd.uriEncode(artifactIri) + '&isforce=true';
         if (typeof versionIri !== "undefined") {
             podd.debug(' of artifact (' + versionIri + ').');
             // set query parameters in the URI as setting them under data
             // failed, mostly leading to a 415 error
-            requestUrl = requestUrl + '&versionuri=' + encodeURIComponent(versionIri);
+            requestUrl = requestUrl + '&versionuri=' + podd.uriEncode(versionIri);
         }
         if (typeof objectUri !== 'undefined') {
             podd.debug(' on object (' + objectUri + ').');
-            requestUrl = requestUrl + '&objectUri=' + encodeURIComponent(objectUri);
+            requestUrl = requestUrl + '&objectUri=' + podd.uriEncode(objectUri);
         }
     }
     podd.debug('[updatePoddObject] Request (POST):  ' + requestUrl);
@@ -1226,4 +1226,28 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType,
 	}
 
 	return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectPart);
+};
+
+/**
+ * PODD specific URI encoding function where a given string is first trimmed of
+ * surrounding angle brackets ('<' , '>') if they are present and then URI
+ * encoded.
+ */
+podd.uriEncode = function(input) {
+
+	if (typeof input === 'undefined') {
+		return input;
+	}
+
+	var trimmedInput = $.trim(input);
+
+	var len = trimmedInput.length;
+
+	if ((len > 2) && (trimmedInput.substring(0, 1) === '<')
+			&& (trimmedInput.substring(len - 1, len) === '>')) {
+
+		trimmedInput = trimmedInput.substring(1, len - 1);
+	}
+
+	return encodeURIComponent(trimmedInput);
 };
