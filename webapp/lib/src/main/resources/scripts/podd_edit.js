@@ -27,6 +27,9 @@ var XSD_DATETIME = 'http://www.w3.org/2001/XMLSchema#dateTime';
 
 var DETAILS_LIST_Selector = '#details ol';
 
+
+var PODD_CREATED_AT = '<http://purl.org/podd/ns/poddBase#createdAt>';
+var PODD_LAST_MODIFIED = '<http://purl.org/podd/ns/poddBase#lastModified>';
 var DUMMY_Datetime = '1970-01-01T00:00:00';
 // --------------------------------
 
@@ -76,17 +79,9 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddScience/1>');
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddPlant/1>');
     
-    // add createdAt statement with dummy value
-	nextDatabank.add(
-		podd.buildTriple(objectUri,	'<http://purl.org/podd/ns/poddBase#createdAt>',
-			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME)
-	);
-
-    // add lastModified statement with dummy value
-	nextDatabank.add(
-		podd.buildTriple(objectUri,	'<http://purl.org/podd/ns/poddBase#lastModified>',
-			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME)
-	);
+    // add createdAt statement with default value
+	nextDatabank.add(podd.buildTriple(objectUri, PODD_CREATED_AT,
+			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
 };
 
 /**
@@ -96,19 +91,29 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
  */
 podd.initialiseNewObject = function(nextDatabank, artifactUri, objectUri, parentUri, parentPredicateUri) {
     nextDatabank.add(parentUri + ' ' + parentPredicateUri + ' ' + objectUri);
-    
-    // add createdAt statement with default value
-	nextDatabank.add(
-		podd.buildTriple(objectUri,	'<http://purl.org/podd/ns/poddBase#createdAt>',
-			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME)
-	);
 
-    // add lastModified statement with dummy value
-	nextDatabank.add(
-		podd.buildTriple(objectUri,	'<http://purl.org/podd/ns/poddBase#lastModified>',
-			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME)
-	);
+	// add createdAt statement with default value
+	nextDatabank.add(podd.buildTriple(objectUri, PODD_CREATED_AT,
+			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
 };
+
+/**
+ * Resets the "lastModifiedAt" statement for the current object to the default
+ * value.
+ * 
+ * @param objectUri
+ *            The current object
+ * @param nextDatabank
+ *            Contains statements of current object
+ */
+podd.resetLastModifiedAt = function(objectUri, nextDatabank) {
+	// delete lastModified statement if it exists
+	podd.deleteTriples(nextDatabank, objectUri, PODD_LAST_MODIFIED);
+
+	// add lastModified statement with dummy value
+	nextDatabank.add(podd.buildTriple(objectUri, PODD_LAST_MODIFIED,
+			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
+}
 
 /**
  * If podd.objectUri exists, it returns that, wrapped in braces to look like a
@@ -887,6 +892,8 @@ podd.submitPoddObjectUpdate = function(
 /* object */nextArtifactDatabank,
 /* function */updateCallback) {
 
+	podd.resetLastModifiedAt(objectUri, nextArtifactDatabank);
+	
     var requestUrl;
 
     var modifiedTriples = $.toJSON(nextArtifactDatabank.dump({
