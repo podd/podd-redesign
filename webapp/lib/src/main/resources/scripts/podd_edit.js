@@ -238,27 +238,30 @@ podd.debug = function(message) {
 /**
  * Retrieve metadata to render the fields to add a new object of the given type.
  * 
- * @param objectTypeUri -
- *            the type of Object to be added
+ * @param artifactUri -
+ *            The current artifact's URI. Maybe "undefined" if adding a new
+ *            artifact.
+ * @param objectType -
+ *            The type of Object to be added (e.g. Project, Publication)
  * @param successCallback -
  *            where to send the results
  * @param nextSchemaDatabank -
+ * 			  Databank where retrieved metadata is to be stored.
  * @param nextArtifactDatabank -
+ * 			  Databank where artifact's triples are stored.
  */
-podd.getObjectTypeMetadata = function(/* String */artifactUri, /* String */objectTypeUri, /* function */successCallback, /* object */
+podd.getObjectTypeMetadata = function(/* String */artifactUri, /* String */objectType, /* function */successCallback, /* object */
 nextSchemaDatabank, /* object */nextArtifactDatabank) {
-
-	podd.debug('[getMetadata]  "' + objectTypeUri + '" .');
 
     var requestUrl = podd.baseUrl + '/metadata';
 
-    podd.debug('[getMetadata] Request (GET):  ' + requestUrl);
+    podd.debug('[getObjectTypeMetadata] Request (GET) (' + objectType + '): ' + requestUrl);
 
     $.ajax({
         url : requestUrl,
         type : 'GET',
         data : {
-            objecttypeuri : objectTypeUri
+            objecttypeuri : objectType
         },
         dataType : 'json', // what is expected back
         success : function(resultData, status, xhr) {
@@ -267,12 +270,12 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
 
             nextSchemaDatabank.load(resultData);
 
-            podd.debug('Schema Databank size = ' + nextSchemaDatabank.size());
+            podd.debug('[getObjectTypeMetadata] Schema Databank size = ' + nextSchemaDatabank.size());
 
-            successCallback(artifactUri, objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
+            successCallback(artifactUri, objectType, nextSchemaDatabank, nextArtifactDatabank);
         },
         error : function(xhr, status, error) {
-            podd.debug('[getMetadata] $$$ ERROR $$$ ' + error);
+            podd.debug('[getObjectTypeMetadata] $$$ ERROR $$$ ' + error);
             podd.debug(xhr.statusText);
         }
     });
@@ -281,18 +284,27 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
 /**
  * Continue updating interface after schemaDatabank is populated with metadata.
  * If an existing artifact is being updated, populates the artifactDatabank.
+ * @param artifactUri -
+ *            The current artifact's URI. Maybe "undefined" if adding a new
+ *            artifact.
+ * @param objectType -
+ *            The type of Object to be added (e.g. Project, Publication)
+ * @param nextSchemaDatabank -
+ * 			  Databank where metadata is stored.
+ * @param nextArtifactDatabank -
+ * 			  Databank where artifact's triples are stored.
  */
-podd.callbackFromGetMetadata = function(artifactUri, objectTypeUri, nextSchemaDatabank, nextArtifactDatabank) {
+podd.callbackFromGetMetadata = function(artifactUri, objectType, nextSchemaDatabank, nextArtifactDatabank) {
 	
-	podd.debug('[callbackFromGetMetadata] artifactUri=' + artifactUri + ' objectType=' + objectTypeUri);
+	podd.debug('[callbackFromGetMetadata] objectType=<' +objectType + '>, artifactUri=<' + artifactUri + '>');
 	
 	// TODO: are these two conditions sufficient to ensure it is a new artifact?
 	if (typeof artifactUri !== 'undefined' && artifactUri !== 'undefined') {
-		podd.debug('[callbackFromGetMetadata] first try to get artifact');
-		podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, podd.updateInterface, objectTypeUri);
+		podd.debug('[callbackFromGetMetadata] artifact exists. retrieve it before update interface.');
+		podd.getArtifact(artifactUri, nextSchemaDatabank, nextArtifactDatabank, podd.updateInterface, objectType);
 	} else {
-		podd.debug('[callbackFromGetMetadata] new artifact. just update interface');
-		podd.updateInterface(objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
+		podd.debug('[callbackFromGetMetadata] new artifact. invoke update interface');
+		podd.updateInterface(objectType, nextSchemaDatabank, nextArtifactDatabank);
 	}
 }
 
@@ -799,7 +811,23 @@ podd.searchOntologyService = function(
     }, 'json');
 };
 
-/* Retrieve the current version of an artifact and populate the databank */
+/**
+ * Retrieve the current version of an artifact and populate the artifact
+ * databank.
+ * 
+ * @param artifactUri
+ * 			  The artifact to be retrieved.
+ * @param nextSchemaDatabank
+ * 			  To be passed into the callback method.
+ * @param nextArtifactDatabank
+ * 			  Databank to be populated with artifact triples.
+ * @param updateDisplayCallbackFunction
+ * 			  The callback method to invoke on successful retrieval of the artifact.
+ * @param callbackParam
+ *            If this parameter is not 'undefined', it should be the 4th
+ *            parameter of the callback method. Otherwise, the callback should
+ *            be invoked with only 3 parameters.
+ */
 podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, updateDisplayCallbackFunction, callbackParam) {
     var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
