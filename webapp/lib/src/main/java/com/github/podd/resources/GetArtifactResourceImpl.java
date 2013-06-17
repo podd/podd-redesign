@@ -234,6 +234,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
         
         dataModel.put("util", new FreemarkerUtil());
+        
+        //FIXME: should be set based on the current object and user authorization
+        dataModel.put("canAddChildren", true);
     }
     
     /**
