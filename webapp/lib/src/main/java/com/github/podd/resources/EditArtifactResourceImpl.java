@@ -10,18 +10,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFWriter;
@@ -47,7 +40,6 @@ import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.FreemarkerUtil;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
@@ -232,130 +224,6 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
-     * Request for RDF data for building the "edit object" page.
-     */
-    @Get("rdf|rj|json|ttl")
-    public Representation getEditArtifactRdf(final Representation entity, final Variant variant)
-        throws ResourceException
-    {
-        // the artifact in which editing is requested
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
-        if(artifactUri == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
-        }
-        
-        // Podd object to be edited. NULL indicates top object is to be edited.
-        final String objectUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
-        
-        this.log.info("requesting to populate edit artifact ({}): {}, ", variant.getMediaType().getName(), artifactUri);
-        
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                Collections.singleton(PoddRdfConstants.VF.createURI(artifactUri)));
-        
-        final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
-        
-        // validate artifact exists
-        InferredOWLOntologyID ontologyID;
-        try
-        {
-            ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-        }
-        catch(final UnmanagedArtifactIRIException e)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
-        }
-        
-        final Model modelForEdit = this.getModelForEdit(ontologyID, objectUri);
-        
-        // - prepare response
-        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        final RDFWriter writer =
-                Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
-                        output);
-        try
-        {
-            writer.startRDF();
-            for(final Statement st : modelForEdit)
-            {
-                writer.handleStatement(st);
-            }
-            writer.endRDF();
-        }
-        catch(final OpenRDFException e)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response", e);
-        }
-        
-        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
-                .getDefaultMIMEType()));
-    }
-    
-    /**
-     * Get a {@link Model} containing all data and meta-data necessary to display the "edit object"
-     * page.
-     * 
-     * @param ontologyID
-     * @param objectToEdit
-     * @return A Model containing all necessary statements
-     */
-    private Model getModelForEdit(final InferredOWLOntologyID ontologyID, final String objectToEdit)
-    {
-        RepositoryConnection conn = null;
-        try
-        {
-            conn = this.getPoddRepositoryManager().getRepository().getConnection();
-            conn.begin();
-            
-            URI objectUri;
-            
-            if(objectToEdit == null)
-            {
-                objectUri = this.getPoddSesameManager().getTopObjectIRI(ontologyID, conn);
-            }
-            else
-            {
-                objectUri = ValueFactoryImpl.getInstance().createURI(objectToEdit);
-            }
-            
-            if(objectUri == null)
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not recognise the request");
-            }
-            
-            final List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
-            if(objectTypes == null || objectTypes.isEmpty())
-            {
-                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
-            }
-            
-            return this.getPoddSesameManager().getObjectDetailsForEdit(ontologyID, objectUri, conn);
-        }
-        catch(final OpenRDFException e)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
-        }
-        finally
-        {
-            if(conn != null)
-            {
-                try
-                {
-                    // This is a Get request, therefore nothing to commit
-                    conn.rollback();
-                    conn.close();
-                }
-                catch(final OpenRDFException e)
-                {
-                    this.log.error("Failed to close RepositoryConnection", e);
-                    // Should we do anything other than log an error?
-                }
-            }
-        }
-    }
-    
-    /**
      * Internal method to populate the Freemarker Data Model for Get request
      * 
      * @param ontologyID
@@ -370,8 +238,6 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "modify_object.html.ftl");
         dataModel.put("pageTitle", "Edit Artifact");
-        
-        dataModel.put("util", new FreemarkerUtil());
         
         // Defaults to false. Set to true if multiple objects are being edited concurrently
         // TODO: investigate how to use this
