@@ -81,16 +81,6 @@ public interface PoddSesameManager
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     /**
-     * TODO: remove this from the API once the other method is used successfully
-     * 
-     * @deprecated use
-     *             {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
-     */
-    @Deprecated
-    Model getCardinality(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
-            RepositoryConnection repositoryConnection) throws OpenRDFException;
-    
-    /**
      * Calculates the cardinality value for a given PODD object and property.
      * 
      * Possible output URIs represent the following cardinalities:

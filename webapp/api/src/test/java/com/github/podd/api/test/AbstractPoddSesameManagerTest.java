@@ -583,86 +583,6 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getCardinality(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
-     * .
-     */
-    @Test
-    public void testGetCardinalityWithPublicationObjectHasAbstract() throws Exception
-    {
-        // prepare: load schema ontologies and test artifact
-        this.loadSchemaOntologies();
-        final InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
-                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
-        
-        final URI publicationObjectUri =
-                ValueFactoryImpl.getInstance().createURI(
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
-        
-        final URI hasAbstractPropertyUri =
-                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAbstract");
-        
-        final Model displayModel =
-                this.testPoddSesameManager.getCardinality(ontologyID, publicationObjectUri, hasAbstractPropertyUri,
-                        this.testRepositoryConnection);
-        
-        // verify:
-        Assert.assertNotNull("Resultant Model is null", displayModel);
-        Assert.assertEquals("Resultant Model not of expected size", 1, displayModel.size());
-        
-        Assert.assertEquals(
-                "Expected 1 hasAbstract maxQualifiedcardinality statement",
-                1,
-                displayModel.filter(
-                        hasAbstractPropertyUri,
-                        ValueFactoryImpl.getInstance().createURI(
-                                "http://www.w3.org/2002/07/owl#maxQualifiedCardinality"), null).size());
-        
-        Assert.assertEquals("Unexpected Cardinality for hasAbstract", "1", displayModel.filter(null, null, null)
-                .objectString());
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getCardinality(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
-     * .
-     */
-    @Test
-    public void testGetCardinalityWithTopObjectHasLeadInstitution() throws Exception
-    {
-        // prepare: load schema ontologies and test artifact
-        this.loadSchemaOntologies();
-        final InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
-                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
-        
-        final URI topObjectUri =
-                ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/basic-1-20130206/object:2966");
-        
-        final URI hasLeadInstitutionPropertyUri =
-                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasLeadInstitution");
-        
-        final Model displayModel =
-                this.testPoddSesameManager.getCardinality(ontologyID, topObjectUri, hasLeadInstitutionPropertyUri,
-                        this.testRepositoryConnection);
-        
-        // verify:
-        Assert.assertNotNull("Resultant Model is null", displayModel);
-        Assert.assertEquals("Resultant Model not of expected size", 1, displayModel.size());
-        
-        Assert.assertEquals(
-                "Expected 1 hasLeadInstitution cardinality statement",
-                1,
-                displayModel.filter(hasLeadInstitutionPropertyUri,
-                        ValueFactoryImpl.getInstance().createURI("http://www.w3.org/2002/07/owl#qualifiedCardinality"),
-                        null).size());
-        
-        Assert.assertEquals("Unexpected Cardinality for Lead Institution", "1", displayModel.filter(null, null, null)
-                .objectString());
-    }
-    
-    /**
-     * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getCurrentArtifactVersion(org.semanticweb.owlapi.model.IRI, org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI)}
      * .
      * 
@@ -1456,8 +1376,6 @@ public abstract class AbstractPoddSesameManagerTest
             
             final Model model =
                     this.testPoddSesameManager.getParentDetails(objectUri, this.testRepositoryConnection, contexts);
-            
-            DebugUtils.printContents(model);
             
             Assert.assertEquals("Unexpected no. of statements", expectedStatementCount, model.size());
             if(expectedStatementCount == 1)
