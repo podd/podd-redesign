@@ -1051,11 +1051,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /*
-     * Internal helper method which encapsulates the creation of a RepositoryConnection before
-     * calling the SesameManager.
+     * (non-Javadoc)
      * 
-     * Can avoid dealing with RepositoryConnections here if this could be moved to somewhere in the
-     * API.
+     * @see com.github.podd.api.PoddArtifactManager#searchForOntologyLabels(org.semanticweb.owlapi.model.
+     * OWLOntologyID, java.lang.String, org.openrdf.model.URI[])
      */
     @Override
     public Model searchForOntologyLabels(final InferredOWLOntologyID ontologyID, final String searchTerm,

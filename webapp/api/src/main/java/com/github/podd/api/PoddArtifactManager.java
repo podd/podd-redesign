@@ -255,6 +255,21 @@ public interface PoddArtifactManager
     InferredOWLOntologyID publishArtifact(InferredOWLOntologyID ontologyId) throws PublishArtifactException,
         OpenRDFException, UnmanagedArtifactIRIException;
     
+    /**
+     * Carries out a case-insensitive search for objects whose labels match a given term. The search
+     * consists of the given ontology and its imported ontologies. An optional array of URIs can be used to limit the
+     * RDF types of objects to match. <br>
+     * 
+     * @param ontologyID
+     *          The ontology and its imported ontologies make up the search space
+     * @param searchTerm
+     *            A String term which is searched for in the RDF:Labels
+     * @param searchTypes
+     *            The types (i.e. RDF:Type) of results to match with the search term
+     * @return A {@link Model} containing the URI and Label of each matching object.
+     * @throws OpenRDFException
+     * @throws ResourceException
+     */
     Model searchForOntologyLabels(InferredOWLOntologyID ontologyID, String searchTerm, URI[] searchTypes)
         throws OpenRDFException, ResourceException;
     
