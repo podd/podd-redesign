@@ -853,10 +853,13 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
             var artifactId = podd.getOntologyID(nextArtifactDatabank);
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
-            // FIXME: May not always want to do this
-            podd.parentUri = artifactId[0].parentUri;
-            podd.objectUri = artifactId[0].objectUri;
-
+            if (typeof artifactId[0].parentUri !== 'undefined') {
+            	podd.parentUri = artifactId[0].parentUri;
+            }
+            if (typeof artifactId[0].objectUri !== 'undefined') {
+            	podd.objectUri = artifactId[0].objectUri;
+            }
+            
             podd.updateErrorMessageList('<i>Successfully retrieved artifact version: ' + podd.versionIri + '</i><br>');
             // The following may update the interface, redirect the user to
             // another page, or so anything it likes really
@@ -950,9 +953,12 @@ podd.submitPoddObjectUpdate = function(
             podd.versionIri = artifactId[0].versionIri;
             // Also setup the parent URI and object URI as they may be empty
             // before this point or may have changed as part of the update
-            // FIXME: May not always want to do this
-            podd.parentUri = artifactId[0].parentUri;
-            podd.objectUri = artifactId[0].objectUri;
+            if (typeof artifactId[0].parentUri !== 'undefined') {
+            	podd.parentUri = artifactId[0].parentUri;
+            }
+            if (typeof artifactId[0].objectUri !== 'undefined') {
+            	podd.objectUri = artifactId[0].objectUri;
+            }
 
             // After the update is complete we try to fetch the complete content
             // before calling updateCallback again, to make sure that all of the
@@ -1004,6 +1010,11 @@ podd.parseSearchResults = function(/* string */searchURL, /* rdf/json */data) {
  * 
  * Also extracts and updates the parent URI and the current Object URI if they
  * are temporary URIs or unknown.
+ * 
+ * @param Databank
+ *            containing artifact statements
+ * @return an array with a single element which contains the Ontology's artifact
+ *         IRI and version IRI and optionally the object URI and parent URI.
  */
 podd.getOntologyID = function(nextDatabank) {
 
@@ -1045,8 +1056,12 @@ podd.getOntologyID = function(nextDatabank) {
                     // work.
                     var myQuery = $.rdf({
                         databank : nextDatabank
-                    }).where('<' + podd.parentUri + '> ?property ?currentObject').where(
-                            '?currentObject rdf:type <' + podd.objectTypeUri + '> ');
+                    })
+                    //
+                    .where('<' + podd.parentUri + '> ?property ?currentObject')
+                    //
+                    .where('?currentObject rdf:type <' + podd.objectTypeUri + '> ');
+                    
                     var innerBindings = myQuery.select();
 
                     $.each(innerBindings, function(index, value) {
