@@ -218,9 +218,6 @@ public interface PoddSesameManager
     Model getObjectDetailsForDisplay(InferredOWLOntologyID artifactID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
-    Model getObjectDetailsForEdit(InferredOWLOntologyID artifactID, URI objectUri,
-            RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
-    
     PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
