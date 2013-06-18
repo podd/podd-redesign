@@ -398,12 +398,93 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     /*
      * (non-Javadoc)
      * 
+     * @see com.github.podd.api.PoddArtifactManager#getObjectTypes(com.github.podd.utils.
+     * InferredOWLOntologyID, org.openrdf.model.URI)
+     */
+    @Override
+    public List<PoddObjectLabel> getObjectTypes(final InferredOWLOntologyID artifactId, final URI objectUri)
+        throws OpenRDFException
+    {
+        final List<PoddObjectLabel> results = new ArrayList<PoddObjectLabel>();
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            
+            List<URI> typesList = this.getSesameManager().getObjectTypes(artifactId, objectUri, conn);
+            for (URI objectType : typesList)
+            {
+                results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, conn));
+            }
+        }
+        finally
+        {
+            conn.close();
+        }
+        return results;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.github.podd.api.PoddArtifactManager#getOWLManager()
      */
     @Override
     public PoddOWLManager getOWLManager()
     {
         return this.owlManager;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.api.PoddArtifactManager#getParentDetails(com.github.podd.utils.
+     * InferredOWLOntologyID, org.openrdf.model.URI)
+     */
+    @Override
+    public Model getParentDetails(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            final URI[] contexts =
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                            this.getRepositoryManager().getSchemaManagementGraph());
+            
+            return this.getSesameManager().getParentDetails(objectUri, conn, contexts);
+        }
+        catch(final OpenRDFException e)
+        {
+            try
+            {
+                if(conn != null && conn.isActive())
+                {
+                    conn.rollback();
+                }
+            }
+            catch(final RepositoryException e1)
+            {
+                this.log.error("Found error rolling back repository connection", e1);
+            }
+            
+            throw e;
+        }
+        finally
+        {
+            try
+            {
+                if(conn != null && conn.isOpen())
+                {
+                    conn.close();
+                }
+            }
+            catch(final RepositoryException e)
+            {
+                throw e;
+            }
+        }
     }
     
     /*
@@ -1058,7 +1139,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     @Override
     public Model searchForOntologyLabels(final InferredOWLOntologyID ontologyID, final String searchTerm,
-            final URI[] searchTypes) throws OpenRDFException, ResourceException
+            final URI[] searchTypes) throws OpenRDFException
     {
         RepositoryConnection conn = null;
         

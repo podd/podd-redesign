@@ -68,6 +68,7 @@ import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -682,9 +683,94 @@ public abstract class AbstractPoddArtifactManagerTest
     }
     
     @Test
+    public final void testGetObjectTypes() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final Object[][] testData =
+            {
+                    { "http://purl.org/podd/basic-1-20130206/object:2966", 1,
+                        "http://purl.org/podd/ns/poddScience#Project" },
+                    { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 1,
+                    "http://purl.org/podd/ns/poddScience#Publication" },
+                    { "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype", 1,
+                            "http://purl.org/podd/ns/poddScience#Genotype" },
+                    { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 1,
+                            "http://purl.org/podd/ns/poddScience#Material" },
+
+                    // FIXME: figure out why ANZSRC_NotApplicable is also a poddScience;ANZSRC         
+                    //{ "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", 2, 
+                    //            "http://purl.org/podd/ns/poddScience#ANZSRCAssertion" }, 
+            };
+    
+        for(final Object[] element : testData)
+        {
+            final URI objectUri = ValueFactoryImpl.getInstance().createURI(element[0].toString());
+            final int expectedStatementCount = (int)element[1];
+            
+            final List<PoddObjectLabel> list = this.testArtifactManager.getObjectTypes(artifactIDv1, objectUri);
+            
+            this.log.info("Results for object <{}> are {}", objectUri, list.get(0).toString());
+            
+            Assert.assertEquals("Unexpected no. of statements", expectedStatementCount, list.size());
+            if(expectedStatementCount == 1)
+            {
+                final URI expectedType = ValueFactoryImpl.getInstance().createURI(element[2].toString());
+                Assert.assertEquals("Not the expected type", expectedType, list.get(0).getObjectURI());
+            }
+        }        
+    }
+    
+    @Test
     public final void testGetOWLManager() throws Exception
     {
         Assert.assertNotNull("OWL Manager was null", this.testArtifactManager.getOWLManager());
+    }
+    
+    @Test
+    public final void testGetParentDetails() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final Object[][] testData =
+            {
+                    { "http://purl.org/podd/basic-1-20130206/object:2966", 0, "" },
+                    { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 1,
+                    "http://purl.org/podd/basic-1-20130206/object:2966" },
+                    { "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype", 1,
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material" },
+                    { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 1,
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation" },
+                    { "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", 0, "" }, };
+    
+        for(final Object[] element : testData)
+        {
+            final URI objectUri = ValueFactoryImpl.getInstance().createURI(element[0].toString());
+            final int expectedStatementCount = (int)element[1];
+            
+            final Model model = this.testArtifactManager.getParentDetails(artifactIDv1, objectUri);
+            
+            Assert.assertEquals("Unexpected no. of statements", expectedStatementCount, model.size());
+            if(expectedStatementCount == 1)
+            {
+                final URI expectedParent = ValueFactoryImpl.getInstance().createURI(element[2].toString());
+                Assert.assertTrue("Not the expected parent", model.subjects().contains(expectedParent));
+            }
+        }        
     }
     
     @Test

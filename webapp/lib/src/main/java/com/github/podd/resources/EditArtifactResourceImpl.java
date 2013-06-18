@@ -14,8 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
@@ -196,9 +197,9 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         // Podd object to be edited. NULL indicates top object is to be edited.
-        final String objectUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
+        final String objectToEdit = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
         
-        this.log.info("requesting to edit artifact (HTML): {}, {}", artifactUri, objectUri);
+        this.log.info("requesting to edit artifact (HTML): {}, {}", artifactUri, objectToEdit);
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
                 Collections.singleton(PoddRdfConstants.VF.createURI(artifactUri)));
@@ -217,112 +218,66 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
         
-        final Map<String, Object> dataModel = this.populateDataModelForGet(ontologyID, objectUri);
-        
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
-    }
-    
-    /**
-     * Internal method to populate the Freemarker Data Model for Get request
-     * 
-     * @param ontologyID
-     *            The Artifact to be edited
-     * @param objectToEdit
-     *            The specific PODD object to edit.
-     * @return The populated data model
-     */
-    private Map<String, Object> populateDataModelForGet(final InferredOWLOntologyID ontologyID,
-            final String objectToEdit)
-    {
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
+        
         dataModel.put("contentTemplate", "modify_object.html.ftl");
         dataModel.put("pageTitle", "Edit Artifact");
         
-        // Defaults to false. Set to true if multiple objects are being edited concurrently
-        // TODO: investigate how to use this
-        final boolean initialized = false;
-        
-        RepositoryConnection conn = null;
         try
         {
-            conn = this.getPoddRepositoryManager().getRepository().getConnection();
-            conn.begin();
-            
-            URI objectUri;
-            
+            URI objectUri = null;
+
+            // objectUri
             if(objectToEdit == null)
             {
-                objectUri = this.getPoddSesameManager().getTopObjectIRI(ontologyID, conn);
+                // set the top object as the object URI
+                final List<PoddObjectLabel> topObjectLabels = this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(ontologyID));
+                if (topObjectLabels.size() > 0)
+                {
+                    objectUri = topObjectLabels.get(0).getObjectURI();
+                }
             }
             else
             {
                 objectUri = PoddRdfConstants.VF.createURI(objectToEdit);
             }
-            
-            final List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
+            if (objectUri != null)
+            {
+                dataModel.put("objectUri", objectUri.toString());
+            }
+
+            // objectType
+            final List<PoddObjectLabel> objectTypes = this.getPoddArtifactManager().getObjectTypes(ontologyID, objectUri);
             if(objectTypes == null || objectTypes.isEmpty())
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
             }
+            // TODO: handle case where more than 1 type is found
+            dataModel.put("objectType", objectTypes.get(0));
             
-            // Get label for the object type
-            final PoddObjectLabel objectType =
-                    this.getPoddSesameManager().getObjectLabel(ontologyID, objectTypes.get(0), conn);
-            dataModel.put("objectType", objectType);
-            
-            dataModel.put("objectUri", objectUri.toString());
-            dataModel.put("parentUri", ontologyID.getOntologyIRI().toString());
-            
-            // FIXME - hard coded
-            dataModel.put("parentPredicateUri", "http://purl.org/podd/ns/poddBase#artifactHasTopObject");
-            
-            dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
-            dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
-            
-            dataModel.put("stopRefreshKey", "Stop Refresh Key");
+            // Parent Details
+            final Model parentDetails = this.getPoddArtifactManager().getParentDetails(ontologyID, objectUri);
+            if (parentDetails.size() == 1)
+            {
+                final Statement statement = parentDetails.iterator().next();
+                dataModel.put("parentUri", statement.getSubject().stringValue());
+                dataModel.put("parentPredicateUri", statement.getPredicate().stringValue());
+            }
         }
-        catch(final OpenRDFException e) // should be OpenRDFException
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
         }
-        finally
-        {
-            if(conn != null)
-            {
-                try
-                {
-                    if(conn.isActive())
-                    {
-                        // This is a Get request, therefore nothing to commit
-                        conn.rollback();
-                    }
-                }
-                catch(final OpenRDFException e)
-                {
-                    this.log.error("Failed to rollback RepositoryConnection", e);
-                    // Should we do anything other than log an error?
-                }
-                finally
-                {
-                    try
-                    {
-                        if(conn.isOpen())
-                        {
-                            conn.close();
-                        }
-                    }
-                    catch(final OpenRDFException e)
-                    {
-                        this.log.error("Failed to close RepositoryConnection", e);
-                        // Should we do anything other than log an error?
-                    }
-                }
-            }
-        }
         
-        dataModel.put("initialized", initialized);
-        return dataModel;
+        dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
+        dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
+        
+        // Defaults to false. Set to true if multiple objects are being edited concurrently
+        // TODO: investigate how to use this
+        dataModel.put("initialized", false);
+        dataModel.put("stopRefreshKey", "Stop Refresh Key");
+        
+        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-    
 }

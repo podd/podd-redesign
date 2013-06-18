@@ -159,13 +159,42 @@ public interface PoddArtifactManager
      *         configurations.
      */
     PoddFileRepositoryManager getFileRepositoryManager();
-    
+
+    /**
+     * Retrieves a list of {@link PoddObjectLabel}s for the most-specific types to which the given
+     * object URI belongs.
+     * 
+     * @param artifactId
+     *            The artifact where the given object URI is found.
+     * @param objectUri
+     *            The object whose types are needed.
+     * @return
+     * @throws OpenRDFException
+     */
+    List<PoddObjectLabel> getObjectTypes(InferredOWLOntologyID artifactId, URI objectUri) throws OpenRDFException;
+
     /**
      * 
      * @return The {@link PoddOWLManager} used to manage OWL validation and inferencing for
      *         artifacts.
      */
     PoddOWLManager getOWLManager();
+
+    /**
+     * This method returns a {@link Model} containing a single statement which links the given
+     * object with its parent object. A <i>parent</i> is connected to the given object by a property
+     * which is a sub-property of <code>PODDBase:contains</code>. If the object URI is null or does not
+     * have a parent (i.e. it is a <code>PoddTopObject</code>), an empty Model is returned.
+     * 
+     * @param ontologyID
+     *            The ontology to which this object belongs.
+     * @param objectUri
+     *            The Object whose parent is sought
+     * @return A {@link Model} containing a single statement which links the parent with the given
+     *         object
+     * @throws OpenRDFException
+     */
+    Model getParentDetails(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException;
     
     /**
      * 
@@ -408,5 +437,5 @@ public interface PoddArtifactManager
      */
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
             Set<OWLOntologyID> oldSchemaOntologyIds, Set<OWLOntologyID> newSchemaOntologyIds);
-    
+
 }
