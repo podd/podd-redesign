@@ -133,4 +133,18 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     {
         return this.ontologyID;
     }
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder b = new StringBuilder("[");
+        b.append(" objectURI=");
+        b.append(this.objectID.stringValue());
+        b.append(" label=");
+        b.append(this.label);
+        b.append(" description=");
+        b.append(this.description);
+        b.append("]");
+        return b.toString();
+    }
 }
