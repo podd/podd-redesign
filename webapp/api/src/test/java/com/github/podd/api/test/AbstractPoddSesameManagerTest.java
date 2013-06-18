@@ -1450,7 +1450,7 @@ public abstract class AbstractPoddSesameManagerTest
      * .
      */
     @Test
-    public void testGetPoddObjectData() throws Exception
+    public void testGetObjectData() throws Exception
     {
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
@@ -1514,6 +1514,55 @@ public abstract class AbstractPoddSesameManagerTest
         
         Assert.assertTrue("Expected empty Model for NULL object",
                 this.testPoddSesameManager.getObjectData(ontologyID, null, this.testRepositoryConnection).isEmpty());
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getParentDetails(URI, RepositoryConnection, URI...)}
+     * .
+     */
+    @Test
+    public void testGetParentDetails() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        final URI[] contexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
+                        this.schemaGraph);
+        
+        // object, expected statement count, expected parent
+        final Object[][] testData =
+                {
+                        { "http://purl.org/podd/basic-1-20130206/object:2966", 0, "" },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 1,
+                        "http://purl.org/podd/basic-1-20130206/object:2966" },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype", 1,
+                                "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material" },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 1,
+                                "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation" },
+                        { "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", 0, "" }, };
+        
+        for(final Object[] element : testData)
+        {
+            final URI objectUri = ValueFactoryImpl.getInstance().createURI(element[0].toString());
+            final int expectedStatementCount = (int)element[1];
+            
+            final Model model =
+                    this.testPoddSesameManager.getParentDetails(objectUri, this.testRepositoryConnection, contexts);
+            
+            DebugUtils.printContents(model);
+            
+            Assert.assertEquals("Unexpected no. of statements", expectedStatementCount, model.size());
+            if(expectedStatementCount == 1)
+            {
+                final URI expectedParent = ValueFactoryImpl.getInstance().createURI(element[2].toString());
+                Assert.assertTrue("Not the expected parent", model.subjects().contains(expectedParent));
+            }
+        }
     }
     
     /**

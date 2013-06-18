@@ -296,6 +296,23 @@ public interface PoddSesameManager
             URI managementGraph) throws OpenRDFException;
     
     /**
+     * This method identifies the given object's parent and the parent-child linking property.
+     * If the object URI is null, an empty Model is returned.
+     * 
+     * @param objectUri
+     *            The Object whose parent is sought
+     * @param repositoryConnection
+     * @param contexts
+     * @return A {@link Model} containing a single statement which links the parent with the given
+     *         object
+     * @throws OpenRDFException
+     * 
+     * @since 18/06/2013
+     */
+    Model getParentDetails(URI objectUri, RepositoryConnection repositoryConnection,
+            URI... contexts) throws OpenRDFException;
+    
+    /**
      * If the given IRI represents a version IRI of a schema ontology, the Ontology ID for this
      * schema version is returned. If the given IRI represents an ontology IRI of a schema ontology,
      * the Ontology ID for the most current version of this schema ontology is returned.
@@ -436,5 +453,5 @@ public interface PoddSesameManager
     
     URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
-    
+
 }

@@ -785,7 +785,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         return queryResults;
     }
-    
+
     /**
      * This method returns a {@link Model} containing sufficient triples to construct the HTML page
      * for editing an object.
@@ -808,6 +808,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         {
             resultModel.add(objectUri, RDF.TYPE, objectTypes.get(0));
         }
+        
+        
         
         // --- add displayable property values, details of properties, and value labels if present
         final StringBuilder sb = new StringBuilder();
@@ -1415,6 +1417,39 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         // could not find given IRI as a version IRI
         return null;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.api.PoddSesameManager#getParentDetails(org.openrdf.model.URI,
+     * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI...)
+     */
+    @Override
+    public Model getParentDetails(final URI objectUri, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        if(objectUri == null)
+        {
+            return new LinkedHashModel();
+        }
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?parent ?parentChildProperty ?poddObject ");
+        sb.append("} WHERE {");
+        sb.append(" ?parent ?parentChildProperty ?poddObject . ");
+        sb.append(" ?parentChildProperty <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> . ");
+        sb.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectUri);
+        
+        this.log.debug("Created SPARQL {} \n   with poddObject bound to {}", sb, objectUri);
+        
+        return this.executeGraphQuery(graphQuery, contexts);
     }
     
     @Override
