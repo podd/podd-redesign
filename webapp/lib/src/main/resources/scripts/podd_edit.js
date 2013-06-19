@@ -853,13 +853,7 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
             var artifactId = podd.getOntologyID(nextArtifactDatabank);
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
-            if (typeof artifactId[0].parentUri !== 'undefined') {
-            	podd.parentUri = artifactId[0].parentUri;
-            }
-            if (typeof artifactId[0].objectUri !== 'undefined') {
-            	podd.objectUri = artifactId[0].objectUri;
-            }
-            
+
             podd.updateErrorMessageList('<i>Successfully retrieved artifact version: ' + podd.versionIri + '</i><br>');
             // The following may update the interface, redirect the user to
             // another page, or so anything it likes really
