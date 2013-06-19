@@ -152,6 +152,16 @@ public interface PoddWebConstants
     public static final String KEY_OBJECT_IDENTIFIER = "objecturi";
     
     /**
+     * Key used to represent a parent object as part of a request
+     */
+    public static final String KEY_PARENT_IDENTIFIER = "parenturi";
+
+    /**
+     * Key used to represent a parent-child property as part of a request
+     */
+    public static final String KEY_PARENT_PREDICATE_IDENTIFIER = "parentPredicateuri";
+
+    /**
      * Key used to represent the file reference verification policy to use
      */
     public static final String KEY_VERIFICATION_POLICY = "file_verification";

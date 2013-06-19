@@ -68,6 +68,8 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         }
         
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String parentUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_IDENTIFIER);
+        final String parentPredicateUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_PREDICATE_IDENTIFIER);
         
         if(artifactUri == null)
         {
@@ -88,10 +90,38 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("pageTitle", title);
         dataModel.put("title", title);
         dataModel.put("objectType", objectTypeLabel);
+        // objectUri is unavailable as this is a new object
         
         if(artifactUri != null)
         {
-            dataModel.put("artifactUri", artifactUri);
+            // adding a child object to an existing artifact
+            
+            if (parentUri == null)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "parent URI not specified");
+            }
+            
+            if (parentPredicateUri == null)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "parent predicate URI not specified");
+            }
+            
+            InferredOWLOntologyID ontologyID;
+            try
+            {
+                ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
+            }
+            catch(final UnmanagedArtifactIRIException e)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
+            }
+            
+            dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
+            dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
+            
+            // parentUri and parentPredicate - is any validation required?
+            dataModel.put("parentUri", parentUri);
+            dataModel.put("parentPredicateUri", parentPredicateUri);
         }
         
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
