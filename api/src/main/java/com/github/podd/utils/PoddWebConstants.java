@@ -159,7 +159,7 @@ public interface PoddWebConstants
     /**
      * Key used to represent a parent-child property as part of a request
      */
-    public static final String KEY_PARENT_PREDICATE_IDENTIFIER = "parentPredicateuri";
+    public static final String KEY_PARENT_PREDICATE_IDENTIFIER = "parentpredicateuri";
 
     /**
      * Key used to represent the file reference verification policy to use
