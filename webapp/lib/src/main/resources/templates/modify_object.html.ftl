@@ -5,6 +5,8 @@
 <#-- @ftlvariable name="parentUri" type="java.lang.String" -->
 <#-- @ftlvariable name="parentPredicateUri" type="java.lang.String" -->
 <#-- @ftlvariable name="objectUri" type="java.lang.String" -->
+<#-- @ftlvariable name="artifactIri" type="java.lang.String" -->
+<#-- @ftlvariable name="versionIri" type="java.lang.String" -->
 
 <script type="text/javascript">
 	$(document).ready(function() {
