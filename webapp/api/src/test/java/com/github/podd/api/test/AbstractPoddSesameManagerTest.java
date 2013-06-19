@@ -915,7 +915,7 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 36, displayModel.size());
+        Assert.assertEquals("Display Model not of expected size", 35, displayModel.size());
         Assert.assertEquals("Not the expected no. of statements about object", 14,
                 displayModel.filter(objectUri, null, null).size());
         
@@ -959,7 +959,7 @@ public abstract class AbstractPoddSesameManagerTest
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
-                        "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", };
+                        "http://purl.org/podd/ns/poddScience#WildType_NotApplicable", };
         
         final String[] expectedLabels =
                 { "Project#2012-0006_ Cotton Leaf Morphology", "Demo genotype", "Squeekee material", "Not Applicable", };
@@ -1080,13 +1080,13 @@ public abstract class AbstractPoddSesameManagerTest
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#publication45",
-                        "mailto:helen.daily@csiro.au", "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", };
+                        "mailto:helen.daily@csiro.au", "http://purl.org/podd/ns/poddScience#WildType_NotApplicable", };
         
         final String[] expectedTypes =
                 { "http://purl.org/podd/ns/poddScience#Project", "http://purl.org/podd/ns/poddScience#Genotype",
                         "http://purl.org/podd/ns/poddScience#Material",
                         "http://purl.org/podd/ns/poddScience#Publication", "http://purl.org/podd/ns/poddUser#User",
-                        "http://purl.org/podd/ns/poddScience#ANZSRCAssertion", };
+                        "http://purl.org/podd/ns/poddScience#WildTypeAssertion", };
         
         // test in a loop these PODD objects for their types
         for(int i = 0; i < objectUris.length; i++)
@@ -1285,7 +1285,7 @@ public abstract class AbstractPoddSesameManagerTest
                 { "http://purl.org/podd/basic-1-20130206/object:2966",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
-                        "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", // NOT a PODD
+                        "http://purl.org/podd/ns/poddScience#WildType_NotApplicable", // NOT a PODD
                                                                                     // Object
                 };
         
@@ -1296,7 +1296,7 @@ public abstract class AbstractPoddSesameManagerTest
                         { 4, 1, "Demo genotype", "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material" },
                         { 5, 1, "Squeekee material",
                                 "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation" },
-                        { 6, 3, "Not Applicable" }, };
+                        { 5, 2, "Not Applicable" }, };
         
         // test in a loop these PODD objects for their details
         for(int i = 0; i < objectUris.length; i++)
@@ -1869,7 +1869,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final String searchTerm = "";
         final URI[] searchTypes =
-                { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRCAssertion"),
+                { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "WildTypeAssertion"),
                         PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
         final URI[] contexts =
                 this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,

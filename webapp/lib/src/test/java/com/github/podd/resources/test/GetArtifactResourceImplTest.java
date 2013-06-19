@@ -181,9 +181,9 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
         
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFJSON, 28);
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFJSON, 29);
         
-        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(6, model.subjects().size());
         Assert.assertEquals(15, model.predicates().size());
         Assert.assertEquals(24, model.objects().size());
         
@@ -221,9 +221,9 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
         
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 28);
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 29);
         
-        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(6, model.subjects().size());
         Assert.assertEquals(15, model.predicates().size());
         Assert.assertEquals(24, model.objects().size());
         
@@ -260,9 +260,9 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
         
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 28);
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 29);
         
-        Assert.assertEquals(5, model.subjects().size());
+        Assert.assertEquals(6, model.subjects().size());
         Assert.assertEquals(15, model.predicates().size());
         Assert.assertEquals(24, model.objects().size());
         

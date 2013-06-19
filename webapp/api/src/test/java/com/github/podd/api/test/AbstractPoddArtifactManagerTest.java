@@ -704,10 +704,8 @@ public abstract class AbstractPoddArtifactManagerTest
                             "http://purl.org/podd/ns/poddScience#Genotype" },
                     { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 1,
                             "http://purl.org/podd/ns/poddScience#Material" },
-
-                    // FIXME: figure out why ANZSRC_NotApplicable is also a poddScience;ANZSRC         
-                    //{ "http://purl.org/podd/ns/poddScience#ANZSRC_NotApplicable", 2, 
-                    //            "http://purl.org/podd/ns/poddScience#ANZSRCAssertion" }, 
+                    { "http://purl.org/podd/ns/poddScience#WildType_NotApplicable", 1, 
+                                "http://purl.org/podd/ns/poddScience#WildTypeAssertion" }, 
             };
     
         for(final Object[] element : testData)
@@ -1057,7 +1055,7 @@ public abstract class AbstractPoddArtifactManagerTest
         // prepare: load poddScience v2
         final InferredOWLOntologyID inferredPScienceOntologyID =
                 this.loadInferStoreOntology("/test/ontologies/poddScienceV2.owl", RDFFormat.RDFXML, 1265,
-                        TestConstants.EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED, this.testRepositoryConnection);
+                        215, this.testRepositoryConnection);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, true,
                 this.testRepositoryConnection, this.schemaGraph);
         

@@ -165,9 +165,9 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
      * Test successful search for a FOR Codes in RDF/XML
      */
     @Test
-    public void testSearchRdfForANZSRCAssertion() throws Exception
+    public void testSearchRdfForWildtTypeAssertion() throws Exception
     {
-        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#ANZSRCAssertion" };
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#WildTypeAssertion" };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
         
         final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType, null);
