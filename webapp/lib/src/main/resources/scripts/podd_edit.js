@@ -90,8 +90,11 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
  * 
  */
 podd.initialiseNewObject = function(nextDatabank, artifactUri, objectUri, parentUri, parentPredicateUri) {
-    nextDatabank.add(parentUri + ' ' + parentPredicateUri + ' ' + objectUri);
+	
+	podd.debug('Trying to build triple out of: ' + parentUri + ' ' + parentPredicateUri + ' and ' + objectUri);
 
+    nextDatabank.add('<' + parentUri + '> <' + parentPredicateUri + '> ' + objectUri);
+    
 	// add createdAt statement with default value
 	nextDatabank.add(podd.buildTriple(objectUri, PODD_CREATED_AT,
 			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
@@ -211,6 +214,19 @@ podd.deleteTriples = function(nextDatabank, subject, property) {
 };
 
 /**
+ * Removes all triples in the given databank.
+ */
+podd.deleteAllTriples = function(nextDatabank) {
+	var size = nextDatabank.size();
+    $.rdf({
+        databank : nextDatabank
+    }).where('?subject ?property ?object').sources().each(function(index, tripleArray) {
+        nextDatabank.remove(tripleArray[0]);
+    });
+    podd.debug('[deleteAllTriples] Cleaned databank by deleting ' + size + ' triples.')
+};
+
+/**
  * Display a message on leaving text field
  * 
  * This is mostly used for DEBUG.
@@ -306,7 +322,7 @@ podd.callbackFromGetMetadata = function(artifactUri, objectType, nextSchemaDatab
 	// TODO: are these two conditions sufficient to ensure it is a new artifact?
 	if (typeof artifactUri !== 'undefined' && artifactUri !== 'undefined') {
 		podd.debug('[callbackFromGetMetadata] artifact exists. retrieve it before update interface.');
-		podd.getArtifact(artifactUri, nextSchemaDatabank, nextArtifactDatabank, podd.updateInterface, objectType);
+		podd.getArtifact(artifactUri, nextSchemaDatabank, nextArtifactDatabank, false, podd.updateInterface, objectType);
 	} else {
 		podd.debug('[callbackFromGetMetadata] new artifact. invoke update interface');
 		podd.updateInterface(objectType, nextSchemaDatabank, nextArtifactDatabank);
@@ -820,20 +836,29 @@ podd.searchOntologyService = function(
  * Retrieve the current version of an artifact and populate the artifact
  * databank.
  * 
+ * This method also sets podd.artifactIri and podd.versionIri to match the
+ * retrieved artifact.
+ * 
  * @param artifactUri
- * 			  The artifact to be retrieved.
+ *            The artifact to be retrieved.
  * @param nextSchemaDatabank
- * 			  To be passed into the callback method.
+ *            To be passed into the callback method.
  * @param nextArtifactDatabank
- * 			  Databank to be populated with artifact triples.
+ *            Databank to be populated with artifact triples.
+ * @param cleanArtifactDatabank
+ *            If true, the artifact databank is wiped clean before it is
+ *            populated with newly retrieved content.
  * @param updateDisplayCallbackFunction
- * 			  The callback method to invoke on successful retrieval of the artifact.
+ *            The callback method to invoke on successful retrieval of the
+ *            artifact.
  * @param callbackParam
  *            If this parameter is not 'undefined', it should be the 4th
  *            parameter of the callback method. Otherwise, the callback should
  *            be invoked with only 3 parameters.
  */
-podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, updateDisplayCallbackFunction, callbackParam) {
+podd.getArtifact = function(artifactUri, nextSchemaDatabank,
+		nextArtifactDatabank, cleanArtifactDatabank,
+		updateDisplayCallbackFunction, callbackParam) {
     var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
     podd.debug('[getArtifact] Request to: ' + requestUrl);
@@ -842,10 +867,9 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
         type : 'GET',
         // dataType : 'application/rdf+xml', // what is expected back
         success : function(resultData, status, xhr) {
-            // Wipe out databank so it contains the most current copy after this
-            // point, since we succeeded in our quest to get the current version
-        	// FIXME: have a separate method which deletes everything
-            podd.deleteTriples(nextArtifactDatabank, "?subject", "?predicate");
+        	if (cleanArtifactDatabank) {
+        		podd.deleteAllTriples(nextArtifactDatabank);
+        	}
             nextArtifactDatabank.load(resultData);
             podd.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextArtifactDatabank.size());
 
@@ -959,7 +983,7 @@ podd.submitPoddObjectUpdate = function(
             // temporary URIs in nextArtifactDatabank are replaced with their
             // PURL versions
             var emptyParam;
-            podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, updateCallback, emptyParam);
+            podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, true, updateCallback, emptyParam);
         },
         error : function(xhr, status, error) {
             podd.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
@@ -1002,13 +1026,13 @@ podd.parseSearchResults = function(/* string */searchURL, /* rdf/json */data) {
  * Parse the given temporary Databank and extract the artifact IRI and version
  * IRI of the ontology/artifact contained within.
  * 
- * Also extracts and updates the parent URI and the current Object URI if they
+ * Also extracts and returns the parent URI and the current Object URI if they
  * are temporary URIs or unknown.
  * 
  * @param Databank
  *            containing artifact statements
  * @return an array with a single element which contains the Ontology's artifact
- *         IRI and version IRI and optionally the object URI and parent URI.
+ *         IRI, version IRI and optionally the object URI and parent URI.
  */
 podd.getOntologyID = function(nextDatabank) {
 
