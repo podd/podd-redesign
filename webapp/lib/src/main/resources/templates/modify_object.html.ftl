@@ -18,7 +18,6 @@
 		podd.artifactIri = '${artifactIri!"undefined"}';
 		podd.versionIri = '${versionIri!"undefined"}';
 		
-		// FIXME: Insert the parent URI using freemarker
 		podd.parentUri = '${parentUri!"undefined"}';
 		podd.parentPredicateUri = '${parentPredicateUri!"undefined"}'; 
 		
