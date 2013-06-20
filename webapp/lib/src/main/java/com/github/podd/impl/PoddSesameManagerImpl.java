@@ -43,6 +43,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.MetadataPolicy;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -777,8 +778,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     
     @Override
     public Model getObjectTypeMetadata(final URI objectType, final boolean includeDoNotDisplayProperties,
-            boolean includeContainsProperties, final RepositoryConnection repositoryConnection, final URI... contexts)
-        throws OpenRDFException
+            MetadataPolicy containsPropertyPolicy, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
     {
         final Model results = new LinkedHashModel();
         if(objectType == null)
@@ -815,17 +816,29 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         owlRestrictionQuery.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass } . ");
         owlRestrictionQuery.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange } . ");
         
+        
+        
         if(!includeDoNotDisplayProperties)
         {
             owlRestrictionQuery.append(" FILTER NOT EXISTS { ?propertyUri <"
                     + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
         }
         
-        if(!includeContainsProperties)
+        switch(containsPropertyPolicy)
         {
-            owlRestrictionQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
-                    + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
-        }        
+            case EXCLUDE_CONTAINS:
+                owlRestrictionQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue()
+                        + "> <" + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                break;
+            
+            case ONLY_CONTAINS:
+                owlRestrictionQuery.append("FILTER { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                        + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                break;
+            
+            default:
+                // do nothing. everything will be included
+        }
         
         owlRestrictionQuery.append("}");
         
@@ -864,11 +877,21 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
         }
         
-        if(!includeContainsProperties)
+        switch(containsPropertyPolicy)
         {
-            owlRestrictionQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
-                    + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
-        }        
+            case EXCLUDE_CONTAINS:
+                owlRestrictionQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue()
+                        + "> <" + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                break;
+            
+            case ONLY_CONTAINS:
+                owlRestrictionQuery.append("FILTER { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                        + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                break;
+            
+            default:
+                // do nothing. everything will be included
+        }
 
         rdfsQuery.append("}");
         

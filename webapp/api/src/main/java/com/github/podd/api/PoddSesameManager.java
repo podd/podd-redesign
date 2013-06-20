@@ -221,8 +221,8 @@ public interface PoddSesameManager
      *            The object type whose details are sought
      * @param includeDoNotDisplayProperties
      *            If true, properties that have been annotated as "Do Not Display" are also included
-     * @param includeContainsProperties
-     *            If true, properties that are sub-properties of poddBase:contains are included
+     * @param containsPropertyPolicy
+     *            Indicates policy regards types of properties to include in metadata 
      * @param repositoryConnection
      * @param contexts
      *            The contexts from which metadata is to be retrieved
@@ -233,7 +233,7 @@ public interface PoddSesameManager
      * @since 10/05/2013
      */
     Model getObjectTypeMetadata(URI objectType, boolean includeDoNotDisplayProperties,
-            boolean includeContainsProperties, RepositoryConnection repositoryConnection, URI... contexts)
+            MetadataPolicy containsPropertyPolicy, RepositoryConnection repositoryConnection, URI... contexts)
         throws OpenRDFException;
     
     List<URI> getObjectTypes(InferredOWLOntologyID ontologyID, URI objectUri, RepositoryConnection repositoryConnection)

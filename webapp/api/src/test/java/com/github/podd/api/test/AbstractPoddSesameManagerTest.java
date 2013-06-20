@@ -35,6 +35,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.MetadataPolicy;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -983,7 +984,7 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(URI, boolean, boolean, RepositoryConnection, URI...)}
+     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(URI, boolean, MetadataPolicy, RepositoryConnection, URI...)}
      * .
      */
     @Test
@@ -1009,43 +1010,44 @@ public abstract class AbstractPoddSesameManagerTest
         // expected model size, expected property count, do-not-display statement count
         final Object[][] testData =
                 {
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false, true,
-                                0, -1, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false,
+                                MetadataPolicy.INCLUDE_ALL, 0, -1, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, true, 175,
-                                22, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, false, 125,
-                                15, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true, true, 283, 35,
-                                11 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
+                                MetadataPolicy.INCLUDE_ALL, 175, 22, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
+                                MetadataPolicy.EXCLUDE_CONTAINS, 125, 15, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
+                                MetadataPolicy.INCLUDE_ALL, 283, 35, 11 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false, true, 107,
-                                14, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true, true, 133,
-                                18, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
+                                MetadataPolicy.INCLUDE_ALL, 107, 14, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
+                                MetadataPolicy.INCLUDE_ALL, 133, 18, 3 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false, true, 65,
-                                8, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true, true, 91,
-                                12, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
+                                MetadataPolicy.INCLUDE_ALL, 65, 8, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
+                                MetadataPolicy.INCLUDE_ALL, 91, 12, 3 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false, true,
-                                81, 10, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true, true,
-                                107, 14, 3 },                                };
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
+                                MetadataPolicy.INCLUDE_ALL, 81, 10, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
+                                MetadataPolicy.INCLUDE_ALL, 107, 14, 3 }
+                };
         
         for(final Object[] element : testData)
         {
             final URI objectType = (URI)element[0];
             final boolean includeDoNotDisplayProperties = (Boolean)element[1];
-            final boolean includeContainsProperties = (Boolean)element[2];
+            final MetadataPolicy policy = (MetadataPolicy) element[2];
             final int expectedTripleCount = (int)element[3];
             final int expectedPropertyCount = (int)element[4];
             final int expectedNonDisplayablePropertyCount = (int)element[5];
             
             final Model model =
                     this.testPoddSesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties,
-                            includeContainsProperties, this.testRepositoryConnection, contexts.toArray(new URI[0]));
+                            policy, this.testRepositoryConnection, contexts.toArray(new URI[0]));
             
             if(expectedTripleCount != model.size())
             {

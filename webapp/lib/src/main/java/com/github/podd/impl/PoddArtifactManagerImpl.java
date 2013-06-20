@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.FileReferenceVerificationPolicy;
+import com.github.podd.api.MetadataPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
@@ -262,6 +263,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final boolean includeDoNotDisplayProperties, boolean includeContainsProperties, final InferredOWLOntologyID artifactID)
         throws OpenRDFException, PoddException, IOException
     {
+        MetadataPolicy metadataPolicy = MetadataPolicy.EXCLUDE_CONTAINS;
+        if (includeContainsProperties)
+        {
+            metadataPolicy = MetadataPolicy.INCLUDE_ALL;
+        }
+        
         RepositoryConnection connection = null;
         
         try
@@ -273,7 +280,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             this.repositoryManager.getSchemaManagementGraph());
             
             final Model model =
-                    this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, includeContainsProperties,
+                    this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, metadataPolicy,
                             connection, contexts);
             
             Rio.write(model, outputStream, format);
