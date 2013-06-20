@@ -95,7 +95,10 @@
         <a href="${baseUrl}/artifact/edit?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Edit Object</a>
         </#if>
         <#if  canAddChildren?? && canAddChildren>
-        <a href="${baseUrl}/object/${poddObject.objectURI!"unknown-pid"}/add">Add Child Object</a>
+        	<!-- HACK: temporary code to always create a child Publication object -->
+        	<#global objectType="http://purl.org/podd/ns/poddScience#Publication"> 
+        	<#global parentPredicateUri="http://purl.org/podd/ns/poddScience#hasPublication"> 
+        	<a href="${baseUrl}/artifact/addobject?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;parenturi=${poddObject.objectURI?url!"unknown-parenturi"}&amp;objecttypeuri=${objectType?url!"unknown-objecturi"}&amp;parentpredicateuri=${parentPredicateUri?url!"unknown-parentpredicate"}">Add Publication Object</a>
         </#if>
         <#if  canPublish?? && canPublish>
         <a href="${baseUrl}/artifact/publish?artifacturi=${poddObject.objectURI!"unknown-pid"}/publish?publish=true">Publish Project</a>
