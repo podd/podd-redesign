@@ -832,7 +832,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 break;
             
             case ONLY_CONTAINS:
-                owlRestrictionQuery.append("FILTER { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                owlRestrictionQuery.append("FILTER EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
                         + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
                 break;
             
@@ -885,7 +885,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 break;
             
             case ONLY_CONTAINS:
-                owlRestrictionQuery.append("FILTER { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                owlRestrictionQuery.append("FILTER EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
                         + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
                 break;
             
