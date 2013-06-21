@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.FileReferenceVerificationPolicy;
+import com.github.podd.api.MetadataPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
@@ -246,36 +247,45 @@ public abstract class AbstractPoddArtifactManagerTest
         // expected model size, expected property count, do-not-display statement count
         final Object[][] testData =
                 {
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false, true,
-                                0, -1, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false,
+                                MetadataPolicy.INCLUDE_ALL, 0, -1, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, true, 175,
-                                22, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false, false, 125,
-                                15, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true, true, 283, 35,
-                                11 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
+                                MetadataPolicy.INCLUDE_ALL, 175, 22, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
+                                MetadataPolicy.EXCLUDE_CONTAINS, 125, 15, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
+                                MetadataPolicy.INCLUDE_ALL, 283, 35, 11 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
+                                MetadataPolicy.ONLY_CONTAINS, 85, 10, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false, true, 107,
-                                14, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true, true, 133,
-                                18, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
+                                MetadataPolicy.INCLUDE_ALL, 107, 14, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
+                                MetadataPolicy.INCLUDE_ALL, 133, 18, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
+                                MetadataPolicy.ONLY_CONTAINS, 22, 3, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false, true, 65,
-                                8, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true, true, 91,
-                                12, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
+                                MetadataPolicy.INCLUDE_ALL, 65, 8, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
+                                MetadataPolicy.INCLUDE_ALL, 91, 12, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
+                                MetadataPolicy.ONLY_CONTAINS, 7, 1, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false, true,
-                                81, 10, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true, true,
-                                107, 14, 3 },                };
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
+                                MetadataPolicy.INCLUDE_ALL, 81, 10, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
+                                MetadataPolicy.INCLUDE_ALL, 107, 14, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
+                                MetadataPolicy.ONLY_CONTAINS, 7, 1, 0 }, };
         
         for(final Object[] element : testData)
         {
             final URI objectType = (URI)element[0];
             final boolean includeDoNotDisplayProperties = (Boolean)element[1];
-            final boolean includeContainsProperties = (Boolean)element[2];
+
+            final MetadataPolicy containsPropertyPolicy = (MetadataPolicy)element[2];
             final int expectedTripleCount = (int)element[3];
             final int expectedPropertyCount = (int)element[4];
             final int expectedNonDisplayablePropertyCount = (int)element[5];
@@ -283,7 +293,7 @@ public abstract class AbstractPoddArtifactManagerTest
             final ByteArrayOutputStream output = new ByteArrayOutputStream();
             
             this.testArtifactManager.exportObjectMetadata(objectType, output, RDFFormat.TURTLE,
-                    includeDoNotDisplayProperties, includeContainsProperties, artifactID);
+                    includeDoNotDisplayProperties, containsPropertyPolicy, artifactID);
             
             // parse output into a Model
             final ByteArrayInputStream bin = new ByteArrayInputStream(output.toByteArray());
@@ -645,7 +655,7 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, boolean, InferredOWLOntologyID)}
+     * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, MetadataPolicy, InferredOWLOntologyID)}
      * .
      */
     @Test
@@ -665,7 +675,7 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, boolean, InferredOWLOntologyID)}
+     * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, MetadataPolicy, InferredOWLOntologyID)}
      * .
      */
     @Test

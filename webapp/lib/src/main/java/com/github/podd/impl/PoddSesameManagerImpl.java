@@ -918,33 +918,37 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         /*
          * add statements for annotation properties RDFS:Label and RDFS:Comment
          */
-        final URI[] commonAnnotationProperties = { RDFS.LABEL, RDFS.COMMENT };
-        for(URI annotationProperty : commonAnnotationProperties)
+        if (containsPropertyPolicy != MetadataPolicy.ONLY_CONTAINS)
         {
-            final StringBuilder annotationQuery = new StringBuilder();
-            
-            annotationQuery.append("CONSTRUCT { ");
-            annotationQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
-            annotationQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
-            annotationQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?annotationProperty . ");
-            annotationQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
-            
-            annotationQuery.append("} WHERE {");
-            annotationQuery.append(" ?annotationProperty <" + RDFS.RANGE.stringValue() + "> ?rangeClass . ");
-            annotationQuery.append("}");
-            
-            final GraphQuery annotationGraphQuery =
-                    repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, annotationQuery.toString());
-            annotationGraphQuery.setBinding("objectType", objectType);
-            annotationGraphQuery.setBinding("annotationProperty", annotationProperty);
-            
-            this.log.info("Created SPARQL {} \n   with objectType bound to {} and annotationProperty {}",
-                    annotationQuery, objectType, annotationProperty);
-            
-            final Model annotationQueryResults = this.executeGraphQuery(annotationGraphQuery, contexts);
-            
-            results.addAll(annotationQueryResults);
-            properties.addAll(annotationQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
+            final URI[] commonAnnotationProperties = { RDFS.LABEL, RDFS.COMMENT };
+            for(URI annotationProperty : commonAnnotationProperties)
+            {
+                final StringBuilder annotationQuery = new StringBuilder();
+                
+                annotationQuery.append("CONSTRUCT { ");
+                annotationQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
+                annotationQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue()
+                        + "> . ");
+                annotationQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?annotationProperty . ");
+                annotationQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
+                
+                annotationQuery.append("} WHERE {");
+                annotationQuery.append(" ?annotationProperty <" + RDFS.RANGE.stringValue() + "> ?rangeClass . ");
+                annotationQuery.append("}");
+                
+                final GraphQuery annotationGraphQuery =
+                        repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, annotationQuery.toString());
+                annotationGraphQuery.setBinding("objectType", objectType);
+                annotationGraphQuery.setBinding("annotationProperty", annotationProperty);
+                
+                this.log.info("Created SPARQL {} \n   with objectType bound to {} and annotationProperty {}",
+                        annotationQuery, objectType, annotationProperty);
+                
+                final Model annotationQueryResults = this.executeGraphQuery(annotationGraphQuery, contexts);
+                
+                results.addAll(annotationQueryResults);
+                properties.addAll(annotationQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
+            }
         }
         
         // -- for each property, get meta-data about it

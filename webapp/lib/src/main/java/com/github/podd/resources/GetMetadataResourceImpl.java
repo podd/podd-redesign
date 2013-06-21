@@ -18,6 +18,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.podd.api.MetadataPolicy;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
@@ -61,10 +62,22 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, true);
         final boolean includeDoNotDisplayProperties = Boolean.valueOf(includeDoNotDisplayPropertiesString);
         
-        // - include sub-properties of PoddBase:contains (optional, defaults to false)
-        final String includeContainsPropertiesString =
-                this.getQuery().getFirstValue(PoddWebConstants.KEY_INCLUDE_CONTAINS_SUB_PROPERTIES, true);
-        final boolean includeContainsProperties = Boolean.valueOf(includeContainsPropertiesString);
+        // - metadata policy (optional, default is to exclude sub-properties of poddBase:contains)
+        final String metadataPolicyString =
+                this.getQuery().getFirstValue(PoddWebConstants.KEY_METADATA_POLICY, true);
+        
+        MetadataPolicy containsPropertyPolicy = MetadataPolicy.EXCLUDE_CONTAINS;
+        if (metadataPolicyString != null)
+        {
+            if (metadataPolicyString.equalsIgnoreCase(PoddWebConstants.METADATA_ONLY_CONTAINS))
+            {
+                containsPropertyPolicy = MetadataPolicy.ONLY_CONTAINS;
+            }
+            else if (metadataPolicyString.equalsIgnoreCase(PoddWebConstants.METADATA_ALL))
+            {
+                containsPropertyPolicy = MetadataPolicy.INCLUDE_ALL;
+            }
+        }
         
         this.log.info("@Get Metadata: {} ({})", objectType, variant.getMediaType().getName());
         
@@ -85,7 +98,7 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
             
             this.getPoddArtifactManager().exportObjectMetadata(PoddRdfConstants.VF.createURI(objectType), output,
                     RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE),
-                    includeDoNotDisplayProperties, includeContainsProperties, artifactID);
+                    includeDoNotDisplayProperties, containsPropertyPolicy, artifactID);
         }
         catch(final UnmanagedArtifactIRIException e)
         {

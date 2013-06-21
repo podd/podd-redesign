@@ -58,7 +58,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         final String objectType = PoddRdfConstants.PODD_SCIENCE + "Genotype";
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, "true");
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_CONTAINS_SUB_PROPERTIES, "true");
+        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_METADATA_POLICY, PoddWebConstants.METADATA_ALL);
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         
         final Representation results =

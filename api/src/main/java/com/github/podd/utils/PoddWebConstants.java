@@ -224,10 +224,10 @@ public interface PoddWebConstants
     public static final String KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES = "includedndprops";
     
     /**
-     * Key used in "create object" service to indicate whether sub-properties of poddBase:contains are
+     * Key used in "metadata" service to indicate policy on types of properties
      * to be included.
      */
-    public static final String KEY_INCLUDE_CONTAINS_SUB_PROPERTIES = "includecontainsprops";
+    public static final String KEY_METADATA_POLICY = "metadatapolicy";
     
     
     /**
@@ -236,4 +236,9 @@ public interface PoddWebConstants
      */
     public static final String KEY_INCLUDE_INFERRED = "includeInferred";
     
+    public static final String METADATA_ALL = "all";
+    
+    public static final String METADATA_EXCLUDE_CONTAINS = "nocontains";
+    
+    public static final String METADATA_ONLY_CONTAINS = "containsonly";
 }
