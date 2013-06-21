@@ -800,6 +800,133 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
 };
 
 /**
+ * Retrieve metadata on which types of child objects can be added to the
+ * given object type.
+ * 
+ * @param artifactUri -
+ *            The current artifact's URI. Maybe "undefined" if adding a new
+ *            artifact.
+ * @param objectType -
+ *            The type of Object (e.g. Project, Publication)
+ * @param successCallback -
+ *            where to send the results
+ * @param nextSchemaDatabank -
+ * 			  Databank where retrieved metadata is to be stored.
+ * @param nextArtifactDatabank -
+ * 			  Databank where artifact's triples are stored.
+ */
+podd.getCreateChildMetadata = function(artifactUri, objectType,
+		successCallback, nextSchemaDatabank, nextArtifactDatabank) {
+
+    var requestUrl = podd.baseUrl + '/metadata';
+
+    podd.debug('[getCreateChildMetadata] Request (GET) (' + objectType + '): ' + requestUrl);
+
+    $.ajax({
+        url : requestUrl,
+        type : 'GET',
+        data : {
+            objecttypeuri : objectType,
+            includedndprops : false,
+            metadatapolicy : 'containsonly'
+        },
+        dataType : 'json', // what is expected back
+        success : function(resultData, status, xhr) {
+            podd.debug('[getCreateChildMetadata] ### SUCCESS ### ');
+			podd.debug(resultData);
+
+            nextSchemaDatabank.load(resultData);
+
+            successCallback(objectType, nextSchemaDatabank);
+        },
+        error : function(xhr, status, error) {
+            podd.debug('[getCreateChildMetadata] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
+        }
+    });
+};
+
+/**
+ * Display a Dialog where user can select the relationship to the child object
+ * and the type of child object.
+ * 
+ * @param objectType
+ *            The current object's type
+ * @param nextSchemaDatabank
+ *            Databank populated with necessary metadata
+ */
+podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
+    podd.debug('[showAddChildDialog] Schema Databank size = ' + nextSchemaDatabank.size());
+
+    var select1 = $('<select>', {
+        name : 'name_child_relationship',
+    });
+
+    var select2 = $('<select>', {
+        name : 'name_child_type',
+    });
+
+    
+    var myQuery = $.rdf({
+        databank : nextSchemaDatabank
+    })
+    // Find all possible child object details for this object type
+    .where('<' +objectType + '> rdfs:subClassOf ?myRestriction')
+    //
+    .where('?myRestriction a owl:Restriction')
+    //
+    .where('?myRestriction owl:onProperty ?childRelationship')
+    // 
+    .where('?myRestriction owl:allValuesFrom ?childType')
+    //
+    .where('?childRelationship rdfs:label ?relationshipLabel')
+    ;
+    var bindings = myQuery.select();
+
+    $.each(bindings, function(index, value) {
+        var nextChild = {};
+        nextChild.weight;
+        nextChild.propertyUri = value.childRelationship.value;
+        nextChild.propertyLabel = value.relationshipLabel.value;
+        nextChild.objectType = value.childType.value;
+        // FIXME: retrieve objectType's label
+    	nextChild.objectLabel = value.childType.value;
+    	
+        podd.debug('[showAddChildDialog] child relationship: <' + nextChild.propertyUri + '> "' 
+        		+ nextChild.propertyLabel + '"  and child type: ' + nextChild.objectType);
+        
+        var option1 = $('<option>', {
+            value : nextChild.propertyUri,
+            text : nextChild.propertyLabel
+        });
+
+        var option2 = $('<option>', {
+            value : nextChild.objectType,
+            text : nextChild.objectLabel
+        });
+        
+        select1.append(option1);
+        select2.append(option2);
+    });
+
+    // TODO: display these in a dialog
+    var div = $('<div>', {
+        name : 'add_child',
+    });
+    
+    div.append(select1);
+    div.append(select2);
+    // FIXME: appropriately link the two drop-down lists to prevent incorrect selections of
+    // child properties and child object types
+    // TODO: add a "Continue" link
+    
+    var li2 = $("#buttonwrapper");
+    li2.append(div);
+    
+    podd.debug('[showAddChildDialog] finished');
+};
+
+/**
  * Call Search Ontology Resource Service using AJAX, convert the RDF response to
  * a JSON array and invoke the specified callback function.
  * 

@@ -295,7 +295,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             // Get label for the object type
             final URI objectType = objectTypes.get(0);
             final PoddObjectLabel label = this.getPoddSesameManager().getObjectLabel(ontologyID, objectType, conn);
-            dataModel.put("objectType", label.getLabel());
+            dataModel.put("objectType", label);
             
             // populate the properties of the object
             final List<URI> orderedProperties =

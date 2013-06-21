@@ -30,11 +30,38 @@
     ***********************************************/
 </script>
 
+<script type="text/javascript">
+	$(document).ready(function() {
+        podd.debug('-------------------');
+        podd.debug('initializing...');
+        podd.debug('-------------------');
+
+		podd.objectUri = '${poddObject.objectURI!"Not Found"}';
+		podd.objectTypeUri = '${objectType.objectURI!"undefined"}';
+		podd.artifactIri = '${artifactUri!"undefined"}';
+		//podd.versionIri = '${versionIri!"undefined"}';
+		
+	    podd.schemaDatabank = podd.newDatabank();
+
+		// Add child object clicked
+		$("#createChildObject").click(function(event) {
+			event.preventDefault();
+			podd.debug("Clicked add child object");
+			
+			podd.getCreateChildMetadata(podd.artifactIri, podd.objectTypeUri, podd.showAddChildDialog,
+				podd.schemaDatabank, podd.schemaDatabank);
+		});
+	
+        podd.debug('### initialization complete ###');
+	});
+</script>
+
+
 <div id="title_pane">
     <#if state??>
-        <h3>View: ${objectType!"Object"} (<span class="descriptive">${state}</span>)</h3>
+        <h3>View: ${objectType.label!"Object"} (<span class="descriptive">${state}</span>)</h3>
     <#else>
-        <h3>View: ${objectType!"Object"}</h3>
+        <h3>View: ${objectType.label!"Object"}</h3>
     </#if>
 </div>
 
@@ -42,12 +69,12 @@
 
 <#include "parent_details.html.ftl"/>
 
-<h3 class="underlined_heading">${objectType!"Object"} Details
+<h3 class="underlined_heading">${objectType.label!"Object"} Details
     <a href="javascript:animatedcollapse.toggle('details')" icon="toggle" title="View Details"></a>
 </h3>
     <div id="details">  <!-- Collapsible div -->
         <#if poddObject?? && poddObject.objectURI??>
-            <div about="${poddObject.objectURI!"unknown-uri"}" id="${objectType!"object"}_details" class="fieldset">
+            <div about="${poddObject.objectURI!"unknown-uri"}" id="${objectType.label!"object"}_details" class="fieldset">
                 <ol>
                 	<#-- object URI, Title and description -->
                     <li><span class="bold">URI: </span> <a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${poddObject.objectURI?url}">${util.clipProtocol(poddObject.objectURI!"Unknown URI")}</a></li>
@@ -96,9 +123,10 @@
         </#if>
         <#if  canAddChildren?? && canAddChildren>
         	<!-- HACK: temporary code to always create a child Publication object -->
-        	<#global objectType="http://purl.org/podd/ns/poddScience#Publication"> 
+        	<#global objectTypeHack="http://purl.org/podd/ns/poddScience#Publication"> 
         	<#global parentPredicateUri="http://purl.org/podd/ns/poddScience#hasPublication"> 
-        	<a href="${baseUrl}/artifact/addobject?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;parenturi=${poddObject.objectURI?url!"unknown-parenturi"}&amp;objecttypeuri=${objectType?url!"unknown-objecturi"}&amp;parentpredicateuri=${parentPredicateUri?url!"unknown-parentpredicate"}">Add Publication Object</a>
+        	<a href="${baseUrl}/artifact/addobject?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;parenturi=${poddObject.objectURI?url!"unknown-parenturi"}&amp;objecttypeuri=${objectTypeHack?url!"unknown-objecturi"}&amp;parentpredicateuri=${parentPredicateUri?url!"unknown-parentpredicate"}">Add Publication Object</a>
+	    	<a id="createChildObject" value="createChildObject">Add Child Object</a>
         </#if>
         <#if  canPublish?? && canPublish>
         <a href="${baseUrl}/artifact/publish?artifacturi=${poddObject.objectURI!"unknown-pid"}/publish?publish=true">Publish Project</a>
@@ -107,7 +135,7 @@
         <a href="${baseUrl}/artifact/updatepurls?artifacturi=${poddObject.objectURI!"unknown-pid"}">Update PURLs</a>
         <a href="${baseUrl}/artifact/unpublish?artifacturi=${poddObject.objectURI!"unknown-pid"}">Unpublish Project</a>
         </#if>
-        <#if objectType?? && objectType == 'Investigation'>
+        <#if objectType?? && objectType.label == 'Investigation'>
         	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.objectURI!"unknown-pid"}">Download hierarchy attachments</a>
         </#if>        
         <#if canDelete?? && canDelete>
