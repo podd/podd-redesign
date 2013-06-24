@@ -47,10 +47,16 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetChildrenWithInvestigationRdf() throws Exception
     {
+        // prepare: add an artifact
+        final String artifactUri =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE)
+                        .getOntologyIRI().toString();
+        
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
         
         final String objectType = PoddRdfConstants.PODD_SCIENCE + "Investigation";
+        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, "false");
         createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_METADATA_POLICY,
@@ -64,12 +70,12 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         
         // verify:
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 63);
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 57);
         
         // FIXME: assert that FieldConditions and GrowthConditions are returned as possible object types for #hasEnvironment property 
         // FIXME: assert that labels for object types are returned
         
-        Assert.assertEquals("Unexpected no. of properties", 9,
+        Assert.assertEquals("Unexpected no. of properties", 8,
                 model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
         Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                 model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
@@ -95,9 +101,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         
         // verify:
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 85);
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 51);
         
-        Assert.assertEquals("Unexpected no. of properties", 10,
+        Assert.assertEquals("Unexpected no. of properties", 7,
                 model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
         Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                 model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
@@ -120,15 +126,16 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final String body = results.getText();
-        
+
         // verify:
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 7);
-        
-        Assert.assertEquals("Unexpected no. of properties", 1,
-                model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
-        Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-                model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        Assert.assertNull("No content since Publication cannot have child objects", body);
+//        final Model model =
+//                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 7);
+//        
+//        Assert.assertEquals("Unexpected no. of properties", 1,
+//                model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+//        Assert.assertEquals("Expected no Do-Not-Display properties", 0,
+//                model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
     }
     
     @Test
