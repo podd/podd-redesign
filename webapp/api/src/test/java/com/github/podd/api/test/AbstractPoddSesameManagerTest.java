@@ -1071,6 +1071,60 @@ public abstract class AbstractPoddSesameManagerTest
         }
     }
 
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeContainsMetadata(URI, RepositoryConnection, URI...)}
+     * .
+     */
+    @Test
+    public void testGetObjectTypeContainsMetadata() throws Exception
+    {
+        // prepare: load schema ontologies
+        this.loadSchemaOntologies();
+        
+        // prepare: the contexts to search in - (load an artifact and get its imported schemas)
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        final Set<IRI> directImports =
+                this.testPoddSesameManager.getDirectImports(ontologyID, this.testRepositoryConnection);
+        final List<URI> contexts = new ArrayList<URI>(directImports.size() + 2);
+        for(final IRI nextDirectImport : directImports)
+        {
+            contexts.add(nextDirectImport.toOpenRDFURI());
+        }
+        
+        // Format: Object Type, expected model size, expected relationship count, expected child
+        // object type count
+        final Object[][] testData =
+                { { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation"), 57, 8, 10 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), 28, 4, 4 }, };
+        
+        for(final Object[] element : testData)
+        {
+            final URI objectTypeToTest = (URI)element[0];
+            final int expectedModelSize = (int)element[1];
+            final int expectedChildRelationshipCount = (int)element[2];
+            final int expectedChildObjectTypes = (int)element[3];
+            
+            final Model model =
+                    this.testPoddSesameManager.getObjectTypeContainsMetadata(objectTypeToTest,
+                            this.testRepositoryConnection, contexts.toArray(new URI[0]));
+            
+            if(expectedModelSize != model.size())
+            {
+                DebugUtils.printContents(model);
+            }
+            // verify:
+            Assert.assertEquals("Not the expected statement count in Model", expectedModelSize, model.size());
+            Assert.assertEquals("Not the expected no. of child relationships", expectedChildRelationshipCount, model
+                    .filter(null, OWL.ONPROPERTY, null).objects().size());
+            Assert.assertEquals("Not the expected no. of child object types", expectedChildObjectTypes,
+                    model.filter(null, OWL.ALLVALUESFROM, null).objects().size());
+        }
+    }
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getObjectTypes(InferredOWLOntologyID, URI, RepositoryConnection)}

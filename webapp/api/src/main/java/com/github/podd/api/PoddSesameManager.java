@@ -212,6 +212,25 @@ public interface PoddSesameManager
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
     /**
+     * For a given PODD Object Type, this method retrieves metadata about possible objects that it
+     * can <b>contain</b> and the parent-child relationships with them. Parent-child relationships
+     * annotated as "Do Not Display" are excluded by this method.
+     * 
+     * @param objectType
+     *            The object type whose details are sought
+     * @param repositoryConnection
+     * @param contexts
+     *            The contexts from which metadata is to be retrieved
+     * @return A {@link Model} containing statements about possible children the given Object Type
+     *         may have
+     * @throws OpenRDFException
+     * 
+     * @since 24/06/2013
+     */
+    Model getObjectTypeContainsMetadata(URI objectType, RepositoryConnection repositoryConnection, URI... contexts)
+            throws OpenRDFException;
+    
+    /**
      * <p>
      * For a given PODD Object type, this method returns meta-data about it which can be used to
      * render the object.

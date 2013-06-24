@@ -777,6 +777,118 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
+    public Model getObjectTypeContainsMetadata(final URI objectType, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final Model results = new LinkedHashModel();
+        if(objectType == null)
+        {
+            return results;
+        }
+        
+        final Set<Value> restrictions = new HashSet<Value>();
+        
+        /*
+         * NOTE: This SPARQL query only finds properties defined as OWL restrictions in the given
+         * Object Type and its ancestors.
+         */
+        final StringBuilder owlRestrictionQuery = new StringBuilder();
+        
+        owlRestrictionQuery.append("CONSTRUCT { ");
+        owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
+        owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        owlRestrictionQuery.append(" ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
+        
+        owlRestrictionQuery.append(" ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass . ");
+        owlRestrictionQuery.append(" ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange . ");
+        owlRestrictionQuery.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyUriLabel . ");
+        owlRestrictionQuery.append(" ?rangeClass <" + RDFS.LABEL.stringValue() + "> ?rangeClassLabel . ");
+        
+        owlRestrictionQuery.append("} WHERE {");
+        
+        owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+        owlRestrictionQuery.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
+        owlRestrictionQuery.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass } . ");
+        owlRestrictionQuery.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange } . ");
+        owlRestrictionQuery
+                .append(" OPTIONAL { ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyUriLabel } . ");
+        owlRestrictionQuery.append(" OPTIONAL { ?rangeClass <" + RDFS.LABEL.stringValue() + "> ?rangeClassLabel } . ");
+        
+        // exclude doNotDisplay properties
+        owlRestrictionQuery.append(" FILTER NOT EXISTS { ?propertyUri <"
+                + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue() + "> true . } ");
+        
+        // include only contains sub-properties
+        owlRestrictionQuery.append("FILTER EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+        
+        owlRestrictionQuery.append("}");
+        
+        final GraphQuery rdfsGraphQuery =
+                repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, owlRestrictionQuery.toString());
+        rdfsGraphQuery.setBinding("objectType", objectType);
+        
+        this.log.debug("Created SPARQL {} \n   with objectType bound to {}", owlRestrictionQuery, objectType);
+        
+        final Model rdfsQueryResults = this.executeGraphQuery(rdfsGraphQuery, contexts);
+        results.addAll(rdfsQueryResults);
+        
+        restrictions.addAll(rdfsQueryResults.filter(null, RDF.TYPE, OWL.RESTRICTION).subjects());
+        this.log.info("{} Restrictions found", restrictions.size());
+        
+        /*
+         * Find any sub-classes of the above ranges and include them also
+         */
+        final Model subModel = new LinkedHashModel();
+        for(final Value restriction : restrictions)
+        {
+            
+            if(restriction instanceof Resource)
+            {
+                final Resource onProperty =
+                        rdfsQueryResults.filter((Resource)restriction, OWL.ONPROPERTY, null).objectResource();
+                final Resource onRange =
+                        rdfsQueryResults.filter((Resource)restriction, OWL.ALLVALUESFROM, null).objectResource();
+                
+                final StringBuilder subRangeQuery = new StringBuilder();
+                
+                subRangeQuery.append("CONSTRUCT { ");
+                subRangeQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
+                subRangeQuery
+                        .append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+                subRangeQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+                subRangeQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?subRange . ");
+                subRangeQuery.append(" ?subRange <" + RDFS.LABEL.stringValue() + "> ?subRangeLabel . ");
+                
+                subRangeQuery.append("} WHERE {");
+                
+                subRangeQuery.append(" ?subRange <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?rangeClass . ");
+                subRangeQuery.append(" OPTIONAL { ?subRange <" + RDFS.LABEL.stringValue() + "> ?subRangeLabel } . ");
+                
+                subRangeQuery.append("}");
+                
+                final GraphQuery subRangeGraphQuery =
+                        repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, subRangeQuery.toString());
+                subRangeGraphQuery.setBinding("rangeClass", onRange);
+                subRangeGraphQuery.setBinding("propertyUri", onProperty);
+                subRangeGraphQuery.setBinding("objectType", objectType);
+                
+                this.log.debug("Created SPARQL {} \n   with rangeClass bound to {}", subRangeQuery, restriction);
+                
+                final Model subRangeResults = this.executeGraphQuery(subRangeGraphQuery, contexts);
+                subModel.addAll(subRangeResults);
+            }
+        }
+        
+        results.addAll(subModel);
+        
+        return results;
+    }
+    
+    @Override
     public Model getObjectTypeMetadata(final URI objectType, final boolean includeDoNotDisplayProperties,
             MetadataPolicy containsPropertyPolicy, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
