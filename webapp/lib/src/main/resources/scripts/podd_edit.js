@@ -813,7 +813,7 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
  * @param nextSchemaDatabank -
  * 			  Databank where retrieved metadata is to be stored.
  * @param nextArtifactDatabank -
- * 			  Databank where artifact's triples are stored.
+ * 			  Databank where artifact's triples are stored. FIXME - remove as unused
  */
 podd.getCreateChildMetadata = function(artifactUri, objectType,
 		successCallback, nextSchemaDatabank, nextArtifactDatabank) {
@@ -847,6 +847,13 @@ podd.getCreateChildMetadata = function(artifactUri, objectType,
 };
 
 /**
+ * 
+ */
+podd.continueToAddChild = function() {
+	
+};
+
+/**
  * Display a Dialog where user can select the relationship to the child object
  * and the type of child object.
  * 
@@ -862,8 +869,9 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
         name : 'name_child_relationship',
     });
 
-    var select2 = $('<select>', {
-        name : 'name_child_type',
+    var continueLink = $('<a>', {
+        name : 'name_add_object_link',
+        text : 'Continue' 
     });
 
     
@@ -880,6 +888,8 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
     .where('?myRestriction owl:allValuesFrom ?childType')
     //
     .where('?childRelationship rdfs:label ?relationshipLabel')
+    //
+    .where('?childType rdfs:label ?childTypeLabel')
     ;
     var bindings = myQuery.select();
 
@@ -889,24 +899,21 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
         nextChild.propertyUri = value.childRelationship.value;
         nextChild.propertyLabel = value.relationshipLabel.value;
         nextChild.objectType = value.childType.value;
-        // FIXME: retrieve objectType's label
-    	nextChild.objectLabel = value.childType.value;
+    	nextChild.objectLabel = value.childTypeLabel.value;
     	
         podd.debug('[showAddChildDialog] child relationship: <' + nextChild.propertyUri + '> "' 
         		+ nextChild.propertyLabel + '"  and child type: ' + nextChild.objectType);
         
+        var text = nextChild.objectLabel + ' (' + nextChild.propertyLabel + ')'; 
+        
         var option1 = $('<option>', {
             value : nextChild.propertyUri,
-            text : nextChild.propertyLabel
+            text : text,
+            targetobject : nextChild.objectType
         });
 
-        var option2 = $('<option>', {
-            value : nextChild.objectType,
-            text : nextChild.objectLabel
-        });
         
         select1.append(option1);
-        select2.append(option2);
     });
 
     // TODO: display these in a dialog
@@ -915,10 +922,9 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
     });
     
     div.append(select1);
-    div.append(select2);
-    // FIXME: appropriately link the two drop-down lists to prevent incorrect selections of
-    // child properties and child object types
-    // TODO: add a "Continue" link
+    
+    // TODO: add a handler to invoke "Add Object" service with appropriate parameters
+    div.append(continueLink);
     
     var li2 = $("#buttonwrapper");
     li2.append(div);
