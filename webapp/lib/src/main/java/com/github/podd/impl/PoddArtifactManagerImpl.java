@@ -272,11 +272,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final URI[] contexts =
                     this.sesameManager.versionAndSchemaContexts(artifactID, connection,
                             this.repositoryManager.getSchemaManagementGraph());
-            
-            final Model model =
-                    this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, containsPropertyPolicy,
-                            connection, contexts);
-            
+
+            Model model = null;
+            if(containsPropertyPolicy == MetadataPolicy.ONLY_CONTAINS)
+            {
+                model = this.sesameManager.getObjectTypeContainsMetadata(objectType, connection, contexts);
+            }
+            else
+            {
+                model =
+                        this.sesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties,
+                                containsPropertyPolicy, connection, contexts);
+            }
             Rio.write(model, outputStream, format);
         }
         finally

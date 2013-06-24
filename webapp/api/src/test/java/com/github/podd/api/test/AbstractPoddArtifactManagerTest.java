@@ -248,37 +248,37 @@ public abstract class AbstractPoddArtifactManagerTest
         final Object[][] testData =
                 {
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false,
-                                MetadataPolicy.INCLUDE_ALL, 0, -1, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 0, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 175, 22, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 175, 23, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 125, 15, 0 },
+                                MetadataPolicy.EXCLUDE_CONTAINS, 125, 16, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 283, 35, 11 },
+                                MetadataPolicy.INCLUDE_ALL, 283, 36, 11 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 51, 7, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 42, 7, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                MetadataPolicy.INCLUDE_ALL, 107, 14, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 107, 15, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                MetadataPolicy.INCLUDE_ALL, 133, 18, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 133, 19, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 8, 1, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 6, 1, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.INCLUDE_ALL, 65, 8, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 65, 9, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                MetadataPolicy.INCLUDE_ALL, 91, 12, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 91, 13, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 0, -1, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 0, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.INCLUDE_ALL, 81, 10, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 81, 11, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
-                                MetadataPolicy.INCLUDE_ALL, 107, 14, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 107, 15, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 0, -1, 0 }, };
+                                MetadataPolicy.ONLY_CONTAINS, 0, 0, 0 }, };
         
         for(final Object[] element : testData)
         {
@@ -302,10 +302,15 @@ public abstract class AbstractPoddArtifactManagerTest
             rdfParser.setRDFHandler(new StatementCollector(model));
             rdfParser.parse(bin, "");
             
+            if(expectedTripleCount != model.size())
+            {
+                DebugUtils.printContents(model);
+            }
+            
             // verify:
             Assert.assertEquals("Not the expected statement count in Model", expectedTripleCount, model.size());
             Assert.assertEquals("Not the expected no. of properties", expectedPropertyCount,
-                    model.filter(objectType, null, null).size() - 1);
+                    model.filter(objectType, null, null).size());
             Assert.assertEquals("Not the expected no. of non-displayable properties", expectedNonDisplayablePropertyCount,
                     model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
