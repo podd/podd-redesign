@@ -66,6 +66,11 @@
 </div>
 
 <div id="content_pane">
+<h4 id="errorMsgHeader" class="errorMsg">${errorMessage!""}</h4>
+
+<#-- add general error messages -->
+<ol id="errorMsgList">
+</ol>
 
 <#include "parent_details.html.ftl"/>
 
