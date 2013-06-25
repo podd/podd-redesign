@@ -36,6 +36,16 @@
         podd.debug('initializing...');
         podd.debug('-------------------');
 
+		// keep Dialog hidden
+		$("#dialog").dialog({
+			autoOpen : false,
+			modal: true,
+		    dialogClass: "dialog_class",
+		    close: function () {
+        		$(this).remove();
+      		}  
+		});
+
 		podd.objectUri = '${poddObject.objectURI!"Not Found"}';
 		podd.objectTypeUri = '${objectType.objectURI!"undefined"}';
 		podd.artifactIri = '${artifactUri!"undefined"}';
@@ -47,7 +57,7 @@
 		$("#createChildObject").click(function(event) {
 			event.preventDefault();
 			podd.debug("Clicked add child object");
-			
+
 			podd.getCreateChildMetadata(podd.artifactIri, podd.objectTypeUri, podd.showAddChildDialog,
 				podd.schemaDatabank, podd.schemaDatabank);
 		});
@@ -56,6 +66,7 @@
 	});
 </script>
 
+<div id="dialog" title="Add Child Object"></div>
 
 <div id="title_pane">
     <#if state??>

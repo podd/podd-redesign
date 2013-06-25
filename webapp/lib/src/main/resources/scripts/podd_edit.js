@@ -923,21 +923,27 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
     
     var continueLink = $('<a>', {
         name : 'name_add_object_link',
-        text : 'Continue' 
+        text : 'Continue', 
+        class : 'button'
     });
 
     var div = $('<div>', {
         name : 'add_child',
     });
+
+	var dialog = $('#dialog');
     
     podd.addChildObjectHandler(continueLink, select, hiddenChildType, hiddenRelationship);
-    
+   
+    div.append('<p>Select Child Object Type (and Relationship)</p>')
     div.append(select);
+    div.append('<br><br>');
     div.append(continueLink);
     div.append(hiddenChildType);
     div.append(hiddenRelationship);
     
-    $("#buttonwrapper").append(div);
+	dialog.append(div);
+	dialog.dialog("open");
     
     podd.debug('[showAddChildDialog] finished');
 };
@@ -1447,6 +1453,9 @@ podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType,
 	});
 
 	theLink.click(function(event) {
+		
+		$('#dialog').dialog('close');
+		
 		var propertyUri = hiddenRelationship.val();
 		var targetObjectType = hiddenChildType.val();
 		podd.debug('Clicked ' + $(this).attr('name') + ' Relationship = '

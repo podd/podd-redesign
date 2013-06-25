@@ -145,6 +145,11 @@ body#admin #toolbar_div a#admin_tab {
     border-color: #556B2F;
 }
 
+/* class for all PODD Dialogs */
+.dialog_class {
+	 background:#e5eecc !important
+} 
+
 /* hierarchy display */
 .parent {
     background-image: url(../images/parent.png);
