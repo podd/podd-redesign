@@ -931,8 +931,6 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
         name : 'add_child',
     });
 
-	var dialog = $('#dialog');
-    
     podd.addChildObjectHandler(continueLink, select, hiddenChildType, hiddenRelationship);
    
     div.append('<p>Select Child Object Type (and Relationship)</p>')
@@ -942,6 +940,14 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
     div.append(hiddenChildType);
     div.append(hiddenRelationship);
     
+	var dialog = $("#dialog").dialog({
+		autoOpen : false,
+		modal: true,
+	    dialogClass: "dialog_class",
+	    close: function () {
+    		$(this).remove();
+  		}  
+	});
 	dialog.append(div);
 	dialog.dialog("open");
     

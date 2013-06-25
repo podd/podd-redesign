@@ -36,16 +36,6 @@
         podd.debug('initializing...');
         podd.debug('-------------------');
 
-		// keep Dialog hidden
-		$("#dialog").dialog({
-			autoOpen : false,
-			modal: true,
-		    dialogClass: "dialog_class",
-		    close: function () {
-        		$(this).remove();
-      		}  
-		});
-
 		podd.objectUri = '${poddObject.objectURI!"Not Found"}';
 		podd.objectTypeUri = '${objectType.objectURI!"undefined"}';
 		podd.artifactIri = '${artifactUri!"undefined"}';
