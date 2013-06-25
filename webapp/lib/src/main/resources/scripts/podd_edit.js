@@ -860,10 +860,17 @@ podd.getCreateChildMetadata = function(artifactUri, objectType,
 podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
     podd.debug('[showAddChildDialog] Schema Databank size = ' + nextSchemaDatabank.size());
 
-    var select1 = $('<select>', {
+    var select = $('<select>', {
         name : 'name_child_relationship',
     });
 
+    var defaultOption = $('<option>', {
+        value : '',
+        text : 'Please Select',
+        targetobject : ''
+    });
+    select.append(defaultOption);
+    
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
     })
@@ -895,13 +902,13 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
         
         var text = nextChild.objectLabel + ' (' + nextChild.propertyLabel + ')'; 
         
-        var option1 = $('<option>', {
+        var option = $('<option>', {
             value : nextChild.propertyUri,
             text : text,
             targetobject : nextChild.objectType
         });
         
-        select1.append(option1);
+        select.append(option);
     });
 
     var hiddenChildType = $('<input>', {
@@ -923,9 +930,9 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
         name : 'add_child',
     });
     
-    podd.addChildObjectHandler(continueLink, select1, hiddenChildType, hiddenRelationship);
+    podd.addChildObjectHandler(continueLink, select, hiddenChildType, hiddenRelationship);
     
-    div.append(select1);
+    div.append(select);
     div.append(continueLink);
     div.append(hiddenChildType);
     div.append(hiddenRelationship);
@@ -1422,51 +1429,57 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
  */
 podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType,
 		hiddenRelationship) {
-	
+
 	dropDown.change(function(event) {
 		var option = $('option:selected', this);
 
 		if (typeof option !== 'undefined') {
 			var propertyUri = '' + option.val();
 			var targetObjectType = '' + option.attr('targetobject');
-		
+
 			podd.debug('Selected ' + targetObjectType + ' and ' + propertyUri);
 
-	        hiddenRelationship.val(propertyUri);
+			hiddenRelationship.val(propertyUri);
 			hiddenChildType.val(targetObjectType);
 		} else {
 			podd.debug('option was undefined');
 		}
 	});
-	
+
 	theLink.click(function(event) {
-		podd.debug("Clicked " + $(this).attr('name'));
-		
-        var propertyUri = '' + hiddenRelationship.val();
-        var targetObjectType = '' + hiddenChildType.val();
-        podd.debug(' Relationship = ' + propertyUri + ' and object type = ' + targetObjectType);
-        
-        var requestUrl = podd.baseUrl + '/artifact/addobject'
+		var propertyUri = hiddenRelationship.val();
+		var targetObjectType = hiddenChildType.val();
+		podd.debug('Clicked ' + $(this).attr('name') + ' Relationship = '
+				+ propertyUri + ' and object type = ' + targetObjectType);
 
-    	// the artifact
-        requestUrl = requestUrl + '?artifacturi=' + podd.uriEncode(podd.artifactIri);
+		var errors = [];
+		if (typeof propertyUri === 'undefined' || propertyUri.length === 0) {
+			errors.push('<p>Child object relationship is undefined</p>');
+		}
+		if (typeof targetObjectType === 'undefined'
+				|| targetObjectType.length === 0) {
+			errors.push('<p>Child object type is undefined</p>');
+		}
 
-    	// the parent object
-    	requestUrl = requestUrl + '&parenturi=' + podd.uriEncode(podd.objectUri);
-    	
-    	// the type of child object
-    	requestUrl = requestUrl + '&objecttypeuri=' + podd.uriEncode(targetObjectType);
-    	
-    	// relationship to child object
-    	requestUrl = requestUrl + '&parentpredicateuri=' + podd.uriEncode(propertyUri);
-    	
-    	podd.debug('Request to ADD Child Object (GET):  ' + requestUrl);
+		if (errors.length > 0) {
+			$.each(errors, function(index, value) {
+				podd.updateErrorMessageList(value);
+			});
+		} else {
+			var requestUrl = podd.baseUrl + '/artifact/addobject' +
+			// artifact
+			'?artifacturi=' + podd.uriEncode(podd.getCurrentArtifactIri()) +
+			// parent object
+			'&parenturi=' + podd.uriEncode(podd.getCurrentObjectUri()) +
+			// type of child object
+			'&objecttypeuri=' + podd.uriEncode(targetObjectType) +
+			// relationship to child object
+			'&parentpredicateuri=' + podd.uriEncode(propertyUri);
 
-        window.location.href = requestUrl;
+			window.location.href = requestUrl;
+		}
 	});
 };
-
-
 
 /**
  * Build an RDF triple from the given subject, property and object.
