@@ -227,6 +227,71 @@ podd.deleteAllTriples = function(nextDatabank) {
 };
 
 /**
+ * Build an RDF triple from the given subject, property and object.
+ * 
+ * @param subjectUri
+ * @param propertyUri
+ * @param objectValue
+ * @param propertyType
+ *            Identifies the type of this property (e.g. object property, data
+ *            property)
+ * @param objectDatatype
+ *            Specifies the datatype of the object
+ * @return The constructed triple
+ */
+podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType,
+		objectDatatype) {
+
+	podd.debug('buildTriple(' + subjectUri + ', ' + propertyUri + ', '
+			+ objectValue + ' [' + objectDatatype + ']');
+
+	var objectPart;
+
+	if (typeof objectDatatype !== 'undefined') {
+
+		// figure out if the object is a Resource or a Literal
+		if (typeof propertyType !== 'undefined'
+				&& propertyType.toString() === OBJECT_PROPERTY) {
+
+			objectPart = $.rdf.resource('<' + objectValue + '>');
+		} else {
+
+			objectPart = $.rdf.literal(objectValue, {
+				datatype : objectDatatype
+			});
+		}
+	} else {
+		objectPart = $.rdf.literal(objectValue);
+	}
+
+	return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectPart);
+};
+
+/**
+ * PODD specific URI encoding function where a given string is first trimmed of
+ * surrounding angle brackets ('<' , '>') if they are present and then URI
+ * encoded.
+ */
+podd.uriEncode = function(input) {
+
+	if (typeof input === 'undefined') {
+		return input;
+	}
+
+	var trimmedInput = $.trim(input);
+
+	var len = trimmedInput.length;
+
+	if ((len > 2) && (trimmedInput.substring(0, 1) === '<')
+			&& (trimmedInput.substring(len - 1, len) === '>')) {
+
+		trimmedInput = trimmedInput.substring(1, len - 1);
+	}
+
+	return encodeURIComponent(trimmedInput);
+};
+
+/**
  * Display a message on leaving text field
  * 
  * This is mostly used for DEBUG.
@@ -800,161 +865,6 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
 };
 
 /**
- * Retrieve metadata on which types of child objects can be added to the
- * given object type.
- * 
- * @param artifactUri -
- *            The current artifact's URI. Maybe "undefined" if adding a new
- *            artifact.
- * @param objectType -
- *            The type of Object (e.g. Project, Publication)
- * @param successCallback -
- *            where to send the results
- * @param nextSchemaDatabank -
- * 			  Databank where retrieved metadata is to be stored.
- * @param nextArtifactDatabank -
- * 			  Databank where artifact's triples are stored. FIXME - remove as unused
- */
-podd.getCreateChildMetadata = function(artifactUri, objectType,
-		successCallback, nextSchemaDatabank, nextArtifactDatabank) {
-
-    var requestUrl = podd.baseUrl + '/metadata';
-
-    podd.debug('[getCreateChildMetadata] Request (GET) (' + objectType + '): ' + requestUrl);
-
-    $.ajax({
-        url : requestUrl,
-        type : 'GET',
-        data : {
-            objecttypeuri : objectType,
-            includedndprops : false,
-            metadatapolicy : 'containsonly'
-        },
-        dataType : 'json', // what is expected back
-        success : function(resultData, status, xhr) {
-            podd.debug('[getCreateChildMetadata] ### SUCCESS ### ');
-			podd.debug(resultData);
-
-            nextSchemaDatabank.load(resultData);
-
-            successCallback(objectType, nextSchemaDatabank);
-        },
-        error : function(xhr, status, error) {
-            podd.debug('[getCreateChildMetadata] $$$ ERROR $$$ ' + error);
-            podd.debug(xhr.statusText);
-        }
-    });
-};
-
-/**
- * Display a Dialog where user can select the relationship to the child object
- * and the type of child object.
- * 
- * TODO: display in a new Dialog
- * 
- * @param objectType
- *            The current object's type
- * @param nextSchemaDatabank
- *            Databank populated with necessary metadata
- */
-podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
-    podd.debug('[showAddChildDialog] Schema Databank size = ' + nextSchemaDatabank.size());
-
-    var select = $('<select>', {
-        name : 'name_child_relationship',
-    });
-
-    var defaultOption = $('<option>', {
-        value : '',
-        text : 'Please Select',
-        targetobject : ''
-    });
-    select.append(defaultOption);
-    
-    var myQuery = $.rdf({
-        databank : nextSchemaDatabank
-    })
-    // Find all possible child object details for this object type
-    .where('<' +objectType + '> rdfs:subClassOf ?myRestriction')
-    //
-    .where('?myRestriction a owl:Restriction')
-    //
-    .where('?myRestriction owl:onProperty ?childRelationship')
-    // 
-    .where('?myRestriction owl:allValuesFrom ?childType')
-    //
-    .where('?childRelationship rdfs:label ?relationshipLabel')
-    //
-    .where('?childType rdfs:label ?childTypeLabel')
-    ;
-    var bindings = myQuery.select();
-
-    $.each(bindings, function(index, value) {
-        var nextChild = {};
-        nextChild.weight;
-        nextChild.propertyUri = value.childRelationship.value;
-        nextChild.propertyLabel = value.relationshipLabel.value;
-        nextChild.objectType = value.childType.value;
-    	nextChild.objectLabel = value.childTypeLabel.value;
-    	
-        podd.debug('[showAddChildDialog] child relationship: <' + nextChild.propertyUri + '> "' 
-        		+ nextChild.propertyLabel + '"  and child type: ' + nextChild.objectType);
-        
-        var text = nextChild.objectLabel + ' (' + nextChild.propertyLabel + ')'; 
-        
-        var option = $('<option>', {
-            value : nextChild.propertyUri,
-            text : text,
-            targetobject : nextChild.objectType
-        });
-        
-        select.append(option);
-    });
-
-    var hiddenChildType = $('<input>', {
-    	name : 'name_child_type',
-    	type : 'hidden'
-    });
-    
-    var hiddenRelationship = $('<input>', {
-    	name : 'name_child_relationship',
-    	type : 'hidden'
-    });
-    
-    var continueLink = $('<a>', {
-        name : 'name_add_object_link',
-        text : 'Continue', 
-        class : 'button'
-    });
-
-    var div = $('<div>', {
-        name : 'add_child',
-    });
-
-    podd.addChildObjectHandler(continueLink, select, hiddenChildType, hiddenRelationship);
-   
-    div.append('<p>Select Child Object Type (and Relationship)</p>')
-    div.append(select);
-    div.append('<br><br>');
-    div.append(continueLink);
-    div.append(hiddenChildType);
-    div.append(hiddenRelationship);
-    
-	var dialog = $("#dialog").dialog({
-		autoOpen : false,
-		modal: true,
-	    dialogClass: "dialog_class",
-	    close: function () {
-    		$(this).remove();
-  		}  
-	});
-	dialog.append(div);
-	dialog.dialog("open");
-    
-    podd.debug('[showAddChildDialog] finished');
-};
-
-/**
  * Call Search Ontology Resource Service using AJAX, convert the RDF response to
  * a JSON array and invoke the specified callback function.
  * 
@@ -1428,6 +1338,161 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
 };
 
 /**
+ * Retrieve metadata on which types of child objects can be added to the
+ * given object type.
+ * 
+ * @param artifactUri -
+ *            The current artifact's URI. Maybe "undefined" if adding a new
+ *            artifact.
+ * @param objectType -
+ *            The type of Object (e.g. Project, Publication)
+ * @param successCallback -
+ *            where to send the results
+ * @param nextSchemaDatabank -
+ * 			  Databank where retrieved metadata is to be stored.
+ * @param nextArtifactDatabank -
+ * 			  Databank where artifact's triples are stored. FIXME - remove as unused
+ */
+podd.getCreateChildMetadata = function(artifactUri, objectType,
+		successCallback, nextSchemaDatabank, nextArtifactDatabank) {
+
+    var requestUrl = podd.baseUrl + '/metadata';
+
+    podd.debug('[getCreateChildMetadata] Request (GET) (' + objectType + '): ' + requestUrl);
+
+    $.ajax({
+        url : requestUrl,
+        type : 'GET',
+        data : {
+            objecttypeuri : objectType,
+            includedndprops : false,
+            metadatapolicy : 'containsonly'
+        },
+        dataType : 'json', // what is expected back
+        success : function(resultData, status, xhr) {
+            podd.debug('[getCreateChildMetadata] ### SUCCESS ### ');
+			podd.debug(resultData);
+
+            nextSchemaDatabank.load(resultData);
+
+            successCallback(objectType, nextSchemaDatabank);
+        },
+        error : function(xhr, status, error) {
+            podd.debug('[getCreateChildMetadata] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
+        }
+    });
+};
+
+/**
+ * Display a Dialog where user can select the relationship to the child object
+ * and the type of child object.
+ * 
+ * TODO: display in a new Dialog
+ * 
+ * @param objectType
+ *            The current object's type
+ * @param nextSchemaDatabank
+ *            Databank populated with necessary metadata
+ */
+podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
+    podd.debug('[showAddChildDialog] Schema Databank size = ' + nextSchemaDatabank.size());
+
+    var select = $('<select>', {
+        name : 'name_child_relationship',
+    });
+
+    var defaultOption = $('<option>', {
+        value : '',
+        text : 'Please Select',
+        targetobject : ''
+    });
+    select.append(defaultOption);
+    
+    var myQuery = $.rdf({
+        databank : nextSchemaDatabank
+    })
+    // Find all possible child object details for this object type
+    .where('<' +objectType + '> rdfs:subClassOf ?myRestriction')
+    //
+    .where('?myRestriction a owl:Restriction')
+    //
+    .where('?myRestriction owl:onProperty ?childRelationship')
+    // 
+    .where('?myRestriction owl:allValuesFrom ?childType')
+    //
+    .where('?childRelationship rdfs:label ?relationshipLabel')
+    //
+    .where('?childType rdfs:label ?childTypeLabel')
+    ;
+    var bindings = myQuery.select();
+
+    $.each(bindings, function(index, value) {
+        var nextChild = {};
+        nextChild.weight;
+        nextChild.propertyUri = value.childRelationship.value;
+        nextChild.propertyLabel = value.relationshipLabel.value;
+        nextChild.objectType = value.childType.value;
+    	nextChild.objectLabel = value.childTypeLabel.value;
+    	
+        podd.debug('[showAddChildDialog] child relationship: <' + nextChild.propertyUri + '> "' 
+        		+ nextChild.propertyLabel + '"  and child type: ' + nextChild.objectType);
+        
+        var text = nextChild.objectLabel + ' (' + nextChild.propertyLabel + ')'; 
+        
+        var option = $('<option>', {
+            value : nextChild.propertyUri,
+            text : text,
+            targetobject : nextChild.objectType
+        });
+        
+        select.append(option);
+    });
+
+    var hiddenChildType = $('<input>', {
+    	name : 'name_child_type',
+    	type : 'hidden'
+    });
+    
+    var hiddenRelationship = $('<input>', {
+    	name : 'name_child_relationship',
+    	type : 'hidden'
+    });
+    
+    var continueLink = $('<a>', {
+        name : 'name_add_object_link',
+        text : 'Continue', 
+        class : 'button'
+    });
+
+    var div = $('<div>', {
+        name : 'add_child',
+    });
+
+    podd.addChildObjectHandler(continueLink, select, hiddenChildType, hiddenRelationship);
+   
+    div.append('<p>Select Child Object Type (and Relationship)</p>')
+    div.append(select);
+    div.append('<br><br>');
+    div.append(continueLink);
+    div.append(hiddenChildType);
+    div.append(hiddenRelationship);
+    
+	var dialog = $("#dialog").dialog({
+		autoOpen : false,
+		modal: true,
+	    dialogClass: "dialog_class",
+	    close: function () {
+    		$(this).remove();
+  		}  
+	});
+	dialog.append(div);
+	dialog.dialog("open");
+    
+    podd.debug('[showAddChildDialog] finished');
+};
+
+/**
  * Add handlers for the Child Object Drop Down list and the "Continue" link.
  * 
  * @param theLink
@@ -1496,67 +1561,3 @@ podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType,
 	});
 };
 
-/**
- * Build an RDF triple from the given subject, property and object.
- * 
- * @param subjectUri
- * @param propertyUri
- * @param objectValue
- * @param propertyType
- *            Identifies the type of this property (e.g. object property, data
- *            property)
- * @param objectDatatype
- *            Specifies the datatype of the object
- * @return The constructed triple
- */
-podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType,
-		objectDatatype) {
-
-	podd.debug('buildTriple(' + subjectUri + ', ' + propertyUri + ', '
-			+ objectValue + ' [' + objectDatatype + ']');
-
-	var objectPart;
-
-	if (typeof objectDatatype !== 'undefined') {
-
-		// figure out if the object is a Resource or a Literal
-		if (typeof propertyType !== 'undefined'
-				&& propertyType.toString() === OBJECT_PROPERTY) {
-
-			objectPart = $.rdf.resource('<' + objectValue + '>');
-		} else {
-
-			objectPart = $.rdf.literal(objectValue, {
-				datatype : objectDatatype
-			});
-		}
-	} else {
-		objectPart = $.rdf.literal(objectValue);
-	}
-
-	return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectPart);
-};
-
-/**
- * PODD specific URI encoding function where a given string is first trimmed of
- * surrounding angle brackets ('<' , '>') if they are present and then URI
- * encoded.
- */
-podd.uriEncode = function(input) {
-
-	if (typeof input === 'undefined') {
-		return input;
-	}
-
-	var trimmedInput = $.trim(input);
-
-	var len = trimmedInput.length;
-
-	if ((len > 2) && (trimmedInput.substring(0, 1) === '<')
-			&& (trimmedInput.substring(len - 1, len) === '>')) {
-
-		trimmedInput = trimmedInput.substring(1, len - 1);
-	}
-
-	return encodeURIComponent(trimmedInput);
-};
