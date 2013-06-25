@@ -847,15 +847,10 @@ podd.getCreateChildMetadata = function(artifactUri, objectType,
 };
 
 /**
- * 
- */
-podd.continueToAddChild = function() {
-	
-};
-
-/**
  * Display a Dialog where user can select the relationship to the child object
  * and the type of child object.
+ * 
+ * TODO: display in a new Dialog
  * 
  * @param objectType
  *            The current object's type
@@ -869,12 +864,6 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
         name : 'name_child_relationship',
     });
 
-    var continueLink = $('<a>', {
-        name : 'name_add_object_link',
-        text : 'Continue' 
-    });
-
-    
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
     })
@@ -911,23 +900,37 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
             text : text,
             targetobject : nextChild.objectType
         });
-
         
         select1.append(option1);
     });
 
-    // TODO: display these in a dialog
+    var hiddenChildType = $('<input>', {
+    	name : 'name_child_type',
+    	type : 'hidden'
+    });
+    
+    var hiddenRelationship = $('<input>', {
+    	name : 'name_child_relationship',
+    	type : 'hidden'
+    });
+    
+    var continueLink = $('<a>', {
+        name : 'name_add_object_link',
+        text : 'Continue' 
+    });
+
     var div = $('<div>', {
         name : 'add_child',
     });
     
+    podd.addChildObjectHandler(continueLink, select1, hiddenChildType, hiddenRelationship);
+    
     div.append(select1);
-    
-    // TODO: add a handler to invoke "Add Object" service with appropriate parameters
     div.append(continueLink);
+    div.append(hiddenChildType);
+    div.append(hiddenRelationship);
     
-    var li2 = $("#buttonwrapper");
-    li2.append(div);
+    $("#buttonwrapper").append(div);
     
     podd.debug('[showAddChildDialog] finished');
 };
@@ -1404,6 +1407,66 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
         // fields may have incomplete/invalid values at this point.
     });
 };
+
+/**
+ * Add handlers for the Child Object Drop Down list and the "Continue" link.
+ * 
+ * @param theLink
+ *            The link to click after child object type has been selected
+ * @param dropDown
+ *            Drop Down list to select the child object type and relationship
+ * @param hiddenChildType
+ *            Hidden input where the selected child object type is set
+ * @param hiddenRelationsip
+ *            Hidden input where the selected child relationship is set
+ */
+podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType,
+		hiddenRelationship) {
+	
+	dropDown.change(function(event) {
+		var option = $('option:selected', this);
+
+		if (typeof option !== 'undefined') {
+			var propertyUri = '' + option.val();
+			var targetObjectType = '' + option.attr('targetobject');
+		
+			podd.debug('Selected ' + targetObjectType + ' and ' + propertyUri);
+
+	        hiddenRelationship.val(propertyUri);
+			hiddenChildType.val(targetObjectType);
+		} else {
+			podd.debug('option was undefined');
+		}
+	});
+	
+	theLink.click(function(event) {
+		podd.debug("Clicked " + $(this).attr('name'));
+		
+        var propertyUri = '' + hiddenRelationship.val();
+        var targetObjectType = '' + hiddenChildType.val();
+        podd.debug(' Relationship = ' + propertyUri + ' and object type = ' + targetObjectType);
+        
+        var requestUrl = podd.baseUrl + '/artifact/addobject'
+
+    	// the artifact
+        requestUrl = requestUrl + '?artifacturi=' + podd.uriEncode(podd.artifactIri);
+
+    	// the parent object
+    	requestUrl = requestUrl + '&parenturi=' + podd.uriEncode(podd.objectUri);
+    	
+    	// the type of child object
+    	requestUrl = requestUrl + '&objecttypeuri=' + podd.uriEncode(targetObjectType);
+    	
+    	// relationship to child object
+    	requestUrl = requestUrl + '&parentpredicateuri=' + podd.uriEncode(propertyUri);
+    	
+    	podd.debug('Request to ADD Child Object (GET):  ' + requestUrl);
+
+        window.location.href = requestUrl;
+	});
+};
+
+
 
 /**
  * Build an RDF triple from the given subject, property and object.
