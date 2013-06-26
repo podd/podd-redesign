@@ -183,6 +183,10 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_HAS_ALLOWED_VALUE = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasAllowedValue");
     
+    /** http://purl.org/podd/ns/poddBase#hasPURL */
+    public static final URI PODD_BASE_HAS_PURL = ValueFactoryImpl.getInstance().createURI(
+            PoddRdfConstants.PODD_BASE, "hasPURL");
+    
     // ----- custom representation of cardinalities -----
     
     /**

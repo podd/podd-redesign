@@ -1,0 +1,76 @@
+@prefix : <http://purl.org/podd/basic-2-20130206/artifact:1#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
+@prefix poddUser: <http://purl.org/podd/ns/poddUser#> .
+@prefix poddScience: <http://purl.org/podd/ns/poddScience#> .
+@base <http://purl.org/podd/basic-2-20130206/artifact:1> .
+
+
+### an SSH file reference resource with a temporary URL
+ 
+<urn:temp:uuid:object-rice-scan-34343-a> rdf:type poddBase:FileReference ,
+						poddBase:SSHFileReference ;
+
+               rdfs:label "Rice tree scan 003454-98" ;
+
+               poddBase:hasAlias "alias_local_ssh" ;
+
+               poddBase:hasFileName "plant_003456-233445.bag.zip" ;
+
+               poddBase:hasPath "/dap/plant/rice-34343/" .
+						 
+
+### publication35 resource with a temporary URL
+
+<urn:temp:uuid:publication35> rdf:type poddScience:Publication ,
+                        owl:NamedIndividual ;
+               
+               rdfs:label "PODD: Data Management for Plant Phenomics Research" ;
+               
+               dcterms:created "2013-06-12"^^xsd:date ;
+               
+               poddBase:hasPURL "http://dx.doi.org/10.1109/eScience.2013.45"^^xsd:anyURI ;
+               
+               poddScience:hasAbstract " PODD is a Data management  disciplines in which the provision of sound data management is pivotal to the achievements and impact of research projects. Massive and rapidly expanding amounts of data combined with data models that evolve over time contribute to making data management an increasingly challenging task that warrants a rethinking of its design. In this paper we present PODD, an ontology-centric architecture for data management systems that is extensible and domain independent. In this architecture, the behaviors of domain concepts and objects are captured entirely by ontological entities, around which all data management tasks are carried out. The open and semantic nature of ontology languages also makes PODD amenable to greater data reuse and interoperability. To evaluate the PODD architecture, we have applied it to the challenge of managing phenomics data."^^xsd:string ;
+               
+               poddScience:publishedIn "Proceedings of the ISWC 2013"^^xsd:string ;
+               
+               rdfs:comment "Published in IEEE ISWC 2013, Sydney, Australia"^^xsd:string ;
+               
+               poddScience:hasYear 2013 ;
+               
+               dcterms:creator <mailto:xavier.sirault@csiro.au> .
+
+
+
+### publication46 resource with a temporary URL
+
+<urn:temp:uuid:publication46> rdf:type poddScience:Publication ,
+                        owl:NamedIndividual ;
+               
+               rdfs:label "Flexible Scientific Data Management for Plant Phenomics Research" ;
+               
+               dcterms:created "2013-03-12"^^xsd:date ;
+               
+               poddBase:hasPURL "http://dx.doi.org/10.1109/eScience.2013.44"^^xsd:anyURI ;
+               
+               poddScience:hasAbstract " Data management has become a critical challenge faced by a wide array of scientiﬁc disciplines in which the provision of sound data management is pivotal to the achievements and impact of research projects. Massive and rapidly expanding amounts of data combined with data models that evolve over time contribute to making data management an increasingly challenging task that warrants a rethinking of its design. In this paper we present PODD, an ontology-centric architecture for data management systems that is extensible and domain independent. In this architecture, the behaviors of domain concepts and objects are captured entirely by ontological entities, around which all data management tasks are carried out. The open and semantic nature of ontology languages also makes PODD amenable to greater data reuse and interoperability. To evaluate the PODD architecture, we have applied it to the challenge of managing phenomics data."^^xsd:string ;
+               
+               poddScience:publishedIn "Proceedings of the IEEE eScience 2013"^^xsd:string ;
+               
+               rdfs:comment "Published in IEEE eScience 2013, Brisbane, Australia"^^xsd:string ;
+               
+               poddScience:hasYear 2013 ;
+               
+               dcterms:creator <mailto:xavier.sirault@csiro.au> .
+
+### owner
+<http://purl.org/podd/basic-2-20130206/artifact:1#publication45> poddBase:hasFileReference <urn:temp:uuid:object-rice-scan-34343-a> .
+<http://purl.org/podd/basic-1-20130206/object:2966> poddScience:hasPublication <urn:temp:uuid:publication35> .
+<http://purl.org/podd/basic-1-20130206/object:2966> poddScience:hasPublication <urn:temp:uuid:publication46> .
+

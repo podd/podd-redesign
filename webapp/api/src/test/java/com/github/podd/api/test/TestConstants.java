@@ -102,6 +102,10 @@ public interface TestConstants
     /** Test resource: fragment containing a new File Reference object in Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT_TTL =
             "/test/artifacts/fragment-new-file-ref.ttl";
+
+    /** Test resource: fragment containing multiple objects with temporary URIs in Turtle format */
+    public static final String TEST_ARTIFACT_FRAGMENT_MULTIPLE_OBJECTS_TTL =
+            "/test/artifacts/fragment-new-multiple-objects.ttl";
     
     /**
      * Test resource: fragment modifying Demo_Investigation object to no longer contain
