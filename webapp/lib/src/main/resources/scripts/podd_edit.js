@@ -397,9 +397,21 @@ podd.callbackFromGetMetadata = function(artifactUri, objectType, nextSchemaDatab
 /**
  * Callback function that redirects to the artifact when submitPoddObjectUpdate
  * is successful.
+ * 
+ * podd.artifactIri and podd.objectUri are used to determine the artifact/object
+ * to redirect to. The incoming parameters are not used.
  */
 podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
-    window.location.href = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(podd.artifactIri);
+	
+	var redirectUri = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(podd.artifactIri);
+	
+	if (typeof podd.objectUri !== 'undefined' && podd.objectUri !== 'undefined'
+			&& podd.objectUri.lastIndexOf('<urn:temp:uuid:', 0) !== 0) {
+
+		podd.debug('[Redirect] to object: ' + podd.objectUri);
+		redirectUri = redirectUri + '&objecturi=' + encodeURIComponent(podd.objectUri);
+	}
+	window.location.href = redirectUri;
 };
 
 /**
@@ -1571,6 +1583,7 @@ podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType,
 			// relationship to child object
 			'&parentpredicateuri=' + podd.uriEncode(propertyUri);
 
+			// TODO: turn this into an AJAX call which listens for errors and then redirect
 			window.location.href = requestUrl;
 		}
 	});
