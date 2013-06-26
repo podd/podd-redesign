@@ -52,7 +52,7 @@
 	});
 </script>
 
-<div id="dialog" title="Add Child Object"></div>
+<div id="dialog" title="Add Child"></div>
 
 <div id="title_pane">
     <#if state??>

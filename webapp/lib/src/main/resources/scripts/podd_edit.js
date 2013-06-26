@@ -1498,7 +1498,7 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
 
     podd.addChildObjectHandler(continueLink, select, hiddenChildType, hiddenRelationship);
    
-    div.append('<p>Select Child Object Type</p>')
+    div.append('<p>Select Type of Child</p>')
     div.append(select);
     div.append('<br><br>');
     div.append(continueLink);
@@ -1561,11 +1561,11 @@ podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType,
 
 		var errors = [];
 		if (typeof propertyUri === 'undefined' || propertyUri.length === 0) {
-			errors.push('<p>Child object relationship is undefined</p>');
+			errors.push('<p>A Parent-Child relationship should be selected</p>');
 		}
 		if (typeof targetObjectType === 'undefined'
 				|| targetObjectType.length === 0) {
-			errors.push('<p>Child object type is undefined</p>');
+			errors.push('<p>A child type should be selected</p>');
 		}
 
 		if (errors.length > 0) {
