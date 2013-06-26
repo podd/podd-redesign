@@ -1427,6 +1427,8 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
     ;
     var bindings = myQuery.select();
 
+    var bindingsList = [];
+    
     $.each(bindings, function(index, value) {
         var nextChild = {};
         nextChild.weight;
@@ -1438,6 +1440,23 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
         podd.debug('[showAddChildDialog] child relationship: <' + nextChild.propertyUri + '> "' 
         		+ nextChild.propertyLabel + '"  and child type: ' + nextChild.objectType);
         
+        bindingsList.push(nextChild);
+    });
+
+    // sort bindings list in ascending order of weight
+    bindingsList.sort(function(a, b) {
+        var aID = a.weight;
+        var bID = b.weight;
+        
+        if (aID == bID) {
+        	// on equal weights sort by property label
+        	return (a.propertyLabel > b.propertyLabel) ? 1: -1;
+        } else {
+        	return (aID - bID);
+        }
+    });
+    
+    $.each(bindingsList, function(index, nextChild) {
         var text = nextChild.objectLabel + ' (' + nextChild.propertyLabel + ')'; 
         
         var option = $('<option>', {
@@ -1448,7 +1467,7 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
         
         select.append(option);
     });
-
+    
     var hiddenChildType = $('<input>', {
     	name : 'name_child_type',
     	type : 'hidden'
