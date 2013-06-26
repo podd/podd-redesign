@@ -405,6 +405,7 @@ podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifa
 	
 	var redirectUri = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(podd.artifactIri);
 	
+	//TODO: podd.objectUri should be set before this redirect is called
 	if (typeof podd.objectUri !== 'undefined' && podd.objectUri !== 'undefined'
 			&& podd.objectUri.lastIndexOf('<urn:temp:uuid:', 0) !== 0) {
 
