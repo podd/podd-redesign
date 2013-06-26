@@ -145,14 +145,11 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        final RDFWriter writer =
-                Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
-                        output);
-        
+        final RDFFormat outputFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML); 
         // - do the artifact update
         try
         {
-            final InferredOWLOntologyID ontologyID =
+            final Model model =
                     this.getPoddArtifactManager().updateArtifact(PoddRdfConstants.VF.createURI(artifactUri),
                             PoddRdfConstants.VF.createURI(versionUri), objectUris, inputStream, inputFormat,
                             updatePolicy, danglingObjectPolicy, fileRefVerificationPolicy);
@@ -160,9 +157,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             
             // FIXME Change response format so that it does not resemble an empty OWL Ontology
             // - write the artifact ID into response
-            writer.startRDF();
-            OntologyUtils.ontologyIDsToHandler(Arrays.asList(ontologyID), writer);
-            writer.endRDF();
+            Rio.write(model, output, outputFormat);
         }
         catch(final UnmanagedArtifactIRIException e)
         {
@@ -177,8 +172,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
         
-        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
-                .getDefaultMIMEType()));
+        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
     
     /**

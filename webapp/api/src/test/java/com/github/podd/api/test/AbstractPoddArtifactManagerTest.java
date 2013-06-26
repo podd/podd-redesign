@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +70,7 @@ import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -346,11 +348,10 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactId, mgtGraphSize, assertedStatementCount, inferredStatementCount, isPublished);
         
         final InputStream editInputStream = this.getClass().getResourceAsStream(fragmentPath);
-        final InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
+        final Model model = this.testArtifactManager.updateArtifact(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
                         .getVersionIRI().toOpenRDFURI(), updateObjectUris, editInputStream, fragmentFormat,
                         updatePolicy, danglingObjectPolicy, verifyFileReferences);
-        return updatedArtifact;
+        return OntologyUtils.modelToOntologyIDs(model).get(0);
     }
     
     /**
@@ -1449,6 +1450,66 @@ public abstract class AbstractPoddArtifactManagerTest
         }
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     * 
+     * Tests adding multiple new PODD objects to an artifact.
+     */
+    @Test
+    public final void testUpdateArtifactAddNewPoddObjectsWithMerge() throws Exception
+    {
+        List<URI> objectUriList = Arrays.asList(PoddRdfConstants.VF.createURI("urn:temp:uuid:object-rice-scan-34343-a"),
+                PoddRdfConstants.VF.createURI("urn:temp:uuid:publication35"),
+                PoddRdfConstants.VF.createURI("urn:temp:uuid:publication46")
+                );
+        
+        final InferredOWLOntologyID updatedArtifact =
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7,
+                        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
+                        TestConstants.TEST_ARTIFACT_FRAGMENT_MULTIPLE_OBJECTS_TTL, RDFFormat.TURTLE,
+                        UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
+                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, objectUriList);
+        
+        // verify:
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 30, nextRepositoryConnection);
+            
+            // verify: 2 publications exist
+            final List<Statement> testList =
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
+                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, updatedArtifact
+                            .getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Graph should have 2 publications", 3, testList.size());
+            
+            // verify: newly added publication exists
+            Assert.assertTrue("New publication is missing",
+                    testList.get(0).getObject().toString().endsWith("publication46")
+                            || testList.get(1).getObject().toString().endsWith("publication46")
+                            || testList.get(2).getObject().toString().endsWith("publication46"));
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+    }
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}

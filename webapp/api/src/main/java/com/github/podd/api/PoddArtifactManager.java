@@ -402,16 +402,17 @@ public interface PoddArtifactManager
      * @param fileReferencePolicy
      *            Indicates whether any File References found should be verified by accessing them
      *            from their source.
-     * @return
+     * @return A Model containing the updated artifact ID and PURL mappings for any temporary object URIs
+     *         that were passed in.
      * @throws OpenRDFException
      * @throws PoddException
      * @throws IOException
      * @throws OWLException
      */
-    InferredOWLOntologyID updateArtifact(final URI artifactUri, URI versionUri, final Collection<URI> objectUris,
-            final InputStream inputStream, final RDFFormat format, final UpdatePolicy updatePolicy,
-            final DanglingObjectPolicy danglingObjectPolicy, final FileReferenceVerificationPolicy fileReferencePolicy)
-        throws OpenRDFException, PoddException, IOException, OWLException;
+    Model updateArtifact(URI artifactUri, URI versionUri, Collection<URI> objectUris, InputStream inputStream,
+            RDFFormat format, UpdatePolicy updatePolicy, DanglingObjectPolicy danglingObjectAction,
+            FileReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException, OWLException,
+        PoddException;
     
     /**
      * Updates the importing of the given schema ontology in the given PODD Artifact.

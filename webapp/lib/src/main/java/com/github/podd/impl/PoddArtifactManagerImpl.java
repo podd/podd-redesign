@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -34,7 +36,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
-import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -71,8 +72,8 @@ import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.PurlProcessorNotHandledException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.RdfUtility;
@@ -139,9 +140,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         Rio.write(model, output, RDFFormat.RDFJSON);
         
-        return this.updateArtifact(artifactUri, versionUri, fileReferenceObjects,
+        final Model resultModel = this.updateArtifact(artifactUri, versionUri, fileReferenceObjects,
                 new ByteArrayInputStream(output.toByteArray()), RDFFormat.RDFJSON, UpdatePolicy.MERGE_WITH_EXISTING,
                 DanglingObjectPolicy.REPORT, fileReferenceVerificationPolicy);
+        return OntologyUtils.modelToOntologyIDs(resultModel).get(0);        
     }
     
     @Override
@@ -654,7 +656,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     /**
      * Helper method to handle File References in a newly loaded/updated set of statements
      */
-    private void handlePurls(final RepositoryConnection repositoryConnection, final URI context)
+    private Set<PoddPurlReference> handlePurls(final RepositoryConnection repositoryConnection, final URI context)
         throws PurlProcessorNotHandledException, OpenRDFException
     {
         if(this.getPurlManager() != null)
@@ -664,9 +666,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     this.getPurlManager().extractPurlReferences(repositoryConnection, context);
             
             this.getPurlManager().convertTemporaryUris(purlResults, repositoryConnection, context);
+            return purlResults;
         }
+        return Collections.emptySet();
     }
-    
+
     /**
      * Helper method to check schema ontology imports and update use of ontology IRIs to version
      * IRIs.
@@ -1267,11 +1271,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @see com.github.podd.api.PoddArtifactManager#updateArtifact(org.openrdf.model.URI,
      * java.io.InputStream, org.openrdf.rio.RDFFormat)
      * 
-     * This implementation performs most of the steps carried out during loadArtifact(). Therefore,
-     * code and comments are duplicated across these two methods.
      */
     @Override
-    public InferredOWLOntologyID updateArtifact(final URI artifactUri, final URI versionUri,
+    public Model updateArtifact(final URI artifactUri, final URI versionUri,
             final Collection<URI> objectUris, final InputStream inputStream, RDFFormat format,
             final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectAction,
             final FileReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException,
@@ -1382,7 +1384,25 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.handleDanglingObjects(artifactID.getOntologyIRI(), tempRepositoryConnection, tempContext,
                     danglingObjectAction);
             
-            this.handlePurls(tempRepositoryConnection, tempContext);
+            final Set<PoddPurlReference> purls = this.handlePurls(tempRepositoryConnection, tempContext);
+
+            final Model resultsModel = new LinkedHashModel();
+
+            // add (temp-object-URI :hasPurl PURL) statements to Model
+            // NOTE: Using nested loops is rather inefficient, but these collections are not expected
+            // to have more than a handful of elements
+            for (URI objectUri : objectUris)
+            {
+                for (PoddPurlReference purl : purls) 
+                {
+                    final URI tempUri = purl.getTemporaryURI();
+                    if (objectUri.equals(tempUri))
+                    {
+                        resultsModel.add(objectUri, PoddRdfConstants.PODD_BASE_HAS_PURL, purl.getPurlURI());
+                        break; // out of inner loop
+                    }
+                }
+            }
             
             // this.handleFileReferences(tempRepositoryConnection, tempContext,
             // fileReferenceAction);
@@ -1415,7 +1435,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             permanentRepositoryConnection.commit();
             tempRepositoryConnection.rollback();
             
-            return inferredOWLOntologyID;
+            return OntologyUtils.ontologyIDsToModel(Arrays.asList(inferredOWLOntologyID), resultsModel);
         }
         catch(final Exception e)
         {

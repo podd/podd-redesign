@@ -3,9 +3,16 @@
  */
 package com.github.podd.resources.test;
 
+import java.io.StringReader;
+import java.util.Collection;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openrdf.model.Model;
+import org.openrdf.model.URI;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -16,6 +23,8 @@ import org.restlet.resource.ResourceException;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -163,6 +172,76 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         }
     }
     
+    @Test
+    public void testEditArtifactTurtleWithMultipleNewObjects() throws Exception
+    {
+        // prepare: add an artifact
+        final InferredOWLOntologyID artifactID =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                .getOntologyIRI().toString());
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                .getVersionIRI().toString());
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(true));
+
+        // prepare: add (temporary) object URIs that are being added
+        final String[] newObjects =
+                { "urn:temp:uuid:object-rice-scan-34343-a", "urn:temp:uuid:publication35",
+                        "urn:temp:uuid:publication46" };
+        for(String objectUri : newObjects)
+        {
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
+        }
+        
+        // edit Representation contains statements in Turtle format
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_MULTIPLE_OBJECTS_TTL,
+                        MediaType.APPLICATION_RDF_TURTLE);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String updatedArtifactDetails = results.getText();
+        
+        // verify: Inferred Ontology ID is NOT in RDF format
+        Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
+        Assert.assertTrue("Artifact version has not been updated properly",
+                updatedArtifactDetails.contains("artifact:1:version:2"));
+        Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
+        Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
+
+        // verify: response contains the ontology ID
+        final Model model = Rio.parse(new StringReader(updatedArtifactDetails), "", RDFFormat.TURTLE);
+        final Collection<InferredOWLOntologyID> updatedOntologyID = OntologyUtils.modelToOntologyIDs(model);
+        Assert.assertEquals("Response did not contain an ontology ID", 1,updatedOntologyID.size());
+        
+        // verify: response contains object URIs and their PURLs
+        for(String objectUri : newObjects)
+        {
+            final String purl =
+                    model.filter(PoddRdfConstants.VF.createURI(objectUri), PoddRdfConstants.PODD_BASE_HAS_PURL, null)
+                            .objectString();
+            Assert.assertNotNull("Object URI's PURL not in response", purl);
+            Assert.assertTrue("PURL does not start as expected", purl.startsWith("http://example.org/purl/"));
+        }
+        
+        final String artifactBody =
+                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
+        // verify: publication46 has been added to the artifact
+        Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication46"));
+        Assert.assertTrue("New publication not added to artifact",
+                artifactBody.contains("http://dx.doi.org/10.1109/eScience.2013.44"));
+
+        // verify: publication46 has been added to the artifact
+        Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication35"));
+    }
+
     @Test
     public void testErrorEditArtifactRdfWithoutArtifactID() throws Exception
     {
