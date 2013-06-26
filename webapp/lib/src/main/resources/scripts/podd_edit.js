@@ -1338,8 +1338,8 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
 };
 
 /**
- * Retrieve metadata on which types of child objects can be added to the
- * given object type.
+ * Retrieve metadata describing possible types of child objects and relationshps for the
+ * given parent object type.
  * 
  * @param artifactUri -
  *            The current artifact's URI. Maybe "undefined" if adding a new
@@ -1348,13 +1348,8 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
  *            The type of Object (e.g. Project, Publication)
  * @param successCallback -
  *            where to send the results
- * @param nextSchemaDatabank -
- * 			  Databank where retrieved metadata is to be stored.
- * @param nextArtifactDatabank -
- * 			  Databank where artifact's triples are stored. FIXME - remove as unused
  */
-podd.getCreateChildMetadata = function(artifactUri, objectType,
-		successCallback, nextSchemaDatabank, nextArtifactDatabank) {
+podd.getCreateChildMetadata = function(artifactUri, objectType, successCallback) {
 
     var requestUrl = podd.baseUrl + '/metadata';
 
@@ -1364,6 +1359,7 @@ podd.getCreateChildMetadata = function(artifactUri, objectType,
         url : requestUrl,
         type : 'GET',
         data : {
+        	artifacturi : artifactUri,
             objecttypeuri : objectType,
             includedndprops : false,
             metadatapolicy : 'containsonly'
@@ -1373,6 +1369,8 @@ podd.getCreateChildMetadata = function(artifactUri, objectType,
             podd.debug('[getCreateChildMetadata] ### SUCCESS ### ');
 			podd.debug(resultData);
 
+		    var nextSchemaDatabank = podd.newDatabank();
+			
             nextSchemaDatabank.load(resultData);
 
             successCallback(objectType, nextSchemaDatabank);
@@ -1387,8 +1385,6 @@ podd.getCreateChildMetadata = function(artifactUri, objectType,
 /**
  * Display a Dialog where user can select the relationship to the child object
  * and the type of child object.
- * 
- * TODO: display in a new Dialog
  * 
  * @param objectType
  *            The current object's type

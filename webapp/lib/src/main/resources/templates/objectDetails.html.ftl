@@ -39,17 +39,13 @@
 		podd.objectUri = '${poddObject.objectURI!"Not Found"}';
 		podd.objectTypeUri = '${objectType.objectURI!"undefined"}';
 		podd.artifactIri = '${artifactUri!"undefined"}';
-		//podd.versionIri = '${versionIri!"undefined"}';
 		
-	    podd.schemaDatabank = podd.newDatabank();
-
 		// Add child object clicked
 		$("#createChildObject").click(function(event) {
 			event.preventDefault();
 			podd.debug("Clicked add child object");
 
-			podd.getCreateChildMetadata(podd.artifactIri, podd.objectTypeUri, podd.showAddChildDialog,
-				podd.schemaDatabank, podd.schemaDatabank);
+			podd.getCreateChildMetadata(podd.artifactIri, podd.objectTypeUri, podd.showAddChildDialog);
 		});
 	
         podd.debug('### initialization complete ###');
