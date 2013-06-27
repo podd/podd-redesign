@@ -1047,15 +1047,10 @@ podd.submitPoddObjectUpdate = function(
             // Reset the artifact and version URIs based on what came back
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
-            // Also setup the parent URI and object URI as they may be empty
-            // before this point or may have changed as part of the update
-            if (typeof artifactId[0].parentUri !== 'undefined') {
-            	podd.parentUri = artifactId[0].parentUri;
-            }
-            if (typeof artifactId[0].objectUri !== 'undefined') {
-            	podd.objectUri = artifactId[0].objectUri;
-            }
-
+            
+            podd.updateObjectUriWithPurl(tempDatabank);
+            // Do we need to worry about parent URI?
+            
             // After the update is complete we try to fetch the complete content
             // before calling updateCallback again, to make sure that all of the
             // temporary URIs in nextArtifactDatabank are replaced with their
@@ -1104,13 +1099,10 @@ podd.parseSearchResults = function(/* string */searchURL, /* rdf/json */data) {
  * Parse the given temporary Databank and extract the artifact IRI and version
  * IRI of the ontology/artifact contained within.
  * 
- * Also extracts and returns the parent URI and the current Object URI if they
- * are temporary URIs or unknown.
- * 
- * @param Databank
+ * @param nextDatabank
  *            containing artifact statements
  * @return an array with a single element which contains the Ontology's artifact
- *         IRI, version IRI and optionally the object URI and parent URI.
+ *         IRI and version IRI.
  */
 podd.getOntologyID = function(nextDatabank) {
 
@@ -1126,49 +1118,6 @@ podd.getOntologyID = function(nextDatabank) {
                 nextChild.artifactIri = value.artifactIri.value;
                 nextChild.versionIri = value.versionIri.value;
 
-                // If the current object URI is empty and the parent URI is
-                // empty, then we bootstrap the current object URI based on
-                // artifactHasTopObject as it is a top object
-                if (typeof podd.parentUri === 'undefined'
-                        && podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
-                    var myQuery = $.rdf({
-                        databank : nextDatabank
-                    }).where('?artifactIri poddBase:artifactHasTopObject ?topObject');
-                    var innerBindings = myQuery.select();
-
-                    $.each(innerBindings, function(index, value) {
-                        nextChild.parentUri = value.topObject.value;
-                        nextChild.objectUri = value.topObject.value;
-                    });
-
-                    if (nodeChildren.length > 1) {
-                        podd.debug('[getVersion] ERROR - More than 1 artifact top object statement found!!!');
-                        podd.debug(bindings);
-                    }
-                }
-                else {
-                    // NOTE: The results must contain only one triple linking
-                    // the known parent URI to the current object for this to
-                    // work.
-                    var myQuery = $.rdf({
-                        databank : nextDatabank
-                    })
-                    //
-                    .where('<' + podd.parentUri + '> ?property ?currentObject')
-                    //
-                    .where('?currentObject rdf:type <' + podd.objectTypeUri + '> ');
-                    
-                    var innerBindings = myQuery.select();
-
-                    $.each(innerBindings, function(index, value) {
-                        nextChild.objectUri = value.currentObject.value;
-                    });
-
-                    if (nodeChildren.length > 1) {
-                        podd.debug('[getVersion] ERROR - More than 1 artifact top object statement found!!!');
-                        podd.debug(bindings);
-                    }
-                }
                 nodeChildren.push(nextChild);
             });
 
@@ -1179,6 +1128,79 @@ podd.getOntologyID = function(nextDatabank) {
 
     return nodeChildren;
 };
+
+/**
+ * NOTE: This function extracted from podd.getOntologyID() is not being used. Is
+ * it useful any more?
+ * 
+ * Extracts and returns the parent URI and the current Object URI if they are
+ * temporary URIs or unknown.
+ * 
+ * @param nextDatabank
+ *            containing artifact statements
+ * @return an object containing the parent URI and object URI if they have been
+ *         set
+ */
+podd.getParentAndObjectUri = function(nextDatabank) {
+    var nextChild = {};
+
+    // If the current object URI is empty and the parent URI is
+    // empty, then we bootstrap the current object URI based on
+    // artifactHasTopObject as it is a top object
+    if (typeof podd.parentUri === 'undefined' && podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
+        var myQuery = $.rdf({
+            databank : nextDatabank
+        })
+        .where('?artifactIri poddBase:artifactHasTopObject ?topObject');
+        var innerBindings = myQuery.select();
+        // TODO: validate only 1 binding exists
+        $.each(innerBindings, function(index, value) {
+            nextChild.parentUri = value.topObject.value;
+            nextChild.objectUri = value.topObject.value;
+        });
+
+    } else {
+        // NOTE: The results must contain only one triple linking
+        // the known parent URI to the current object for this to
+        // work.
+        var myQuery = $.rdf({
+            databank : nextDatabank
+        })
+        //
+        .where('<' + podd.parentUri + '> ?property ?currentObject')
+        //
+        .where('?currentObject rdf:type <' + podd.objectTypeUri + '> ');
+        
+        var innerBindings = myQuery.select();
+
+        $.each(innerBindings, function(index, value) {
+            nextChild.objectUri = value.currentObject.value;
+        });
+    }
+    return nextChild;
+}
+
+/**
+ * If podd.objectUri is a temporary URI or unknown, this function attempts to
+ * update to a PURL from data in the given databank.
+ * 
+ * @param nextDatabank
+ *            A databank which may contain temporary URI to PURL mappings
+ */
+podd.updateObjectUriWithPurl = function(nextDatabank) {
+	
+	if (podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
+		var myQuery = $.rdf({
+			databank : nextDatabank
+		}).where(podd.getCurrentObjectUri()	+ ' poddBase:hasPURL ?purl');
+		
+		var bindings = myQuery.select();
+		$.each(bindings, function(index, value) {
+			podd.objectUri = value.purl.value.toString();
+			podd.debug('[updateObjectUri] podd.objectUri set to: ' + value.purl.value);
+		});
+	}
+}
 
 /**
  * DEBUG-ONLY : Could be more generic, but right now only used for debugging.
