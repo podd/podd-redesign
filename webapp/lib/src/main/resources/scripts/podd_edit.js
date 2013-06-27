@@ -40,6 +40,8 @@ var DUMMY_Datetime = '1970-01-01T00:00:00';
 jQuery.ajaxSettings.traditional = true;
 
 /**
+ * @memberOf podd
+ * 
  * Creates a new rdfquery.js databank, adds common prefixes to it, and then
  * returns the databank to the caller.
  */
@@ -61,6 +63,8 @@ podd.newDatabank = function() {
 };
 
 /**
+ * @memberOf podd
+ * 
  * Add triples to the given databank to initialise the top object using the PODD
  * Plant ontologies.
  * 
@@ -85,6 +89,8 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
 };
 
 /**
+ * @memberOf podd
+ * 
  * Add triples to the given databank to initialise a new non-TopObject with the
  * given relationship to an existing parent.
  * 
