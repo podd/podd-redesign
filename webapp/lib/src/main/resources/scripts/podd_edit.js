@@ -303,7 +303,8 @@ podd.uriEncode = function(input) {
  * This is mostly used for DEBUG.
  */
 podd.updateErrorMessageList = function(theMessage) {
-    var li = $("<li>")
+    var li = $("<li>");
+    li.addClass("errorMsg");
     li.html(theMessage);
     $("#errorMsgList").append(li);
 };
