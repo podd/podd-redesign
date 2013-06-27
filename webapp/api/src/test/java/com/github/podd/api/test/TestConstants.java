@@ -107,6 +107,10 @@ public interface TestConstants
     public static final String TEST_ARTIFACT_FRAGMENT_MULTIPLE_OBJECTS_TTL =
             "/test/artifacts/fragment-new-multiple-objects.ttl";
     
+    /** Test resource: fragment containing platform objects with temporary URIs in Turtle format */
+    public static final String TEST_ARTIFACT_FRAGMENT_NEW_PLATFORM_OBJECTS =
+            "/test/artifacts/fragment-new-platform-objects.ttl";
+
     /**
      * Test resource: fragment modifying Demo_Investigation object to no longer contain
      * SqueekeeMaterial. In Turtle format

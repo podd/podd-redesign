@@ -1349,6 +1349,77 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * .
      * 
+     * Edit an artifact by adding a Platform pre-defined in a schema ontology and a new custom
+     * Platform.
+     */
+    @Test
+    public final void testUpdateArtifactAddNewPoddObjectsWithPlatforms() throws Exception
+    {
+        List<URI> objectUriList = Arrays.asList(
+                // a temporary URI for a Platform being newly added
+                PoddRdfConstants.VF.createURI("urn:temp:uuid:object-rice-scanner-platform"),
+                // a Platform that is pre-defined in PODD Plant Ontology
+                PoddRdfConstants.VF.createURI("http://purl.org/podd/ns/poddPlant#PlantScan-6e")
+                );
+        
+        final InferredOWLOntologyID updatedArtifact =
+                this.internalTestUpdateArtifact(TestConstants.TEST_ARTIFACT_20130206, RDFFormat.TURTLE, 7,
+                        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                        TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
+                        TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PLATFORM_OBJECTS, RDFFormat.TURTLE,
+                        UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
+                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, objectUriList);
+        
+        // verify:
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 7, nextRepositoryConnection);
+            
+            // verify: platform object
+            final List<Statement> platformList =
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
+                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatform"), null, false, updatedArtifact
+                            .getVersionIRI().toOpenRDFURI()));
+            
+            // 2 added in the test plus a platform that was defined in the initially uploaded artifact
+            Assert.assertEquals("Not the expected number of Platforms", 3, platformList.size());
+            
+            // verify: correct set of platforms
+            Assert.assertTrue("PlantScan Platform is missing",
+                    platformList.get(0).getObject().toString().endsWith("PlantScan-6e")
+                            || platformList.get(1).getObject().toString().endsWith("PlantScan-6e")
+                            || platformList.get(2).getObject().toString().endsWith("PlantScan-6e"));
+            
+            Assert.assertTrue("Rice-Scanner Platform is missing",
+                    platformList.get(0).getObject().toString().endsWith("object-rice-scanner-platform")
+                            || platformList.get(1).getObject().toString().endsWith("object-rice-scanner-platform")
+                            || platformList.get(2).getObject().toString().endsWith("object-rice-scanner-platform"));
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+        
+    }
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
+     * .
+     * 
      * NOTE: Once file reference validation is implemented in the FileReferenceManager this test
      * will fail. The referred file will have to be created for validation to pass.
      */
@@ -1397,7 +1468,7 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         
     }
-    
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}

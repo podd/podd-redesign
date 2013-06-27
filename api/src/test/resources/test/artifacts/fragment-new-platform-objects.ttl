@@ -1,0 +1,31 @@
+@prefix : <http://purl.org/podd/basic-2-20130206/artifact:1#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
+@prefix poddUser: <http://purl.org/podd/ns/poddUser#> .
+@prefix poddScience: <http://purl.org/podd/ns/poddScience#> .
+@prefix poddPlant: <http://purl.org/podd/ns/poddPlant#> .
+@base <http://purl.org/podd/basic-2-20130206/artifact:1> .
+
+
+### a Platform resource with a temporary URL
+ 
+<urn:temp:uuid:object-rice-scanner-platform> rdf:type poddScience:Platform ,
+						 owl:NamedIndividual ;
+
+               rdfs:label "Rice Scanner" ;
+
+               rdfs:comment "A Rice Scanner platform to monitor paddy growth" ;
+
+               poddScience:hasPlatformType poddScience:Hardware .
+
+
+### contains: Platform defined above
+<http://purl.org/podd/basic-1-20130206/object:2966> poddScience:hasPlatform <urn:temp:uuid:object-rice-scanner-platform> .
+
+### contains: predefined platform 'PlantScan'
+<http://purl.org/podd/basic-1-20130206/object:2966> poddScience:hasPlatform <http://purl.org/podd/ns/poddPlant#PlantScan-6e> .
