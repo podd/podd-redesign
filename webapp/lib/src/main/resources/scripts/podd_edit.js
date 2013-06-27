@@ -332,19 +332,20 @@ podd.debug = function(message) {
  * Retrieve metadata to render the fields to add a new object of the given type.
  * 
  * @param artifactUri -
- *            The current artifact's URI. Maybe "undefined" if adding a new
- *            artifact.
+ *            {string} The current artifact's URI. Maybe "undefined" if adding a
+ *            new artifact.
  * @param objectType -
- *            The type of Object to be added (e.g. Project, Publication)
+ *            {string} Type of Object to be added (e.g. Project, Publication)
  * @param successCallback -
- *            where to send the results
+ *            {function} where to send the results
  * @param nextSchemaDatabank -
- * 			  Databank where retrieved metadata is to be stored.
+ *            {databank} Databank where retrieved metadata is to be stored.
  * @param nextArtifactDatabank -
- * 			  Databank where artifact's triples are stored.
+ *            {databank} Databank where artifact's triples are stored.
+ * @memberOf podd
  */
-podd.getObjectTypeMetadata = function(/* String */artifactUri, /* String */objectType, /* function */successCallback, /* object */
-nextSchemaDatabank, /* object */nextArtifactDatabank) {
+podd.getObjectTypeMetadata = function(artifactUri, objectType, successCallback, nextSchemaDatabank,
+		nextArtifactDatabank) {
 
     var requestUrl = podd.baseUrl + '/metadata';
 
@@ -377,15 +378,18 @@ nextSchemaDatabank, /* object */nextArtifactDatabank) {
 /**
  * Continue updating interface after schemaDatabank is populated with metadata.
  * If an existing artifact is being updated, populates the artifactDatabank.
+ * 
  * @param artifactUri -
- *            The current artifact's URI. Maybe "undefined" if adding a new
- *            artifact.
+ *            {string} The current artifact's URI. Maybe "undefined" if adding a
+ *            new artifact.
  * @param objectType -
- *            The type of Object to be added (e.g. Project, Publication)
+ *            {string} The type of Object to be added (e.g. Project,
+ *            Publication)
  * @param nextSchemaDatabank -
- * 			  Databank where metadata is stored.
+ *            {databank} Databank where metadata is stored.
  * @param nextArtifactDatabank -
- * 			  Databank where artifact's triples are stored.
+ *            {databank} Databank where artifact's triples are stored.
+ * @memberOf podd
  */
 podd.callbackFromGetMetadata = function(artifactUri, objectType, nextSchemaDatabank, nextArtifactDatabank) {
 	
