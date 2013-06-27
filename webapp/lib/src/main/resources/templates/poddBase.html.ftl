@@ -162,9 +162,13 @@
         </ul>
     </div>
 
-	<!-- content pane -->
-    <#include contentTemplate/>
-
+	<#attempt>
+		<!-- content pane -->
+    	<#include contentTemplate/>
+	<#recover>
+		<div id="content_pane">Error: Could not generate page "${contentTemplate}"</div>
+	</#attempt>
+	
     <a class="no_image float_right" href="${baseUrl}/about">About us</a>
 
 
