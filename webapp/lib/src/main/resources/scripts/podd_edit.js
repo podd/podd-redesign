@@ -701,18 +701,12 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 			artifactUri = podd.artifactIri;
 		}
 
-		var input = podd.addFieldInputText(nextField, 'text',
-				nextSchemaDatabank);
-		var hiddenValueElement = podd.addFieldInputText(nextField, 'hidden',
-				nextSchemaDatabank);
-		podd.addAutoCompleteHandler(input, hiddenValueElement,
-				nextArtifactDatabank, searchTypes, artifactUri, isNew);
-		podd.addTextFieldBlurHandler(input, nextField.propertyUri,
-				nextField.displayValue, nextField.propertyType,
+		var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
+		podd.addAutoCompleteHandler(input, nextArtifactDatabank, searchTypes, artifactUri, isNew);
+		podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextField.propertyType,
 				nextArtifactDatabank, isNew);
 
 		li2.append(input);
-		li2.append(hiddenValueElement);
     }
     else { // default
         podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + nextField.displayValue
@@ -1247,9 +1241,6 @@ podd.getProjectTitle = function(nextDatabank) {
  * 
  * @param autoComplete
  *            object to have auto completion
- * @param hiddenValueElement
- *            a hidden element where the URI value of the auto completion object
- *            is to be saved
  * @param nextArtifactDatabank
  *            databank
  * @param searchTypes
@@ -1259,7 +1250,6 @@ podd.getProjectTitle = function(nextDatabank) {
  */
 podd.addAutoCompleteHandler = function(
 /* object */autoComplete,
-/* object */hiddenValueElement,
 /* object */nextArtifactDatabank,
 /* object array */searchTypes,
 /* object */artifactUri,
