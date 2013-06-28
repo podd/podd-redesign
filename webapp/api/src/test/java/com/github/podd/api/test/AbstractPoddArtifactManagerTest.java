@@ -253,32 +253,32 @@ public abstract class AbstractPoddArtifactManagerTest
                                 MetadataPolicy.INCLUDE_ALL, 0, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 175, 23, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 174, 23, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.EXCLUDE_CONTAINS, 125, 16, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 283, 36, 11 },
+                                MetadataPolicy.INCLUDE_ALL, 282, 36, 11 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 42, 7, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                MetadataPolicy.INCLUDE_ALL, 107, 15, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 122, 15, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                MetadataPolicy.INCLUDE_ALL, 133, 19, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 148, 19, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 6, 1, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.INCLUDE_ALL, 65, 9, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 66, 9, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                MetadataPolicy.INCLUDE_ALL, 91, 13, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 92, 13, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 0, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.INCLUDE_ALL, 81, 11, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 82, 11, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
-                                MetadataPolicy.INCLUDE_ALL, 107, 15, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 108, 15, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 0, 0, 0 }, };
         
@@ -1378,7 +1378,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 7, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 8, nextRepositoryConnection);
             
             // verify: platform object
             final List<Statement> platformList =
