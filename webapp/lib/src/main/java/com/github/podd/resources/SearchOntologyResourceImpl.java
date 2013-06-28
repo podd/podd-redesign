@@ -87,7 +87,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             }
         }
         
-        this.log.info("requesting search ({}): {}, {}", variant.getMediaType().getName(), searchTerm, artifactUri);
+        this.log.info("requesting search ({}): {}, {}, {}", variant.getMediaType().getName(), searchTerm, artifactUri, searchTypes);
         
         // TODO - add a new PoddAction to suit the search.
         this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST, Collections.<URI> emptySet());

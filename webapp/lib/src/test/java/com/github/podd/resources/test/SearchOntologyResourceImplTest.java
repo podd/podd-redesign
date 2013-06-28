@@ -162,6 +162,27 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
+     * Test successful search for a custom Platform in RDF/XML
+     */
+    @Test
+    public void testSearchRdfForCustomPlatforms() throws Exception
+    {
+        // prepare:
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform"};
+        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
+        
+        final Model resultModel = this.internalTestSearchRdf("lat", searchTypes, requestMediaType, testArtifact.getOntologyIRI().toString());
+        
+        // verify:
+        Assert.assertEquals("Not the expected number of results", 1, resultModel.size());
+        Assert.assertEquals("Expected Platform 1 not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Platform 1")).size());
+    }
+
+    /**
      * Test successful search for a FOR Codes in RDF/XML
      */
     @Test
