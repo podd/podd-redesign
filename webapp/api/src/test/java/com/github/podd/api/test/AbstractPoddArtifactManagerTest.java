@@ -1319,6 +1319,40 @@ public abstract class AbstractPoddArtifactManagerTest
         // FIXME: How do we get information about whether an artifact is published and other
         // metadata like who can access the artifact?
     }
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#searchForOntologyLabels(InferredOWLOntologyID, String, URI[])}
+     */
+    @Test
+    public final void testSearchForOntologyLabelsWithPlatforms() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+     
+        final String searchTerm = "lat";
+        final URI[] searchTypes =
+            { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
+                    PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "NamedIndividual") };
+        
+        final Model result = this.testArtifactManager.searchForOntologyLabels(artifactIDv1, searchTerm, searchTypes);
+        
+        // verify:
+        Assert.assertNotNull("NULL result", result);
+        
+        DebugUtils.printContents(result);
+        
+        Assert.assertEquals("Not the expected number of search results", 21, result.size());
+        
+        Assert.assertEquals("Expected custom Platform 1 not found", 1,
+                result.filter(null, null, PoddRdfConstants.VF.createLiteral("Platform 1")).size());
+    }
     
     /**
      * Test method for
