@@ -855,6 +855,22 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
     .optional('?pValue rdfs:label ?pDisplayValue');
     var bindings = myQuery.select();
 
+    // see if restriction exists with owl:onClass
+    if (bindings.length === 0) {
+        myQuery = $.rdf({
+            databank : nextSchemaDatabank
+        })
+        // Find all display values for this property
+        .where('?restriction owl:onProperty <' + nextField.propertyUri + '> ')
+        //
+        .where('?restriction owl:onClass ?class')
+        // 
+        .where('?pValue rdf:type ?class')
+        //
+        .optional('?pValue rdfs:label ?pDisplayValue');
+        bindings = myQuery.select();
+    }
+    
     $.each(bindings, function(index, value) {
 
         var optionValue = value.pValue.value;

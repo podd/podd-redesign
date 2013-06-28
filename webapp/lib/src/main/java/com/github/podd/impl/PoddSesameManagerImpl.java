@@ -1131,8 +1131,16 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 {
                     for(final Resource nextRestriction : results.filter(null, OWL.ONPROPERTY, property).subjects())
                     {
-                        final Set<Value> nextRangeTypes =
-                                results.filter(nextRestriction, OWL.ALLVALUESFROM, null).objects();
+                        Set<Value> nextRangeTypes = results.filter(nextRestriction, OWL.ALLVALUESFROM, null).objects();
+                        
+                        if(nextRangeTypes.isEmpty())
+                        {
+                            // see if restriction exists with owl:onClass 
+                            nextRangeTypes =
+                                    results.filter(nextRestriction,
+                                            PoddRdfConstants.VF.createURI("http://www.w3.org/2002/07/owl#onClass"),
+                                            null).objects();
+                        }
                         
                         for(final Value nextRangeType : nextRangeTypes)
                         {
