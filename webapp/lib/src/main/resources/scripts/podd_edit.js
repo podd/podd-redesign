@@ -1283,32 +1283,13 @@ podd.addAutoCompleteHandler = function(
 
         select : function(event, ui) {
             podd.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
-            hiddenValueElement.val(ui.item.value);
             $(this).val(ui.item.label);
-            // $('#message1').html('Selected : ' + ui.item.value);
+            $(this).attr('value_uri', ui.item.value);
             return false;
         },
 
         blur : function(event, ui) {
-            podd.debug("autocomplete blur event");
-            podd.debug(event);
-            podd.debug(ui);
-            var objectUri = podd.getCurrentObjectUri();
-
-            var attributes = [];
-            var nextAttribute = {};
-            nextAttribute.isNew = isNew;
-            nextAttribute.objectUri = objectUri;
-            nextAttribute.property = '<' + $(this).attr('property') + '>';
-            nextAttribute.newValue = '<' + hiddenValueElement.val() + '>';
-            attributes.push(nextAttribute);
-
-            podd.debug('Add new autocomplete property: <' + nextAttribute.property + '> <' + nextAttribute.newValue
-                    + '>');
-
-            podd.updateDatabank(attributes, nextArtifactDatabank);
-            // NOTE: Cannot call update to the server after each edit, as some
-            // fields may have invalid values at this point.
+        	podd.debug('***ERROR*** - autocomplete blur event should be handled by textFieldBlurHandler');
         }
     });
 };
@@ -1345,6 +1326,12 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
 
         var newValue = '' + $(this).val();
 
+        // if the field has a separate value_uri field, use that 
+        var valueUri = $(this).attr('value_uri');
+        if (typeof valueUri !== 'undefined'){
+        	newValue = '' + valueUri;
+        } 
+        	
         var propertyDatatype = $(this).attr('datatype');
         
         if (newValue !== nextOriginalValue) {
