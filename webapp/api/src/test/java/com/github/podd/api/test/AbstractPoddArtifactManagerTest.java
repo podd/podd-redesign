@@ -1345,11 +1345,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify:
         Assert.assertNotNull("NULL result", result);
-        
-        DebugUtils.printContents(result);
-        
-        Assert.assertEquals("Not the expected number of search results", 21, result.size());
-        
+        Assert.assertEquals("Not the expected number of search results", 1, result.size());
         Assert.assertEquals("Expected custom Platform 1 not found", 1,
                 result.filter(null, null, PoddRdfConstants.VF.createLiteral("Platform 1")).size());
     }
