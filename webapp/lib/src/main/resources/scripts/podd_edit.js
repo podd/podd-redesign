@@ -22,7 +22,7 @@ var DISPLAY_Table = 'http://purl.org/podd/ns/poddBase#DisplayType_Table';
 
 var OBJECT_PROPERTY = 'http://www.w3.org/2002/07/owl#ObjectProperty';
 var DATATYPE_PROPERTY = 'http://www.w3.org/2002/07/owl#DatatypeProperty';
-var OWL_THING = 'http://www.w3.org/2002/07/owl#Thing';
+var OWL_NAMED_INDIVIDUAL = 'http://www.w3.org/2002/07/owl#NamedIndividual';
 var XSD_DATETIME = 'http://www.w3.org/2001/XMLSchema#dateTime';
 
 var DETAILS_LIST_Selector = '#details ol';
@@ -688,10 +688,13 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     else if (nextField.displayType == DISPLAY_AutoComplete) {
 
 		// - set search Types
-		var searchTypes = [ OWL_THING ];
+		var searchTypes = [ ];
 		if (typeof nextField.propertyRange != 'undefined'
 				&& nextField.propertyRange != 'Not Found') {
 			searchTypes.push(nextField.propertyRange);
+		} else {
+			podd.debug('WARNING: Could not find search types for property: ' + nextField.propertyUri);
+			searchTypes.push(OWL_NAMED_INDIVIDUAL); // attempt to limit the damage
 		}
 
 		// - set artifact URI
