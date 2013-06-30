@@ -21,6 +21,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
@@ -247,6 +248,26 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
                 resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Male")).size());
     }
     
+    /**
+     * Test a search in RDF/XML, with no "searchTypes" specified.
+     */
+    @Test
+    public void testSearchRdfWithoutSearchTypes() throws Exception
+    {
+        final String[] searchTypes = {}; // EVERYTHING in the search space is compared
+        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
+        
+        final Model resultModel = this.internalTestSearchRdf("e", searchTypes, requestMediaType, null);
+        
+        // verify:
+        Assert.assertEquals("Not the expected number of results", 200, resultModel.size());
+
+        Assert.assertEquals("dcTerms not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("The PODD Ontology for Dublin Core Terms")).size());
+        Assert.assertEquals("The PODD Ontology for Dublin Core Terms not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("The PODD Ontology for Dublin Core Terms")).size());
+    }
+
     /**
      * Test successful search for a Platform in Turtle
      */
