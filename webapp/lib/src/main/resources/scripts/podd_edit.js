@@ -651,7 +651,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 
     if (nextField.displayType == DISPLAY_LongText) {
         var input = podd.addFieldTextArea(nextField, 30, 2, nextSchemaDatabank);
-        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
+        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
         if (typeof link !== 'undefined') {
             link.click(function() {
                 var clonedField = input.clone(true);
@@ -665,12 +665,12 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
         var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
-        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
+        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
         var input = podd.addFieldDropDownListNonAutoComplete(nextField, nextSchemaDatabank, isNew);
-        podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
+        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_CheckBox) {
@@ -704,12 +704,18 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 			artifactUri = podd.artifactIri;
 		}
 
-		var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
-		podd.addAutoCompleteHandler(input, nextArtifactDatabank, searchTypes, artifactUri, isNew);
-		podd.addTextFieldBlurHandler(input, nextField.propertyUri, nextField.displayValue, nextField.propertyType,
+		var input = podd.addFieldInputText(nextField, 'text',
+				nextSchemaDatabank);
+		var hiddenValueElement = podd.addFieldInputText(nextField, 'hidden',
+				nextSchemaDatabank);
+		podd.addAutoCompleteHandler(input, hiddenValueElement,
+				nextArtifactDatabank, searchTypes, artifactUri, isNew);
+		podd.addTextFieldBlurHandler(input, hiddenValueElement, nextField.propertyUri,
+				nextField.displayValue, nextField.propertyType,
 				nextArtifactDatabank, isNew);
 
 		li2.append(input);
+		li2.append(hiddenValueElement);
     }
     else { // default
         podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + nextField.displayValue
@@ -1260,6 +1266,9 @@ podd.getProjectTitle = function(nextDatabank) {
  * 
  * @param autoComplete
  *            object to have auto completion
+ * @param hiddenValueElement
+ *            a hidden element where the URI value of the auto completion object
+ *            is to be saved
  * @param nextArtifactDatabank
  *            databank
  * @param searchTypes
@@ -1269,6 +1278,7 @@ podd.getProjectTitle = function(nextDatabank) {
  */
 podd.addAutoCompleteHandler = function(
 /* object */autoComplete,
+/* object */hiddenValueElement,
 /* object */nextArtifactDatabank,
 /* object array */searchTypes,
 /* object */artifactUri,
@@ -1293,7 +1303,7 @@ podd.addAutoCompleteHandler = function(
         select : function(event, ui) {
             podd.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
             $(this).val(ui.item.label);
-            $(this).attr('value_uri', ui.item.value);
+			hiddenValueElement.val(ui.item.value);
             return false;
         },
 
@@ -1320,7 +1330,7 @@ podd.addAutoCompleteHandler = function(
  *            value
  * 
  */
-podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
+podd.addTextFieldBlurHandler = function(/* object */textField, /* object */hiddenValueElement, /* object */
 		propertyUri, /* object */originalValue, /* object */propertyType, /* object */
 		nextArtifactDatabank, /* boolean */isNew) {
 	
@@ -1334,13 +1344,11 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
         var changesets = [];
 
         var newValue = '' + $(this).val();
+        if (typeof hiddenValueElement !== 'undefined') {
+        	podd.debug('[blur] hidden field with value found');
+        	newValue = hiddenValueElement.val();
+        }
 
-        // if the field has a separate value_uri field, use that 
-        var valueUri = $(this).attr('value_uri');
-        if (typeof valueUri !== 'undefined'){
-        	newValue = '' + valueUri;
-        } 
-        	
         var propertyDatatype = $(this).attr('datatype');
         
         if (newValue !== nextOriginalValue) {
@@ -1368,7 +1376,7 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */
             $(this).unbind("blur");
             // NOTE: isNew is always false after the first time through this
             // method with a non-empty/non-default value
-            podd.addTextFieldBlurHandler(textField, propertyUri, newValue, propertyType, nextArtifactDatabank, false);
+            podd.addTextFieldBlurHandler(textField, hiddenValueElement, propertyUri, newValue, propertyType, nextArtifactDatabank, false);
         }
         else {
             podd.debug("No change on blur for value for property=" + propertyUri + " original=" + nextOriginalValue
