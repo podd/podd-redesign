@@ -4,19 +4,14 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -87,7 +82,8 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             }
         }
         
-        this.log.info("requesting search ({}): {}, {}, {}", variant.getMediaType().getName(), searchTerm, artifactUri, searchTypes);
+        this.log.info("requesting search ({}): {}, {}, {}", variant.getMediaType().getName(), searchTerm, artifactUri,
+                searchTypes);
         
         // TODO - add a new PoddAction to suit the search.
         this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST, Collections.<URI> emptySet());
