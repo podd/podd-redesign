@@ -30,6 +30,7 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -298,6 +299,53 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
+    public Model fillMissingData(final InferredOWLOntologyID ontologyID, final Model inputModel)
+        throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            final URI[] contexts =
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                            this.getRepositoryManager().getSchemaManagementGraph());
+            
+            return this.getSesameManager().fillMissingLabels(inputModel, conn, contexts);
+        }
+        catch(final OpenRDFException e)
+        {
+            try
+            {
+                if(conn != null && conn.isActive())
+                {
+                    conn.rollback();
+                }
+            }
+            catch(final RepositoryException e1)
+            {
+                this.log.error("Found error rolling back repository connection", e1);
+            }
+            
+            throw e;
+        }
+        finally
+        {
+            try
+            {
+                if(conn != null && conn.isOpen())
+                {
+                    conn.close();
+                }
+            }
+            catch(final RepositoryException e)
+            {
+                throw e;
+            }
+        }
+    }
+    
+    @Override
     public InferredOWLOntologyID getArtifact(final IRI artifactIRI) throws UnmanagedArtifactIRIException
     {
         return getArtifact(artifactIRI, null);
@@ -403,6 +451,26 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public PoddFileRepositoryManager getFileRepositoryManager()
     {
         return this.fileRepositoryManager;
+    }
+    
+    @Override
+    public Model getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri)
+    throws OpenRDFException
+    {
+        final Model model = new LinkedHashModel();
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            PoddObjectLabel objectLabel = this.getSesameManager().getObjectLabel(ontologyID, objectUri, conn);
+            model.add(objectUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(objectLabel.getLabel()));
+        }
+        finally
+        {
+            conn.close();
+        }
+        return model;
     }
     
     /*

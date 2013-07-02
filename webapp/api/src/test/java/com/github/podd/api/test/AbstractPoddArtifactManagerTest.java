@@ -28,6 +28,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -698,6 +699,48 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertNotNull("File Reference Manager was null", this.testArtifactManager.getFileReferenceManager());
     }
     
+    @Test
+    public final void testFillMissingData() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final String[] objectUris =
+                { "http://purl.org/podd/basic-1-20130206/object:2966",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                        "http://purl.org/podd/ns/poddScience#WildType_NotApplicable",
+                        "http://purl.org/podd/ns/poddPlant#DeltaTporometer-63",
+                        "http://purl.org/podd/ns/poddBase#DisplayType_LongText" };
+        
+        final String[] expectedLabels =
+                { "Project#2012-0006_ Cotton Leaf Morphology", "Demo genotype", "Squeekee material", "Not Applicable",
+                        "Delta-T porometer", null };
+        
+        // prepare: Model with test data
+        final Model testModel = new LinkedHashModel();
+        for(String s : objectUris)
+        {
+            testModel.add(PoddRdfConstants.VF.createURI(s), RDFS.LABEL, PoddRdfConstants.VF.createLiteral("?blank"));
+        }
+        
+        Model resultModel = this.testArtifactManager.fillMissingData(artifactIDv1, testModel);
+        
+        // verify: each URI has the expected label
+        for(int i = 0; i < objectUris.length; i++)
+        {
+            final String objectString =
+                    resultModel.filter(PoddRdfConstants.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
+            Assert.assertEquals("Not the expected label", expectedLabels[i], objectString);
+        }
+    }
+
     @Test
     public final void testGetObjectTypes() throws Exception
     {

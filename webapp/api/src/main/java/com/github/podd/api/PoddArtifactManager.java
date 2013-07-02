@@ -122,6 +122,28 @@ public interface PoddArtifactManager
      *             If the artifact is not managed.
      */
     InferredOWLOntologyID getArtifact(IRI artifactIRI) throws UnmanagedArtifactIRIException;
+
+    /**
+     * This method takes in a {@link Model} where the statements have missing data and attempts to
+     * fill this data using information from the graphs of the given ontology's import closure. <br>
+     * 
+     * Missing data is identified by special placeholder nodes. The placeholder for a missing object
+     * value is the String Literal "?blank".
+     * 
+     * <br>
+     * <br>
+     * 
+     * TODO: The current implementation of this method can only handle missing rdfs:labels. <br>
+     * 
+     * @param ontologyID
+     *            The ontology whose import closure is used to look for missing information.
+     * @param inputModel
+     *            Contains the statements with missing data.
+     * @return The statements with missing data completed. Any statements for which data could not
+     *         be found are omitted from the results.
+     * @throws OpenRDFException
+     */
+    Model fillMissingData(InferredOWLOntologyID ontologyID, Model inputModel) throws OpenRDFException;
     
     /**
      * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI and
@@ -160,6 +182,18 @@ public interface PoddArtifactManager
      */
     PoddFileRepositoryManager getFileRepositoryManager();
 
+    /**
+     * 
+     * 
+     * @param ontologyID
+     *            The given object URI is to be found in this ontology or its imported ontologies.
+     * @param objectUri
+     *            URI of the object whose label is required
+     * @return A {@link Model} containing a single statement which specifies the object's label.
+     * @throws OpenRDFException
+     */
+    Model getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException;
+    
     /**
      * Retrieves a list of {@link PoddObjectLabel}s for the most-specific types to which the given
      * object URI belongs.
