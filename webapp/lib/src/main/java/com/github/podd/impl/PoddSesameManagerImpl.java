@@ -140,6 +140,34 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
     }
     
+    @Override
+    public Model fillMissingLabels(final Model inputModel, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder graphQuery = new StringBuilder();
+        
+        graphQuery.append("CONSTRUCT { ");
+        graphQuery.append(" ?subject <" + RDFS.LABEL.stringValue() + "> ?label . ");
+        
+        graphQuery.append("} WHERE {");
+        graphQuery.append(" ?subject <" + RDFS.LABEL.stringValue() + "> ?label .  ");
+        graphQuery.append("}");
+        final GraphQuery rdfsGraphQuery =
+                repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, graphQuery.toString());
+        
+        this.log.info("Created SPARQL {}.", graphQuery);
+        
+        final Model resultModel = new LinkedHashModel();
+        for(Statement statement : inputModel)
+        {
+            rdfsGraphQuery.setBinding("subject", statement.getSubject());
+            
+            resultModel.addAll(this.executeGraphQuery(rdfsGraphQuery, contexts));
+            rdfsGraphQuery.clearBindings();
+        }
+        return resultModel;
+    }
+    
     /**
      * Helper method to execute a given SPARQL Graph query.
      * 

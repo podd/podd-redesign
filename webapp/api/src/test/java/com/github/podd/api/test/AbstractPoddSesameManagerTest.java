@@ -356,6 +356,48 @@ public abstract class AbstractPoddSesameManagerTest
     }
     
     @Test
+    public void testFillMissingLabels() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        final URI[] contexts =
+                this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
+                        this.schemaGraph);
+        
+        final String[] objectUris =
+                { "http://purl.org/podd/basic-1-20130206/object:2966",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                        "http://purl.org/podd/ns/poddScience#WildType_NotApplicable",
+                        "http://purl.org/podd/ns/poddPlant#DeltaTporometer-63",
+                        "http://purl.org/podd/ns/poddBase#DisplayType_LongText" };
+        
+        final String[] expectedLabels =
+                { "Project#2012-0006_ Cotton Leaf Morphology", "Demo genotype", "Squeekee material", "Not Applicable",
+                        "Delta-T porometer", null };
+        
+        // prepare: Model with test data
+        final Model testModel = new LinkedHashModel();
+        for(String s : objectUris)
+        {
+            testModel.add(PoddRdfConstants.VF.createURI(s), RDFS.LABEL, PoddRdfConstants.VF.createLiteral("?blank"));
+        }
+        
+        Model resultModel = this.testPoddSesameManager.fillMissingLabels(testModel, testRepositoryConnection, contexts);
+        
+        // verify: each URI has the expected label
+        for(int i = 0; i < objectUris.length; i++)
+        {
+            final String objectString =
+                    resultModel.filter(PoddRdfConstants.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
+            Assert.assertEquals("Not the expected label", expectedLabels[i], objectString);
+        }
+    }
+    
+    @Test
     public void testGetAllSchemaOntologyVersions() throws Exception
     {
         this.populateSchemaManagementGraph();

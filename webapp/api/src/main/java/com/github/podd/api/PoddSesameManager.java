@@ -45,6 +45,22 @@ public interface PoddSesameManager
      */
     void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
             RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
+
+    
+    /**
+     * This method attempts to find the labels for a given collection of URIs. If a label could not
+     * be found, the statement is removed from the returned Model.
+     * 
+     * @param inputModel
+     *            A {@link Model} containing a collection of statements of the form
+     *            {&lt;subject&gt; &lt;rdfs:label&gt; "?blank"}.
+     * @param repositoryConnection
+     * @param contexts
+     * @return A {@link Model} containing the labels.
+     * @throws OpenRDFException
+     */
+    Model fillMissingLabels(Model inputModel, RepositoryConnection repositoryConnection, URI... contexts)
+        throws OpenRDFException;
     
     /**
      * Get all versions of the ontology with the given IRI that are managed in the given context in
