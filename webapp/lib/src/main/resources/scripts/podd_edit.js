@@ -567,24 +567,35 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         // If there are values for the property in the artifact
         // databank, display them instead of showing a single new empty field
         if (nextArtifactBindings.length > 0) {
-            podd.debug("Found existing values for " + podd.getCurrentObjectUri() + " property <" + value.propertyUri
-                    + "> value=" + nextArtifactBindings);
             $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
                 // found existing value for property
+                value.displayValue = nextArtifactValue.propertyValue.value;
+                podd.debug(podd.getCurrentObjectUri() + ", property <" + value.propertyUri + "> has value: "
+						+ value.displayValue);
 
                 // for URIs populate the valueUri property with the value so we
                 // have the option to put a human readable label in displayValue
                 if (nextArtifactValue.propertyValue.type === 'uri') {
-                    // TODO: Fetch label here for the URI
                     value.valueUri = nextArtifactValue.propertyValue.value;
+                	
+                    // look for a label in the schema databank
+                    var labelQuery = $.rdf({
+                        databank : nextSchemaDatabank
+                    })
+                    // 
+                    .where('<' + value.valueUri + '> <http://www.w3.org/2000/01/rdf-schema#label> ?uLabel');
+                    var labelBindings = labelQuery.select();
+
+                    $.each(labelBindings, function(index, nextBinding) {
+                    	podd.debug('Found <' + value.valueUri + '> has label: ' + nextBinding.uLabel.value);
+                    	value.displayValue = nextBinding.uLabel.value;
+                    });
                 }
-                value.displayValue = nextArtifactValue.propertyValue.value;
                 $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
             });
         }
         else {
-            podd.debug("Found no existing values for " + podd.getCurrentObjectUri() + " property <"
-                    + value.propertyUri + "> value=" + nextArtifactBindings);
+            podd.debug("No existing values for " + podd.getCurrentObjectUri() + " property <" + value.propertyUri + "> ");
             $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
         }
     });
@@ -941,6 +952,90 @@ podd.searchOntologyService = function(
 };
 
 /**
+ * @memberOf podd
+ * 
+ * This method identifies object URIs in the artifact databank that do not have
+ * labels, retrieves them from the PODD service and stores them in the schema
+ * databank (labels are stored in the schma databank as they are not
+ * part of the artifact).
+ * 
+ * @param artifactUri -
+ *            {string} URI for the current artifact
+ * @param nextSchemaDatabank -
+ *            {databank} Databank where metadata is stored
+ * @param nextArtifactDatabank -
+ *            {databank} Databank where artifact's triples are stored
+ * @param callbackFunction -
+ *            {function} Function to be invoked on completion of this request
+ * @param callbackParam -
+ *            {object} Parameter to be used when invoking the callback
+ */
+podd.loadMissingArtifactLabels = function(artifactUri, nextSchemaDatabank,
+		nextArtifactDatabank, callbackFunction, callbackParam) {
+    podd.debug('[loadArtifactLabels] started')
+    
+    // go through artifact databank and identify URIs without labels
+    var uriList = [];
+    var tempDatabank = podd.newDatabank();
+    
+    var myQuery = $.rdf({
+        databank : nextArtifactDatabank
+    })
+    //for all statements
+    .where('?subject ?predicate ?object')
+    //optionally, if object has a label
+    .optional('?object <http://www.w3.org/2000/01/rdf-schema#label> ?objectLabel')
+    ;
+    var bindings = myQuery.select();
+
+    $.each(bindings, function(index, value) {
+        if (value.object.type === 'uri' && value.objectLabel === undefined) {
+            //podd.debug('[loadArtifactLabels] missing label for = ' + value.object.value)
+            uriList.push(value.object.value);
+            tempDatabank.add('<' + value.object.value + '> <http://www.w3.org/2000/01/rdf-schema#label> "?blank"');
+        }
+    });
+    
+    // retrieve labels for these and populate the schemadatabank with them
+    var triplesToSendInJson = $.toJSON(tempDatabank.dump({
+        format : 'application/json'
+    }));    
+    var requestUrl = podd.baseUrl + '/search?artifacturi=' + podd.uriEncode(artifactUri); 
+    
+    $.ajax({
+        url : requestUrl,
+        type : 'POST',
+        
+        data : {
+            artifacturi : artifactUri
+        },
+        data : triplesToSendInJson,
+        
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
+        success : function(resultData, status, xhr) {
+            // add the results to schemadatabank
+        	//podd.debug('[getUriLabel] response is = ' + resultData.toString());
+        	var sizeBefore = nextSchemaDatabank.size();
+            nextSchemaDatabank.load(resultData);
+            podd.debug('[loadArtifactLabels] ### SUCCESS ### databank size changed from ' + sizeBefore + ' to ' + nextSchemaDatabank.size());
+            
+            // callback
+            // The following may update the interface, redirect the user to
+            // another page, or so anything it likes really
+        	podd.debug('[loadArtifactLabels] invoke callback with 4 parameters')
+        	callbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank, callbackParam);
+        },
+        error : function(xhr, status, error) {
+            podd.debug(status + '[loadArtifactLabels] $$$ ERROR $$$ ' + error);
+            // podd.debug(xhr.statusText);
+        }
+    });
+};
+
+/**
  * Retrieve the current version of an artifact and populate the artifact
  * databank.
  * 
@@ -960,9 +1055,7 @@ podd.searchOntologyService = function(
  *            The callback method to invoke on successful retrieval of the
  *            artifact.
  * @param callbackParam
- *            If this parameter is not 'undefined', it should be the 4th
- *            parameter of the callback method. Otherwise, the callback should
- *            be invoked with only 3 parameters.
+ *            The 4th parameter of the callback method. Could be undefined.
  */
 podd.getArtifact = function(artifactUri, nextSchemaDatabank,
 		nextArtifactDatabank, cleanArtifactDatabank,
@@ -987,15 +1080,8 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank,
             podd.versionIri = artifactId[0].versionIri;
 
             podd.updateErrorMessageList('<i>Successfully retrieved artifact version: ' + podd.versionIri + '</i><br>');
-            // The following may update the interface, redirect the user to
-            // another page, or so anything it likes really
-            if (typeof callbackParam === 'undefined') {
-            	podd.debug('[getArtifact] invoke callback with 3 parameters')
-            	updateDisplayCallbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank);
-            } else {
-            	podd.debug('[getArtifact] invoke callback with 4 parameters')
-            	updateDisplayCallbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank, callbackParam);
-            }
+
+            podd.loadMissingArtifactLabels(artifactUri, nextSchemaDatabank, nextArtifactDatabank, updateDisplayCallbackFunction, callbackParam);
         },
         error : function(xhr, status, error) {
             podd.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
