@@ -958,8 +958,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 35, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 14,
+        Assert.assertEquals("Display Model not of expected size", 32, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 13,
                 displayModel.filter(objectUri, null, null).size());
         
         Assert.assertEquals(
@@ -1056,11 +1056,11 @@ public abstract class AbstractPoddSesameManagerTest
                                 MetadataPolicy.INCLUDE_ALL, 0, -1, 0 },
                                 
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 174, 22, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 148, 19, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 125, 15, 0 },
+                                MetadataPolicy.EXCLUDE_CONTAINS, 99, 12, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 282, 35, 11 },
+                                MetadataPolicy.INCLUDE_ALL, 284, 35, 13 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 50, 7, 0 },
                         
@@ -1780,7 +1780,7 @@ public abstract class AbstractPoddSesameManagerTest
                         this.testRepositoryConnection, contexts);
         
         // verify:
-        Assert.assertEquals("Incorrect number of statements about Top Object", 11, orderedPropertyUris.size());
+        Assert.assertEquals("Incorrect number of statements about Top Object", 10, orderedPropertyUris.size());
         
         final String[] expectedUris =
                 { "http://purl.org/podd/ns/poddBase#createdAt", "http://purl.org/dc/terms/creator",
@@ -1789,7 +1789,6 @@ public abstract class AbstractPoddSesameManagerTest
                         "http://purl.org/podd/ns/poddScience#hasProcess",
                         "http://purl.org/podd/ns/poddScience#hasProjectPlan",
                         "http://purl.org/podd/ns/poddScience#hasPublication",
-                        "http://purl.org/podd/ns/poddBase#hasPublicationStatus",
                         "http://purl.org/podd/ns/poddScience#hasANZSRC",
                         "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
                         "http://purl.org/podd/ns/poddBase#hasStartDate" };
@@ -1829,11 +1828,10 @@ public abstract class AbstractPoddSesameManagerTest
                         this.testRepositoryConnection, contexts);
         
         // verify:
-        Assert.assertEquals("Incorrect number of statements about Top Object", 6, orderedPropertyUris.size());
+        Assert.assertEquals("Incorrect number of statements about Top Object", 5, orderedPropertyUris.size());
         
         final String[] expectedUris =
                 { "http://purl.org/podd/ns/poddBase#createdAt", "http://purl.org/dc/terms/creator",
-                        "http://purl.org/podd/ns/poddBase#hasPublicationStatus",
                         "http://purl.org/podd/ns/poddScience#hasANZSRC",
                         "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
                         "http://purl.org/podd/ns/poddBase#hasStartDate" };

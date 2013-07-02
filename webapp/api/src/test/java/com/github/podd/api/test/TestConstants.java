@@ -17,7 +17,7 @@ public interface TestConstants
     public static final int EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE = 217;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED = 34;
     
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE = 348;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE = 350;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED = 71;
     
     public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE = 1304;
