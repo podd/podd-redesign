@@ -35,14 +35,12 @@
     <link rel="shortcut icon" href="${baseUrl}/resources/images/podd_ico.png" type="image/png" />
     <link rel="stylesheet" href="${baseUrl}/resources/styles/podd.css" media="screen" type="text/css" />
     <link rel="stylesheet" href="${baseUrl}/resources/styles/podd-colours.css" media="screen" type="text/css" />
-	<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-smoothness.css" media="screen" type="text/css" />
+	<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-1.10.3.custom.css" media="screen" type="text/css" />
 
-    	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.6.2.js"></script>
+    	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.9.1.js"></script>
+    	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-ui-1.10.3.custom.js"></script>
 
- 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.core.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.widget.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.core.js"></script>
-
+		
 		<!-- Dependencies for rdfquery -->
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.rdfquery.rules-1.1-SNAPSHOT.js"></script>
@@ -50,16 +48,7 @@
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.effects.bounce.js"></script>
 		
 		<!-- Dependencies for autocomplete -->
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.mouse.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.position.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.selectable.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.resizable.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.sortable.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.button.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.dialog.js"></script>
 	    
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.ui.autocomplete.js"></script>
-
  		<!-- Dependencies for PODD -->
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.metadata.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.inputlimiter.1.2.js"></script>
