@@ -676,22 +676,21 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     else if (nextField.displayType == DISPLAY_ShortText) {
         var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
 
+        // TODO: add support for date/time types other than xsd:date
         if (typeof nextField.propertyRange !== 'undefined' &&
         		nextField.propertyRange.toString() === 'http://www.w3.org/2001/XMLSchema#date') {
-        	//podd.addDatePicker(input);
         	
         	input.datepicker({
-        		//	minDate : "-2",
         			dateFormat : "yy-mm-dd",
         			changeYear : true,
-        			yearRange : "-5:+20",
+        			yearRange : "-5:+10",
         			onSelect : function() {
-        				podd.debug('[onSelect] Invoking handler. selected = ' + input.val());
-        		        podd.handleDatePickerFieldBlur(input, nextField.propertyUri, nextField.displayValue,
+        				// blur handler does not work with datepicker as the blur event gets fired before
+        				// the selected value is set.
+        		        podd.handleDatePickerFieldChange(input, nextField.propertyUri, nextField.displayValue,
 							nextField.propertyType, nextArtifactDatabank, isNew);
         			} 
         		});
-        	podd.debug('added datePicker');
         } else {
 		    podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue,
 		    	nextField.propertyType, nextArtifactDatabank, isNew);
@@ -1458,7 +1457,11 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */hidde
             if (nextOriginalValue !== 'undefined') {
             	nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType, propertyDatatype));
             }
-            nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
+
+            // add a new triple ONLY if the value is non-empty. enables deleting of previous entries. 
+            if (newValue !== '') {
+            	nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
+            }
             
             changesets.push(nextChangeset);
 
@@ -1489,23 +1492,24 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */hidde
  * 
  * @param textField
  *            {object} reference to the text field that has been 'blurred'
- * @param propertyUri
- *            {} property/predicate representing this field
+ * @param propertyUri 
+ * 			  property/predicate representing this field
  * @param originalValue
- *            {} the original value that is recorded against this field. can be 'undefined'
+ *            the original value that is recorded against this field. can be
+ *            'undefined'
  * @param nextArtifactDatabank
  *            {databank} databank containing artifact triples
  * @param isNew
- *            {boolean} boolean indicating whether this field did not previously have a
- *            value
+ *            {boolean} boolean indicating whether this field did not previously
+ *            have a value
  */
-podd.handleDatePickerFieldBlur = function(textField, propertyUri, originalValue, propertyType, nextArtifactDatabank,
+podd.handleDatePickerFieldChange = function(textField, propertyUri, originalValue, propertyType, nextArtifactDatabank,
 		isNew) {
-	
-    var nextOriginalValue = '' + originalValue;
+
+	var nextOriginalValue = '' + originalValue;
 
 	var newValue = '' + textField.val();
-	podd.debug("[datePicker] triggered with new value: " + newValue);
+	podd.debug("[dateField] triggered with new value: " + newValue);
 
 	var objectUri = podd.getCurrentObjectUri();
 
@@ -1525,17 +1529,21 @@ podd.handleDatePickerFieldBlur = function(textField, propertyUri, originalValue,
 			nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType,
 					propertyDatatype));
 		}
-		nextChangeset.newTriples.push(podd
-				.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
-
+		
+        // add a new triple ONLY if the value is non-empty. enables deleting of previous entries. 
+		if (newValue !== '') {
+			nextChangeset.newTriples.push(podd
+					.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
+		}
+		
 		changesets.push(nextChangeset);
 
-		podd.debug('Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue + ' (isNew='
+		podd.debug('[dateField] Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue + ' (isNew='
 				+ isNew + ')');
 
 		podd.updateDatabank(changesets, nextArtifactDatabank);
 	} else {
-		podd.debug("No change on blur for value for property=" + propertyUri + " original=" + nextOriginalValue
+		podd.debug("[dateField] No change of value for property=" + propertyUri + " original=" + nextOriginalValue
 				+ " newValue=" + newValue);
 	}
 };
