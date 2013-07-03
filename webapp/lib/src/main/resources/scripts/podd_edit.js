@@ -675,7 +675,28 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
         var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
-        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
+
+        if (typeof nextField.propertyRange !== 'undefined' &&
+        		nextField.propertyRange.toString() === 'http://www.w3.org/2001/XMLSchema#date') {
+        	//podd.addDatePicker(input);
+        	
+        	input.datepicker({
+        		//	minDate : "-2",
+        			dateFormat : "yy-mm-dd",
+        			changeYear : true,
+        			yearRange : "-5:+20",
+        			onSelect : function() {
+        				podd.debug('[onSelect] Invoking handler. selected = ' + input.val());
+        		        podd.handleDatePickerFieldBlur(input, nextField.propertyUri, nextField.displayValue,
+							nextField.propertyType, nextArtifactDatabank, isNew);
+        			} 
+        		});
+        	podd.debug('added datePicker');
+        } else {
+		    podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue,
+		    	nextField.propertyType, nextArtifactDatabank, isNew);
+        }
+
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_DropDown) {
@@ -1399,9 +1420,9 @@ podd.addAutoCompleteHandler = function(
  * @param originalValue
  *            the original value that is recorded against this field. can be 'undefined'
  * @param nextArtifactDatabank
- *            databank containing artifact triples
+ *            {databank} databank containing artifact triples
  * @param isNew
- *            boolean indicating whether this field did not previously have a
+ *            {boolean} boolean indicating whether this field did not previously have a
  *            value
  * 
  */
@@ -1412,13 +1433,13 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */hidde
     var nextOriginalValue = '' + originalValue;
 
     textField.blur(function(event) {
-        podd.debug("text field blur event");
+        var newValue = '' + $(this).val();
+        podd.debug("[blur] triggered with new value: " + newValue);
 
         var objectUri = podd.getCurrentObjectUri();
 
         var changesets = [];
 
-        var newValue = '' + $(this).val();
         if (typeof hiddenValueElement !== 'undefined') {
         	newValue = hiddenValueElement.val();
         	podd.debug('[blur] hidden field found with value: ' + newValue);
@@ -1434,7 +1455,7 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */hidde
             nextChangeset.oldTriples = [];
 
             // add old triple ONLY if there originally was a value
-            if (typeof originalValue !== 'undefined') {
+            if (nextOriginalValue !== 'undefined') {
             	nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType, propertyDatatype));
             }
             nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
@@ -1463,8 +1484,65 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */hidde
 };
 
 /**
- * Retrieve metadata describing possible types of child objects and relationshps for the
- * given parent object type.
+ * On change of a datepicker field, check if the contents of the field have
+ * changed and if so, request the artifact databank to be updated.
+ * 
+ * @param textField
+ *            {object} reference to the text field that has been 'blurred'
+ * @param propertyUri
+ *            {} property/predicate representing this field
+ * @param originalValue
+ *            {} the original value that is recorded against this field. can be 'undefined'
+ * @param nextArtifactDatabank
+ *            {databank} databank containing artifact triples
+ * @param isNew
+ *            {boolean} boolean indicating whether this field did not previously have a
+ *            value
+ */
+podd.handleDatePickerFieldBlur = function(textField, propertyUri, originalValue, propertyType, nextArtifactDatabank,
+		isNew) {
+	
+    var nextOriginalValue = '' + originalValue;
+
+	var newValue = '' + textField.val();
+	podd.debug("[datePicker] triggered with new value: " + newValue);
+
+	var objectUri = podd.getCurrentObjectUri();
+
+	var changesets = [];
+
+	var propertyDatatype = textField.attr('datatype');
+
+	if (newValue !== nextOriginalValue) {
+		var nextChangeset = {};
+		nextChangeset.isNew = isNew;
+		nextChangeset.objectUri = objectUri;
+		nextChangeset.newTriples = [];
+		nextChangeset.oldTriples = [];
+
+		// add old triple ONLY if there originally was a value
+		if (nextOriginalValue !== 'undefined') {
+			nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType,
+					propertyDatatype));
+		}
+		nextChangeset.newTriples.push(podd
+				.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
+
+		changesets.push(nextChangeset);
+
+		podd.debug('Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue + ' (isNew='
+				+ isNew + ')');
+
+		podd.updateDatabank(changesets, nextArtifactDatabank);
+	} else {
+		podd.debug("No change on blur for value for property=" + propertyUri + " original=" + nextOriginalValue
+				+ " newValue=" + newValue);
+	}
+};
+
+/**
+ * Retrieve metadata describing possible types of child objects and relationshps
+ * for the given parent object type.
  * 
  * @param artifactUri -
  *            The current artifact's URI. Maybe "undefined" if adding a new
