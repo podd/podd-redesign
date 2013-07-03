@@ -594,7 +594,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
             });
         }
         else {
-            podd.debug("No existing values for " + podd.getCurrentObjectUri() + " property <" + value.propertyUri + "> ");
+            podd.debug("Property <" + value.propertyUri + "> has NO value");
             $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
         }
     });
@@ -721,7 +721,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		podd.addAutoCompleteHandler(input, hiddenValueElement,
 				nextArtifactDatabank, searchTypes, artifactUri, isNew);
 		podd.addTextFieldBlurHandler(input, hiddenValueElement, nextField.propertyUri,
-				nextField.displayValue, nextField.propertyType,
+				nextField.valueUri, nextField.propertyType,
 				nextArtifactDatabank, isNew);
 
 		li2.append(input);
@@ -786,11 +786,6 @@ podd.cloneEmptyField = function() {
  */
 podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
 
-    var displayValue = nextField.displayValue;
-    if (inputType == 'checkbox') {
-        displayValue = nextField.valueUri;
-    }
-
     // FIXME: id is useless here as it doesn't preserve the URI, and it will
     // never be unique for more than one element
     // var idString = 'id_' + nextField.propertyUri;
@@ -798,18 +793,18 @@ podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
 
     var input = $('<input>', {
         // id : idString,
-        name : 'name_' + nextField.propertyLabel,
-        type : inputType,
-        value : displayValue
+        name : 'name_' + inputType + '_' + nextField.propertyLabel,
+        type : inputType
     });
+
+    if (inputType === 'checkbox' || inputType === 'hidden') {
+        input.val(nextField.valueUri);
+    } else {
+    	input.val(nextField.displayValue);
+    }
 
     input.attr('datatype', nextField.propertyRange);
     
-    // add handler to process changes to this field
-    // - handler should have property URI
-    // - detect if value actually changed
-    // - if changed, update the "instance" databank and set dirty flag
-
     return input;
 };
 
@@ -1425,8 +1420,8 @@ podd.addTextFieldBlurHandler = function(/* object */textField, /* object */hidde
 
         var newValue = '' + $(this).val();
         if (typeof hiddenValueElement !== 'undefined') {
-        	podd.debug('[blur] hidden field with value found');
         	newValue = hiddenValueElement.val();
+        	podd.debug('[blur] hidden field found with value: ' + newValue);
         }
 
         var propertyDatatype = $(this).attr('datatype');
