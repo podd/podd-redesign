@@ -570,8 +570,7 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
             $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
                 // found existing value for property
                 value.displayValue = nextArtifactValue.propertyValue.value;
-                podd.debug(podd.getCurrentObjectUri() + ", property <" + value.propertyUri + "> has value: "
-						+ value.displayValue);
+                podd.debug("Property <" + value.propertyUri + "> has value: " + value.displayValue);
 
                 // for URIs populate the valueUri property with the value so we
                 // have the option to put a human readable label in displayValue
@@ -831,16 +830,11 @@ podd.addFieldTextArea = function(nextField, noOfColumns, noOfRows, nextSchemaDat
     var textarea = $('<textarea>', {
         name : 'name_' + nextField.propertyLabel,
         cols : noOfColumns,
-        rows : noOfRows,
-        value : nextField.displayValue
+        rows : noOfRows
     });
 
+    textarea.val(nextField.displayValue);
     textarea.attr('datatype', nextField.propertyRange);
-
-    // add handler to process changes to this field
-    // - handler should have property URI
-    // - detect if value actually changed
-    // - if changed, update the "instance" databank and set dirty flag
 
     return textarea;
 };
