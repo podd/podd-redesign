@@ -688,7 +688,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         var input = podd.addFieldTextArea(nextField, 30, 2, nextSchemaDatabank);
         podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
         
-        podd.addCloneHandle(subList, link, input, nextField, nextArtifactDatabank);
+        podd.addCloneHandler(subList, link, input, nextField, nextArtifactDatabank);
         
         li2.append(input);
     }
