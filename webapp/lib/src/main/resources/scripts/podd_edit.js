@@ -530,9 +530,6 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
         }
 
         
-        nextChild.displayValue; //undefined to indicate there is NO value
-        nextChild.valueUri = '';
-
         // Avoid duplicates, which are occurring due to multiple ways of specifying ranges/etc., in OWL
         if($.inArray(nextChild.propertyUri, propertyUris) === -1)
        	{
@@ -583,37 +580,57 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
 
         var nextArtifactBindings = nextArtifactQuery.select();
 
-        // If there are values for the property in the artifact
-        // databank, display them instead of showing a single new empty field
+		// If there are values for the property in the artifact databank, add them as an
+        // array so that they can be displayed instead of showing a single new empty field
         if (nextArtifactBindings.length > 0) {
+        	
+        	var valuesArray = [];
             $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
+            	var oneValue = {};
                 // found existing value for property
-                value.displayValue = nextArtifactValue.propertyValue.value;
-                podd.debug("Property <" + value.propertyUri + "> has value: " + value.displayValue);
+                oneValue.displayValue = nextArtifactValue.propertyValue.value;
+                podd.debug("Property <" + value.propertyUri + "> has value: " + oneValue.displayValue);
 
                 // for URIs populate the valueUri property with the value so we
                 // have the option to put a human readable label in displayValue
                 if (nextArtifactValue.propertyValue.type === 'uri') {
-                    value.valueUri = nextArtifactValue.propertyValue.value;
+                	oneValue.valueUri = nextArtifactValue.propertyValue.value;
                 	
                     // look for a label in the schema databank
                     var labelQuery = $.rdf({
                         databank : nextSchemaDatabank
                     })
                     // 
-                    .where('<' + value.valueUri + '> <http://www.w3.org/2000/01/rdf-schema#label> ?uLabel');
+                    .where('<' + oneValue.valueUri + '> <http://www.w3.org/2000/01/rdf-schema#label> ?uLabel');
                     var labelBindings = labelQuery.select();
 
                     $.each(labelBindings, function(index, nextBinding) {
-                    	podd.debug('Found <' + value.valueUri + '> has label: ' + nextBinding.uLabel.value);
-                    	value.displayValue = nextBinding.uLabel.value;
+                    	podd.debug('Found <' + oneValue.valueUri + '> has label: ' + nextBinding.uLabel.value);
+                    	oneValue.displayValue = nextBinding.uLabel.value;
                     });
                 }
-                $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
+                valuesArray.push(oneValue);
+                
             });
+            value.valuesArray = valuesArray;
+            $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
+            
+            //TODO - invoke createEditField with this array of values rather than just one
+            podd.debug('found ' + valuesArray.length + ' values for property ' + value.propertyUri);
         }
         else {
             podd.debug("Property <" + value.propertyUri + "> has NO value");
+
+            var oneValue = {};
+            oneValue.displayValue; //undefined to indicate there is NO value
+            oneValue.valueUri = '';
+
+            value.valuesArray = [];
+            value.valuesArray.push(oneValue);
+            
+//            nextChild.displayValue; //undefined to indicate there is NO value
+//            nextChild.valueUri = '';
+
             $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
         }
     });
@@ -682,109 +699,115 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     // a list which will be useful if this field supports multi-values;
     var subList = $('<ul>');
 
-    var li2 = $("<li>");
 
-    if (nextField.displayType == DISPLAY_LongText) {
-        var input = podd.addFieldTextArea(nextField, 30, 2, nextSchemaDatabank);
-        
-        // TODO: refactor so that there is one addHandler() inside which
-		// blur handler is invoked for both the original and the cloned fields
-		podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue,
-				nextField.propertyType, nextArtifactDatabank, isNew);
-        
-        podd.addCloneHandler(subList, link, input, nextField, nextArtifactDatabank);
-        
-        li2.append(input);
+    if (typeof nextField.valuesArray !== 'undefined' && nextField.valuesArray.length > 0) {
+    	
+    	$.each(nextField.valuesArray, function(index, aValue) {
+    	    var li2 = $("<li>");
+		    		
+		    if (nextField.displayType == DISPLAY_LongText) {
+		        var input = podd.addFieldTextArea(nextField, aValue, 30, 2, nextSchemaDatabank);
+		        
+		        // TODO: refactor so that there is one addHandler() inside which
+				// blur handler is invoked for both the original and the cloned fields
+				podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue,
+						nextField.propertyType, nextArtifactDatabank, isNew);
+		        
+		        if (index === 0) {
+		        	//clone handler should only be added once
+		        	podd.addCloneHandler(subList, link, input, nextField, nextArtifactDatabank);
+		        }
+		        
+		        li2.append(input);
+		    }
+		    else if (nextField.displayType == DISPLAY_ShortText) {
+		        var input = podd.addFieldInputText(nextField, aValue, 'text', nextSchemaDatabank);
+		
+		        // TODO: add support for date/time types other than xsd:date
+		        if (typeof nextField.propertyRange !== 'undefined' &&
+		        		nextField.propertyRange.toString() === 'http://www.w3.org/2001/XMLSchema#date') {
+		
+		        	// prevent user bypassing the datepicker widget and typing values in
+		        	input.attr('readonly', 'readonly');
+		        	input.attr('style', 'background:white');
+		        	
+		        	input.datepicker({
+		        			dateFormat : "yy-mm-dd",
+		        			changeYear : true,
+		        			yearRange : "-5:+10",
+		        			onSelect : function() {
+		        				// blur handler does not work with datepicker as the blur event gets fired before
+		        				// the selected value is set.
+		        		        podd.handleDatePickerFieldChange(input, nextField.propertyUri, aValue.displayValue,
+									nextField.propertyType, nextArtifactDatabank, isNew);
+		        			} 
+		        		});
+		        } else {
+				    podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue,
+				    	nextField.propertyType, nextArtifactDatabank, isNew);
+		        }
+		
+		        li2.append(input);
+		    }
+		    else if (nextField.displayType == DISPLAY_DropDown) {
+		        var input = podd.addFieldDropDownListNonAutoComplete(nextField, aValue, nextSchemaDatabank, isNew);
+		        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue, 
+		        		nextField.propertyType, nextArtifactDatabank, isNew);
+		        li2.append(input);
+		    }
+		    else if (nextField.displayType == DISPLAY_CheckBox) {
+		        var input = podd.addFieldInputText(nextField, aValue, 'checkbox', nextSchemaDatabank);
+		        var label = '<label>' + aValue.displayValue + '</label>';
+		        // TODO: add blur handler
+		        li2.append(input.after(label));
+		    }
+		    else if (nextField.displayType == DISPLAY_Table) {
+		        var checkBox = $('<p>');
+		        checkBox.text('Table here please');
+		
+		        li2.append(checkBox);
+		    }
+		    else if (nextField.displayType == DISPLAY_AutoComplete) {
+		
+				// - set search Types
+				var searchTypes = [ ];
+				if (typeof nextField.propertyRange != 'undefined'
+						&& nextField.propertyRange != 'Not Found') {
+					searchTypes.push(nextField.propertyRange);
+				} else {
+					podd.debug('WARNING: Could not find search types for property: ' + nextField.propertyUri);
+					searchTypes.push(OWL_NAMED_INDIVIDUAL); // attempt to limit the damage
+				}
+		
+				// - set artifact URI
+				var artifactUri;
+				if (typeof podd.artifactIri != 'undefined'
+						&& podd.artifactIri != 'undefined') {
+					artifactUri = podd.artifactIri;
+				}
+		
+				var input = podd.addFieldInputText(nextField, aValue, 'text',
+						nextSchemaDatabank);
+				var hiddenValueElement = podd.addFieldInputText(nextField, aValue, 'hidden',
+						nextSchemaDatabank);
+				podd.addAutoCompleteHandler(input, hiddenValueElement,
+						nextArtifactDatabank, searchTypes, artifactUri, isNew);
+				podd.addTextFieldBlurHandler(input, hiddenValueElement, nextField.propertyUri,
+						aValue.valueUri, nextField.propertyType,
+						nextArtifactDatabank, isNew);
+		
+				li2.append(input);
+				li2.append(hiddenValueElement);
+		    }
+		    else { // default
+		        podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + aValue.displayValue
+		                + ")");
+		    }
+		    subList.append(li2);
+		
+    	}); //end $.each()
     }
-    else if (nextField.displayType == DISPLAY_ShortText) {
-        var input = podd.addFieldInputText(nextField, 'text', nextSchemaDatabank);
-
-        // TODO: add support for date/time types other than xsd:date
-        if (typeof nextField.propertyRange !== 'undefined' &&
-        		nextField.propertyRange.toString() === 'http://www.w3.org/2001/XMLSchema#date') {
-
-        	// prevent user bypassing the datepicker widget and typing values in
-        	input.attr('readonly', 'readonly');
-        	input.attr('style', 'background:white');
-        	
-        	input.datepicker({
-        			dateFormat : "yy-mm-dd",
-        			changeYear : true,
-        			yearRange : "-5:+10",
-        			onSelect : function() {
-        				// blur handler does not work with datepicker as the blur event gets fired before
-        				// the selected value is set.
-        		        podd.handleDatePickerFieldChange(input, nextField.propertyUri, nextField.displayValue,
-							nextField.propertyType, nextArtifactDatabank, isNew);
-        			} 
-        		});
-        } else {
-		    podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue,
-		    	nextField.propertyType, nextArtifactDatabank, isNew);
-        }
-
-        li2.append(input);
-    }
-    else if (nextField.displayType == DISPLAY_DropDown) {
-        var input = podd.addFieldDropDownListNonAutoComplete(nextField, nextSchemaDatabank, isNew);
-        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
-        li2.append(input);
-    }
-    else if (nextField.displayType == DISPLAY_CheckBox) {
-        var input = podd.addFieldInputText(nextField, 'checkbox', nextSchemaDatabank);
-        var label = '<label>' + nextField.displayValue + '</label>';
-        // TODO: add blur handler
-        li2.append(input.after(label));
-    }
-    else if (nextField.displayType == DISPLAY_Table) {
-        var checkBox = $('<p>');
-        checkBox.text('Table here please');
-
-        li2.append(checkBox);
-    }
-    else if (nextField.displayType == DISPLAY_AutoComplete) {
-
-		// - set search Types
-		var searchTypes = [ ];
-		if (typeof nextField.propertyRange != 'undefined'
-				&& nextField.propertyRange != 'Not Found') {
-			searchTypes.push(nextField.propertyRange);
-		} else {
-			podd.debug('WARNING: Could not find search types for property: ' + nextField.propertyUri);
-			searchTypes.push(OWL_NAMED_INDIVIDUAL); // attempt to limit the damage
-		}
-
-		// - set artifact URI
-		var artifactUri;
-		if (typeof podd.artifactIri != 'undefined'
-				&& podd.artifactIri != 'undefined') {
-			artifactUri = podd.artifactIri;
-		}
-
-		var input = podd.addFieldInputText(nextField, 'text',
-				nextSchemaDatabank);
-		var hiddenValueElement = podd.addFieldInputText(nextField, 'hidden',
-				nextSchemaDatabank);
-		podd.addAutoCompleteHandler(input, hiddenValueElement,
-				nextArtifactDatabank, searchTypes, artifactUri, isNew);
-		podd.addTextFieldBlurHandler(input, hiddenValueElement, nextField.propertyUri,
-				nextField.valueUri, nextField.propertyType,
-				nextArtifactDatabank, isNew);
-
-		li2.append(input);
-		li2.append(hiddenValueElement);
-    }
-    else { // default
-        podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + nextField.displayValue
-                + ")");
-        // var input = podd.addFieldInputText(nextField, 'text',
-        // nextSchemaDatabank);
-        // podd.addTextFieldBlurHandler(input, nextField.propertyUri,
-        // nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
-        // li2.append(input);
-    }
-
-    subList.append(li2);
+    
     li.append(subList);
     return li;
 };
@@ -864,7 +887,7 @@ podd.cloneEmptyField = function() {
 /**
  * Construct an HTML input field of a type text or checkbox.
  */
-podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
+podd.addFieldInputText = function(nextField, nextFieldValue, inputType, nextDatabank) {
 
     // FIXME: id is useless here as it doesn't preserve the URI, and it will
     // never be unique for more than one element
@@ -878,9 +901,9 @@ podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
     });
 
     if (inputType === 'checkbox' || inputType === 'hidden') {
-        input.val(nextField.valueUri);
+        input.val(nextFieldValue.valueUri);
     } else {
-    	input.val(nextField.displayValue);
+    	input.val(nextFieldValue.displayValue);
     }
 
     input.attr('datatype', nextField.propertyRange);
@@ -900,7 +923,7 @@ podd.addFieldInputText = function(nextField, inputType, nextDatabank) {
  * @param nextSchemaDatabank
  * 			Databank containing all meta-data
  */
-podd.addFieldTextArea = function(nextField, noOfColumns, noOfRows, nextSchemaDatabank) {
+podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRows, nextSchemaDatabank) {
 
     var textarea = $('<textarea>', {
         name : 'name_' + nextField.propertyLabel,
@@ -908,7 +931,7 @@ podd.addFieldTextArea = function(nextField, noOfColumns, noOfRows, nextSchemaDat
         rows : noOfRows
     });
 
-    textarea.val(nextField.displayValue);
+    textarea.val(nextFieldValue.displayValue);
     textarea.attr('datatype', nextField.propertyRange);
 
     return textarea;
@@ -922,7 +945,7 @@ podd.addFieldTextArea = function(nextField, noOfColumns, noOfRows, nextSchemaDat
  * In these cases, the relevant options for this property must have been loaded
  * into the schema databank prior to calling this method.
  */
-podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDatabank, isNew) {
+podd.addFieldDropDownListNonAutoComplete = function(nextField, nextFieldValue, nextSchemaDatabank, isNew) {
     podd.debug("addFieldDropDownListNonAutoComplete");
     var select = $('<select>', {
         // id : 'id_' + nextField.propertyUri,
@@ -970,7 +993,7 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextSchemaDataban
         }
 
         var selectedVal = false;
-        if (nextField.valueUri == optionValue) {
+        if (nextFieldValue.valueUri == optionValue) {
             podd.debug('SELECTED option = ' + optionValue);
             selectedVal = true;
         }
