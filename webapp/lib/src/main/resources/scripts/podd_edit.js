@@ -700,6 +700,10 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         // TODO: add support for date/time types other than xsd:date
         if (typeof nextField.propertyRange !== 'undefined' &&
         		nextField.propertyRange.toString() === 'http://www.w3.org/2001/XMLSchema#date') {
+
+        	// prevent user bypassing the datepicker widget and typing values in
+        	input.attr('readonly', 'readonly');
+        	input.attr('style', 'background:white');
         	
         	input.datepicker({
         			dateFormat : "yy-mm-dd",
