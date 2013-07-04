@@ -706,7 +706,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     	    var li2 = $("<li>");
 		    		
 		    if (nextField.displayType == DISPLAY_LongText) {
-		        var input = podd.addFieldTextArea(nextField, aValue, 30, 2, nextSchemaDatabank);
+		        var input = podd.addFieldTextArea(nextField, aValue, 30, 2);
 		        
 		        // TODO: refactor so that there is one addHandler() inside which
 				// blur handler is invoked for both the original and the cloned fields
@@ -721,7 +721,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		        li2.append(input);
 		    }
 		    else if (nextField.displayType == DISPLAY_ShortText) {
-		        var input = podd.addFieldInputText(nextField, aValue, 'text', nextSchemaDatabank);
+		        var input = podd.addFieldInputText(nextField, aValue, 'text');
 		
 		        // TODO: add support for date/time types other than xsd:date
 		        if (typeof nextField.propertyRange !== 'undefined' &&
@@ -750,13 +750,13 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		        li2.append(input);
 		    }
 		    else if (nextField.displayType == DISPLAY_DropDown) {
-		        var input = podd.addFieldDropDownListNonAutoComplete(nextField, aValue, nextSchemaDatabank, isNew);
+		        var input = podd.addFieldDropDownListNonAutoComplete(nextField, aValue, nextSchemaDatabank);
 		        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue, 
 		        		nextField.propertyType, nextArtifactDatabank, isNew);
 		        li2.append(input);
 		    }
 		    else if (nextField.displayType == DISPLAY_CheckBox) {
-		        var input = podd.addFieldInputText(nextField, aValue, 'checkbox', nextSchemaDatabank);
+		        var input = podd.addFieldInputText(nextField, aValue, 'checkbox');
 		        var label = '<label>' + aValue.displayValue + '</label>';
 		        // TODO: add blur handler
 		        li2.append(input.after(label));
@@ -786,10 +786,8 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 					artifactUri = podd.artifactIri;
 				}
 		
-				var input = podd.addFieldInputText(nextField, aValue, 'text',
-						nextSchemaDatabank);
-				var hiddenValueElement = podd.addFieldInputText(nextField, aValue, 'hidden',
-						nextSchemaDatabank);
+				var input = podd.addFieldInputText(nextField, aValue, 'text');
+				var hiddenValueElement = podd.addFieldInputText(nextField, aValue, 'hidden');
 				podd.addAutoCompleteHandler(input, hiddenValueElement,
 						nextArtifactDatabank, searchTypes, artifactUri, isNew);
 				podd.addTextFieldBlurHandler(input, hiddenValueElement, nextField.propertyUri,
@@ -885,9 +883,16 @@ podd.cloneEmptyField = function() {
 };
 
 /**
- * Construct an HTML input field of a type text or checkbox.
+ * Construct an HTML input field using the given values.
+ * 
+ * @param nextField
+ * 			{object} Contains metadata to create the Input field
+ * @param nextFieldValue
+ * 			{object} Contains a pre-existing value which should be displayed in the Input field
+ * @param inputType
+ * 			{string} The type of Input field (e.g. 'text', 'checkbox', 'hidden')
  */
-podd.addFieldInputText = function(nextField, nextFieldValue, inputType, nextDatabank) {
+podd.addFieldInputText = function(nextField, nextFieldValue, inputType) {
 
     // FIXME: id is useless here as it doesn't preserve the URI, and it will
     // never be unique for more than one element
@@ -912,18 +917,18 @@ podd.addFieldInputText = function(nextField, nextFieldValue, inputType, nextData
 };
 
 /**
- * Construct an HTML TextArea element.
+ * Construct an HTML TextArea element using the given values.
  * 
  * @param nextField
- * 			Object containing values and meta-data of the current property
+ * 			{object} Contains metadata to create the Input field
+ * @param nextFieldValue
+ * 			{object} Contains a pre-existing value which should be displayed in the TextArea field
  * @param noOfColumns
- * 			number of columns in the TextArea
+ * 			{number} Columns in the TextArea
  * @param noOfRows
- * 			number of rows in the TextArea
- * @param nextSchemaDatabank
- * 			Databank containing all meta-data
+ * 			{number} Rows in the TextArea
  */
-podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRows, nextSchemaDatabank) {
+podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRows) {
 
     var textarea = $('<textarea>', {
         name : 'name_' + nextField.propertyLabel,
@@ -944,8 +949,16 @@ podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRow
  * 
  * In these cases, the relevant options for this property must have been loaded
  * into the schema databank prior to calling this method.
+ * 
+ * @param nextField
+ *            {object} Contains metadata to create the Input field
+ * @param nextFieldValue
+ *            {object} Contains a pre-existing value which should be displayed
+ *            in the TextArea field
+ * @param nextSchemaDatabank
+ *            {databank} Contains schema triples
  */
-podd.addFieldDropDownListNonAutoComplete = function(nextField, nextFieldValue, nextSchemaDatabank, isNew) {
+podd.addFieldDropDownListNonAutoComplete = function(nextField, nextFieldValue, nextSchemaDatabank) {
     podd.debug("addFieldDropDownListNonAutoComplete");
     var select = $('<select>', {
         // id : 'id_' + nextField.propertyUri,
