@@ -686,7 +686,11 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 
     if (nextField.displayType == DISPLAY_LongText) {
         var input = podd.addFieldTextArea(nextField, 30, 2, nextSchemaDatabank);
-        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
+        
+        // TODO: refactor so that there is one addHandler() inside which
+		// blur handler is invoked for both the original and the cloned fields
+		podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue,
+				nextField.propertyType, nextArtifactDatabank, isNew);
         
         podd.addCloneHandler(subList, link, input, nextField, nextArtifactDatabank);
         
