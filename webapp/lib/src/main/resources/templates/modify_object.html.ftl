@@ -28,6 +28,10 @@
 	    podd.artifactDatabank = podd.newDatabank();
 	    podd.schemaDatabank = podd.newDatabank();
 		
+		// an array to hold cardinality values
+		podd.cardinalityList = [];
+		
+		
 		// FIXME: Are the following always necessary? Should they only be added for new objects?
 		podd.artifactDatabank.add(podd.getCurrentObjectUri() + ' rdf:type <' + podd.objectTypeUri + '> ');
 		<#if user?? && user.email??>

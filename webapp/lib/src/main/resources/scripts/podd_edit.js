@@ -10,6 +10,7 @@
 var CARD_ExactlyOne = 'http://purl.org/podd/ns/poddBase#Cardinality_Exactly_One';
 var CARD_OneOrMany = 'http://purl.org/podd/ns/poddBase#Cardinality_One_Or_Many';
 var CARD_ZeroOrMany = 'http://purl.org/podd/ns/poddBase#Cardinality_Zero_Or_Many'
+// constant not required for cardinality zero or one.
 
 // These are used to define the expected input control types, so that the client
 // knows which method to use in each case.
@@ -310,6 +311,15 @@ podd.updateErrorMessageList = function(theMessage) {
 };
 
 /**
+ * @memberOf podd
+ * 
+ * Clean all the error messages
+ */
+podd.emptyErrorMessages = function() {
+	$("#errorMsgList").empty();
+}
+
+/**
  * DEBUG-ONLY : Prints the contents of the given databank to the console
  */
 podd.debugPrintDatabank = function(databank, message) {
@@ -427,6 +437,8 @@ podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifa
 };
 
 /**
+ * @memberOf podd
+ * 
  * Callback function when RDF containing metadata is available
  * 
  * FIXME: Any properties without weights should have them added, just as any
@@ -529,6 +541,13 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
 //                podd.debug("[" + nextChild.weight + "] propertyUri=<" + nextChild.propertyUri + "> label=\""
 //                        + nextChild.propertyLabel + "\" displayType=<" + nextChild.displayType + "> card=<"
 //                        + nextChild.cardinality + ">");
+            
+            //add cardinalities for use in validation at submit time. could be undefined
+            var entry = {};
+            entry.cardinality = nextChild.cardinality;
+            entry.propertyUri = nextChild.propertyUri;
+            entry.propertyLabel = nextChild.propertyLabel;
+            podd.cardinalityList.push(entry);
        	}
         else
         {
@@ -601,6 +620,8 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
 };
 
 /**
+ * @memberOf podd
+ * 
  * Display the given field on page
  * 
  * @param nextField
@@ -1117,6 +1138,12 @@ podd.submitPoddObjectUpdate = function(
 /* function */updateCallback) {
 
 	podd.resetLastModifiedAt(objectUri, nextArtifactDatabank);
+	
+	podd.emptyErrorMessages();
+
+	if (!podd.isValidArtifact(nextArtifactDatabank)) {
+		return; // cannot continue submission
+	}
 	
     var requestUrl;
 
@@ -1788,3 +1815,35 @@ podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType,
 	});
 };
 
+/**
+ * @memberOf podd
+ * 
+ * Checks that the given artifact databank contains values for all mandatory
+ * properties. Cardinality information is available from podd.cardinalityList.
+ * 
+ * @param nextDatabank
+ *            {databank} Contains the artifact statements to be validated
+ * @return {boolean} Indicating whether the artifact is valid or not
+ */
+podd.isValidArtifact = function(nextDatabank) {
+	var valid = true;
+	
+	$.each(podd.cardinalityList, function(index, value) {
+		
+		if (typeof value.cardinality !== 'undefined' && (value.cardinality.toString() === CARD_ExactlyOne 
+				|| value.cardinality.toString() === CARD_OneOrMany)) {
+			
+			 var myQuery = $.rdf({
+			        databank : nextDatabank
+			    }).where('?someObject <' +value.propertyUri + '> ?someValue');
+		    var bindings = myQuery.select();
+		    if (bindings.length === 0) {
+				podd.updateErrorMessageList('Mandatory property ' + value.propertyLabel + ' is empty.');
+
+				//TODO: display error next to the erroneous
+				valid = false;
+		    }
+		}
+	});
+	return valid;
+};
