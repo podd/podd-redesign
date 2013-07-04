@@ -807,8 +807,8 @@ podd.addCloneHandler = function(parentList, link, input, nextField, nextArtifact
     	
         link.click(function() {
         	podd.debug('Clicked (+) button to Clone');
-            var clonedField = input.clone(true);
-            podd.addTextFieldBlurHandler(clonedField, hiddenValueElement, nextField.propertyUri, nextField.displayValue, nextField.propertyType, 
+            var clonedField = input.clone(false);
+            podd.addTextFieldBlurHandler(clonedField, hiddenValueElement, nextField.propertyUri, undefined, nextField.propertyType, 
                     nextArtifactDatabank, true);
 
             var li = $("<li>");
