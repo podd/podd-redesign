@@ -633,14 +633,16 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
  * @param isNew
  *            Boolean value indicating whether this field is new or a value
  *            exists
+ * @return a list item (i.e. &lt;li&gt;) containing the HTML field
  */
 podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatabank, isNew) {
 	// podd.debug('[' + nextField.weight + '] <' + nextField.propertyUri
 	// + '> "' + nextField.propertyLabel + '" <' +
 	// nextField.displayType + '> <' + nextField.cardinality + '>');
 
-	// podd.debug('<<<<< [' + nextField.propertyUri + '] has range [' + nextField.propertyRange + '] >>>>>');
-	
+	// <li> element to which the whole field is to be attached
+    var li = $("<li>");
+
     // field name
     var span = $('<span>');
     span.attr('class', 'bold');
@@ -655,7 +657,6 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         span.html(nextField.propertyUri.toString());
     }
 
-    var li = $("<li>")
     li.append(span);
 
     // required icon
@@ -678,20 +679,17 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         li.append(link);
     }
 
+    // a list which will be useful if this field supports multi-values;
+    var subList = $('<ul>');
+
     var li2 = $("<li>");
 
     if (nextField.displayType == DISPLAY_LongText) {
         var input = podd.addFieldTextArea(nextField, 30, 2, nextSchemaDatabank);
         podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, nextField.displayValue, nextField.propertyType, nextArtifactDatabank, isNew);
-        if (typeof link !== 'undefined') {
-            link.click(function() {
-                var clonedField = input.clone(true);
-                podd.addTextFieldBlurHandler(clonedField, nextField.propertyUri, nextField.displayValue, nextField.propertyType, 
-                        nextArtifactDatabank, true);
-                // FIXME: Determine correct place to append this to
-                li.append(clonedField);
-            });
-        }
+        
+        podd.addCloneHandle(subList, link, input, nextField, nextArtifactDatabank);
+        
         li2.append(input);
     }
     else if (nextField.displayType == DISPLAY_ShortText) {
@@ -782,9 +780,42 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
         // li2.append(input);
     }
 
-    var subList = $('<ul>').append(li2);
+    subList.append(li2);
     li.append(subList);
     return li;
+};
+
+/**
+ * Add method which will clone the edit field on clicking of the (+) link. 
+ * 
+ * @param parentList
+ * 			{object} an HTML element to which the cloned field should be appended
+ * @param link
+ * 			{object} an HTML anchor that gets clicked to trigger cloning
+ * @param input
+ * 			{object} The element to be cloned
+ * @param nextField
+ * 			{object} Contains details about the current field
+ * @param nextArtifactDatabank
+ * 			{databank} Contains artifact triples
+ */
+podd.addCloneHandler = function(parentList, link, input, nextField, nextArtifactDatabank) {
+	
+	var hiddenValueElement = undefined;
+	
+    if (typeof link !== 'undefined') {
+    	
+        link.click(function() {
+        	podd.debug('Clicked (+) button to Clone');
+            var clonedField = input.clone(true);
+            podd.addTextFieldBlurHandler(clonedField, hiddenValueElement, nextField.propertyUri, nextField.displayValue, nextField.propertyType, 
+                    nextArtifactDatabank, true);
+
+            var li = $("<li>");
+            li.append(clonedField);
+            parentList.append(li);
+        });
+    }
 };
 
 /**
@@ -1445,10 +1476,14 @@ podd.addAutoCompleteHandler = function(
  * 
  * @param textField
  *            reference to the text field that has been 'blurred'
+ * @param hiddenValueElement
+ * 			  TODO
  * @param propertyUri
  *            property/predicate representing this field
  * @param originalValue
  *            the original value that is recorded against this field. can be 'undefined'
+ * @param propertyType
+ * 			  TODO
  * @param nextArtifactDatabank
  *            {databank} databank containing artifact triples
  * @param isNew
@@ -1456,9 +1491,8 @@ podd.addAutoCompleteHandler = function(
  *            value
  * 
  */
-podd.addTextFieldBlurHandler = function(/* object */textField, /* object */hiddenValueElement, /* object */
-		propertyUri, /* object */originalValue, /* object */propertyType, /* object */
-		nextArtifactDatabank, /* boolean */isNew) {
+podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyUri, originalValue, propertyType,
+		nextArtifactDatabank, isNew) {
 	
     var nextOriginalValue = '' + originalValue;
 
