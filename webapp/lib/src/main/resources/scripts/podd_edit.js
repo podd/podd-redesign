@@ -747,6 +747,11 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 				    	nextField.propertyType, nextArtifactDatabank, isNew);
 		        }
 		
+		        if (index === 0) {
+		        	//clone handler should only be added once
+		        	podd.addCloneHandler(subList, link, input, nextField, nextArtifactDatabank);
+		        }
+		        
 		        li2.append(input);
 		    }
 		    else if (nextField.displayType == DISPLAY_DropDown) {
