@@ -751,9 +751,16 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		    }
 		    else if (nextField.displayType == DISPLAY_DropDown) {
 		        var input = podd.addFieldDropDownListNonAutoComplete(nextField, aValue, nextSchemaDatabank);
-		        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue, 
+		        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.valueUri, 
 		        		nextField.propertyType, nextArtifactDatabank, isNew);
+		        
+		        if (index === 0) {
+		        	//clone handler should only be added once
+		        	podd.addCloneHandler(subList, link, input, nextField, nextArtifactDatabank);
+		        }
+		        
 		        li2.append(input);
+		        
 		    }
 		    else if (nextField.displayType == DISPLAY_CheckBox) {
 		        var input = podd.addFieldInputText(nextField, aValue, 'checkbox');
@@ -966,6 +973,12 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextFieldValue, n
     });
 
     select.attr('datatype', nextField.propertyRange);
+    
+    var defaultOption = $('<option>', {
+        value : '',
+        text : 'Please Select'
+    });
+    select.append(defaultOption);
     
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
