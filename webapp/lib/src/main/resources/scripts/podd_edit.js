@@ -715,7 +715,12 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		        
 		        if (index === 0) {
 		        	//clone handler should only be added once
-		        	podd.addCloneHandler(subList, link, input, nextField, nextArtifactDatabank);
+		        	var parameterObject = {};
+		        	parameterObject.parentList = subList;
+		        	parameterObject.link = link;
+		        	parameterObject.nextField = nextField;
+		        	parameterObject.artifactDatabank = nextArtifactDatabank;
+		        	podd.addCloneHandler(input, parameterObject);
 		        }
 		        
 		        li2.append(input);
@@ -749,7 +754,12 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		
 		        if (index === 0) {
 		        	//clone handler should only be added once
-		        	podd.addCloneHandler(subList, link, input, nextField, nextArtifactDatabank);
+		        	var parameterObject = {};
+		        	parameterObject.parentList = subList;
+		        	parameterObject.link = link;
+		        	parameterObject.nextField = nextField;
+		        	parameterObject.artifactDatabank = nextArtifactDatabank;
+		        	podd.addCloneHandler(input, parameterObject);
 		        }
 		        
 		        li2.append(input);
@@ -761,11 +771,15 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		        
 		        if (index === 0) {
 		        	//clone handler should only be added once
-		        	podd.addCloneHandler(subList, link, input, nextField, nextArtifactDatabank);
+		        	var parameterObject = {};
+		        	parameterObject.parentList = subList;
+		        	parameterObject.link = link;
+		        	parameterObject.nextField = nextField;
+		        	parameterObject.artifactDatabank = nextArtifactDatabank;
+		        	podd.addCloneHandler(input, parameterObject);
 		        }
 		        
 		        li2.append(input);
-		        
 		    }
 		    else if (nextField.displayType == DISPLAY_AutoComplete) {
 		
@@ -793,10 +807,25 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 				podd.addTextFieldBlurHandler(input, hiddenValueElement, nextField.propertyUri,
 						aValue.valueUri, nextField.propertyType,
 						nextArtifactDatabank, isNew);
-		
+
+		        if (index === 0) {
+		        	//clone handler should only be added once
+		        	var parameterObject = {};
+		        	parameterObject.parentList = subList;
+		        	parameterObject.link = link;
+		        	parameterObject.nextField = nextField;
+		        	parameterObject.artifactDatabank = nextArtifactDatabank;
+		        	parameterObject.isAutoComplete = true;
+		        	parameterObject.hiddenValueElement = hiddenValueElement;
+		        	parameterObject.searchTypes = searchTypes;
+		        	parameterObject.artifactUri = artifactUri;
+		        	parameterObject.isNew = isNew;
+		        	
+		        	podd.addCloneHandler(input, parameterObject);
+		        }
+				
 				li2.append(input);
 				li2.append(hiddenValueElement);
-				
 		    }
 		    else if (nextField.displayType == DISPLAY_CheckBox) {
 		    	podd.updateErrorMessageList("TODO: Support DISPLAY_Checkbox for property : " + nextField.propertyUri + " (" 
@@ -822,75 +851,66 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 };
 
 /**
- * Add method which will clone the edit field on clicking of the (+) link. 
+ * Add method which will clone the edit field on clicking of the (+) link.
  * 
- * @param parentList
- * 			{object} an HTML element to which the cloned field should be appended
- * @param link
- * 			{object} an HTML anchor that gets clicked to trigger cloning
  * @param input
- * 			{object} The element to be cloned
- * @param nextField
- * 			{object} Contains details about the current field
- * @param nextArtifactDatabank
- * 			{databank} Contains artifact triples
+ *            {object} The element to be cloned
+ * @param params
+ *            {object} An object which encapsulates all other required
+ *            parameters.
+ * 
+ * The "parameter" object should contain the following:
+ * <ul>
+ * <li>parentList: An HTML element to which the cloned field should b eappended</li>
+ * <li>link: An HTML anchor that gets clicked to trigger cloning</li>
+ * <li>nextField: Contains details about current field</li>
+ * <li>artifactDatabank: Databank with artifact triples</li>
+ * <li>hiddenValueElement: Optional, a hidden Input which should store the URI
+ * value while the main Input will hold a user-friendly text</li>
+ * <li>isAutoComplete: Optional, indicates whether the current field is an
+ * autocomplete</li>
+ * <li>searchTypes: Optional, for an autocomplete field, types to search for</li>
+ * <li>artifactUri: Optional, for an autocomplete field, the artifact URI</li>
+ * <li>isNew: Optional for an autocomplete field, whether this is a new entry</li>
+ * </ul>
  */
-podd.addCloneHandler = function(parentList, link, input, nextField, nextArtifactDatabank) {
+podd.addCloneHandler = function(input, params) {
+	// create local variables for parameters
+	var parentList = params.parentList;
+	var link = params.link;
+	var nextField = params.nextField;
+	var nextArtifactDatabank = params.artifactDatabank;
+	var hiddenValueElement = params.hiddenValueElement;
+	var isAutoComplete = params.isAutoComplete;
+	var searchTypes = params.searchTypes;
+	var artifactUri = params.artifactUri;
+	var isNew = params.isNew;
 	
-	var hiddenValueElement = undefined;
-	
+	// get on with adding the handler
     if (typeof link !== 'undefined') {
     	
         link.click(function() {
         	podd.debug('Clicked (+) button to Clone');
             var clonedField = input.clone(false);
+
+            // make value empty
+            clonedField.val('');
+            if (typeof hiddenValueElement !== 'undefined') {
+            	hiddenValueElement.val('');
+            }
+            
             podd.addTextFieldBlurHandler(clonedField, hiddenValueElement, nextField.propertyUri, undefined, nextField.propertyType, 
                     nextArtifactDatabank, true);
 
+            if (isAutoComplete) {
+    			podd.addAutoCompleteHandler(clonedField, hiddenValueElement, nextArtifactDatabank, searchTypes, artifactUri, isNew);
+            }
+            
             var li = $("<li>");
             li.append(clonedField);
             parentList.append(li);
         });
     }
-};
-
-/**
- * FIXME: Convert the following to a range of functions that work for each
- * object type.
- * 
- * This function must be able to reset the value consistently and attach
- * handlers that know the field has not been saved before this point.
- */
-podd.cloneEmptyField = function() {
-    // var thisProperty = $(this).attr('property');
-    // if (typeof console !== "undefined" && console.debug) {
-    // console.debug('Clicked clonable: ' + thisProperty);
-    // }
-
-    // var idToClone = '#tLbl1'; //
-    // '#id_http://purl.org/podd/ns/poddScience_hasANZSRC';
-    // //'#id_' + $(this).attr('property');
-    // console.debug('Requested cloning ' + idToClone);
-
-    var clonedField = $(this).clone(true);
-    // clonedField.attr('id', 'LABEL_cloned');
-    // console.debug('Cloned: ' + clonedField.attr('id'));
-    // $(this).append(clonedField);
-    // if (typeof console !== "undefined" && console.debug) {
-    // console.debug('appended cloned field');
-    // }
-
-    // var newObject = jQuery.extend(true, {}, $(idToClone));
-    // console.debug('## SO clone: ' + JSON.stringify(newObject, null, 4));
-    // $(this).append(newObject);
-
-    // debug - cloning
-    // var p1Id = '#p1';
-    // var cloned = $(p1Id).clone()
-    // var oldId = cloned.attr('id');
-    // cloned.attr('id', oldId + '_v1');
-    // $(this).append(cloned);
-
 };
 
 /**
@@ -1561,7 +1581,7 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
 
         var changesets = [];
 
-        if (typeof hiddenValueElement !== 'undefined') {
+        if (typeof hiddenValueElement !== 'undefined' && newValue !== '') {
         	newValue = hiddenValueElement.val();
         	podd.debug('[blur] hidden field found with value: ' + newValue);
         }
