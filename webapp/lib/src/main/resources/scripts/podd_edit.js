@@ -767,18 +767,6 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		        li2.append(input);
 		        
 		    }
-		    else if (nextField.displayType == DISPLAY_CheckBox) {
-		        var input = podd.addFieldInputText(nextField, aValue, 'checkbox');
-		        var label = '<label>' + aValue.displayValue + '</label>';
-		        // TODO: add blur handler
-		        li2.append(input.after(label));
-		    }
-		    else if (nextField.displayType == DISPLAY_Table) {
-		        var checkBox = $('<p>');
-		        checkBox.text('Table here please');
-		
-		        li2.append(checkBox);
-		    }
 		    else if (nextField.displayType == DISPLAY_AutoComplete) {
 		
 				// - set search Types
@@ -808,6 +796,17 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		
 				li2.append(input);
 				li2.append(hiddenValueElement);
+				
+		    }
+		    else if (nextField.displayType == DISPLAY_CheckBox) {
+		    	podd.updateErrorMessageList("TODO: Support DISPLAY_Checkbox for property : " + nextField.propertyUri + " (" 
+		    			+ aValue.displayValue + ")");		        
+		        
+		    }
+		    else if (nextField.displayType == DISPLAY_Table) {
+		    	podd.updateErrorMessageList("TODO: Support DISPLAY_Table for property : " + nextField.propertyUri + " (" 
+		    			+ aValue.displayValue + ")");
+		    	
 		    }
 		    else { // default
 		        podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + aValue.displayValue
