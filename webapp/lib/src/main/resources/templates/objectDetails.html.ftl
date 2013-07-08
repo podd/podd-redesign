@@ -80,8 +80,8 @@
                 <ol>
                 	<#-- object URI, Title and description -->
                     <li><span class="bold">URI: </span> <a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${poddObject.objectURI?url}">${util.clipProtocol(poddObject.objectURI!"Unknown URI")}</a></li>
-                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string">${poddObject.label!""}</span></li>
-                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string">${poddObject.description!""}</span></li>
+                    <li><span class="bold">Title: </span><span property="dcterms:title" datatype="xsd:string"><@formatText textValue=poddObject.label!""/></span></li>
+                    <li><span class="bold">Description: </span><span property="dcterms:description" datatype="xsd:string"><@formatText textValue=poddObject.description!""/></span></li>
                     
                     <#-- all other attributes (data/object properties) -->
                     <#if propertyList??>
@@ -172,7 +172,7 @@ Macro to display information about the PODD object being viewed
 							<span><a property="${propertyUri}" href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 						</#if>
 					<#else>
-						<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}">${thisObject.stringValue()}</span>
+						<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}"><@formatText textValue=thisObject.stringValue()!""/></span>
 					</#if>
 				</li>
 			</#list>
@@ -189,13 +189,19 @@ Macro to display information about the PODD object being viewed
 						<span><a property="${propertyUri}" href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${thisObject?url}">${util.clipProtocol(thisObject.stringValue())}</a></span>	
 					</#if>
 				<#else>
-					<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}">${thisObject.stringValue()}</span>
+					<span property="${propertyUri}" datatype="${util.getDatatype(thisObject)}"><@formatText textValue=thisObject.stringValue()!""/></span>
 				</#if>
 			</#list>
 		</#if>
     </li>
 </#macro>
 
+<#-- 
+Macro to format a given text field for display by HTML encoding it and replacing newline characters with HTML <br> elements.
+-->
+<#macro formatText textValue>
+	${textValue?html?replace("\n", "<br>")}
+</#macro>
 
 
 <#macro refersToTable element>
