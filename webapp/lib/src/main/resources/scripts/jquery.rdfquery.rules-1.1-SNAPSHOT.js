@@ -630,7 +630,11 @@
   $.typedValue.types = {};
 
   $.typedValue.types['http://www.w3.org/2001/XMLSchema#string'] = {
-    regex: /^.*$/,
+  /** 
+   * Fix rdfquery issue 33: xsd:string validation
+   * (see http://code.google.com/p/rdfquery/issues/detail?id=33) 
+   */
+    regex: /^.*$/m,
     strip: false,
     /** @ignore */
     value: function (v) {
