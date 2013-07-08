@@ -750,6 +750,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 		        } else {
 				    podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue,
 				    	nextField.propertyType, nextArtifactDatabank, isNew);
+				    podd.addEnterKeyHandler(input);
 		        }
 		
 		        if (index === 0) {
@@ -1626,6 +1627,35 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
         // NOTE: Cannot call update to the server after each edit, as some
         // fields may have incomplete/invalid values at this point.
     });
+    
+};
+
+/**
+ * FIXME - when Enter is pressed to select an item from a browser cached list of values
+ * submit should not be invoked.
+ * 
+ * FIXME - add handler for cloned fields
+ */
+podd.addEnterKeyHandler = function(textField) {
+	
+    textField.keydown(function(event) {
+    	
+		var code = event.keyCode || event.which; 
+		if (code  === 13) {               
+			event.preventDefault();
+			
+			podd.debug('Enter pressed! event type=' + event.type);
+			
+			podd.debug('1. invoke blur()');
+			$(this).blur();
+			
+			podd.debug('2 invoke submit()');
+			$("#editObjectForm").submit();
+			
+		   	return false;
+		}
+    });
+    
 };
 
 /**
