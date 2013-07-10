@@ -862,7 +862,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
  * 
  * The "parameter" object should contain the following:
  * <ul>
- * <li>parentList: An HTML element to which the cloned field should b eappended</li>
+ * <li>parentList: An HTML element to which the cloned field should be appended</li>
  * <li>link: An HTML anchor that gets clicked to trigger cloning</li>
  * <li>nextField: Contains details about current field</li>
  * <li>artifactDatabank: Databank with artifact triples</li>
@@ -902,7 +902,11 @@ podd.addCloneHandler = function(input, params) {
             
             podd.addTextFieldBlurHandler(clonedField, hiddenValueElement, nextField.propertyUri, undefined, nextField.propertyType, 
                     nextArtifactDatabank, true);
-
+            
+            if (nextField.displayType === DISPLAY_ShortText) {
+            	podd.addEnterKeyHandler(clonedField);
+            }
+            
             if (isAutoComplete) {
     			podd.addAutoCompleteHandler(clonedField, hiddenValueElement, nextArtifactDatabank, searchTypes, artifactUri, isNew);
             }
@@ -1255,6 +1259,7 @@ podd.submitPoddObjectUpdate = function(
 	podd.emptyErrorMessages();
 
 	if (!podd.isValidArtifact(nextArtifactDatabank)) {
+		podd.debug('[updatePoddObject] Invalid artifact. Aborting submit.');
 		return; // cannot continue submission
 	}
 	
@@ -1634,7 +1639,6 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
  * FIXME - when Enter is pressed to select an item from a browser cached list of values
  * submit should not be invoked.
  * 
- * FIXME - add handler for cloned fields
  */
 podd.addEnterKeyHandler = function(textField) {
 	
@@ -1646,12 +1650,12 @@ podd.addEnterKeyHandler = function(textField) {
 			
 			podd.debug('Enter pressed! event type=' + event.type);
 			
-			podd.debug('1. invoke blur()');
+/*			podd.debug('1. invoke blur()');
 			$(this).blur();
 			
 			podd.debug('2 invoke submit()');
 			$("#editObjectForm").submit();
-			
+*/			
 		   	return false;
 		}
     });
