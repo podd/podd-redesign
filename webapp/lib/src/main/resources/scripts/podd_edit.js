@@ -1612,6 +1612,11 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
             // add old triple ONLY if there originally was a value
             if (nextOriginalValue !== 'undefined') {
             	podd.vTableRemovePropertyValue(propertyUri, nextOriginalValue);
+		    	/*
+				 * Due to rdf deduplication, the databank will never have more than one triple to represent
+				 * this property-value. Therefore, mark this triple for removal only if there are no other
+				 * occurrences of this value in the vTable.
+				 */
             	if (podd.vTablePropertyContainsValue(propertyUri, nextOriginalValue) === false) {
                 	nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType, propertyDatatype));
             	}
@@ -1715,6 +1720,11 @@ podd.handleDatePickerFieldChange = function(textField, propertyUri, originalValu
 		// add old triple ONLY if there originally was a value
 		if (nextOriginalValue !== 'undefined') {
         	podd.vTableRemovePropertyValue(propertyUri, nextOriginalValue);
+	    	/*
+			 * Due to rdf deduplication, the databank will never have more than one triple to represent
+			 * this property-value. Therefore, mark this triple for removal only if there are no other
+			 * occurrences of this value in the vTable.
+			 */
         	if (podd.vTablePropertyContainsValue(propertyUri, nextOriginalValue) === false) {
 				nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType,
 						propertyDatatype));
