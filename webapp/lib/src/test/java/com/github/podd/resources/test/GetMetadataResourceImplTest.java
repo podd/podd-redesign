@@ -72,7 +72,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         
         // verify:
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 57);
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 58);
         
         Assert.assertEquals(
                 "GrowthConditions not found",
@@ -98,7 +98,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     {
         final Object[][] testData = {
                 {PoddRdfConstants.PODD_SCIENCE + "Project", 42, 7, 0},
-                {PoddRdfConstants.PODD_SCIENCE + "Investigation", 57, 11, 0},
+                {PoddRdfConstants.PODD_SCIENCE + "Investigation", 58, 11, 0},
         };
         
         for(Object[] element : testData)

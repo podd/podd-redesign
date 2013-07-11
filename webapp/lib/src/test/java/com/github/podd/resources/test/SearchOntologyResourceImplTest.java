@@ -322,7 +322,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final Model resultModel = this.internalTestSearchRdf("e", searchTypes, requestMediaType, null);
         
         // verify:
-        Assert.assertEquals("Not the expected number of results", 201, resultModel.size());
+        Assert.assertEquals("Not the expected number of results", 202, resultModel.size());
 
         Assert.assertEquals("dcTerms not found", 1,
                 resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("The PODD Ontology for Dublin Core Terms")).size());

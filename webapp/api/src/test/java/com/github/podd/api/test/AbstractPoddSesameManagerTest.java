@@ -1144,7 +1144,7 @@ public abstract class AbstractPoddSesameManagerTest
         // Format: Object Type, expected model size, expected relationship count, expected child
         // object type count
         final Object[][] testData =
-                { { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation"), 57, 8, 10 },
+                { { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation"), 58, 8, 10 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), 28, 4, 4 }, };
         
         for(final Object[] element : testData)
