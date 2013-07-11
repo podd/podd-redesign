@@ -842,6 +842,34 @@ podd.emptyErrorMessages = function() {
 };
 
 /**
+ * Search the given databank for the label (i.e. rdfs:label) of the given object.
+ * 
+ * @param nextDatabank
+ *            {databank} Databank to search for label
+ * @param objectUri
+ *            {string} URI of the object whose label is sought
+ * @return String label if found, undefined otherwise.
+ */
+podd.findLabel = function(nextDatabank, objectUri) {
+
+	var result;
+
+    var labelQuery = $.rdf({
+        databank : nextDatabank
+    }).where('<' + objectUri + '> <http://www.w3.org/2000/01/rdf-schema#label> ?uLabel');
+
+    var labelBindings = labelQuery.select();
+
+    $.each(labelBindings, function(index, nextBinding) {
+    	result = nextBinding.uLabel.value;
+    	return false;
+    });
+    
+	podd.debug('Label for <' + objectUri + '> is: ' + result);
+    return result;
+};
+
+/**
  * Retrieve the current version of an artifact and populate the artifact
  * databank.
  * 
@@ -1936,28 +1964,27 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
                 // have the option to put a human readable label in displayValue
                 if (nextArtifactValue.propertyValue.type === 'uri') {
                 	oneValue.valueUri = nextArtifactValue.propertyValue.value;
-                	
-                    // look for a label in the schema databank
-                    var labelQuery = $.rdf({
-                        databank : nextSchemaDatabank
-                    })
-                    // 
-                    .where('<' + oneValue.valueUri + '> <http://www.w3.org/2000/01/rdf-schema#label> ?uLabel');
-                    var labelBindings = labelQuery.select();
 
-                    $.each(labelBindings, function(index, nextBinding) {
-                    	podd.debug('Found <' + oneValue.valueUri + '> has label: ' + nextBinding.uLabel.value);
-                    	oneValue.displayValue = nextBinding.uLabel.value;
-                    });
+                	// look for label in schema databank
+                	var displayLabel = podd.findLabel(nextSchemaDatabank, oneValue.valueUri);
+
+                	// look for label in artifact databank
+                	if (typeof displayLabel === 'undefined' || displayLabel === 'undefined') {
+                		displayLabel = podd.findLabel(nextArtifactDatabank, oneValue.valueUri);
+                	}
+                	
+                	if (typeof displayLabel !== 'undefined' && displayLabel !== 'undefined') {
+                		oneValue.displayValue = displayLabel;
+                	}                	
                 }
                 valuesArray.push(oneValue);
                 
             });
-            value.valuesArray = valuesArray;
-            $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
             
-            //TODO - invoke createEditField with this array of values rather than just one
-            podd.debug('found ' + valuesArray.length + ' values for property ' + value.propertyUri);
+            value.valuesArray = valuesArray;
+            podd.debug('Property <' + value.propertyUri + '> has ' + valuesArray.length + ' values' );
+
+            $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
         }
         else {
             podd.debug("Property <" + value.propertyUri + "> has NO value");
@@ -1969,9 +1996,6 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
             value.valuesArray = [];
             value.valuesArray.push(oneValue);
             
-//            nextChild.displayValue; //undefined to indicate there is NO value
-//            nextChild.valueUri = '';
-
             $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
         }
     });
