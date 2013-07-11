@@ -9,7 +9,7 @@
 // whether to offer or accept properties with a given number of values.
 var CARD_ExactlyOne = 'http://purl.org/podd/ns/poddBase#Cardinality_Exactly_One';
 var CARD_OneOrMany = 'http://purl.org/podd/ns/poddBase#Cardinality_One_Or_Many';
-var CARD_ZeroOrMany = 'http://purl.org/podd/ns/poddBase#Cardinality_Zero_Or_Many'
+var CARD_ZeroOrMany = 'http://purl.org/podd/ns/poddBase#Cardinality_Zero_Or_Many';
 // constant not required for cardinality zero or one.
 
 // These are used to define the expected input control types, so that the client
@@ -703,6 +703,14 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     if (typeof nextField.valuesArray !== 'undefined' && nextField.valuesArray.length > 0) {
     	
     	$.each(nextField.valuesArray, function(index, aValue) {
+    		
+    		// store this value for validating modifications
+    		if (typeof aValue.valueUri !== 'undefined') {
+    			podd.vTableAddPropertyValue(nextField.propertyUri, aValue.valueUri);
+    		} else {
+    			podd.vTableAddPropertyValue(nextField.propertyUri, aValue.displayValue);
+    		}
+    		
     	    var li2 = $("<li>");
 		    		
 		    if (nextField.displayType == DISPLAY_LongText) {
@@ -1603,11 +1611,15 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
 
             // add old triple ONLY if there originally was a value
             if (nextOriginalValue !== 'undefined') {
-            	nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType, propertyDatatype));
+            	podd.vTableRemovePropertyValue(propertyUri, nextOriginalValue);
+            	if (podd.vTablePropertyContainsValue(propertyUri, nextOriginalValue) === false) {
+                	nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType, propertyDatatype));
+            	}
             }
 
             // add a new triple ONLY if the value is non-empty. enables deleting of previous entries. 
             if (newValue !== '') {
+            	podd.vTableAddPropertyValue(propertyUri, newValue);
             	nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
             }
             
@@ -1647,10 +1659,10 @@ podd.addEnterKeyHandler = function(textField) {
 		var code = event.keyCode || event.which; 
 		if (code  === 13) {               
 			event.preventDefault();
-			
+/*			
 			podd.debug('Enter pressed! event type=' + event.type);
 			
-/*			podd.debug('1. invoke blur()');
+			podd.debug('1. invoke blur()');
 			$(this).blur();
 			
 			podd.debug('2 invoke submit()');
@@ -1996,3 +2008,88 @@ podd.isValidArtifact = function(nextDatabank) {
 	});
 	return valid;
 };
+
+
+/**
+ * @memberOf podd
+ * 
+ * Add the given value to the vTable under the given property.
+ * 
+ * @param propertyUri
+ * 			{string} A property of the artifact
+ * @param value
+ * 			{string} A value assigned to this property
+ */
+podd.vTableAddPropertyValue = function(propertyUri, value) {
+	
+	podd.debug('[addPropertyValue] add [' + propertyUri + ', ' + value + ']');
+	
+	if (typeof propertyUri === 'undefined') {
+		return;
+	}
+	
+	if (typeof podd.valuesTable === 'undefined') {
+		podd.valuesTable = {};
+	}
+	
+	if (typeof podd.valuesTable[propertyUri] === 'undefined') {
+		podd.valuesTable[propertyUri] = [];
+	}
+	
+	if (typeof value !== 'undefined' && value !== '') {
+		podd.valuesTable[propertyUri].push(value.toString());
+	}
+}
+
+/**
+ * @memberOf podd
+ * 
+ * Remove from the vTable, the given value if it is found listed under the given
+ * property. If the value exists more than once, only the first instance is removed.
+ * 
+ * @param propertyUri
+ *            {string} A property of the artifact
+ * @param value
+ *            {string} Value to be removed
+ */
+podd.vTableRemovePropertyValue = function(propertyUri, value) {
+
+	podd.debug('[removePropertyValue] remove [' + propertyUri + ', ' + value + ']');
+	
+	if (typeof podd.valuesTable === 'undefined' || typeof podd.valuesTable[propertyUri] === 'undefined') {
+		//nothing to remove
+		return;
+	}
+	
+	var theArray = podd.valuesTable[propertyUri];
+	//podd.debug('[removePropertyValue] before = ' + theArray);
+	var pos = $.inArray(value, theArray);
+	if (pos > -1) {
+		theArray.splice( pos ,1 );	
+		//podd.debug('[removePropertyValue] after = ' + theArray);
+	}
+	
+	podd.valuesTable[propertyUri] = theArray;
+}
+
+/**
+ * @memberOf podd
+ * 
+ * Checks if vTable contains the given value for the given property.
+ * 
+ * @param propertyUri
+ * 			{string} A property of the artifact
+ * @param value
+ * 			{string} A value assigned to this property
+ * @return true if the value is present, false otherwise
+ */
+podd.vTablePropertyContainsValue = function(propertyUri, value) {
+	
+	var result = false;
+	if (typeof podd.valuesTable !== 'undefined' && typeof podd.valuesTable[propertyUri] !== 'undefined') {
+		result = ($.inArray(value, podd.valuesTable[propertyUri]) > -1);
+	}
+	
+	podd.debug('[propertyContainsValue] contains [' + propertyUri + ', ' + value + '] result =' + result);
+	return result;
+}

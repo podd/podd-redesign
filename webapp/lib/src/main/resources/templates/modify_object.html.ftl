@@ -28,6 +28,9 @@
 	    podd.artifactDatabank = podd.newDatabank();
 	    podd.schemaDatabank = podd.newDatabank();
 		
+		// object to hold each property values for validation purposes
+		podd.valuesTable = {};
+		
 		// an array to hold cardinality values
 		podd.cardinalityList = [];
 		
