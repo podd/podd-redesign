@@ -1714,12 +1714,16 @@ podd.handleDatePickerFieldChange = function(textField, propertyUri, originalValu
 
 		// add old triple ONLY if there originally was a value
 		if (nextOriginalValue !== 'undefined') {
-			nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType,
-					propertyDatatype));
+        	podd.vTableRemovePropertyValue(propertyUri, nextOriginalValue);
+        	if (podd.vTablePropertyContainsValue(propertyUri, nextOriginalValue) === false) {
+				nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType,
+						propertyDatatype));
+        	}
 		}
 		
         // add a new triple ONLY if the value is non-empty. enables deleting of previous entries. 
 		if (newValue !== '') {
+        	podd.vTableAddPropertyValue(propertyUri, newValue);
 			nextChangeset.newTriples.push(podd
 					.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
 		}
