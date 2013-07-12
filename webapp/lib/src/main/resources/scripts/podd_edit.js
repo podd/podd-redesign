@@ -914,8 +914,6 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank,
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
 
-            podd.updateErrorMessageList('<i>Successfully retrieved artifact version: ' + podd.versionIri + '</i><br>');
-
             podd.loadMissingArtifactLabels(artifactUri, nextSchemaDatabank, nextArtifactDatabank, updateDisplayCallbackFunction, callbackParam);
         },
         error : function(xhr, status, error) {
