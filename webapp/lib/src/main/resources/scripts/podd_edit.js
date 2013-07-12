@@ -535,6 +535,8 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType,
 };
 
 /**
+ * @memberOf podd
+ * 
  * Continue updating interface after schemaDatabank is populated with metadata.
  * If an existing artifact is being updated, populates the artifactDatabank.
  * 
@@ -548,7 +550,6 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType,
  *            {databank} Databank where metadata is stored.
  * @param nextArtifactDatabank -
  *            {databank} Databank where artifact's triples are stored.
- * @memberOf podd
  */
 podd.callbackFromGetMetadata = function(artifactUri, objectType, nextSchemaDatabank, nextArtifactDatabank) {
 	
@@ -1478,6 +1479,13 @@ podd.parseSearchResults = function(/* string */searchURL, /* rdf/json */data) {
  * to redirect to. The incoming parameters are not used.
  */
 podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
+
+	if (typeof podd.artifactIri === 'undefined' || podd.artifactIri === 'undefined'
+		|| podd.artifactIri.toString().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
+		
+		window.location.href = podd.baseUrl + '/artifacts';
+		return;
+	}
 	
 	var redirectUri = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(podd.artifactIri);
 	

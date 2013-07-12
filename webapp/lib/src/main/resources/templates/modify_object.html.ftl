@@ -72,6 +72,12 @@
 			return false;
 		});
 	
+		$("#btnCancel").click(function(event) {
+			event.preventDefault();
+			podd.redirectToGetArtifact(undefined, undefined, undefined);
+			return false;
+		});
+	
         podd.debug('### initialization complete ###');
 	});
 </script>
@@ -105,9 +111,9 @@
 		<h3 class="underlined_heading"> </h3> <!-- just want the line -->
 		<div id="buttonwrapper">
 	    	<button type="button" id="btnSubmit" name="createObject" value="createObject">Submit</button>
+	        <button type="button" id="btnCancel" name="cancelEdit" value="cancelEdit">Cancel</button>
 <#--	    	
 	    	<button type="reset" name="reset" value="reset">Reset</button>
-	        <button type="submit" name="cancel" value="cancel">Cancel</button>
 	        <button type="submit" name="reinitialize" value="reinitialize">ReInitialize</button>
 -->
 	    </div>
