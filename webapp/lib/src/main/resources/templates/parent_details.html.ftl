@@ -12,12 +12,12 @@
         <div class="legend">Parent Object Summary Information</div>
         <#if parentObject??>
         <ol>
-        <li><span class="bold">ID: </span><a href="${baseUrl}/object/${parentObject.getPid()!""}">${parentObject.getPid()!""}</a></li>
-        <li><span class="bold">Type: </span>${parentObject.getConcept().getConceptName()!""}</li>
-        <li><span class="bold">Title: </span>${parentObject.getLocalName()!""}</li>
-        <#if relationshipToParent??>
-        <li><span class="bold">Relationship: </span>${relationshipToParent}</li>
-        </#if>
+        <li><span class="bold">ID:</span>
+        	<a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${parentObject.uri?url}">${parentObject.uri!""}</a>
+        </li>
+        <li><span class="bold">Type: </span>${parentObject.type!""}</li>
+        <li><span class="bold">Title: </span>${parentObject.label!""}</li>
+        <li><span class="bold">Relationship: </span>${parentObject.relationship}</li>
         </ol>
         </#if>
     </div>

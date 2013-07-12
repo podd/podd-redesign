@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
@@ -281,6 +282,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 objectUri = ValueFactoryImpl.getInstance().createURI(objectToView);
             }
             
+            this.populateParentDetails(ontologyID, objectUri, dataModel);
+            
             // first get the title & description encapsulated in a PoddObject
             final PoddObjectLabel theObject = this.getPoddSesameManager().getObjectLabel(ontologyID, objectUri, conn);
             dataModel.put("poddObject", theObject);
@@ -339,6 +342,64 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         dataModel.put("selectedObjectCount", 0);
         dataModel.put("childHierarchyList", Collections.emptyList());
+    }
+    
+    /**
+     * Populate the data model with info about the parent of the current object. If the given object
+     * does not have a parent (i.e. is a Top Object) the data model remains unchanged.
+     * 
+     * TODO: This method uses multiple API methods resulting in several SPARQL queries. Efficiency
+     * could be improved by either adding a new API method or modifying getParentDetails() to supply
+     * most of the required information.
+     * 
+     * @param ontologyID
+     * @param objectUri
+     *            The object whose parent details are required
+     * @param dataModel
+     * @throws OpenRDFException
+     */
+    protected void populateParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri,
+            final Map<String, Object> dataModel) throws OpenRDFException {
+
+        final Model parentDetails = this.getPoddArtifactManager().getParentDetails(ontologyID, objectUri);
+        if (parentDetails.size() == 1)
+        {
+            final Statement statement = parentDetails.iterator().next();
+            
+            final Map<String, String> parentMap = new HashMap<>();
+
+            final String parentUriString = statement.getSubject().stringValue();
+            parentMap.put("uri", parentUriString);
+            
+            final URI parentUri = PoddRdfConstants.VF.createURI(parentUriString);
+            final URI parentPredicateUri = PoddRdfConstants.VF.createURI(statement.getPredicate().stringValue());
+            
+            // - parent's Title
+            String parentLabel = "Missing Title";
+            final Model objectLabel = this.getPoddArtifactManager().getObjectLabel(ontologyID, parentUri);
+            if (objectLabel.size() == 1) {
+                parentLabel = objectLabel.objectString();
+            }
+            parentMap.put("label", parentLabel);
+            
+            // - parent relationship Label
+            String predicateLabel = "Missing parent relationship";
+            final Model predicateLabelModel = this.getPoddArtifactManager().getObjectLabel(ontologyID, parentPredicateUri);
+            if (predicateLabelModel.size() == 1) {
+                predicateLabel = predicateLabelModel.objectString();
+            }
+            parentMap.put("relationship", predicateLabel);
+            
+            // - parent's Type
+            String parentType = "Unknown Type";
+            final List<PoddObjectLabel> objectTypes = this.getPoddArtifactManager().getObjectTypes(ontologyID, parentUri);
+            if (objectTypes.size() > 0) {
+                parentType = objectTypes.get(0).getLabel();
+            }
+            parentMap.put("type", parentType);
+            
+            dataModel.put("parentObject", parentMap);
+        }
     }
     
 }
