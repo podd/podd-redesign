@@ -194,7 +194,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Result does not have RDF", body.endsWith("</rdf:RDF>"));
         
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 151);
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 152);
         
         Assert.assertEquals("Unexpected no. of properties", 18,
                 model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);

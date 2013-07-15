@@ -1065,9 +1065,9 @@ public abstract class AbstractPoddSesameManagerTest
                                 MetadataPolicy.ONLY_CONTAINS, 57, 7, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                MetadataPolicy.INCLUDE_ALL, 125, 14, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 126, 14, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                MetadataPolicy.INCLUDE_ALL, 151, 18, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 152, 18, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 9, 1, 0 },
                         

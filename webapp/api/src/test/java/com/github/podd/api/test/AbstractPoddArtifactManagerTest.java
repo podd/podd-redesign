@@ -263,9 +263,9 @@ public abstract class AbstractPoddArtifactManagerTest
                                 MetadataPolicy.ONLY_CONTAINS, 42, 7, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                MetadataPolicy.INCLUDE_ALL, 125, 15, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 126, 15, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                MetadataPolicy.INCLUDE_ALL, 151, 19, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 152, 19, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 6, 1, 0 },
                         
