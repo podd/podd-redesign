@@ -4,7 +4,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix fileRepository: <http://purl.org/podd/ns/fileRepository#> .
+@prefix fileRepository: <http://purl.org/podd/ns/dataRepository#> .
 @base <http://test.example.org/filerepositoryaliases#defaultaliasfile> .
 
 <http://test.example.org/filerepositoryaliases#defaultaliasfile> rdf:type owl:Ontology ;
@@ -51,7 +51,7 @@
 
 ###  http://test.example.org/filerepositoryaliases#localssh
 
-:localssh rdf:type fileRepository:FileRepository ,
+:localssh rdf:type fileRepository:DataRepository ,
                    fileRepository:SSHFileRepository ;
           
           fileRepository:hasFileRepositoryUsername "salt" ;
