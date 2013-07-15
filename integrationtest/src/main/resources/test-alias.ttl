@@ -4,12 +4,12 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix fileRepository: <http://purl.org/podd/ns/fileRepository#> .
+@prefix dataRepository: <http://purl.org/podd/ns/dataRepository#> .
 @base <http://test.example.org/filerepositoryaliases#defaultaliasfile> .
 
 <http://test.example.org/filerepositoryaliases#defaultaliasfile> rdf:type owl:Ontology ;
                                                                  
-                                                                 owl:imports <http://purl.org/podd/ns/version/fileRepository/1> ;
+                                                                 owl:imports <http://purl.org/podd/ns/version/dataRepository/1> ;
                                                                  
                                                                  owl:versionIRI <http://test.example.org/filerepositoryaliases:version:1> .
 
@@ -45,28 +45,28 @@
 
 <http://test.example.org/filerepositoryaliases#defaultaliasfile> rdf:type owl:NamedIndividual ;
                                                                  
-                                                                 fileRepository:hasRepositoryConfiguration :localssh .
+                                                                 dataRepository:hasRepositoryConfiguration :localssh .
 
 
 
 ###  http://test.example.org/filerepositoryaliases#localssh
 
-:localssh rdf:type fileRepository:FileRepository ,
-                   fileRepository:SSHFileRepository ;
+:localssh rdf:type dataRepository:FileRepository ,
+                   dataRepository:SSHFileRepository ;
           
-          fileRepository:hasFileRepositoryUsername "salt" ;
+          dataRepository:hasDataRepositoryUsername "salt" ;
           
-          fileRepository:hasFileRepositoryHost "localhost" ;
+          dataRepository:hasDataRepositoryHost "localhost" ;
           
-          fileRepository:hasFileRepositoryFingerprint "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db" ;
+          dataRepository:hasDataRepositoryFingerprint "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db" ;
           
-          fileRepository:hasFileRepositorySecret "salt" ;
+          dataRepository:hasDataRepositorySecret "salt" ;
           
-          fileRepository:hasFileRepositoryProtocol "SSH" ;
+          dataRepository:hasDataRepositoryProtocol "SSH" ;
           
-          fileRepository:hasFileRepositoryPort "9856" ;
+          dataRepository:hasDataRepositoryPort "9856" ;
           
-          fileRepository:hasFileRepositoryAlias "alias_local_ssh" .
+          dataRepository:hasDataRepositoryAlias "alias_local_ssh" .
           
 
 

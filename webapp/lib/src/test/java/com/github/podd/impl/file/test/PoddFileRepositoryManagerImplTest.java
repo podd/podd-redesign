@@ -119,18 +119,18 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         final Model model = new LinkedHashModel();
         for(final String alias : aliases)
         {
-            model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
+            model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
                     .createLiteral(alias));
         }
         model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
         
         // SSH implementation specific configurations
         model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
-        model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance()
+        model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance()
                 .createLiteral(SSHFileRepositoryImpl.PROTOCOL_SSH));
-        model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_HOST,
+        model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST,
                 ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_HOST));
-        model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PORT,
+        model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT,
                 ValueFactoryImpl.getInstance().createLiteral(this.sshd.TEST_SSH_SERVICE_PORT));
         model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance()
                 .createLiteral(SSHService.TEST_SSH_FINGERPRINT));

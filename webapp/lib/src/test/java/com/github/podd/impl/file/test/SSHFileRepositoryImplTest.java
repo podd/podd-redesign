@@ -57,7 +57,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         // - no "protocol"
         final Model model1 = new LinkedHashModel();
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
                         AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_DATA_REPOSITORY));
@@ -65,10 +65,10 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                 PoddRdfConstants.PODD_SSH_FILE_REPOSITORY));
         
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_HOST)));
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
                         this.sshd.TEST_SSH_SERVICE_PORT)));
         model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(
@@ -85,7 +85,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         // - no "host"
         final Model model2 = new LinkedHashModel();
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
                         AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_DATA_REPOSITORY));
@@ -93,10 +93,10 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                 PoddRdfConstants.PODD_SSH_FILE_REPOSITORY));
         
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
                         SSHFileRepositoryImpl.PROTOCOL_SSH)));
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
                         this.sshd.TEST_SSH_SERVICE_PORT)));
         model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(
@@ -113,7 +113,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         // - no "fingerprint"
         final Model model3 = new LinkedHashModel();
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
                         AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_DATA_REPOSITORY));
@@ -121,13 +121,13 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
                 PoddRdfConstants.PODD_SSH_FILE_REPOSITORY));
         
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
                         SSHFileRepositoryImpl.PROTOCOL_SSH)));
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_HOST)));
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
                         this.sshd.TEST_SSH_SERVICE_PORT)));
         model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, ValueFactoryImpl.getInstance().createLiteral(
@@ -141,7 +141,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         // - no protocol, host, port, fingerprint, username, secret
         final Model model4 = new LinkedHashModel();
         model4.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
                         AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model4.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_DATA_REPOSITORY));
@@ -179,7 +179,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     {
         final Model model = new LinkedHashModel();
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
                         AbstractPoddFileRepositoryTest.TEST_ALIAS)));
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
                 PoddRdfConstants.PODD_DATA_REPOSITORY));
@@ -188,13 +188,13 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
         
         // ssh specific attributes
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
                         SSHFileRepositoryImpl.PROTOCOL_SSH)));
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral(
                         SSHService.TEST_SSH_HOST)));
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
+                PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(
                         this.sshd.TEST_SSH_SERVICE_PORT)));
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, ValueFactoryImpl.getInstance().createLiteral(

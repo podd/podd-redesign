@@ -140,13 +140,13 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             {
                 final Set<Resource> subjectUris =
                         repositoryConfiguration.getAsModel()
-                                .filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null).subjects();
+                                .filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null).subjects();
                 
                 this.log.debug("Found {} subject URIs", subjectUris.size()); // should be only 1
                                                                              // here
                 for(final Resource subjectUri : subjectUris)
                 {
-                    conn.add(subjectUri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
+                    conn.add(subjectUri, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
                             .createLiteral(aliasInLowerCase), context);
                     this.log.debug("Added alias '{}' triple with subject <{}>", aliasInLowerCase, subjectUri);
                 }
@@ -163,7 +163,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 // check that the subject URIs used in the repository configuration are not already
                 // used in the file repository management graph
                 final Set<Resource> subjectUris =
-                        model.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null).subjects();
+                        model.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null).subjects();
                 for(final Resource subjectUri : subjectUris)
                 {
                     final RepositoryResult<Statement> statements =
@@ -345,7 +345,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             final StringBuilder sb = new StringBuilder();
             
             sb.append("SELECT ?alias WHERE { ");
-            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
+            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
             sb.append(" } ");
             
             this.log.debug("Created SPARQL {} ", sb);
@@ -391,8 +391,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             final StringBuilder sb = new StringBuilder();
             
             sb.append("SELECT ?otherAlias WHERE { ");
-            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?otherAlias .");
-            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
+            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS.stringValue() + "> ?otherAlias .");
+            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
             sb.append(" } ");
             
             this.log.debug("Created SPARQL {} with alias bound to '{}'", sb, aliasInLowerCase);
@@ -460,12 +460,12 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             sb.append(" ?aliasUri ?predicate ?object . ");
             sb.append(" ?aliasUri <" + RDF.TYPE.stringValue() + "> <"
                     + PoddRdfConstants.PODD_DATA_REPOSITORY.stringValue() + "> .");
-            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
+            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
             
             // filter to exclude other aliases
             if(multipleAliasesExist)
             {
-                sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue()
+                sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS.stringValue()
                         + "> ?otherAlias . ");
                 sb.append(" FILTER ( str(?object) != str(?otherAlias) && str(?otherAlias) != str(?alias) )  . ");
             }
@@ -528,7 +528,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             this.verifyFileRepositoryAgainstSchema(defaultAliasConfiguration);
             
             final Model allAliases =
-                    defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
+                    defaultAliasConfiguration.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
             
             this.log.warn("Found {} default aliases to add", allAliases.size());
             
@@ -537,10 +537,10 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 final String alias = stmt.getObject().stringValue();
                 final Model model = defaultAliasConfiguration.filter(stmt.getSubject(), null, null);
                 
-                final PoddDataRepository<?> fileRepository =
+                final PoddDataRepository<?> dataRepository =
                         PoddFileRepositoryFactory.createFileRepository(alias, model);
                 
-                this.addRepositoryMapping(alias, fileRepository, false);
+                this.addRepositoryMapping(alias, dataRepository, false);
             }
         }
     }
@@ -573,7 +573,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             {
                 // several aliases map to this repository. only remove the statement which maps this
                 // alias
-                conn.remove(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
+                conn.remove(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
                         .createLiteral(aliasInLowerCase), context);
                 this.log.debug("Removed ONLY the mapping for alias '{}'", aliasInLowerCase);
             }
@@ -583,7 +583,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 final Set<Resource> subjectUris =
                         repositoryToRemove
                                 .getAsModel()
-                                .filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS,
+                                .filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS,
                                         ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase)).subjects();
                 
                 this.log.debug("Need to remove {} triples", subjectUris.size()); // DEBUG output
@@ -672,27 +672,27 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
      */
     private void verifyFileRepositoryAgainstSchema(final Model model) throws DataRepositoryException
     {
-        OWLOntology fileRepositoryOntology = null;
+        OWLOntology dataRepositoryOntology = null;
         OWLOntology defaultAliasOntology = null;
         
         final Model schemaModel = new LinkedHashModel();
         try
         {
-            // load poddFileRepository.owl into a Model
-            final InputStream inputA = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_FILE_REPOSITORY);
+            // load poddDataRepository.owl into a Model
+            final InputStream inputA = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_DATA_REPOSITORY);
             final RDFParser rdfParserA = Rio.createParser(RDFFormat.RDFXML);
             final StatementCollector collectorA = new StatementCollector(schemaModel);
             rdfParserA.setRDFHandler(collectorA);
             rdfParserA.parse(inputA, "");
             
-            // verify & load poddFileRepository.owl into OWLAPI
-            fileRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel);
+            // verify & load poddDataRepository.owl into OWLAPI
+            dataRepositoryOntology = this.checkForConsistentOwlDlOntology(schemaModel);
             
             defaultAliasOntology = this.checkForConsistentOwlDlOntology(model);
         }
         catch(final PoddException | OpenRDFException | IOException e)
         {
-            final String msg = "Failed verification of the FileRepsitory against poddFileRepository.owl";
+            final String msg = "Failed verification of the DataRepsitory against poddDataRepository.owl";
             this.log.error(msg, e);
             throw new FileRepositoryIncompleteException(schemaModel, msg, e);
         }
@@ -707,9 +707,9 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 {
                     manager.removeOntology(defaultAliasOntology);
                 }
-                if(fileRepositoryOntology != null)
+                if(dataRepositoryOntology != null)
                 {
-                    manager.removeOntology(fileRepositoryOntology);
+                    manager.removeOntology(dataRepositoryOntology);
                 }
             }
         }

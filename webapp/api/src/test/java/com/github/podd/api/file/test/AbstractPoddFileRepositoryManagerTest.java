@@ -157,13 +157,13 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     {
         // prepare:
         final String alias = "alias-1-gamma";
-        final PoddDataRepository<?> fileRepository = this.buildFileRepositoryInstance(alias, null);
+        final PoddDataRepository<?> dataRepository = this.buildFileRepositoryInstance(alias, null);
         
-        Assert.assertNotNull("FileRepository was NULL", fileRepository);
+        Assert.assertNotNull("FileRepository was NULL", dataRepository);
         
         try
         {
-            this.testFileRepositoryManager.addRepositoryMapping(alias, fileRepository);
+            this.testFileRepositoryManager.addRepositoryMapping(alias, dataRepository);
             Assert.fail("Should have thrown a FileRepositoryIncompleteException");
         }
         catch(final FileRepositoryIncompleteException e)
@@ -183,14 +183,14 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         // prepare:
         final String alias = "alias-1-gamma";
         final URI duplicateAliasUri = ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/alias/1-alpha");
-        final PoddDataRepository<?> fileRepository =
+        final PoddDataRepository<?> dataRepository =
                 this.buildFileRepositoryInstance(alias, this.buildModelForFileRepository(duplicateAliasUri, alias));
         
-        Assert.assertNotNull("FileRepository was NULL", fileRepository);
+        Assert.assertNotNull("FileRepository was NULL", dataRepository);
         
         try
         {
-            this.testFileRepositoryManager.addRepositoryMapping(alias, fileRepository);
+            this.testFileRepositoryManager.addRepositoryMapping(alias, dataRepository);
             Assert.fail("Should have thrown a FileRepositoryIncompleteException");
         }
         catch(final FileRepositoryIncompleteException e)
@@ -206,12 +206,12 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         // prepare:
         final String alias = "alias-1-gamma";
         final URI aliasUri = ValueFactoryImpl.getInstance().createURI("http://purl.org/alias-1-gamma");
-        final PoddDataRepository<?> fileRepository =
+        final PoddDataRepository<?> dataRepository =
                 this.buildFileRepositoryInstance(alias, this.buildModelForFileRepository(aliasUri, alias));
         
-        Assert.assertNotNull("FileRepository was NULL", fileRepository);
+        Assert.assertNotNull("FileRepository was NULL", dataRepository);
         
-        this.testFileRepositoryManager.addRepositoryMapping(alias, fileRepository);
+        this.testFileRepositoryManager.addRepositoryMapping(alias, dataRepository);
         
         // verify:
         final PoddDataRepository<?> mappedRepository = this.testFileRepositoryManager.getRepository(alias);
@@ -221,11 +221,11 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     @Test
     public void testAddRepositoryMappingWithNullAlias() throws Exception
     {
-        final PoddDataRepository<?> fileRepository =
+        final PoddDataRepository<?> dataRepository =
                 this.buildFileRepositoryInstance(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, null);
         try
         {
-            this.testFileRepositoryManager.addRepositoryMapping(null, fileRepository);
+            this.testFileRepositoryManager.addRepositoryMapping(null, dataRepository);
             Assert.fail("Should have thrown a NullPointerException");
         }
         catch(final NullPointerException e)
@@ -238,11 +238,11 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     @Test
     public void testAddRepositoryMappingWithNullRepository() throws Exception
     {
-        final PoddDataRepository<?> fileRepository = null;
+        final PoddDataRepository<?> dataRepository = null;
         try
         {
             this.testFileRepositoryManager.addRepositoryMapping(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A,
-                    fileRepository);
+                    dataRepository);
             Assert.fail("Should have thrown a NullPointerException");
         }
         catch(final NullPointerException e)
@@ -280,8 +280,8 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     {
         // prepare: clean up any aliases that already exist
         final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
-        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
-        connection.clear(fileRepositoryManagementGraph);
+        final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        connection.clear(dataRepositoryManagementGraph);
         connection.close();
         
         final List<String> aliases = this.testFileRepositoryManager.getAllAliases();
@@ -334,10 +334,10 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     @Test
     public void testGetRepositoryAliasesSuccess() throws Exception
     {
-        final PoddDataRepository<?> fileRepository =
+        final PoddDataRepository<?> dataRepository =
                 this.buildFileRepositoryInstance(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A, null);
         
-        final List<String> aliases = this.testFileRepositoryManager.getRepositoryAliases(fileRepository);
+        final List<String> aliases = this.testFileRepositoryManager.getRepositoryAliases(dataRepository);
         
         // verify:
         Assert.assertNotNull("NULL list of aliases", aliases);
@@ -351,9 +351,9 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     @Test
     public void testGetRepositoryAliasesWithNonExistentRepository() throws Exception
     {
-        final PoddDataRepository<?> fileRepository = this.buildFileRepositoryInstance("no_such_alias", null);
+        final PoddDataRepository<?> dataRepository = this.buildFileRepositoryInstance("no_such_alias", null);
         
-        final List<String> aliases = this.testFileRepositoryManager.getRepositoryAliases(fileRepository);
+        final List<String> aliases = this.testFileRepositoryManager.getRepositoryAliases(dataRepository);
         
         // verify:
         Assert.assertNotNull("NULL list of aliases", aliases);
@@ -419,8 +419,8 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     {
         // prepare: clean up any aliases that already exist
         final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
-        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
-        connection.clear(fileRepositoryManagementGraph);
+        final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        connection.clear(dataRepositoryManagementGraph);
         connection.close();
         Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
                 .getAllAliases().size());
@@ -440,8 +440,8 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     {
         // prepare: clean up any aliases that already exist
         final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
-        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
-        connection.clear(fileRepositoryManagementGraph);
+        final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        connection.clear(dataRepositoryManagementGraph);
         connection.close();
         Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
                 .getAllAliases().size());
@@ -462,9 +462,9 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     {
         // prepare: clean up any aliases that already exist
         final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
-        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
         connection.begin();
-        connection.clear(fileRepositoryManagementGraph);
+        connection.clear(dataRepositoryManagementGraph);
         connection.commit();
         connection.close();
         Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager
@@ -487,9 +487,9 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     {
         // prepare: clean up any aliases that already exist
         final RepositoryConnection connection = this.testRepositoryManager.getRepository().getConnection();
-        final URI fileRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
+        final URI dataRepositoryManagementGraph = this.testRepositoryManager.getFileRepositoryManagementGraph();
         connection.begin();
-        connection.clear(fileRepositoryManagementGraph);
+        connection.clear(dataRepositoryManagementGraph);
         connection.commit();
         connection.close();
         Assert.assertEquals("File Repository Graph was not cleaned properly", 0, this.testFileRepositoryManager

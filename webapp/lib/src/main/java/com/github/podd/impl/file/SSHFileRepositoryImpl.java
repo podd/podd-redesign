@@ -36,11 +36,11 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
         // check that the model contains values for protocol, host, port, fingerprint, username, and
         // secret
         final String protocol =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PROTOCOL, null).objectString();
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, null).objectString();
         final String host =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_HOST, null).objectString();
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, null).objectString();
         final String port =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, null).objectString();
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, null).objectString();
         final String fingerprint =
                 model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
         final String username =
@@ -92,9 +92,9 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
         }
         
         final String host =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_HOST, null).objectString();
+                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, null).objectString();
         final String port =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_PORT, null).objectString();
+                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, null).objectString();
         final String fingerprint =
                 this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, null)
                         .objectString();
