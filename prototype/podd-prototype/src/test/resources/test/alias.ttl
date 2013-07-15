@@ -5,22 +5,22 @@
 #Used for tests
 #
 :localhost a poddBase:FileRepository , poddBase:HttpFileRepository ;
-poddBase:hasFileRepositoryAlias "localhost" ;
-poddBase:hasFileRepositoryProtocol "http" ;
-poddBase:hasFileRepositoryHost "localhost" .
+poddBase:hasDataRepositoryAlias "localhost" ;
+poddBase:hasDataRepositoryProtocol "http" ;
+poddBase:hasDataRepositoryHost "localhost" .
 #
 # alias details for W3
 :w3 a poddBase:FileRepository , poddBase:HttpFileRepository ;
-poddBase:hasFileRepositoryAlias "w3" ;
-poddBase:hasFileRepositoryProtocol "http" ;
-poddBase:hasFileRepositoryHost "www.w3.org" .
+poddBase:hasDataRepositoryAlias "w3" ;
+poddBase:hasDataRepositoryProtocol "http" ;
+poddBase:hasDataRepositoryHost "www.w3.org" .
 #
 # alias details for an SSH server
 :localssh a poddBase:FileRepository , poddBase:SshFileRepository ;
-poddBase:hasFileRepositoryAlias "localssh" ;
-poddBase:hasFileRepositoryProtocol "ssh" ;
-poddBase:hasFileRepositoryHost "localhost" ;
-poddBase:hasFileRepositoryPort "9856" ;
-poddBase:hasFileRepositoryFingerprint "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db" ;
-poddBase:hasFileRepositoryUsername "salt" ;
-poddBase:hasFileRepositorySecret "salt" .
+poddBase:hasDataRepositoryAlias "localssh" ;
+poddBase:hasDataRepositoryProtocol "ssh" ;
+poddBase:hasDataRepositoryHost "localhost" ;
+poddBase:hasDataRepositoryPort "9856" ;
+poddBase:hasDataRepositoryFingerprint "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db" ;
+poddBase:hasDataRepositoryUsername "salt" ;
+poddBase:hasDataRepositorySecret "salt" .

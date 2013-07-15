@@ -54,19 +54,19 @@
 :localssh rdf:type dataRepository:DataRepository ,
                    dataRepository:SSHFileRepository ;
           
-          dataRepository:hasFileRepositoryUsername "salt" ;
+          dataRepository:hasDataRepositoryUsername "salt" ;
           
-          dataRepository:hasFileRepositoryHost "localhost" ;
+          dataRepository:hasDataRepositoryHost "localhost" ;
           
-          dataRepository:hasFileRepositoryFingerprint "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db" ;
+          dataRepository:hasDataRepositoryFingerprint "ce:a7:c1:cf:17:3f:96:49:6a:53:1a:05:0b:ba:90:db" ;
           
-          dataRepository:hasFileRepositorySecret "salt" ;
+          dataRepository:hasDataRepositorySecret "salt" ;
           
-          dataRepository:hasFileRepositoryProtocol "SSH" ;
+          dataRepository:hasDataRepositoryProtocol "SSH" ;
           
-          dataRepository:hasFileRepositoryPort "9856" ;
+          dataRepository:hasDataRepositoryPort "9856" ;
           
-          dataRepository:hasFileRepositoryAlias "alias_local_ssh" .
+          dataRepository:hasDataRepositoryAlias "alias_local_ssh" .
           
 
 

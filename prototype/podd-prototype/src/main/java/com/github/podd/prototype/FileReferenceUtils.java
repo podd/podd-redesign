@@ -59,19 +59,19 @@ public class FileReferenceUtils
             "http://purl.org/podd/ns/poddBase#", "SshFileRepository");
     
     public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryAlias");
+            "http://purl.org/podd/ns/poddBase#", "hasDataRepositoryAlias");
     public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryProtocol");
+            "http://purl.org/podd/ns/poddBase#", "hasDataRepositoryProtocol");
     public static final URI PODD_FILE_REPOSITORY_HOST = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryHost");
+            "http://purl.org/podd/ns/poddBase#", "hasDataRepositoryHost");
     public static final URI PODD_FILE_REPOSITORY_PORT = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryPort");
+            "http://purl.org/podd/ns/poddBase#", "hasDataRepositoryPort");
     public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryFingerprint");
+            "http://purl.org/podd/ns/poddBase#", "hasDataRepositoryFingerprint");
     public static final URI PODD_FILE_REPOSITORY_USERNAME = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositoryUsername");
+            "http://purl.org/podd/ns/poddBase#", "hasDataRepositoryUsername");
     public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(
-            "http://purl.org/podd/ns/poddBase#", "hasFileRepositorySecret");
+            "http://purl.org/podd/ns/poddBase#", "hasDataRepositorySecret");
     
     public static final String KEY_FILE_REF_TYPE = "file_reference_type";
     public static final String KEY_OBJECT_URI = "object_uri";

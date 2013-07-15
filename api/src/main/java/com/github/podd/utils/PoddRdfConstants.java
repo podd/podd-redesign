@@ -274,16 +274,16 @@ public interface PoddRdfConstants
     public static final URI PODD_DATA_REPOSITORY_PORT = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
             "hasDataRepositoryPort");
     
-    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryFingerprint */
+    /** http://purl.org/podd/ns/poddBase#hasDataRepositoryFingerprint */
     public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = PoddRdfConstants.VF.createURI(
-            PoddRdfConstants.DATA_REPOSITORY, "hasFileRepositoryFingerprint");
+            PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositoryFingerprint");
     
-    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryUsername */
+    /** http://purl.org/podd/ns/poddBase#hasDataRepositoryUsername */
     public static final URI PODD_FILE_REPOSITORY_USERNAME = PoddRdfConstants.VF.createURI(
-            PoddRdfConstants.DATA_REPOSITORY, "hasFileRepositoryUsername");
+            PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositoryUsername");
     
-    /** http://purl.org/podd/ns/poddBase#hasFileRepositorySecret */
+    /** http://purl.org/podd/ns/poddBase#hasDataRepositorySecret */
     public static final URI PODD_FILE_REPOSITORY_SECRET = PoddRdfConstants.VF.createURI(
-            PoddRdfConstants.DATA_REPOSITORY, "hasFileRepositorySecret");
+            PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositorySecret");
     
 }
