@@ -15,12 +15,12 @@ import com.github.podd.api.file.SSHFileReference;
  * 
  * @author kutila
  */
-public abstract class AbstractSSHFileReferenceTest extends AbstractFileReferenceTest
+public abstract class AbstractSSHFileReferenceTest extends AbstractDataReferenceTest
 {
     protected SSHFileReference sshFileReference;
     
     @Override
-    protected final DataReference getNewFileReference()
+    protected final DataReference getNewDataReference()
     {
         return this.getNewSSHFileReference();
     }

@@ -122,7 +122,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
             model.add(aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance()
                     .createLiteral(alias));
         }
-        model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_FILE_REPOSITORY);
+        model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
         
         // SSH implementation specific configurations
         model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);

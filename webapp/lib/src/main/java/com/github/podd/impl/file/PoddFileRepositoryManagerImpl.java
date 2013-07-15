@@ -459,7 +459,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             
             sb.append(" ?aliasUri ?predicate ?object . ");
             sb.append(" ?aliasUri <" + RDF.TYPE.stringValue() + "> <"
-                    + PoddRdfConstants.PODD_FILE_REPOSITORY.stringValue() + "> .");
+                    + PoddRdfConstants.PODD_DATA_REPOSITORY.stringValue() + "> .");
             sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
             
             // filter to exclude other aliases

@@ -16,7 +16,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
  * 
  * @author kutila
  */
-public abstract class AbstractFileReferenceTest
+public abstract class AbstractDataReferenceTest
 {
     protected DataReference dataReference;
     
@@ -24,12 +24,12 @@ public abstract class AbstractFileReferenceTest
      * 
      * @return A new DataReference instance for use by the test
      */
-    protected abstract DataReference getNewFileReference();
+    protected abstract DataReference getNewDataReference();
     
     @Before
     public void setUp() throws Exception
     {
-        this.dataReference = this.getNewFileReference();
+        this.dataReference = this.getNewDataReference();
     }
     
     @After

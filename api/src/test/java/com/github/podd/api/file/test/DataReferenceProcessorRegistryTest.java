@@ -15,7 +15,6 @@ import org.mockito.Mockito;
 import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.api.file.DataReferenceProcessorFactory;
 import com.github.podd.api.file.DataReferenceProcessorRegistry;
-import com.github.podd.api.purl.test.PoddPurlProcessorFactoryRegistryTest;
 
 /**
  * Tests functionality of the DataReferenceProcessorRegistry.
