@@ -58,7 +58,7 @@
 
 ###  http://test.example.org/filerepositoryaliases#localssh
 
-:localssh rdf:type dataRepository:FileRepository ,
+:localssh rdf:type dataRepository:DataRepository ,
                    dataRepository:SSHFileRepository ;
           
           dataRepository:hasDataRepositoryUsername "salt" ;

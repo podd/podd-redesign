@@ -14,30 +14,30 @@ import org.openrdf.model.impl.ValueFactoryImpl;
  */
 public class DataReferenceConstants
 {
-    private static final String PODD_BASE_PREFIX = "http://purl.org/podd/ns/poddBase#";
+    private static final String PODD_DATA_PREFIX = "http://purl.org/podd/ns/dataRepository#";
     
     public static final URI PODD_DATA_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "DataRepository");
+            DataReferenceConstants.PODD_DATA_PREFIX, "DataRepository");
     public static final URI PODD_HTTP_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "HTTPFileRepository");
+            DataReferenceConstants.PODD_DATA_PREFIX, "HTTPFileRepository");
     public static final URI PODD_SSH_FILE_REPOSITORY = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "SSHFileRepository");
+            DataReferenceConstants.PODD_DATA_PREFIX, "SSHFileRepository");
     
     public static final URI PODD_FILE_REPOSITORY_ALIAS = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "hasAlias");
+            DataReferenceConstants.PODD_DATA_PREFIX, "hasAlias");
     
     public static final URI PODD_FILE_REPOSITORY_PROTOCOL = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "hasDataRepositoryProtocol");
+            DataReferenceConstants.PODD_DATA_PREFIX, "hasDataRepositoryProtocol");
     public static final URI PODD_FILE_REPOSITORY_HOST = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "hasDataRepositoryHost");
+            DataReferenceConstants.PODD_DATA_PREFIX, "hasDataRepositoryHost");
     public static final URI PODD_FILE_REPOSITORY_PORT = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "hasDataRepositoryPort");
+            DataReferenceConstants.PODD_DATA_PREFIX, "hasDataRepositoryPort");
     public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "hasDataRepositoryFingerprint");
+            DataReferenceConstants.PODD_DATA_PREFIX, "hasDataRepositoryFingerprint");
     public static final URI PODD_FILE_REPOSITORY_USERNAME = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "hasDataRepositoryUsername");
+            DataReferenceConstants.PODD_DATA_PREFIX, "hasDataRepositoryUsername");
     public static final URI PODD_FILE_REPOSITORY_SECRET = ValueFactoryImpl.getInstance().createURI(
-            DataReferenceConstants.PODD_BASE_PREFIX, "hasDataRepositorySecret");
+            DataReferenceConstants.PODD_DATA_PREFIX, "hasDataRepositorySecret");
     
     public static final String KEY_FILE_REF_TYPE = "file_reference_type";
     public static final String KEY_OBJECT_URI = "object_uri";
