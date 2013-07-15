@@ -262,26 +262,26 @@ public abstract class AbstractPoddArtifactManagerTest
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 42, 7, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                MetadataPolicy.INCLUDE_ALL, 127, 15, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                MetadataPolicy.INCLUDE_ALL, 153, 19, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 6, 1, 0 },
-                        
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.INCLUDE_ALL, 71, 9, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                MetadataPolicy.INCLUDE_ALL, 97, 13, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
+                                MetadataPolicy.INCLUDE_ALL, 90, 11, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), true,
+                                MetadataPolicy.INCLUDE_ALL, 116, 15, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 0, 0, 0 },
                         
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
+                                MetadataPolicy.INCLUDE_ALL, 69, 9, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
+                                MetadataPolicy.INCLUDE_ALL, 95, 13, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
+                                MetadataPolicy.ONLY_CONTAINS, 12, 2, 0 },
+                        
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.INCLUDE_ALL, 87, 11, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 85, 11, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
-                                MetadataPolicy.INCLUDE_ALL, 113, 15, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 111, 15, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 0, 0, 0 }, };
+                                MetadataPolicy.ONLY_CONTAINS, 12, 2, 0 }, };
         
         for(final Object[] element : testData)
         {

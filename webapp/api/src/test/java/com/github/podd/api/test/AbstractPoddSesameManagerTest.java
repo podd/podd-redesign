@@ -1064,29 +1064,30 @@ public abstract class AbstractPoddSesameManagerTest
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 57, 7, 0 },
                         
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                MetadataPolicy.INCLUDE_ALL, 127, 14, 0 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), true,
-                                MetadataPolicy.INCLUDE_ALL, 153, 18, 3 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Genotype"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 9, 1, 0 },
+                        // cannot "contain" any Child Objects
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
+                                MetadataPolicy.INCLUDE_ALL, 90, 10, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), true,
+                                MetadataPolicy.INCLUDE_ALL, 116, 14, 3 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
+                                MetadataPolicy.ONLY_CONTAINS, 0, -1, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.INCLUDE_ALL, 71, 8, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 69, 8, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                MetadataPolicy.INCLUDE_ALL, 97, 12, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 95, 12, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 0, -1, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 17, 2, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.INCLUDE_ALL, 87, 10, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 85, 10, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
-                            MetadataPolicy.INCLUDE_ALL, 113, 14, 3 },
+                            MetadataPolicy.INCLUDE_ALL, 111, 14, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 0, -1, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 17, 2, 0 },
 
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), false,
-                            MetadataPolicy.INCLUDE_ALL, 215, 23, 0 },
+                            MetadataPolicy.INCLUDE_ALL, 213, 23, 0 },
                                     
                 };
         
@@ -1144,8 +1145,8 @@ public abstract class AbstractPoddSesameManagerTest
         // Format: Object Type, expected model size, expected relationship count, expected child
         // object type count
         final Object[][] testData =
-                { { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation"), 58, 8, 10 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), 28, 4, 4 }, };
+                { { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation"), 64, 9, 11 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), 40, 6, 6 }, };
         
         for(final Object[] element : testData)
         {
