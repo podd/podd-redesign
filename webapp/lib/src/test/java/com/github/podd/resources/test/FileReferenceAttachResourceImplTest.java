@@ -189,7 +189,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             final String fileReferenceAsString =
                     this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE,
                             RDFFormat.RDFXML, this.sshDir);
-            Assert.assertFalse("Input FileReference could not be genereated", fileReferenceAsString.isEmpty());
+            Assert.assertFalse("Input DataReference could not be genereated", fileReferenceAsString.isEmpty());
             
             final ClientResource fileRefAttachClientResource =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
@@ -287,7 +287,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             final String fileReferenceAsString =
                     this.buildFileReferenceString(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_VERIFIABLE_TTL,
                             RDFFormat.TURTLE, this.sshDir);
-            Assert.assertFalse("Input FileReference could not be genereated", fileReferenceAsString.isEmpty());
+            Assert.assertFalse("Input DataReference could not be genereated", fileReferenceAsString.isEmpty());
             
             final ClientResource fileRefAttachClientResource =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));

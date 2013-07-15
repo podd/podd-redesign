@@ -9,22 +9,22 @@ package com.github.podd.exception;
  * 
  * @author kutila
  */
-public abstract class FileRepositoryException extends PoddException
+public abstract class DataRepositoryException extends PoddException
 {
     
     private static final long serialVersionUID = 6527298790638967965L;
     
-    public FileRepositoryException(final String msg)
+    public DataRepositoryException(final String msg)
     {
         super(msg);
     }
     
-    public FileRepositoryException(final String msg, final Throwable throwable)
+    public DataRepositoryException(final String msg, final Throwable throwable)
     {
         super(msg, throwable);
     }
     
-    public FileRepositoryException(final Throwable throwable)
+    public DataRepositoryException(final Throwable throwable)
     {
         super(throwable);
     }

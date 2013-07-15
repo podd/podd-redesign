@@ -12,7 +12,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.openrdf.model.URI;
 
-import com.github.podd.api.file.FileReferenceProcessor;
+import com.github.podd.api.file.DataReferenceProcessor;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.api.file.SSHFileReferenceProcessor;
 import com.github.podd.api.test.TestConstants;
@@ -23,16 +23,16 @@ import com.github.podd.utils.PoddRdfConstants;
  * 
  */
 public abstract class AbstractSSHFileReferenceProcessorTest extends
-        AbstractFileReferenceProcessorTest<SSHFileReference>
+        AbstractDataReferenceProcessorTest<SSHFileReference>
 {
     @Override
-    protected Set<URI> getExpectedFileReferenceTypes()
+    protected Set<URI> getExpectedDataReferenceTypes()
     {
         return Collections.singleton(PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
     }
     
     @Override
-    protected final FileReferenceProcessor<SSHFileReference> getNewFileReferenceProcessor()
+    protected final DataReferenceProcessor<SSHFileReference> getNewDataReferenceProcessor()
     {
         return this.getNewSSHFileReferenceProcessor();
     }
@@ -40,13 +40,13 @@ public abstract class AbstractSSHFileReferenceProcessorTest extends
     protected abstract SSHFileReferenceProcessor getNewSSHFileReferenceProcessor();
     
     @Override
-    protected String getPathToResourceWith2FileReferences()
+    protected String getPathToResourceWith2DataReferences()
     {
         return TestConstants.TEST_ARTIFACT_PURLS_2_FILE_REFS;
     }
     
     @Override
-    protected void verify2FileReferences(final Collection<SSHFileReference> fileReferences)
+    protected void verify2DataReferences(final Collection<SSHFileReference> fileReferences)
     {
         Assert.assertNotNull("NULL collection of file references", fileReferences);
         Assert.assertEquals("Expected 2 file references to verify", 2, fileReferences.size());

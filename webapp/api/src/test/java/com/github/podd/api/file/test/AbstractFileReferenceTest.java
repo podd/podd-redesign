@@ -8,58 +8,58 @@ import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.DataReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
- * Simple abstract test class for FileReference
+ * Simple abstract test class for DataReference
  * 
  * @author kutila
  */
 public abstract class AbstractFileReferenceTest
 {
-    protected FileReference fileReference;
+    protected DataReference dataReference;
     
     /**
      * 
-     * @return A new FileReference instance for use by the test
+     * @return A new DataReference instance for use by the test
      */
-    protected abstract FileReference getNewFileReference();
+    protected abstract DataReference getNewFileReference();
     
     @Before
     public void setUp() throws Exception
     {
-        this.fileReference = this.getNewFileReference();
+        this.dataReference = this.getNewFileReference();
     }
     
     @After
     public void tearDown() throws Exception
     {
-        this.fileReference = null;
+        this.dataReference = null;
     }
     
     @Test
     public void testGetArtifactID() throws Exception
     {
-        this.fileReference.getArtifactID();
+        this.dataReference.getArtifactID();
     }
     
     @Test
     public void testGetLabel() throws Exception
     {
-        this.fileReference.getLabel();
+        this.dataReference.getLabel();
     }
     
     @Test
     public void testGetObjectIRI() throws Exception
     {
-        this.fileReference.getObjectIri();
+        this.dataReference.getObjectIri();
     }
     
     @Test
     public void testGetRepositoryAlias() throws Exception
     {
-        this.fileReference.getRepositoryAlias();
+        this.dataReference.getRepositoryAlias();
     }
     
     @Test
@@ -70,26 +70,26 @@ public abstract class AbstractFileReferenceTest
                         IRI.create("urn:test:versioniri:abc:version:44"),
                         IRI.create("urn:test:inferred:versioniri:abc:version:44"));
         
-        this.fileReference.setArtifactID(ontologyID);
+        this.dataReference.setArtifactID(ontologyID);
     }
     
     @Test
     public void testSetLabel() throws Exception
     {
-        this.fileReference.setLabel("Test Label");
+        this.dataReference.setLabel("Test Label");
     }
     
     @Test
     public void testSetObjectIRI() throws Exception
     {
         final IRI objectIri = IRI.create("urn:test:objectiri:podd-object:4a");
-        this.fileReference.setObjectIri(objectIri);
+        this.dataReference.setObjectIri(objectIri);
     }
     
     @Test
     public void testSetRepositoryAlias() throws Exception
     {
-        this.fileReference.setRepositoryAlias("Test Repository Alias");
+        this.dataReference.setRepositoryAlias("Test Repository Alias");
     }
     
 }

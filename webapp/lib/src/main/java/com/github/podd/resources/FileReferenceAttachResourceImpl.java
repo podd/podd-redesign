@@ -32,7 +32,7 @@ import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.FileReferenceVerificationPolicy;
+import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -105,10 +105,10 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         // check optional parameter: whether file references should be verified. Defaults to NO
         final String verifyFileRefs = this.getQuery().getFirstValue(PoddWebConstants.KEY_VERIFICATION_POLICY);
-        FileReferenceVerificationPolicy verificationPolicy = FileReferenceVerificationPolicy.DO_NOT_VERIFY;
+        DataReferenceVerificationPolicy verificationPolicy = DataReferenceVerificationPolicy.DO_NOT_VERIFY;
         if(verifyFileRefs != null && Boolean.valueOf(verifyFileRefs))
         {
-            verificationPolicy = FileReferenceVerificationPolicy.VERIFY;
+            verificationPolicy = DataReferenceVerificationPolicy.VERIFY;
         }
         
         // get input stream containing RDF statements

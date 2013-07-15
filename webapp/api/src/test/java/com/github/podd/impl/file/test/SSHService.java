@@ -113,12 +113,12 @@ public class SSHService
     /**
      * 
      * @param alias
-     *            The alias to be assigned to the created FileReference.
+     *            The alias to be assigned to the created DataReference.
      * @param invalidFileIdentifier
      *            If this parameter is not null, its value will be set as the file Identifier and
      *            the file will not be copied out.
      * 
-     * @return A new FileReference instance for use by tests
+     * @return A new DataReference instance for use by tests
      * @throws IOException
      */
     public static SSHFileReference getNewFileReference(final String alias, final String invalidFileIdentifier,

@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.DanglingObjectPolicy;
-import com.github.podd.api.FileReferenceVerificationPolicy;
+import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.MetadataPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
@@ -56,9 +56,9 @@ import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.UpdatePolicy;
-import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.FileReferenceManager;
-import com.github.podd.api.file.PoddFileRepositoryManager;
+import com.github.podd.api.file.DataReference;
+import com.github.podd.api.file.DataReferenceManager;
+import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.DeleteArtifactException;
@@ -89,8 +89,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private FileReferenceManager fileReferenceManager;
-    private PoddFileRepositoryManager fileRepositoryManager;
+    private DataReferenceManager dataReferenceManager;
+    private PoddDataRepositoryManager fileRepositoryManager;
     private PoddOWLManager owlManager;
     private PoddPurlManager purlManager;
     private PoddSchemaManager schemaManager;
@@ -107,7 +107,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public InferredOWLOntologyID attachFileReference(final InferredOWLOntologyID artifactId, final URI objectUri,
-            final FileReference fileReference) throws OpenRDFException, PoddException
+            final DataReference dataReference) throws OpenRDFException, PoddException
     {
         throw new RuntimeException("TODO: Implement attachFileReference");
     }
@@ -115,7 +115,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID attachFileReferences(final URI artifactUri, final URI versionUri,
             final InputStream inputStream, final RDFFormat format,
-            final FileReferenceVerificationPolicy fileReferenceVerificationPolicy) throws OpenRDFException,
+            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
         IOException, OWLException, PoddException
     {
         final Model model = Rio.parse(inputStream, "", format);
@@ -143,7 +143,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         final Model resultModel = this.updateArtifact(artifactUri, versionUri, fileReferenceObjects,
                 new ByteArrayInputStream(output.toByteArray()), RDFFormat.RDFJSON, UpdatePolicy.MERGE_WITH_EXISTING,
-                DanglingObjectPolicy.REPORT, fileReferenceVerificationPolicy);
+                DanglingObjectPolicy.REPORT, dataReferenceVerificationPolicy);
         return OntologyUtils.modelToOntologyIDs(resultModel).get(0);        
     }
     
@@ -416,27 +416,27 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @see com.github.podd.api.PoddArtifactManager#getFileReferenceManager()
      */
     @Override
-    public FileReferenceManager getFileReferenceManager()
+    public DataReferenceManager getFileReferenceManager()
     {
-        return this.fileReferenceManager;
+        return this.dataReferenceManager;
     }
     
     @Override
-    public Set<FileReference> getFileReferences(final InferredOWLOntologyID artifactId)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    @Override
-    public Set<FileReference> getFileReferences(final InferredOWLOntologyID artifactId, final String alias)
+    public Set<DataReference> getFileReferences(final InferredOWLOntologyID artifactId)
     {
         // TODO Auto-generated method stub
         return null;
     }
     
     @Override
-    public Set<FileReference> getFileReferences(final InferredOWLOntologyID artifactId, final URI objectUri)
+    public Set<DataReference> getFileReferences(final InferredOWLOntologyID artifactId, final String alias)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public Set<DataReference> getFileReferences(final InferredOWLOntologyID artifactId, final URI objectUri)
     {
         // TODO Auto-generated method stub
         return null;
@@ -448,7 +448,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @see com.github.podd.api.PoddArtifactManager#getFileRepositoryManager()
      */
     @Override
-    public PoddFileRepositoryManager getFileRepositoryManager()
+    public PoddDataRepositoryManager getFileRepositoryManager()
     {
         return this.fileRepositoryManager;
     }
@@ -687,14 +687,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @param repositoryConnection
      * @param context
      * @param policy
-     *            If true, verifies that FileReference objects are accessible from their respective
+     *            If true, verifies that DataReference objects are accessible from their respective
      *            remote File Repositories
      * 
      * @throws OpenRDFException
      * @throws PoddException
      */
     private void handleFileReferences(final RepositoryConnection repositoryConnection,
-            final FileReferenceVerificationPolicy policy, final URI... contexts) throws OpenRDFException, PoddException
+            final DataReferenceVerificationPolicy policy, final URI... contexts) throws OpenRDFException, PoddException
     {
         if(this.getFileReferenceManager() == null)
         {
@@ -703,14 +703,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         this.log.info("Handling File reference validation");
         
-        final Set<FileReference> fileReferenceResults =
-                this.getFileReferenceManager().extractFileReferences(repositoryConnection, contexts);
+        final Set<DataReference> fileReferenceResults =
+                this.getFileReferenceManager().extractDataReferences(repositoryConnection, contexts);
         
-        if(FileReferenceVerificationPolicy.VERIFY.equals(policy))
+        if(DataReferenceVerificationPolicy.VERIFY.equals(policy))
         {
             try
             {
-                this.fileRepositoryManager.verifyFileReferences(fileReferenceResults);
+                this.fileRepositoryManager.verifyDataReferences(fileReferenceResults);
             }
             catch(final FileReferenceVerificationFailureException e)
             {
@@ -1006,7 +1006,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // TODO: This web service could be used accidentally to insert invalid file references
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(temporaryRepositoryConnection, permanentRepositoryConnection,
-                            randomContext, FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                            randomContext, DataReferenceVerificationPolicy.DO_NOT_VERIFY);
             
             permanentRepositoryConnection.commit();
             
@@ -1069,7 +1069,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      */
     private InferredOWLOntologyID loadInferStoreArtifact(final RepositoryConnection tempRepositoryConnection,
             final RepositoryConnection permanentRepositoryConnection, final URI tempContext,
-            final FileReferenceVerificationPolicy fileReferencePolicy) throws OpenRDFException, OWLException,
+            final DataReferenceVerificationPolicy fileReferencePolicy) throws OpenRDFException, OWLException,
         IOException, PoddException, OntologyNotInProfileException, InconsistentOntologyException
     {
         // load into OWLAPI
@@ -1272,9 +1272,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * PoddFileReferenceManager)
      */
     @Override
-    public void setFileReferenceManager(final FileReferenceManager fileManager)
+    public void setFileReferenceManager(final DataReferenceManager fileManager)
     {
-        this.fileReferenceManager = fileManager;
+        this.dataReferenceManager = fileManager;
     }
     
     /*
@@ -1285,7 +1285,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * .PoddFileRepositoryManager)
      */
     @Override
-    public void setFileRepositoryManager(final PoddFileRepositoryManager fileRepositoryManager)
+    public void setFileRepositoryManager(final PoddDataRepositoryManager fileRepositoryManager)
     {
         this.fileRepositoryManager = fileRepositoryManager;
     }
@@ -1344,7 +1344,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public Model updateArtifact(final URI artifactUri, final URI versionUri,
             final Collection<URI> objectUris, final InputStream inputStream, RDFFormat format,
             final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectAction,
-            final FileReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException,
+            final DataReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException,
         OWLException, PoddException
     {
         if(inputStream == null)

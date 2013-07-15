@@ -14,8 +14,8 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.file.FileReferenceManager;
-import com.github.podd.api.file.FileReferenceProcessorFactory;
+import com.github.podd.api.file.DataReferenceManager;
+import com.github.podd.api.file.DataReferenceProcessorFactory;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.test.AbstractPoddArtifactManagerTest;
@@ -49,7 +49,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected FileReferenceManager getNewFileReferenceManager()
+    protected DataReferenceManager getNewFileReferenceManager()
     {
         return new FileReferenceManagerImpl();
     }
@@ -62,7 +62,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected FileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory()
+    protected DataReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory()
     {
         // TODO Auto-generated method stub
         return null;
@@ -105,7 +105,7 @@ public class PoddArtifactManagerImplTest extends AbstractPoddArtifactManagerTest
     }
     
     @Override
-    protected FileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory()
+    protected DataReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory()
     {
         return new SSHFileReferenceProcessorFactoryImpl();
     }

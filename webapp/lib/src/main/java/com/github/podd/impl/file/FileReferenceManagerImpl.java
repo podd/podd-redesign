@@ -22,23 +22,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddProcessorStage;
-import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.FileReferenceManager;
-import com.github.podd.api.file.FileReferenceProcessor;
-import com.github.podd.api.file.FileReferenceProcessorFactory;
-import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.file.DataReference;
+import com.github.podd.api.file.DataReferenceManager;
+import com.github.podd.api.file.DataReferenceProcessor;
+import com.github.podd.api.file.DataReferenceProcessorFactory;
+import com.github.podd.api.file.DataReferenceProcessorRegistry;
 import com.github.podd.utils.PoddRdfUtils;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public class FileReferenceManagerImpl implements FileReferenceManager
+public class FileReferenceManagerImpl implements DataReferenceManager
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     // Initially setup the registry to the global instance
-    private FileReferenceProcessorFactoryRegistry registry = FileReferenceProcessorFactoryRegistry.getInstance();
+    private DataReferenceProcessorRegistry registry = DataReferenceProcessorRegistry.getInstance();
     
     private final PoddProcessorStage processorStage = PoddProcessorStage.RDF_PARSING;
     
@@ -57,13 +57,13 @@ public class FileReferenceManagerImpl implements FileReferenceManager
      * .RepositoryConnection, org.openrdf.model.URI[])
      */
     @Override
-    public Set<FileReference> extractFileReferences(final RepositoryConnection repositoryConnection,
+    public Set<DataReference> extractDataReferences(final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
-        final Set<FileReference> internalFileRefResults =
-                Collections.newSetFromMap(new ConcurrentHashMap<FileReference, Boolean>());
+        final Set<DataReference> internalFileRefResults =
+                Collections.newSetFromMap(new ConcurrentHashMap<DataReference, Boolean>());
         
-        for(final FileReferenceProcessorFactory nextProcessorFactory : this.getFileProcessorFactoryRegistry()
+        for(final DataReferenceProcessorFactory nextProcessorFactory : this.getDataProcessorRegistry()
                 .getByStage(this.processorStage))
         {
             try
@@ -93,7 +93,7 @@ public class FileReferenceManagerImpl implements FileReferenceManager
                     // processor instance now to create the File Reference
                     // NOTE: This object cannot be shared as we do not specify that it needs to be
                     // threadsafe
-                    final FileReferenceProcessor<FileReference> processor = nextProcessorFactory.getProcessor();
+                    final DataReferenceProcessor<DataReference> processor = nextProcessorFactory.getProcessor();
                     
                     if(processor.canHandle(results))
                     {
@@ -115,7 +115,7 @@ public class FileReferenceManagerImpl implements FileReferenceManager
      * @see com.github.podd.api.file.PoddFileReferenceManager#getProcessorFactoryRegistry()
      */
     @Override
-    public FileReferenceProcessorFactoryRegistry getFileProcessorFactoryRegistry()
+    public DataReferenceProcessorRegistry getDataProcessorRegistry()
     {
         return this.registry;
     }
@@ -128,7 +128,7 @@ public class FileReferenceManagerImpl implements FileReferenceManager
      * podd.api.file.PoddFileReferenceProcessorFactoryRegistry)
      */
     @Override
-    public void setProcessorFactoryRegistry(final FileReferenceProcessorFactoryRegistry registry)
+    public void setDataProcessorRegistry(final DataReferenceProcessorRegistry registry)
     {
         this.registry = registry;
     }

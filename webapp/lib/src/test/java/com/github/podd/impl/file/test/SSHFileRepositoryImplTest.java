@@ -19,7 +19,7 @@ import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 
-import com.github.podd.api.file.PoddFileRepository;
+import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.api.file.test.AbstractPoddFileRepositoryTest;
 import com.github.podd.impl.file.SSHFileRepositoryImpl;
@@ -175,7 +175,7 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
      * @see com.github.podd.api.file.test.AbstractPoddFileRepositoryTest#getNewPoddFileRepository()
      */
     @Override
-    protected PoddFileRepository<SSHFileReference> getNewPoddFileRepository() throws Exception
+    protected PoddDataRepository<SSHFileReference> getNewPoddFileRepository() throws Exception
     {
         final Model model = new LinkedHashModel();
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
@@ -210,9 +210,9 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     }
     
     @Override
-    protected PoddFileRepository<SSHFileReference> getNewPoddFileRepository(final Model model) throws Exception
+    protected PoddDataRepository<SSHFileReference> getNewPoddFileRepository(final Model model) throws Exception
     {
-        final PoddFileRepository result = new SSHFileRepositoryImpl(model);
+        final PoddDataRepository result = new SSHFileRepositoryImpl(model);
         return result;
     }
     

@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.DanglingObjectPolicy;
-import com.github.podd.api.FileReferenceVerificationPolicy;
+import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.UpdatePolicy;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
@@ -111,12 +111,12 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         // - optional parameter 'verifyfilerefs'
-        FileReferenceVerificationPolicy fileRefVerificationPolicy = FileReferenceVerificationPolicy.DO_NOT_VERIFY;
+        DataReferenceVerificationPolicy fileRefVerificationPolicy = DataReferenceVerificationPolicy.DO_NOT_VERIFY;
         final String fileRefVerifyStr =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES, true);
         if(fileRefVerifyStr != null && Boolean.valueOf(fileRefVerifyStr))
         {
-            fileRefVerificationPolicy = FileReferenceVerificationPolicy.VERIFY;
+            fileRefVerificationPolicy = DataReferenceVerificationPolicy.VERIFY;
         }
         
         Collection<URI> objectUris = new ArrayList<URI>(objectURIStrings.length);

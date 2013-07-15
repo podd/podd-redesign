@@ -54,16 +54,16 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
-import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.PoddFileRepository;
-import com.github.podd.api.file.PoddFileRepositoryManager;
+import com.github.podd.api.file.DataReference;
+import com.github.podd.api.file.PoddDataRepository;
+import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.FileReferenceInvalidException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
-import com.github.podd.exception.FileRepositoryException;
+import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.exception.FileRepositoryMappingExistsException;
-import com.github.podd.exception.FileRepositoryMappingNotFoundException;
+import com.github.podd.exception.DataRepositoryMappingNotFoundException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -75,7 +75,7 @@ import com.github.podd.utils.PoddRdfConstants;
  * 
  * @author kutila
  */
-public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
+public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -91,15 +91,15 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public void addRepositoryMapping(final String alias, final PoddFileRepository<?> repositoryConfiguration)
-        throws OpenRDFException, FileRepositoryException
+    public void addRepositoryMapping(final String alias, final PoddDataRepository<?> repositoryConfiguration)
+        throws OpenRDFException, DataRepositoryException
     {
         this.addRepositoryMapping(alias, repositoryConfiguration, false);
     }
     
     @Override
-    public void addRepositoryMapping(final String alias, final PoddFileRepository<?> repositoryConfiguration,
-            final boolean overwrite) throws OpenRDFException, FileRepositoryException
+    public void addRepositoryMapping(final String alias, final PoddDataRepository<?> repositoryConfiguration,
+            final boolean overwrite) throws OpenRDFException, DataRepositoryException
     {
         if(repositoryConfiguration == null || alias == null)
         {
@@ -217,7 +217,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
      * @param model
      *            A Model which should contain an Ontology
      * @return The loaded Ontology if verification succeeds
-     * @throws FileRepositoryException
+     * @throws DataRepositoryException
      *             If verification fails
      */
     private OWLOntology checkForConsistentOwlDlOntology(final Model model) throws EmptyOntologyException,
@@ -276,7 +276,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public void downloadFileReference(final FileReference nextFileReference, final OutputStream outputStream)
+    public void downloadFileReference(final DataReference nextFileReference, final OutputStream outputStream)
         throws PoddException, IOException
     {
         // TODO
@@ -330,7 +330,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public List<String> getAllAliases() throws FileRepositoryException, OpenRDFException
+    public List<String> getAllAliases() throws DataRepositoryException, OpenRDFException
     {
         final List<String> results = new ArrayList<String>();
         
@@ -375,7 +375,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public List<String> getEquivalentAliases(final String alias) throws FileRepositoryException, OpenRDFException
+    public List<String> getEquivalentAliases(final String alias) throws DataRepositoryException, OpenRDFException
     {
         final List<String> results = new ArrayList<String>();
         final String aliasInLowerCase = alias.toLowerCase();
@@ -429,7 +429,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public PoddFileRepository<?> getRepository(final String alias) throws FileRepositoryException, OpenRDFException
+    public PoddDataRepository<?> getRepository(final String alias) throws DataRepositoryException, OpenRDFException
     {
         if(alias == null)
         {
@@ -499,8 +499,8 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public List<String> getRepositoryAliases(final PoddFileRepository<?> repositoryConfiguration)
-        throws FileRepositoryException, OpenRDFException
+    public List<String> getRepositoryAliases(final PoddDataRepository<?> repositoryConfiguration)
+        throws DataRepositoryException, OpenRDFException
     {
         return this.getEquivalentAliases(repositoryConfiguration.getAlias());
     }
@@ -512,7 +512,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public void init(final Model defaultAliasConfiguration) throws OpenRDFException, FileRepositoryException,
+    public void init(final Model defaultAliasConfiguration) throws OpenRDFException, DataRepositoryException,
         IOException
     {
         if(this.repositoryManager == null)
@@ -537,7 +537,7 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
                 final String alias = stmt.getObject().stringValue();
                 final Model model = defaultAliasConfiguration.filter(stmt.getSubject(), null, null);
                 
-                final PoddFileRepository<?> fileRepository =
+                final PoddDataRepository<?> fileRepository =
                         PoddFileRepositoryFactory.createFileRepository(alias, model);
                 
                 this.addRepositoryMapping(alias, fileRepository, false);
@@ -546,15 +546,15 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public PoddFileRepository<?> removeRepositoryMapping(final String alias) throws FileRepositoryException,
+    public PoddDataRepository<?> removeRepositoryMapping(final String alias) throws DataRepositoryException,
         OpenRDFException
     {
         final String aliasInLowerCase = alias.toLowerCase();
         
-        final PoddFileRepository<?> repositoryToRemove = this.getRepository(aliasInLowerCase);
+        final PoddDataRepository<?> repositoryToRemove = this.getRepository(aliasInLowerCase);
         if(repositoryToRemove == null)
         {
-            throw new FileRepositoryMappingNotFoundException(aliasInLowerCase,
+            throw new DataRepositoryMappingNotFoundException(aliasInLowerCase,
                     "No File Repository mapped to this alias");
         }
         
@@ -623,34 +623,34 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
     }
     
     @Override
-    public void verifyFileReferences(final Set<FileReference> fileReferenceResults) throws OpenRDFException,
-        FileRepositoryException, FileReferenceVerificationFailureException
+    public void verifyDataReferences(final Set<DataReference> fileReferenceResults) throws OpenRDFException,
+        DataRepositoryException, FileReferenceVerificationFailureException
     {
-        final Map<FileReference, Throwable> errors = new HashMap<FileReference, Throwable>();
+        final Map<DataReference, Throwable> errors = new HashMap<DataReference, Throwable>();
         
-        for(final FileReference fileReference : fileReferenceResults)
+        for(final DataReference dataReference : fileReferenceResults)
         {
-            final String alias = fileReference.getRepositoryAlias();
-            final PoddFileRepository<FileReference> repository =
-                    (PoddFileRepository<FileReference>)this.getRepository(alias);
+            final String alias = dataReference.getRepositoryAlias();
+            final PoddDataRepository<DataReference> repository =
+                    (PoddDataRepository<DataReference>)this.getRepository(alias);
             if(repository == null)
             {
-                errors.put(fileReference, new FileRepositoryMappingNotFoundException(alias,
+                errors.put(dataReference, new DataRepositoryMappingNotFoundException(alias,
                         "Could not find a File Repository configuration mapped to this alias"));
             }
             else
             {
                 try
                 {
-                    if(!repository.validate(fileReference))
+                    if(!repository.validate(dataReference))
                     {
-                        errors.put(fileReference, new FileReferenceInvalidException(fileReference,
+                        errors.put(dataReference, new FileReferenceInvalidException(dataReference,
                                 "Remote File Repository says this File Reference is invalid"));
                     }
                 }
                 catch(final Exception e)
                 {
-                    errors.put(fileReference, e);
+                    errors.put(dataReference, e);
                 }
             }
         }
@@ -668,9 +668,9 @@ public class PoddFileRepositoryManagerImpl implements PoddFileRepositoryManager
      * 
      * @param model
      * @param mimeType
-     * @throws FileRepositoryException
+     * @throws DataRepositoryException
      */
-    private void verifyFileRepositoryAgainstSchema(final Model model) throws FileRepositoryException
+    private void verifyFileRepositoryAgainstSchema(final Model model) throws DataRepositoryException
     {
         OWLOntology fileRepositoryOntology = null;
         OWLOntology defaultAliasOntology = null;

@@ -13,28 +13,28 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import com.github.podd.api.PoddProcessorStage;
-import com.github.podd.api.file.FileReferenceProcessorFactory;
-import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.file.DataReferenceProcessorFactory;
+import com.github.podd.api.file.DataReferenceProcessorRegistry;
 import com.github.podd.api.purl.test.PoddPurlProcessorFactoryRegistryTest;
 
 /**
- * Tests functionality of the FileReferenceProcessorFactoryRegistry.
+ * Tests functionality of the DataReferenceProcessorRegistry.
  * 
  * The test implementation is copied from {@link PoddPurlProcessorFactoryRegistryTest} with PURL
- * related references replaced by corresponding FileReference references.
+ * related references replaced by corresponding DataReference references.
  * 
  * @author kutila
  * 
  */
-public class FileReferenceProcessorFactoryRegistryTest
+public class DataReferenceProcessorRegistryTest
 {
     
-    private FileReferenceProcessorFactoryRegistry testRegistry;
+    private DataReferenceProcessorRegistry testRegistry;
     
-    private FileReferenceProcessorFactory factory4rdfParsingStage;
-    private FileReferenceProcessorFactory secondFactory4RDFParsingStage;
-    private FileReferenceProcessorFactory factory4AllStages;
-    private FileReferenceProcessorFactory factory4InferenceStage;
+    private DataReferenceProcessorFactory factory4rdfParsingStage;
+    private DataReferenceProcessorFactory secondFactory4RDFParsingStage;
+    private DataReferenceProcessorFactory factory4AllStages;
+    private DataReferenceProcessorFactory factory4InferenceStage;
     
     /**
      * 
@@ -43,26 +43,26 @@ public class FileReferenceProcessorFactoryRegistryTest
     @Before
     public void setUp() throws Exception
     {
-        this.testRegistry = new FileReferenceProcessorFactoryRegistry();
+        this.testRegistry = new DataReferenceProcessorRegistry();
         this.testRegistry.clear();
         
         Assert.assertEquals("Registry wasn't cleared", 0, this.testRegistry.getAll().size());
         
         // create mock factories for use in tests
-        this.factory4rdfParsingStage = Mockito.mock(FileReferenceProcessorFactory.class);
+        this.factory4rdfParsingStage = Mockito.mock(DataReferenceProcessorFactory.class);
         Mockito.when(this.factory4rdfParsingStage.canHandleStage(PoddProcessorStage.RDF_PARSING)).thenReturn(true);
         Mockito.when(this.factory4rdfParsingStage.getKey()).thenReturn("key_RDF_PARSING");
         
-        this.secondFactory4RDFParsingStage = Mockito.mock(FileReferenceProcessorFactory.class);
+        this.secondFactory4RDFParsingStage = Mockito.mock(DataReferenceProcessorFactory.class);
         Mockito.when(this.secondFactory4RDFParsingStage.canHandleStage(PoddProcessorStage.RDF_PARSING))
                 .thenReturn(true);
         Mockito.when(this.secondFactory4RDFParsingStage.getKey()).thenReturn("key_RDF_PARSING");
         
-        this.factory4InferenceStage = Mockito.mock(FileReferenceProcessorFactory.class);
+        this.factory4InferenceStage = Mockito.mock(DataReferenceProcessorFactory.class);
         Mockito.when(this.factory4InferenceStage.canHandleStage(PoddProcessorStage.INFERENCE)).thenReturn(true);
         Mockito.when(this.factory4InferenceStage.getKey()).thenReturn("key_INFERENCE");
         
-        this.factory4AllStages = Mockito.mock(FileReferenceProcessorFactory.class);
+        this.factory4AllStages = Mockito.mock(DataReferenceProcessorFactory.class);
         Mockito.when(this.factory4AllStages.canHandleStage((PoddProcessorStage)Matchers.any())).thenReturn(true);
         Mockito.when(this.factory4AllStages.getKey()).thenReturn("key_ALL");
     }
@@ -81,7 +81,7 @@ public class FileReferenceProcessorFactoryRegistryTest
     @Test
     public void testGetByStageNullStage() throws Exception
     {
-        final List<FileReferenceProcessorFactory> nullStageFactories = this.testRegistry.getByStage(null);
+        final List<DataReferenceProcessorFactory> nullStageFactories = this.testRegistry.getByStage(null);
         Assert.assertNotNull(nullStageFactories);
         Assert.assertEquals("Should return an empty List for NULL stage", 0, nullStageFactories.size());
     }
@@ -95,7 +95,7 @@ public class FileReferenceProcessorFactoryRegistryTest
         // go through ALL stages and verify the factory is returned for each one
         for(final PoddProcessorStage stage : PoddProcessorStage.values())
         {
-            final List<FileReferenceProcessorFactory> factories = this.testRegistry.getByStage(stage);
+            final List<DataReferenceProcessorFactory> factories = this.testRegistry.getByStage(stage);
             Assert.assertEquals(1, factories.size());
             Assert.assertEquals("key_ALL", factories.get(0).getKey());
         }
@@ -108,14 +108,14 @@ public class FileReferenceProcessorFactoryRegistryTest
         this.testRegistry.add(this.factory4rdfParsingStage);
         
         // retrieve factories for RDF_PARSING stage
-        final List<FileReferenceProcessorFactory> parsingStageFactories =
+        final List<DataReferenceProcessorFactory> parsingStageFactories =
                 this.testRegistry.getByStage(PoddProcessorStage.RDF_PARSING);
         
         Assert.assertEquals(1, parsingStageFactories.size());
         Assert.assertEquals("key_RDF_PARSING", parsingStageFactories.get(0).getKey());
         
         // retrieve factories for PROFILE_CHECK stage
-        final List<FileReferenceProcessorFactory> profileCheckingStageFactories =
+        final List<DataReferenceProcessorFactory> profileCheckingStageFactories =
                 this.testRegistry.getByStage(PoddProcessorStage.PROFILE_CHECK);
         Assert.assertEquals(0, profileCheckingStageFactories.size());
     }
@@ -128,21 +128,21 @@ public class FileReferenceProcessorFactoryRegistryTest
         this.testRegistry.add(this.factory4InferenceStage);
         
         // retrieve factories for RDF_PARSING stage
-        final List<FileReferenceProcessorFactory> parsingStageFactories =
+        final List<DataReferenceProcessorFactory> parsingStageFactories =
                 this.testRegistry.getByStage(PoddProcessorStage.RDF_PARSING);
         
         Assert.assertEquals(1, parsingStageFactories.size());
         Assert.assertEquals("key_RDF_PARSING", parsingStageFactories.get(0).getKey());
         
         // retrieve factories for INFERENCE stage
-        final List<FileReferenceProcessorFactory> inferenceStageFactories =
+        final List<DataReferenceProcessorFactory> inferenceStageFactories =
                 this.testRegistry.getByStage(PoddProcessorStage.INFERENCE);
         
         Assert.assertEquals(1, inferenceStageFactories.size());
         Assert.assertEquals("key_INFERENCE", inferenceStageFactories.get(0).getKey());
         
         // retrieve factories for PROFILE_CHECK stage
-        final List<FileReferenceProcessorFactory> profileCheckingStageFactories =
+        final List<DataReferenceProcessorFactory> profileCheckingStageFactories =
                 this.testRegistry.getByStage(PoddProcessorStage.PROFILE_CHECK);
         Assert.assertEquals(0, profileCheckingStageFactories.size());
     }
@@ -155,14 +155,14 @@ public class FileReferenceProcessorFactoryRegistryTest
         this.testRegistry.add(this.secondFactory4RDFParsingStage);
         
         // retrieve factories for RDF_PARSING stage
-        final List<FileReferenceProcessorFactory> parsingStageFactories =
+        final List<DataReferenceProcessorFactory> parsingStageFactories =
                 this.testRegistry.getByStage(PoddProcessorStage.RDF_PARSING);
         
         Assert.assertEquals(2, parsingStageFactories.size());
         Assert.assertEquals("key_RDF_PARSING", parsingStageFactories.get(0).getKey());
         
         // retrieve factories for PROFILE_CHECK stage
-        final List<FileReferenceProcessorFactory> profileCheckingStageFactories =
+        final List<DataReferenceProcessorFactory> profileCheckingStageFactories =
                 this.testRegistry.getByStage(PoddProcessorStage.PROFILE_CHECK);
         Assert.assertEquals(0, profileCheckingStageFactories.size());
     }
@@ -170,7 +170,7 @@ public class FileReferenceProcessorFactoryRegistryTest
     @Test
     public void testGetInstance() throws Exception
     {
-        Assert.assertNotNull("getInstance was null", FileReferenceProcessorFactoryRegistry.getInstance());
+        Assert.assertNotNull("getInstance was null", DataReferenceProcessorRegistry.getInstance());
     }
     
 }

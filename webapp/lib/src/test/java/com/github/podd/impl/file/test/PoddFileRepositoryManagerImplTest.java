@@ -27,9 +27,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
-import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.PoddFileRepository;
-import com.github.podd.api.file.PoddFileRepositoryManager;
+import com.github.podd.api.file.DataReference;
+import com.github.podd.api.file.PoddDataRepository;
+import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.file.test.AbstractPoddFileRepositoryManagerTest;
 import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.impl.PoddOWLManagerImpl;
@@ -40,7 +40,7 @@ import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * This concrete test class uses SSH File References and a test SSH file repository to run through
- * the abstract PoddFileRepositoryManager tests.
+ * the abstract PoddDataRepositoryManager tests.
  * 
  * @author kutila
  */
@@ -56,7 +56,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     private Path sshDir = null;
     
     @Override
-    protected FileReference buildFileReference(final String alias, final String fileIdentifier)
+    protected DataReference buildFileReference(final String alias, final String fileIdentifier)
     {
         try
         {
@@ -74,14 +74,14 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     }
     
     @Override
-    protected PoddFileRepository<?> buildFileRepositoryInstance(final String alias, final Model model)
+    protected PoddDataRepository<?> buildFileRepositoryInstance(final String alias, final Model model)
     {
-        // prepare: create a mock PoddFileRepository which can only return the test alias string
-        return new PoddFileRepository<FileReference>()
+        // prepare: create a mock PoddDataRepository which can only return the test alias string
+        return new PoddDataRepository<DataReference>()
             {
                 
                 @Override
-                public boolean canHandle(final FileReference reference)
+                public boolean canHandle(final DataReference reference)
                 {
                     return false;
                 }
@@ -105,7 +105,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
                 }
                 
                 @Override
-                public boolean validate(final FileReference reference) throws FileReferenceNotSupportedException,
+                public boolean validate(final DataReference reference) throws FileReferenceNotSupportedException,
                     IOException
                 {
                     return false;
@@ -143,7 +143,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     }
     
     @Override
-    protected PoddFileRepositoryManager getNewPoddFileRepositoryManager() throws OpenRDFException
+    protected PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws OpenRDFException
     {
         // create a Repository Manager with an internal memory Repository
         final Repository testRepository = new SailRepository(new MemoryStore());
@@ -160,8 +160,8 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
         owlManager.setOWLOntologyManager(manager);
         
-        // create the PoddFileRepositoryManager for testing
-        final PoddFileRepositoryManager testFileRepositoryManager = new PoddFileRepositoryManagerImpl();
+        // create the PoddDataRepositoryManager for testing
+        final PoddDataRepositoryManager testFileRepositoryManager = new PoddFileRepositoryManagerImpl();
         testFileRepositoryManager.setRepositoryManager(repositoryManager);
         testFileRepositoryManager.setOWLManager(owlManager);
         

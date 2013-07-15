@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.DanglingObjectPolicy;
-import com.github.podd.api.FileReferenceVerificationPolicy;
+import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.MetadataPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddOWLManager;
@@ -58,9 +58,9 @@ import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.UpdatePolicy;
-import com.github.podd.api.file.FileReferenceManager;
-import com.github.podd.api.file.FileReferenceProcessorFactory;
-import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
+import com.github.podd.api.file.DataReferenceManager;
+import com.github.podd.api.file.DataReferenceProcessorFactory;
+import com.github.podd.api.file.DataReferenceProcessorRegistry;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
@@ -153,7 +153,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      * @return A new empty instance of an implementation of PoddFileReferenceManager.
      */
-    protected abstract FileReferenceManager getNewFileReferenceManager();
+    protected abstract DataReferenceManager getNewFileReferenceManager();
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -172,7 +172,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * @return A new empty instance of an implementation of PoddFileReferenceProcessorFactory that
      *         can process HTTP-based file references.
      */
-    protected abstract FileReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory();
+    protected abstract DataReferenceProcessorFactory getNewHttpFileReferenceProcessorFactory();
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of {@link PoddOWLManager}
@@ -226,13 +226,13 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
-     * {@link FileReferenceProcessorFactory} that can process SSH-based file references for each
+     * {@link DataReferenceProcessorFactory} that can process SSH-based file references for each
      * invocation.
      * 
      * @return A new empty instance of an implementation of PoddFileReferenceProcessorFactory that
      *         can process SSH-based file references.
      */
-    protected abstract FileReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
+    protected abstract DataReferenceProcessorFactory getNewSSHFileReferenceProcessorFactory();
     
     /**
      * Concrete tests must override this to provide a new, empty, instance of
@@ -338,7 +338,7 @@ public abstract class AbstractPoddArtifactManagerTest
             final int mgtGraphSize, final long assertedStatementCount, final long inferredStatementCount,
             final boolean isPublished, final String fragmentPath, final RDFFormat fragmentFormat,
             final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectPolicy,
-            final FileReferenceVerificationPolicy verifyFileReferences, final Collection<URI> updateObjectUris)
+            final DataReferenceVerificationPolicy verifyFileReferences, final Collection<URI> updateObjectUris)
         throws Exception
     {
         this.loadSchemaOntologies();
@@ -468,7 +468,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         this.testRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
         
-        final FileReferenceProcessorFactoryRegistry testFileRegistry = new FileReferenceProcessorFactoryRegistry();
+        final DataReferenceProcessorRegistry testFileRegistry = new DataReferenceProcessorRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
         // classpath
         testFileRegistry.clear();
@@ -493,8 +493,8 @@ public abstract class AbstractPoddArtifactManagerTest
          * testFileRegistry.add(httpFactory);
          */
         
-        final FileReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
-        testFileReferenceManager.setProcessorFactoryRegistry(testFileRegistry);
+        final DataReferenceManager testFileReferenceManager = this.getNewFileReferenceManager();
+        testFileReferenceManager.setDataProcessorRegistry(testFileRegistry);
         
         /**
          * // FIXME: Implement these purl processor factories PoddPurlProcessorFactory doiFactory =
@@ -557,7 +557,7 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#attachFileReferences(URI, URI, InputStream, RDFFormat, FileReferenceVerificationPolicy)}
+     * {@link com.github.podd.api.PoddArtifactManager#attachFileReferences(URI, URI, InputStream, RDFFormat, DataReferenceVerificationPolicy)}
      * .
      */
     @Test
@@ -577,7 +577,7 @@ public abstract class AbstractPoddArtifactManagerTest
         final InferredOWLOntologyID updatedArtifact =
                 this.testArtifactManager.attachFileReferences(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
                         .getVersionIRI().toOpenRDFURI(), editInputStream, RDFFormat.RDFXML,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                        DataReferenceVerificationPolicy.DO_NOT_VERIFY);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1408,7 +1408,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                     TestConstants.TEST_ARTIFACT_FRAGMENT_INCONSISTENT_OBJECT, RDFFormat.TURTLE,
                     UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                    FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
+                    DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
             Assert.fail("Should have thrown an InconsistentOntologyException");
         }
         catch(final InconsistentOntologyException e)
@@ -1441,7 +1441,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PLATFORM_OBJECTS, RDFFormat.TURTLE,
                         UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, objectUriList);
+                        DataReferenceVerificationPolicy.DO_NOT_VERIFY, objectUriList);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1493,7 +1493,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#updateArtifact(URI, InputStream, RDFFormat, boolean)}
      * .
      * 
-     * NOTE: Once file reference validation is implemented in the FileReferenceManager this test
+     * NOTE: Once file reference validation is implemented in the DataReferenceManager this test
      * will fail. The referred file will have to be created for validation to pass.
      */
     @Test
@@ -1505,7 +1505,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT, RDFFormat.RDFXML,
                         UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
+                        DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1556,7 +1556,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT, RDFFormat.TURTLE,
                         UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
+                        DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1615,7 +1615,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MULTIPLE_OBJECTS_TTL, RDFFormat.TURTLE,
                         UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, objectUriList);
+                        DataReferenceVerificationPolicy.DO_NOT_VERIFY, objectUriList);
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1674,7 +1674,7 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             this.testArtifactManager.updateArtifact(nonExistentArtifactURI, nonExistentArtifactURI,
                     Collections.<URI> emptyList(), editInputStream, RDFFormat.TURTLE, UpdatePolicy.REPLACE_EXISTING,
-                    DanglingObjectPolicy.FORCE_CLEAN, FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                    DanglingObjectPolicy.FORCE_CLEAN, DataReferenceVerificationPolicy.DO_NOT_VERIFY);
             Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
         }
         catch(final UnmanagedArtifactIRIException e)
@@ -1698,7 +1698,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFIED_PUBLICATION_OBJECT, RDFFormat.TURTLE,
                         UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
+                        DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1755,7 +1755,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MOVE_DEMO_INVESTIGATION, RDFFormat.TURTLE,
                         UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
+                        DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1813,7 +1813,7 @@ public abstract class AbstractPoddArtifactManagerTest
                         TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                         TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE,
                         UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                        FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
+                        DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
         
         // verify:
         RepositoryConnection nextRepositoryConnection = null;
@@ -1870,7 +1870,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false,
                     TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION, RDFFormat.TURTLE,
                     UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.REPORT,
-                    FileReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
+                    DataReferenceVerificationPolicy.DO_NOT_VERIFY, Collections.<URI> emptyList());
             Assert.fail("Should have thrown an Exception to indicate that dangling objects will result");
         }
         catch(final DisconnectedObjectException e)
@@ -1928,7 +1928,7 @@ public abstract class AbstractPoddArtifactManagerTest
             this.testArtifactManager.updateArtifact(artifactIDv1.getOntologyIRI().toOpenRDFURI(), artifactIDv1
                     .getVersionIRI().toOpenRDFURI(), Collections.<URI> emptyList(), editInputStream, RDFFormat.TURTLE,
                     UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
-                    FileReferenceVerificationPolicy.DO_NOT_VERIFY);
+                    DataReferenceVerificationPolicy.DO_NOT_VERIFY);
             Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
         }
         catch(final UnmanagedArtifactIRIException e)

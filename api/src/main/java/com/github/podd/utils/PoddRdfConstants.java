@@ -228,13 +228,13 @@ public interface PoddRdfConstants
     /**
      * http://purl.org/podd/ns/poddBase#hasAlias.
      * 
-     * This property is used to specify an "alias" value found inside a FileReference.
+     * This property is used to specify an "alias" value found inside a DataReference.
      */
     public static final URI PODD_BASE_HAS_ALIAS = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "hasAlias");
     
     /** http://purl.org/podd/ns/poddBase#FileReference */
     public static final URI PODD_BASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
-            "FileReference");
+            "DataReference");
     
     /** http://purl.org/podd/ns/poddBase#SSHFileReference */
     public static final URI PODD_BASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VF.createURI(
