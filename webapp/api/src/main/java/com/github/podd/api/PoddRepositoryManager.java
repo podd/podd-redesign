@@ -59,9 +59,9 @@ public interface PoddRepositoryManager
     /**
      * Sets the file repository management graph URI for use with this repository manager.
      * 
-     * @param fileRepositoryManagementGraph
+     * @param dataRepositoryManagementGraph
      */
-    void setFileRepositoryManagementGraph(URI fileRepositoryManagementGraph);
+    void setFileRepositoryManagementGraph(URI dataRepositoryManagementGraph);
     
     /**
      * Sets the repository for this repository manager.

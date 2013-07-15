@@ -46,7 +46,7 @@ public abstract class PoddFileRepositoryImpl<T extends DataReference> implements
     public PoddFileRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
     {
         // check that the model contains an "alias" and at least one "type"
-        final Model aliasModel = model.filter(null, PoddRdfConstants.PODD_FILE_REPOSITORY_ALIAS, null);
+        final Model aliasModel = model.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
         
         if(aliasModel.size() != 1)
         {

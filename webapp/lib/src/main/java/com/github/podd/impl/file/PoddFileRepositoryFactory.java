@@ -38,16 +38,16 @@ public class PoddFileRepositoryFactory
             throw new FileRepositoryIncompleteException(model, "Insufficient data to create a FileRepository");
         }
         
-        PoddDataRepository<?> fileRepository = null;
+        PoddDataRepository<?> dataRepository = null;
         
         if(!model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY).isEmpty())
         {
-            fileRepository = new SSHFileRepositoryImpl(model);
+            dataRepository = new SSHFileRepositoryImpl(model);
         }
         else
         {
             throw new FileRepositoryIncompleteException(model, "No known FileRepository type to create an instance");
         }
-        return fileRepository;
+        return dataRepository;
     }
 }

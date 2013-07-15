@@ -43,12 +43,12 @@ public interface PoddRdfConstants
     public static final String PATH_PODD_ANIMAL = "/ontologies/poddAnimal.owl";
     
     /**
-     * Path to poddFileRepository.owl.
+     * Path to poddDataRepository.owl.
      * 
      * This ontology is NOT part of the standard schema ontologies. It is a separate ontology used
-     * to validate File Repository configurations.
+     * to validate Data Repository configurations.
      */
-    public static final String PATH_PODD_FILE_REPOSITORY = "/ontologies/poddFileRepository.owl";
+    public static final String PATH_PODD_DATA_REPOSITORY = "/ontologies/poddDataRepository.owl";
     
     public static final String PODD_DCTERMS = "http://purl.org/podd/ns/dcTerms#";
     
@@ -213,9 +213,9 @@ public interface PoddRdfConstants
     
     // ----- file reference constants -----
     
-    /** http://purl.org/podd/ns/poddBase#hasFileReference */
-    public static final URI PODD_BASE_HAS_FILE_REFERENCE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
-            "hasFileReference");
+    /** http://purl.org/podd/ns/poddBase#hasDataReference */
+    public static final URI PODD_BASE_HAS_DATA_REFERENCE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasDataReference");
     
     /** http://purl.org/podd/ns/poddBase#hasFileName */
     public static final URI PODD_BASE_HAS_FILENAME = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
@@ -233,7 +233,7 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_HAS_ALIAS = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "hasAlias");
     
     /** http://purl.org/podd/ns/poddBase#DataReference */
-    public static final URI PODD_BASE_FILE_REFERENCE_TYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+    public static final URI PODD_BASE_DATA_REFERENCE_TYPE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
             "DataReference");
     
     /** http://purl.org/podd/ns/poddBase#SSHFileReference */
@@ -255,24 +255,24 @@ public interface PoddRdfConstants
             "HTTPFileRepository");
     
     /**
-     * http://purl.org/podd/ns/poddBase#hasFileRepositoryAlias
+     * http://purl.org/podd/ns/poddBase#hasDataRepositoryAlias
      * 
-     * This property is ONLY used in the File Repository management implementations.
+     * This property is ONLY used in the Data Repository management implementations.
      */
-    public static final URI PODD_FILE_REPOSITORY_ALIAS = PoddRdfConstants.VF.createURI(
-            PoddRdfConstants.DATA_REPOSITORY, "hasFileRepositoryAlias");
+    public static final URI PODD_DATA_REPOSITORY_ALIAS = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositoryAlias");
     
-    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryProtocol */
-    public static final URI PODD_FILE_REPOSITORY_PROTOCOL = PoddRdfConstants.VF.createURI(
-            PoddRdfConstants.DATA_REPOSITORY, "hasFileRepositoryProtocol");
+    /** http://purl.org/podd/ns/poddBase#hasDataRepositoryProtocol */
+    public static final URI PODD_DATA_REPOSITORY_PROTOCOL = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositoryProtocol");
     
-    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryHost */
-    public static final URI PODD_FILE_REPOSITORY_HOST = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
-            "hasFileRepositoryHost");
+    /** http://purl.org/podd/ns/poddBase#hasDataRepositoryHost */
+    public static final URI PODD_DATA_REPOSITORY_HOST = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
+            "hasDataRepositoryHost");
     
-    /** http://purl.org/podd/ns/poddBase#hasFileRepositoryPort */
-    public static final URI PODD_FILE_REPOSITORY_PORT = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
-            "hasFileRepositoryPort");
+    /** http://purl.org/podd/ns/poddBase#hasDataRepositoryPort */
+    public static final URI PODD_DATA_REPOSITORY_PORT = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
+            "hasDataRepositoryPort");
     
     /** http://purl.org/podd/ns/poddBase#hasFileRepositoryFingerprint */
     public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = PoddRdfConstants.VF.createURI(

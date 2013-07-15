@@ -349,10 +349,10 @@ public interface PoddArtifactManager
      * Sets the {@link PoddDataRepositoryManager} to use for managing file repository
      * configurations.
      * 
-     * @param fileRepositoryManager
+     * @param dataRepositoryManager
      *            The manager to use for managing file repository configurations.
      */
-    void setFileRepositoryManager(PoddDataRepositoryManager fileRepositoryManager);
+    void setFileRepositoryManager(PoddDataRepositoryManager dataRepositoryManager);
     
     /**
      * Sets the {@link PoddOWLManager} instance to use when loading and dealing with Artifacts in

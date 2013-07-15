@@ -26,7 +26,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     
     private URI schemaGraph = PoddRdfConstants.DEFAULT_SCHEMA_MANAGEMENT_GRAPH;
     
-    private URI fileRepositoryGraph = PoddRdfConstants.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH;
+    private URI dataRepositoryGraph = PoddRdfConstants.DEFAULT_FILE_REPOSITORY_MANAGEMENT_GRAPH;
     
     /**
      * Default constructor, which sets up an in-memory MemoryStore repository.
@@ -63,7 +63,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     @Override
     public URI getFileRepositoryManagementGraph()
     {
-        return this.fileRepositoryGraph;
+        return this.dataRepositoryGraph;
     }
     
     @Override
@@ -94,9 +94,9 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
     }
     
     @Override
-    public void setFileRepositoryManagementGraph(final URI fileRepositoryManagementGraph)
+    public void setFileRepositoryManagementGraph(final URI dataRepositoryManagementGraph)
     {
-        this.fileRepositoryGraph = fileRepositoryManagementGraph;
+        this.dataRepositoryGraph = dataRepositoryManagementGraph;
     }
     
     @Override

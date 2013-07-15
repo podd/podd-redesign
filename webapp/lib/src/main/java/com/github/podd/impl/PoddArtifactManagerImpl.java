@@ -90,7 +90,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private DataReferenceManager dataReferenceManager;
-    private PoddDataRepositoryManager fileRepositoryManager;
+    private PoddDataRepositoryManager dataRepositoryManager;
     private PoddOWLManager owlManager;
     private PoddPurlManager purlManager;
     private PoddSchemaManager schemaManager;
@@ -123,7 +123,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         model.removeAll(model.filter(null, PoddRdfConstants.PODD_BASE_INFERRED_VERSION, null));
         
         final Set<Resource> fileReferences =
-                model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE).subjects();
+                model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE).subjects();
         final Collection<URI> fileReferenceObjects = new ArrayList<URI>(fileReferences.size());
         for(final Resource nextFileReference : fileReferences)
         {
@@ -450,7 +450,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public PoddDataRepositoryManager getFileRepositoryManager()
     {
-        return this.fileRepositoryManager;
+        return this.dataRepositoryManager;
     }
     
     @Override
@@ -710,7 +710,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             try
             {
-                this.fileRepositoryManager.verifyDataReferences(fileReferenceResults);
+                this.dataRepositoryManager.verifyDataReferences(fileReferenceResults);
             }
             catch(final FileReferenceVerificationFailureException e)
             {
@@ -1285,9 +1285,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * .PoddFileRepositoryManager)
      */
     @Override
-    public void setFileRepositoryManager(final PoddDataRepositoryManager fileRepositoryManager)
+    public void setFileRepositoryManager(final PoddDataRepositoryManager dataRepositoryManager)
     {
-        this.fileRepositoryManager = fileRepositoryManager;
+        this.dataRepositoryManager = dataRepositoryManager;
     }
     
     /*
