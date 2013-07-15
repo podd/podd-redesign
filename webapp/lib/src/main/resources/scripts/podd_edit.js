@@ -19,7 +19,7 @@ var DISPLAY_ShortText = 'http://purl.org/podd/ns/poddBase#DisplayType_ShortText'
 var DISPLAY_CheckBox = 'http://purl.org/podd/ns/poddBase#DisplayType_CheckBox';
 var DISPLAY_DropDown = 'http://purl.org/podd/ns/poddBase#DisplayType_DropDownList'
 var DISPLAY_AutoComplete = 'http://purl.org/podd/ns/poddBase#DisplayType_AutoComplete';
-var DISPLAY_Table = 'http://purl.org/podd/ns/poddBase#DisplayType_Table';
+var DISPLAY_FieldSet = 'http://purl.org/podd/ns/poddBase#DisplayType_FieldSet';
 
 var OBJECT_PROPERTY = 'http://www.w3.org/2002/07/owl#ObjectProperty';
 var DATATYPE_PROPERTY = 'http://www.w3.org/2002/07/owl#DatatypeProperty';
@@ -340,6 +340,12 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextFieldValue, n
         select.append(option);
     });
     return select;
+};
+
+podd.addFieldSet = function(nextField, nextFieldValue) {
+	podd.updateErrorMessageList("In Progress: Support DISPLAY_FieldSet for property : " + nextField.propertyUri + " (" 
+			+ nextFieldValue.displayValue + ")");
+
 };
 
 /**
@@ -765,15 +771,14 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 				li2.append(input);
 				li2.append(hiddenValueElement);
 		    }
+		    else if (nextField.displayType == DISPLAY_FieldSet) {
+		    	podd.addFieldSet(nextField, aValue);
+		    	
+		    }
 		    else if (nextField.displayType == DISPLAY_CheckBox) {
 		    	podd.updateErrorMessageList("TODO: Support DISPLAY_Checkbox for property : " + nextField.propertyUri + " (" 
 		    			+ aValue.displayValue + ")");		        
 		        
-		    }
-		    else if (nextField.displayType == DISPLAY_Table) {
-		    	podd.updateErrorMessageList("TODO: Support DISPLAY_Table for property : " + nextField.propertyUri + " (" 
-		    			+ aValue.displayValue + ")");
-		    	
 		    }
 		    else { // default
 		        podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + aValue.displayValue

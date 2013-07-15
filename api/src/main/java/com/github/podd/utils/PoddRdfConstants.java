@@ -176,8 +176,8 @@ public interface PoddRdfConstants
             "DisplayType_CheckBox");
     
     /** http://purl.org/podd/ns/poddBase#DisplayType_Table */
-    public static final URI PODD_BASE_DISPLAY_TYPE_TABLE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
-            "DisplayType_Table");
+    public static final URI PODD_BASE_DISPLAY_TYPE_FIELDSET = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "DisplayType_FieldSet");
     
     /** http://purl.org/podd/ns/poddBase#hasAllowedValue */
     public static final URI PODD_BASE_HAS_ALLOWED_VALUE = ValueFactoryImpl.getInstance().createURI(
