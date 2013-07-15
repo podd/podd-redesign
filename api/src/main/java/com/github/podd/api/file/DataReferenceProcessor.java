@@ -18,7 +18,7 @@ import com.github.podd.api.PoddRdfProcessor;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public interface FileReferenceProcessor<T extends FileReference> extends PoddRdfProcessor
+public interface DataReferenceProcessor<T extends DataReference> extends PoddRdfProcessor
 {
     /**
      * Decides whether this File Reference Processor is able to extract references from the given

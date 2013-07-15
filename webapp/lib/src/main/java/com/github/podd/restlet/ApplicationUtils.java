@@ -37,10 +37,10 @@ import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddSesameManager;
-import com.github.podd.api.file.FileReferenceManager;
-import com.github.podd.api.file.FileReferenceProcessorFactory;
-import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
-import com.github.podd.api.file.PoddFileRepositoryManager;
+import com.github.podd.api.file.DataReferenceManager;
+import com.github.podd.api.file.DataReferenceProcessorFactory;
+import com.github.podd.api.file.DataReferenceProcessorRegistry;
+import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
@@ -249,16 +249,16 @@ public class ApplicationUtils
                 PoddWebServiceApplicationImpl.ARTIFACT_MGT_GRAPH);
         
         // File Reference manager
-        final FileReferenceProcessorFactoryRegistry nextFileRegistry = new FileReferenceProcessorFactoryRegistry();
+        final DataReferenceProcessorRegistry nextFileRegistry = new DataReferenceProcessorRegistry();
         // clear any automatically added entries that may come from META-INF/services entries on the
         // classpath
         nextFileRegistry.clear();
-        final FileReferenceProcessorFactory nextFileProcessorFactory = new SSHFileReferenceProcessorFactoryImpl();
+        final DataReferenceProcessorFactory nextFileProcessorFactory = new SSHFileReferenceProcessorFactoryImpl();
         nextFileRegistry.add(nextFileProcessorFactory);
         
         // File Reference Manager
-        final FileReferenceManager nextFileReferenceManager = new FileReferenceManagerImpl();
-        nextFileReferenceManager.setProcessorFactoryRegistry(nextFileRegistry);
+        final DataReferenceManager nextFileReferenceManager = new FileReferenceManagerImpl();
+        nextFileReferenceManager.setDataProcessorRegistry(nextFileRegistry);
         
         // PURL manager
         final PoddPurlProcessorFactoryRegistry nextPurlRegistry = new PoddPurlProcessorFactoryRegistry();
@@ -283,7 +283,7 @@ public class ApplicationUtils
         nextOWLManager.setOWLOntologyManager(nextOWLOntologyManager);
         
         // File Repository Manager
-        final PoddFileRepositoryManager nextFileRepositoryManager = new PoddFileRepositoryManagerImpl();
+        final PoddDataRepositoryManager nextFileRepositoryManager = new PoddFileRepositoryManagerImpl();
         nextFileRepositoryManager.setRepositoryManager(application.getPoddRepositoryManager());
         nextFileRepositoryManager.setOWLManager(nextOWLManager);
         try

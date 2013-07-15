@@ -9,7 +9,7 @@ package com.github.podd.exception;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public class FileRepositoryMappingNotFoundException extends FileRepositoryException
+public class DataRepositoryMappingNotFoundException extends DataRepositoryException
 {
     private static final long serialVersionUID = -6834156313829093766L;
     
@@ -22,7 +22,7 @@ public class FileRepositoryMappingNotFoundException extends FileRepositoryExcept
      * @param msg
      *            The message for this exception.
      */
-    public FileRepositoryMappingNotFoundException(final String alias, final String msg)
+    public DataRepositoryMappingNotFoundException(final String alias, final String msg)
     {
         super(msg);
         this.alias = alias;
@@ -36,7 +36,7 @@ public class FileRepositoryMappingNotFoundException extends FileRepositoryExcept
      * @param throwable
      *            The cause for this exception.
      */
-    public FileRepositoryMappingNotFoundException(final String alias, final String msg, final Throwable throwable)
+    public DataRepositoryMappingNotFoundException(final String alias, final String msg, final Throwable throwable)
     {
         super(msg, throwable);
         this.alias = alias;
@@ -48,7 +48,7 @@ public class FileRepositoryMappingNotFoundException extends FileRepositoryExcept
      * @param throwable
      *            The cause for this exception.
      */
-    public FileRepositoryMappingNotFoundException(final String alias, final Throwable throwable)
+    public DataRepositoryMappingNotFoundException(final String alias, final Throwable throwable)
     {
         super(throwable);
         this.alias = alias;

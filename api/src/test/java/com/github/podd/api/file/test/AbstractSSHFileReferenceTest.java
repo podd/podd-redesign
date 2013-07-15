@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.SSHFileReference;
 
 /**
@@ -15,12 +15,12 @@ import com.github.podd.api.file.SSHFileReference;
  * 
  * @author kutila
  */
-public abstract class AbstractSSHFileReferenceTest extends AbstractFileReferenceTest
+public abstract class AbstractSSHFileReferenceTest extends AbstractDataReferenceTest
 {
     protected SSHFileReference sshFileReference;
     
     @Override
-    protected final FileReference getNewFileReference()
+    protected final DataReference getNewDataReference()
     {
         return this.getNewSSHFileReference();
     }

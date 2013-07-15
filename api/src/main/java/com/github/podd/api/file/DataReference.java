@@ -16,7 +16,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
  * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
-public interface FileReference
+public interface DataReference
 {
     /**
      * 

@@ -13,19 +13,19 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.RDF;
 
-import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.PoddFileRepository;
+import com.github.podd.api.file.DataReference;
+import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
- * An abstract implementation of {@link PoddFileRepository} which maintains the <i>alias</i> and
+ * An abstract implementation of {@link PoddDataRepository} which maintains the <i>alias</i> and
  * <i>types</i>. All internal attributes required to construct a repository configuration are stored
  * in a {@link Model} object and should be validated by sub-classes.
  * 
  * @author kutila
  */
-public abstract class PoddFileRepositoryImpl<T extends FileReference> implements PoddFileRepository<FileReference>
+public abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDataRepository<DataReference>
 {
     protected Model model;
     

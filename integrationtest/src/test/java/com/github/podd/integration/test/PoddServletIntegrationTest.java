@@ -28,7 +28,7 @@ import org.restlet.representation.Representation;
 import org.restlet.util.Series;
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.api.file.FileReferenceConstants;
+import com.github.podd.api.file.DataReferenceConstants;
 import com.github.podd.impl.file.test.SSHService;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -195,13 +195,13 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
         
         // -- generate and send an attach request
         final Form form = new Form();
-        form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
+        form.add(DataReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
         form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
-        form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
-        form.add(FileReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616");
-        form.add(FileReferenceConstants.KEY_FILE_NAME, "rfc2616.html");
-        form.add(FileReferenceConstants.KEY_FILE_DESCRIPTION, "http RFC");
+        form.add(DataReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
+        form.add(DataReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
+        form.add(DataReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616");
+        form.add(DataReferenceConstants.KEY_FILE_NAME, "rfc2616.html");
+        form.add(DataReferenceConstants.KEY_FILE_DESCRIPTION, "http RFC");
         
         final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
         editRequest.setCookies(this.cookies);
@@ -265,13 +265,13 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
             
             // -- generate and send an attach request
             final Form form = new Form();
-            form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "SSH");
+            form.add(DataReferenceConstants.KEY_FILE_REF_TYPE, "SSH");
             form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-            form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
-            form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "localssh");
-            form.add(FileReferenceConstants.KEY_FILE_PATH, tempFolder.toAbsolutePath().toString());
-            form.add(FileReferenceConstants.KEY_FILE_NAME, tempFile.getFileName().toString());
-            form.add(FileReferenceConstants.KEY_FILE_DESCRIPTION,
+            form.add(DataReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
+            form.add(DataReferenceConstants.KEY_FILE_SERVER_ALIAS, "localssh");
+            form.add(DataReferenceConstants.KEY_FILE_PATH, tempFolder.toAbsolutePath().toString());
+            form.add(DataReferenceConstants.KEY_FILE_NAME, tempFile.getFileName().toString());
+            form.add(DataReferenceConstants.KEY_FILE_DESCRIPTION,
                     "Refers to one of the test artifacts, to be accessed through an ssh server");
             
             final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
@@ -325,13 +325,13 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
         
         // -- generate and send an attach request
         final Form form = new Form();
-        form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
+        form.add(DataReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
         form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
         // object URI is missing here
-        form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
-        form.add(FileReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616");
-        form.add(FileReferenceConstants.KEY_FILE_NAME, "rfc2616.html");
-        form.add(FileReferenceConstants.KEY_FILE_DESCRIPTION, "http RFC");
+        form.add(DataReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
+        form.add(DataReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616");
+        form.add(DataReferenceConstants.KEY_FILE_NAME, "rfc2616.html");
+        form.add(DataReferenceConstants.KEY_FILE_DESCRIPTION, "http RFC");
         
         final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
         editRequest.setCookies(this.cookies);
@@ -366,13 +366,13 @@ public class PoddServletIntegrationTest extends AbstractPoddRestletClientIntegra
         
         // -- generate and send an attach request
         final Form form = new Form();
-        form.add(FileReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
+        form.add(DataReferenceConstants.KEY_FILE_REF_TYPE, "HTTP");
         form.add(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        form.add(FileReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
-        form.add(FileReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
-        form.add(FileReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616thisiswrong");
-        form.add(FileReferenceConstants.KEY_FILE_NAME, "rfc2616.html");
-        form.add(FileReferenceConstants.KEY_FILE_DESCRIPTION, "http RFC");
+        form.add(DataReferenceConstants.KEY_OBJECT_URI, "urn:poddinternal:7616392e-802b-4c5d-953d-bf81da5a98f4:0");
+        form.add(DataReferenceConstants.KEY_FILE_SERVER_ALIAS, "w3");
+        form.add(DataReferenceConstants.KEY_FILE_PATH, "Protocols/rfc2616thisiswrong");
+        form.add(DataReferenceConstants.KEY_FILE_NAME, "rfc2616.html");
+        form.add(DataReferenceConstants.KEY_FILE_DESCRIPTION, "http RFC");
         
         final Request editRequest = new Request(Method.POST, this.BASE_URL + "/attachref");
         editRequest.setCookies(this.cookies);

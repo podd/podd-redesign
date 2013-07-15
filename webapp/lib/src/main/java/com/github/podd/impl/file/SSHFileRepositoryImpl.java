@@ -13,7 +13,7 @@ import org.openrdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
@@ -61,7 +61,7 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
     }
     
     @Override
-    public boolean canHandle(final FileReference reference)
+    public boolean canHandle(final DataReference reference)
     {
         if(reference == null)
         {
@@ -84,11 +84,11 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
     }
     
     @Override
-    public boolean validate(final FileReference fileReference) throws FileReferenceNotSupportedException, IOException
+    public boolean validate(final DataReference dataReference) throws FileReferenceNotSupportedException, IOException
     {
-        if(!this.canHandle(fileReference))
+        if(!this.canHandle(dataReference))
         {
-            throw new FileReferenceNotSupportedException(fileReference, "cannot handle file reference for validation");
+            throw new FileReferenceNotSupportedException(dataReference, "cannot handle file reference for validation");
         }
         
         final String host =
@@ -113,8 +113,8 @@ public class SSHFileRepositoryImpl extends PoddFileRepositoryImpl<SSHFileReferen
             throw new IOException("Port number could not be parsed correctly: " + port);
         }
         
-        String fileName = ((SSHFileReference)fileReference).getFilename();
-        final String path = ((SSHFileReference)fileReference).getPath();
+        String fileName = ((SSHFileReference)dataReference).getFilename();
+        final String path = ((SSHFileReference)dataReference).getPath();
         if(path != null && path.trim().length() > 0)
         {
             fileName = path + "/" + fileName;

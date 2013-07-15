@@ -15,7 +15,7 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.restlet.resource.ClientResource;
 
-import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.test.AbstractPoddClientTest;
@@ -40,7 +40,7 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
     private Map<String, Path> tempFiles = new ConcurrentHashMap<String, Path>();
     
     @Override
-    protected FileReference deployFileReference(final String label) throws Exception
+    protected DataReference deployFileReference(final String label) throws Exception
     {
         Path nextTempFile;
         

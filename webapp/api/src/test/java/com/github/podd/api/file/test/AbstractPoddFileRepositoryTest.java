@@ -14,8 +14,8 @@ import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 
-import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.PoddFileRepository;
+import com.github.podd.api.file.DataReference;
+import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
 
@@ -23,13 +23,13 @@ import com.github.podd.exception.FileRepositoryIncompleteException;
  * 
  * @author kutila
  */
-public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
+public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
 {
     protected static final String TEST_ALIAS = "test_alias";
     protected static final URI TEST_ALIAS_URI = ValueFactoryImpl.getInstance().createURI(
             "http://purl.org/podd/test_alias");
     
-    protected PoddFileRepository<T> testFileRepository;
+    protected PoddDataRepository<T> testFileRepository;
     
     /**
      * @return A Collection of URIs representing the expected types of the test FileRepository
@@ -45,22 +45,22 @@ public abstract class AbstractPoddFileRepositoryTest<T extends FileReference>
     
     /**
      * @param alias
-     *            The alias to be assigned to the created FileReference.
+     *            The alias to be assigned to the created DataReference.
      * @param fileIdentifier
      *            If this parameter is not null, its value will be set as the file Identifier
-     * @return A new FileReference instance for use by the test
+     * @return A new DataReference instance for use by the test
      */
     protected abstract T getNewFileReference(String alias, String fileIdentifier);
     
     /**
-     * @return A new {@link PoddFileRepository} instance for use by the test
+     * @return A new {@link PoddDataRepository} instance for use by the test
      */
-    protected abstract PoddFileRepository<T> getNewPoddFileRepository() throws Exception;
+    protected abstract PoddDataRepository<T> getNewPoddFileRepository() throws Exception;
     
     /**
-     * @return A new {@link PoddFileRepository} instance for use by the test
+     * @return A new {@link PoddDataRepository} instance for use by the test
      */
-    protected abstract PoddFileRepository<T> getNewPoddFileRepository(final Model model) throws Exception;
+    protected abstract PoddDataRepository<T> getNewPoddFileRepository(final Model model) throws Exception;
     
     @Before
     public void setUp() throws Exception

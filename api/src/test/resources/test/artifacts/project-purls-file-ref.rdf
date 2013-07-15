@@ -223,7 +223,7 @@
     
 	<!-- an SSH file reference resource -->
 	<rdf:Description rdf:about="http://purl.org/podd-test/130326f/object-rice-scan-34343-a">
-		<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
+		<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#DataReference"/>
 		<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#SSHFileReference"/>
 		<rdfs:label>Rice tree scan 003454-98</rdfs:label>
 		<poddBase:hasAlias>csiro_dap</poddBase:hasAlias>
@@ -233,7 +233,7 @@
 	
 	<!-- an SSH file reference resource -->
 	<rdf:Description rdf:about="http://purl.org/podd-test/130326f/object-rice-scan-34343-b">
-		<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
+		<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#DataReference"/>
 		<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#SSHFileReference"/>
 		<rdfs:label>Rice tree scan 003454-99</rdfs:label>
 		<poddBase:hasAlias>csiro_dap</poddBase:hasAlias>

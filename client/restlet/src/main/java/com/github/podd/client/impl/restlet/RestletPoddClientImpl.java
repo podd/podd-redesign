@@ -35,8 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
-import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.FileReferenceConstants;
+import com.github.podd.api.file.DataReference;
+import com.github.podd.api.file.DataReferenceConstants;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -75,7 +75,7 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public InferredOWLOntologyID attachFileReference(final FileReference ref) throws PoddClientException
+    public InferredOWLOntologyID attachFileReference(final DataReference ref) throws PoddClientException
     {
         this.log.info("cookies: {}", this.currentCookies);
         
@@ -85,7 +85,7 @@ public class RestletPoddClientImpl implements PoddClient
                 .toString());
         resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, ref.getArtifactID()
                 .getVersionIRI().toString());
-        resource.addQueryParameter(FileReferenceConstants.KEY_OBJECT_URI, ref.getObjectIri().toString());
+        resource.addQueryParameter(DataReferenceConstants.KEY_OBJECT_URI, ref.getObjectIri().toString());
         
         final Model rdf = ref.toRDF();
         

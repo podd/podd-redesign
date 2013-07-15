@@ -9,7 +9,7 @@ package com.github.podd.api.file;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public interface SSHFileReferenceProcessor extends FileReferenceProcessor<SSHFileReference>
+public interface SSHFileReferenceProcessor extends DataReferenceProcessor<SSHFileReference>
 {
     
 }

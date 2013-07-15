@@ -11,7 +11,7 @@ import java.util.List;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 
-import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.DataReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
@@ -65,7 +65,7 @@ public interface PoddClient
      * @return An {@link InferredOWLOntologyID} object containing the details of the updated
      *         artifact.
      */
-    InferredOWLOntologyID attachFileReference(FileReference ref) throws PoddClientException;
+    InferredOWLOntologyID attachFileReference(DataReference ref) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Delete Artifact service to delete the artifact identified by

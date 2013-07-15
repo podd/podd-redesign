@@ -20,9 +20,9 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
-import com.github.podd.api.file.FileReference;
-import com.github.podd.api.file.FileReferenceManager;
-import com.github.podd.api.file.PoddFileRepositoryManager;
+import com.github.podd.api.file.DataReference;
+import com.github.podd.api.file.DataReferenceManager;
+import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
@@ -39,10 +39,10 @@ import com.github.podd.utils.PoddObjectLabel;
 public interface PoddArtifactManager
 {
     InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
-            FileReference fileReference) throws OpenRDFException, PoddException;
+            DataReference dataReference) throws OpenRDFException, PoddException;
     
     InferredOWLOntologyID attachFileReferences(URI artifactUri, URI versionUri, InputStream inputStream,
-            RDFFormat format, FileReferenceVerificationPolicy fileReferenceVerificationPolicy) throws OpenRDFException,
+            RDFFormat format, DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
         IOException, OWLException, PoddException;
     
     /**
@@ -164,23 +164,23 @@ public interface PoddArtifactManager
     
     /**
      * 
-     * @return The {@link FileReferenceManager} used to create and fetch file references from
+     * @return The {@link DataReferenceManager} used to create and fetch file references from
      *         artifacts.
      */
-    FileReferenceManager getFileReferenceManager();
+    DataReferenceManager getFileReferenceManager();
     
-    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId);
+    Set<DataReference> getFileReferences(InferredOWLOntologyID artifactId);
     
-    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
+    Set<DataReference> getFileReferences(InferredOWLOntologyID artifactId, String alias);
     
-    Set<FileReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
+    Set<DataReference> getFileReferences(InferredOWLOntologyID artifactId, URI objectUri);
     
     /**
      * 
-     * @return The {@link PoddFileRepositoryManager} used to manage external file repository
+     * @return The {@link PoddDataRepositoryManager} used to manage external file repository
      *         configurations.
      */
-    PoddFileRepositoryManager getFileRepositoryManager();
+    PoddDataRepositoryManager getFileRepositoryManager();
 
     /**
      * 
@@ -337,22 +337,22 @@ public interface PoddArtifactManager
         throws OpenRDFException, ResourceException;
     
     /**
-     * Sets the {@link FileReferenceManager} to use for verifying file references for PODD
+     * Sets the {@link DataReferenceManager} to use for verifying file references for PODD
      * artifacts.
      * 
      * @param fileManager
      *            The manager to use for verifying file references for PODD artifacts.
      */
-    void setFileReferenceManager(FileReferenceManager fileManager);
+    void setFileReferenceManager(DataReferenceManager fileManager);
     
     /**
-     * Sets the {@link PoddFileRepositoryManager} to use for managing file repository
+     * Sets the {@link PoddDataRepositoryManager} to use for managing file repository
      * configurations.
      * 
      * @param fileRepositoryManager
      *            The manager to use for managing file repository configurations.
      */
-    void setFileRepositoryManager(PoddFileRepositoryManager fileRepositoryManager);
+    void setFileRepositoryManager(PoddDataRepositoryManager fileRepositoryManager);
     
     /**
      * Sets the {@link PoddOWLManager} instance to use when loading and dealing with Artifacts in
@@ -445,7 +445,7 @@ public interface PoddArtifactManager
      */
     Model updateArtifact(URI artifactUri, URI versionUri, Collection<URI> objectUris, InputStream inputStream,
             RDFFormat format, UpdatePolicy updatePolicy, DanglingObjectPolicy danglingObjectAction,
-            FileReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException, OWLException,
+            DataReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException, OWLException,
         PoddException;
     
     /**

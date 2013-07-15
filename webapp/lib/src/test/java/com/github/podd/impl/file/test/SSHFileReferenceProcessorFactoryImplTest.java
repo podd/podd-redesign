@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddRdfProcessorFactory;
-import com.github.podd.api.file.FileReferenceProcessor;
+import com.github.podd.api.file.DataReferenceProcessor;
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.api.file.SSHFileReferenceProcessor;
 import com.github.podd.api.test.AbstractPoddRdfProcessorFactoryTest;
@@ -40,7 +40,7 @@ import com.github.podd.utils.PoddRdfUtils;
  * @author kutila
  */
 public class SSHFileReferenceProcessorFactoryImplTest extends
-        AbstractPoddRdfProcessorFactoryTest<FileReferenceProcessor<SSHFileReference>>
+        AbstractPoddRdfProcessorFactoryTest<DataReferenceProcessor<SSHFileReference>>
 {
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());

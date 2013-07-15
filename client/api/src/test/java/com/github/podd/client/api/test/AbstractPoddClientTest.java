@@ -26,7 +26,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.podd.api.file.FileReference;
+import com.github.podd.api.file.DataReference;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -50,28 +50,28 @@ public abstract class AbstractPoddClientTest
     
     /**
      * Instruct the implementors of this test to attempt to deploy a file reference that has the
-     * given label and return a partial FileReference object that contains the specific details of
+     * given label and return a partial DataReference object that contains the specific details of
      * how and where the file reference is located.
      * <p>
-     * The {@link FileReference#getArtifactID()}, {@link FileReference#getObjectIri()},
-     * {@link FileReference#getParentIri()}, and {@link FileReference#getParentPredicateIRI()}
+     * The {@link DataReference#getArtifactID()}, {@link DataReference#getObjectIri()},
+     * {@link DataReference#getParentIri()}, and {@link DataReference#getParentPredicateIRI()}
      * SHOULD not be populated, as they will be overwritten.
      * <p>
-     * The {@link FileReference#getRepositoryAlias()} MUST be populated, and MUST match an alias
+     * The {@link DataReference#getRepositoryAlias()} MUST be populated, and MUST match an alias
      * returned from {@link PoddClient#listFileReferenceRepositories()}.
      * <p>
      * Successive calls with different labels must return distinct FileReferences.
      * <p>
-     * Successive calls with the same label must return a FileReference containing the same
+     * Successive calls with the same label must return a DataReference containing the same
      * essential details.
      * 
      * @param label
      *            The label to give the file reference.
-     * @return A partially populated {@link FileReference} object.
+     * @return A partially populated {@link DataReference} object.
      * @throws Exception
      *             If there were any issues deploying a file reference for this label.
      */
-    protected abstract FileReference deployFileReference(String label) throws Exception;
+    protected abstract DataReference deployFileReference(String label) throws Exception;
     
     /**
      * Any file repositories that were made active for this test can now be shutdown.
@@ -192,7 +192,7 @@ public abstract class AbstractPoddClientTest
             
             Assert.assertEquals("Did not find unique top object in artifact", 1, topObject.size());
             
-            final FileReference testRef = this.deployFileReference("test-file-label");
+            final DataReference testRef = this.deployFileReference("test-file-label");
             testRef.setArtifactID(newArtifact);
             testRef.setParentIri(IRI.create(topObject.objectURI()));
             // TODO: If this breaks then need to attach it to a different part of an extended

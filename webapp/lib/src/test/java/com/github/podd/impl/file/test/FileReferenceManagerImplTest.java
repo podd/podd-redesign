@@ -3,27 +3,27 @@
  */
 package com.github.podd.impl.file.test;
 
-import com.github.podd.api.file.FileReferenceManager;
-import com.github.podd.api.file.FileReferenceProcessorFactoryRegistry;
-import com.github.podd.api.file.test.AbstractFileReferenceManagerTest;
+import com.github.podd.api.file.DataReferenceManager;
+import com.github.podd.api.file.DataReferenceProcessorRegistry;
+import com.github.podd.api.file.test.AbstractDataReferenceManagerTest;
 import com.github.podd.impl.file.FileReferenceManagerImpl;
 
 /**
- * Concrete test for FileReferenceManager
+ * Concrete test for DataReferenceManager
  * 
  * @author kutila
  */
-public class FileReferenceManagerImplTest extends AbstractFileReferenceManagerTest
+public class FileReferenceManagerImplTest extends AbstractDataReferenceManagerTest
 {
     
     /*
      * (non-Javadoc)
      * 
      * @see
-     * com.github.podd.api.file.test.AbstractFileReferenceManagerTest#getNewFileReferenceManager()
+     * com.github.podd.api.file.test.AbstractDataReferenceManagerTest#getNewFileReferenceManager()
      */
     @Override
-    public FileReferenceManager getNewFileReferenceManager()
+    public DataReferenceManager getNewDataReferenceManager()
     {
         final FileReferenceManagerImpl fileRefManager = new FileReferenceManagerImpl();
         return fileRefManager;
@@ -32,13 +32,13 @@ public class FileReferenceManagerImplTest extends AbstractFileReferenceManagerTe
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.file.test.AbstractFileReferenceManagerTest#
+     * @see com.github.podd.api.file.test.AbstractDataReferenceManagerTest#
      * getNewPoddFileReferenceProcessorFactoryRegistry()
      */
     @Override
-    public FileReferenceProcessorFactoryRegistry getNewPoddFileReferenceProcessorFactoryRegistry()
+    public DataReferenceProcessorRegistry getNewDataReferenceProcessorRegistry()
     {
-        final FileReferenceProcessorFactoryRegistry registry = new FileReferenceProcessorFactoryRegistry();
+        final DataReferenceProcessorRegistry registry = new DataReferenceProcessorRegistry();
         
         // this should happen automatically
         // registry.add(new SSHFileReferenceProcessorFactoryImpl());

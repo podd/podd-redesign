@@ -11,7 +11,7 @@ import org.openrdf.model.Model;
  * 
  * @author kutila
  */
-public class FileRepositoryIncompleteException extends FileRepositoryException
+public class FileRepositoryIncompleteException extends DataRepositoryException
 {
     private static final long serialVersionUID = -689252740293644258L;
     
