@@ -84,6 +84,11 @@
             <groupId>com.github.ansell.restlet-utils</groupId>
             <artifactId>restlet-utils</artifactId>
         </dependency>
+        <dependency>
+        	<groupId>org.kohsuke.metainf-services</groupId>
+        	<artifactId>metainf-services</artifactId>
+        	<optional>true</optional>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
