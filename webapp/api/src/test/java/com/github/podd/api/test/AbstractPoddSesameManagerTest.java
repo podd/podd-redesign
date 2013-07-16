@@ -1743,10 +1743,11 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Incorrect number of statements about Internal Object", 5, orderedPropertyUris.size());
         
         final String[] expectedUris =
-                { "http://purl.org/dc/terms/creator", 
-                        "http://purl.org/podd/ns/poddBase#hasPURL", "http://purl.org/podd/ns/poddScience#hasAbstract",
+                { "http://purl.org/podd/ns/poddScience#hasAbstract", 
                         "http://purl.org/podd/ns/poddScience#publishedIn",
-                        "http://purl.org/podd/ns/poddScience#hasYear", };
+                        "http://purl.org/podd/ns/poddScience#hasYear", 
+                        "http://purl.org/podd/ns/poddBase#hasPURL",
+                        "http://purl.org/dc/terms/creator", };
         for(int i = 0; i < orderedPropertyUris.size(); i++)
         {
             Assert.assertEquals("Property URI not in expected position",
@@ -1784,15 +1785,16 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Incorrect number of statements about Top Object", 10, orderedPropertyUris.size());
         
         final String[] expectedUris =
-                { "http://purl.org/podd/ns/poddBase#createdAt", "http://purl.org/dc/terms/creator",
+                { "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
+                        "http://purl.org/podd/ns/poddBase#hasStartDate",
                         "http://purl.org/podd/ns/poddScience#hasAnalysis",
                         "http://purl.org/podd/ns/poddScience#hasInvestigation",
                         "http://purl.org/podd/ns/poddScience#hasProcess",
                         "http://purl.org/podd/ns/poddScience#hasProjectPlan",
                         "http://purl.org/podd/ns/poddScience#hasPublication",
-                        "http://purl.org/podd/ns/poddScience#hasANZSRC",
-                        "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
-                        "http://purl.org/podd/ns/poddBase#hasStartDate" };
+                        "http://purl.org/podd/ns/poddScience#hasANZSRC", 
+                        "http://purl.org/podd/ns/poddBase#createdAt",
+                        "http://purl.org/dc/terms/creator", };
         for(int i = 0; i < orderedPropertyUris.size(); i++)
         {
             Assert.assertEquals("Property URI not in expected position",
@@ -1832,10 +1834,11 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Incorrect number of statements about Top Object", 5, orderedPropertyUris.size());
         
         final String[] expectedUris =
-                { "http://purl.org/podd/ns/poddBase#createdAt", "http://purl.org/dc/terms/creator",
-                        "http://purl.org/podd/ns/poddScience#hasANZSRC",
-                        "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
-                        "http://purl.org/podd/ns/poddBase#hasStartDate" };
+                { "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
+                        "http://purl.org/podd/ns/poddBase#hasStartDate",
+                        "http://purl.org/podd/ns/poddScience#hasANZSRC", 
+                        "http://purl.org/podd/ns/poddBase#createdAt",
+                        "http://purl.org/dc/terms/creator", };
         for(int i = 0; i < orderedPropertyUris.size(); i++)
         {
             Assert.assertEquals("Property URI not in expected position",
