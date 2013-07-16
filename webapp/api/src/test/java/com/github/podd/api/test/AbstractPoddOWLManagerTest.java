@@ -1156,7 +1156,7 @@ public abstract class AbstractPoddOWLManagerTest
         Rio.write(statementsOwlapi, owlapiWriter, RDFFormat.NTRIPLES);
         
         System.out.println("------------");
-        System.out.println("Mismatched statements with URI subject");
+        System.out.println("Mismatched statements");
         System.out.println("------------");
         
         for(Statement nextOwlapiStatement : statementsOwlapi)
@@ -1170,19 +1170,6 @@ public abstract class AbstractPoddOWLManagerTest
                     System.out.println(nextOwlapiStatement);
                 }
             }
-            else if(nextOwlapiStatement.getSubject() instanceof URI)
-            {
-                // System.out.println(nextOwlapiStatement);
-                // DebugUtils.printContents(statementsOriginal.filter(nextOwlapiStatement.getSubject(),
-                // nextOwlapiStatement.getPredicate(), null));
-            }
-            else if(nextOwlapiStatement.getObject() instanceof URI)
-            {
-                // System.out.println(nextOwlapiStatement);
-                // DebugUtils.printContents(statementsOriginal.filter(null,
-                // nextOwlapiStatement.getPredicate(),
-                // nextOwlapiStatement.getObject()));
-            }
             else
             {
                 Model originalFilter = statementsOriginal.filter(null, nextOwlapiStatement.getPredicate(), null);
@@ -1190,7 +1177,9 @@ public abstract class AbstractPoddOWLManagerTest
                 
                 if(originalFilter.size() != owlapiFilter.size())
                 {
+                    System.out.println("Original statements for predicate");
                     DebugUtils.printContents(originalFilter);
+                    System.out.println("OWLAPI statements for predicate");
                     DebugUtils.printContents(owlapiFilter);
                 }
             }
