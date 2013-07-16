@@ -1019,7 +1019,7 @@ public abstract class AbstractPoddOWLManagerTest
         final List<Statement> statements =
                 Iterations.asList(this.testRepositoryConnection.getStatements(null, null, null, false, context));
         Assert.assertEquals("Not the expected number of statements in Repository",
-                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 3, statements.size());
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 2, statements.size());
         
         final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
         
@@ -1098,7 +1098,7 @@ public abstract class AbstractPoddOWLManagerTest
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
         Assert.assertEquals("Not the expected number of statements in Repository",
-                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 3, this.testRepositoryConnection.size(context));
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 2, this.testRepositoryConnection.size(context));
         
         final OWLOntologyID loadedOntologyID =
                 this.testOWLManager.parseRDFStatements(this.testRepositoryConnection, context);
