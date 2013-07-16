@@ -1522,9 +1522,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * org.openrdf.repository.RepositoryConnection)
      */
     @Override
-    public List<URI> getWeightedProperties(final InferredOWLOntologyID artifactID, final URI objectUri,
-            final boolean excludeContainsProperties, final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
+    public List<URI> getWeightedProperties(final URI objectUri, final boolean excludeContainsProperties,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
     {
         final StringBuilder sb = new StringBuilder();
         

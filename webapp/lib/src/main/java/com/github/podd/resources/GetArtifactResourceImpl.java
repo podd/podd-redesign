@@ -5,7 +5,7 @@ package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +15,6 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -71,12 +66,10 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         final String versionString =
                 this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
         
+        // optional parameter for inner objects
         final String objectToView = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
         
-        // URI objectToView = topObject URI by default
-        // optional parameter for inner objects
-        
-        this.log.info("requesting get artifact (HTML): {}", artifactString);
+        this.log.info("requesting get artifact (HTML): {}, {}, {}", artifactString, versionString, objectToView);
         
         this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
                 Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactString)));
@@ -107,8 +100,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
         dataModel.put("pageTitle", "View Artifact");
-        this.loadConstantsAndUtilsToDataModel(dataModel);
-        
+
         try
         {
             this.populateDataModelWithArtifactData(ontologyID, objectToView, dataModel);
@@ -167,9 +159,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                         this.getPoddArtifactManager()
                                 .getArtifact(IRI.create(artifactString), IRI.create(versionString));
             }
-            // FIXME: support prototype method for this
-            // use this instead of ../base/ ../inferred/.. in the Prototype. Change documentation
-            // too.
+            
             final String includeInferredString =
                     this.getRequest().getResourceRef().getQueryAsForm().getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
             final boolean includeInferred = Boolean.valueOf(includeInferredString);
@@ -191,55 +181,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         return new ByteArrayRepresentation(stream.toByteArray());
     }
     
-    /*
-     * private List<Object> getDummyReferredObjects() { final List<Object> list = new
-     * ArrayList<Object>(); for(int i = 0; i < 2; i++) { final Map<String, Object> anObject = new
-     * HashMap<String, Object>(); anObject.put("isSelected", true); anObject.put("state", "A");
-     * anObject.put("type", "IntrnalObject"); anObject.put("uri", "object:34343");
-     * anObject.put("title", "Object " + i); anObject.put("description",
-     * "This is a simple object within an artifact");
-     * 
-     * list.add(anObject); }
-     * 
-     * return list; }
-     * 
-     * // FIXME: cannot work until Schema Manager is implemented protected List<URI>
-     * getSchemaOntologyGraphs() throws UnmanagedSchemaIRIException { String[] schemaOntologies = {
-     * PoddRdfConstants.PODD_DCTERMS, PoddRdfConstants.PODD_FOAF, PoddRdfConstants.PODD_USER,
-     * PoddRdfConstants.PODD_BASE, PoddRdfConstants.PODD_SCIENCE, PoddRdfConstants.PODD_PLANT };
-     * 
-     * final List<URI> schemaOntologyGraphs = new ArrayList<URI>();
-     * 
-     * for(String schema : schemaOntologies) { InferredOWLOntologyID ontologyID =
-     * this.getPoddApplication().getPoddSchemaManager()
-     * .getCurrentSchemaOntologyVersion(IRI.create(schema));
-     * schemaOntologyGraphs.add(ontologyID.getVersionIRI().toOpenRDFURI());
-     * schemaOntologyGraphs.add(ontologyID.getInferredOntologyIRI().toOpenRDFURI()); } return
-     * schemaOntologyGraphs; }
-     */
-    /**
-     * Populates the data model with necessary constant values and Utility classes.
-     * 
-     * NOTE: If these are common across multiple ResourceImpls, this method could be moved to the
-     * parent.
-     * 
-     * @param dataModel
-     */
-    protected void loadConstantsAndUtilsToDataModel(final Map<String, Object> dataModel)
-    {
-        dataModel.put("RDFS_LABEL", RDFS.LABEL);
-        dataModel.put("RDFS_RANGE", RDFS.RANGE);
-        dataModel.put("RDF_TYPE", RDF.TYPE);
-        dataModel.put("OWL_OBJECT_PROPERTY", OWL.OBJECTPROPERTY);
-        dataModel.put("OWL_DATA_PROPERTY", OWL.DATATYPEPROPERTY);
-        dataModel.put("OWL_ANNOTATION_PROPERTY", OWL.ANNOTATIONPROPERTY);
-        
-        dataModel.put("util", new FreemarkerUtil());
-        
-        //FIXME: should be set based on the current object and user authorization
-        dataModel.put("canAddChildren", true);
-    }
-    
     /**
      * This method retrieves necessary info about the object being viewed via SPARQL queries and
      * populates the data model.
@@ -253,95 +194,70 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      * @param dataModel
      *            Freemarker data model to be populated
      * @throws OpenRDFException
-     * @deprecated This needs to be restructured so that it uses methods in PoddArtifactManager so
-     *             they can easily be independently tested. Warning sign is that we need to create a
-     *             RepositoryConnection here and go directly into the PoddSesameManager which should
-     *             be wrapped up in all normal cases.
      */
-    @Deprecated
     private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
             final Map<String, Object> dataModel) throws OpenRDFException
     {
         
-        final RepositoryConnection conn = this.getPoddRepositoryManager().getRepository().getConnection();
-        conn.begin();
-        try
+        PoddObjectLabel theObject = null;
+        
+        if(objectToView != null && !objectToView.trim().isEmpty())
         {
-            // get top-object of this artifact
-            final List<URI> topObjectList = this.getPoddSesameManager().getTopObjects(ontologyID, conn);
-            if(topObjectList == null || topObjectList.size() != 1)
+            theObject =
+                    this.getPoddArtifactManager().getObjectLabel(ontologyID,
+                            PoddRdfConstants.VF.createURI(objectToView));
+        }
+        else
+        {
+            // find and set top-object of this artifact as the object to display
+            final List<PoddObjectLabel> topObjectLabels =
+                    this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(ontologyID));
+            if(topObjectLabels == null || topObjectLabels.size() != 1)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
             }
             
-            // the object to display (default is Top Object)
-            URI objectUri = topObjectList.get(0);
-            
-            if(objectToView != null && !objectToView.trim().isEmpty())
-            {
-                objectUri = ValueFactoryImpl.getInstance().createURI(objectToView);
-            }
-            
-            this.populateParentDetails(ontologyID, objectUri, dataModel);
-            
-            // first get the title & description encapsulated in a PoddObject
-            final PoddObjectLabel theObject = this.getPoddSesameManager().getObjectLabel(ontologyID, objectUri, conn);
-            dataModel.put("poddObject", theObject);
-            
-            // find the object's type
-            final List<URI> objectTypes = this.getPoddSesameManager().getObjectTypes(ontologyID, objectUri, conn);
-            if(objectTypes == null || objectTypes.isEmpty())
-            {
-                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
-            }
-            
-            // Get label for the object type
-            final URI objectType = objectTypes.get(0);
-            final PoddObjectLabel label = this.getPoddSesameManager().getObjectLabel(ontologyID, objectType, conn);
-            dataModel.put("objectType", label);
-            
-            // populate the properties of the object
-            final List<URI> orderedProperties =
-                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
-                            .getWeightedProperties(ontologyID, objectUri, false, conn);
-            
-            final Model allNeededStatementsForDisplay =
-                    this.getPoddApplication().getPoddArtifactManager().getSesameManager()
-                            .getObjectDetailsForDisplay(ontologyID, objectUri, conn);
-            
-            dataModel.put("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
-            dataModel.put("propertyList", orderedProperties);
-            dataModel.put("completeModel", allNeededStatementsForDisplay);
+            theObject = topObjectLabels.get(0);
         }
-        finally
+        // set title & description of object to display
+        dataModel.put("poddObject", theObject);
+        
+        final URI objectUri = theObject.getObjectURI();
+        
+        this.populateParentDetails(ontologyID, objectUri, dataModel);
+        
+        // find the object's type
+        final List<PoddObjectLabel> objectTypes = this.getPoddArtifactManager().getObjectTypes(ontologyID, objectUri);
+        if(objectTypes == null || objectTypes.isEmpty())
         {
-            if(conn != null)
-            {
-                conn.rollback(); // read only, nothing to commit
-                conn.close();
-            }
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
         }
+        
+        // Get label for the object type
+        final PoddObjectLabel label = objectTypes.get(0);
+        dataModel.put("objectType", label);
+        
+        // populate the properties of the object
+        final List<URI> orderedProperties =
+                this.getPoddArtifactManager().getOrderedProperties(ontologyID, objectUri, false);
+        
+        final Model allNeededStatementsForDisplay =
+                this.getPoddArtifactManager().getObjectDetailsForDisplay(ontologyID, objectUri);
+        
+        dataModel.put("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
+        dataModel.put("propertyList", orderedProperties);
+        dataModel.put("completeModel", allNeededStatementsForDisplay);
         
         // FIXME: determine based on project status and user authorization
         dataModel.put("canEditObject", true);
         
-        // -TODO: populate refers to list
-        final List<Object> refersToList = new ArrayList<Object>();
-        
-        final Map<String, Object> refersToElement = new HashMap<String, Object>();
-        refersToElement.put("label", "Refers To Label");
-        // DESIGN FIXME: Figure out a way of doing this without removing characters. It is not an
-        // option to remove characters or split URIs.
-        refersToElement.put("propertyUriWithoutNamespace", "artifact89");
-        refersToElement.put("availableObjects", Collections.EMPTY_LIST);
-        refersToElement.put("areSelectedObjects", true);
-        
-        refersToList.add(refersToElement);
-        
-        dataModel.put("refersToList", refersToList);
-        
+        //FIXME: should be set based on the current object and user authorization
+        dataModel.put("canAddChildren", true);
+
         dataModel.put("selectedObjectCount", 0);
         dataModel.put("childHierarchyList", Collections.emptyList());
+        
+        dataModel.put("util", new FreemarkerUtil());
     }
     
     /**
@@ -358,7 +274,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      * @param dataModel
      * @throws OpenRDFException
      */
-    protected void populateParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri,
+    private void populateParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri,
             final Map<String, Object> dataModel) throws OpenRDFException {
 
         final Model parentDetails = this.getPoddArtifactManager().getParentDetails(ontologyID, objectUri);
@@ -376,17 +292,17 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             
             // - parent's Title
             String parentLabel = "Missing Title";
-            final Model objectLabel = this.getPoddArtifactManager().getObjectLabel(ontologyID, parentUri);
-            if (objectLabel.size() == 1) {
-                parentLabel = objectLabel.objectString();
+            final PoddObjectLabel objectLabel = this.getPoddArtifactManager().getObjectLabel(ontologyID, parentUri);
+            if (objectLabel != null) {
+                parentLabel = objectLabel.getLabel();
             }
             parentMap.put("label", parentLabel);
             
             // - parent relationship Label
             String predicateLabel = "Missing parent relationship";
-            final Model predicateLabelModel = this.getPoddArtifactManager().getObjectLabel(ontologyID, parentPredicateUri);
-            if (predicateLabelModel.size() == 1) {
-                predicateLabel = predicateLabelModel.objectString();
+            final PoddObjectLabel predicateLabelModel = this.getPoddArtifactManager().getObjectLabel(ontologyID, parentPredicateUri);
+            if (predicateLabelModel != null) {
+                predicateLabel = predicateLabelModel.getLabel();
             }
             parentMap.put("relationship", predicateLabel);
             

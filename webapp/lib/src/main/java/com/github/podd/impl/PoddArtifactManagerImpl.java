@@ -453,24 +453,43 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         return this.dataRepositoryManager;
     }
     
+    /*
+     * (non-Javadoc)
+     * 
+     * Wraps PoddSesameManager.getObjectDetailsForDisplay()
+     * 
+     * @see com.github.podd.api.PoddArtifactManager#getObjectDetailsForDisplay()
+     */
     @Override
-    public Model getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri)
-    throws OpenRDFException
+    public Model getObjectDetailsForDisplay(final InferredOWLOntologyID ontologyID, final URI objectUri)
+        throws OpenRDFException
     {
-        final Model model = new LinkedHashModel();
         RepositoryConnection conn = null;
-        
         try
         {
             conn = this.getRepositoryManager().getRepository().getConnection();
-            PoddObjectLabel objectLabel = this.getSesameManager().getObjectLabel(ontologyID, objectUri, conn);
-            model.add(objectUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(objectLabel.getLabel()));
+            return this.getSesameManager().getObjectDetailsForDisplay(ontologyID, objectUri, conn);
         }
         finally
         {
             conn.close();
         }
-        return model;
+    }
+            
+    @Override
+    public PoddObjectLabel getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri)
+    throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            return this.getSesameManager().getObjectLabel(ontologyID, objectUri, conn);
+        }
+        finally
+        {
+            conn.close();
+        }
     }
     
     /*
@@ -501,6 +520,34 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             conn.close();
         }
         return results;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * Wraps PoddSesameManager.getOrderedProperties()
+     * 
+     * @see com.github.podd.api.PoddArtifactManager#getOrderedProperties()
+     */
+    @Override
+    public List<URI> getOrderedProperties(final InferredOWLOntologyID ontologyID, final URI objectUri, final boolean excludeContainsProperties) 
+    throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            
+            final URI[] contexts =
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                            this.getRepositoryManager().getSchemaManagementGraph());
+            
+            return this.getSesameManager().getWeightedProperties(objectUri, excludeContainsProperties, conn, contexts);
+        }
+        finally
+        {
+            conn.close();
+        }
     }
     
     /*

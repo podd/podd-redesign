@@ -14,6 +14,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
@@ -183,7 +184,26 @@ public interface PoddArtifactManager
     PoddDataRepositoryManager getFileRepositoryManager();
 
     /**
+     * Retrieves a {@link Model} containing all data required for displaying the details
+     * of the object in HTML+RDFa.
      * 
+     * The returned graph has the following structure.
+     * 
+     * poddObject :propertyUri :value
+     * 
+     * propertyUri RDFS:Label "property label"
+     * 
+     * value RDFS:Label "value label"
+     * 
+     * @param objectUri
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    Model getObjectDetailsForDisplay(final InferredOWLOntologyID artifactID, final URI objectUri)
+        throws OpenRDFException;
+
+    /**
      * 
      * @param ontologyID
      *            The given object URI is to be found in this ontology or its imported ontologies.
@@ -192,7 +212,7 @@ public interface PoddArtifactManager
      * @return A {@link Model} containing a single statement which specifies the object's label.
      * @throws OpenRDFException
      */
-    Model getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException;
+    PoddObjectLabel getObjectLabel(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException;
     
     /**
      * Retrieves a list of {@link PoddObjectLabel}s for the most-specific types to which the given
@@ -207,6 +227,29 @@ public interface PoddArtifactManager
      */
     List<PoddObjectLabel> getObjectTypes(InferredOWLOntologyID artifactId, URI objectUri) throws OpenRDFException;
 
+    /**
+     * Retrieve a list of <b>asserted</b> properties about the given object. The list is ordered
+     * based on property weights and secondarily based on property labels.
+     * 
+     * Properties RDF:Type, RDFS:Comment and RDFS:Label as well as properties whose values are
+     * generic OWL concepts (i.e. OWL:Thing, OWL:Individial, OWL:NamedIndividual, OWL:Class) are not
+     * included in the results.
+     * 
+     * Properties with an annotation poddBase:doNotDisplay are also not included in the results.
+     * 
+     * @param ontologyID
+     *            The artifact to which this object belongs
+     * @param objectUri
+     *            The object whose properties are sought
+     * @param excludeContainsProperties
+     *            Whether to exclude sub-properties of "poddBase:contains" property
+     * @return A List containing URIs of sorted properties about the object
+     * 
+     * @throws OpenRDFException
+     */
+    List<URI> getOrderedProperties(InferredOWLOntologyID ontologyID, URI objectUri, boolean excludeContainsProperties)
+        throws OpenRDFException;
+    
     /**
      * 
      * @return The {@link PoddOWLManager} used to manage OWL validation and inferencing for
@@ -265,7 +308,7 @@ public interface PoddArtifactManager
      * @throws OpenRDFException
      */
     List<PoddObjectLabel> getTopObjectLabels(List<InferredOWLOntologyID> artifacts) throws OpenRDFException;
-    
+
     /**
      * 
      * @return The list of artifacts that have been published.

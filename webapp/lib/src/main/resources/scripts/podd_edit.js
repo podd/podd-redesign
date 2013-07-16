@@ -24,6 +24,7 @@ var OBJECT_PROPERTY = 'http://www.w3.org/2002/07/owl#ObjectProperty';
 var DATATYPE_PROPERTY = 'http://www.w3.org/2002/07/owl#DatatypeProperty';
 var OWL_NAMED_INDIVIDUAL = 'http://www.w3.org/2002/07/owl#NamedIndividual';
 var XSD_DATETIME = 'http://www.w3.org/2001/XMLSchema#dateTime';
+var RDFS_LABEL = 'http://www.w3.org/2000/01/rdf-schema#label';
 
 var DETAILS_LIST_Selector = '#details ol';
 

@@ -1736,8 +1736,8 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
                         this.schemaGraph);
         final List<URI> orderedPropertyUris =
-                this.testPoddSesameManager.getWeightedProperties(nextOntologyID, internalObjectUri, false,
-                        this.testRepositoryConnection, contexts);
+                this.testPoddSesameManager.getWeightedProperties(internalObjectUri, false, this.testRepositoryConnection,
+                        contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Internal Object", 5, orderedPropertyUris.size());
@@ -1778,8 +1778,8 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
                         this.schemaGraph);
         final List<URI> orderedPropertyUris =
-                this.testPoddSesameManager.getWeightedProperties(nextOntologyID, topObjectUri, false,
-                        this.testRepositoryConnection, contexts);
+                this.testPoddSesameManager.getWeightedProperties(topObjectUri, false, this.testRepositoryConnection,
+                        contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 10, orderedPropertyUris.size());
@@ -1827,8 +1827,8 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
                         this.schemaGraph);
         final List<URI> orderedPropertyUris =
-                this.testPoddSesameManager.getWeightedProperties(nextOntologyID, topObjectUri, true,
-                        this.testRepositoryConnection, contexts);
+                this.testPoddSesameManager.getWeightedProperties(topObjectUri, true, this.testRepositoryConnection,
+                        contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Top Object", 5, orderedPropertyUris.size());

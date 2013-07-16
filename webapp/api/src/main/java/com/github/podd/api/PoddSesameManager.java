@@ -370,21 +370,18 @@ public interface PoddSesameManager
      * included in the results.
      * 
      * Properties with an annotation poddBase:doNotDisplay are also not included in the results.
-     * 
-     * @param artifactID
-     *            The artifact to which this object belongs
      * @param objectUri
      *            The object whose properties are sought
      * @param excludeContainsProperties
      *            Whether to exclude sub-properties of "poddBase:contains" property
      * @param repositoryConnection
-     * @return A List containing URIs of sorted properties about the object
+     * @param contexts
+     * @return A {@link List} containing URIs of sorted properties about the object
      * 
      * @throws OpenRDFException
      */
-    List<URI> getWeightedProperties(final InferredOWLOntologyID artifactID, final URI objectUri,
-            final boolean excludeContainsProperties, final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException;
+    List<URI> getWeightedProperties(final URI objectUri, final boolean excludeContainsProperties,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException;
     
     /**
      * Returns true if the combination of the Ontology IRI and the Version IRI in the given
