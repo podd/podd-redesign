@@ -1558,7 +1558,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 + "> true } ");
         
         sb.append(" } ");
-        sb.append("  ORDER BY ASC(?weight) ASC(?propertyLabel) ");
+        sb.append("  ORDER BY ASC(xsd:integer(?weight)) ASC(?propertyLabel) ");
         
         this.log.debug("Created SPARQL {} with poddObject bound to {}", sb, objectUri);
         
