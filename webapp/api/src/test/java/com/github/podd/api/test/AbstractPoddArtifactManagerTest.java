@@ -254,32 +254,32 @@ public abstract class AbstractPoddArtifactManagerTest
                                 MetadataPolicy.INCLUDE_ALL, 0, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 159, 20, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 151, 19, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 103, 13, 0 },
+                                MetadataPolicy.EXCLUDE_CONTAINS, 95, 12, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 296, 36, 13 },
+                                MetadataPolicy.INCLUDE_ALL, 295, 36, 14 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 42, 7, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.INCLUDE_ALL, 90, 11, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 82, 10, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), true,
-                                MetadataPolicy.INCLUDE_ALL, 116, 15, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 115, 15, 4 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 0, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.INCLUDE_ALL, 69, 9, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 61, 8, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                MetadataPolicy.INCLUDE_ALL, 95, 13, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 94, 13, 4 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 12, 2, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.INCLUDE_ALL, 85, 11, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 77, 10, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
-                                MetadataPolicy.INCLUDE_ALL, 111, 15, 3 },
+                                MetadataPolicy.INCLUDE_ALL, 110, 15, 4 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 12, 2, 0 }, };
         
@@ -592,7 +592,7 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: file reference object
             final List<Statement> fileRefList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_BASE, "hasFileReference"), null, false, updatedArtifact
+                            .createURI(PoddRdfConstants.PODD_BASE, "hasDataReference"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
             
@@ -1520,7 +1520,7 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: file reference object
             final List<Statement> fileRefList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_BASE, "hasFileReference"), null, false, updatedArtifact
+                            .createURI(PoddRdfConstants.PODD_BASE, "hasDataReference"), null, false, updatedArtifact
                             .getVersionIRI().toOpenRDFURI()));
             Assert.assertEquals("Graph should have 1 file reference", 1, fileRefList.size());
             
