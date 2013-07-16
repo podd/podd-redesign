@@ -7,7 +7,9 @@ import info.aduna.iteration.Iterations;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -1030,7 +1032,7 @@ public abstract class AbstractPoddOWLManagerTest
         final Model statements = new LinkedHashModel();
         this.testRepositoryConnection.export(new StatementCollector(statements), context);
         Assert.assertEquals("Not the expected number of statements in Repository",
-                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 2, statements.size());
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 9, statements.size());
         
         final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
         
@@ -1111,10 +1113,10 @@ public abstract class AbstractPoddOWLManagerTest
         Model statementsOriginal = new TreeModel(Rio.parse(inputStream, "", RDFFormat.RDFXML, contextOriginal));
         
         Assert.assertEquals("Not the expected number of statements in Repository",
-                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 2, statementsOriginal.size());
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 9, statementsOriginal.size());
         this.testRepositoryConnection.add(statementsOriginal);
         Assert.assertEquals("Not the expected number of statements in Repository",
-                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 2,
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 9,
                 this.testRepositoryConnection.size(contextOriginal));
         
         final OWLOntologyID loadedOntologyID =
@@ -1159,6 +1161,8 @@ public abstract class AbstractPoddOWLManagerTest
         System.out.println("Mismatched statements");
         System.out.println("------------");
         
+        Set<URI> displayedPredicates = new HashSet<URI>();
+        
         for(Statement nextOwlapiStatement : statementsOwlapi)
         {
             if(!(nextOwlapiStatement.getSubject() instanceof BNode)
@@ -1177,10 +1181,14 @@ public abstract class AbstractPoddOWLManagerTest
                 
                 if(originalFilter.size() != owlapiFilter.size())
                 {
-                    System.out.println("Original statements for predicate");
-                    DebugUtils.printContents(originalFilter);
-                    System.out.println("OWLAPI statements for predicate");
-                    DebugUtils.printContents(owlapiFilter);
+                    if(!displayedPredicates.contains(nextOwlapiStatement.getPredicate()))
+                    {
+                        displayedPredicates.add(nextOwlapiStatement.getPredicate());
+                        System.out.println("Original statements for predicate");
+                        DebugUtils.printContents(originalFilter);
+                        System.out.println("OWLAPI statements for predicate");
+                        DebugUtils.printContents(owlapiFilter);
+                    }
                 }
             }
         }
