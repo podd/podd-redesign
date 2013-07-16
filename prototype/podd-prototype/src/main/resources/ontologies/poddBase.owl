@@ -182,7 +182,7 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddBase#hasFileReference -->
+    <!-- http://purl.org/podd/ns/poddBase#hasDataReference -->
 
     <owl:ObjectProperty rdf:about="&poddBase;hasFileReference">
         <rdfs:label>has File Reference</rdfs:label>
@@ -399,7 +399,7 @@
     </owl:DatatypeProperty>
     
 
-    <!-- http://purl.org/podd/ns/poddBase#hasFileReferenceType -->
+    <!-- http://purl.org/podd/ns/poddBase#hasDataReferenceType -->
 
     <owl:DatatypeProperty rdf:about="&poddBase;hasFileReferenceType">
         <rdfs:label>has File Reference Type</rdfs:label>
@@ -566,7 +566,7 @@
     
 
 
-    <!-- http://purl.org/podd/ns/poddBase#FileReference -->
+    <!-- http://purl.org/podd/ns/poddBase#DataReference -->
 
     <owl:Class rdf:about="&poddBase;FileReference">
         <rdfs:label>File Reference</rdfs:label>

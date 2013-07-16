@@ -11,8 +11,8 @@
 <!-- a file reference resource -->
 <rdf:Description rdf:about="http://podd.org/filereference#unique_random_id:2">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
-	<poddBase:hasFileReferenceType>HTTP</poddBase:hasFileReferenceType>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#DataReference"/>
+	<poddBase:hasDataReferenceType>HTTP</poddBase:hasDataReferenceType>
 	<poddBase:hasFileName>rfc2616.html</poddBase:hasFileName>
 	<poddBase:hasDescription>The http RFC</poddBase:hasDescription>
 	<poddBase:hasPath>Protocols/rfc2616</poddBase:hasPath>
@@ -28,7 +28,7 @@
 <!-- owner of file reference -->
 <rdf:Description rdf:about="http://www.podd.org/user#John.Doe@csiro.au">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-	<poddBase:hasFileReference rdf:resource="http://podd.org/filereference#unique_random_id:2"/>
+	<poddBase:hasDataReference rdf:resource="http://podd.org/filereference#unique_random_id:2"/>
 </rdf:Description>
 
 </rdf:RDF>

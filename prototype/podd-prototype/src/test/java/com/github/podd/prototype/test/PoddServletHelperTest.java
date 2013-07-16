@@ -429,7 +429,7 @@ public class PoddServletHelperTest
         final URI context = IRI.create("urn:context").toOpenRDFURI();
         final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
         final URI propertyHasFileReference =
-                IRI.create("http://purl.org/podd/ns/poddBase#hasFileReference").toOpenRDFURI();
+                IRI.create("http://purl.org/podd/ns/poddBase#hasDataReference").toOpenRDFURI();
         final RepositoryResult<Statement> statements =
                 repoConn.getStatements(null, propertyHasFileReference, null, false);
         final List<Statement> fileRefStatements = Iterations.addAll(statements, new ArrayList<Statement>());
@@ -527,7 +527,7 @@ public class PoddServletHelperTest
         final URI context = IRI.create("urn:context").toOpenRDFURI();
         final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
         final URI propertyHasFileReference =
-                IRI.create("http://purl.org/podd/ns/poddBase#hasFileReference").toOpenRDFURI();
+                IRI.create("http://purl.org/podd/ns/poddBase#hasDataReference").toOpenRDFURI();
         final RepositoryResult<Statement> statements =
                 repoConn.getStatements(null, propertyHasFileReference, null, false);
         final List<Statement> fileRefStatements = Iterations.addAll(statements, new ArrayList<Statement>());
@@ -580,7 +580,7 @@ public class PoddServletHelperTest
             final URI context = IRI.create("urn:context").toOpenRDFURI();
             final RepositoryConnection repoConn = this.loadDataToNewRepository(resultRDF, mimeType, context);
             final URI propertyHasFileReference =
-                    IRI.create("http://purl.org/podd/ns/poddBase#hasFileReference").toOpenRDFURI();
+                    IRI.create("http://purl.org/podd/ns/poddBase#hasDataReference").toOpenRDFURI();
             final RepositoryResult<Statement> statements =
                     repoConn.getStatements(null, propertyHasFileReference, null, false);
             final List<Statement> fileRefStatements = Iterations.addAll(statements, new ArrayList<Statement>());

@@ -20,7 +20,7 @@
 <http://purl.org/podd/ns/poddBase#contains> owl:inverseOf <http://purl.org/podd/ns/poddBase#containedBy> ;
 	rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
 
-<http://purl.org/podd/ns/poddBase#hasFileReference> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
+<http://purl.org/podd/ns/poddBase#hasDataReference> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#poddObjectProperty> .
 
 <http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasUser> .
 
@@ -155,7 +155,7 @@
 
 <http://purl.org/podd/ns/poddBase#hasFileName> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddBase#hasFileReferenceType> rdfs:subPropertyOf owl:topDataProperty .
+<http://purl.org/podd/ns/poddBase#hasDataReferenceType> rdfs:subPropertyOf owl:topDataProperty .
 
 <http://purl.org/podd/ns/poddBase#hasIssue> rdfs:subPropertyOf owl:topDataProperty .
 
@@ -278,7 +278,7 @@
 <http://purl.org/dc/terms/Agent> owl:equivalentClass <http://xmlns.com/foaf/0.1/Agent> ;
 	rdfs:subClassOf owl:Thing .
 
-<http://purl.org/podd/ns/poddBase#FileReference> rdfs:subClassOf owl:Thing .
+<http://purl.org/podd/ns/poddBase#DataReference> rdfs:subClassOf owl:Thing .
 
 <http://purl.org/podd/ns/poddBase#PoddInternalObject> rdfs:subClassOf <http://purl.org/podd/ns/poddBase#PoddObject> .
 

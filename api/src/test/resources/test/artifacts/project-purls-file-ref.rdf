@@ -217,8 +217,8 @@
         <rdf:type rdf:resource="&poddScience;Material"/>
         <rdfs:label>Squeekee material</rdfs:label>
         <poddScience:hasGenotype rdf:resource="http://purl.org/podd-test/130326f/objA24#Demo_genotype_3"/>
-		<poddBase:hasFileReference rdf:resource="http://purl.org/podd-test/130326f/object-rice-scan-34343-a"/>
-		<poddBase:hasFileReference rdf:resource="http://purl.org/podd-test/130326f/object-rice-scan-34343-b"/>
+		<poddBase:hasDataReference rdf:resource="http://purl.org/podd-test/130326f/object-rice-scan-34343-a"/>
+		<poddBase:hasDataReference rdf:resource="http://purl.org/podd-test/130326f/object-rice-scan-34343-b"/>
     </owl:NamedIndividual>
     
 	<!-- an SSH file reference resource -->

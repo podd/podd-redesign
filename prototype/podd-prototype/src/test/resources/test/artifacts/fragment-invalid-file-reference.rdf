@@ -11,9 +11,9 @@
 <!-- a file reference resource which does not exist -->
 <rdf:Description rdf:about="http://podd.org/filereference#unique_random_id:1">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#DataReference"/>
 	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">SalesForce GIT CheatSheet</rdfs:label>
-	<poddBase:hasFileReferenceType>HTTP</poddBase:hasFileReferenceType>
+	<poddBase:hasDataReferenceType>HTTP</poddBase:hasDataReferenceType>
 	<poddBase:hasFileName>salesforce_git_developer_cheatsheet.pdf</poddBase:hasFileName>
 	<poddBase:hasDescription>GIT developer cheatsheet from salesforce</poddBase:hasDescription>
 	<poddBase:hasPath>this/is/path</poddBase:hasPath>
@@ -23,8 +23,8 @@
 <!-- a file reference resource -->
 <rdf:Description rdf:about="http://podd.org/filereference#unique_random_id:2">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#FileReference"/>
-	<poddBase:hasFileReferenceType>HTTP</poddBase:hasFileReferenceType>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddBase#DataReference"/>
+	<poddBase:hasDataReferenceType>HTTP</poddBase:hasDataReferenceType>
 	<poddBase:hasFileName>rfc2616.html</poddBase:hasFileName>
 	<poddBase:hasDescription>The http RFC</poddBase:hasDescription>
 	<poddBase:hasPath>Protocols/rfc2616</poddBase:hasPath>
@@ -40,8 +40,8 @@
 <!-- owner of file reference -->
 <rdf:Description rdf:about="http://www.podd.org/user#John.Doe@csiro.au">
 	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-	<poddBase:hasFileReference rdf:resource="http://podd.org/filereference#unique_random_id:1"/>
-	<poddBase:hasFileReference rdf:resource="http://podd.org/filereference#unique_random_id:2"/>
+	<poddBase:hasDataReference rdf:resource="http://podd.org/filereference#unique_random_id:1"/>
+	<poddBase:hasDataReference rdf:resource="http://podd.org/filereference#unique_random_id:2"/>
 </rdf:Description>
 
 </rdf:RDF>
