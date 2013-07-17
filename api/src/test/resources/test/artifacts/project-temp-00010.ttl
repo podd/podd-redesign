@@ -1,0 +1,97 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dcTerms: <http://purl.org/podd/ns/dcTerms#> .
+@prefix foaf: <http://purl.org/podd/ns/foaf#> .
+@prefix poddUser: <http://purl.org/podd/ns/poddUser#> .
+@prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
+@prefix poddScience: <http://purl.org/podd/ns/poddScience#> .
+@prefix poddPlant: <http://purl.org/podd/ns/poddPlant#> .
+
+<urn:temp:uuid:artifact:sdre> a owl:Ontology ;
+	owl:imports <http://purl.org/podd/ns/dcTerms> , <http://purl.org/podd/ns/foaf> , <http://purl.org/podd/ns/poddUser> , <http://purl.org/podd/ns/poddBase> , <http://purl.org/podd/ns/poddScience> , <http://purl.org/podd/ns/poddPlant> .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> a poddScience:Project , owl:NamedIndividual ;
+	rdfs:label "Project sdre" ;
+	rdfs:comment "Description about Project sdre"^^xsd:string ;
+	poddBase:hasLeadInstitution "CSIRO HRPPC sdre"^^xsd:string ;
+	poddScience:hasANZSRC poddPlant:ANZSRC06-Biological-Sciences ;
+	poddBase:hasPrincipalInvestigator <mailto:xavier.sirault@csiro.au> ;
+	poddBase:hasPublicationStatus poddBase:NotPublished ;
+	poddBase:hasStartDate "2013-01-01"^^xsd:date .
+
+<urn:temp:uuid:artifact:sdre> poddBase:artifactHasTopObject <urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> .
+
+<urn:temp:uuid:object:sdre10:67a60d9b-11da-41d0-baba-b647427b7bda> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation sdre10" ;
+	rdfs:comment "Description about Investigation sdre10"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> poddScience:hasInvestigation <urn:temp:uuid:object:sdre10:67a60d9b-11da-41d0-baba-b647427b7bda> .
+
+<urn:temp:uuid:object:sdre10:7f8ff614-d12e-4029-a762-79a69de37aa8> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform sdre10" ;
+	rdfs:comment "Description about Platform sdre10"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> poddScience:hasPlatform <urn:temp:uuid:object:sdre10:7f8ff614-d12e-4029-a762-79a69de37aa8> .
+
+<urn:temp:uuid:object:sdre10:ed74d368-f0a8-4006-a8fd-d4ea4e656e42> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform sdre10" ;
+	rdfs:comment "Description about Platform sdre10"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> poddScience:hasPlatform <urn:temp:uuid:object:sdre10:ed74d368-f0a8-4006-a8fd-d4ea4e656e42> .
+
+<urn:temp:uuid:object:sdre10:865e08c9-75af-4958-8b73-28731bc96df9> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis sdre10" ;
+	rdfs:comment "Description about Analysis sdre10"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:sdre10:7f8ff614-d12e-4029-a762-79a69de37aa8> , <urn:temp:uuid:object:sdre10:ed74d368-f0a8-4006-a8fd-d4ea4e656e42> .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> poddScience:hasAnalysis <urn:temp:uuid:object:sdre10:865e08c9-75af-4958-8b73-28731bc96df9> .
+
+<urn:temp:uuid:object:sdre10:d5573709-38ed-4039-a373-39980df700fc> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype sdre10" ;
+	rdfs:comment "Description about Genotype sdre10"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species sdre10"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> poddScience:hasGenotype <urn:temp:uuid:object:sdre10:d5573709-38ed-4039-a373-39980df700fc> .
+
+<urn:temp:uuid:object:sdre5:c47a2bc0-fbe8-4b1a-9dd3-05b2143dd352> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation sdre5" ;
+	rdfs:comment "Description about Investigation sdre5"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:sdre10:67a60d9b-11da-41d0-baba-b647427b7bda> poddScience:hasInvestigation <urn:temp:uuid:object:sdre5:c47a2bc0-fbe8-4b1a-9dd3-05b2143dd352> .
+
+<urn:temp:uuid:object:sdre5:90578480-627d-489f-94a6-4021c5bd1d11> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform sdre5" ;
+	rdfs:comment "Description about Platform sdre5"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> poddScience:hasPlatform <urn:temp:uuid:object:sdre5:90578480-627d-489f-94a6-4021c5bd1d11> .
+
+<urn:temp:uuid:object:sdre5:fe7dffed-91cf-4799-a76c-a36f52dcc2b2> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform sdre5" ;
+	rdfs:comment "Description about Platform sdre5"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> poddScience:hasPlatform <urn:temp:uuid:object:sdre5:fe7dffed-91cf-4799-a76c-a36f52dcc2b2> .
+
+<urn:temp:uuid:object:sdre5:c95886ab-d402-497d-9b8d-3bb36cc67ed2> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis sdre5" ;
+	rdfs:comment "Description about Analysis sdre5"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:sdre5:90578480-627d-489f-94a6-4021c5bd1d11> , <urn:temp:uuid:object:sdre5:fe7dffed-91cf-4799-a76c-a36f52dcc2b2> .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> poddScience:hasAnalysis <urn:temp:uuid:object:sdre5:c95886ab-d402-497d-9b8d-3bb36cc67ed2> .
+
+<urn:temp:uuid:object:sdre5:76ee914f-74f2-422a-bbe1-a6f8cad996c0> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype sdre5" ;
+	rdfs:comment "Description about Genotype sdre5"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species sdre5"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:sdre:96bc12f9-edba-4366-a848-ac59adf87e17> poddScience:hasGenotype <urn:temp:uuid:object:sdre5:76ee914f-74f2-422a-bbe1-a6f8cad996c0> .

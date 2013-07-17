@@ -1,0 +1,1281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:dcTerms="http://purl.org/podd/ns/dcTerms#"
+	xmlns:foaf="http://purl.org/podd/ns/foaf#"
+	xmlns:poddUser="http://purl.org/podd/ns/poddUser#"
+	xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
+	xmlns:poddScience="http://purl.org/podd/ns/poddScience#"
+	xmlns:poddPlant="http://purl.org/podd/ns/poddPlant#">
+
+<rdf:Description rdf:about="urn:temp:uuid:artifact:cent">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/dcTerms"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/foaf"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddUser"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddBase"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddScience"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddPlant"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Project"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Project cent</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Project cent</rdfs:comment>
+	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CSIRO HRPPC cent</poddBase:hasLeadInstitution>
+	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddPlant#ANZSRC06-Biological-Sciences"/>
+	<poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
+	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
+	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-01-01</poddBase:hasStartDate>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:artifact:cent">
+	<poddBase:artifactHasTopObject rdf:resource="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent100:e4b6f039-b1dd-4499-a517-1b77aed0784b">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent100</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent100</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent100:e4b6f039-b1dd-4499-a517-1b77aed0784b"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent100:35ae11cc-13a8-4fc5-a2c1-312a7c9bc03f">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent100</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent100</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent100:35ae11cc-13a8-4fc5-a2c1-312a7c9bc03f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent100:d2dad5a6-a20b-439a-9b94-b0656f09491a">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent100</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent100</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent100:d2dad5a6-a20b-439a-9b94-b0656f09491a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent100:d409409f-17a4-4121-a29e-76e0200daf7a">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent100</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent100</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent100:35ae11cc-13a8-4fc5-a2c1-312a7c9bc03f"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent100:d2dad5a6-a20b-439a-9b94-b0656f09491a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent100:d409409f-17a4-4121-a29e-76e0200daf7a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent100:8ddbbff7-dcba-4ca0-ba37-2dc43c2160bf">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent100</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent100</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent100</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent100:8ddbbff7-dcba-4ca0-ba37-2dc43c2160bf"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent95:fa1f4b72-c75f-488c-ab6f-623d89add896">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent95</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent95</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent100:e4b6f039-b1dd-4499-a517-1b77aed0784b">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent95:fa1f4b72-c75f-488c-ab6f-623d89add896"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent95:336276ff-e1fa-496b-b60f-213f7f7a4b2d">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent95</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent95</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent95:336276ff-e1fa-496b-b60f-213f7f7a4b2d"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent95:c6ffd1ff-335a-459e-ab2d-37eee3114318">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent95</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent95</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent95:c6ffd1ff-335a-459e-ab2d-37eee3114318"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent95:b0439b7a-31d9-47cc-8f8c-8785ee6bc628">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent95</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent95</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent95:336276ff-e1fa-496b-b60f-213f7f7a4b2d"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent95:c6ffd1ff-335a-459e-ab2d-37eee3114318"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent95:b0439b7a-31d9-47cc-8f8c-8785ee6bc628"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent95:b2b0c863-9e51-41f8-8f02-3daa086b96ed">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent95</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent95</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent95</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent95:b2b0c863-9e51-41f8-8f02-3daa086b96ed"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent90:9b2d6772-cd99-47b1-b4fa-d7af7890356c">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent90</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent90</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent95:fa1f4b72-c75f-488c-ab6f-623d89add896">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent90:9b2d6772-cd99-47b1-b4fa-d7af7890356c"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent90:0a542e45-6854-4382-9780-fd04aeb70cd6">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent90</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent90</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent90:0a542e45-6854-4382-9780-fd04aeb70cd6"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent90:8433ac77-d78a-445d-9795-0204872cccab">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent90</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent90</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent90:8433ac77-d78a-445d-9795-0204872cccab"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent90:1ac05d29-e9d2-41d9-8c5e-bf9c17b312a0">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent90</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent90</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent90:0a542e45-6854-4382-9780-fd04aeb70cd6"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent90:8433ac77-d78a-445d-9795-0204872cccab"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent90:1ac05d29-e9d2-41d9-8c5e-bf9c17b312a0"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent90:231bdb2a-803a-4375-9b90-a0c02f386253">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent90</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent90</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent90</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent90:231bdb2a-803a-4375-9b90-a0c02f386253"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent85:6d34a506-1374-4aba-96e4-2374f0a7077e">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent85</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent85</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent90:9b2d6772-cd99-47b1-b4fa-d7af7890356c">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent85:6d34a506-1374-4aba-96e4-2374f0a7077e"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent85:8a04fa5d-4f3e-42b5-8833-cc27e3312c2d">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent85</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent85</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent85:8a04fa5d-4f3e-42b5-8833-cc27e3312c2d"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent85:9342fe88-d0fe-4675-a77c-9c061aae7b83">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent85</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent85</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent85:9342fe88-d0fe-4675-a77c-9c061aae7b83"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent85:116ce07b-9b00-463b-be98-893bdf224084">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent85</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent85</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent85:8a04fa5d-4f3e-42b5-8833-cc27e3312c2d"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent85:9342fe88-d0fe-4675-a77c-9c061aae7b83"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent85:116ce07b-9b00-463b-be98-893bdf224084"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent85:45f53638-d50b-4cbb-baaf-caa648ce4127">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent85</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent85</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent85</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent85:45f53638-d50b-4cbb-baaf-caa648ce4127"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent80:90642fb4-3388-429e-9c94-10b17e5e2854">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent80</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent80</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent85:6d34a506-1374-4aba-96e4-2374f0a7077e">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent80:90642fb4-3388-429e-9c94-10b17e5e2854"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent80:33a8bd0a-b98f-4601-b2a4-b4cbc9bece65">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent80</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent80</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent80:33a8bd0a-b98f-4601-b2a4-b4cbc9bece65"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent80:1f53b69f-742d-42d9-924e-a762a87c35b6">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent80</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent80</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent80:1f53b69f-742d-42d9-924e-a762a87c35b6"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent80:60145960-c71e-473f-9df5-90e934d5cfc4">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent80</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent80</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent80:33a8bd0a-b98f-4601-b2a4-b4cbc9bece65"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent80:1f53b69f-742d-42d9-924e-a762a87c35b6"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent80:60145960-c71e-473f-9df5-90e934d5cfc4"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent80:f4f1658b-c7e6-4c88-b3f4-2b5999f600c7">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent80</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent80</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent80</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent80:f4f1658b-c7e6-4c88-b3f4-2b5999f600c7"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent75:e89c238e-1f09-4b7d-a532-de552b380d02">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent75</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent75</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent80:90642fb4-3388-429e-9c94-10b17e5e2854">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent75:e89c238e-1f09-4b7d-a532-de552b380d02"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent75:5d5c1fa7-9fb5-41f0-a734-b7951c28c4f9">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent75</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent75</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent75:5d5c1fa7-9fb5-41f0-a734-b7951c28c4f9"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent75:de7b24f4-a39a-449c-9b8e-8066a4ab9e98">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent75</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent75</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent75:de7b24f4-a39a-449c-9b8e-8066a4ab9e98"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent75:932f969f-6c87-4fb3-b7f4-025782f50f05">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent75</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent75</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent75:5d5c1fa7-9fb5-41f0-a734-b7951c28c4f9"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent75:de7b24f4-a39a-449c-9b8e-8066a4ab9e98"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent75:932f969f-6c87-4fb3-b7f4-025782f50f05"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent75:bc0e59a1-b181-41f6-9163-52b0600a9dd5">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent75</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent75</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent75</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent75:bc0e59a1-b181-41f6-9163-52b0600a9dd5"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent70:12e94fff-a7c3-426d-a60c-3d111e3dcefe">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent70</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent70</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent75:e89c238e-1f09-4b7d-a532-de552b380d02">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent70:12e94fff-a7c3-426d-a60c-3d111e3dcefe"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent70:43eeac0e-0cf7-424b-8733-5e6d6415256a">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent70</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent70</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent70:43eeac0e-0cf7-424b-8733-5e6d6415256a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent70:1cd73e13-5406-4cda-93f8-8aeb1881a39a">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent70</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent70</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent70:1cd73e13-5406-4cda-93f8-8aeb1881a39a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent70:aea60f94-ca49-4cac-a31e-2d45b59432c4">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent70</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent70</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent70:43eeac0e-0cf7-424b-8733-5e6d6415256a"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent70:1cd73e13-5406-4cda-93f8-8aeb1881a39a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent70:aea60f94-ca49-4cac-a31e-2d45b59432c4"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent70:912df729-d14b-4675-9ce1-dda6630a0e43">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent70</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent70</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent70</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent70:912df729-d14b-4675-9ce1-dda6630a0e43"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent65:d65b28d5-f12c-4585-adc3-cc17da99e8e9">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent65</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent65</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent70:12e94fff-a7c3-426d-a60c-3d111e3dcefe">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent65:d65b28d5-f12c-4585-adc3-cc17da99e8e9"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent65:0e9f87d5-5a04-4f5e-9ecc-07b76510c491">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent65</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent65</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent65:0e9f87d5-5a04-4f5e-9ecc-07b76510c491"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent65:d190102a-a91f-42f2-91d4-2d3ba674d8e4">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent65</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent65</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent65:d190102a-a91f-42f2-91d4-2d3ba674d8e4"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent65:077a67e5-73f5-4856-8df1-b37c3db2de9e">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent65</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent65</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent65:0e9f87d5-5a04-4f5e-9ecc-07b76510c491"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent65:d190102a-a91f-42f2-91d4-2d3ba674d8e4"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent65:077a67e5-73f5-4856-8df1-b37c3db2de9e"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent65:542653b0-2629-498b-8681-3ed07d728726">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent65</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent65</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent65</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent65:542653b0-2629-498b-8681-3ed07d728726"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent60:1c67cffa-214d-49f1-97af-dd87d198f96f">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent60</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent60</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent65:d65b28d5-f12c-4585-adc3-cc17da99e8e9">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent60:1c67cffa-214d-49f1-97af-dd87d198f96f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent60:7cbf8bef-b3d8-43d9-ade5-0551f0c551ae">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent60</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent60</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent60:7cbf8bef-b3d8-43d9-ade5-0551f0c551ae"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent60:990a3256-5ecf-4d8c-ad73-cc920d9b3c70">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent60</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent60</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent60:990a3256-5ecf-4d8c-ad73-cc920d9b3c70"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent60:65b7b12d-321d-434d-bd3f-4c6a88ba876f">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent60</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent60</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent60:7cbf8bef-b3d8-43d9-ade5-0551f0c551ae"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent60:990a3256-5ecf-4d8c-ad73-cc920d9b3c70"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent60:65b7b12d-321d-434d-bd3f-4c6a88ba876f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent60:7a10c9e6-2a36-4555-90ad-adf153ba88b1">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent60</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent60</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent60</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent60:7a10c9e6-2a36-4555-90ad-adf153ba88b1"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent55:7562fb7d-2474-401a-9424-9f6acdd974d9">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent55</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent55</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent60:1c67cffa-214d-49f1-97af-dd87d198f96f">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent55:7562fb7d-2474-401a-9424-9f6acdd974d9"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent55:6ddd1414-4cd8-4f81-affa-614404e8a7f6">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent55</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent55</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent55:6ddd1414-4cd8-4f81-affa-614404e8a7f6"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent55:aa70da5b-309f-41f1-a3c2-9d3803bb7896">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent55</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent55</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent55:aa70da5b-309f-41f1-a3c2-9d3803bb7896"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent55:4878a70c-e060-4bf3-ac15-e1ee626501cb">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent55</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent55</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent55:6ddd1414-4cd8-4f81-affa-614404e8a7f6"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent55:aa70da5b-309f-41f1-a3c2-9d3803bb7896"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent55:4878a70c-e060-4bf3-ac15-e1ee626501cb"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent55:cdf9c46a-a416-40b2-bdda-4e5befeac75f">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent55</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent55</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent55</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent55:cdf9c46a-a416-40b2-bdda-4e5befeac75f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent50:5bf3ce0b-f0c7-4cf0-ab62-6002e8432dec">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent50</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent50</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent55:7562fb7d-2474-401a-9424-9f6acdd974d9">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent50:5bf3ce0b-f0c7-4cf0-ab62-6002e8432dec"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent50:bbac3b39-ba70-4956-a16d-23592f8c5ef3">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent50</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent50</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent50:bbac3b39-ba70-4956-a16d-23592f8c5ef3"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent50:2584997d-9af2-4cd1-90ac-f2604285aa6c">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent50</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent50</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent50:2584997d-9af2-4cd1-90ac-f2604285aa6c"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent50:58bd4104-00e9-42ce-8a54-442f80e642a5">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent50</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent50</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent50:bbac3b39-ba70-4956-a16d-23592f8c5ef3"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent50:2584997d-9af2-4cd1-90ac-f2604285aa6c"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent50:58bd4104-00e9-42ce-8a54-442f80e642a5"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent50:b861526b-6ab9-4c4e-bc98-9b91a6fd8893">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent50</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent50</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent50</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent50:b861526b-6ab9-4c4e-bc98-9b91a6fd8893"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent45:e9865c97-b7d8-4ea2-b0a1-9aee6a9ded86">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent45</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent45</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent50:5bf3ce0b-f0c7-4cf0-ab62-6002e8432dec">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent45:e9865c97-b7d8-4ea2-b0a1-9aee6a9ded86"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent45:dd8d620f-2ca0-406b-8c37-9d9d13cb573d">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent45</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent45</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent45:dd8d620f-2ca0-406b-8c37-9d9d13cb573d"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent45:f1d28671-e7fc-4c93-925d-d29ff343bf9b">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent45</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent45</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent45:f1d28671-e7fc-4c93-925d-d29ff343bf9b"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent45:cb51316b-fd3b-4344-a88c-b4fcfbb048c7">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent45</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent45</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent45:dd8d620f-2ca0-406b-8c37-9d9d13cb573d"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent45:f1d28671-e7fc-4c93-925d-d29ff343bf9b"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent45:cb51316b-fd3b-4344-a88c-b4fcfbb048c7"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent45:0813d61d-f791-4b95-9e15-3b9e75ae2eb8">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent45</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent45</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent45</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent45:0813d61d-f791-4b95-9e15-3b9e75ae2eb8"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent40:6e501cd9-c06e-47e7-b004-20ff5625de34">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent40</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent40</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent45:e9865c97-b7d8-4ea2-b0a1-9aee6a9ded86">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent40:6e501cd9-c06e-47e7-b004-20ff5625de34"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent40:f31d9174-70d0-45f1-87f1-91d7dea20953">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent40</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent40</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent40:f31d9174-70d0-45f1-87f1-91d7dea20953"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent40:38e744b5-5eea-444d-b89e-114299beb44c">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent40</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent40</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent40:38e744b5-5eea-444d-b89e-114299beb44c"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent40:4743b8b4-eb4d-45cb-b6cf-a43b578a2c64">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent40</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent40</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent40:f31d9174-70d0-45f1-87f1-91d7dea20953"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent40:38e744b5-5eea-444d-b89e-114299beb44c"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent40:4743b8b4-eb4d-45cb-b6cf-a43b578a2c64"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent40:ca4411eb-a620-4b3d-94d6-e5cbbc199b90">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent40</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent40</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent40</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent40:ca4411eb-a620-4b3d-94d6-e5cbbc199b90"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent35:c9926006-6a50-4823-9048-7885e8390e5f">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent35</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent35</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent40:6e501cd9-c06e-47e7-b004-20ff5625de34">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent35:c9926006-6a50-4823-9048-7885e8390e5f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent35:52ec8f89-ce7f-4619-a634-cae2d6537f87">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent35</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent35</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent35:52ec8f89-ce7f-4619-a634-cae2d6537f87"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent35:9da20b1a-e036-4d91-92bd-6d8ee71aa1f4">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent35</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent35</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent35:9da20b1a-e036-4d91-92bd-6d8ee71aa1f4"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent35:4c92e7fc-87ed-480c-8a72-997b1ce00831">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent35</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent35</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent35:52ec8f89-ce7f-4619-a634-cae2d6537f87"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent35:9da20b1a-e036-4d91-92bd-6d8ee71aa1f4"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent35:4c92e7fc-87ed-480c-8a72-997b1ce00831"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent35:b246ce47-f8c8-4a24-9dd9-7a3e5448f63d">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent35</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent35</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent35</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent35:b246ce47-f8c8-4a24-9dd9-7a3e5448f63d"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent30:aa4d9daf-a5be-46e7-ab59-ba9acb819a4a">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent30</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent30</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent35:c9926006-6a50-4823-9048-7885e8390e5f">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent30:aa4d9daf-a5be-46e7-ab59-ba9acb819a4a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent30:21acaa0d-3c05-4edf-8889-219e9c325dd2">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent30</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent30</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent30:21acaa0d-3c05-4edf-8889-219e9c325dd2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent30:16946ea5-0658-4668-906a-b358a19e4b87">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent30</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent30</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent30:16946ea5-0658-4668-906a-b358a19e4b87"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent30:047d60e7-2b15-49eb-94ff-cca6c23c020f">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent30</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent30</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent30:21acaa0d-3c05-4edf-8889-219e9c325dd2"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent30:16946ea5-0658-4668-906a-b358a19e4b87"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent30:047d60e7-2b15-49eb-94ff-cca6c23c020f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent30:290f6083-59c8-4104-9e46-d25a17c4999a">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent30</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent30</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent30</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent30:290f6083-59c8-4104-9e46-d25a17c4999a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent25:a8a3db4d-274d-4d66-ab69-29d1098c17fe">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent25</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent25</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent30:aa4d9daf-a5be-46e7-ab59-ba9acb819a4a">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent25:a8a3db4d-274d-4d66-ab69-29d1098c17fe"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent25:5ccb5647-a3fa-4912-b979-bbd501e8f724">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent25</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent25</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent25:5ccb5647-a3fa-4912-b979-bbd501e8f724"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent25:b703e7e2-5a3f-45d4-92b1-34891c0c53e8">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent25</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent25</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent25:b703e7e2-5a3f-45d4-92b1-34891c0c53e8"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent25:55034c85-056b-46b4-90f0-e2614530e9ac">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent25</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent25</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent25:5ccb5647-a3fa-4912-b979-bbd501e8f724"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent25:b703e7e2-5a3f-45d4-92b1-34891c0c53e8"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent25:55034c85-056b-46b4-90f0-e2614530e9ac"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent25:7feba3b5-c6c8-476a-9fc2-8663dae35fef">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent25</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent25</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent25</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent25:7feba3b5-c6c8-476a-9fc2-8663dae35fef"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent20:3e04acf8-8ea2-48cb-b135-dedb511c6122">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent20</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent20</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent25:a8a3db4d-274d-4d66-ab69-29d1098c17fe">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent20:3e04acf8-8ea2-48cb-b135-dedb511c6122"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent20:ccf2caf6-b8f1-477b-ac47-f2922069a814">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent20</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent20</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent20:ccf2caf6-b8f1-477b-ac47-f2922069a814"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent20:50b382aa-fc10-4996-962d-d1affd4d1630">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent20</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent20</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent20:50b382aa-fc10-4996-962d-d1affd4d1630"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent20:a42d1834-c147-402d-a59d-6a2160f31c4a">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent20</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent20</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent20:ccf2caf6-b8f1-477b-ac47-f2922069a814"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent20:50b382aa-fc10-4996-962d-d1affd4d1630"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent20:a42d1834-c147-402d-a59d-6a2160f31c4a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent20:d3a340a6-e0f9-4d17-9e31-30625ddcb90d">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent20</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent20</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent20</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent20:d3a340a6-e0f9-4d17-9e31-30625ddcb90d"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent15:6525045f-ab22-4e55-b14d-1fd429b10f01">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent15</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent15</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent20:3e04acf8-8ea2-48cb-b135-dedb511c6122">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent15:6525045f-ab22-4e55-b14d-1fd429b10f01"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent15:2bffcb11-eedc-45e8-9983-8693edba0b18">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent15</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent15</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent15:2bffcb11-eedc-45e8-9983-8693edba0b18"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent15:1b6b0c3f-795f-4dd6-9b0c-b9606222ff8a">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent15</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent15</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent15:1b6b0c3f-795f-4dd6-9b0c-b9606222ff8a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent15:5d8299f8-962c-418c-a3d0-699c282770dc">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent15</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent15</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent15:2bffcb11-eedc-45e8-9983-8693edba0b18"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent15:1b6b0c3f-795f-4dd6-9b0c-b9606222ff8a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent15:5d8299f8-962c-418c-a3d0-699c282770dc"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent15:ff82ede6-a49e-44fd-a36b-32c4a6f18b2c">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent15</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent15</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent15</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent15:ff82ede6-a49e-44fd-a36b-32c4a6f18b2c"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent10:d2ece0c4-581d-44f3-80d8-598a0870450f">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent10</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent15:6525045f-ab22-4e55-b14d-1fd429b10f01">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent10:d2ece0c4-581d-44f3-80d8-598a0870450f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent10:2a5297c8-a79e-4ca1-a558-bd4a62e1a3fb">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent10</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent10:2a5297c8-a79e-4ca1-a558-bd4a62e1a3fb"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent10:73a81dc9-a015-4a77-ae17-250d285ac298">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent10</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent10:73a81dc9-a015-4a77-ae17-250d285ac298"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent10:60b6852a-017b-45fe-9c69-e09620e26b86">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent10</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent10:2a5297c8-a79e-4ca1-a558-bd4a62e1a3fb"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent10:73a81dc9-a015-4a77-ae17-250d285ac298"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent10:60b6852a-017b-45fe-9c69-e09620e26b86"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent10:eadca95b-1492-4a77-af3c-6dbca86f6831">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent10</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent10</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent10:eadca95b-1492-4a77-af3c-6dbca86f6831"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent5:1cfa11d6-8945-447e-98d8-eedab3cf18dd">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation cent5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation cent5</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent10:d2ece0c4-581d-44f3-80d8-598a0870450f">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:cent5:1cfa11d6-8945-447e-98d8-eedab3cf18dd"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent5:71c18e16-4deb-47f7-ad97-a52240685e42">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent5</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent5:71c18e16-4deb-47f7-ad97-a52240685e42"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent5:a65aca77-fc2f-4d1b-8692-534fb18bb7f2">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform cent5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform cent5</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:cent5:a65aca77-fc2f-4d1b-8692-534fb18bb7f2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent5:8b69d3c1-5b66-4af5-b824-72012f7a99f2">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis cent5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis cent5</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent5:71c18e16-4deb-47f7-ad97-a52240685e42"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:cent5:a65aca77-fc2f-4d1b-8692-534fb18bb7f2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:cent5:8b69d3c1-5b66-4af5-b824-72012f7a99f2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent5:ba0f2b2d-9572-4578-af9d-234fbe6a1f13">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype cent5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype cent5</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species cent5</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:cent:5d08e448-ceed-4b55-9620-61804704ba0c">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:cent5:ba0f2b2d-9572-4578-af9d-234fbe6a1f13"/>
+</rdf:Description>
+
+</rdf:RDF>

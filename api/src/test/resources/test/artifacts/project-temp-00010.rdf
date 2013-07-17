@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:dcTerms="http://purl.org/podd/ns/dcTerms#"
+	xmlns:foaf="http://purl.org/podd/ns/foaf#"
+	xmlns:poddUser="http://purl.org/podd/ns/poddUser#"
+	xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
+	xmlns:poddScience="http://purl.org/podd/ns/poddScience#"
+	xmlns:poddPlant="http://purl.org/podd/ns/poddPlant#">
+
+<rdf:Description rdf:about="urn:temp:uuid:artifact:deci">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/dcTerms"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/foaf"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddUser"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddBase"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddScience"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddPlant"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Project"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Project deci</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Project deci</rdfs:comment>
+	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CSIRO HRPPC deci</poddBase:hasLeadInstitution>
+	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddPlant#ANZSRC06-Biological-Sciences"/>
+	<poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
+	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#NotPublished"/>
+	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-01-01</poddBase:hasStartDate>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:artifact:deci">
+	<poddBase:artifactHasTopObject rdf:resource="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci10:f9a2ace1-4664-4f3c-aab4-d0fe71d439ae">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation deci10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation deci10</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:deci10:f9a2ace1-4664-4f3c-aab4-d0fe71d439ae"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci10:fe5e6cb0-573d-4e4f-a06f-0d19ffbfc681">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform deci10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform deci10</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:deci10:fe5e6cb0-573d-4e4f-a06f-0d19ffbfc681"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci10:d767a67d-9b7a-4d40-8c03-eaa2cc001c95">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform deci10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform deci10</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:deci10:d767a67d-9b7a-4d40-8c03-eaa2cc001c95"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci10:23da2ba9-5abe-425d-adb8-26d6040cb864">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis deci10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis deci10</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:deci10:fe5e6cb0-573d-4e4f-a06f-0d19ffbfc681"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:deci10:d767a67d-9b7a-4d40-8c03-eaa2cc001c95"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:deci10:23da2ba9-5abe-425d-adb8-26d6040cb864"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci10:b8531793-69af-4135-bbf7-bfe0921e16f9">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype deci10</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype deci10</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species deci10</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:deci10:b8531793-69af-4135-bbf7-bfe0921e16f9"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci5:0470bbb4-884d-44f2-a573-04e08e672088">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Investigation"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Investigation deci5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Investigation deci5</rdfs:comment>
+	<poddBase:hasStartDateTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T09:00:00</poddBase:hasStartDateTime>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci10:f9a2ace1-4664-4f3c-aab4-d0fe71d439ae">
+	<poddScience:hasInvestigation rdf:resource="urn:temp:uuid:object:deci5:0470bbb4-884d-44f2-a573-04e08e672088"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci5:da74ae2b-29d2-4f9a-bdb8-2af4745c65f2">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform deci5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform deci5</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:deci5:da74ae2b-29d2-4f9a-bdb8-2af4745c65f2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci5:6e8f64c2-4612-4dde-851d-86b27e78b405">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Platform"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Platform deci5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Platform deci5</rdfs:comment>
+	<poddScience:hasPlatformType rdf:resource="http://purl.org/podd/ns/poddScience#PlatformType_HardwareSoftware"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<poddScience:hasPlatform rdf:resource="urn:temp:uuid:object:deci5:6e8f64c2-4612-4dde-851d-86b27e78b405"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci5:ecf88d7e-70f8-4b4e-9e28-8a9d20d4eb42">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Analysis"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Analysis deci5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Analysis deci5</rdfs:comment>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:deci5:da74ae2b-29d2-4f9a-bdb8-2af4745c65f2"/>
+	<poddScience:refersToPlatform rdf:resource="urn:temp:uuid:object:deci5:6e8f64c2-4612-4dde-851d-86b27e78b405"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<poddScience:hasAnalysis rdf:resource="urn:temp:uuid:object:deci5:ecf88d7e-70f8-4b4e-9e28-8a9d20d4eb42"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci5:5858e64b-0dee-499a-a123-dc782a1f79aa">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Genotype"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+	<rdfs:label>Genotype deci5</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Description about Genotype deci5</rdfs:comment>
+	<poddScience:hasGenusSpecies rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genus or species deci5</poddScience:hasGenusSpecies>
+	<poddScience:hasWildType rdf:resource="http://purl.org/podd/ns/poddScience#WildType_Yes"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:deci:7959a572-2892-428e-80e7-e1687f2c1e8f">
+	<poddScience:hasGenotype rdf:resource="urn:temp:uuid:object:deci5:5858e64b-0dee-499a-a123-dc782a1f79aa"/>
+</rdf:Description>
+
+</rdf:RDF>
