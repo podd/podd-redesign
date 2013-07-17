@@ -16,7 +16,7 @@ import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
- * @author kutila
+ * @author Peter Ansell p_ansell@yahoo.com
  * 
  */
 public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataReference>
@@ -55,7 +55,7 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
             return false;
         }
         
-        // unnecessary as Generics ensure only an SSHFileReference can be passed in
+        // unnecessary as Generics ensure only an SPARQLDataReference can be passed in
         if(!(reference instanceof SPARQLDataReference))
         {
             return false;
