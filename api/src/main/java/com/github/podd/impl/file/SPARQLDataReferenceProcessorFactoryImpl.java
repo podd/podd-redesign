@@ -55,7 +55,7 @@ public class SPARQLDataReferenceProcessorFactoryImpl implements SPARQLDataRefere
     @Override
     public DataReferenceProcessor getProcessor()
     {
-        return new SSHFileReferenceProcessorImpl();
+        return new SPARQLDataReferenceProcessorImpl();
     }
     
     @Override
