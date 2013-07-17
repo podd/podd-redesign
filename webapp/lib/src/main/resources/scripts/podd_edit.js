@@ -2014,7 +2014,7 @@ podd.updateObjectUriWithPurl = function(nextDatabank) {
 	if (podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
 		var myQuery = $.rdf({
 			databank : nextDatabank
-		}).where(podd.getCurrentObjectUri()	+ ' poddBase:hasPURL ?purl');
+		}).where(podd.getCurrentObjectUri()	+ ' poddBase:replacedTempUriWith ?purl');
 		
 		var bindings = myQuery.select();
 		$.each(bindings, function(index, value) {

@@ -50,7 +50,9 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     protected PoddDataRepositoryManager testFileRepositoryManager;
     protected PoddRepositoryManager testRepositoryManager;
     
-    protected abstract DataReference buildFileReference(final String alias, final String fileIdentifier);
+    protected abstract DataReference getNewValidFileReference() throws Exception;
+    
+    protected abstract DataReference getNewInvalidFileReference() throws Exception;
     
     /**
      * Build a File Repository object in memory with the given alias and Model. ALl other method
@@ -595,12 +597,12 @@ public abstract class AbstractPoddFileRepositoryManagerTest
             this.startRepositorySource();
             // prepare: create FileReferences to test
             final Set<DataReference> dataReferences = new HashSet<DataReference>();
-            final DataReference fileRefWithAlias1A =
-                    this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, null);
+            final DataReference fileRefWithAlias1A = this.getNewValidFileReference();
+            fileRefWithAlias1A.setRepositoryAlias(TEST_ALIAS_1A);
             dataReferences.add(fileRefWithAlias1A);
             
-            final DataReference fileRefWithAlias2A =
-                    this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A, null);
+            final DataReference fileRefWithAlias2A = this.getNewValidFileReference();
+            fileRefWithAlias2A.setRepositoryAlias(TEST_ALIAS_2A);
             dataReferences.add(fileRefWithAlias2A);
             
             this.testFileRepositoryManager.verifyDataReferences(dataReferences);
@@ -631,33 +633,35 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     @Test
     public void testVerifyFileReferencesWithOneFailure() throws Exception
     {
-        DataReference fileRefWithNoSuchFile = null;
         try
         {
             this.startRepositorySource();
             
             // prepare: create FileReferences to test
             final Set<DataReference> dataReferences = new HashSet<DataReference>();
-            final DataReference fileRefWithAlias1A =
-                    this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, null);
+            final DataReference fileRefWithAlias1A = this.getNewValidFileReference();
+            fileRefWithAlias1A.setRepositoryAlias(TEST_ALIAS_1A);
             dataReferences.add(fileRefWithAlias1A);
             
-            fileRefWithNoSuchFile =
-                    this.buildFileReference(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A, "no_such_file");
+            final DataReference fileRefWithNoSuchFile = this.getNewInvalidFileReference();
+            fileRefWithNoSuchFile.setRepositoryAlias(TEST_ALIAS_1A);
             dataReferences.add(fileRefWithNoSuchFile);
             
-            this.testFileRepositoryManager.verifyDataReferences(dataReferences);
-            Assert.fail("Verify should have thrown an Exception containing errors");
-        }
-        catch(final FileReferenceVerificationFailureException e)
-        {
-            Assert.assertEquals("Expected 1 validation failure", 1, e.getValidationFailures().size());
-            Assert.assertNotNull(fileRefWithNoSuchFile);
-            final Throwable throwable = e.getValidationFailures().get(fileRefWithNoSuchFile);
-            Assert.assertTrue("Not the expected cause of validation failure",
-                    throwable instanceof FileReferenceInvalidException);
-            Assert.assertEquals("Not the expected error message",
-                    "Remote File Repository says this File Reference is invalid", throwable.getMessage());
+            try
+            {
+                this.testFileRepositoryManager.verifyDataReferences(dataReferences);
+                Assert.fail("Verify should have thrown an Exception containing errors");
+            }
+            catch(final FileReferenceVerificationFailureException e)
+            {
+                Assert.assertEquals("Expected 1 validation failure", 1, e.getValidationFailures().size());
+                Assert.assertNotNull(fileRefWithNoSuchFile);
+                final Throwable throwable = e.getValidationFailures().get(fileRefWithNoSuchFile);
+                Assert.assertTrue("Not the expected cause of validation failure",
+                        throwable instanceof FileReferenceInvalidException);
+                Assert.assertEquals("Not the expected error message",
+                        "Remote File Repository says this File Reference is invalid", throwable.getMessage());
+            }
         }
         finally
         {

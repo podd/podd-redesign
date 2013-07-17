@@ -163,8 +163,6 @@
 
 <http://purl.org/podd/ns/poddBase#hasNotes> rdfs:subPropertyOf owl:topDataProperty .
 
-<http://purl.org/podd/ns/poddBase#hasPURL> rdfs:subPropertyOf <http://purl.org/podd/ns/poddBase#hasURL> .
-
 <http://purl.org/podd/ns/poddBase#hasPath> rdfs:subPropertyOf owl:topDataProperty .
 
 <http://purl.org/podd/ns/poddBase#hasPublicationDate> rdfs:subPropertyOf <http://purl.org/dc/terms/date> .

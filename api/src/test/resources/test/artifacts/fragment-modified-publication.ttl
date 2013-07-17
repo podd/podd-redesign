@@ -20,8 +20,6 @@
                
                dcterms:created "2013-03-12"^^xsd:date ;
                
-               poddBase:hasPURL "http://dx.doi.org/10.1109/eScience.2011.44"^^xsd:anyURI ;
-               
                poddScience:hasAbstract " Data management has become a critical challenge faced by a wide array of scientiﬁc disciplines in which the provision of sound data management is pivotal to the achievements and impact of research projects. Massive and rapidly expanding amounts of data combined with data models that evolve over time contribute to making data management an increasingly challenging task that warrants a rethinking of its design. In this paper we present PODD, an ontology-centric architecture for data management systems that is extensible and domain independent. In this architecture, the behaviors of domain concepts and objects are captured entirely by ontological entities, around which all data management tasks are carried out. The open and semantic nature of ontology languages also makes PODD amenable to greater data reuse and interoperability. To evaluate the PODD architecture, we have applied it to the challenge of managing phenomics data."^^xsd:string ;
                
                poddScience:publishedIn "Proceedings of the IEEE eScience 2011"^^xsd:string ;

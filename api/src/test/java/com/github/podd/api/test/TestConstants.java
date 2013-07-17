@@ -17,8 +17,8 @@ public interface TestConstants
     public static final int EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE = 217;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED = 34;
     
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE = 368;
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED = 68;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE = 352;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED = 69;
     
     public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE = 1309;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED = 208;
@@ -47,6 +47,8 @@ public interface TestConstants
     public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_INFERRED_TRIPLES = 311;
     
     public static final String TEST_ARTIFACT_PURLS_2_FILE_REFS = "/test/artifacts/project-purls-file-ref.rdf";
+    
+    public static final String TEST_ARTIFACT_PURLS_2_SPARQL_DATA_REFS = "/test/artifacts/project-purls-sparql-ref.rdf";
     
     /** Test resource (in RDF/XML): invalid artifact with 2 lead institutes */
     public static final String TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES = "/test/artifacts/bad-twoLeadInstitutions.rdf";
@@ -78,8 +80,8 @@ public interface TestConstants
     
     /** Test resource: artifact with PURLs and multiple internal objects in Turtle format */
     public static final String TEST_ARTIFACT_20130206 = "/test/artifacts/basic-20130206.ttl";
-    public static final int TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES = 92;
-    public static final int TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES = 556;
+    public static final int TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES = 91;
+    public static final int TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES = 555;
     
     /** Test resource (in Turtle): inferred artifact with PURLs and multiple internal objects */
     public static final String TEST_ARTIFACT_20130206_INFERRED = "/test/artifacts/basic-20130206-inferred.ttl";

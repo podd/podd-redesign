@@ -121,6 +121,9 @@ public interface PoddRdfConstants
     public static final URI HTTP_REASON_PHRASE = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.HTTP,
             "reasonPhrase");
     
+    public static final URI PODD_REPLACED_TEMP_URI_WITH = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "replacedTempUriWith");;
+    
     /**
      * Creating a property for PODD to track the inferredVersion for the inferred axioms ontology of
      * a particular versioned ontology.
@@ -183,10 +186,6 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_HAS_ALLOWED_VALUE = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasAllowedValue");
     
-    /** http://purl.org/podd/ns/poddBase#hasPURL */
-    public static final URI PODD_BASE_HAS_PURL = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE,
-            "hasPURL");
-    
     // ----- custom representation of cardinalities -----
     
     /**
@@ -225,6 +224,10 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_HAS_FILE_PATH = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
             "hasPath");
     
+    /** http://purl.org/podd/ns/poddBase#hasSPARQLGraph */
+    public static final URI PODD_BASE_HAS_SPARQL_GRAPH = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasSPARQLGraph");
+    
     /**
      * http://purl.org/podd/ns/poddBase#hasAlias.
      * 
@@ -240,6 +243,10 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "SSHFileReference");
     
+    /** http://purl.org/podd/ns/poddBase#SSHFileReference */
+    public static final URI PODD_BASE_DATA_REFERENCE_TYPE_SPARQL = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_BASE, "SPARQLDataReference");
+    
     // ----- file repository constants -----
     
     /** http://purl.org/podd/ns/poddBase#DataRepository */
@@ -249,6 +256,10 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/poddBase#SSHFileRepository */
     public static final URI PODD_SSH_FILE_REPOSITORY = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
             "SSHFileRepository");
+    
+    /** http://purl.org/podd/ns/poddBase#SPARQLDataRepository */
+    public static final URI PODD_SPARQL_DATA_REPOSITORY = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.DATA_REPOSITORY, "SPARQLDataRepository");
     
     /** http://purl.org/podd/ns/poddBase#HTTPFileRepository */
     public static final URI PODD_HTTP_FILE_REPOSITORY = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,

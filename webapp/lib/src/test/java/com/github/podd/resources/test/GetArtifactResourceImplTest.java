@@ -334,8 +334,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Publication title is missing",
                 body.contains("Towards An Extensible, Domain-agnostic Scientific Data Management System"));
         Assert.assertTrue("#publishedIn value is missing", body.contains("Proceedings of the IEEE eScience 2010"));
-        Assert.assertTrue("Publicatin's PURL value is missing",
-                body.contains("http://dx.doi.org/10.1109/eScience.2010.44"));
+        // Assert.assertTrue("Publicatin's PURL value is missing",
+        // body.contains("http://dx.doi.org/10.1109/eScience.2010.44"));
         
         this.assertFreemarker(body);
     }

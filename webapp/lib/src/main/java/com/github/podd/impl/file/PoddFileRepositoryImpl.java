@@ -25,7 +25,7 @@ import com.github.podd.utils.PoddRdfConstants;
  * 
  * @author kutila
  */
-public abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDataRepository<DataReference>
+abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDataRepository<DataReference>
 {
     protected Model model;
     
@@ -43,7 +43,7 @@ public abstract class PoddFileRepositoryImpl<T extends DataReference> implements
      *            A {@link Model} containing data to construct a File Repository configuration.
      * @throws FileRepositoryIncompleteException
      */
-    public PoddFileRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
+    protected PoddFileRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
     {
         // check that the model contains an "alias" and at least one "type"
         final Model aliasModel = model.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);

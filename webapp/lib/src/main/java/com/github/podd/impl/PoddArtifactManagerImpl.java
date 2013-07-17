@@ -42,6 +42,7 @@ import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
+import org.semanticweb.owlapi.profiles.OWLProfileViolation;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.rio.RioMemoryTripleSource;
 import org.slf4j.Logger;
@@ -141,10 +142,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         Rio.write(model, output, RDFFormat.RDFJSON);
         
-        final Model resultModel = this.updateArtifact(artifactUri, versionUri, fileReferenceObjects,
-                new ByteArrayInputStream(output.toByteArray()), RDFFormat.RDFJSON, UpdatePolicy.MERGE_WITH_EXISTING,
-                DanglingObjectPolicy.REPORT, dataReferenceVerificationPolicy);
-        return OntologyUtils.modelToOntologyIDs(resultModel).get(0);        
+        final Model resultModel =
+                this.updateArtifact(artifactUri, versionUri, fileReferenceObjects,
+                        new ByteArrayInputStream(output.toByteArray()), RDFFormat.RDFJSON,
+                        UpdatePolicy.MERGE_WITH_EXISTING, DanglingObjectPolicy.REPORT, dataReferenceVerificationPolicy);
+        return OntologyUtils.modelToOntologyIDs(resultModel).get(0);
     }
     
     @Override
@@ -263,8 +265,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public void exportObjectMetadata(final URI objectType, final OutputStream outputStream, final RDFFormat format,
-            final boolean includeDoNotDisplayProperties, MetadataPolicy containsPropertyPolicy, final InferredOWLOntologyID artifactID)
-        throws OpenRDFException, PoddException, IOException
+            final boolean includeDoNotDisplayProperties, MetadataPolicy containsPropertyPolicy,
+            final InferredOWLOntologyID artifactID) throws OpenRDFException, PoddException, IOException
     {
         RepositoryConnection connection = null;
         
@@ -275,7 +277,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final URI[] contexts =
                     this.sesameManager.versionAndSchemaContexts(artifactID, connection,
                             this.repositoryManager.getSchemaManagementGraph());
-
+            
             Model model = null;
             if(containsPropertyPolicy == MetadataPolicy.ONLY_CONTAINS)
             {
@@ -475,10 +477,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             conn.close();
         }
     }
-            
+    
     @Override
     public PoddObjectLabel getObjectLabel(final InferredOWLOntologyID ontologyID, final URI objectUri)
-    throws OpenRDFException
+        throws OpenRDFException
     {
         RepositoryConnection conn = null;
         try
@@ -510,7 +512,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             conn = this.getRepositoryManager().getRepository().getConnection();
             
             List<URI> typesList = this.getSesameManager().getObjectTypes(artifactId, objectUri, conn);
-            for (URI objectType : typesList)
+            for(URI objectType : typesList)
             {
                 results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, conn));
             }
@@ -530,8 +532,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @see com.github.podd.api.PoddArtifactManager#getOrderedProperties()
      */
     @Override
-    public List<URI> getOrderedProperties(final InferredOWLOntologyID ontologyID, final URI objectUri, final boolean excludeContainsProperties) 
-    throws OpenRDFException
+    public List<URI> getOrderedProperties(final InferredOWLOntologyID ontologyID, final URI objectUri,
+            final boolean excludeContainsProperties) throws OpenRDFException
     {
         RepositoryConnection conn = null;
         try
@@ -785,7 +787,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         return Collections.emptySet();
     }
-
+    
     /**
      * Helper method to check schema ontology imports and update use of ontology IRIs to version
      * IRIs.
@@ -815,8 +817,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     /**
-     * This helper method checks for statements with the given property and having
-     * a date-time value with the year 1970 and updates their date-time with the given {@link Value}.
+     * This helper method checks for statements with the given property and having a date-time value
+     * with the year 1970 and updates their date-time with the given {@link Value}.
      * 
      * @param repositoryConnection
      * @param propertyUri
@@ -824,8 +826,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * @param context
      * @throws OpenRDFException
      */
-    private void handleTimestamps(final RepositoryConnection repositoryConnection, final URI propertyUri, final Value newTimestamp,
-            final URI context) throws OpenRDFException
+    private void handleTimestamps(final RepositoryConnection repositoryConnection, final URI propertyUri,
+            final Value newTimestamp, final URI context) throws OpenRDFException
     {
         final List<Statement> statements =
                 Iterations.asList(repositoryConnection.getStatements(null, propertyUri, null, false, context));
@@ -1037,19 +1039,21 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // check and update statements with default timestamp values
             final Value now = PoddRdfConstants.VF.createLiteral(new Date());
-            this.handleTimestamps(temporaryRepositoryConnection, PoddRdfConstants.PODD_BASE_CREATED_AT, now, randomContext);
-            this.handleTimestamps(temporaryRepositoryConnection, PoddRdfConstants.PODD_BASE_LAST_MODIFIED, now, randomContext);
+            this.handleTimestamps(temporaryRepositoryConnection, PoddRdfConstants.PODD_BASE_CREATED_AT, now,
+                    randomContext);
+            this.handleTimestamps(temporaryRepositoryConnection, PoddRdfConstants.PODD_BASE_LAST_MODIFIED, now,
+                    randomContext);
             
             this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext,
                     DanglingObjectPolicy.REPORT);
-
+            
             // check and ensure schema ontology imports are for version IRIs
             this.handleSchemaImports(ontologyIRI, permanentRepositoryConnection, temporaryRepositoryConnection,
                     randomContext);
             
             // ensure schema ontologies are cached in memory before loading statements into OWLAPI
             this.handleCacheSchemasInMemory(permanentRepositoryConnection, permanentRepositoryConnection, randomContext);
-
+            
             // TODO: This web service could be used accidentally to insert invalid file references
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(temporaryRepositoryConnection, permanentRepositoryConnection,
@@ -1135,6 +1139,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         if(!profileReport.isInProfile())
         {
             this.getOWLManager().removeCache(nextOntology.getOntologyID());
+            
+            if(this.log.isInfoEnabled())
+            {
+                for(OWLProfileViolation violation : profileReport.getViolations())
+                {
+                    this.log.info(violation.toString());
+                }
+            }
             throw new OntologyNotInProfileException(nextOntology, profileReport,
                     "Ontology is not in required OWL Profile");
         }
@@ -1261,7 +1273,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.api.PoddArtifactManager#searchForOntologyLabels(org.semanticweb.owlapi.model.
+     * @see
+     * com.github.podd.api.PoddArtifactManager#searchForOntologyLabels(org.semanticweb.owlapi.model.
      * OWLOntologyID, java.lang.String, org.openrdf.model.URI[])
      */
     @Override
@@ -1385,14 +1398,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * 
      * @see com.github.podd.api.PoddArtifactManager#updateArtifact(org.openrdf.model.URI,
      * java.io.InputStream, org.openrdf.rio.RDFFormat)
-     * 
      */
     @Override
-    public Model updateArtifact(final URI artifactUri, final URI versionUri,
-            final Collection<URI> objectUris, final InputStream inputStream, RDFFormat format,
-            final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectAction,
-            final DataReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException,
-        OWLException, PoddException
+    public Model updateArtifact(final URI artifactUri, final URI versionUri, final Collection<URI> objectUris,
+            final InputStream inputStream, RDFFormat format, final UpdatePolicy updatePolicy,
+            final DanglingObjectPolicy danglingObjectAction, final DataReferenceVerificationPolicy fileReferenceAction)
+        throws OpenRDFException, IOException, OWLException, PoddException
     {
         if(inputStream == null)
         {
@@ -1500,20 +1511,21 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     danglingObjectAction);
             
             final Set<PoddPurlReference> purls = this.handlePurls(tempRepositoryConnection, tempContext);
-
+            
             final Model resultsModel = new LinkedHashModel();
-
+            
             // add (temp-object-URI :hasPurl PURL) statements to Model
-            // NOTE: Using nested loops is rather inefficient, but these collections are not expected
+            // NOTE: Using nested loops is rather inefficient, but these collections are not
+            // expected
             // to have more than a handful of elements
-            for (URI objectUri : objectUris)
+            for(URI objectUri : objectUris)
             {
-                for (PoddPurlReference purl : purls) 
+                for(PoddPurlReference purl : purls)
                 {
                     final URI tempUri = purl.getTemporaryURI();
-                    if (objectUri.equals(tempUri))
+                    if(objectUri.equals(tempUri))
                     {
-                        resultsModel.add(objectUri, PoddRdfConstants.PODD_BASE_HAS_PURL, purl.getPurlURI());
+                        resultsModel.add(objectUri, PoddRdfConstants.PODD_REPLACED_TEMP_URI_WITH, purl.getPurlURI());
                         break; // out of inner loop
                     }
                 }

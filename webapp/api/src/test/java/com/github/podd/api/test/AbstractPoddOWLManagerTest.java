@@ -6,7 +6,10 @@ package com.github.podd.api.test;
 import info.aduna.iteration.Iterations;
 
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -14,15 +17,23 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.openrdf.model.BNode;
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.util.ModelUtil;
+import org.openrdf.model.util.Namespaces;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.StatementCollector;
 import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.formats.OWLOntologyFormatFactoryRegistry;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -44,6 +55,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.exception.EmptyOntologyException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -630,6 +642,7 @@ public abstract class AbstractPoddOWLManagerTest
         // verify:
         Assert.assertEquals("Dumped statement count not expected value",
                 TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE, this.testRepositoryConnection.size(context));
+        
     }
     
     /**
@@ -1016,10 +1029,10 @@ public abstract class AbstractPoddOWLManagerTest
         Assert.assertNotNull("Could not find resource", inputStream);
         
         this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
-        final List<Statement> statements =
-                Iterations.asList(this.testRepositoryConnection.getStatements(null, null, null, false, context));
+        final Model statements = new LinkedHashModel();
+        this.testRepositoryConnection.export(new StatementCollector(statements), context);
         Assert.assertEquals("Not the expected number of statements in Repository",
-                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 2, statements.size());
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 9, statements.size());
         
         final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
         
@@ -1095,13 +1108,19 @@ public abstract class AbstractPoddOWLManagerTest
         final InputStream inputStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE);
         Assert.assertNotNull("Could not find resource", inputStream);
         
-        final URI context = ValueFactoryImpl.getInstance().createURI("urn:test:context:");
-        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, context);
+        final URI contextOriginal = ValueFactoryImpl.getInstance().createURI("urn:test:context:original:");
+        
+        Model statementsOriginal = new TreeModel(Rio.parse(inputStream, "", RDFFormat.RDFXML, contextOriginal));
+        
         Assert.assertEquals("Not the expected number of statements in Repository",
-                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 2, this.testRepositoryConnection.size(context));
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 9, statementsOriginal.size());
+        this.testRepositoryConnection.add(statementsOriginal);
+        Assert.assertEquals("Not the expected number of statements in Repository",
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 9,
+                this.testRepositoryConnection.size(contextOriginal));
         
         final OWLOntologyID loadedOntologyID =
-                this.testOWLManager.parseRDFStatements(this.testRepositoryConnection, context);
+                this.testOWLManager.parseRDFStatements(this.testRepositoryConnection, contextOriginal);
         
         // verify:
         Assert.assertNotNull("OntologyID was null", loadedOntologyID);
@@ -1111,6 +1130,68 @@ public abstract class AbstractPoddOWLManagerTest
         
         final OWLOntology loadedOntology = this.testOWLManager.getOntology(loadedOntologyID);
         Assert.assertNotNull("Ontology not in memory", loadedOntology);
+        
+        final URI contextOwlapi = ValueFactoryImpl.getInstance().createURI("urn:test:context:owlapi:");
+        this.testOWLManager.dumpOntologyToRepository(loadedOntology, this.testRepositoryConnection, contextOwlapi);
+        
+        // verify:
+        Assert.assertEquals("Dumped statement count not expected value",
+                TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
+                this.testRepositoryConnection.size(contextOwlapi));
+        
+        Model statementsOwlapi = new TreeModel();
+        
+        this.testRepositoryConnection.export(new StatementCollector(statementsOwlapi), contextOwlapi);
+        
+        System.out.println("------------");
+        System.out.println("RDF statements");
+        System.out.println("------------");
+        
+        StringWriter originalWriter = new StringWriter();
+        Rio.write(statementsOriginal, originalWriter, RDFFormat.NTRIPLES);
+        
+        System.out.println("------------");
+        System.out.println("OWLAPI statements");
+        System.out.println("------------");
+        
+        StringWriter owlapiWriter = new StringWriter();
+        Rio.write(statementsOwlapi, owlapiWriter, RDFFormat.NTRIPLES);
+        
+        System.out.println("------------");
+        System.out.println("Mismatched statements");
+        System.out.println("------------");
+        
+        Set<URI> displayedPredicates = new HashSet<URI>();
+        
+        for(Statement nextOwlapiStatement : statementsOwlapi)
+        {
+            if(!(nextOwlapiStatement.getSubject() instanceof BNode)
+                    && !(nextOwlapiStatement.getObject() instanceof BNode))
+            {
+                if(!statementsOriginal.contains(nextOwlapiStatement.getSubject(), nextOwlapiStatement.getPredicate(),
+                        nextOwlapiStatement.getObject()))
+                {
+                    System.out.println(nextOwlapiStatement);
+                }
+            }
+            else
+            {
+                Model originalFilter = statementsOriginal.filter(null, nextOwlapiStatement.getPredicate(), null);
+                Model owlapiFilter = statementsOwlapi.filter(null, nextOwlapiStatement.getPredicate(), null);
+                
+                if(originalFilter.size() != owlapiFilter.size())
+                {
+                    if(!displayedPredicates.contains(nextOwlapiStatement.getPredicate()))
+                    {
+                        displayedPredicates.add(nextOwlapiStatement.getPredicate());
+                        System.out.println("Original statements for predicate");
+                        DebugUtils.printContents(originalFilter);
+                        System.out.println("OWLAPI statements for predicate");
+                        DebugUtils.printContents(owlapiFilter);
+                    }
+                }
+            }
+        }
     }
     
     /**

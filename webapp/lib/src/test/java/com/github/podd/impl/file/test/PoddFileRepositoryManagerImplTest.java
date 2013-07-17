@@ -35,7 +35,6 @@ import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
-import com.github.podd.impl.file.SSHFileRepositoryImpl;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -56,21 +55,19 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     private Path sshDir = null;
     
     @Override
-    protected DataReference buildFileReference(final String alias, final String fileIdentifier)
+    protected DataReference getNewValidFileReference() throws Exception
     {
-        try
-        {
-            return SSHService
-                    .getNewFileReference(
-                            alias,
-                            fileIdentifier,
-                            this.tempDirectory.newFolder(
-                                    "poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString()).toPath());
-        }
-        catch(final IOException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return SSHService.getNewValidFileReference("valid-file",
+                this.tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                        .toPath());
+    }
+    
+    @Override
+    protected DataReference getNewInvalidFileReference() throws Exception
+    {
+        return SSHService.getNewInvalidFileReference("invalid-file",
+                this.tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                        .toPath());
     }
     
     @Override
@@ -127,7 +124,7 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         // SSH implementation specific configurations
         model.add(aliasUri, RDF.TYPE, PoddRdfConstants.PODD_SSH_FILE_REPOSITORY);
         model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance()
-                .createLiteral(SSHFileRepositoryImpl.PROTOCOL_SSH));
+                .createLiteral(PoddDataRepository.PROTOCOL_SSH));
         model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST,
                 ValueFactoryImpl.getInstance().createLiteral(SSHService.TEST_SSH_HOST));
         model.add(aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT,
