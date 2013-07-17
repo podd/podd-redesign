@@ -36,7 +36,7 @@ public class SPARQLDataRepositoryImplFactory implements PoddDataRepositoryFactor
     {
         if(statements.contains(null, RDF.TYPE, PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY))
         {
-            return new SSHFileRepositoryImpl(statements);
+            return new SPARQLDataRepositoryImpl(statements);
         }
         
         throw new FileRepositoryIncompleteException(statements,
