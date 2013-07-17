@@ -225,6 +225,14 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_HAS_FILE_PATH = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
             "hasPath");
     
+    /** http://purl.org/podd/ns/poddBase#hasSPARQLGraph */
+    public static final URI PODD_BASE_HAS_SPARQL_GRAPH = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasSPARQLGraph");
+    
+    /** http://purl.org/podd/ns/poddBase#hasSPARQLEndpoint */
+    public static final URI PODD_BASE_HAS_SPARQL_ENDPOINT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasSPARQLEndpoint");
+    
     /**
      * http://purl.org/podd/ns/poddBase#hasAlias.
      * 
