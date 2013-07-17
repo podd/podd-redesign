@@ -1,0 +1,745 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dcTerms: <http://purl.org/podd/ns/dcTerms#> .
+@prefix foaf: <http://purl.org/podd/ns/foaf#> .
+@prefix poddUser: <http://purl.org/podd/ns/poddUser#> .
+@prefix poddBase: <http://purl.org/podd/ns/poddBase#> .
+@prefix poddScience: <http://purl.org/podd/ns/poddScience#> .
+@prefix poddPlant: <http://purl.org/podd/ns/poddPlant#> .
+
+<urn:temp:uuid:artifact:cent> a owl:Ontology ;
+	owl:imports <http://purl.org/podd/ns/dcTerms> , <http://purl.org/podd/ns/foaf> , <http://purl.org/podd/ns/poddUser> , <http://purl.org/podd/ns/poddBase> , <http://purl.org/podd/ns/poddScience> , <http://purl.org/podd/ns/poddPlant> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> a poddScience:Project , owl:NamedIndividual ;
+	rdfs:label "Project cent" ;
+	rdfs:comment "Description about Project cent"^^xsd:string ;
+	poddBase:hasLeadInstitution "CSIRO HRPPC cent"^^xsd:string ;
+	poddScience:hasANZSRC poddPlant:ANZSRC06-Biological-Sciences ;
+	poddBase:hasPrincipalInvestigator <mailto:xavier.sirault@csiro.au> ;
+	poddBase:hasPublicationStatus poddBase:NotPublished ;
+	poddBase:hasStartDate "2013-01-01"^^xsd:date .
+
+<urn:temp:uuid:artifact:cent> poddBase:artifactHasTopObject <urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> .
+
+<urn:temp:uuid:object:cent100:1be502d9-86c0-43dd-b4b2-c2fcaf9ddabb> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent100" ;
+	rdfs:comment "Description about Investigation cent100"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasInvestigation <urn:temp:uuid:object:cent100:1be502d9-86c0-43dd-b4b2-c2fcaf9ddabb> .
+
+<urn:temp:uuid:object:cent100:bf18a2ce-bcd7-4169-8653-ab6d8812c9f8> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent100" ;
+	rdfs:comment "Description about Platform cent100"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent100:bf18a2ce-bcd7-4169-8653-ab6d8812c9f8> .
+
+<urn:temp:uuid:object:cent100:ea358bf9-6416-4d7b-b5d0-73d48df91c1c> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent100" ;
+	rdfs:comment "Description about Platform cent100"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent100:ea358bf9-6416-4d7b-b5d0-73d48df91c1c> .
+
+<urn:temp:uuid:object:cent100:b607c973-3d7d-4671-b497-3b3b4dcb0760> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent100" ;
+	rdfs:comment "Description about Analysis cent100"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent100:bf18a2ce-bcd7-4169-8653-ab6d8812c9f8> , <urn:temp:uuid:object:cent100:ea358bf9-6416-4d7b-b5d0-73d48df91c1c> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent100:b607c973-3d7d-4671-b497-3b3b4dcb0760> .
+
+<urn:temp:uuid:object:cent100:ade025f8-e958-40dc-a170-b1696a46e790> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent100" ;
+	rdfs:comment "Description about Genotype cent100"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent100"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent100:ade025f8-e958-40dc-a170-b1696a46e790> .
+
+<urn:temp:uuid:object:cent95:1f4bf002-464c-4171-acef-12690e71ea0f> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent95" ;
+	rdfs:comment "Description about Investigation cent95"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent100:1be502d9-86c0-43dd-b4b2-c2fcaf9ddabb> poddScience:hasInvestigation <urn:temp:uuid:object:cent95:1f4bf002-464c-4171-acef-12690e71ea0f> .
+
+<urn:temp:uuid:object:cent95:d2a1784b-0973-4b45-8a91-5a53715fcc9e> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent95" ;
+	rdfs:comment "Description about Platform cent95"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent95:d2a1784b-0973-4b45-8a91-5a53715fcc9e> .
+
+<urn:temp:uuid:object:cent95:736f1ea0-ec93-4558-ba41-ccc82540be8e> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent95" ;
+	rdfs:comment "Description about Platform cent95"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent95:736f1ea0-ec93-4558-ba41-ccc82540be8e> .
+
+<urn:temp:uuid:object:cent95:23839420-e9d9-450b-aed9-b13d1634bc48> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent95" ;
+	rdfs:comment "Description about Analysis cent95"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent95:d2a1784b-0973-4b45-8a91-5a53715fcc9e> , <urn:temp:uuid:object:cent95:736f1ea0-ec93-4558-ba41-ccc82540be8e> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent95:23839420-e9d9-450b-aed9-b13d1634bc48> .
+
+<urn:temp:uuid:object:cent95:c4b9b992-26bb-479e-ad5e-c2398ecbb013> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent95" ;
+	rdfs:comment "Description about Genotype cent95"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent95"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent95:c4b9b992-26bb-479e-ad5e-c2398ecbb013> .
+
+<urn:temp:uuid:object:cent90:3829778c-202d-417d-983d-9e2e04a742aa> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent90" ;
+	rdfs:comment "Description about Investigation cent90"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent95:1f4bf002-464c-4171-acef-12690e71ea0f> poddScience:hasInvestigation <urn:temp:uuid:object:cent90:3829778c-202d-417d-983d-9e2e04a742aa> .
+
+<urn:temp:uuid:object:cent90:cb575eb8-abaf-4e63-89a5-d883ef9e5895> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent90" ;
+	rdfs:comment "Description about Platform cent90"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent90:cb575eb8-abaf-4e63-89a5-d883ef9e5895> .
+
+<urn:temp:uuid:object:cent90:f763e349-6bcc-4b14-9cd6-86cdc4cd5f7f> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent90" ;
+	rdfs:comment "Description about Platform cent90"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent90:f763e349-6bcc-4b14-9cd6-86cdc4cd5f7f> .
+
+<urn:temp:uuid:object:cent90:0ecb39da-91b4-4f64-a1d5-6348d229a901> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent90" ;
+	rdfs:comment "Description about Analysis cent90"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent90:cb575eb8-abaf-4e63-89a5-d883ef9e5895> , <urn:temp:uuid:object:cent90:f763e349-6bcc-4b14-9cd6-86cdc4cd5f7f> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent90:0ecb39da-91b4-4f64-a1d5-6348d229a901> .
+
+<urn:temp:uuid:object:cent90:80f216aa-e0ce-49d1-b3e6-92d12096c90e> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent90" ;
+	rdfs:comment "Description about Genotype cent90"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent90"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent90:80f216aa-e0ce-49d1-b3e6-92d12096c90e> .
+
+<urn:temp:uuid:object:cent85:ed20997d-82f8-47f0-bb3f-915289c0b45c> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent85" ;
+	rdfs:comment "Description about Investigation cent85"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent90:3829778c-202d-417d-983d-9e2e04a742aa> poddScience:hasInvestigation <urn:temp:uuid:object:cent85:ed20997d-82f8-47f0-bb3f-915289c0b45c> .
+
+<urn:temp:uuid:object:cent85:018468d0-ecc1-473d-b52b-27a0160641cc> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent85" ;
+	rdfs:comment "Description about Platform cent85"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent85:018468d0-ecc1-473d-b52b-27a0160641cc> .
+
+<urn:temp:uuid:object:cent85:7eb44e19-9be8-4a2c-b7e7-c5f84e939b42> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent85" ;
+	rdfs:comment "Description about Platform cent85"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent85:7eb44e19-9be8-4a2c-b7e7-c5f84e939b42> .
+
+<urn:temp:uuid:object:cent85:8128cf0d-317f-45d3-b227-050d4302271f> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent85" ;
+	rdfs:comment "Description about Analysis cent85"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent85:018468d0-ecc1-473d-b52b-27a0160641cc> , <urn:temp:uuid:object:cent85:7eb44e19-9be8-4a2c-b7e7-c5f84e939b42> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent85:8128cf0d-317f-45d3-b227-050d4302271f> .
+
+<urn:temp:uuid:object:cent85:0356abc0-ffef-4a94-9324-e07e2d09986c> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent85" ;
+	rdfs:comment "Description about Genotype cent85"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent85"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent85:0356abc0-ffef-4a94-9324-e07e2d09986c> .
+
+<urn:temp:uuid:object:cent80:8121ff2e-2f08-4a51-a7fe-ba7d9ca490a6> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent80" ;
+	rdfs:comment "Description about Investigation cent80"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent85:ed20997d-82f8-47f0-bb3f-915289c0b45c> poddScience:hasInvestigation <urn:temp:uuid:object:cent80:8121ff2e-2f08-4a51-a7fe-ba7d9ca490a6> .
+
+<urn:temp:uuid:object:cent80:751776fa-6b40-4054-af23-925c63e68139> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent80" ;
+	rdfs:comment "Description about Platform cent80"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent80:751776fa-6b40-4054-af23-925c63e68139> .
+
+<urn:temp:uuid:object:cent80:2c52cfb0-4f7f-47e1-bed4-016a93079e43> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent80" ;
+	rdfs:comment "Description about Platform cent80"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent80:2c52cfb0-4f7f-47e1-bed4-016a93079e43> .
+
+<urn:temp:uuid:object:cent80:a684aebf-46f7-4d9a-bbb6-b5226af160b3> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent80" ;
+	rdfs:comment "Description about Analysis cent80"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent80:751776fa-6b40-4054-af23-925c63e68139> , <urn:temp:uuid:object:cent80:2c52cfb0-4f7f-47e1-bed4-016a93079e43> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent80:a684aebf-46f7-4d9a-bbb6-b5226af160b3> .
+
+<urn:temp:uuid:object:cent80:bd847567-9db0-4140-9e1c-ff07884cba75> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent80" ;
+	rdfs:comment "Description about Genotype cent80"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent80"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent80:bd847567-9db0-4140-9e1c-ff07884cba75> .
+
+<urn:temp:uuid:object:cent75:40e3938f-6cd3-46aa-8490-222fda2c1878> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent75" ;
+	rdfs:comment "Description about Investigation cent75"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent80:8121ff2e-2f08-4a51-a7fe-ba7d9ca490a6> poddScience:hasInvestigation <urn:temp:uuid:object:cent75:40e3938f-6cd3-46aa-8490-222fda2c1878> .
+
+<urn:temp:uuid:object:cent75:3da702df-ce97-4a7b-972c-3d2d107f52b9> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent75" ;
+	rdfs:comment "Description about Platform cent75"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent75:3da702df-ce97-4a7b-972c-3d2d107f52b9> .
+
+<urn:temp:uuid:object:cent75:30815736-1723-4882-ad5a-8b652c6164ab> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent75" ;
+	rdfs:comment "Description about Platform cent75"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent75:30815736-1723-4882-ad5a-8b652c6164ab> .
+
+<urn:temp:uuid:object:cent75:5ee49ebd-43bb-46ec-a992-1d7fbfa615bf> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent75" ;
+	rdfs:comment "Description about Analysis cent75"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent75:3da702df-ce97-4a7b-972c-3d2d107f52b9> , <urn:temp:uuid:object:cent75:30815736-1723-4882-ad5a-8b652c6164ab> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent75:5ee49ebd-43bb-46ec-a992-1d7fbfa615bf> .
+
+<urn:temp:uuid:object:cent75:854b6514-84eb-4346-be60-173797474190> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent75" ;
+	rdfs:comment "Description about Genotype cent75"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent75"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent75:854b6514-84eb-4346-be60-173797474190> .
+
+<urn:temp:uuid:object:cent70:b4f01bcf-e071-495d-9233-1949c55266fd> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent70" ;
+	rdfs:comment "Description about Investigation cent70"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent75:40e3938f-6cd3-46aa-8490-222fda2c1878> poddScience:hasInvestigation <urn:temp:uuid:object:cent70:b4f01bcf-e071-495d-9233-1949c55266fd> .
+
+<urn:temp:uuid:object:cent70:11a8d68a-ac2c-4733-8ee8-b5ef0ed9e726> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent70" ;
+	rdfs:comment "Description about Platform cent70"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent70:11a8d68a-ac2c-4733-8ee8-b5ef0ed9e726> .
+
+<urn:temp:uuid:object:cent70:8f7318ae-9511-41ca-b75b-8028a5c794d7> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent70" ;
+	rdfs:comment "Description about Platform cent70"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent70:8f7318ae-9511-41ca-b75b-8028a5c794d7> .
+
+<urn:temp:uuid:object:cent70:0f611bbf-5cd0-4b9d-893e-26f7a012933f> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent70" ;
+	rdfs:comment "Description about Analysis cent70"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent70:11a8d68a-ac2c-4733-8ee8-b5ef0ed9e726> , <urn:temp:uuid:object:cent70:8f7318ae-9511-41ca-b75b-8028a5c794d7> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent70:0f611bbf-5cd0-4b9d-893e-26f7a012933f> .
+
+<urn:temp:uuid:object:cent70:c152b955-3c53-4b30-9e2d-863715ed00d4> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent70" ;
+	rdfs:comment "Description about Genotype cent70"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent70"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent70:c152b955-3c53-4b30-9e2d-863715ed00d4> .
+
+<urn:temp:uuid:object:cent65:f47bc1c2-e5e8-4dba-8b7b-adc9339ce911> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent65" ;
+	rdfs:comment "Description about Investigation cent65"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent70:b4f01bcf-e071-495d-9233-1949c55266fd> poddScience:hasInvestigation <urn:temp:uuid:object:cent65:f47bc1c2-e5e8-4dba-8b7b-adc9339ce911> .
+
+<urn:temp:uuid:object:cent65:654701c9-d5ec-4bc8-8697-f03c47976139> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent65" ;
+	rdfs:comment "Description about Platform cent65"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent65:654701c9-d5ec-4bc8-8697-f03c47976139> .
+
+<urn:temp:uuid:object:cent65:1a2952ca-97be-4e73-9943-331fdebf83cd> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent65" ;
+	rdfs:comment "Description about Platform cent65"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent65:1a2952ca-97be-4e73-9943-331fdebf83cd> .
+
+<urn:temp:uuid:object:cent65:0c984dcc-750b-4845-8ec2-0333900d7be5> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent65" ;
+	rdfs:comment "Description about Analysis cent65"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent65:654701c9-d5ec-4bc8-8697-f03c47976139> , <urn:temp:uuid:object:cent65:1a2952ca-97be-4e73-9943-331fdebf83cd> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent65:0c984dcc-750b-4845-8ec2-0333900d7be5> .
+
+<urn:temp:uuid:object:cent65:ae8eb3fa-d2f9-4dd3-b344-db76acaa0bf4> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent65" ;
+	rdfs:comment "Description about Genotype cent65"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent65"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent65:ae8eb3fa-d2f9-4dd3-b344-db76acaa0bf4> .
+
+<urn:temp:uuid:object:cent60:021d6af8-2ba7-4e24-ab1b-f8593fd24a1f> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent60" ;
+	rdfs:comment "Description about Investigation cent60"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent65:f47bc1c2-e5e8-4dba-8b7b-adc9339ce911> poddScience:hasInvestigation <urn:temp:uuid:object:cent60:021d6af8-2ba7-4e24-ab1b-f8593fd24a1f> .
+
+<urn:temp:uuid:object:cent60:fd7c1b63-5ffb-4f6f-a596-1d40fea2b423> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent60" ;
+	rdfs:comment "Description about Platform cent60"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent60:fd7c1b63-5ffb-4f6f-a596-1d40fea2b423> .
+
+<urn:temp:uuid:object:cent60:83df0423-3fe0-44f0-b2fa-0445a46e1ed9> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent60" ;
+	rdfs:comment "Description about Platform cent60"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent60:83df0423-3fe0-44f0-b2fa-0445a46e1ed9> .
+
+<urn:temp:uuid:object:cent60:10c5c0e9-3869-4b62-9cf6-b2c92ab9d06e> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent60" ;
+	rdfs:comment "Description about Analysis cent60"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent60:fd7c1b63-5ffb-4f6f-a596-1d40fea2b423> , <urn:temp:uuid:object:cent60:83df0423-3fe0-44f0-b2fa-0445a46e1ed9> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent60:10c5c0e9-3869-4b62-9cf6-b2c92ab9d06e> .
+
+<urn:temp:uuid:object:cent60:541b56e7-7ea4-45da-88d0-7023f74e16cc> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent60" ;
+	rdfs:comment "Description about Genotype cent60"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent60"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent60:541b56e7-7ea4-45da-88d0-7023f74e16cc> .
+
+<urn:temp:uuid:object:cent55:d511a249-fbef-4074-90d7-d3d6cfcdd6ae> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent55" ;
+	rdfs:comment "Description about Investigation cent55"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent60:021d6af8-2ba7-4e24-ab1b-f8593fd24a1f> poddScience:hasInvestigation <urn:temp:uuid:object:cent55:d511a249-fbef-4074-90d7-d3d6cfcdd6ae> .
+
+<urn:temp:uuid:object:cent55:80f13002-5236-4c28-b622-bb5700fcdc5d> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent55" ;
+	rdfs:comment "Description about Platform cent55"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent55:80f13002-5236-4c28-b622-bb5700fcdc5d> .
+
+<urn:temp:uuid:object:cent55:c5123db7-2173-4dd2-b0ab-ea1342c0f807> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent55" ;
+	rdfs:comment "Description about Platform cent55"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent55:c5123db7-2173-4dd2-b0ab-ea1342c0f807> .
+
+<urn:temp:uuid:object:cent55:7cc4d28f-5250-4ce2-8858-3a3be658266d> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent55" ;
+	rdfs:comment "Description about Analysis cent55"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent55:80f13002-5236-4c28-b622-bb5700fcdc5d> , <urn:temp:uuid:object:cent55:c5123db7-2173-4dd2-b0ab-ea1342c0f807> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent55:7cc4d28f-5250-4ce2-8858-3a3be658266d> .
+
+<urn:temp:uuid:object:cent55:d7352a19-bac2-4117-9f18-85df04f14b69> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent55" ;
+	rdfs:comment "Description about Genotype cent55"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent55"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent55:d7352a19-bac2-4117-9f18-85df04f14b69> .
+
+<urn:temp:uuid:object:cent50:746105de-b00d-4f85-92eb-274f41e8e289> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent50" ;
+	rdfs:comment "Description about Investigation cent50"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent55:d511a249-fbef-4074-90d7-d3d6cfcdd6ae> poddScience:hasInvestigation <urn:temp:uuid:object:cent50:746105de-b00d-4f85-92eb-274f41e8e289> .
+
+<urn:temp:uuid:object:cent50:059c8e21-10a5-45a4-a28c-947b512c58c0> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent50" ;
+	rdfs:comment "Description about Platform cent50"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent50:059c8e21-10a5-45a4-a28c-947b512c58c0> .
+
+<urn:temp:uuid:object:cent50:c48129e7-2416-417f-870e-15dc84a2cc9a> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent50" ;
+	rdfs:comment "Description about Platform cent50"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent50:c48129e7-2416-417f-870e-15dc84a2cc9a> .
+
+<urn:temp:uuid:object:cent50:c27f70a1-e935-4bd4-845b-c77b78cc0db7> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent50" ;
+	rdfs:comment "Description about Analysis cent50"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent50:059c8e21-10a5-45a4-a28c-947b512c58c0> , <urn:temp:uuid:object:cent50:c48129e7-2416-417f-870e-15dc84a2cc9a> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent50:c27f70a1-e935-4bd4-845b-c77b78cc0db7> .
+
+<urn:temp:uuid:object:cent50:17d917e3-9b96-417d-a493-6e52706ef934> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent50" ;
+	rdfs:comment "Description about Genotype cent50"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent50"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent50:17d917e3-9b96-417d-a493-6e52706ef934> .
+
+<urn:temp:uuid:object:cent45:24f13f93-74fc-45d2-ae91-77f9b42213cc> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent45" ;
+	rdfs:comment "Description about Investigation cent45"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent50:746105de-b00d-4f85-92eb-274f41e8e289> poddScience:hasInvestigation <urn:temp:uuid:object:cent45:24f13f93-74fc-45d2-ae91-77f9b42213cc> .
+
+<urn:temp:uuid:object:cent45:699a7dc0-355f-4cb4-8b2f-6c160933dd78> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent45" ;
+	rdfs:comment "Description about Platform cent45"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent45:699a7dc0-355f-4cb4-8b2f-6c160933dd78> .
+
+<urn:temp:uuid:object:cent45:853427ee-5d48-4ae7-a7d1-790c654ecac1> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent45" ;
+	rdfs:comment "Description about Platform cent45"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent45:853427ee-5d48-4ae7-a7d1-790c654ecac1> .
+
+<urn:temp:uuid:object:cent45:0e7e729d-297c-4547-ba54-e89025fb4f99> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent45" ;
+	rdfs:comment "Description about Analysis cent45"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent45:699a7dc0-355f-4cb4-8b2f-6c160933dd78> , <urn:temp:uuid:object:cent45:853427ee-5d48-4ae7-a7d1-790c654ecac1> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent45:0e7e729d-297c-4547-ba54-e89025fb4f99> .
+
+<urn:temp:uuid:object:cent45:3034836f-0b4d-4cd4-9fe1-9b774d4d868c> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent45" ;
+	rdfs:comment "Description about Genotype cent45"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent45"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent45:3034836f-0b4d-4cd4-9fe1-9b774d4d868c> .
+
+<urn:temp:uuid:object:cent40:8b2fe503-accb-41fe-99d0-25022e7a1f65> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent40" ;
+	rdfs:comment "Description about Investigation cent40"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent45:24f13f93-74fc-45d2-ae91-77f9b42213cc> poddScience:hasInvestigation <urn:temp:uuid:object:cent40:8b2fe503-accb-41fe-99d0-25022e7a1f65> .
+
+<urn:temp:uuid:object:cent40:5c9f8a36-7c53-4c15-9090-325f6cd2ca4a> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent40" ;
+	rdfs:comment "Description about Platform cent40"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent40:5c9f8a36-7c53-4c15-9090-325f6cd2ca4a> .
+
+<urn:temp:uuid:object:cent40:a01302d9-d579-48fa-a66f-cf857e68af0a> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent40" ;
+	rdfs:comment "Description about Platform cent40"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent40:a01302d9-d579-48fa-a66f-cf857e68af0a> .
+
+<urn:temp:uuid:object:cent40:430c58a9-4da7-4e01-9006-7e7ac5d73c23> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent40" ;
+	rdfs:comment "Description about Analysis cent40"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent40:5c9f8a36-7c53-4c15-9090-325f6cd2ca4a> , <urn:temp:uuid:object:cent40:a01302d9-d579-48fa-a66f-cf857e68af0a> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent40:430c58a9-4da7-4e01-9006-7e7ac5d73c23> .
+
+<urn:temp:uuid:object:cent40:7577c532-7a4b-4867-999f-1e117362a6a5> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent40" ;
+	rdfs:comment "Description about Genotype cent40"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent40"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent40:7577c532-7a4b-4867-999f-1e117362a6a5> .
+
+<urn:temp:uuid:object:cent35:ef149ea9-af6a-4a7e-8d27-483e8bb162a1> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent35" ;
+	rdfs:comment "Description about Investigation cent35"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent40:8b2fe503-accb-41fe-99d0-25022e7a1f65> poddScience:hasInvestigation <urn:temp:uuid:object:cent35:ef149ea9-af6a-4a7e-8d27-483e8bb162a1> .
+
+<urn:temp:uuid:object:cent35:1d82c2f9-9356-4d02-909a-ef8bb6ed04ae> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent35" ;
+	rdfs:comment "Description about Platform cent35"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent35:1d82c2f9-9356-4d02-909a-ef8bb6ed04ae> .
+
+<urn:temp:uuid:object:cent35:f5b497f4-b829-45fa-baf2-e223ddb5f30a> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent35" ;
+	rdfs:comment "Description about Platform cent35"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent35:f5b497f4-b829-45fa-baf2-e223ddb5f30a> .
+
+<urn:temp:uuid:object:cent35:3e7e123a-c3a3-42d7-a7c8-86466bc3be47> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent35" ;
+	rdfs:comment "Description about Analysis cent35"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent35:1d82c2f9-9356-4d02-909a-ef8bb6ed04ae> , <urn:temp:uuid:object:cent35:f5b497f4-b829-45fa-baf2-e223ddb5f30a> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent35:3e7e123a-c3a3-42d7-a7c8-86466bc3be47> .
+
+<urn:temp:uuid:object:cent35:233f99ee-9402-4ee7-9d39-a7630e9606df> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent35" ;
+	rdfs:comment "Description about Genotype cent35"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent35"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent35:233f99ee-9402-4ee7-9d39-a7630e9606df> .
+
+<urn:temp:uuid:object:cent30:7af4c017-f683-4cfc-9b60-cfd7d54e4c5b> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent30" ;
+	rdfs:comment "Description about Investigation cent30"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent35:ef149ea9-af6a-4a7e-8d27-483e8bb162a1> poddScience:hasInvestigation <urn:temp:uuid:object:cent30:7af4c017-f683-4cfc-9b60-cfd7d54e4c5b> .
+
+<urn:temp:uuid:object:cent30:484dca92-85d1-41d5-85a6-b26114d99fdb> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent30" ;
+	rdfs:comment "Description about Platform cent30"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent30:484dca92-85d1-41d5-85a6-b26114d99fdb> .
+
+<urn:temp:uuid:object:cent30:13d94e2b-3543-4bb2-8a3e-2f4fb2371946> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent30" ;
+	rdfs:comment "Description about Platform cent30"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent30:13d94e2b-3543-4bb2-8a3e-2f4fb2371946> .
+
+<urn:temp:uuid:object:cent30:b7d5165e-9f84-4969-9fa6-0b3c1363176d> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent30" ;
+	rdfs:comment "Description about Analysis cent30"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent30:484dca92-85d1-41d5-85a6-b26114d99fdb> , <urn:temp:uuid:object:cent30:13d94e2b-3543-4bb2-8a3e-2f4fb2371946> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent30:b7d5165e-9f84-4969-9fa6-0b3c1363176d> .
+
+<urn:temp:uuid:object:cent30:d291242f-4124-451a-a8c8-524ae4deb087> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent30" ;
+	rdfs:comment "Description about Genotype cent30"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent30"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent30:d291242f-4124-451a-a8c8-524ae4deb087> .
+
+<urn:temp:uuid:object:cent25:e31bcb8e-2d6f-4fdf-bdca-b2786c584658> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent25" ;
+	rdfs:comment "Description about Investigation cent25"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent30:7af4c017-f683-4cfc-9b60-cfd7d54e4c5b> poddScience:hasInvestigation <urn:temp:uuid:object:cent25:e31bcb8e-2d6f-4fdf-bdca-b2786c584658> .
+
+<urn:temp:uuid:object:cent25:b4cc5ce0-8b0b-4f74-b66e-4770fc33a74b> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent25" ;
+	rdfs:comment "Description about Platform cent25"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent25:b4cc5ce0-8b0b-4f74-b66e-4770fc33a74b> .
+
+<urn:temp:uuid:object:cent25:0424951d-8bce-452a-959b-b3bdd8d4b3c5> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent25" ;
+	rdfs:comment "Description about Platform cent25"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent25:0424951d-8bce-452a-959b-b3bdd8d4b3c5> .
+
+<urn:temp:uuid:object:cent25:f2d0e281-c521-456f-bd3d-fb894fe702be> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent25" ;
+	rdfs:comment "Description about Analysis cent25"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent25:b4cc5ce0-8b0b-4f74-b66e-4770fc33a74b> , <urn:temp:uuid:object:cent25:0424951d-8bce-452a-959b-b3bdd8d4b3c5> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent25:f2d0e281-c521-456f-bd3d-fb894fe702be> .
+
+<urn:temp:uuid:object:cent25:75bcedc8-034d-432e-a993-9cfa4fe3c5f1> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent25" ;
+	rdfs:comment "Description about Genotype cent25"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent25"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent25:75bcedc8-034d-432e-a993-9cfa4fe3c5f1> .
+
+<urn:temp:uuid:object:cent20:2c63bd55-28da-4af8-90b3-dd6ee68eb877> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent20" ;
+	rdfs:comment "Description about Investigation cent20"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent25:e31bcb8e-2d6f-4fdf-bdca-b2786c584658> poddScience:hasInvestigation <urn:temp:uuid:object:cent20:2c63bd55-28da-4af8-90b3-dd6ee68eb877> .
+
+<urn:temp:uuid:object:cent20:a8f9974b-b8f5-45c9-8ecb-c02dc1bee644> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent20" ;
+	rdfs:comment "Description about Platform cent20"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent20:a8f9974b-b8f5-45c9-8ecb-c02dc1bee644> .
+
+<urn:temp:uuid:object:cent20:8f86b94b-be93-4a93-a59d-163c80cdedda> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent20" ;
+	rdfs:comment "Description about Platform cent20"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent20:8f86b94b-be93-4a93-a59d-163c80cdedda> .
+
+<urn:temp:uuid:object:cent20:167432f1-4221-4050-bfbc-12c692af9b6a> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent20" ;
+	rdfs:comment "Description about Analysis cent20"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent20:a8f9974b-b8f5-45c9-8ecb-c02dc1bee644> , <urn:temp:uuid:object:cent20:8f86b94b-be93-4a93-a59d-163c80cdedda> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent20:167432f1-4221-4050-bfbc-12c692af9b6a> .
+
+<urn:temp:uuid:object:cent20:547b7734-f5d7-4db1-987b-8532bbd13d09> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent20" ;
+	rdfs:comment "Description about Genotype cent20"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent20"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent20:547b7734-f5d7-4db1-987b-8532bbd13d09> .
+
+<urn:temp:uuid:object:cent15:fd5c1a0a-dc64-4e9d-a666-d8f4cb3803a0> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent15" ;
+	rdfs:comment "Description about Investigation cent15"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent20:2c63bd55-28da-4af8-90b3-dd6ee68eb877> poddScience:hasInvestigation <urn:temp:uuid:object:cent15:fd5c1a0a-dc64-4e9d-a666-d8f4cb3803a0> .
+
+<urn:temp:uuid:object:cent15:9b40a1a9-1009-4777-931a-7b4c5079347e> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent15" ;
+	rdfs:comment "Description about Platform cent15"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent15:9b40a1a9-1009-4777-931a-7b4c5079347e> .
+
+<urn:temp:uuid:object:cent15:bb611e3f-065c-4888-ab22-6958e34b23b2> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent15" ;
+	rdfs:comment "Description about Platform cent15"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent15:bb611e3f-065c-4888-ab22-6958e34b23b2> .
+
+<urn:temp:uuid:object:cent15:428a6ab4-3f3b-4901-8053-1479994012e2> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent15" ;
+	rdfs:comment "Description about Analysis cent15"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent15:9b40a1a9-1009-4777-931a-7b4c5079347e> , <urn:temp:uuid:object:cent15:bb611e3f-065c-4888-ab22-6958e34b23b2> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent15:428a6ab4-3f3b-4901-8053-1479994012e2> .
+
+<urn:temp:uuid:object:cent15:0239acdc-81d8-4949-9093-07bdfb9c721e> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent15" ;
+	rdfs:comment "Description about Genotype cent15"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent15"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent15:0239acdc-81d8-4949-9093-07bdfb9c721e> .
+
+<urn:temp:uuid:object:cent10:fd36ba1c-cfec-48a9-91a7-93d152cd276a> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent10" ;
+	rdfs:comment "Description about Investigation cent10"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent15:fd5c1a0a-dc64-4e9d-a666-d8f4cb3803a0> poddScience:hasInvestigation <urn:temp:uuid:object:cent10:fd36ba1c-cfec-48a9-91a7-93d152cd276a> .
+
+<urn:temp:uuid:object:cent10:2f296b49-fc35-4d2a-85cc-61287bde803d> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent10" ;
+	rdfs:comment "Description about Platform cent10"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent10:2f296b49-fc35-4d2a-85cc-61287bde803d> .
+
+<urn:temp:uuid:object:cent10:97b2f835-c66a-4c49-824a-062fd6a4a391> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent10" ;
+	rdfs:comment "Description about Platform cent10"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent10:97b2f835-c66a-4c49-824a-062fd6a4a391> .
+
+<urn:temp:uuid:object:cent10:f7968f87-2366-45a5-aae5-4f613d5615b3> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent10" ;
+	rdfs:comment "Description about Analysis cent10"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent10:2f296b49-fc35-4d2a-85cc-61287bde803d> , <urn:temp:uuid:object:cent10:97b2f835-c66a-4c49-824a-062fd6a4a391> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent10:f7968f87-2366-45a5-aae5-4f613d5615b3> .
+
+<urn:temp:uuid:object:cent10:7facc804-81d2-4c96-b972-7c2f8ec36b1f> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent10" ;
+	rdfs:comment "Description about Genotype cent10"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent10"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent10:7facc804-81d2-4c96-b972-7c2f8ec36b1f> .
+
+<urn:temp:uuid:object:cent5:1fffabd3-db59-4876-ad65-b12eb59aaf8d> a poddScience:Investigation , owl:NamedIndividual ;
+	rdfs:label "Investigation cent5" ;
+	rdfs:comment "Description about Investigation cent5"^^xsd:string ;
+	poddBase:hasStartDateTime "2013-01-01T09:00:00"^^xsd:dateTime .
+
+<urn:temp:uuid:object:cent10:fd36ba1c-cfec-48a9-91a7-93d152cd276a> poddScience:hasInvestigation <urn:temp:uuid:object:cent5:1fffabd3-db59-4876-ad65-b12eb59aaf8d> .
+
+<urn:temp:uuid:object:cent5:16918898-3f7f-4c20-960b-0f4270db1463> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent5" ;
+	rdfs:comment "Description about Platform cent5"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent5:16918898-3f7f-4c20-960b-0f4270db1463> .
+
+<urn:temp:uuid:object:cent5:f7572f76-0180-4a95-b852-45a12346ba19> a poddScience:Platform , owl:NamedIndividual ;
+	rdfs:label "Platform cent5" ;
+	rdfs:comment "Description about Platform cent5"^^xsd:string ;
+	poddScience:hasPlatformType poddScience:PlatformType_HardwareSoftware .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasPlatform <urn:temp:uuid:object:cent5:f7572f76-0180-4a95-b852-45a12346ba19> .
+
+<urn:temp:uuid:object:cent5:8416befc-dddb-4e29-8422-20d601acf230> a poddScience:Analysis , owl:NamedIndividual ;
+	rdfs:label "Analysis cent5" ;
+	rdfs:comment "Description about Analysis cent5"^^xsd:string ;
+	poddScience:refersToPlatform <urn:temp:uuid:object:cent5:16918898-3f7f-4c20-960b-0f4270db1463> , <urn:temp:uuid:object:cent5:f7572f76-0180-4a95-b852-45a12346ba19> .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasAnalysis <urn:temp:uuid:object:cent5:8416befc-dddb-4e29-8422-20d601acf230> .
+
+<urn:temp:uuid:object:cent5:f5d3b4cf-5657-4969-8e8f-3d2cd5bd0c9a> a poddScience:Genotype , owl:NamedIndividual ;
+	rdfs:label "Genotype cent5" ;
+	rdfs:comment "Description about Genotype cent5"^^xsd:string ;
+	poddScience:hasGenusSpecies "Genus or species cent5"^^xsd:string ;
+	poddScience:hasWildType poddScience:WildType_Yes .
+
+<urn:temp:uuid:object:cent:432579b0-7034-4399-bfd9-49f1b7697e4d> poddScience:hasGenotype <urn:temp:uuid:object:cent5:f5d3b4cf-5657-4969-8e8f-3d2cd5bd0c9a> .

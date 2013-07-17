@@ -3,15 +3,22 @@
  */
 package com.github.podd.performance.test;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.openrdf.model.Model;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -34,6 +41,7 @@ import com.github.podd.utils.PoddWebConstants;
 @RunWith(value = Parameterized.class)
 public class PerformanceTestLoadArtifact extends AbstractResourceImplTest
 {
+    
     /**
      * log4j logger which writes to the statistics file.
      */
@@ -57,6 +65,10 @@ public class PerformanceTestLoadArtifact extends AbstractResourceImplTest
     public PerformanceTestLoadArtifact(final String filename, final MediaType mediaType)
     {
         super();
+        
+        // increase test timeout
+        super.timeout = new Timeout(30000*1000);
+        
         this.filename = filename;
         this.mediaType = mediaType;
     }
@@ -66,10 +78,27 @@ public class PerformanceTestLoadArtifact extends AbstractResourceImplTest
     {
         final Object[][] data =
                 new Object[][] {
-                        { "/test/artifacts/basicProject-1-internal-object.rdf", MediaType.APPLICATION_RDF_XML },
-                        { "/test/artifacts/connected-1-object.ttl", MediaType.APPLICATION_RDF_TURTLE },
-                        { "/test/artifacts/basic-20130206.ttl", MediaType.APPLICATION_RDF_TURTLE },
-                // TODO - add large artifacts
+//                        { "/test/artifacts/basic-20130206.ttl", MediaType.APPLICATION_RDF_TURTLE },
+//                        { "/test/artifacts/project-temp-00010.ttl", MediaType.APPLICATION_RDF_TURTLE },
+//                        { "/test/artifacts/project-temp-00100.ttl", MediaType.APPLICATION_RDF_TURTLE },
+//                        { "/test/artifacts/project-temp-01000.ttl", MediaType.APPLICATION_RDF_TURTLE },
+                        
+                        // fails in PURL generation
+                        //{ "/test/artifacts/project-temp-10000.ttl", MediaType.APPLICATION_RDF_TURTLE },
+                        
+                        { "/test/artifacts/project-temp-00010.rdf", MediaType.APPLICATION_RDF_XML },
+                        { "/test/artifacts/project-temp-00100.rdf", MediaType.APPLICATION_RDF_XML },
+                        { "/test/artifacts/project-temp-01000.rdf", MediaType.APPLICATION_RDF_XML },
+                        
+                        // fails in PURL generation
+                        //{ "/test/artifacts/project-temp-10000.rdf", MediaType.APPLICATION_RDF_XML },
+                        
+//                        { "/test/artifacts/project-purl-01000.rdf", MediaType.APPLICATION_RDF_XML },
+//                        { "/test/artifacts/project-purl-10000.rdf", MediaType.APPLICATION_RDF_XML },
+                        
+                        // fails
+                        //{ "/test/artifacts/project-purl-20000.rdf", MediaType.APPLICATION_RDF_XML },
+                        
                 };
         return Arrays.asList(data);
     }
@@ -98,6 +127,7 @@ public class PerformanceTestLoadArtifact extends AbstractResourceImplTest
         Assert.assertFalse(body.contains("html"));
         Assert.assertFalse(body.contains("\n"));
         
+        
         // write statistics
         final StringBuilder statsMsg = new StringBuilder();
         statsMsg.append(this.filename.substring(this.filename.lastIndexOf('/') + 1) + ",");
@@ -106,14 +136,31 @@ public class PerformanceTestLoadArtifact extends AbstractResourceImplTest
         statsMsg.append((System.currentTimeMillis() - startedAt));
         statsMsg.append(',');
         
-        // ontology statement count
-        // statsMsg.append(this.getTestRepositoryConnection().size(inferred.getVersionIRI().toOpenRDFURI()));
-        statsMsg.append(',');
+        // ontology asserted statement count
+        final int statementCount = this.getStatementCount(body);
+        statsMsg.append(statementCount);
+        statsMsg.append('\n');
         
-        // inferred statement count
-        // statsMsg.append(this.getTestRepositoryConnection().size(inferred.getInferredOntologyIRI().toOpenRDFURI()));
-        statsMsg.append("\n");
         this.statsLogger.info(statsMsg.toString());
+    }
+    
+    public int getStatementCount(String artifactUri) throws Exception
+    {
+        // retrieve artifact
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        // load into a Model and find statement count
+        final InputStream input = new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8));
+        final Model model = Rio.parse(input, "", RDFFormat.TURTLE);
+
+        return model.size();
     }
     
 }
