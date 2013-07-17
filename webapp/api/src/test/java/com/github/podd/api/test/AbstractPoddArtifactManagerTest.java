@@ -254,11 +254,11 @@ public abstract class AbstractPoddArtifactManagerTest
                                 MetadataPolicy.INCLUDE_ALL, 0, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 142, 19, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 142, 18, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 95, 12, 0 },
+                                MetadataPolicy.EXCLUDE_CONTAINS, 86, 11, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 295, 36, 14 },
+                                MetadataPolicy.INCLUDE_ALL, 286, 35, 14 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 42, 7, 0 },
                         
@@ -1566,7 +1566,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 11, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 10, nextRepositoryConnection);
             
             // verify: 2 publications exist
             final List<Statement> testList =
@@ -1625,7 +1625,7 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection.begin();
             
             this.verifyUpdatedArtifact(updatedArtifact, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 30, nextRepositoryConnection);
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES + 28, nextRepositoryConnection);
             
             // verify: 2 publications exist
             final List<Statement> testList =
