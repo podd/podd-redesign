@@ -6,6 +6,7 @@ package com.github.podd.impl.file;
 import org.openrdf.model.Model;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
@@ -136,6 +137,9 @@ public class SPARQLDataReferenceImpl implements SPARQLDataReference
     {
         final ValueFactory vf = PoddRdfConstants.VF;
         final Model result = new LinkedHashModel();
+        
+        result.add(this.objectIri.toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE);
+        result.add(this.objectIri.toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
         
         if(this.getArtifactID() != null)
         {
