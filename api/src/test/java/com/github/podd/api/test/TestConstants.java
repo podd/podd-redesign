@@ -39,12 +39,12 @@ public interface TestConstants
     /** Test resource: artifact with 1 internal object, slightly different */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_2 = "/test/artifacts/basicProject-2.rdf";
     public static final int TEST_ARTIFACT_BASIC_PROJECT_2_CONCRETE_TRIPLES = 25;
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES = 311;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_2_INFERRED_TRIPLES = 312;
     
     /** Test resource: (in RDF/XML) artifact with published status */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED = "/test/artifacts/basicProject-1-published.rdf";
     public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_CONCRETE_TRIPLES = 25;
-    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_INFERRED_TRIPLES = 311;
+    public static final int TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED_INFERRED_TRIPLES = 312;
     
     public static final String TEST_ARTIFACT_PURLS_2_FILE_REFS = "/test/artifacts/project-purls-file-ref.rdf";
     
@@ -61,7 +61,7 @@ public interface TestConstants
     public static final String TEST_ARTIFACT_IMPORT_PSCIENCEv1 =
             "/test/artifacts/project-imports-sciencev1-version.rdf";
     public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_CONCRETE_TRIPLES = 29;
-    public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_INFERRED_TRIPLES = 317;
+    public static final int TEST_ARTIFACT_IMPORT_PSCIENCEv1_INFERRED_TRIPLES = 318;
     
     /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
     public static final String TEST_ARTIFACT_NO_VERSION_INFO = "/test/artifacts/project-with-no-version-info.rdf";

@@ -906,8 +906,8 @@ public abstract class AbstractPoddSesameManagerTest
         // verify:
         Assert.assertNotNull("Display Model is null", displayModel);
         Assert.assertFalse("Display Model is empty", displayModel.isEmpty());
-        Assert.assertEquals("Display Model not of expected size", 15, displayModel.size());
-        Assert.assertEquals("Not the expected no. of statements about object", 7,
+        Assert.assertEquals("Display Model not of expected size", 13, displayModel.size());
+        Assert.assertEquals("Not the expected no. of statements about object", 6,
                 displayModel.filter(objectUri, null, null).size());
         
         // verify: a string search for some content
@@ -1037,11 +1037,11 @@ public abstract class AbstractPoddSesameManagerTest
                                 MetadataPolicy.INCLUDE_ALL, 0, -1, 0 },
                                 
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 151, 18, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 142, 17, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 95, 11, 0 },
+                                MetadataPolicy.EXCLUDE_CONTAINS, 86, 10, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 295, 35, 14 },
+                                MetadataPolicy.INCLUDE_ALL, 286, 34, 14 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 57, 7, 0 },
                         
@@ -1721,7 +1721,7 @@ public abstract class AbstractPoddSesameManagerTest
                         contexts);
         
         // verify:
-        Assert.assertEquals("Incorrect number of statements about Internal Object", 5, orderedPropertyUris.size());
+        Assert.assertEquals("Incorrect number of statements about Internal Object", 4, orderedPropertyUris.size());
         
         final String[] expectedUris =
                 { "http://purl.org/podd/ns/poddScience#hasAbstract", 
