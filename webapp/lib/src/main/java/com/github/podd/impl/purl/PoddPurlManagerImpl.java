@@ -18,6 +18,7 @@ import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,6 @@ import com.github.podd.api.purl.PoddPurlProcessor;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.api.purl.PoddPurlReference;
-import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.PurlProcessorNotHandledException;
 import com.github.podd.utils.PoddRdfUtils;
 
@@ -55,19 +55,49 @@ public class PoddPurlManagerImpl implements PoddPurlManager
     {
         for(final PoddPurlReference purl : purlResults)
         {
-            final String inputUri = purl.getTemporaryURI().stringValue();
-            final String outputUri = purl.getPurlURI().stringValue();
+            final URI inputUri = purl.getTemporaryURI();
+            final URI outputUri = purl.getPurlURI();
             this.log.debug("Converting: {} to {}", inputUri, outputUri);
-            try
+            
+            this.convertTemporaryUri(inputUri, outputUri, repositoryConnection, contexts);
+        }
+    }
+    
+    private void convertTemporaryUri(final URI inputUri, final URI outputUri,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws RepositoryException
+    {
+        // replace occurrences as Subject
+        final RepositoryResult<Statement> stmtsWithTempSubject =
+                repositoryConnection.getStatements(inputUri, null, null, false, contexts);
+        try
+        {
+            while(stmtsWithTempSubject.hasNext())
             {
-                URITranslator.doTranslation(repositoryConnection, inputUri, outputUri, contexts);
+                final Statement next = stmtsWithTempSubject.next();
+                repositoryConnection.add(outputUri, next.getPredicate(), next.getObject(), contexts);
+                repositoryConnection.remove(next, contexts);
             }
-            catch(final MalformedQueryException e)
+        }
+        finally
+        {
+            stmtsWithTempSubject.close();
+        }
+        
+        // replace occurrences as Object
+        final RepositoryResult<Statement> stmtsWithTempObject =
+                repositoryConnection.getStatements(null, null, inputUri, false, contexts);
+        try
+        {
+            while(stmtsWithTempObject.hasNext())
             {
-                final String message = "Error while translating temporary URIs to Purls";
-                this.log.error(message, e);
-                throw new PoddRuntimeException(message, e);
+                final Statement next = stmtsWithTempObject.next();
+                repositoryConnection.add(next.getSubject(), next.getPredicate(), outputUri, contexts);
+                repositoryConnection.remove(next, contexts);
             }
+        }
+        finally
+        {
+            stmtsWithTempObject.close();
         }
     }
     
