@@ -115,7 +115,9 @@
 	        
 	    </div>
 
-	    <span><h3>PODD - Phenomics Ontology Driven Database</h3></span>
+	    <span><h3>PODD - Phenomics Ontology Driven Database</h3> 
+	    	<p class="errorMsg">Beta Version (Data is not persisted on disk and will be lost on application restart.)</p>
+	    </span>
 	</div>
 
     <!-- navigation bar-->
