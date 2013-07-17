@@ -39,7 +39,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 @Ignore
 @RunWith(value = Parameterized.class)
-public class PerformanceTestLoadArtifact extends AbstractResourceImplTest
+public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplTest
 {
     
     /**
@@ -62,7 +62,7 @@ public class PerformanceTestLoadArtifact extends AbstractResourceImplTest
      * 
      * @param number
      */
-    public PerformanceTestLoadArtifact(final String filename, final MediaType mediaType)
+    public UploadArtifactResourcePerformanceTest(final String filename, final MediaType mediaType)
     {
         super();
         
