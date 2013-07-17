@@ -82,19 +82,15 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
 //                        { "/test/artifacts/project-temp-00010.ttl", MediaType.APPLICATION_RDF_TURTLE },
 //                        { "/test/artifacts/project-temp-00100.ttl", MediaType.APPLICATION_RDF_TURTLE },
 //                        { "/test/artifacts/project-temp-01000.ttl", MediaType.APPLICATION_RDF_TURTLE },
-                        
-                        // fails in PURL generation
-                        //{ "/test/artifacts/project-temp-10000.ttl", MediaType.APPLICATION_RDF_TURTLE },
+//                        { "/test/artifacts/project-temp-10000.ttl", MediaType.APPLICATION_RDF_TURTLE },
                         
                         { "/test/artifacts/project-temp-00010.rdf", MediaType.APPLICATION_RDF_XML },
                         { "/test/artifacts/project-temp-00100.rdf", MediaType.APPLICATION_RDF_XML },
                         { "/test/artifacts/project-temp-01000.rdf", MediaType.APPLICATION_RDF_XML },
+                        { "/test/artifacts/project-temp-10000.rdf", MediaType.APPLICATION_RDF_XML },
                         
-                        // fails in PURL generation
-                        //{ "/test/artifacts/project-temp-10000.rdf", MediaType.APPLICATION_RDF_XML },
-                        
-//                        { "/test/artifacts/project-purl-01000.rdf", MediaType.APPLICATION_RDF_XML },
-//                        { "/test/artifacts/project-purl-10000.rdf", MediaType.APPLICATION_RDF_XML },
+                        { "/test/artifacts/project-purl-01000.rdf", MediaType.APPLICATION_RDF_XML },
+                        { "/test/artifacts/project-purl-10000.rdf", MediaType.APPLICATION_RDF_XML },
                         
                         // fails
                         //{ "/test/artifacts/project-purl-20000.rdf", MediaType.APPLICATION_RDF_XML },
