@@ -75,7 +75,7 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public InferredOWLOntologyID attachFileReference(final DataReference ref) throws PoddClientException
+    public InferredOWLOntologyID attachDataReference(final DataReference ref) throws PoddClientException
     {
         this.log.info("cookies: {}", this.currentCookies);
         

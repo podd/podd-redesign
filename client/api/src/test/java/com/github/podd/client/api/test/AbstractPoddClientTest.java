@@ -199,7 +199,7 @@ public abstract class AbstractPoddClientTest
             // project
             testRef.setObjectIri(IRI.create(topObject.objectURI()));
             
-            final InferredOWLOntologyID afterFileAttachment = this.testClient.attachFileReference(testRef);
+            final InferredOWLOntologyID afterFileAttachment = this.testClient.attachDataReference(testRef);
             
             Assert.assertNotNull(afterFileAttachment);
             Assert.assertNotNull(afterFileAttachment.getOntologyIRI());

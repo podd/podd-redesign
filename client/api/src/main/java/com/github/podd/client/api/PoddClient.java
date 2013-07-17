@@ -65,7 +65,7 @@ public interface PoddClient
      * @return An {@link InferredOWLOntologyID} object containing the details of the updated
      *         artifact.
      */
-    InferredOWLOntologyID attachFileReference(DataReference ref) throws PoddClientException;
+    InferredOWLOntologyID attachDataReference(DataReference ref) throws PoddClientException;
     
     /**
      * Submits a request to the PODD Delete Artifact service to delete the artifact identified by
