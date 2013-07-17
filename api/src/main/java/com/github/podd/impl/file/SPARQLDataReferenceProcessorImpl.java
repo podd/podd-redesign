@@ -134,7 +134,7 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
     @Override
     public Set<URI> getTypes()
     {
-        return Collections.singleton(PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
+        return Collections.singleton(PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
     }
     
 }

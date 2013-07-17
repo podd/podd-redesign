@@ -73,7 +73,7 @@ public class SPARQLDataReferenceProcessorFactoryImpl implements SPARQLDataRefere
         builder.append(" ?")
                 .append(this.getSPARQLVariable())
                 .append(" <" + RDF.TYPE.stringValue() + "> <"
-                        + PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH.stringValue() + "> . ");
+                        + PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL.stringValue() + "> . ");
         
         builder.append(" ?").append(this.getSPARQLVariable()).append(" ?predicate ?object . ");
         

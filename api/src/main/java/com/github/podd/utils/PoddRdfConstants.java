@@ -247,6 +247,10 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_FILE_REFERENCE_TYPE_SSH = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "SSHFileReference");
     
+    /** http://purl.org/podd/ns/poddBase#SSHFileReference */
+    public static final URI PODD_BASE_DATA_REFERENCE_TYPE_SPARQL = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_BASE, "SPARQLDataReference");
+    
     // ----- file repository constants -----
     
     /** http://purl.org/podd/ns/poddBase#DataRepository */
