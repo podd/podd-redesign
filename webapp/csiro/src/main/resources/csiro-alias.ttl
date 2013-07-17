@@ -69,6 +69,20 @@
           dataRepository:hasDataRepositoryAlias "alias_local_ssh" .
           
 
+###  http://test.example.org/filerepositoryaliases#localsparql
+
+:localsparql rdf:type dataRepository:DataRepository ,
+                   dataRepository:SPARQLDataRepository ;
+          
+          dataRepository:hasDataRepositoryHost "localhost" ;
+          
+          dataRepository:hasDataRepositoryProtocol "HTTP" ;
+          
+          dataRepository:hasDataRepositoryPort "9857" ;
+          
+          dataRepository:hasDataRepositoryAlias "alias_local_sparql" .
+          
+
 
 
 
