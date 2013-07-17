@@ -17,14 +17,14 @@ public interface TestConstants
     public static final int EXPECTED_TRIPLE_COUNT_PODD_USER_CONCRETE = 217;
     public static final int EXPECTED_TRIPLE_COUNT_PODD_USER_INFERRED = 34;
     
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE = 348;
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED = 68;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE = 357;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_BASE_INFERRED = 70;
     
     public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_CONCRETE = 1309;
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED = 207;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_SCIENCE_INFERRED = 209;
     
     public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_CONCRETE = 243;
-    public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED = 345;
+    public static final int EXPECTED_TRIPLE_COUNT_PODD_PLANT_INFERRED = 347;
     
     /** Test resource: artifact with no internal objects */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_1 = "/test/artifacts/basicProject-1.rdf";
@@ -34,7 +34,7 @@ public interface TestConstants
     /** Test resource: artifact with 1 internal object */
     public static final String TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT = "/test/artifacts/basic-1-internal-object.rdf";
     public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES = 29;
-    public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES = 317;
+    public static final int TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES = 318;
     
     /** Test resource: artifact with 1 internal object, slightly different */
     public static final String TEST_ARTIFACT_BASIC_PROJECT_2 = "/test/artifacts/basicProject-2.rdf";
@@ -78,7 +78,7 @@ public interface TestConstants
     
     /** Test resource: artifact with PURLs and multiple internal objects in Turtle format */
     public static final String TEST_ARTIFACT_20130206 = "/test/artifacts/basic-20130206.ttl";
-    public static final int TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES = 92;
+    public static final int TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES = 91;
     public static final int TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES = 556;
     
     /** Test resource (in Turtle): inferred artifact with PURLs and multiple internal objects */

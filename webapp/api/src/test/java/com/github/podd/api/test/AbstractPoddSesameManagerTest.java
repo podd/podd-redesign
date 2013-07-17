@@ -550,9 +550,6 @@ public abstract class AbstractPoddSesameManagerTest
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAbstract"),
                                 PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
                         { projectObject,
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasPURL"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
-                        { projectObject,
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
                                 PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY },
                         { publication45,
@@ -602,8 +599,6 @@ public abstract class AbstractPoddSesameManagerTest
                                         "hasLeadInstitution"), PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE },
                         { publicationType,
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasAbstract"),
-                                PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
-                        { projectType, ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasPURL"),
                                 PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE },
                         { projectType,
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
@@ -914,20 +909,6 @@ public abstract class AbstractPoddSesameManagerTest
         Assert.assertEquals("Display Model not of expected size", 15, displayModel.size());
         Assert.assertEquals("Not the expected no. of statements about object", 7,
                 displayModel.filter(objectUri, null, null).size());
-        
-        Assert.assertEquals(
-                "Expected 1 hasPURL statement",
-                1,
-                displayModel.filter(objectUri,
-                        ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasPURL"), null)
-                        .size());
-        
-        Assert.assertEquals(
-                "Unexpected PURL value",
-                "http://dx.doi.org/10.1109/eScience.2010.44",
-                displayModel.filter(objectUri,
-                        ValueFactoryImpl.getInstance().createURI("http://purl.org/podd/ns/poddBase#hasPURL"), null)
-                        .objectString());
         
         // verify: a string search for some content
         Assert.assertTrue("Expected content missing in display model",
@@ -1746,7 +1727,6 @@ public abstract class AbstractPoddSesameManagerTest
                 { "http://purl.org/podd/ns/poddScience#hasAbstract", 
                         "http://purl.org/podd/ns/poddScience#publishedIn",
                         "http://purl.org/podd/ns/poddScience#hasYear", 
-                        "http://purl.org/podd/ns/poddBase#hasPURL",
                         "http://purl.org/dc/terms/creator", };
         for(int i = 0; i < orderedPropertyUris.size(); i++)
         {

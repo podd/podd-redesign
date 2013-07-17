@@ -225,7 +225,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         for(String objectUri : newObjects)
         {
             final String purl =
-                    model.filter(PoddRdfConstants.VF.createURI(objectUri), PoddRdfConstants.PODD_BASE_HAS_PURL, null)
+                    model.filter(PoddRdfConstants.VF.createURI(objectUri), PoddRdfConstants.PODD_REPLACED_TEMP_URI_WITH, null)
                             .objectString();
             Assert.assertNotNull("Object URI's PURL not in response", purl);
             Assert.assertTrue("PURL does not start as expected", purl.startsWith("http://example.org/purl/"));

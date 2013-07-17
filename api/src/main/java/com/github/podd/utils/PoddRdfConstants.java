@@ -121,6 +121,9 @@ public interface PoddRdfConstants
     public static final URI HTTP_REASON_PHRASE = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.HTTP,
             "reasonPhrase");
     
+    public static final URI PODD_REPLACED_TEMP_URI_WITH = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "replacedTempUriWith");;
+    
     /**
      * Creating a property for PODD to track the inferredVersion for the inferred axioms ontology of
      * a particular versioned ontology.
@@ -182,10 +185,6 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/poddBase#hasAllowedValue */
     public static final URI PODD_BASE_HAS_ALLOWED_VALUE = ValueFactoryImpl.getInstance().createURI(
             PoddRdfConstants.PODD_BASE, "hasAllowedValue");
-    
-    /** http://purl.org/podd/ns/poddBase#hasPURL */
-    public static final URI PODD_BASE_HAS_PURL = ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE,
-            "hasPURL");
     
     // ----- custom representation of cardinalities -----
     
