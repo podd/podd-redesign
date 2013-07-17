@@ -3,16 +3,21 @@
  */
 package com.github.podd.impl.file;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -57,7 +62,9 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.PoddDataRepository;
+import com.github.podd.api.file.PoddDataRepositoryFactory;
 import com.github.podd.api.file.PoddDataRepositoryManager;
+import com.github.podd.api.file.PoddDataRepositoryRegistry;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.FileReferenceInvalidException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
@@ -444,66 +451,67 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             return null;
         }
         
-        // Could use LCASE function in the SPARQL query instead of converting to lower case here
-        // (http://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-lcase)
-        final String aliasInLowerCase = alias.toLowerCase();
-        
-        final boolean multipleAliasesExist = this.getEquivalentAliases(aliasInLowerCase).size() > 1;
-        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repositoryManager.getRepository().getConnection();
-            conn.begin();
             
             final URI context = this.repositoryManager.getFileRepositoryManagementGraph();
-            
-            final StringBuilder sb = new StringBuilder();
-            
-            sb.append("CONSTRUCT { ");
-            sb.append(" ?aliasUri ?predicate ?object . ");
-            
-            sb.append(" } WHERE { ");
-            
-            sb.append(" ?aliasUri ?predicate ?object . ");
-            sb.append(" ?aliasUri <" + RDF.TYPE.stringValue() + "> <"
-                    + PoddRdfConstants.PODD_DATA_REPOSITORY.stringValue() + "> .");
-            sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS.stringValue() + "> ?alias .");
-            
-            // filter to exclude other aliases
-            if(multipleAliasesExist)
+            final Model repositories = new LinkedHashModel();
+            // Fetch the entire configuration into memory, as it should never be more than a trivial
+            // size. If this hampers efficiency could switch back to on demand querying
+            Iterations.addAll(conn.getStatements(null, null, null, true, context), repositories);
+            final Set<Resource> matchingRepositories = new HashSet<Resource>();
+            for(Resource nextRepository : repositories.filter(null, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY)
+                    .subjects())
             {
-                sb.append(" ?aliasUri <" + PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS.stringValue()
-                        + "> ?otherAlias . ");
-                sb.append(" FILTER ( str(?object) != str(?otherAlias) && str(?otherAlias) != str(?alias) )  . ");
+                for(Value nextAlias : repositories.filter(nextRepository, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS,
+                        null).objects())
+                {
+                    if(nextAlias instanceof Literal && ((Literal)nextAlias).getLabel().equalsIgnoreCase(alias))
+                    {
+                        matchingRepositories.add(nextRepository);
+                        break;
+                    }
+                }
             }
-            sb.append(" } ");
             
-            this.log.debug("Created SPARQL {} with alias bound to '{}'", sb, aliasInLowerCase);
-            
-            final GraphQuery query = conn.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
-            query.setBinding("alias", ValueFactoryImpl.getInstance().createLiteral(aliasInLowerCase));
-            
-            final Model queryResults = this.executeGraphQuery(query, context);
-            
-            if(queryResults.isEmpty())
+            if(matchingRepositories.isEmpty())
             {
+                log.warn("Could not find a repository with alias: {}", alias);
                 return null;
             }
             
-            return PoddFileRepositoryFactory.createFileRepository(aliasInLowerCase, queryResults);
+            for(Resource nextMatchingRepository : matchingRepositories)
+            {
+                Set<Value> types = repositories.filter(nextMatchingRepository, RDF.TYPE, null).objects();
+                Set<URI> uriTypes = new HashSet<URI>();
+                for(Value nextType : types)
+                {
+                    if(nextType instanceof URI)
+                    {
+                        uriTypes.add((URI)nextType);
+                    }
+                }
+                
+                for(PoddDataRepositoryFactory factory : PoddDataRepositoryRegistry.getInstance().getAll())
+                {
+                    if(factory.canCreate(uriTypes))
+                    {
+                        return factory.createDataRepository(repositories.filter(nextMatchingRepository, null, null));
+                    }
+                }
+            }
         }
         finally
         {
-            if(conn != null && conn.isActive())
-            {
-                conn.rollback();
-            }
             if(conn != null && conn.isOpen())
             {
                 conn.close();
             }
         }
+        
+        throw new RuntimeException("TODO: Implement me!");
     }
     
     @Override
@@ -546,7 +554,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 final Model model = defaultAliasConfiguration.filter(stmt.getSubject(), null, null);
                 
                 final PoddDataRepository<?> dataRepository =
-                        PoddFileRepositoryFactory.createFileRepository(alias, model);
+                        PoddDataRepositoryRegistry.getInstance().createDataRepository(model);
                 
                 this.addRepositoryMapping(alias, dataRepository, false);
             }
