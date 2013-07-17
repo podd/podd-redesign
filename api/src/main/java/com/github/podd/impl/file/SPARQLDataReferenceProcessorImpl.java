@@ -94,13 +94,6 @@ public class SPARQLDataReferenceProcessorImpl implements SPARQLDataReferenceProc
                     fileReference.setGraph(graph.iterator().next().stringValue());
                 }
                 
-                final Set<Value> endpoint =
-                        model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_SPARQL_ENDPOINT, null).objects();
-                if(!endpoint.isEmpty())
-                {
-                    fileReference.setEndpointURL(endpoint.iterator().next().stringValue());
-                }
-                
                 final Set<Value> alias = model.filter(fileRef, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objects();
                 if(!alias.isEmpty())
                 {

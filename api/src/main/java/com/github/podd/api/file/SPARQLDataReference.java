@@ -17,13 +17,5 @@ public interface SPARQLDataReference extends DataReference
      */
     String getGraph();
     
-    /**
-     * 
-     * @return The URL of the SPARQL Endpoint.
-     */
-    String getEndpointURL();
-    
     void setGraph(final String graph);
-    
-    void setEndpointURL(final String endpointURL);
 }

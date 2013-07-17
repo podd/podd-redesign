@@ -77,12 +77,6 @@ public class SPARQLDataReferenceImpl implements SPARQLDataReference
     }
     
     @Override
-    public String getEndpointURL()
-    {
-        return this.endpointURL;
-    }
-    
-    @Override
     public String getRepositoryAlias()
     {
         return this.repositoryAlias;
@@ -132,12 +126,6 @@ public class SPARQLDataReferenceImpl implements SPARQLDataReference
     }
     
     @Override
-    public void setEndpointURL(final String path)
-    {
-        this.endpointURL = path;
-    }
-    
-    @Override
     public void setRepositoryAlias(final String repositoryAlias)
     {
         this.repositoryAlias = repositoryAlias;
@@ -163,12 +151,6 @@ public class SPARQLDataReferenceImpl implements SPARQLDataReference
         if(this.getLabel() != null)
         {
             result.add(this.objectIri.toOpenRDFURI(), RDFS.LABEL, vf.createLiteral(this.getLabel()));
-        }
-        
-        if(this.getEndpointURL() != null)
-        {
-            result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_SPARQL_ENDPOINT,
-                    vf.createLiteral(this.getEndpointURL()));
         }
         
         if(this.getRepositoryAlias() != null)
