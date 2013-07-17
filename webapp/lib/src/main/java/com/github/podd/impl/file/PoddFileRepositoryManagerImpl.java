@@ -448,7 +448,8 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
     {
         if(alias == null)
         {
-            return null;
+            log.warn("Could not find a repository with a null alias");
+            throw new IllegalArgumentException("Could not find a repository with a null alias");
         }
         
         RepositoryConnection conn = null;
@@ -476,30 +477,15 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 }
             }
             
-            if(matchingRepositories.isEmpty())
-            {
-                log.warn("Could not find a repository with alias: {}", alias);
-                return null;
-            }
-            
             for(Resource nextMatchingRepository : matchingRepositories)
             {
-                Set<Value> types = repositories.filter(nextMatchingRepository, RDF.TYPE, null).objects();
-                Set<URI> uriTypes = new HashSet<URI>();
-                for(Value nextType : types)
-                {
-                    if(nextType instanceof URI)
-                    {
-                        uriTypes.add((URI)nextType);
-                    }
-                }
+                PoddDataRepository<?> repository =
+                        PoddDataRepositoryRegistry.getInstance().createDataRepository(
+                                repositories.filter(nextMatchingRepository, null, null));
                 
-                for(PoddDataRepositoryFactory factory : PoddDataRepositoryRegistry.getInstance().getAll())
+                if(repository != null)
                 {
-                    if(factory.canCreate(uriTypes))
-                    {
-                        return factory.createDataRepository(repositories.filter(nextMatchingRepository, null, null));
-                    }
+                    return repository;
                 }
             }
         }
@@ -511,7 +497,9 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             }
         }
         
-        throw new RuntimeException("TODO: Implement me!");
+        log.warn("Could not find a repository with alias: {}", alias);
+        //throw new DataRepositoryMappingNotFoundException(alias, "Could not find a repository with this alias");
+        return null;
     }
     
     @Override
@@ -551,12 +539,23 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             for(final Statement stmt : allAliases)
             {
                 final String alias = stmt.getObject().stringValue();
-                final Model model = defaultAliasConfiguration.filter(stmt.getSubject(), null, null);
                 
-                final PoddDataRepository<?> dataRepository =
-                        PoddDataRepositoryRegistry.getInstance().createDataRepository(model);
+                try
+                {
+                    final PoddDataRepository<?> dataRepository =
+                            PoddDataRepositoryRegistry.getInstance().createDataRepository(
+                                    defaultAliasConfiguration.filter(stmt.getSubject(), null, null));
+                    
+                    if(dataRepository != null)
+                    {
+                        this.addRepositoryMapping(alias, dataRepository, false);
+                    }
+                }
+                catch(DataRepositoryException dre)
+                {
+                    this.log.error("Found error attempting to create repository for alias", dre);
+                }
                 
-                this.addRepositoryMapping(alias, dataRepository, false);
             }
         }
     }

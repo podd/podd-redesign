@@ -9,7 +9,7 @@ package com.github.podd.exception;
  * 
  * @author kutila
  */
-public abstract class DataRepositoryException extends PoddException
+public class DataRepositoryException extends PoddException
 {
     
     private static final long serialVersionUID = 6527298790638967965L;

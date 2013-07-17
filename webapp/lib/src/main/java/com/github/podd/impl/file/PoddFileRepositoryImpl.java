@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -48,16 +49,16 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
         // check that the model contains an "alias" and at least one "type"
         final Model aliasModel = model.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null);
         
-        if(aliasModel.size() != 1)
+        if(aliasModel.isEmpty())
         {
-            throw new FileRepositoryIncompleteException(model, "Model should have exactly 1 alias");
+            throw new FileRepositoryIncompleteException(model, "Model did not contain any aliases");
         }
         
         // alias
-        this.alias = aliasModel.objectString();
-        if(this.alias == null || this.alias.trim().isEmpty())
+        this.alias = ((Literal)aliasModel.objects().iterator().next()).getLabel();
+        if(this.alias.trim().isEmpty())
         {
-            throw new FileRepositoryIncompleteException(model, "File Repository Alias cannot be NULL/empty");
+            throw new FileRepositoryIncompleteException(model, "File Repository Alias cannot be empty");
         }
         
         this.aliasUri = aliasModel.subjects().iterator().next();
@@ -73,7 +74,7 @@ abstract class PoddFileRepositoryImpl<T extends DataReference> implements PoddDa
         }
         if(this.types.isEmpty())
         {
-            throw new FileRepositoryIncompleteException(model, "No FileRepsitoryType information found");
+            throw new FileRepositoryIncompleteException(model, "No File Repository type information found");
         }
         
         this.model = model;

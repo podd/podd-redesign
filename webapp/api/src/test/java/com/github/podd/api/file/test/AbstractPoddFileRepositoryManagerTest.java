@@ -409,6 +409,7 @@ public abstract class AbstractPoddFileRepositoryManagerTest
         Assert.assertNull("FileRepository should be NULL", repository);
     }
     
+    @Ignore("No reason to be attempting to find a repository using a null alias without having an exception thrown")
     @Test
     public void testGetRepositoryWithNullAlias() throws Exception
     {
