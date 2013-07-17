@@ -257,6 +257,10 @@ public interface PoddRdfConstants
     public static final URI PODD_SSH_FILE_REPOSITORY = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
             "SSHFileRepository");
     
+    /** http://purl.org/podd/ns/poddBase#SPARQLDataRepository */
+    public static final URI PODD_SPARQL_DATA_REPOSITORY = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.DATA_REPOSITORY, "SPARQLDataRepository");
+    
     /** http://purl.org/podd/ns/poddBase#HTTPFileRepository */
     public static final URI PODD_HTTP_FILE_REPOSITORY = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
             "HTTPFileRepository");

@@ -5,10 +5,6 @@ package com.github.podd.impl.file;
 
 import java.io.IOException;
 
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.sftp.FileAttributes;
-import net.schmizz.sshj.sftp.SFTPClient;
-
 import org.openrdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +21,6 @@ import com.github.podd.utils.PoddRdfConstants;
  */
 public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataReference>
 {
-    public final static String PROTOCOL_SSH = "SSH";
-    
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     public SPARQLDataRepositoryImpl(final Model model) throws FileRepositoryIncompleteException
@@ -41,22 +35,15 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
                 model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, null).objectString();
         final String port =
                 model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, null).objectString();
-        final String fingerprint =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_FINGERPRINT, null).objectString();
-        final String username =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
-        final String secret =
-                model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET, null).objectString();
         
-        if(protocol == null || host == null || port == null || fingerprint == null || username == null
-                || secret == null)
+        if(protocol == null || host == null || port == null)
         {
             throw new FileRepositoryIncompleteException(model, "SSH repository configuration incomplete");
         }
         
-        if(!SPARQLDataRepositoryImpl.PROTOCOL_SSH.equalsIgnoreCase(protocol))
+        if(!SPARQLDataRepositoryImpl.PROTOCOL_HTTP.equalsIgnoreCase(protocol))
         {
-            throw new FileRepositoryIncompleteException(model, "Protocol needs to be SSH");
+            throw new FileRepositoryIncompleteException(model, "Protocol needs to be HTTP");
         }
     }
     
@@ -95,10 +82,6 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
                 this.model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, null).objectString();
         final String port =
                 this.model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, null).objectString();
-        final String username =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_USERNAME, null).objectString();
-        final String secret =
-                this.model.filter(super.aliasUri, PoddRdfConstants.PODD_FILE_REPOSITORY_SECRET, null).objectString();
         
         int portNo = -1;
         try

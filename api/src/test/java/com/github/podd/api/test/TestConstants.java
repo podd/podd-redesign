@@ -48,6 +48,8 @@ public interface TestConstants
     
     public static final String TEST_ARTIFACT_PURLS_2_FILE_REFS = "/test/artifacts/project-purls-file-ref.rdf";
     
+    public static final String TEST_ARTIFACT_PURLS_2_SPARQL_DATA_REFS = "/test/artifacts/project-purls-sparql-ref.rdf";
+    
     /** Test resource (in RDF/XML): invalid artifact with 2 lead institutes */
     public static final String TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES = "/test/artifacts/bad-twoLeadInstitutions.rdf";
     

@@ -112,50 +112,59 @@ public class SSHService
     
     /**
      * 
-     * @param alias
-     *            The alias to be assigned to the created DataReference.
-     * @param invalidFileIdentifier
-     *            If this parameter is not null, its value will be set as the file Identifier and
-     *            the file will not be copied out.
+     * @param validFileIdentifier
+     *            A file that must exist after this method returns.
+     * @param tempDirectory
+     *            The directory containing the files.
      * 
      * @return A new DataReference instance for use by tests
      * @throws IOException
      */
-    public static SSHFileReference getNewFileReference(final String alias, final String invalidFileIdentifier,
+    public static SSHFileReference getNewValidFileReference(final String validFileIdentifier, final Path tempDirectory)
+        throws IOException
+    {
+        final SSHFileReference fileReference = new SSHFileReferenceImpl();
+        
+        try (final InputStream testFile = SSHService.class.getResourceAsStream(TestConstants.TEST_FILE_REFERENCE_PATH);)
+        {
+            String fileName = TestConstants.TEST_FILE_REFERENCE_PATH;
+            
+            final int lastSlashPosition = fileName.lastIndexOf("/");
+            if(lastSlashPosition != -1)
+            {
+                fileName = fileName.substring(lastSlashPosition + 1);
+            }
+            
+            Path finalPath = tempDirectory.resolve(fileName);
+            fileReference.setFilename(fileName);
+            
+            Files.createFile(finalPath);
+            Files.copy(testFile, finalPath, StandardCopyOption.REPLACE_EXISTING);
+            fileReference.setPath(finalPath.getParent().toString());
+        }
+        
+        return fileReference;
+    }
+    
+    /**
+     * 
+     * @param invalidFileIdentifier
+     *            A file that must not exist.
+     * @param tempDirectory
+     *            The directory containing the files.
+     * 
+     * @return A new DataReference instance for use by tests
+     * @throws IOException
+     */
+    public static SSHFileReference getNewInvalidFileReference(final String invalidFileIdentifier,
             final Path tempDirectory) throws IOException
     {
         final SSHFileReference fileReference = new SSHFileReferenceImpl();
-        fileReference.setRepositoryAlias(alias);
         
-        Path finalPath = null;
-        
-        if(invalidFileIdentifier != null)
-        {
-            finalPath = tempDirectory.resolve(invalidFileIdentifier);
-            fileReference.setFilename(invalidFileIdentifier);
-        }
-        else
-        {
-            try (final InputStream testFile =
-                    SSHService.class.getResourceAsStream(TestConstants.TEST_FILE_REFERENCE_PATH);)
-            {
-                String fileName = TestConstants.TEST_FILE_REFERENCE_PATH;
-                
-                final int lastSlashPosition = fileName.lastIndexOf("/");
-                if(lastSlashPosition != -1)
-                {
-                    fileName = fileName.substring(lastSlashPosition + 1);
-                }
-                
-                finalPath = tempDirectory.resolve(fileName);
-                fileReference.setFilename(fileName);
-                
-                Files.createFile(finalPath);
-                Files.copy(testFile, finalPath, StandardCopyOption.REPLACE_EXISTING);
-            }
-        }
-        
+        Path finalPath = tempDirectory.resolve(invalidFileIdentifier);
         fileReference.setPath(finalPath.getParent().toString());
+        
+        fileReference.setFilename(invalidFileIdentifier);
         
         return fileReference;
     }
