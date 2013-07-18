@@ -3,11 +3,19 @@
  */
 package com.github.podd.resources.test;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -19,8 +27,10 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -29,6 +39,97 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
 {
+    /**
+     * Test Upload attempt with an artifact that is inconsistent. 
+     * Results in an HTTP 500 Internal Server Error with detailed error causes
+     * in the RDF body. 
+     */
+    @Test
+    public void testErrorUploadWithInconsistentArtifactRdf() throws Exception
+    {
+        final ClientResource uploadArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES,
+                        MediaType.APPLICATION_RDF_XML);
+        
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat responseFormat = RDFFormat.forMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        try
+        {
+            RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                    mediaType, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+        }
+        catch(final ResourceException e)
+        {
+            // verify: error details
+            Assert.assertEquals("Not the expected HTTP status code", Status.SERVER_ERROR_INTERNAL, e.getStatus());
+            
+            final String body = uploadArtifactClientResource.getResponseEntity().getText();
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+            final Model model = Rio.parse(inputStream, "", responseFormat);
+            
+            Assert.assertEquals("Not the expected results size", 10, model.size());
+            final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR).subjects();
+            Assert.assertEquals("Not the expected number of Errors", 1, errors.size());
+            
+            Assert.assertEquals("Not the expected error source", "urn:temp:inconsistentArtifact:1", 
+            model.filter(null, PoddRdfConstants.ERR_SOURCE, null).objectString());
+            
+            //DebugUtils.printContents(model);
+        }
+    }    
+    
+    /**
+     * Test Upload attempt with an artifact that is inconsistent. 
+     * Results in an HTTP 500 Internal Server Error with detailed error causes
+     * in the RDF body. 
+     */
+    @Test
+    public void testErrorUploadWithNotInOwlDlProfileArtifactRdf() throws Exception
+    {
+        final ClientResource uploadArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_BAD_NOT_OWL_DL,
+                        MediaType.APPLICATION_RDF_XML);
+        
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat responseFormat = RDFFormat.forMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        try
+        {
+            RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                    mediaType, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+        }
+        catch(final ResourceException e)
+        {
+            // verify: error details
+            Assert.assertEquals("Not the expected HTTP status code", Status.SERVER_ERROR_INTERNAL, e.getStatus());
+            
+            final String body = uploadArtifactClientResource.getResponseEntity().getText();
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+            final Model model = Rio.parse(inputStream, "", responseFormat);
+            
+            Assert.assertEquals("Not the expected results size", 15, model.size());
+            final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR).subjects();
+            Assert.assertEquals("Not the expected number of Errors", 3, errors.size());
+            
+            Assert.assertEquals(
+                    "Expected error sources not found",
+                    2,
+                    model.filter(
+                            null,
+                            PoddRdfConstants.ERR_SOURCE,
+                            PoddRdfConstants.VF
+                                    .createLiteral("ClassAssertion(owl:Individual <mailto:helen.daily@csiro.au>)"))
+                            .size());
+            
+            //DebugUtils.printContents(model);
+        }
+    }    
+    
     /**
      * Test unauthenticated access to "upload artifact" leads to an UNAUTHORIZED error.
      */
@@ -80,6 +181,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
         }
     }
+    
     
     /**
      * Test authenticated access to the upload Artifact page in HTML
