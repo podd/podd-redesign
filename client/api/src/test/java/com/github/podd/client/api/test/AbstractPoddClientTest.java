@@ -195,9 +195,10 @@ public abstract class AbstractPoddClientTest
             final DataReference testRef = this.deployFileReference("test-file-label");
             testRef.setArtifactID(newArtifact);
             testRef.setParentIri(IRI.create(topObject.objectURI()));
+            testRef.setParentPredicateIRI(IRI.create(PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE));
             // TODO: If this breaks then need to attach it to a different part of an extended
             // project
-            testRef.setObjectIri(IRI.create(topObject.objectURI()));
+            testRef.setObjectIri(IRI.create("urn:temp:uuid:dataReference:1"));
             
             final InferredOWLOntologyID afterFileAttachment = this.testClient.attachDataReference(testRef);
             
@@ -212,7 +213,7 @@ public abstract class AbstractPoddClientTest
             final ByteArrayOutputStream afterOutputStream = new ByteArrayOutputStream(8096);
             this.testClient.downloadArtifact(newArtifact, afterOutputStream, RDFFormat.RDFJSON);
             final Model afterParseRdf =
-                    this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON, 30);
+                    this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON, 32);
             
             final Model afterTopObject =
                     afterParseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(),
@@ -220,6 +221,19 @@ public abstract class AbstractPoddClientTest
             
             Assert.assertEquals("Did not find unique top object in artifact", 1, afterTopObject.size());
             
+            // If this starts to fail it is okay, as the server may reassign URIs as it desires,
+            // just comment it out if this occurs
+            Assert.assertEquals(afterTopObject.objectURI(), topObject.objectURI());
+            
+            Model afterDataReferenceURI =
+                    afterParseRdf.filter(topObject.objectURI(), PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE, null);
+            
+            Assert.assertNotEquals(topObject.objectURI(), afterDataReferenceURI.objectURI());
+            
+            Model afterDataReferenceTriples = afterParseRdf.filter(afterDataReferenceURI.objectURI(), null, null);
+            
+            Assert.assertEquals("Found unexpected number of triples for data reference", 5,
+                    afterDataReferenceTriples.size());
         }
         finally
         {
