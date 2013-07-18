@@ -32,7 +32,10 @@ public class SPARQLDataReferenceImpl implements SPARQLDataReference
     
     private String graph;
     private String endpointURL;
-    private IRI parentPredicateIRI;
+    /**
+     * Defaults to http://purl.org/podd/ns/poddBase#hasDataReference
+     */
+    private IRI parentPredicateIRI = IRI.create(PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE);
     
     /**
      * Constructor

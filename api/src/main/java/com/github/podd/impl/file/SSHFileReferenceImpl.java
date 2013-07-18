@@ -31,7 +31,10 @@ public class SSHFileReferenceImpl implements SSHFileReference
     
     private String filename;
     private String path;
-    private IRI parentPredicateIRI;
+    /**
+     * Defaults to http://purl.org/podd/ns/poddBase#hasDataReference
+     */
+    private IRI parentPredicateIRI = IRI.create(PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE);
     
     /**
      * Constructor
