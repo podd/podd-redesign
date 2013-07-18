@@ -296,5 +296,30 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/poddBase#hasDataRepositorySecret */
     public static final URI PODD_FILE_REPOSITORY_SECRET = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositorySecret");
+
+
+    /**
+     * TODO: Temporary domain for specifying error messages in RDF 
+     */
+    public static final String PODD_ERROR = "http://purl.org/podd/ns/err#";
     
+    /** Type to identify an Error http://purl.org/podd/ns/err#Error  */
+    public static final URI ERR_TYPE_ERROR = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_ERROR, "Error");
+
+    /** Error source/what caused the error http://purl.org/podd/ns/err#source  */
+    public static final URI ERR_SOURCE = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_ERROR, "source");
+    
+    /** What/who identified the error http://purl.org/podd/ns/err#identifier */
+    public static final URI ERR_IDENTIFIER = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_ERROR, "identifier");
+
+    /** The Exception class http://purl.org/podd/ns/err#exceptionClass */
+    public static final URI ERR_EXCEPTION_CLASS = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_ERROR, "exceptionClass");
+
+    /** http://purl.org/podd/ns/err#contains */
+    public static final URI ERR_CONTAINS = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_ERROR, "contains");
 }
