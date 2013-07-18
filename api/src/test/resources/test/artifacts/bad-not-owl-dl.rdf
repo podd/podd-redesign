@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:poddUser="http://purl.org/podd/ns/poddUser#"
+	xmlns:poddBase="http://purl.org/podd/ns/poddBase#"
+	xmlns:poddScience="http://purl.org/podd/ns/poddScience#">
+
+<rdf:Description rdf:about="urn:temp:uuid:artifact:1">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+	<owl:versionIRI rdf:resource="urn:temp:uuid:artifact:version:55" />
+	<poddBase:artifactHasTopObject rdf:resource="urn:temp:uuid:object:1960"/>
+	<owl:imports rdf:resource="http://purl.org/podd/ns/dcTerms" />
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddUser" />
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddBase" />
+	<owl:imports rdf:resource="http://purl.org/podd/ns/poddScience" />
+</rdf:Description>
+
+<rdf:Description rdf:about="mailto:xavier.sirault@csiro.au">
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#User"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="mailto:helen.daily@csiro.au">
+	<!-- This statement makes this artifact not fit OWL-DL profile -->
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Individual"/>
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddUser#User"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="urn:temp:uuid:object:1960">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+
+	<rdf:type rdf:resource="http://purl.org/podd/ns/poddScience#Project"/>
+	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Project#2012-0006_ Cotton Leaf Morphology</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Characterising normal and okra leaf shapes</rdfs:comment>
+	<poddBase:hasLeadInstitution rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CSIRO HRPPC</poddBase:hasLeadInstitution>
+	<poddBase:hasStartDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-05-22</poddBase:hasStartDate>
+	<poddScience:hasANZSRC rdf:resource="http://purl.org/podd/ns/poddBase#NotApplicable"/>
+	<poddBase:hasPrincipalInvestigator rdf:resource="mailto:xavier.sirault@csiro.au"/>
+
+	<!-- To be added by PODD, not to be submitted by user -->
+	<poddBase:createdAt rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-06-05T01:57:16.643Z</poddBase:createdAt>
+	<dcterms:creator rdf:resource="mailto:helen.daily@csiro.au" />
+	<poddBase:hasPublicationStatus rdf:resource="http://purl.org/podd/ns/poddBase#UnPublished"/>
+	<poddBase:hasTopObjectStatus rdf:resource="http://purl.org/podd/ns/poddBase#Active"/>
+</rdf:Description>
+
+
+</rdf:RDF>
