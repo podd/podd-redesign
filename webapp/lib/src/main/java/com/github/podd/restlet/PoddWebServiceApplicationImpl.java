@@ -30,6 +30,7 @@ import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.AddObjectResourceImpl;
@@ -76,6 +77,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     private PoddRepositoryManager poddRepositoryManager;
     private PoddSchemaManager poddSchemaManager;
     private PoddArtifactManager poddArtifactManager;
+    private PoddDataRepositoryManager poddDataRepositoryManager;
     
     private Model aliasesConfiguration = new LinkedHashModel();
     
@@ -375,6 +377,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
+    public PoddDataRepositoryManager getPoddDataRepositoryManager()
+    {
+        return this.poddDataRepositoryManager;
+    }
+    
+    @Override
     public PoddRepositoryManager getPoddRepositoryManager()
     {
         return this.poddRepositoryManager;
@@ -428,6 +436,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     public void setPoddArtifactManager(final PoddArtifactManager poddArtifactManager)
     {
         this.poddArtifactManager = poddArtifactManager;
+    }
+    
+    @Override
+    public void setPoddDataRepositoryManager(final PoddDataRepositoryManager poddDataRepositoryManager)
+    {
+        this.poddDataRepositoryManager = poddDataRepositoryManager;
     }
     
     /**

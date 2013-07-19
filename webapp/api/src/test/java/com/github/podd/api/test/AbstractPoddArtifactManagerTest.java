@@ -523,7 +523,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         this.testArtifactManager = this.getNewArtifactManager();
         this.testArtifactManager.setRepositoryManager(this.testRepositoryManager);
-        this.testArtifactManager.setFileReferenceManager(testFileReferenceManager);
+        this.testArtifactManager.setDataReferenceManager(testFileReferenceManager);
         this.testArtifactManager.setPurlManager(testPurlManager);
         this.testArtifactManager.setOwlManager(testOWLManager);
         this.testArtifactManager.setSchemaManager(this.testSchemaManager);

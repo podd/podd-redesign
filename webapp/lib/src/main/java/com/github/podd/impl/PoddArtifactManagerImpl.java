@@ -1332,7 +1332,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * PoddFileReferenceManager)
      */
     @Override
-    public void setFileReferenceManager(final DataReferenceManager fileManager)
+    public void setDataReferenceManager(final DataReferenceManager fileManager)
     {
         this.dataReferenceManager = fileManager;
     }
@@ -1345,7 +1345,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * .PoddFileRepositoryManager)
      */
     @Override
-    public void setFileRepositoryManager(final PoddDataRepositoryManager dataRepositoryManager)
+    public void setDataRepositoryManager(final PoddDataRepositoryManager dataRepositoryManager)
     {
         this.dataRepositoryManager = dataRepositoryManager;
     }

@@ -386,7 +386,7 @@ public interface PoddArtifactManager
      * @param fileManager
      *            The manager to use for verifying file references for PODD artifacts.
      */
-    void setFileReferenceManager(DataReferenceManager fileManager);
+    void setDataReferenceManager(DataReferenceManager fileManager);
     
     /**
      * Sets the {@link PoddDataRepositoryManager} to use for managing file repository
@@ -395,7 +395,7 @@ public interface PoddArtifactManager
      * @param dataRepositoryManager
      *            The manager to use for managing file repository configurations.
      */
-    void setFileRepositoryManager(PoddDataRepositoryManager dataRepositoryManager);
+    void setDataRepositoryManager(PoddDataRepositoryManager dataRepositoryManager);
     
     /**
      * Sets the {@link PoddOWLManager} instance to use when loading and dealing with Artifacts in

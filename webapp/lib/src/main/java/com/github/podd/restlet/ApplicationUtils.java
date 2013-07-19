@@ -257,8 +257,8 @@ public class ApplicationUtils
         nextFileRegistry.add(nextFileProcessorFactory);
         
         // File Reference Manager
-        final DataReferenceManager nextFileReferenceManager = new FileReferenceManagerImpl();
-        nextFileReferenceManager.setDataProcessorRegistry(nextFileRegistry);
+        final DataReferenceManager nextDataReferenceManager = new FileReferenceManagerImpl();
+        nextDataReferenceManager.setDataProcessorRegistry(nextFileRegistry);
         
         // PURL manager
         final PoddPurlProcessorFactoryRegistry nextPurlRegistry = new PoddPurlProcessorFactoryRegistry();
@@ -283,18 +283,20 @@ public class ApplicationUtils
         nextOWLManager.setOWLOntologyManager(nextOWLOntologyManager);
         
         // File Repository Manager
-        final PoddDataRepositoryManager nextFileRepositoryManager = new PoddFileRepositoryManagerImpl();
-        nextFileRepositoryManager.setRepositoryManager(application.getPoddRepositoryManager());
-        nextFileRepositoryManager.setOWLManager(nextOWLManager);
+        final PoddDataRepositoryManager nextDataRepositoryManager = new PoddFileRepositoryManagerImpl();
+        nextDataRepositoryManager.setRepositoryManager(application.getPoddRepositoryManager());
+        nextDataRepositoryManager.setOWLManager(nextOWLManager);
         try
         {
             final Model aliasConfiguration = application.getAliasesConfiguration();
-            nextFileRepositoryManager.init(application.getAliasesConfiguration());
+            nextDataRepositoryManager.init(application.getAliasesConfiguration());
         }
         catch(PoddException | IOException e)
         {
             ApplicationUtils.log.error("Fatal Error!!! Could not initialize File Repository Manager", e);
         }
+        
+        application.setPoddDataRepositoryManager(nextDataRepositoryManager);
         
         final PoddSesameManager poddSesameManager = new PoddSesameManagerImpl();
         
@@ -305,8 +307,8 @@ public class ApplicationUtils
         
         application.setPoddArtifactManager(new PoddArtifactManagerImpl());
         application.getPoddArtifactManager().setRepositoryManager(application.getPoddRepositoryManager());
-        application.getPoddArtifactManager().setFileReferenceManager(nextFileReferenceManager);
-        application.getPoddArtifactManager().setFileRepositoryManager(nextFileRepositoryManager);
+        application.getPoddArtifactManager().setDataReferenceManager(nextDataReferenceManager);
+        application.getPoddArtifactManager().setDataRepositoryManager(nextDataRepositoryManager);
         application.getPoddArtifactManager().setPurlManager(nextPurlManager);
         application.getPoddArtifactManager().setOwlManager(nextOWLManager);
         application.getPoddArtifactManager().setSchemaManager(application.getPoddSchemaManager());

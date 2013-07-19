@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.repository.Repository;
 import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -13,6 +14,8 @@ import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
+import com.github.podd.api.file.PoddDataRepository;
+import com.github.podd.api.file.PoddDataRepositoryManager;
 
 import freemarker.template.Configuration;
 
@@ -59,6 +62,8 @@ public abstract class PoddWebServiceApplication extends Application
     
     public abstract PoddArtifactManager getPoddArtifactManager();
     
+    public abstract PoddDataRepositoryManager getPoddDataRepositoryManager();
+    
     public abstract PoddRepositoryManager getPoddRepositoryManager();
     
     public abstract PoddSchemaManager getPoddSchemaManager();
@@ -89,6 +94,20 @@ public abstract class PoddWebServiceApplication extends Application
     
     public abstract void setPoddArtifactManager(PoddArtifactManager poddArtifactManager);
     
+    /**
+     * 
+     * @param nextDataRepositoryManager
+     *            A manager for {@link PoddDataRepository} objects used to host external data
+     *            references for PODD Artifacts.
+     */
+    public abstract void setPoddDataRepositoryManager(PoddDataRepositoryManager nextDataRepositoryManager);
+    
+    /**
+     * 
+     * @param poddRepositoryManager
+     *            A manager for OpenRDF {@link Repository} objects used by the application to store
+     *            and retrieve data.
+     */
     public abstract void setPoddRepositoryManager(PoddRepositoryManager poddRepositoryManager);
     
     public abstract void setPoddSchemaManager(PoddSchemaManager poddSchemaManager);
@@ -108,5 +127,4 @@ public abstract class PoddWebServiceApplication extends Application
      * @param nextFreemarkerConfiguration
      */
     public abstract void setTemplateConfiguration(Configuration nextFreemarkerConfiguration);
-    
 }

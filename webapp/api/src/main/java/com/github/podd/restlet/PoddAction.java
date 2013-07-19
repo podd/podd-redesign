@@ -105,6 +105,15 @@ public enum PoddAction
     OTHER_USER_READ(true, "Could not retrieve other user details", Collections.singleton(PoddRoles.ADMIN.getRole()),
             false),
     
+    /**
+     * An action by a user asking to fetch information about a data repository.
+     * 
+     * By default if they are not administrators, they will not be able to see information about
+     * other data repositories.
+     */
+    DATA_REPOSITORY_READ(true, "Could not retrieve data repository details", Collections.singleton(PoddRoles.ADMIN
+            .getRole()), false),
+    
     ;
     
     private final boolean authRequired;
