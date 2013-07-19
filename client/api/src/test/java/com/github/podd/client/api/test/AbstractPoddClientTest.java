@@ -34,6 +34,10 @@ import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * Abstract tests for {@link PoddClient}.
+ * <p>
+ * IMPORTANT: Never run these tests against a server containing real data, such as a production
+ * server. After each test, the test attempts to reset the server, to enable other tests to be
+ * easily verified.
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
