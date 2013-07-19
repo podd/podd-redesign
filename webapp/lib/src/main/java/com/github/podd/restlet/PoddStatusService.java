@@ -4,13 +4,11 @@
 package com.github.podd.restlet;
 
 import java.io.StringWriter;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
-import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -31,9 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
-import com.github.podd.api.file.DataReference;
-import com.github.podd.exception.FileReferenceInvalidException;
-import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -169,51 +164,6 @@ public class PoddStatusService extends StatusService
                 final Model errorModel = ((PoddException)status.getThrowable()).getDetailsAsModel(errorNode);
                 model.add(topNode, PoddRdfConstants.ERR_CONTAINS, errorNode);
                 model.addAll(errorModel);
-            }
-
-            // TODO: Handle Ontology Not Consistent exceptions here and map the reasons specifically
-            // so that web interface and client can describe to users why the ontology save failed
-            
-            // FIXME: move to FileReferenceVerificationFailureException.getDetailsAsModel()
-            else if(status.getThrowable() instanceof FileReferenceVerificationFailureException)
-            {
-                FileReferenceVerificationFailureException fre =(FileReferenceVerificationFailureException)status.getThrowable();
-                model.add(topNode, PoddRdfConstants.ERR_EXCEPTION_CLASS,
-                        PoddRdfConstants.VF.createLiteral(fre.getClass().getName()));
-                
-                final Map<DataReference, Throwable> validationFailures = fre.getValidationFailures();
-                Iterator<DataReference> iterator = validationFailures.keySet().iterator();
-                while (iterator.hasNext())
-                {
-                    final DataReference dataReference = iterator.next();
-                    Throwable throwable = validationFailures.get(dataReference);
-                    //TODO
-                    model.add(dataReference.getObjectIri().toOpenRDFURI(), RDFS.LABEL, PoddRdfConstants.VF.createLiteral(throwable.getMessage()));
-                    dataReference.getLabel();
-                    
-                    final BNode v = PoddRdfConstants.VF.createBNode();
-                    model.add(topNode, PoddRdfConstants.ERR_CONTAINS, v);
-                    model.add(v, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
-                    
-                    final URI dataRefUri = dataReference.getObjectIri().toOpenRDFURI();
-                    model.add(v, PoddRdfConstants.ERR_SOURCE, dataRefUri);
-                    model.add(dataRefUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(dataReference.getLabel()));
-                    model.add(dataRefUri, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(throwable.getMessage()));
-                }
-                
-            }
-            
-            // FIXME: move to FileReferenceVerificationFailureException.getDetailsAsModel()
-            else if(status.getThrowable() instanceof FileReferenceInvalidException)
-            {
-                FileReferenceInvalidException fre =(FileReferenceInvalidException)status.getThrowable();
-                model.add(topNode, PoddRdfConstants.ERR_EXCEPTION_CLASS,
-                        PoddRdfConstants.VF.createLiteral(fre.getClass().getName()));
-                
-                final URI fileRefUri = fre.getFileReference().getObjectIri().toOpenRDFURI();
-                model.add(topNode, PoddRdfConstants.ERR_SOURCE, fileRefUri);
-                model.add(fileRefUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(fre.getFileReference().getLabel()));
-                
             }
         }
         

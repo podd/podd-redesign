@@ -3,7 +3,13 @@
  */
 package com.github.podd.exception;
 
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.RDFS;
+
 import com.github.podd.api.file.DataReference;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * An exception that is thrown to indicate that a {@link DataReference} was deemed invalid by its
@@ -39,6 +45,20 @@ public class FileReferenceInvalidException extends PoddException
     public DataReference getFileReference()
     {
         return this.dataReference;
+    }
+    
+    @Override
+    public Model getDetailsAsModel(final Resource errorResource) 
+    {
+        final Model model = super.getDetailsAsModel(errorResource);
+        
+        //FIXME - untested and incomplete
+        final URI fileRefUri = this.getFileReference().getObjectIri().toOpenRDFURI();
+        model.add(errorResource, PoddRdfConstants.ERR_SOURCE, fileRefUri);
+        model.add(fileRefUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(this.getFileReference().getLabel()));
+    
+        
+        return model;
     }
     
 }
