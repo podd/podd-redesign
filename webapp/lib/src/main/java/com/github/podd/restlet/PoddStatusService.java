@@ -3,7 +3,6 @@
  */
 package com.github.podd.restlet;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
@@ -28,9 +27,6 @@ import org.restlet.data.Status;
 import org.restlet.representation.AppendableRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.service.StatusService;
-import org.semanticweb.owlapi.profiles.OWLProfileReport;
-import org.semanticweb.owlapi.profiles.OWLProfileViolation;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +34,7 @@ import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.exception.FileReferenceInvalidException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
-import com.github.podd.exception.InconsistentOntologyException;
-import com.github.podd.exception.OntologyNotInProfileException;
+import com.github.podd.exception.PoddException;
 import com.github.podd.utils.PoddRdfConstants;
 
 import freemarker.template.Configuration;
@@ -158,71 +153,26 @@ public class PoddStatusService extends StatusService
     {
         final Model model = new LinkedHashModel();
         
-        final BNode errorUri = PoddRdfConstants.VF.createBNode();
-        model.add(errorUri, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
+        final URI errorUri = PoddRdfConstants.ERR_TYPE_ERROR;
         model.add(errorUri, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, PoddRdfConstants.VF.createLiteral(status.getCode()));
         model.add(errorUri, PoddRdfConstants.HTTP_REASON_PHRASE, PoddRdfConstants.VF.createLiteral(status.getReasonPhrase()));
         
         String errorDescription = status.getDescription();
+        model.add(errorUri, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(errorDescription));
+        
         if(status.getThrowable() != null)
         {
-            final StringWriter sw = new StringWriter();
-            status.getThrowable().printStackTrace(new PrintWriter(sw));
-            errorDescription = sw.toString();
             
-            if(status.getThrowable().getMessage() != null)
+            if(status.getThrowable() instanceof PoddException)
             {
-                model.add(errorUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(status.getThrowable().getMessage()));
+                final Model errorModel = ((PoddException)status.getThrowable()).getDetailsAsModel();
+                model.addAll(errorModel);
             }
-            
+
             // TODO: Handle Ontology Not Consistent exceptions here and map the reasons specifically
             // so that web interface and client can describe to users why the ontology save failed
             
-            if(status.getThrowable() instanceof OntologyNotInProfileException)
-            {
-                OntologyNotInProfileException onpe =(OntologyNotInProfileException)status.getThrowable();
-                model.add(errorUri, PoddRdfConstants.ERR_EXCEPTION_CLASS,
-                        PoddRdfConstants.VF.createLiteral(onpe.getClass().getName()));
-                
-                if(onpe.getOntology() != null)
-                {
-                    model.add(errorUri, PoddRdfConstants.ERR_SOURCE, onpe.getOntology().getOntologyID()
-                            .getOntologyIRI().toOpenRDFURI());
-                }
-                
-                final OWLProfileReport profileReport = onpe.getProfileReport();
-                for(OWLProfileViolation violation : profileReport.getViolations())
-                {
-                    final BNode v = PoddRdfConstants.VF.createBNode();
-                    model.add(errorUri, PoddRdfConstants.ERR_CONTAINS, v);
-                    model.add(v, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
-                    model.add(v, PoddRdfConstants.ERR_SOURCE, PoddRdfConstants.VF.createLiteral(violation.getAxiom().toString()));
-                    model.add(v, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(violation.toString()));
-                }
-                
-            }
-            else if(status.getThrowable() instanceof InconsistentOntologyException)
-            {
-                InconsistentOntologyException ioe =(InconsistentOntologyException)status.getThrowable();
-                model.add(errorUri, PoddRdfConstants.ERR_EXCEPTION_CLASS,
-                        PoddRdfConstants.VF.createLiteral(ioe.getClass().getName()));
-
-                final OWLReasoner reasoner = ioe.getReasoner();
-                if (reasoner != null)
-                {
-                    final BNode reasonerUri = PoddRdfConstants.VF.createBNode();
-                    model.add(errorUri, PoddRdfConstants.ERR_IDENTIFIER, reasonerUri);
-                    model.add(reasonerUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(reasoner.getReasonerName()));
-                    model.add(reasonerUri, PoddRdfConstants.OMV_CURRENT_VERSION,
-                            PoddRdfConstants.VF.createLiteral(reasoner.getReasonerVersion().toString()));
-                    
-                    model.add(errorUri, PoddRdfConstants.ERR_SOURCE, reasoner.getRootOntology().getOntologyID()
-                            .getOntologyIRI().toOpenRDFURI());
-                    
-                    // TODO: can we get the causes for inconsistency?
-                }
-                
-            }
+            // FIXME: move to FileReferenceVerificationFailureException.getDetailsAsModel()
             else if(status.getThrowable() instanceof FileReferenceVerificationFailureException)
             {
                 FileReferenceVerificationFailureException fre =(FileReferenceVerificationFailureException)status.getThrowable();
@@ -250,6 +200,7 @@ public class PoddStatusService extends StatusService
                 }
                 
             }
+            // FIXME: move to FileReferenceVerificationFailureException.getDetailsAsModel()
             else if(status.getThrowable() instanceof FileReferenceInvalidException)
             {
                 FileReferenceInvalidException fre =(FileReferenceInvalidException)status.getThrowable();
@@ -261,17 +212,7 @@ public class PoddStatusService extends StatusService
                 model.add(fileRefUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(fre.getFileReference().getLabel()));
                 
             }
-            
-            //DataRepositoryMappingNotFoundException
-            //PoddException
-            //DataRepositoryException
-            //OWLException
-            //OpenRDFException
-            //.....
-            
         }
-        
-        model.add(errorUri, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(errorDescription));
         
         // get a String representation of the statements in the Model
         final StringWriter out = new StringWriter();

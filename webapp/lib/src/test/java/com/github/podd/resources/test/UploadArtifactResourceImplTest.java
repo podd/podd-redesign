@@ -5,15 +5,12 @@ package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
-import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
@@ -27,6 +24,8 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.exception.InconsistentOntologyException;
+import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -71,11 +70,24 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             final Model model = Rio.parse(inputStream, "", responseFormat);
             
             Assert.assertEquals("Not the expected results size", 10, model.size());
-            final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR).subjects();
-            Assert.assertEquals("Not the expected number of Errors", 1, errors.size());
             
-            Assert.assertEquals("Not the expected error source", "urn:temp:inconsistentArtifact:1", 
-            model.filter(null, PoddRdfConstants.ERR_SOURCE, null).objectString());
+            // Resource level error details
+            Assert.assertEquals("Not the expected HTTP Status Code", "500",
+                    model.filter(PoddRdfConstants.ERR_TYPE_ERROR, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, null)
+                            .objectString());
+            Assert.assertEquals("Not the expected Reason Phrase", "Internal Server Error",
+                    model.filter(PoddRdfConstants.ERR_TYPE_ERROR, PoddRdfConstants.HTTP_REASON_PHRASE, null)
+                            .objectString());
+            Assert.assertEquals("Not the expected RDFS:comment", "Error loading artifact to PODD",
+                    model.filter(PoddRdfConstants.ERR_TYPE_ERROR, RDFS.COMMENT, null)
+                            .objectString());
+            
+            // Error cause details
+            Assert.assertEquals("Not the expected Exception class", InconsistentOntologyException.class.getName(),
+                    model.filter(null, PoddRdfConstants.ERR_EXCEPTION_CLASS, null).objectString());
+            
+            Assert.assertEquals("Not the expected error source", "urn:temp:inconsistentArtifact:1",
+                    model.filter(null, PoddRdfConstants.ERR_SOURCE, null).objectString());
             
             //DebugUtils.printContents(model);
         }
@@ -111,10 +123,25 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             final String body = uploadArtifactClientResource.getResponseEntity().getText();
             ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
             final Model model = Rio.parse(inputStream, "", responseFormat);
+
+            DebugUtils.printContents(model);
             
             Assert.assertEquals("Not the expected results size", 15, model.size());
-            final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR).subjects();
-            Assert.assertEquals("Not the expected number of Errors", 3, errors.size());
+            
+            // Resource level error details
+            Assert.assertEquals("Not the expected HTTP Status Code", "500",
+                    model.filter(PoddRdfConstants.ERR_TYPE_ERROR, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, null)
+                            .objectString());
+            Assert.assertEquals("Not the expected Reason Phrase", "Internal Server Error",
+                    model.filter(PoddRdfConstants.ERR_TYPE_ERROR, PoddRdfConstants.HTTP_REASON_PHRASE, null)
+                            .objectString());
+            Assert.assertEquals("Not the expected RDFS:comment", "Error loading artifact to PODD",
+                    model.filter(PoddRdfConstants.ERR_TYPE_ERROR, RDFS.COMMENT, null)
+                            .objectString());
+            
+            // Error cause details
+            Assert.assertEquals("Not the expected Exception class", OntologyNotInProfileException.class.getName(),
+                    model.filter(null, PoddRdfConstants.ERR_EXCEPTION_CLASS, null).objectString());
             
             Assert.assertEquals(
                     "Expected error sources not found",
@@ -125,8 +152,6 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                             PoddRdfConstants.VF
                                     .createLiteral("ClassAssertion(owl:Individual <mailto:helen.daily@csiro.au>)"))
                             .size());
-            
-            //DebugUtils.printContents(model);
         }
     }    
     
