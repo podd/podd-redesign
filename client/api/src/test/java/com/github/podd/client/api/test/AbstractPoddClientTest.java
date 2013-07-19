@@ -213,7 +213,7 @@ public abstract class AbstractPoddClientTest
             final ByteArrayOutputStream afterOutputStream = new ByteArrayOutputStream(8096);
             this.testClient.downloadArtifact(newArtifact, afterOutputStream, RDFFormat.RDFJSON);
             final Model afterParseRdf =
-                    this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON, 32);
+                    this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON, 34);
             
             final Model afterTopObject =
                     afterParseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(),
