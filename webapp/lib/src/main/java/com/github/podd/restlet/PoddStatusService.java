@@ -153,19 +153,21 @@ public class PoddStatusService extends StatusService
     {
         final Model model = new LinkedHashModel();
         
-        final URI errorUri = PoddRdfConstants.ERR_TYPE_ERROR;
-        model.add(errorUri, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, PoddRdfConstants.VF.createLiteral(status.getCode()));
-        model.add(errorUri, PoddRdfConstants.HTTP_REASON_PHRASE, PoddRdfConstants.VF.createLiteral(status.getReasonPhrase()));
+        final BNode topNode = PoddRdfConstants.VF.createBNode();
+        model.add(topNode, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR); 
+        model.add(topNode, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, PoddRdfConstants.VF.createLiteral(status.getCode()));
+        model.add(topNode, PoddRdfConstants.HTTP_REASON_PHRASE, PoddRdfConstants.VF.createLiteral(status.getReasonPhrase()));
         
         String errorDescription = status.getDescription();
-        model.add(errorUri, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(errorDescription));
+        model.add(topNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(errorDescription));
         
         if(status.getThrowable() != null)
         {
-            
             if(status.getThrowable() instanceof PoddException)
             {
-                final Model errorModel = ((PoddException)status.getThrowable()).getDetailsAsModel();
+                final BNode errorNode = PoddRdfConstants.VF.createBNode();
+                final Model errorModel = ((PoddException)status.getThrowable()).getDetailsAsModel(errorNode);
+                model.add(topNode, PoddRdfConstants.ERR_CONTAINS, errorNode);
                 model.addAll(errorModel);
             }
 
@@ -176,7 +178,7 @@ public class PoddStatusService extends StatusService
             else if(status.getThrowable() instanceof FileReferenceVerificationFailureException)
             {
                 FileReferenceVerificationFailureException fre =(FileReferenceVerificationFailureException)status.getThrowable();
-                model.add(errorUri, PoddRdfConstants.ERR_EXCEPTION_CLASS,
+                model.add(topNode, PoddRdfConstants.ERR_EXCEPTION_CLASS,
                         PoddRdfConstants.VF.createLiteral(fre.getClass().getName()));
                 
                 final Map<DataReference, Throwable> validationFailures = fre.getValidationFailures();
@@ -190,7 +192,7 @@ public class PoddStatusService extends StatusService
                     dataReference.getLabel();
                     
                     final BNode v = PoddRdfConstants.VF.createBNode();
-                    model.add(errorUri, PoddRdfConstants.ERR_CONTAINS, v);
+                    model.add(topNode, PoddRdfConstants.ERR_CONTAINS, v);
                     model.add(v, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
                     
                     final URI dataRefUri = dataReference.getObjectIri().toOpenRDFURI();
@@ -200,15 +202,16 @@ public class PoddStatusService extends StatusService
                 }
                 
             }
+            
             // FIXME: move to FileReferenceVerificationFailureException.getDetailsAsModel()
             else if(status.getThrowable() instanceof FileReferenceInvalidException)
             {
                 FileReferenceInvalidException fre =(FileReferenceInvalidException)status.getThrowable();
-                model.add(errorUri, PoddRdfConstants.ERR_EXCEPTION_CLASS,
+                model.add(topNode, PoddRdfConstants.ERR_EXCEPTION_CLASS,
                         PoddRdfConstants.VF.createLiteral(fre.getClass().getName()));
                 
                 final URI fileRefUri = fre.getFileReference().getObjectIri().toOpenRDFURI();
-                model.add(errorUri, PoddRdfConstants.ERR_SOURCE, fileRefUri);
+                model.add(topNode, PoddRdfConstants.ERR_SOURCE, fileRefUri);
                 model.add(fileRefUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(fre.getFileReference().getLabel()));
                 
             }

@@ -98,17 +98,13 @@ public class OntologyNotInProfileException extends PoddException
     }
     
     @Override
-    public Model getDetailsAsModel()
+    public Model getDetailsAsModel(final Resource errorResource)
     {
-        final Model model = super.getDetailsAsModel();
-        
-        // the super-class MUST set this statement
-        final Resource errorUri =
-                model.filter(null, PoddRdfConstants.ERR_EXCEPTION_CLASS, null).subjects().iterator().next();
+        final Model model = super.getDetailsAsModel(errorResource);
         
         if(this.getOntology() != null)
         {
-            model.add(errorUri, PoddRdfConstants.ERR_SOURCE, this.getOntology().getOntologyID().getOntologyIRI()
+            model.add(errorResource, PoddRdfConstants.ERR_SOURCE, this.getOntology().getOntologyID().getOntologyIRI()
                     .toOpenRDFURI());
         }
         
@@ -117,7 +113,7 @@ public class OntologyNotInProfileException extends PoddException
             for(final OWLProfileViolation violation : this.getProfileReport().getViolations())
             {
                 final BNode v = PoddRdfConstants.VF.createBNode();
-                model.add(errorUri, PoddRdfConstants.ERR_CONTAINS, v);
+                model.add(errorResource, PoddRdfConstants.ERR_CONTAINS, v);
                 model.add(v, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
                 model.add(v, PoddRdfConstants.ERR_SOURCE,
                         PoddRdfConstants.VF.createLiteral(violation.getAxiom().toString()));

@@ -303,6 +303,10 @@ public interface PoddRdfConstants
      */
     public static final String PODD_ERROR = "http://purl.org/podd/ns/err#";
     
+    /** Type to identify the TopError http://purl.org/podd/ns/err#TopError  */
+    public static final URI ERR_TYPE_TOP_ERROR = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_ERROR, "TopError");
+
     /** Type to identify an Error http://purl.org/podd/ns/err#Error  */
     public static final URI ERR_TYPE_ERROR = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_ERROR, "Error");

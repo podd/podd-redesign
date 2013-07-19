@@ -75,27 +75,24 @@ public class InconsistentOntologyException extends PoddException
     }
     
     @Override
-    public Model getDetailsAsModel()
+    public Model getDetailsAsModel(final Resource errorResource)
     {
-        final Model model = super.getDetailsAsModel();
-        
-        // the super-class MUST set this statement
-        final Resource errorUri =
-                model.filter(null, PoddRdfConstants.ERR_EXCEPTION_CLASS, null).subjects().iterator().next();
+        final Model model = super.getDetailsAsModel(errorResource);
         
         final OWLReasoner reasoner = this.getReasoner();
         if(reasoner != null)
         {
             final BNode reasonerUri = PoddRdfConstants.VF.createBNode();
-            model.add(errorUri, PoddRdfConstants.ERR_IDENTIFIER, reasonerUri);
+            model.add(errorResource, PoddRdfConstants.ERR_IDENTIFIER, reasonerUri);
             model.add(reasonerUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(reasoner.getReasonerName()));
             model.add(reasonerUri, PoddRdfConstants.OMV_CURRENT_VERSION,
                     PoddRdfConstants.VF.createLiteral(reasoner.getReasonerVersion().toString()));
             
-            model.add(errorUri, PoddRdfConstants.ERR_SOURCE, reasoner.getRootOntology().getOntologyID()
+            model.add(errorResource, PoddRdfConstants.ERR_SOURCE, reasoner.getRootOntology().getOntologyID()
                     .getOntologyIRI().toOpenRDFURI());
             
             // TODO: can we get the causes for inconsistency?
+            // use ExplanationGenerator - sample code in podd-ontologies
         }
         
         return model;
