@@ -117,6 +117,11 @@ public interface PoddWebConstants
     public static final String PATH_ATTACH_FILE_REF = "attachref";
     
     /**
+     * Path to the list data repositories service.
+     */
+    public static final String PATH_DATA_REPOSITORY_LIST = "datarepositories/list";
+    
+    /**
      * Path to the ontology search service
      */
     public static final String PATH_SEARCH = "search";
@@ -155,12 +160,12 @@ public interface PoddWebConstants
      * Key used to represent a parent object as part of a request
      */
     public static final String KEY_PARENT_IDENTIFIER = "parenturi";
-
+    
     /**
      * Key used to represent a parent-child property as part of a request
      */
     public static final String KEY_PARENT_PREDICATE_IDENTIFIER = "parentpredicateuri";
-
+    
     /**
      * Key used to represent the file reference verification policy to use
      */
@@ -224,11 +229,9 @@ public interface PoddWebConstants
     public static final String KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES = "includedndprops";
     
     /**
-     * Key used in "metadata" service to indicate policy on types of properties
-     * to be included.
+     * Key used in "metadata" service to indicate policy on types of properties to be included.
      */
     public static final String KEY_METADATA_POLICY = "metadatapolicy";
-    
     
     /**
      * Key used in "get artifact" service to indicate whether inferred axioms should be included in
@@ -241,4 +244,5 @@ public interface PoddWebConstants
     public static final String METADATA_EXCLUDE_CONTAINS = "nocontains";
     
     public static final String METADATA_ONLY_CONTAINS = "containsonly";
+    
 }

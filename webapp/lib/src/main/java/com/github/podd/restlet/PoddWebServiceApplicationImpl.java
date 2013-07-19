@@ -43,6 +43,7 @@ import com.github.podd.resources.GetMetadataResourceImpl;
 import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.ListArtifactsResourceImpl;
+import com.github.podd.resources.ListDataRepositoriesResourceImpl;
 import com.github.podd.resources.SearchOntologyResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
@@ -292,10 +293,15 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.debug("attaching Delete Artifact service to path={}", deleteArtifact);
         router.attach(deleteArtifact, DeleteArtifactResourceImpl.class);
         
-        // Add a route for the Delete Artifact page.
+        // Add a route for the Attach File Reference page.
         final String attachFileReference = PoddWebConstants.PATH_ATTACH_FILE_REF;
         this.log.debug("attaching File Reference Attach service to path={}", attachFileReference);
         router.attach(attachFileReference, FileReferenceAttachResourceImpl.class);
+        
+        // Add a route for the List Data Repositories page.
+        final String listDataRepositories = PoddWebConstants.PATH_DATA_REPOSITORY_LIST;
+        this.log.debug("attaching List Data Repositories service to path={}", listDataRepositories);
+        router.attach(listDataRepositories, ListDataRepositoriesResourceImpl.class);
         
         // Add a route for the Search ontology service.
         final String searchService = PoddWebConstants.PATH_SEARCH;
