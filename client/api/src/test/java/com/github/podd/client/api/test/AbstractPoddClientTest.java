@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -348,11 +349,12 @@ public abstract class AbstractPoddClientTest
      * Test method for {@link com.github.podd.client.api.PoddClient#listDataReferenceRepositories()}
      * .
      */
-    @Ignore
     @Test
     public final void testListFileReferenceRepositories() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        List<String> repositories = this.testClient.listDataReferenceRepositories();
+        
+        Assert.assertEquals(2, repositories.size());
     }
     
     /**

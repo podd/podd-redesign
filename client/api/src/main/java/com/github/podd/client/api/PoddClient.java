@@ -122,7 +122,7 @@ public interface PoddClient
      * @return A list of Strings identifying the possible values for the repository alias in calls
      *         to {@link #attachFileReference(IRI, String, String)}.
      */
-    Collection<String> listDataReferenceRepositories() throws PoddClientException;
+    List<String> listDataReferenceRepositories() throws PoddClientException;
     
     /**
      * 
