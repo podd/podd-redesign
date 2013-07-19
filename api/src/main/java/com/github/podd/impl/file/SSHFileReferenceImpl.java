@@ -4,15 +4,9 @@
 package com.github.podd.impl.file;
 
 import org.openrdf.model.Model;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.vocabulary.RDFS;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.openrdf.model.vocabulary.RDF;
 
 import com.github.podd.api.file.SSHFileReference;
-import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -20,33 +14,18 @@ import com.github.podd.utils.PoddRdfConstants;
  * 
  * @author kutila
  */
-public class SSHFileReferenceImpl implements SSHFileReference
+public class SSHFileReferenceImpl extends AbstractDataReferenceImpl implements SSHFileReference
 {
-    
-    private OWLOntologyID artifactID;
-    private String label;
-    private IRI objectIri;
-    private IRI parentIri;
-    private String repositoryAlias;
     
     private String filename;
     private String path;
-    /**
-     * Defaults to http://purl.org/podd/ns/poddBase#hasDataReference
-     */
-    private IRI parentPredicateIRI = IRI.create(PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE);
     
     /**
      * Constructor
      */
     public SSHFileReferenceImpl()
     {
-    }
-    
-    @Override
-    public OWLOntologyID getArtifactID()
-    {
-        return this.artifactID;
+        super();
     }
     
     @Override
@@ -56,52 +35,9 @@ public class SSHFileReferenceImpl implements SSHFileReference
     }
     
     @Override
-    public String getLabel()
-    {
-        return this.label;
-    }
-    
-    @Override
-    public IRI getObjectIri()
-    {
-        return this.objectIri;
-    }
-    
-    @Override
-    public IRI getParentIri()
-    {
-        return this.parentIri;
-    }
-    
-    @Override
-    public IRI getParentPredicateIRI()
-    {
-        return this.parentPredicateIRI;
-    }
-    
-    @Override
     public String getPath()
     {
         return this.path;
-    }
-    
-    @Override
-    public String getRepositoryAlias()
-    {
-        return this.repositoryAlias;
-    }
-    
-    @Override
-    public void setArtifactID(final OWLOntologyID artifactID)
-    {
-        if(artifactID instanceof InferredOWLOntologyID)
-        {
-            this.artifactID = ((InferredOWLOntologyID)artifactID).getBaseOWLOntologyID();
-        }
-        else
-        {
-            this.artifactID = artifactID;
-        }
     }
     
     @Override
@@ -111,79 +47,28 @@ public class SSHFileReferenceImpl implements SSHFileReference
     }
     
     @Override
-    public void setLabel(final String label)
-    {
-        this.label = label;
-    }
-    
-    @Override
-    public void setObjectIri(final IRI objectIri)
-    {
-        this.objectIri = objectIri;
-    }
-    
-    @Override
-    public void setParentIri(final IRI parentIri)
-    {
-        this.parentIri = parentIri;
-    }
-    
-    @Override
-    public void setParentPredicateIRI(final IRI parentPredicateIRI)
-    {
-        this.parentPredicateIRI = parentPredicateIRI;
-    }
-    
-    @Override
     public void setPath(final String path)
     {
         this.path = path;
     }
     
     @Override
-    public void setRepositoryAlias(final String repositoryAlias)
-    {
-        this.repositoryAlias = repositoryAlias;
-    }
-    
-    @Override
     public Model toRDF()
     {
-        final ValueFactory vf = PoddRdfConstants.VF;
-        final Model result = new LinkedHashModel();
+        final Model result = super.toRDF();
         
-        if(this.getArtifactID() != null)
-        {
-            OntologyUtils.ontologyIDToRDF(this.getArtifactID(), result, false);
-        }
+        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
         
         if(this.getFilename() != null)
         {
-            result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILENAME,
-                    vf.createLiteral(this.getFilename()));
-        }
-        
-        if(this.getLabel() != null)
-        {
-            result.add(this.objectIri.toOpenRDFURI(), RDFS.LABEL, vf.createLiteral(this.getLabel()));
+            result.add(this.getObjectIri().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILENAME,
+                    PoddRdfConstants.VF.createLiteral(this.getFilename()));
         }
         
         if(this.getPath() != null)
         {
-            result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILE_PATH,
-                    vf.createLiteral(this.getPath()));
-        }
-        
-        if(this.getRepositoryAlias() != null)
-        {
-            result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_ALIAS,
-                    vf.createLiteral(this.getRepositoryAlias()));
-        }
-        
-        if(this.getParentIri() != null && this.getParentPredicateIRI() != null)
-        {
-            result.add(this.getParentIri().toOpenRDFURI(), this.getParentPredicateIRI().toOpenRDFURI(),
-                    this.objectIri.toOpenRDFURI());
+            result.add(this.getObjectIri().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_FILE_PATH,
+                    PoddRdfConstants.VF.createLiteral(this.getPath()));
         }
         
         return result;
@@ -194,19 +79,19 @@ public class SSHFileReferenceImpl implements SSHFileReference
     {
         final StringBuilder b = new StringBuilder();
         b.append("[");
-        b.append(this.artifactID);
+        b.append(this.getArtifactID());
         b.append(" , ");
-        b.append(this.parentIri);
+        b.append(this.getParentIri());
         b.append(" , ");
-        b.append(this.objectIri);
+        b.append(this.getObjectIri());
         b.append(" , ");
-        b.append(this.label);
+        b.append(this.getLabel());
         b.append(" , ");
         b.append(this.filename);
         b.append(" , ");
         b.append(this.path);
         b.append(" , ");
-        b.append(this.repositoryAlias);
+        b.append(this.getRepositoryAlias());
         b.append("]");
         
         return b.toString();

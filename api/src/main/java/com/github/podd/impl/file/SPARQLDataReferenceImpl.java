@@ -4,16 +4,9 @@
 package com.github.podd.impl.file;
 
 import org.openrdf.model.Model;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 
 import com.github.podd.api.file.SPARQLDataReference;
-import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -21,33 +14,16 @@ import com.github.podd.utils.PoddRdfConstants;
  * 
  * @author Peter Ansell p_ansell@yahoo.com
  */
-public class SPARQLDataReferenceImpl implements SPARQLDataReference
+public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implements SPARQLDataReference
 {
-    
-    private OWLOntologyID artifactID;
-    private String label;
-    private IRI objectIri;
-    private IRI parentIri;
-    private String repositoryAlias;
-    
     private String graph;
-    private String endpointURL;
-    /**
-     * Defaults to http://purl.org/podd/ns/poddBase#hasDataReference
-     */
-    private IRI parentPredicateIRI = IRI.create(PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE);
     
     /**
      * Constructor
      */
     public SPARQLDataReferenceImpl()
     {
-    }
-    
-    @Override
-    public OWLOntologyID getArtifactID()
-    {
-        return this.artifactID;
+        super();
     }
     
     @Override
@@ -57,119 +33,22 @@ public class SPARQLDataReferenceImpl implements SPARQLDataReference
     }
     
     @Override
-    public String getLabel()
-    {
-        return this.label;
-    }
-    
-    @Override
-    public IRI getObjectIri()
-    {
-        return this.objectIri;
-    }
-    
-    @Override
-    public IRI getParentIri()
-    {
-        return this.parentIri;
-    }
-    
-    @Override
-    public IRI getParentPredicateIRI()
-    {
-        return this.parentPredicateIRI;
-    }
-    
-    @Override
-    public String getRepositoryAlias()
-    {
-        return this.repositoryAlias;
-    }
-    
-    @Override
-    public void setArtifactID(final OWLOntologyID artifactID)
-    {
-        if(artifactID instanceof InferredOWLOntologyID)
-        {
-            this.artifactID = ((InferredOWLOntologyID)artifactID).getBaseOWLOntologyID();
-        }
-        else
-        {
-            this.artifactID = artifactID;
-        }
-    }
-    
-    @Override
     public void setGraph(final String filename)
     {
         this.graph = filename;
     }
     
     @Override
-    public void setLabel(final String label)
-    {
-        this.label = label;
-    }
-    
-    @Override
-    public void setObjectIri(final IRI objectIri)
-    {
-        this.objectIri = objectIri;
-    }
-    
-    @Override
-    public void setParentIri(final IRI parentIri)
-    {
-        this.parentIri = parentIri;
-    }
-    
-    @Override
-    public void setParentPredicateIRI(final IRI parentPredicateIRI)
-    {
-        this.parentPredicateIRI = parentPredicateIRI;
-    }
-    
-    @Override
-    public void setRepositoryAlias(final String repositoryAlias)
-    {
-        this.repositoryAlias = repositoryAlias;
-    }
-    
-    @Override
     public Model toRDF()
     {
-        final ValueFactory vf = PoddRdfConstants.VF;
-        final Model result = new LinkedHashModel();
+        Model result = super.toRDF();
         
-        result.add(this.objectIri.toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE);
-        result.add(this.objectIri.toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
-        
-        if(this.getArtifactID() != null)
-        {
-            OntologyUtils.ontologyIDToRDF(this.getArtifactID(), result, false);
-        }
+        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
         
         if(this.getGraph() != null)
         {
-            result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_SPARQL_GRAPH,
-                    vf.createLiteral(this.getGraph()));
-        }
-        
-        if(this.getLabel() != null)
-        {
-            result.add(this.objectIri.toOpenRDFURI(), RDFS.LABEL, vf.createLiteral(this.getLabel()));
-        }
-        
-        if(this.getRepositoryAlias() != null)
-        {
-            result.add(this.objectIri.toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_ALIAS,
-                    vf.createLiteral(this.getRepositoryAlias()));
-        }
-        
-        if(this.getParentIri() != null && this.getParentPredicateIRI() != null)
-        {
-            result.add(this.getParentIri().toOpenRDFURI(), this.getParentPredicateIRI().toOpenRDFURI(),
-                    this.objectIri.toOpenRDFURI());
+            result.add(this.getObjectIri().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_SPARQL_GRAPH,
+                    PoddRdfConstants.VF.createLiteral(this.getGraph()));
         }
         
         return result;
@@ -180,19 +59,17 @@ public class SPARQLDataReferenceImpl implements SPARQLDataReference
     {
         final StringBuilder b = new StringBuilder();
         b.append("[");
-        b.append(this.artifactID);
+        b.append(this.getArtifactID());
         b.append(" , ");
-        b.append(this.parentIri);
+        b.append(this.getParentIri());
         b.append(" , ");
-        b.append(this.objectIri);
+        b.append(this.getObjectIri());
         b.append(" , ");
-        b.append(this.label);
+        b.append(this.getLabel());
         b.append(" , ");
-        b.append(this.graph);
+        b.append(this.getGraph());
         b.append(" , ");
-        b.append(this.endpointURL);
-        b.append(" , ");
-        b.append(this.repositoryAlias);
+        b.append(this.getRepositoryAlias());
         b.append("]");
         
         return b.toString();
