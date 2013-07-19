@@ -3,11 +3,9 @@
  */
 package com.github.podd.impl.file.test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -16,12 +14,10 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 
-import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.api.file.SPARQLDataReference;
 import com.github.podd.api.file.test.AbstractPoddFileRepositoryTest;
@@ -53,70 +49,61 @@ public class SPARQLDataRepositoryImplTest extends AbstractPoddFileRepositoryTest
     @Override
     protected Collection<Model> getIncompleteModels()
     {
+        final ValueFactory vf = PoddRdfConstants.VF;
         final Collection<Model> incompleteModels = new ArrayList<Model>();
         
         // - no "protocol"
         final Model model1 = new LinkedHashModel();
-        model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
-                        this.getAliasGood())));
-        model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_DATA_REPOSITORY));
-        model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY));
+        model1.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS,
+                vf.createLiteral(this.getAliasGood()));
+        model1.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
+        model1.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
+                PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY);
         
-        model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral("localhost")));
-        model1.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(12345)));
+        model1.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST,
+                vf.createLiteral("localhost"));
+        model1.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT,
+                vf.createLiteral(12345));
         
         incompleteModels.add(model1);
         
         // - no "host"
         final Model model2 = new LinkedHashModel();
-        model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
-                        this.getAliasGood())));
-        model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_DATA_REPOSITORY));
-        model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY));
+        model2.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS,
+                vf.createLiteral(this.getAliasGood()));
+        model2.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
+        model2.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
+                PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY);
         
-        model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
-                        PoddDataRepository.PROTOCOL_HTTP)));
-        model2.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(12345)));
+        model2.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL,
+                vf.createLiteral(PoddDataRepository.PROTOCOL_HTTP));
+        model2.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT,
+                vf.createLiteral(12345));
         
         incompleteModels.add(model2);
         
         // - no "port"
         final Model model3 = new LinkedHashModel();
-        model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
-                        this.getAliasGood())));
-        model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_DATA_REPOSITORY));
-        model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY));
+        model3.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS,
+                vf.createLiteral(this.getAliasGood()));
+        model3.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
+        model3.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
+                PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY);
         
-        model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
-                        PoddDataRepository.PROTOCOL_HTTP)));
-        model3.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral("localhost")));
+        model3.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL,
+                vf.createLiteral(PoddDataRepository.PROTOCOL_HTTP));
+        model3.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST,
+                vf.createLiteral("localhost"));
         
         incompleteModels.add(model3);
         
         // - no protocol, host, port
         final Model model4 = new LinkedHashModel();
-        model4.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
-                        this.getAliasGood())));
-        model4.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_DATA_REPOSITORY));
-        model4.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY));
+        model4.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS,
+                vf.createLiteral(this.getAliasGood()));
+        model4.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
+        model4.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
+                PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY);
         
         incompleteModels.add(model4);
         return incompleteModels;
@@ -144,27 +131,22 @@ public class SPARQLDataRepositoryImplTest extends AbstractPoddFileRepositoryTest
     @Override
     protected PoddDataRepository<SPARQLDataReference> getNewPoddFileRepository() throws Exception
     {
+        final ValueFactory vf = PoddRdfConstants.VF;
         final Model model = new LinkedHashModel();
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, ValueFactoryImpl.getInstance().createLiteral(
-                        this.getAliasGood())));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_DATA_REPOSITORY));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE,
-                PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY));
+        model.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS,
+                vf.createLiteral(this.getAliasGood()));
+        model.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY);
+        model.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, RDF.TYPE, PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY);
         
         // ssh specific attributes
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL, ValueFactoryImpl.getInstance().createLiteral(
-                        PoddDataRepository.PROTOCOL_HTTP)));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, ValueFactoryImpl.getInstance().createLiteral(
-                        SSHService.TEST_SSH_HOST)));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(12345)));
-        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
-                PoddRdfConstants.PODD_DATA_REPOSITORY_PATH, ValueFactoryImpl.getInstance().createLiteral(
-                        "/path/to/sparql/endpoint")));
+        model.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_PROTOCOL,
+                vf.createLiteral(PoddDataRepository.PROTOCOL_HTTP));
+        model.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST,
+                vf.createLiteral(SSHService.TEST_SSH_HOST));
+        model.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT,
+                vf.createLiteral(12345));
+        model.add(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI, PoddRdfConstants.PODD_DATA_REPOSITORY_PATH,
+                vf.createLiteral("/path/to/sparql/endpoint"));
         
         return this.getNewPoddDataRepository(model);
     }
