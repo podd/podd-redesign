@@ -35,15 +35,17 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
                 model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_HOST, null).objectString();
         final String port =
                 model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, null).objectString();
+        final String path =
+                model.filter(super.aliasUri, PoddRdfConstants.PODD_DATA_REPOSITORY_PATH, null).objectString();
         
-        if(protocol == null || host == null || port == null)
+        if(protocol == null || host == null || port == null || path == null)
         {
-            throw new FileRepositoryIncompleteException(model, "SSH repository configuration incomplete");
+            throw new FileRepositoryIncompleteException(model, "SPARQL repository configuration incomplete");
         }
         
         if(!SPARQLDataRepositoryImpl.PROTOCOL_HTTP.equalsIgnoreCase(protocol))
         {
-            throw new FileRepositoryIncompleteException(model, "Protocol needs to be HTTP");
+            throw new FileRepositoryIncompleteException(model, "Protocol needs to be HTTP for SPARQL Repository");
         }
     }
     

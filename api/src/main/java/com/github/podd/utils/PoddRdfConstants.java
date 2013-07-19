@@ -285,6 +285,11 @@ public interface PoddRdfConstants
     public static final URI PODD_DATA_REPOSITORY_PORT = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
             "hasDataRepositoryPort");
     
+    /** http://purl.org/podd/ns/poddBase#hasDataRepositoryPath */
+    public static final URI PODD_DATA_REPOSITORY_PATH = PoddRdfConstants.VF.createURI(PoddRdfConstants.DATA_REPOSITORY,
+            "hasDataRepositoryPath");
+    
+    
     /** http://purl.org/podd/ns/poddBase#hasDataRepositoryFingerprint */
     public static final URI PODD_FILE_REPOSITORY_FINGERPRINT = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositoryFingerprint");
@@ -322,4 +327,5 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/err#contains */
     public static final URI ERR_CONTAINS = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_ERROR, "contains");
+
 }
