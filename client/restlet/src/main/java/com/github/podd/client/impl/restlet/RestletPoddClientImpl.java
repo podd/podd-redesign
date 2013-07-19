@@ -8,10 +8,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
+import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -41,6 +46,7 @@ import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -250,8 +256,6 @@ public class RestletPoddClientImpl implements PoddClient
         resource.addQueryParameter(PoddWebConstants.KEY_PUBLISHED, Boolean.toString(published));
         resource.addQueryParameter(PoddWebConstants.KEY_UNPUBLISHED, Boolean.toString(unpublished));
         
-        final Model results = new LinkedHashModel();
-        
         try
         {
             final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
@@ -269,24 +273,13 @@ public class RestletPoddClientImpl implements PoddClient
                 throw new PoddClientException("Did not receive valid response from server");
             }
             
-            final RDFParser parser =
-                    Rio.createParser(Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(),
-                            RDFFormat.RDFXML));
-            parser.setRDFHandler(new StatementCollector(results));
+            RDFFormat format = Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
             
-            // log.info("result: {}", getResponse.getText());
-            
-            parser.parse(stream, "");
-            
-            return OntologyUtils.modelToOntologyIDs(results);
+            return OntologyUtils.modelToOntologyIDs(Rio.parse(stream, "", format));
         }
         catch(final RDFParseException e)
         {
             throw new PoddClientException("Failed to parse RDF", e);
-        }
-        catch(final RDFHandlerException e)
-        {
-            throw new PoddClientException("Failed to process RDF", e);
         }
         catch(final ResourceException e)
         {
@@ -306,8 +299,56 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public List<String> listDataReferenceRepositories() throws PoddClientException
     {
-        // TODO Auto-generated method stub
-        return null;
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
+        resource.getCookies().addAll(this.currentCookies);
+        
+        try
+        {
+            final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+            
+            if(!resource.getStatus().equals(Status.SUCCESS_OK))
+            {
+                throw new PoddClientException("Server returned a non-success status code: "
+                        + resource.getStatus().toString());
+            }
+            
+            final InputStream stream = getResponse.getStream();
+            
+            if(stream == null)
+            {
+                throw new PoddClientException("Did not receive valid response from server");
+            }
+            
+            RDFFormat format = Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
+            
+            Model model = Rio.parse(stream, "", format);
+            
+            Set<Value> aliases = model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objects();
+            
+            List<String> aliasResults = new ArrayList<String>(aliases.size());
+            for(Value nextAlias : aliases)
+            {
+                aliasResults.add(((Literal)nextAlias).getLabel());
+            }
+            
+            Collections.sort(aliasResults);
+            
+            return aliasResults;
+        }
+        catch(final RDFParseException e)
+        {
+            throw new PoddClientException("Failed to parse RDF", e);
+        }
+        catch(final ResourceException e)
+        {
+            throw new PoddClientException("Failed to communicate with PODD Server", e);
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Input output exception while parsing RDF", e);
+        }
     }
     
     /*
