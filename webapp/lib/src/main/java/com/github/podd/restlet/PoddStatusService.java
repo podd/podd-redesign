@@ -133,6 +133,14 @@ public class PoddStatusService extends StatusService
         }
         dataModel.put("message", message.toString());
         
+        if(status.getThrowable() instanceof PoddException)
+        {
+            final BNode errorNode = PoddRdfConstants.VF.createBNode("error");
+            final Model model = ((PoddException)status.getThrowable()).getDetailsAsModel(errorNode);
+            final String errorModelAsString = this.convertModelToString(model, MediaType.APPLICATION_JSON);
+            dataModel.put("message_details", errorModelAsString);
+        }
+        
         return RestletUtils.getHtmlRepresentation("poddBase.html.ftl", dataModel, MediaType.TEXT_HTML,
                 this.freemarkerConfiguration);
     }
@@ -148,7 +156,7 @@ public class PoddStatusService extends StatusService
     {
         final Model model = new LinkedHashModel();
         
-        final BNode topNode = PoddRdfConstants.VF.createBNode();
+        final BNode topNode = PoddRdfConstants.VF.createBNode("error");
         model.add(topNode, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR); 
         model.add(topNode, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, PoddRdfConstants.VF.createLiteral(status.getCode()));
         model.add(topNode, PoddRdfConstants.HTTP_REASON_PHRASE, PoddRdfConstants.VF.createLiteral(status.getReasonPhrase()));
@@ -160,7 +168,7 @@ public class PoddStatusService extends StatusService
         {
             if(status.getThrowable() instanceof PoddException)
             {
-                final BNode errorNode = PoddRdfConstants.VF.createBNode();
+                final BNode errorNode = PoddRdfConstants.VF.createBNode("cause");
                 final Model errorModel = ((PoddException)status.getThrowable()).getDetailsAsModel(errorNode);
                 model.add(topNode, PoddRdfConstants.ERR_CONTAINS, errorNode);
                 model.addAll(errorModel);
@@ -168,6 +176,14 @@ public class PoddStatusService extends StatusService
         }
         
         // get a String representation of the statements in the Model
+        final String modelAsString = this.convertModelToString(model, preferredMediaType);
+ 
+        return new AppendableRepresentation(modelAsString, MediaType.APPLICATION_RDF_XML, Language.DEFAULT,
+                CharacterSet.UTF_8);
+    }
+    
+    private String convertModelToString(Model model, MediaType preferredMediaType)
+    {
         final StringWriter out = new StringWriter();
         try
         {
@@ -180,8 +196,7 @@ public class PoddStatusService extends StatusService
             // FIXME: The error may mean that the error message is not syntactically valid at this
             // point, so may need to overwrite it with a hardcoded string
         }
-        
-        return new AppendableRepresentation(out.toString(), MediaType.APPLICATION_RDF_XML, Language.DEFAULT,
-                CharacterSet.UTF_8);
+        return out.toString();
     }
+    
 }
