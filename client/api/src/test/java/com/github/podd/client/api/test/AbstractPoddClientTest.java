@@ -232,7 +232,7 @@ public abstract class AbstractPoddClientTest
             
             Model afterDataReferenceTriples = afterParseRdf.filter(afterDataReferenceURI.objectURI(), null, null);
             
-            Assert.assertEquals("Found unexpected number of triples for data reference", 5,
+            Assert.assertEquals("Found unexpected number of triples for data reference", 7,
                     afterDataReferenceTriples.size());
         }
         finally
