@@ -3,8 +3,16 @@
  */
 package com.github.podd.exception;
 
+import org.openrdf.model.BNode;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.profiles.OWLProfileReport;
+import org.semanticweb.owlapi.profiles.OWLProfileViolation;
+
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * An exception indicating that the OWL Ontology was not found to be in the given OWL Profile.
@@ -87,6 +95,37 @@ public class OntologyNotInProfileException extends PoddException
     public OWLProfileReport getProfileReport()
     {
         return this.profileReport;
+    }
+    
+    @Override
+    public Model getDetailsAsModel()
+    {
+        final Model model = super.getDetailsAsModel();
+        
+        // the super-class MUST set this statement
+        final Resource errorUri =
+                model.filter(null, PoddRdfConstants.ERR_EXCEPTION_CLASS, null).subjects().iterator().next();
+        
+        if(this.getOntology() != null)
+        {
+            model.add(errorUri, PoddRdfConstants.ERR_SOURCE, this.getOntology().getOntologyID().getOntologyIRI()
+                    .toOpenRDFURI());
+        }
+        
+        if(this.getProfileReport() != null)
+        {
+            for(final OWLProfileViolation violation : this.getProfileReport().getViolations())
+            {
+                final BNode v = PoddRdfConstants.VF.createBNode();
+                model.add(errorUri, PoddRdfConstants.ERR_CONTAINS, v);
+                model.add(v, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
+                model.add(v, PoddRdfConstants.ERR_SOURCE,
+                        PoddRdfConstants.VF.createLiteral(violation.getAxiom().toString()));
+                model.add(v, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(violation.toString()));
+            }
+        }
+        
+        return model;
     }
     
 }
