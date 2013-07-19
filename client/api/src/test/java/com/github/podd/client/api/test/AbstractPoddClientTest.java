@@ -62,7 +62,7 @@ public abstract class AbstractPoddClientTest
      * SHOULD not be populated, as they will be overwritten.
      * <p>
      * The {@link DataReference#getRepositoryAlias()} MUST be populated, and MUST match an alias
-     * returned from {@link PoddClient#listFileReferenceRepositories()}.
+     * returned from {@link PoddClient#listDataReferenceRepositories()}.
      * <p>
      * Successive calls with different labels must return distinct FileReferences.
      * <p>
@@ -345,7 +345,7 @@ public abstract class AbstractPoddClientTest
     }
     
     /**
-     * Test method for {@link com.github.podd.client.api.PoddClient#listFileReferenceRepositories()}
+     * Test method for {@link com.github.podd.client.api.PoddClient#listDataReferenceRepositories()}
      * .
      */
     @Ignore

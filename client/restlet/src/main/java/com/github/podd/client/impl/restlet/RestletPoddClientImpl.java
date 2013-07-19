@@ -301,10 +301,10 @@ public class RestletPoddClientImpl implements PoddClient
     /*
      * (non-Javadoc)
      * 
-     * @see com.github.podd.client.api.PoddClient#listFileReferenceRepositories()
+     * @see com.github.podd.client.api.PoddClient#listDataReferenceRepositories()
      */
     @Override
-    public List<String> listFileReferenceRepositories() throws PoddClientException
+    public List<String> listDataReferenceRepositories() throws PoddClientException
     {
         // TODO Auto-generated method stub
         return null;
