@@ -128,6 +128,11 @@ public abstract class AbstractDataReferenceImpl implements DataReference
             this.setObjectIri(IRI.create("urn:temp:uuid:datareference:" + this.getClass().getSimpleName() + ":"));
         }
         
+        if(this.getParentIri().equals(this.getObjectIri()))
+        {
+            throw new IllegalStateException("The parent IRI must be distinct from the data reference object IRI");
+        }
+        
         // Override users who set the parent predicate IRI to null using the default
         if(this.getParentPredicateIRI() == null)
         {
