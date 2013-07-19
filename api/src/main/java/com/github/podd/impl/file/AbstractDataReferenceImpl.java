@@ -139,7 +139,6 @@ public abstract class AbstractDataReferenceImpl implements DataReference
         result.add(this.getParentIri().toOpenRDFURI(), this.getParentPredicateIRI().toOpenRDFURI(), this.getObjectIri()
                 .toOpenRDFURI());
         result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE);
-        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
         result.add(this.getObjectIri().toOpenRDFURI(), PoddRdfConstants.PODD_BASE_HAS_ALIAS,
                 PoddRdfConstants.VF.createLiteral(this.getRepositoryAlias()));
         

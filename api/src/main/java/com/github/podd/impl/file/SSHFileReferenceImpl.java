@@ -4,6 +4,7 @@
 package com.github.podd.impl.file;
 
 import org.openrdf.model.Model;
+import org.openrdf.model.vocabulary.RDF;
 
 import com.github.podd.api.file.SSHFileReference;
 import com.github.podd.utils.PoddRdfConstants;
@@ -55,6 +56,8 @@ public class SSHFileReferenceImpl extends AbstractDataReferenceImpl implements S
     public Model toRDF()
     {
         final Model result = super.toRDF();
+        
+        result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_FILE_REFERENCE_TYPE_SSH);
         
         if(this.getFilename() != null)
         {
