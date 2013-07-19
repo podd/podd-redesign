@@ -162,6 +162,9 @@ public class SPARQLDataRepositoryImplTest extends AbstractPoddFileRepositoryTest
                         SSHService.TEST_SSH_HOST)));
         model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
                 PoddRdfConstants.PODD_DATA_REPOSITORY_PORT, ValueFactoryImpl.getInstance().createLiteral(12345)));
+        model.add(new StatementImpl(AbstractPoddFileRepositoryTest.TEST_ALIAS_URI,
+                PoddRdfConstants.PODD_DATA_REPOSITORY_PATH, ValueFactoryImpl.getInstance().createLiteral(
+                        "/path/to/sparql/endpoint")));
         
         return this.getNewPoddDataRepository(model);
     }

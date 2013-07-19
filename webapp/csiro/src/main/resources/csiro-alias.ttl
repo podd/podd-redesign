@@ -78,7 +78,9 @@
           
           dataRepository:hasDataRepositoryProtocol "HTTP" ;
           
-          dataRepository:hasDataRepositoryPort "9857" ;
+          dataRepository:hasDataRepositoryPort "8080" ;
+          
+          dataRepository:hasDataRepositoryPath "/openrdf-sesame/repositories/podd-bio2rdf" ;
           
           dataRepository:hasDataRepositoryAlias "alias_local_sparql" .
           

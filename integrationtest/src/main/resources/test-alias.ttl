@@ -66,6 +66,8 @@
           
           dataRepository:hasDataRepositoryPort "9856" ;
           
+          dataRepository:hasDataRepositoryPath "/test/path/to/sparql/endpoint" ;
+          
           dataRepository:hasDataRepositoryAlias "alias_local_ssh" .
           
 
