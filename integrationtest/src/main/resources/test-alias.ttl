@@ -71,6 +71,21 @@
           dataRepository:hasDataRepositoryAlias "alias_local_ssh" .
           
 
+###  http://test.example.org/filerepositoryaliases#localsparql
+
+:localsparql rdf:type dataRepository:DataRepository ,
+                   dataRepository:SPARQLDataRepository ;
+          
+          dataRepository:hasDataRepositoryHost "localhost" ;
+          
+          dataRepository:hasDataRepositoryProtocol "HTTP" ;
+          
+          dataRepository:hasDataRepositoryPort "8080" ;
+          
+          dataRepository:hasDataRepositoryPath "/openrdf-sesame/repositories/podd-bio2rdf" ;
+          
+          dataRepository:hasDataRepositoryAlias "alias_local_sparql" .
+          
 
 
 
