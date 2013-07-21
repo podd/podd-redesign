@@ -350,11 +350,15 @@ public abstract class AbstractPoddClientTest
      * .
      */
     @Test
-    public final void testListFileReferenceRepositories() throws Exception
+    public final void testListDataReferenceRepositories() throws Exception
     {
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
         List<String> repositories = this.testClient.listDataReferenceRepositories();
         
         Assert.assertEquals(2, repositories.size());
+        
+        System.out.println(repositories);
     }
     
     /**
