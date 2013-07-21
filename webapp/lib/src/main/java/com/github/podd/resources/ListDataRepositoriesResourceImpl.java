@@ -119,14 +119,14 @@ public class ListDataRepositoriesResourceImpl extends AbstractPoddResourceImpl
                     results.add(resourceNode, RDF.TYPE, nextType);
                 }
             }
+            
+            Rio.write(results, out, resultFormat);
         }
         catch(OpenRDFException | PoddException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not find definitions for data repositories", e);
         }
-        
-        // TODO: Implement me
         
         final ByteArrayRepresentation result = new ByteArrayRepresentation(out.toByteArray(), resultMediaType);
         
