@@ -24,13 +24,13 @@
         nextDatabank.load(errorModelAsString, {format: 'application/json'});
 
 		// Display top level error details
-		// NOTE: This query does not capture errors which only have partial information.
 		// Should be improved as a separate function in podd_edit.js
 		var queryDetails = $.rdf({
         	databank : nextDatabank
     	})
-    	.where('?x rdfs:comment ?stacktrace')
-    	.where('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
+    	.where('?x rdf:type <http://purl.org/podd/ns/err#TopError> ')
+    	.optional('?x rdfs:comment ?stacktrace')
+    	.optional('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
     	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
     	;
     	var bindings1 = queryDetails.select();
@@ -38,14 +38,18 @@
 		$.each(bindings1, function(index, binding) {
 			if (typeof binding.source !== 'undefined') {
 				var source = '<PRE>' + binding.source.value + '</PRE>';
-				podd.updateErrorTable('Source of Error', source);
+				podd.updateErrorTable('Top Source of Error', source);
 			}
 			
-			var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
-			podd.updateErrorTable('Exception Class', exceptionClass);
-
-			var stackTrace = '<PRE>' + binding.stacktrace.value + '</PRE>';
-			podd.updateErrorTable('Stack Trace', stackTrace);
+			if (typeof binding.exceptionClass !== 'undefined') {
+				var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
+				podd.updateErrorTable('Top Exception Class', exceptionClass);
+			}
+			
+			if (typeof binding.stacktrace !== 'undefined') {
+				var stackTrace = '<PRE>' + binding.stacktrace.value + '</PRE>';
+				podd.updateErrorTable('Top Description', stackTrace);
+			}
 			
 			errorDetailsCount = errorDetailsCount + 1;
 		});
@@ -56,17 +60,25 @@
     	})
     	.where('?top <http://purl.org/podd/ns/err#contains> ?x')
     	.where('?x rdfs:comment ?details')
-    	.where('?x <http://purl.org/podd/ns/err#source> ?source')
+    	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
+    	.optional('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
     	;
     	var bindings2 = querySub.select();
 	
 		$.each(bindings2, function(index, binding) {
+			if (typeof binding.source !== 'undefined') {
+				var source = '<PRE>' + binding.source.value + '</PRE>';
+				podd.updateErrorTable('Source', source);
+			}
+
+			if (typeof binding.exceptionClass !== 'undefined') {
+				var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
+				podd.updateErrorTable('Exception Class', exceptionClass);
+			}
+			
 			var details = '<PRE>' + binding.details.value + '</PRE>';
-			var source = '<PRE>' + binding.source.value + '</PRE>';
-			
-			podd.updateErrorTable(' Secondary Source', source);
-			podd.updateErrorTable(' Secondary Details', '<PRE>' + details + '</PRE>');
-			
+			podd.updateErrorTable('Details', '<PRE>' + details + '</PRE>');
+
 			errorDetailsCount = errorDetailsCount + 1;
 		});
 

@@ -69,6 +69,23 @@ public class PoddStatusService extends StatusService
         this.freemarkerConfiguration = freemarkerConfiguration;
     }
     
+    private String convertModelToString(final Model model, final MediaType preferredMediaType)
+    {
+        final StringWriter out = new StringWriter();
+        try
+        {
+            Rio.write(model, out, Rio.getWriterFormatForMIMEType(preferredMediaType.getName(), RDFFormat.RDFJSON));
+        }
+        catch(final RDFHandlerException e)
+        {
+            this.log.error("Error writing RDF content in status service", e);
+            // We're already trying to send back an error. So ignore this?
+            // FIXME: The error may mean that the error message is not syntactically valid at this
+            // point, so may need to overwrite it with a hardcoded string
+        }
+        return out.toString();
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -133,17 +150,8 @@ public class PoddStatusService extends StatusService
             message.append(")");
         }
         dataModel.put("message", message.toString());
-
-        Model model;
-        if(status.getThrowable() instanceof PoddException)
-        {
-            final BNode errorNode = PoddRdfConstants.VF.createBNode("error");
-            model = ((PoddException)status.getThrowable()).getDetailsAsModel(errorNode);
-        }
-        else
-        {
-            model = this.getDetailsAsModel(status.getThrowable());
-        }
+        
+        final Model model = this.getErrorAsModel(status);
         
         final String errorModelAsString = this.convertModelToString(model, MediaType.APPLICATION_JSON);
         dataModel.put("message_details", errorModelAsString);
@@ -159,83 +167,60 @@ public class PoddStatusService extends StatusService
      * 
      */
     private Representation getRepresentationRdf(final Status status, final Request request, final Response response,
-            MediaType preferredMediaType)
+            final MediaType preferredMediaType)
     {
-        final Model model = new LinkedHashModel();
-        
-        final BNode topNode = PoddRdfConstants.VF.createBNode("error");
-        model.add(topNode, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR); 
-        model.add(topNode, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, PoddRdfConstants.VF.createLiteral(status.getCode()));
-        model.add(topNode, PoddRdfConstants.HTTP_REASON_PHRASE, PoddRdfConstants.VF.createLiteral(status.getReasonPhrase()));
-        
-        String errorDescription = status.getDescription();
-        model.add(topNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(errorDescription));
-        
-        if(status.getThrowable() != null)
-        {
-            if(status.getThrowable() instanceof PoddException)
-            {
-                final BNode errorNode = PoddRdfConstants.VF.createBNode("cause");
-                final Model errorModel = ((PoddException)status.getThrowable()).getDetailsAsModel(errorNode);
-                model.add(topNode, PoddRdfConstants.ERR_CONTAINS, errorNode);
-                model.addAll(errorModel);
-            }
-        }
+        final Model model = this.getErrorAsModel(status);
         
         // get a String representation of the statements in the Model
         final String modelAsString = this.convertModelToString(model, preferredMediaType);
- 
+        
         return new AppendableRepresentation(modelAsString, MediaType.APPLICATION_RDF_XML, Language.DEFAULT,
                 CharacterSet.UTF_8);
     }
     
-    private String convertModelToString(Model model, MediaType preferredMediaType)
-    {
-        final StringWriter out = new StringWriter();
-        try
-        {
-            Rio.write(model, out, Rio.getWriterFormatForMIMEType(preferredMediaType.getName(), RDFFormat.RDFJSON));
-        }
-        catch(RDFHandlerException e)
-        {
-            this.log.error("Error writing RDF content in status service", e);
-            // We're already trying to send back an error. So ignore this?
-            // FIXME: The error may mean that the error message is not syntactically valid at this
-            // point, so may need to overwrite it with a hardcoded string
-        }
-        return out.toString();
-    }
-    
-    /**
-     * Helper method to convert error details into a {@link Model}.
-     *  
-     * @param throwable
-     * @return
-     */
-    private Model getDetailsAsModel(final Throwable throwable)
+    private Model getErrorAsModel(final Status status)
     {
         final Model model = new LinkedHashModel();
-        final BNode errorNode = PoddRdfConstants.VF.createBNode("error");
-
-        model.add(errorNode, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
         
-        if (throwable != null)
+        final BNode topNode = PoddRdfConstants.VF.createBNode("error");
+        model.add(topNode, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR);
+        model.add(topNode, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, PoddRdfConstants.VF.createLiteral(status.getCode()));
+        model.add(topNode, PoddRdfConstants.HTTP_REASON_PHRASE,
+                PoddRdfConstants.VF.createLiteral(status.getReasonPhrase()));
+        
+        final String errorDescription = status.getDescription();
+        model.add(topNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(errorDescription));
+        
+        final BNode errorNode = PoddRdfConstants.VF.createBNode("cause");
+        model.add(topNode, PoddRdfConstants.ERR_CONTAINS, errorNode);
+        
+        final Throwable throwable = status.getThrowable();
+        if(throwable != null && throwable instanceof PoddException)
         {
-            model.add(errorNode, PoddRdfConstants.ERR_EXCEPTION_CLASS,
-                    PoddRdfConstants.VF.createLiteral(throwable.getClass().getName()));
-            
-            if(throwable.getMessage() != null)
-            {
-                model.add(errorNode, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(throwable.getMessage()));
-            }
-            
-            final StringWriter sw = new StringWriter();
-            throwable.printStackTrace(new PrintWriter(sw));
-            model.add(errorNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(sw.toString()));
+            model.addAll(((PoddException)throwable).getDetailsAsModel(errorNode));
         }
         else
         {
-            model.add(errorNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral("Error details unavailable"));
+            model.add(errorNode, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
+            
+            if(throwable != null)
+            {
+                model.add(errorNode, PoddRdfConstants.ERR_EXCEPTION_CLASS,
+                        PoddRdfConstants.VF.createLiteral(throwable.getClass().getName()));
+                
+                if(throwable.getMessage() != null)
+                {
+                    model.add(errorNode, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(throwable.getMessage()));
+                }
+                
+                final StringWriter sw = new StringWriter();
+                throwable.printStackTrace(new PrintWriter(sw));
+                model.add(errorNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral(sw.toString()));
+            }
+            else
+            {
+                model.add(errorNode, RDFS.COMMENT, PoddRdfConstants.VF.createLiteral("Error details unavailable"));
+            }
         }
         return model;
     }
