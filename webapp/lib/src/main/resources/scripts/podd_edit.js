@@ -1535,12 +1535,21 @@ podd.searchOntologyService = function(
         searchtypes : request.searchTypes
     };
 
-    $.get(requestUrl, queryParams, function(data) {
-        podd.debug('Response: ' + data.toString());
-        var formattedData = podd.parseSearchResults(requestUrl, data);
-        podd.debug('No. of search results = ' + formattedData.length);
-        callbackFunction(formattedData);
-    }, 'json');
+    $.ajax({
+        url : requestUrl,
+        type : 'GET',
+        data : queryParams,
+        dataType : 'json',
+        success : function(data, status, xhr) {
+            podd.debug('[searchOntologyService] Response: ' + data.toString());
+            var formattedData = podd.parseSearchResults(requestUrl, data);
+            podd.debug('[searchOntologyService] No. of search results = ' + formattedData.length);
+            callbackFunction(formattedData);
+        },
+        error : function(xhr, status, error) {
+            podd.debug(status + '[searchOntologyService] $$$ ERROR $$$ ' + error);
+        }
+    });
 };
 
 /**
