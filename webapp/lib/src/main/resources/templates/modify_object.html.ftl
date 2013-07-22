@@ -57,12 +57,6 @@
 	    // Get Metadata and invoke the callback function which will continue to update the interface
 	    podd.getObjectTypeMetadata(podd.artifactIri, podd.objectTypeUri, podd.callbackFromGetMetadata, podd.schemaDatabank, podd.artifactDatabank);
 	
-	
-	    // use delegation for dynamically added .clonable anchors
-	    // FIXME: This doesn't seem to be the right strategy with respect to handlers, 
-	    // as each handler contains the current value of the field to detect whether it has changed.
-	    //$("#details").delegate(".clonable", "click", podd.cloneEmptyField);
-	
 		// Add form submission handler
 		$("#btnSubmit").click(function(event) {
 			event.preventDefault();
