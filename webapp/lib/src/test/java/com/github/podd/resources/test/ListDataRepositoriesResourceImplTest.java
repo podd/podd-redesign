@@ -12,6 +12,7 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
+import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -130,4 +131,60 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
     }
+    
+    /**
+     * Test requesting data repositories as administrator.
+     */
+    @Test
+    public void testRdfJsonAuthenticatedAdmin() throws Exception
+    {
+        final ClientResource dataRepositoriesClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
+        
+        Representation result =
+                RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                        RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+    }
+    
+    /**
+     * Test requesting data repositories as administrator.
+     */
+    @Test
+    public void testRdfJsonAuthenticatedNonAdmin() throws Exception
+    {
+        final ClientResource dataRepositoriesClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
+        
+        try
+        {
+            RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                    RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testNoAdminPrivileges);
+            Assert.fail("Did not find expected exception");
+        }
+        catch(ResourceException e)
+        {
+            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+    }
+    
+    /**
+     * Test requesting data repositories as administrator.
+     */
+    @Test
+    public void testRdfJsonUnauthenticated() throws Exception
+    {
+        final ClientResource dataRepositoriesClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
+        
+        try
+        {
+            dataRepositoriesClientResource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+            Assert.fail("Did not find expected exception");
+        }
+        catch(ResourceException e)
+        {
+            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+    }
+    
 }
