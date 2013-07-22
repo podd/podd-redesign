@@ -2,6 +2,8 @@ package com.github.podd.resources.test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
@@ -121,11 +123,25 @@ public class AbstractResourceImplTest
     protected Model assertRdf(final InputStream inputStream, final RDFFormat format, final int expectedStatements)
         throws RDFParseException, RDFHandlerException, IOException
     {
-        final Model model = new LinkedHashModel();
-        
-        final RDFParser parser = Rio.createParser(format);
-        parser.setRDFHandler(new StatementCollector(model));
-        parser.parse(inputStream, "http://test.podd.example.org/should/not/occur/in/a/real/graph/");
+        return assertRdf(new InputStreamReader(inputStream), format, expectedStatements);
+    }
+    
+    /**
+     * Utility method to verify that RDF documents can be parsed and the resulting number of
+     * statements is as expected.
+     * 
+     * @param reader
+     * @param format
+     * @param expectedStatements
+     * @return
+     * @throws RDFParseException
+     * @throws RDFHandlerException
+     * @throws IOException
+     */
+    protected Model assertRdf(final Reader reader, final RDFFormat format, final int expectedStatements)
+        throws RDFParseException, RDFHandlerException, IOException
+    {
+        final Model model = Rio.parse(reader, "http://test.podd.example.org/should/not/occur/in/a/real/graph/", format);
         
         if(expectedStatements != model.size())
         {
@@ -134,7 +150,7 @@ public class AbstractResourceImplTest
             DebugUtils.printContents(model);
         }
         
-        Assert.assertEquals(expectedStatements, model.size());
+        Assert.assertEquals("Unexpected number of statements", expectedStatements, model.size());
         
         return model;
     }
