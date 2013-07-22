@@ -44,6 +44,7 @@ import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.DataReferenceConstants;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.client.api.PoddClientException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
@@ -324,6 +325,8 @@ public class RestletPoddClientImpl implements PoddClient
             RDFFormat format = Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
             
             Model model = Rio.parse(stream, "", format);
+            
+            DebugUtils.printContents(model);
             
             Set<Value> aliases = model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objects();
             

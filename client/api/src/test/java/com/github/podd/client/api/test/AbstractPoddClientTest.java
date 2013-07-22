@@ -356,9 +356,10 @@ public abstract class AbstractPoddClientTest
         
         List<String> repositories = this.testClient.listDataReferenceRepositories();
         
+        System.out.println(repositories);
+        
         Assert.assertEquals(2, repositories.size());
         
-        System.out.println(repositories);
     }
     
     /**

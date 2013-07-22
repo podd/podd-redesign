@@ -3,8 +3,13 @@
  */
 package com.github.podd.restlet.integrationtest;
 
+import java.io.IOException;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -48,11 +53,12 @@ public class TestResetResourceImpl extends Restlet
         this.log.info("========== Reset called ==========");
         try
         {
-            // Reset the aliases configuration to that it will be regenerated each time
-            this.application.setAliasesConfiguration(new LinkedHashModel());
+            // Reset the aliases configuration
+            this.application.setAliasesConfiguration(Rio.parse(this.getClass().getResourceAsStream("/test-alias.ttl"),
+                    "", RDFFormat.TURTLE));
             ApplicationUtils.setupApplication(this.application, this.application.getContext());
         }
-        catch(final OpenRDFException e)
+        catch(final OpenRDFException | UnsupportedRDFormatException | IOException e)
         {
             this.log.error("Could not reset application", e);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not reset application", e);
