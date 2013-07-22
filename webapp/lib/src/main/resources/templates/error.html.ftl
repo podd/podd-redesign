@@ -31,17 +31,20 @@
     	})
     	.where('?x rdfs:comment ?stacktrace')
     	.where('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
-    	.where('?x <http://purl.org/podd/ns/err#source> ?source')
+    	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
     	;
     	var bindings1 = queryDetails.select();
 	
 		$.each(bindings1, function(index, binding) {
-			var stackTrace = '<PRE>' + binding.stacktrace.value + '</PRE>';
-			var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
-			var source = '<PRE>' + binding.source.value + '</PRE>';
+			if (typeof binding.source !== 'undefined') {
+				var source = '<PRE>' + binding.source.value + '</PRE>';
+				podd.updateErrorTable('Source of Error', source);
+			}
 			
-			podd.updateErrorTable('Source of Error', source);
+			var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
 			podd.updateErrorTable('Exception Class', exceptionClass);
+
+			var stackTrace = '<PRE>' + binding.stacktrace.value + '</PRE>';
 			podd.updateErrorTable('Stack Trace', stackTrace);
 			
 			errorDetailsCount = errorDetailsCount + 1;
