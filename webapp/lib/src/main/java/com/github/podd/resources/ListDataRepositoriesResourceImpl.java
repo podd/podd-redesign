@@ -62,7 +62,7 @@ public class ListDataRepositoriesResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
-            dataModel.put("datarepositorylist", this.getPoddApplication().getPoddDataRepositoryManager()
+            dataModel.put("dataRepositoriesList", this.getPoddApplication().getPoddDataRepositoryManager()
                     .getAllAliases());
         }
         catch(OpenRDFException | PoddException e)
