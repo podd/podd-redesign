@@ -67,8 +67,33 @@
 			// setup the global PODD object
 			podd = {};
 			podd.baseUrl = "${baseUrl}";
+			
+			oas = {};
+			oas.baseUrl = "http://localhost:8080/oas/";
+			oas.rdf = {};
+			oas.autocomplete = {};
+			oas.ontology = {};
 		</script>
     
+		<script src="http://localhost:8080/oas-test/resources/static/scripts/oas.js" type="text/javascript"></script>
+	    <script src="http://localhost:8080/oas-test/resources/static/scripts/oas-debug-helper.js" type="text/javascript"></script>
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+			    // NOTE: Cannot use [about] here if we are embedding RDFa back into the page
+			    // as it would cause a circular dependency
+			    // If we are not embedding extra RDFa data, then we should be able to use
+			    // [about] to select all objects with the RDFa about attribute
+			    // .rdfatestcontent pulls in everything we have annotated with
+			    // class="rdfatestcontent" and everything under these elements
+			    // oas.rdf.debugRdfaBody('.rdfatestcontent');
+			    // oas.rdf.debugRdfDownloadButtonAttach('.rdfatestcontent');
+			    oas.rdf.showAnnotationPoints("[about]");
+			    // Add annotation handlers to all elements that match [about], targeting them at #dialog as the dialog, with the identifier for the annotation target being put into #annotation_target based on processing the event with the function oas.rdf.rdfaAboutAttribute
+			    oas.rdf.addAnnotationHandlers("[about]", "#dialog", "#loginDialog","#annotation_target", oas.rdf.rdfaAboutAttribute);
+			});
+		</script>
+	    
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/podd_main.js"></script>
 		<script type="text/javascript" src="${baseUrl}/resources/scripts/podd_edit.js"></script>
 	    
