@@ -1809,6 +1809,31 @@ podd.updateErrorMessageList = function(theMessage) {
 /**
  * @memberOf podd
  * 
+ * Add a new row to Error Table.
+ * 
+ * @param column1
+ * 			{string} Value for first column
+ * @param column2
+ * 			{string} Value for second column
+ * 
+ */
+podd.updateErrorTable = function(column1, column2) {
+	var td1 = $('<td>');
+	td1.html(column1);
+	
+	var td2 = $('<td>');
+	td2.html(column2);
+	
+	var tr = $('<tr>');
+	tr.append(td1);
+	tr.append(td2);
+	
+	$("#errorTable").append(tr);
+};
+
+/**
+ * @memberOf podd
+ * 
  * Callback function when RDF containing metadata is available
  * 
  * FIXME: Any properties without weights should have them added, just as any
