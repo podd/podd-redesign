@@ -69,7 +69,7 @@
 			podd.baseUrl = "${baseUrl}";
 			
 			oas = {};
-			oas.baseUrl = "http://localhost:8080/oas/";
+			oas.baseUrl = "http://localhost:8080/oas-test/";
 			oas.rdf = {};
 			oas.autocomplete = {};
 			oas.ontology = {};
@@ -190,6 +190,30 @@
 
     <div id="rdfadebug">
     &nbsp;
+    </div>
+	<div id="dialog" title="Tab data">
+			<form id="ontology_annotation_form">
+				<label id="label-annotationtarget" for="annotation_target">Annotation target :</label>
+				<input id="annotation_target" size="150" name="annotation_target" type="text">&nbsp;</input>
+				
+				<label id="label-annotationcontent" for="annotation_content">Content</label>
+				<textarea name="annotation_content" id="annotation_content" class="ui-widget-content ui-corner-all"></textarea>
+				
+				<label id="label-ontology" for="ontology">Ontology</label>
+				<img id="ontology-icon" src="${baseUrl}resources/static/images/transparent_1x1.png"></img>
+				<input name="ontology" id="ontology" type="text">&nbsp;</input>
+				<input name="ontology-id" type="text" id="ontology-id" value="">&nbsp;</input>
+				<p id="ontology-description">&nbsp;</p>
+				
+				<label id="label-ontologytermlabel" for="ontologytermlabel">Ontology term</label>
+				<input name="ontologytermlabel" id="ontologytermlabel" type="text">&nbsp;</input>
+				<input name="ontologytermuri" id="ontologytermuri" type="text">&nbsp;</input>
+			</form>
+    </div>
+	<div id="loginDialog" title="Login">
+			<form id="login_form">
+				You must login to Ontology Annotation Services before creating annotations.
+			</form>
     </div>
 </body>
 </html>
