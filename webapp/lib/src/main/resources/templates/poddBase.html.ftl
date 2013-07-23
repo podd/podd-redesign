@@ -88,7 +88,7 @@
 			    // class="rdfatestcontent" and everything under these elements
 			    // oas.rdf.debugRdfaBody('.rdfatestcontent');
 			    // oas.rdf.debugRdfDownloadButtonAttach('.rdfatestcontent');
-			    oas.rdf.showAnnotationPoints("[about]");
+			    // oas.rdf.showAnnotationPoints("[about]");
 			    // Add annotation handlers to all elements that match [about], targeting them at #dialog as the dialog, with the identifier for the annotation target being put into #annotation_target based on processing the event with the function oas.rdf.rdfaAboutAttribute
 			    oas.rdf.addAnnotationHandlers("[about]", "#dialog", "#loginDialog","#annotation_target", oas.rdf.rdfaAboutAttribute);
 			});
