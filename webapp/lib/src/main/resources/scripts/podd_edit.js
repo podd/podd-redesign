@@ -843,7 +843,6 @@ podd.displayDetailedErrors = function(errorModelAsJson) {
     nextDatabank.load(errorModelAsJson, {format: 'application/json'});
 
 	// Display top level error details
-	// NOTE: This query does not capture errors which only have partial information.
 	var queryDetails = $.rdf({
     	databank : nextDatabank
 	})
