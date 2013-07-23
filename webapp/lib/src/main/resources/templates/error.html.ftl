@@ -16,75 +16,9 @@
         podd.debug('initializing...');
         podd.debug('-------------------');
 
-		var errorModelAsString = ${message_details!"{}"};
+		var errorDetailsInJson = ${message_details!"{}"};
 
-		var errorDetailsCount = 0;
-
-	    var nextDatabank = podd.newDatabank();
-        nextDatabank.load(errorModelAsString, {format: 'application/json'});
-
-		// Display top level error details
-		// Should be improved as a separate function in podd_edit.js
-		var queryDetails = $.rdf({
-        	databank : nextDatabank
-    	})
-    	.where('?x rdf:type <http://purl.org/podd/ns/err#TopError> ')
-    	.optional('?x rdfs:comment ?stacktrace')
-    	.optional('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
-    	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
-    	;
-    	var bindings1 = queryDetails.select();
-	
-		$.each(bindings1, function(index, binding) {
-			if (typeof binding.source !== 'undefined') {
-				var source = '<PRE>' + binding.source.value + '</PRE>';
-				podd.updateErrorTable('Top Source of Error', source);
-			}
-			
-			if (typeof binding.exceptionClass !== 'undefined') {
-				var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
-				podd.updateErrorTable('Top Exception Class', exceptionClass);
-			}
-			
-			if (typeof binding.stacktrace !== 'undefined') {
-				var stackTrace = '<PRE>' + binding.stacktrace.value + '</PRE>';
-				podd.updateErrorTable('Top Description', stackTrace);
-			}
-			
-			errorDetailsCount = errorDetailsCount + 1;
-		});
-		
-		// Display any sub-details		
-		var querySub = $.rdf({
-        	databank : nextDatabank
-    	})
-    	.where('?top <http://purl.org/podd/ns/err#contains> ?x')
-    	.where('?x rdfs:comment ?details')
-    	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
-    	.optional('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
-    	;
-    	var bindings2 = querySub.select();
-	
-		$.each(bindings2, function(index, binding) {
-			if (typeof binding.source !== 'undefined') {
-				var source = '<PRE>' + binding.source.value + '</PRE>';
-				podd.updateErrorTable('Source', source);
-			}
-
-			if (typeof binding.exceptionClass !== 'undefined') {
-				var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
-				podd.updateErrorTable('Exception Class', exceptionClass);
-			}
-			
-			var details = '<PRE>' + binding.details.value + '</PRE>';
-			podd.updateErrorTable('Details', '<PRE>' + details + '</PRE>');
-
-			errorDetailsCount = errorDetailsCount + 1;
-		});
-
-		if (errorDetailsCount == 0) {
-			podd.updateErrorTable('', 'No error details available');
-		};
+		podd.displayDetailedErrors(errorDetailsInJson);
 
         podd.debug('### initialization complete ###');
 	});
