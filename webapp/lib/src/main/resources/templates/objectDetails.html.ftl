@@ -264,7 +264,7 @@ Macro to format a given text field for display by HTML encoding it and replacing
 <#macro referencedByTable>
 </#macro>
 
-<script type="text/javascript" src="${baseUrl}/scripts/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.tablesorter.js"></script>
 
 <script type="text/javascript">
     animatedcollapse.addDiv('parent_details', 'fade=1,hide=0');

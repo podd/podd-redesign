@@ -132,7 +132,7 @@ No artifacts found
 </#macro>
 
 
-<script type="text/javascript" src="${baseUrl}/scripts/animatedcollapse.js">
+<script type="text/javascript" src="${baseUrl}/resources/scripts/animatedcollapse.js">
 /***********************************************
 * Animated Collapsible DIV v2.4- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
 * This notice MUST stay intact for legal use
