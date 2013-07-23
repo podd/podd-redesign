@@ -16,63 +16,9 @@
         podd.debug('initializing...');
         podd.debug('-------------------');
 
-		var errorModelAsString = ${message_details!"{}"};
+		var errorDetailsInJson = ${message_details!"{}"};
 
-		var errorDetailsCount = 0;
-
-	    var nextDatabank = podd.newDatabank();
-        nextDatabank.load(errorModelAsString, {format: 'application/json'});
-
-		// Display top level error details
-		// NOTE: This query does not capture errors which only have partial information.
-		// Should be improved as a separate function in podd_edit.js
-		var queryDetails = $.rdf({
-        	databank : nextDatabank
-    	})
-    	.where('?x rdfs:comment ?stacktrace')
-    	.where('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
-    	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
-    	;
-    	var bindings1 = queryDetails.select();
-	
-		$.each(bindings1, function(index, binding) {
-			if (typeof binding.source !== 'undefined') {
-				var source = '<PRE>' + binding.source.value + '</PRE>';
-				podd.updateErrorTable('Source of Error', source);
-			}
-			
-			var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
-			podd.updateErrorTable('Exception Class', exceptionClass);
-
-			var stackTrace = '<PRE>' + binding.stacktrace.value + '</PRE>';
-			podd.updateErrorTable('Stack Trace', stackTrace);
-			
-			errorDetailsCount = errorDetailsCount + 1;
-		});
-		
-		// Display any sub-details		
-		var querySub = $.rdf({
-        	databank : nextDatabank
-    	})
-    	.where('?top <http://purl.org/podd/ns/err#contains> ?x')
-    	.where('?x rdfs:comment ?details')
-    	.where('?x <http://purl.org/podd/ns/err#source> ?source')
-    	;
-    	var bindings2 = querySub.select();
-	
-		$.each(bindings2, function(index, binding) {
-			var details = '<PRE>' + binding.details.value + '</PRE>';
-			var source = '<PRE>' + binding.source.value + '</PRE>';
-			
-			podd.updateErrorTable(' Secondary Source', source);
-			podd.updateErrorTable(' Secondary Details', '<PRE>' + details + '</PRE>');
-			
-			errorDetailsCount = errorDetailsCount + 1;
-		});
-
-		if (errorDetailsCount == 0) {
-			podd.updateErrorTable('', 'No error details available');
-		};
+		podd.displayDetailedErrors(errorDetailsInJson);
 
         podd.debug('### initialization complete ###');
 	});

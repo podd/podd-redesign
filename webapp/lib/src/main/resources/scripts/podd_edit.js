@@ -831,6 +831,152 @@ podd.deleteTriples = function(nextDatabank, subject, property) {
 /**
  * @memberOf podd
  * 
+ * Display the given errors in detail on top of HTML page.
+ * 
+ * @param errorModelAsJson
+ *            {string} The error Model as a JSON string
+ */
+podd.displayDetailedErrors = function(errorModelAsJson) {
+	var errorDetailsCount = 0;
+
+    var nextDatabank = podd.newDatabank();
+    nextDatabank.load(errorModelAsJson, {format: 'application/json'});
+
+	// Display top level error details
+	var queryDetails = $.rdf({
+    	databank : nextDatabank
+	})
+	.where('?x rdf:type <http://purl.org/podd/ns/err#TopError> ')
+	.optional('?x rdfs:comment ?description')
+	.optional('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
+	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
+	;
+	var bindings1 = queryDetails.select();
+
+	$.each(bindings1, function(index, binding) {
+		if (typeof binding.source !== 'undefined') {
+			var source = '<PRE>' + binding.source.value + '</PRE>';
+			podd.updateErrorTable('Source of Error: ', source);
+		}
+		
+		if (typeof binding.exceptionClass !== 'undefined') {
+			var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
+			podd.updateErrorTable('Exception Class: ', exceptionClass);
+		}
+		
+		if (typeof binding.description !== 'undefined') {
+			var description = '<PRE>' + binding.description.value + '</PRE>';
+			podd.updateErrorTable('Description: ', description);
+		}
+		
+		errorDetailsCount = errorDetailsCount + 1;
+	});
+	
+	// Display any sub-details		
+	var querySub = $.rdf({
+    	databank : nextDatabank
+	})
+	.where('?top <http://purl.org/podd/ns/err#contains> ?x')
+	.where('?x rdf:type <http://purl.org/podd/ns/err#Error> ')
+	.where('?x rdfs:comment ?details')
+	.where('?x <http://purl.org/podd/ns/err#source> ?source')
+	;
+	var bindings2 = querySub.select();
+
+	$.each(bindings2, function(index, binding) {
+		var details = '<PRE>' + binding.details.value + '</PRE>';
+		var source = '<PRE>' + binding.source.value + '</PRE>';
+		
+		podd.updateErrorTable(' Secondary Source: ', source);
+		podd.updateErrorTable(' Secondary Details: ', details);
+		
+		errorDetailsCount = errorDetailsCount + 1;
+	});
+
+	if (errorDetailsCount == 0) {
+		podd.updateErrorTable('No error details available');
+	};
+};
+
+/**
+ * @memberOf podd
+ * 
+ * Display errors resulting from AJAX calls. A single line error message is
+ * constructed from the top-level error details and displayed on top of the HTML
+ * page.
+ * 
+ * @param errorModelAsJson
+ *            {string} The error Model as a JSON string
+ */
+podd.displaySummaryErrorMessage = function(errorModelAsJson) {
+
+//	if (typeof errorModelAsJson === 'string') {
+//		podd.debug('[displayErrorMsgTable] input is a string');
+//	}
+//	podd.debug('[displayErrorMsgTable] Error model =' + errorModelAsJson);
+	
+	var errorDetailsCount = 0;
+
+    var nextDatabank = podd.newDatabank();
+    nextDatabank.load(errorModelAsJson, {format: 'application/json'});
+
+    podd.debug('[displayErrorMsgTable] error databank size = ' + nextDatabank.size());
+
+	var query = $.rdf({
+    	databank : nextDatabank
+	})
+	.where('?s ?p ?o');
+	var allBindings = query.select();
+	$.each(allBindings, function(index, next) {
+		podd.debug('   > ' + next.s.value + ' : ' + next.p.value + ' : ' + next.o.value);
+	});
+    
+    var message = '';
+    
+	// construct error message
+	var queryDetails = $.rdf({
+    	databank : nextDatabank
+	})
+	.where('?x rdf:type <http://purl.org/podd/ns/err#TopError> ')
+	.optional('?x rdfs:comment ?description')
+	.optional('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
+	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
+	;
+	var bindings1 = queryDetails.select();
+
+	$.each(bindings1, function(index, binding) {
+		
+		if (typeof binding.exceptionClass !== 'undefined') {
+			var exceptionClass = '<b>' + binding.exceptionclass.value + '</b>';
+			message = exceptionClass + ' ';
+		}
+		
+		if (typeof binding.description !== 'undefined') {
+			//var stackTrace = '<PRE>' + binding.description.value + '</PRE>';
+			message = message + binding.description.value;
+		}
+
+		if (typeof binding.source !== 'undefined') {
+			//var source = '<PRE>' + binding.source.value + '</PRE>';
+			message = message + '(Source of error: ' +binding.source.value + ')';
+		}
+		
+		errorDetailsCount = errorDetailsCount + 1;
+	});
+	
+	if (errorDetailsCount == 0) {
+		podd.updateErrorTable('', 'No error details available');
+	};
+
+	podd.updateErrorMessageList(message);
+	
+    podd.debug('[displayErrorMsgTable] errorDetails count = ' + errorDetailsCount);
+};
+
+
+/**
+ * @memberOf podd
+ * 
  * Clean all the error messages
  */
 podd.emptyErrorMessages = function() {
@@ -914,6 +1060,7 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank,
         error : function(xhr, status, error) {
             podd.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
             // podd.debug(xhr.statusText);
+            podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
 
@@ -960,6 +1107,7 @@ podd.getCreateChildMetadata = function(artifactUri, objectType, successCallback)
         error : function(xhr, status, error) {
             podd.debug('[getCreateChildMetadata] $$$ ERROR $$$ ' + error);
             podd.debug(xhr.statusText);
+            podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
 };
@@ -1063,6 +1211,7 @@ podd.getObjectTypeMetadata = function(artifactUri, objectType, successCallback, 
         error : function(xhr, status, error) {
             podd.debug('[getObjectTypeMetadata] $$$ ERROR $$$ ' + error);
             podd.debug(xhr.statusText);
+            podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
 };
@@ -1409,6 +1558,7 @@ podd.loadMissingArtifactLabels = function(artifactUri, nextSchemaDatabank,
         error : function(xhr, status, error) {
             podd.debug(status + '[loadArtifactLabels] $$$ ERROR $$$ ' + error);
             // podd.debug(xhr.statusText);
+            podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
 };
@@ -1548,6 +1698,8 @@ podd.searchOntologyService = function(
         },
         error : function(xhr, status, error) {
             podd.debug(status + '[searchOntologyService] $$$ ERROR $$$ ' + error);
+            
+            podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
 };
@@ -1770,8 +1922,8 @@ podd.submitPoddObjectUpdate = function(
         error : function(xhr, status, error) {
             podd.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
             podd.debug(xhr.statusText);
-            var message = '<div>Failed to store artifact.<pre>' + xhr.responseText + '</pre></div>';
-            podd.updateErrorMessageList(message);
+            
+            podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
 };
