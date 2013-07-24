@@ -46,6 +46,7 @@ import com.github.podd.resources.ListArtifactsResourceImpl;
 import com.github.podd.resources.ListDataRepositoriesResourceImpl;
 import com.github.podd.resources.SearchOntologyResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
+import com.github.podd.resources.UserAddResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
@@ -263,6 +264,13 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
                 PoddWebConstants.PATH_USER_DETAILS + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
         this.log.debug("attaching user details service to path={}", userDetailsPath);
         router.attach(userDetailsPath, UserDetailsResourceImpl.class);
+        
+        // Add a route for Add User page.
+        final String userAddPath = PoddWebConstants.PATH_USER_ADD;
+        this.log.debug("attaching user add service to path={}", userAddPath);
+        router.attach(userAddPath, UserAddResourceImpl.class);
+        
+        // TODO: add routes for other user management pages. (Edit User, Change Password, Modify Roles etc.)
         
         // Add a route for the List Artifacts page.
         final String listArtifactsPath = PoddWebConstants.PATH_ARTIFACT_LIST;

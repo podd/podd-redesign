@@ -80,6 +80,11 @@ public interface PoddWebConstants
      * Path to "user details" page
      */
     public static final String PATH_USER_DETAILS = "user/";
+
+    /**
+     * Path to "add user" page
+     */
+    public static final String PATH_USER_ADD = "admin/user/add";
     
     /**
      * Path to list artifacts
@@ -244,5 +249,6 @@ public interface PoddWebConstants
     public static final String METADATA_EXCLUDE_CONTAINS = "nocontains";
     
     public static final String METADATA_ONLY_CONTAINS = "containsonly";
+
     
 }
