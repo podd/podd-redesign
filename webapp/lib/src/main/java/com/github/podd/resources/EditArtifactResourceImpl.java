@@ -161,7 +161,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final UnmanagedArtifactIRIException e)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
+            throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, "Could not find the given artifact", e);
         }
         catch(final PoddException e)
         {
