@@ -199,21 +199,26 @@
     </div>
 	<div id="oasAnnotationDialog" title="Tab data">
 			<form id="ontology_annotation_form">
-				<label id="label-annotationtarget" for="annotation_target">Annotation target :</label>
-				<input id="annotation_target" size="150" name="annotation_target" type="text">&nbsp;</input>
-				
-				<label id="label-annotationcontent" for="annotation_content">Content</label>
-				<textarea name="annotation_content" id="annotation_content" class="ui-widget-content ui-corner-all"></textarea>
-				
-				<label id="label-ontology" for="ontology">Ontology</label>
-				<img id="ontology-icon" src="${baseUrl}resources/static/images/transparent_1x1.png"></img>
-				<input name="ontology" id="ontology" type="text">&nbsp;</input>
-				<input name="ontology-id" type="text" id="ontology-id" value="">&nbsp;</input>
-				<p id="ontology-description">&nbsp;</p>
-				
-				<label id="label-ontologytermlabel" for="ontologytermlabel">Ontology term</label>
-				<input name="ontologytermlabel" id="ontologytermlabel" type="text">&nbsp;</input>
-				<input name="ontologytermuri" id="ontologytermuri" type="text">&nbsp;</input>
+				<div>
+					<label id="label-annotationtarget" for="annotation_target">Annotation target :</label>
+					<input id="annotation_target" size="150" name="annotation_target" type="text">&nbsp;</input>
+				</div>
+				<div>
+					<label id="label-annotationcontent" for="annotation_content">Content</label>
+					<textarea name="annotation_content" id="annotation_content" class="ui-widget-content ui-corner-all"></textarea>
+				</div>
+				<div>
+					<label id="label-ontology" for="ontology">Ontology</label>
+					<img id="ontology-icon" src="${baseUrl}resources/static/images/transparent_1x1.png"></img>
+					<input name="ontology" id="ontology" type="text">&nbsp;</input>
+					<input name="ontology-id" type="text" id="ontology-id" value="">&nbsp;</input>
+					<p id="ontology-description">&nbsp;</p>
+				</div>
+				<div>
+					<label id="label-ontologytermlabel" for="ontologytermlabel">Ontology term</label>
+					<input name="ontologytermlabel" id="ontologytermlabel" type="text">&nbsp;</input>
+					<input name="ontologytermuri" id="ontologytermuri" type="text">&nbsp;</input>
+				</div>
 			</form>
     </div>
 	<div id="oasLoginDialog" title="Login">
