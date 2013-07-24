@@ -3,14 +3,15 @@
  */
 package com.github.podd.resources.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
@@ -22,6 +23,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
@@ -241,6 +243,51 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         // verify: publication46 has been added to the artifact
         Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication35"));
     }
+    
+    @Test
+    public void testErrorEditArtifactRdfWithIncorrectVersionIRI() throws Exception
+    {
+        // prepare: add an artifact
+        final InferredOWLOntologyID artifactID =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        final ClientResource editArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                .getOntologyIRI().toString());
+        
+        // prepare: set an INVALID version IRI
+        final String incorrectVersionIri = artifactID.getVersionIRI().toString() + ":nosuchversion";
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER,
+                incorrectVersionIri);
+        
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(false));
+        
+        // create edit Representation
+        final Representation input =
+                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                        MediaType.APPLICATION_RDF_XML);
+        
+        try
+        {
+            RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_CONFLICT, this.testWithAdminPrivileges);
+            Assert.fail("Should have failed due to incorrect version IRI");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals(Status.CLIENT_ERROR_CONFLICT, e.getStatus());
+
+            // TODO: verify the cause and details (as in UploadArtifactResourceImplTest)
+//            final String body = editArtifactClientResource.getResponseEntity().getText();
+//            ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+//            final Model model = Rio.parse(inputStream, "", RDFFormat.RDFXML);
+//            DebugUtils.printContents(model);
+        }
+    }
+    
     
     @Test
     public void testErrorEditArtifactRdfWithoutArtifactID() throws Exception
