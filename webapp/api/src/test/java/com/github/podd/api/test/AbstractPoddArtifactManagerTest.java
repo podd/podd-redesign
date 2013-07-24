@@ -68,6 +68,7 @@ import com.github.podd.exception.DisconnectedObjectException;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -1931,10 +1932,10 @@ public abstract class AbstractPoddArtifactManagerTest
                     DataReferenceVerificationPolicy.DO_NOT_VERIFY);
             Assert.fail("Should have thrown an UnmanagedArtifactIRIException");
         }
-        catch(final UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactVersionException e)
         {
             Assert.assertEquals("Exception not due to the expected artifact version", artifactIDv1.getVersionIRI(),
-                    e.getOntologyID());
+                    e.getUnmanagedVersionIRI());
         }
     }
     

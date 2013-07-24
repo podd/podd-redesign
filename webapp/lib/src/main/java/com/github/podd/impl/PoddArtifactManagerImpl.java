@@ -73,6 +73,7 @@ import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.PurlProcessorNotHandledException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -1414,9 +1415,20 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             format = RDFFormat.RDFXML;
         }
+
+        // check if the specified artifact URI refers to a managed artifact
+        InferredOWLOntologyID artifactID = null;
+        try
+        {
+            artifactID = this.getArtifact(IRI.create(artifactUri));
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            this.log.error("This artifact is unmanaged. [{}]", artifactUri);
+            throw e;
+        }
         
         // check if updating from the most current version of the artifact
-        InferredOWLOntologyID artifactID = null;
         try
         {
             artifactID = this.getArtifact(IRI.create(versionUri));
@@ -1424,13 +1436,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         catch(final UnmanagedArtifactIRIException e)
         {
             // if the version IRI is not the most current, it is unmanaged
-            final InferredOWLOntologyID currentArtifactID = this.getArtifact(IRI.create(artifactUri));
             final String message =
-                    "Attempting to update from an older version of an artifact. [" + versionUri
-                            + "] has been succeeded by [" + currentArtifactID.getVersionIRI().toString() + "]";
-                     
+                    "Attempting to update from an invalid version of an artifact [" + versionUri
+                            + "]. The current version is [" + artifactID.getVersionIRI().toString() + "]";
+            
             this.log.error(message);
-            throw new UnmanagedArtifactIRIException(IRI.create(versionUri), message, e);
+            throw new UnmanagedArtifactVersionException(artifactID.getOntologyIRI(), artifactID.getVersionIRI(),
+                    IRI.create(versionUri), message, e);
             // FIXME - handle this conflict intelligently instead of rejecting the update.
         }
         

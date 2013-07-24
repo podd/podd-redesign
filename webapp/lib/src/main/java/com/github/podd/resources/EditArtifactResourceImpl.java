@@ -39,6 +39,7 @@ import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.UpdatePolicy;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -159,9 +160,13 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             // - write the artifact ID into response
             Rio.write(model, output, outputFormat);
         }
+        catch(final UnmanagedArtifactVersionException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, "Could not edit the given artifact", e);
+        }
         catch(final UnmanagedArtifactIRIException e)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, "Could not find the given artifact", e);
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
         catch(final PoddException e)
         {
