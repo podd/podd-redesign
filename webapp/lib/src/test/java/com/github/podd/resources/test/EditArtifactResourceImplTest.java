@@ -3,9 +3,7 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 import org.junit.Assert;
@@ -23,7 +21,6 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
@@ -424,26 +421,6 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         // verify:
         System.out.println(body);
         this.assertFreemarker(body);
-    }
-    
-    /**
-     * Test posting to the edit HTML page modifying an internal PODD object.
-     */
-    @Ignore
-    @Test
-    public void testPostEditArtifactInternalObjectHtml() throws Exception
-    {
-        Assert.fail("TODO: implement");
-    }
-    
-    /**
-     * Test posting to the edit HTML page modifying a PODD top object (i.e. a Project).
-     */
-    @Ignore
-    @Test
-    public void testPostEditArtifactTopObjectHtml() throws Exception
-    {
-        Assert.fail("TODO: implement");
     }
     
 }
