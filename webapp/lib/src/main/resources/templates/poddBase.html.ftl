@@ -39,7 +39,8 @@
 
     	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.9.1.js"></script>
     	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-ui-1.10.3.custom.js"></script>
-
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.cookie-1.3.js"></script>
+	    <script type="text/javascript" src="${baseUrl}/resources/scripts/bootstrap.js"></script>
 		
 		<!-- Dependencies for rdfquery -->
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
@@ -92,7 +93,7 @@
 				    // oas.rdf.debugRdfDownloadButtonAttach('.rdfatestcontent');
 				    // oas.rdf.showAnnotationPoints("[about]");
 				    // Add annotation handlers to all elements that match [about], targeting them at #dialog as the dialog, with the identifier for the annotation target being put into #annotation_target based on processing the event with the function oas.rdf.rdfaAboutAttribute
-				    oas.rdf.addAnnotationHandlers("[about]", "#dialog", "#loginDialog","#annotation_target", oas.rdf.rdfaAboutAttribute);
+				    oas.rdf.addAnnotationHandlers("[about]", "#oasAnnotationDialog", "#oasLoginDialog","#annotation_target", oas.rdf.rdfaAboutAttribute);
 				}
 				else if(typeof console != "undefined" && console.log) {
 					console.log("OAS failed to load");
@@ -197,7 +198,7 @@
     <div id="rdfadebug">
     &nbsp;
     </div>
-	<div id="dialog" title="Tab data">
+	<div id="oasAnnotationDialog" title="Tab data">
 			<form id="ontology_annotation_form">
 				<label id="label-annotationtarget" for="annotation_target">Annotation target :</label>
 				<input id="annotation_target" size="150" name="annotation_target" type="text">&nbsp;</input>
@@ -216,7 +217,7 @@
 				<input name="ontologytermuri" id="ontologytermuri" type="text">&nbsp;</input>
 			</form>
     </div>
-	<div id="loginDialog" title="Login">
+	<div id="oasLoginDialog" title="Login">
 			<form id="login_form">
 				You must login to Ontology Annotation Services before creating annotations.
 			</form>
