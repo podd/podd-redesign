@@ -40,7 +40,6 @@
     	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.9.1.js"></script>
     	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-ui-1.10.3.custom.js"></script>
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.cookie-1.3.js"></script>
-	    <script type="text/javascript" src="${baseUrl}/resources/scripts/bootstrap.js"></script>
 		
 		<!-- Dependencies for rdfquery -->
 	    <script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.json.js"></script>
