@@ -75,8 +75,8 @@
 			oas.ontology = {};
 		</script>
     
-		<script src="http://localhost:8080/oas/resources/static/scripts/oas.js" type="text/javascript"></script>
-	    <script src="http://localhost:8080/oas/resources/static/scripts/oas-debug-helper.js" type="text/javascript"></script>
+		<script src="${baseUrl}/../oas/resources/static/scripts/oas.js" type="text/javascript"></script>
+	    <script src="${baseUrl}/../oas/resources/static/scripts/oas-debug-helper.js" type="text/javascript"></script>
 
 		<script type="text/javascript">
 			$(document).ready(function() {
