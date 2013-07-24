@@ -1426,8 +1426,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // if the version IRI is not the most current, it is unmanaged
             final InferredOWLOntologyID currentArtifactID = this.getArtifact(IRI.create(artifactUri));
             final String message =
-                    "Attempting to update from an older version of an artifact. <" + versionUri
-                            + "> has been succeeded by <" + currentArtifactID.getVersionIRI().toString() + ">";
+                    "Attempting to update from an older version of an artifact. [" + versionUri
+                            + "] has been succeeded by [" + currentArtifactID.getVersionIRI().toString() + "]";
                      
             this.log.error(message);
             throw new UnmanagedArtifactIRIException(IRI.create(versionUri), message, e);
