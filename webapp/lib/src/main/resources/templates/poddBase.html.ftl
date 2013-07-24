@@ -69,7 +69,7 @@
 			podd.baseUrl = "${baseUrl}";
 			
 			oas = {};
-			oas.baseUrl = "http://localhost:8080/oas/";
+			oas.baseUrl = "${baseUrl}/../oas/";
 			oas.rdf = {};
 			oas.autocomplete = {};
 			oas.ontology = {};
