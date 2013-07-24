@@ -952,23 +952,40 @@ podd.displaySummaryErrorMessage = function(errorModelAsJson) {
 		}
 		
 		if (typeof binding.description !== 'undefined') {
-			//var stackTrace = '<PRE>' + binding.description.value + '</PRE>';
 			message = message + binding.description.value;
 		}
 
 		if (typeof binding.source !== 'undefined') {
-			//var source = '<PRE>' + binding.source.value + '</PRE>';
 			message = message + '(Source of error: ' +binding.source.value + ')';
 		}
 		
 		errorDetailsCount = errorDetailsCount + 1;
 	});
+	podd.updateErrorMessageList(message);
+
+	
+	// add more details to error message
+	// NOTE: this could lead to too many error messages if there are several causes
+	var queryDetails2 = $.rdf({
+    	databank : nextDatabank
+	})
+	.where('?top <http://purl.org/podd/ns/err#contains> ?cause')
+	.where('?cause rdf:type <http://purl.org/podd/ns/err#Error> ')
+	.where('?cause rdfs:label ?causelabel ')
+	;
+
+	var bindings2 = queryDetails2.select();
+
+	$.each(bindings2, function(index, binding) {
+		if (typeof binding.causelabel !== 'undefined' && binding.causelabel.value.length < 255) {
+			podd.updateErrorMessageList('<PRE>' + binding.causelabel.value + '</PRE>');
+		}
+		errorDetailsCount = errorDetailsCount + 1;
+	});
 	
 	if (errorDetailsCount == 0) {
-		podd.updateErrorTable('', 'No error details available');
+		podd.updateErrorMessageList('No error details available');
 	};
-
-	podd.updateErrorMessageList(message);
 	
     podd.debug('[displayErrorMsgTable] errorDetails count = ' + errorDetailsCount);
 };
