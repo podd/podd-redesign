@@ -37,7 +37,17 @@ public class PoddUser extends RestletUtilUser
     /** The unique URI for this user */
     private volatile URI uri;
     
-    // TODO - include title, phone, address
+    /** The user's title */
+    private volatile String title;
+
+    /** The user's telephone */
+    private volatile String phone;
+    
+    /** The user's postal address */
+    private volatile String address;
+    
+    /** The user's job position */
+    private volatile String position;
     
     /**
      * Constructor.
@@ -95,6 +105,22 @@ public class PoddUser extends RestletUtilUser
         this.orcid = orcid;
     }
     
+    public PoddUser(final String identifier, final char[] secret, final String firstName, final String lastName,
+            final String email, final PoddUserStatus userStatus, final URI homePage, final String organization,
+            final String orcid, final String title, final String phone, final String address, final String position)
+    {
+        super(identifier, secret, firstName, lastName, email);
+        this.userStatus = userStatus;
+        this.homePage = homePage;
+        this.organization = organization;
+        this.orcid = orcid;
+        this.title = title;
+        this.phone = phone;
+        this.address = address;
+        this.position = position;
+    }
+    
+    
     /**
      * Get the URL of a home page containing details about the User. This value is set by the user.
      * 
@@ -115,6 +141,27 @@ public class PoddUser extends RestletUtilUser
         return this.organization;
     }
     
+    public String getTitle()
+    {
+        return this.title;
+    }
+    
+    public String getPhone()
+    {
+        return phone;
+    }
+
+    public String getAddress()
+    {
+        return address;
+    }
+
+    public String getPosition()
+    {
+        return position;
+    }
+
+
     /**
      * Get the Unique URI allocated to each user. This value is usually generated and set by PODD.
      * 
@@ -151,6 +198,26 @@ public class PoddUser extends RestletUtilUser
         this.organization = organization;
     }
     
+    public void setTitle(final String title)
+    {
+        this.title = title;
+    }
+    
+    public void setPhone(String phone)
+    {
+        this.phone = phone;
+    }
+
+    public void setAddress(String address)
+    {
+        this.address = address;
+    }
+
+    public void setPosition(String position)
+    {
+        this.position = position;
+    }
+    
     /**
      * Set the Unique URI allocated to each user. This value is usually generated and set by PODD.
      * 
@@ -179,6 +246,14 @@ public class PoddUser extends RestletUtilUser
         b.append(this.getOrcid());
         b.append(":");
         b.append(this.getHomePage());
+        b.append(":");
+        b.append(this.getTitle());
+        b.append(":");
+        b.append(this.getPhone());
+        b.append(":");
+        b.append(this.getAddress());
+        b.append(":");
+        b.append(this.getPosition());
         
         return b.toString();
     }

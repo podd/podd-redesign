@@ -314,6 +314,22 @@ public interface PoddRdfConstants
     public static final URI PODD_USER_ORGANIZATION =  PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_USER, "organization");
 
+    /** http://purl.org/podd/ns/poddUser#title */
+    public static final URI PODD_USER_TITLE =  PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_USER, "title");
+    
+    /** http://purl.org/podd/ns/poddUser#phone */
+    public static final URI PODD_USER_PHONE =  PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_USER, "phone");
+    
+    /** http://purl.org/podd/ns/poddUser#address */
+    public static final URI PODD_USER_ADDRESS =  PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_USER, "address");
+
+    /** http://purl.org/podd/ns/poddUser#position */
+    public static final URI PODD_USER_POSITION =  PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_USER, "position");
+
     /**
      * TODO: Temporary domain for specifying error messages in RDF 
      */
@@ -342,6 +358,7 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/err#contains */
     public static final URI ERR_CONTAINS = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_ERROR, "contains");
+
 
 
 }
