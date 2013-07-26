@@ -14,3 +14,7 @@ The following dependencies are fetched by maven from the Sonatype Snapshots repo
 * Restlet Utils: https://github.com/ansell/restlet-utils/tree/master
 * Property Util: https://github.com/ansell/property-util/tree/master
 * Abstract Service Loader: https://github.com/ansell/abstract-service-loader/tree/master
+
+# License
+
+PODD is released under the GNU Affero General Public License 3.0
