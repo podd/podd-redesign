@@ -33,9 +33,9 @@
 
     <link rel="icon" href="${baseUrl}/resources/images/podd.ico" type="image/png" />
     <link rel="shortcut icon" href="${baseUrl}/resources/images/podd_ico.png" type="image/png" />
-    <link rel="stylesheet" href="${baseUrl}/resources/styles/podd.css" media="screen" type="text/css" />
-    <link rel="stylesheet" href="${baseUrl}/resources/styles/podd-colours.css" media="screen" type="text/css" />
-	<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-1.10.3.custom.css" media="screen" type="text/css" />
+    <link rel="stylesheet" href="${baseUrl}/resources/styles/podd.css" type="text/css" />
+    <link rel="stylesheet" href="${baseUrl}/resources/styles/podd-colours.css" type="text/css" />
+	<link rel="stylesheet" href="${baseUrl}/resources/styles/jquery-ui-1.10.3.custom.css" type="text/css" />
 
     	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-1.9.1.js"></script>
     	<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery-ui-1.10.3.custom.js"></script>
