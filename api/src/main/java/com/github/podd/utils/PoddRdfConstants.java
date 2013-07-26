@@ -302,6 +302,17 @@ public interface PoddRdfConstants
     public static final URI PODD_FILE_REPOSITORY_SECRET = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositorySecret");
 
+    /** http://purl.org/podd/ns/poddUser#homepage */
+    public static final URI PODD_USER_HOMEPAGE =  PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_USER, "homepage");
+
+    /** http://purl.org/podd/ns/poddUser#orcid */
+    public static final URI PODD_USER_ORCID = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_USER, "orcid");
+
+    /** http://purl.org/podd/ns/poddUser#organization */
+    public static final URI PODD_USER_ORGANIZATION =  PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_USER, "organization");
 
     /**
      * TODO: Temporary domain for specifying error messages in RDF 
@@ -331,5 +342,6 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/err#contains */
     public static final URI ERR_CONTAINS = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_ERROR, "contains");
+
 
 }
