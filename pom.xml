@@ -63,8 +63,8 @@
 		<junit.version>4.11</junit.version>
 		<mockito.version>1.9.5</mockito.version>
 		<podd-ontologies.version>1-SNAPSHOT</podd-ontologies.version>
-		<owlapi.version>3.4.5.1-ansell-SNAPSHOT</owlapi.version>
-		<pellet.version>2.3.5-ansell-SNAPSHOT</pellet.version>
+		<owlapi.version>3.4.5.1-ansell</owlapi.version>
+		<pellet.version>2.3.5-ansell</pellet.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<restlet.version>2.1.1</restlet.version>
