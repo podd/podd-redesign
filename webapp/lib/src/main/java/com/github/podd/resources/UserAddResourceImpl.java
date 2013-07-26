@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
+import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddRoles;
@@ -107,11 +108,10 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model newUserModel = Rio.parse(inputStream, "", inputFormat);
             
+            // - create new PoddUser and add to Realm
             newUser = this.modelToUser(newUserModel);
-            
-            // - add the new User to Realm
             newUserUri = nextRealm.addUser(newUser);
-            this.log.info("Added new User <{}>", newUser.getIdentifier());
+            this.log.debug("Added new User <{}>", newUser.getIdentifier());
             
             // - map Roles for the new User
             final Iterator<Resource> iterator =
@@ -127,7 +127,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                 final URI mappedObject =
                         newUserModel.filter(mappingUri, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
                 
-                this.log.info("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
+                this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
                         role.getName(), mappedObject);
                 if(mappedObject != null)
                 {
@@ -138,6 +138,14 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                     nextRealm.map(newUser, role.getRole());
                 }
             }
+            
+            // - check the User was successfully added to the Realm
+            final RestletUtilUser findUser = nextRealm.findUser(newUser.getIdentifier());
+            if(findUser == null)
+            {
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to add user");
+            }
+            
         }
         catch(final IOException e)
         {
@@ -207,10 +215,22 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                     "User Email has to be the same as User Identifier");
         }
         
-        // TODO: - optional parameters
         final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
+        if(homePage == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Home Page cannot be empty");
+        }
+        
         final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
+        if(organization == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Organization cannot be empty");
+        }
         final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
+        if(orcidID == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User ORCID ID cannot be empty");
+        }
         
         final PoddUser user =
                 new PoddUser(identifier, password.toCharArray(), firstName, lastName, email, PoddUserStatus.ACTIVE,
@@ -218,5 +238,4 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         
         return user;
     }
-    
 }

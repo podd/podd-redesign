@@ -58,6 +58,11 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                 PoddRdfConstants.VF.createLiteral(testFirstName));
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
                 PoddRdfConstants.VF.createLiteral(testLastName));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE,
+                PoddRdfConstants.VF.createURI("http://nohomepage"));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
+                PoddRdfConstants.VF.createLiteral("n/a"));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral("n/a"));
         
         userInfoModel
                 .add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL, PoddRdfConstants.VF.createLiteral(testEmail));
