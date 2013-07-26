@@ -80,19 +80,10 @@
 
 		<script type="text/javascript">
 			$(document).ready(function() {
-				// If OAS failed to load, do not fail			    
+				// If OAS failed to load, do not fail
 			    if(oas.rdf.addAnnotationHandlers) {
-				    // NOTE: Cannot use [about] here if we are embedding RDFa back into the page
-				    // as it would cause a circular dependency
-				    // If we are not embedding extra RDFa data, then we should be able to use
-				    // [about] to select all objects with the RDFa about attribute
-				    // .rdfatestcontent pulls in everything we have annotated with
-				    // class="rdfatestcontent" and everything under these elements
-				    // oas.rdf.debugRdfaBody('.rdfatestcontent');
-				    // oas.rdf.debugRdfDownloadButtonAttach('.rdfatestcontent');
 				    // oas.rdf.showAnnotationPoints("[about]");
-				    // Add annotation handlers to all elements that match [about], targeting them at #dialog as the dialog, with the identifier for the annotation target being put into #annotation_target based on processing the event with the function oas.rdf.rdfaAboutAttribute
-				    oas.rdf.addAnnotationHandlers("[about]", "#oasAnnotationDialog", "#oasLoginDialog","#annotation_target", oas.rdf.rdfaAboutAttribute);
+				    oas.rdf.addAnnotationHandlers();
 				}
 				else if(typeof console != "undefined" && console.log) {
 					console.log("OAS failed to load");
@@ -192,39 +183,5 @@
 	</#attempt>
 	
     <a class="no_image float_right" href="${baseUrl}/about">About us</a>
-
-
-    <div id="rdfadebug">
-    &nbsp;
-    </div>
-	<div id="oasAnnotationDialog" title="Tab data">
-			<form id="ontology_annotation_form">
-				<div>
-					<label id="label-annotationtarget" for="annotation_target">Annotation target :</label>
-					<input id="annotation_target" size="150" name="annotation_target" type="text">&nbsp;</input>
-				</div>
-				<div>
-					<label id="label-annotationcontent" for="annotation_content">Content</label>
-					<textarea name="annotation_content" id="annotation_content" class="ui-widget-content ui-corner-all"></textarea>
-				</div>
-				<div>
-					<label id="label-ontology" for="ontology">Ontology</label>
-					<img id="ontology-icon" src="${baseUrl}resources/static/images/transparent_1x1.png"></img>
-					<input name="ontology" id="ontology" type="text">&nbsp;</input>
-					<input name="ontology-id" type="text" id="ontology-id" value="">&nbsp;</input>
-					<p id="ontology-description">&nbsp;</p>
-				</div>
-				<div>
-					<label id="label-ontologytermlabel" for="ontologytermlabel">Ontology term</label>
-					<input name="ontologytermlabel" id="ontologytermlabel" type="text">&nbsp;</input>
-					<input name="ontologytermuri" id="ontologytermuri" type="text">&nbsp;</input>
-				</div>
-			</form>
-    </div>
-	<div id="oasLoginDialog" title="Login">
-			<form id="login_form">
-				You must login to Ontology Annotation Services before creating annotations.
-			</form>
-    </div>
 </body>
 </html>
