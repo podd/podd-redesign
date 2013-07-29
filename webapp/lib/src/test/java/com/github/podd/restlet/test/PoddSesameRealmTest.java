@@ -147,7 +147,6 @@ public class PoddSesameRealmTest
         
         // -prepare: map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.ADMIN.getRole());
-        this.testRealm.map(user1, PoddRoles.AUTHENTICATED.getRole());
         
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
         
@@ -160,8 +159,8 @@ public class PoddSesameRealmTest
         this.testRealm.map(user1, PoddRoles.PROJECT_OBSERVER.getRole(), object4URI);
         
         this.testRealm.map(user2, PoddRoles.ADMIN.getRole());
-        this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object1URI);
-        this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object2URI);
+        this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object1URI);
+        this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
         
         // -verify: common Role for 1 Object
         final Collection<Role> rolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
@@ -189,7 +188,6 @@ public class PoddSesameRealmTest
         
         // -prepare: map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.ADMIN.getRole());
-        this.testRealm.map(user1, PoddRoles.AUTHENTICATED.getRole());
         
         // -verify: common Role for Object 1
         final Collection<Role> rolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
@@ -215,8 +213,8 @@ public class PoddSesameRealmTest
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object2URI);
         this.testRealm.map(user1, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
         
-        this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object1URI);
-        this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object2URI);
+        this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object1URI);
+        this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
         
         // -verify: common Role for 1 Object
         final Collection<Role> rolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
@@ -240,19 +238,19 @@ public class PoddSesameRealmTest
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object2URI);
         this.testRealm.map(user1, PoddRoles.ADMIN.getRole(), null);
         
-        this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object1URI);
-        this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object2URI);
+        this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object1URI);
+        this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
         
         // -get Roles of user1
         final Set<Role> user1Roles = this.testRealm.findRoles(user1);
         Assert.assertNotNull("Null set for user roles", user1Roles);
         Assert.assertFalse("No roles allocated to user 1", user1Roles.isEmpty());
         Assert.assertTrue("Admin role wasn't allocated to user 1", user1Roles.contains(PoddRoles.ADMIN.getRole()));
-        Assert.assertTrue("PROJECT_MEMBER role wasn't allocated to user 1",
+        Assert.assertTrue("Project Member role wasn't allocated to user 1",
                 user1Roles.contains(PoddRoles.PROJECT_MEMBER.getRole()));
         
         final Set<Role> user2Roles = this.testRealm.findRoles(user2);
-        Assert.assertTrue("ROLE_A role wasn't allocated to user 2", user2Roles.contains(PoddRoles.ROLE_A.getRole()));
+        Assert.assertTrue("Project Observer role wasn't allocated to user 2", user2Roles.contains(PoddRoles.PROJECT_OBSERVER.getRole()));
     }
     
     /**

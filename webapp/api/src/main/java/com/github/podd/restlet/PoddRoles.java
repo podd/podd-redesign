@@ -24,9 +24,6 @@ public enum PoddRoles implements RestletUtilRole
     ADMIN("Administrator", "A repository administrator of the PODD System",
             "http://purl.org/podd/oas/roles/administrator", true),
     
-    AUTHENTICATED("Authenticated User", "A user of the PODD System", "http://purl.org/podd/oas/roles/authenticated",
-            false),
-    
     PROJECT_MEMBER("Project member", "A user who is a member of a particular project",
             "http://purl.org/podd/oas/roles/project_member", true),
     
@@ -35,8 +32,6 @@ public enum PoddRoles implements RestletUtilRole
     
     PROJECT_ADMIN("Project Administrator", "A user who is an administrator of a particular project",
             "http://purl.org/podd/oas/roles/project_administrator", true),
-    
-    ROLE_A("Role A", "A generic role", "http://purl.org/podd/oas/roles/role_a", true),
     
     ;
     
