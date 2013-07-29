@@ -193,6 +193,30 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 conn.add(nextUserUUID, PoddWebConstants.PODD_USER_HOMEPAGE, nextUser.getHomePage(), this.getContexts());
             }
             
+            if(nextUser.getTitle() != null)
+            {
+                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_TITLE, this.vf.createLiteral(nextUser.getTitle()),
+                        this.getContexts());
+            }
+            
+            if(nextUser.getPhone() != null)
+            {
+                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_PHONE, this.vf.createLiteral(nextUser.getPhone()),
+                        this.getContexts());
+            }
+            
+            if(nextUser.getAddress() != null)
+            {
+                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_ADDRESS,
+                        this.vf.createLiteral(nextUser.getAddress()), this.getContexts());
+            }
+            
+            if(nextUser.getPosition() != null)
+            {
+                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_POSITION,
+                        this.vf.createLiteral(nextUser.getPosition()), this.getContexts());
+            }
+            
             conn.commit();
         }
         catch(final RepositoryException e)
@@ -268,6 +292,30 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         if(uriVal != null)
         {
             result.setUri(PoddRdfConstants.VF.createURI(uriVal.stringValue()));
+        }
+        
+        final Value titleVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_TITLE);
+        if(titleVal != null)
+        {
+            result.setTitle(titleVal.stringValue());
+        }
+        
+        final Value phoneVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_PHONE);
+        if(phoneVal != null)
+        {
+            result.setPhone(phoneVal.stringValue());
+        }
+        
+        final Value addressVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_ADDRESS);
+        if(addressVal != null)
+        {
+            result.setAddress(addressVal.stringValue());
+        }
+        
+        final Value positionVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_POSITION);
+        if(positionVal != null)
+        {
+            result.setPosition(positionVal.stringValue());
         }
         
         return result;
@@ -379,6 +427,14 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(PoddSesameRealm.PARAM_USER_ORCID);
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_TITLE);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_PHONE);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_ADDRESS);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_POSITION);
         
         query.append(" WHERE ");
         query.append(" { ");
@@ -440,6 +496,34 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" <" + SesameRealmConstants.OAS_USEREMAIL + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_EMAIL);
+        query.append(" . } ");
+        
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddRdfConstants.PODD_USER_TITLE + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_TITLE);
+        query.append(" . } ");
+        
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddRdfConstants.PODD_USER_PHONE + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_PHONE);
+        query.append(" . } ");
+        
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddRdfConstants.PODD_USER_ADDRESS + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_ADDRESS);
+        query.append(" . } ");
+        
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddRdfConstants.PODD_USER_POSITION + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_POSITION);
         query.append(" . } ");
         
         // TODO: firstname, lastname, email are mandatory. add optional parameters: ORCID,

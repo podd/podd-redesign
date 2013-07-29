@@ -24,6 +24,10 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
     protected static final String PARAM_USER_IDENTIFIER = "userIdentifier";
     protected static final String PARAM_USER_ORCID = "userOrcid";
     protected static final String PARAM_USER_ORGANIZATION = "userOrganization";
+    protected static final String PARAM_USER_TITLE = "userTitle";
+    protected static final String PARAM_USER_PHONE = "userPhone";
+    protected static final String PARAM_USER_ADDRESS = "userAddress";
+    protected static final String PARAM_USER_POSITION = "userPosition";
     protected static final String PARAM_ROLE = "role";
     
     public PoddSesameRealm(final Repository repository, final URI... contexts)
