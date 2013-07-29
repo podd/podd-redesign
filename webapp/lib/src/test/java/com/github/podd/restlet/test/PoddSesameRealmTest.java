@@ -5,9 +5,7 @@ package com.github.podd.restlet.test;
 
 import info.aduna.iteration.Iterations;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -135,7 +133,7 @@ public class PoddSesameRealmTest
     }
     
     @Test
-    public void testGetCommonRolesForObjectsWithMiscCombinations() throws Exception
+    public void testGetRolesForObjectWithMiscCombinations() throws Exception
     {
         // -prepare: users
         final PoddUser user1 = this.addTestUser("john@example.com");
@@ -166,18 +164,22 @@ public class PoddSesameRealmTest
         this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object2URI);
         
         // -verify: common Role for 1 Object
-        final Collection<Role> commonRolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
-        Assert.assertEquals("Should be only 1 role", 1, commonRolesForObject1.size());
-        Assert.assertTrue("Project_Member role missing",
-                commonRolesForObject1.contains(PoddRoles.PROJECT_MEMBER.getRole()));
+        final Collection<Role> rolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
+        Assert.assertEquals("Should be only 1 role", 1, rolesForObject1.size());
+        Assert.assertTrue("Project_Member role missing", rolesForObject1.contains(PoddRoles.PROJECT_MEMBER.getRole()));
         
+        // -verify: common Role for 1 Object
+        final Collection<Role> rolesForObject3 = this.testRealm.getRolesForObject(user1, object3URI);
+        Assert.assertEquals("Should be 2 roles", 2, rolesForObject3.size());
+        Assert.assertTrue("Project_Observer role missing", rolesForObject3.contains(PoddRoles.PROJECT_OBSERVER.getRole()));
+        Assert.assertTrue("Project_Admin role missing", rolesForObject3.contains(PoddRoles.PROJECT_ADMIN.getRole()));
     }
     
     /**
      * Test that when there are no object URIs mapped for Roles, nothing is returned.
      */
     @Test
-    public void testGetCommonRolesForObjectsWithNoObjectUriMappings() throws Exception
+    public void testGetRolesForObjectWithNoObjectUriMappings() throws Exception
     {
         // -prepare: users
         final PoddUser user1 = this.addTestUser("john@example.com");
@@ -190,17 +192,15 @@ public class PoddSesameRealmTest
         this.testRealm.map(user1, PoddRoles.AUTHENTICATED.getRole());
         
         // -verify: common Role for Object 1
-        final Collection<Role> commonRolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
-        Assert.assertEquals("Should be 0 Roles", 0, commonRolesForObject1.size());
-        
-        // RdfUtils.printContents(this.testRepository, PoddSesameRealmTest.userMgtContext);
+        final Collection<Role> rolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
+        Assert.assertEquals("Should be 0 Roles", 0, rolesForObject1.size());
     }
     
     /**
      * Test common roles for a user when 2 objects are mapped with roles.
      */
     @Test
-    public void testGetCommonRolesForObjectsWithTwoObjects() throws Exception
+    public void testGetRolesForObjectWithTwoObjects() throws Exception
     {
         // -prepare: users
         final PoddUser user1 = this.addTestUser("john@example.com");
@@ -219,11 +219,9 @@ public class PoddSesameRealmTest
         this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object2URI);
         
         // -verify: common Role for 1 Object
-        final Collection<Role> commonRolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
-        Assert.assertEquals("Should be only 1 role", 1, commonRolesForObject1.size());
-        Assert.assertTrue("Project_Member role missing",
-                commonRolesForObject1.contains(PoddRoles.PROJECT_MEMBER.getRole()));
-        
+        final Collection<Role> rolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
+        Assert.assertEquals("Should be only 1 role", 1, rolesForObject1.size());
+        Assert.assertTrue("Project_Member role missing", rolesForObject1.contains(PoddRoles.PROJECT_MEMBER.getRole()));
     }
     
     @Test
