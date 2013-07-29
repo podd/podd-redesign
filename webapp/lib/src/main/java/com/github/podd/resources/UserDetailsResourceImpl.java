@@ -4,7 +4,6 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

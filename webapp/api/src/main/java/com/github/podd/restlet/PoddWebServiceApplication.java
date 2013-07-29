@@ -1,7 +1,5 @@
 package com.github.podd.restlet;
 
-import java.util.Collection;
-
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;

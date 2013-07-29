@@ -6,7 +6,6 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 

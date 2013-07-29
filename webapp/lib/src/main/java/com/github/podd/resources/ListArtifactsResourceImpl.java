@@ -6,7 +6,6 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
-import com.github.podd.utils.PoddObjectLabelImpl;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
