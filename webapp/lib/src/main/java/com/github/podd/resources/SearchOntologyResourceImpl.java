@@ -89,8 +89,16 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         this.log.info("requesting search ({}): {}, {}, {}", variant.getMediaType().getName(), searchTerm, artifactUri,
                 searchTypes);
         
-        // TODO - add a new PoddAction to suit the search.
-        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST, Collections.<URI> emptySet());
+        if(ontologyID == null)
+        {
+            // only when a Project Admin is creating a new artifact 
+            this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
+        }
+        else
+        {
+            this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
+                    Collections.singleton(ontologyID.getOntologyIRI().toOpenRDFURI()));
+        }
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
@@ -144,8 +152,16 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             }
         }
         
-        // TODO - add a new PoddAction to suit the search.
-        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST, Collections.<URI> emptySet());
+        if(ontologyID == null)
+        {
+            // only when a Project Admin is creating a new artifact 
+            this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
+        }
+        else
+        {
+            this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
+                    Collections.singleton(ontologyID.getOntologyIRI().toOpenRDFURI()));
+        }
         
         // - get input stream with incoming content
         InputStream inputStream = null;
