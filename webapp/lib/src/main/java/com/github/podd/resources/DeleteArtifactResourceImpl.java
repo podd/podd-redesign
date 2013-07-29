@@ -3,7 +3,6 @@
  */
 package com.github.podd.resources;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
                         "Did not find an artifacturi parameter in the request");
             }
             
-            this.checkAuthentication(PoddAction.ARTIFACT_DELETE, PoddRdfConstants.VF.createURI(artifactUri));
+            this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, PoddRdfConstants.VF.createURI(artifactUri));
             
             final InferredOWLOntologyID currentVersion =
                     this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
@@ -88,7 +87,7 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
         
-        this.checkAuthentication(PoddAction.ARTIFACT_DELETE, PoddRdfConstants.VF.createURI(artifactUri));
+        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, PoddRdfConstants.VF.createURI(artifactUri));
         
         this.log.info("deleteArtifactHtml");
         final User user = this.getRequest().getClientInfo().getUser();
