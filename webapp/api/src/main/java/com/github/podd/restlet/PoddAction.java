@@ -26,9 +26,10 @@ public enum PoddAction
     /**
      * An action by a user asking to create a new artifact.
      * 
-     * By default only administrator users are allowed to create artifacts.
+     * By default both project and repository administrator users are allowed to create artifacts.
      */
-    ARTIFACT_CREATE(true, "Could not create artifact.", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
+    ARTIFACT_CREATE(true, "Could not create artifact.", new HashSet<Role>(Arrays.asList(
+            PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), false),
     
     /**
      * An action by a user asking to update an existing artifact.
@@ -54,10 +55,12 @@ public enum PoddAction
      * unpublished artifacts.
      */
     UNPUBLISHED_ARTIFACT_READ(true, "Failed to read unpublished artifact", new HashSet<Role>(Arrays.asList(
-            PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), true),
+            PoddRoles.PROJECT_OBSERVER.getRole(), PoddRoles.PROJECT_ADMIN.getRole(),
+            PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), true),
     
     UNPUBLISHED_ARTIFACT_LIST(true, "Failed to list unpublished artifacts", new HashSet<Role>(Arrays.asList(
-            PoddRoles.AUTHENTICATED.getRole(), PoddRoles.ADMIN.getRole())), false),
+            PoddRoles.PROJECT_OBSERVER.getRole(), PoddRoles.PROJECT_ADMIN.getRole(),
+            PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), false),
     
     /**
      * An action by a user asking to read a published artifact.
@@ -93,8 +96,7 @@ public enum PoddAction
      * 
      * By default all authenticated users can request their user details.
      */
-    CURRENT_USER_READ(true, "Could not retrieve current user details", Collections.singleton(PoddRoles.AUTHENTICATED
-            .getRole()), false),
+    CURRENT_USER_READ(true, "Could not retrieve current user details", Collections.<Role> emptySet(), false),
     
     /**
      * An action by a user asking to fetch information about another user.
@@ -104,6 +106,21 @@ public enum PoddAction
      */
     OTHER_USER_READ(true, "Could not retrieve other user details", Collections.singleton(PoddRoles.ADMIN.getRole()),
             false),
+    
+    /**
+     * An action by an administrator asking to edit repository roles for a user.
+     * 
+     * By default only administrators are allowed to edit repository roles.
+     */
+    REPOSITORY_ROLE_EDIT(true, "Could not assign role", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
+    
+    /**
+     * An action by a project administrator to assign a role on a project.
+     * 
+     * By default only the administrators and project-admin users are allowed to edit project roles.
+     */
+    PROJECT_ROLE_EDIT(true, "Could not assign role", new HashSet<Role>(Arrays.asList(PoddRoles.PROJECT_ADMIN.getRole(),
+            PoddRoles.ADMIN.getRole())), true),
     
     /**
      * An action by a user asking to fetch information about a data repository.
