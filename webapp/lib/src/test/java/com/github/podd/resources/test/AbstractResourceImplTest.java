@@ -1,5 +1,7 @@
 package com.github.podd.resources.test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,6 +14,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -21,14 +25,15 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.Timeout;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
-import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.Component;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -36,10 +41,12 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Status;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
@@ -47,6 +54,7 @@ import com.github.podd.restlet.PoddWebServiceApplicationImpl;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -313,6 +321,86 @@ public class AbstractResourceImplTest
     }
     
     /**
+     * 
+     * Load a new test PoddUser
+     * 
+     * @return A String representation of the unique URI assigned to the new User
+     */
+    protected String loadTestUser(final String testIdentifier, final String testPassword, final String testFirstName,
+            final String testLastName, final String testHomePage, final String testOrganization,
+            final String testOrcid, final String testTitle, final String testPhone, final String testAddress,
+            final String testPosition, final Map<URI, URI> roles) throws Exception
+    {
+        // - create a Model of user
+        final Model userInfoModel = new LinkedHashModel();
+        final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
+                PoddRdfConstants.VF.createLiteral(testIdentifier));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
+                PoddRdfConstants.VF.createLiteral(testPassword));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
+                PoddRdfConstants.VF.createLiteral(testFirstName));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
+                PoddRdfConstants.VF.createLiteral(testLastName));
+        userInfoModel
+                .add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE, PoddRdfConstants.VF.createURI(testHomePage));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
+                PoddRdfConstants.VF.createLiteral(testOrganization));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral(testOrcid));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL,
+                PoddRdfConstants.VF.createLiteral(testIdentifier));
+        
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(testTitle));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(testPhone));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ADDRESS,
+                PoddRdfConstants.VF.createLiteral(testAddress));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_POSITION,
+                PoddRdfConstants.VF.createLiteral(testPosition));
+        
+        // prepare: add Role Mappings
+        for(Map.Entry<URI, URI> entry : roles.entrySet())
+        {
+            URI role = entry.getKey();
+            URI mappedObject = entry.getValue();
+            
+            final URI roleMapping =
+                    PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
+            userInfoModel.add(roleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
+            userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
+            userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, role);
+            if(mappedObject != null)
+            {
+                userInfoModel.add(roleMapping, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, mappedObject);
+            }
+        }
+        
+        // - request new user creation from User Add RDF Service
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
+        final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
+        
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Rio.write(userInfoModel, out, format);
+        final Representation input = new StringRepresentation(out.toString(), mediaType);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        // verify: response has 1 statement and identifier is correct
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)),
+                        RDFFormat.RDFXML, 1);
+        Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        
+        // return the unique URI assigned to this User
+        Resource next = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
+        return next.stringValue();
+    }    
+    
+    /**
      * Create a new server for each test.
      * 
      * State will only be shared when they use a common database.
@@ -370,5 +458,6 @@ public class AbstractResourceImplTest
         // nullify the reference to the component
         this.component = null;
     }
+
     
 }
