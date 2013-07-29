@@ -56,7 +56,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     @Get
-    public Representation getUserDetailsPageHtml(final Representation entity) throws ResourceException
+    public Representation getUserAddPageHtml(final Representation entity) throws ResourceException
     {
         this.log.info("addUserHtml");
         
@@ -199,11 +199,13 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         
         final String firstName = model.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString();
         final String lastName = model.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString();
+        // PODD-specific requirement. First/Last names are mandatory.
         if(firstName == null || lastName == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User First/Last name cannot be empty");
         }
         
+        // PODD-specific requirement. Email has to be present and equal to the user Identifier.
         final String email = model.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).objectString();
         if(email == null)
         {
@@ -216,25 +218,16 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         }
         
         final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
-        if(homePage == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Home Page cannot be empty");
-        }
-        
         final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
-        if(organization == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Organization cannot be empty");
-        }
         final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
-        if(orcidID == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User ORCID ID cannot be empty");
-        }
-        
+        final String title = model.filter(null, PoddRdfConstants.PODD_USER_TITLE, null).objectString();
+        final String phone = model.filter(null, PoddRdfConstants.PODD_USER_PHONE, null).objectString();
+        final String address = model.filter(null, PoddRdfConstants.PODD_USER_ADDRESS, null).objectString();
+        final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
+
         final PoddUser user =
                 new PoddUser(identifier, password.toCharArray(), firstName, lastName, email, PoddUserStatus.ACTIVE,
-                        homePage, organization, orcidID);
+                        homePage, organization, orcidID, title, phone, address, position);
         
         return user;
     }

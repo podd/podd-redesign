@@ -6,13 +6,13 @@ package com.github.podd.resources.test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
@@ -38,6 +38,9 @@ import com.github.podd.utils.PoddWebConstants;
 public class UserAddResourceImplTest extends AbstractResourceImplTest
 {
     
+    /**
+     * Test adding a PoddUser without using the utility method AbstractResourceImplTest.loadTestUser() 
+     */
     @Test
     public void testAddUserRdfBasic() throws Exception
     {
@@ -106,91 +109,72 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
     }
     
-    
-    /**
-     * FIXME: in progress
-     * 
-     * Add a new PoddUser
-     * 
-     * @return A String representation of the unique URI assigned to the new User
-     */
-    protected String addTestUser(final String testIdentifier, final String testPassword, final String testFirstName,
-            final String testLastName, final String testHomePage, final String testOrganization,
-            final String testOrcid, final String testTitle, final String testPhone, final String testAddress,
-            final String testPosition, final Map<URI, URI> roles) throws Exception
+    @Test
+    public void testAddUserWithAllAttributesRdf() throws Exception
     {
-        // - create a Model of user
-        final Model userInfoModel = new LinkedHashModel();
-        final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
-                PoddRdfConstants.VF.createLiteral(testPassword));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(testFirstName));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
-                PoddRdfConstants.VF.createLiteral(testLastName));
-        userInfoModel
-                .add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE, PoddRdfConstants.VF.createURI(testHomePage));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
-                PoddRdfConstants.VF.createLiteral(testOrganization));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral(testOrcid));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
-        
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(testTitle));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(testPhone));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ADDRESS,
-                PoddRdfConstants.VF.createLiteral(testAddress));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_POSITION,
-                PoddRdfConstants.VF.createLiteral(testPosition));
-        
-        // prepare: add 'Authenticated User' Role
-        final URI authenticatedRoleMapping =
-                PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
-        userInfoModel.add(authenticatedRoleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
-        userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
-        userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
-                PoddRoles.AUTHENTICATED.getURI());
-        
-        // handle Roles
-        for(Map.Entry<URI, URI> entry : roles.entrySet())
-        {
-            URI role = entry.getKey();
-            URI mappedObject = entry.getValue();
-            
-            final URI observerRoleMapping =
-                    PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
-            userInfoModel.add(observerRoleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
-            userInfoModel.add(observerRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
-            userInfoModel.add(observerRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, role);
-            if(mappedObject != null)
-            {
-                userInfoModel.add(observerRoleMapping, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, mappedObject);
-            }
-        }
-        
-        // - request new user creation from User Add RDF Service
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final Map<URI, URI> roles = new HashMap<URI, URI>();
+        roles.put(PoddRoles.AUTHENTICATED.getURI(), null);
+        roles.put(PoddRoles.ADMIN.getURI(), null);
+        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        String testUserUri =
+                this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
+                        "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address",
+                        "Researcher", roles);
+
+        // verify: 
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-        
-        final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
-        
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(userInfoModel, out, format);
-        
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
+
+        final ClientResource userDetailsClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
         
         final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        
+        final Model resultsModel =
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 20);
+        
+        com.github.podd.utils.DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Resource next = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
-        return next.stringValue();
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        Assert.assertEquals("Unexpected user URI", testUserUri,
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
     }
     
+    @Test
+    public void testAddUserWithOnlyMandatoryAttributesRdf() throws Exception
+    {
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final Map<URI, URI> roles = new HashMap<URI, URI>();
+        roles.put(PoddRoles.AUTHENTICATED.getURI(), null);
+        roles.put(PoddRoles.ADMIN.getURI(), null);
+        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        String testUserUri = this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null,
+                null, null, null, null, null, roles);
+
+        // verify: 
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+
+        final ClientResource userDetailsClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final Model resultsModel =
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 13);
+        
+        //com.github.podd.utils.DebugUtils.printContents(resultsModel);
+        Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        Assert.assertEquals("Unexpected user URI", testUserUri,
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
+    }
+
 }
