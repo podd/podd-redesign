@@ -215,6 +215,27 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
                     PoddRdfConstants.VF.createLiteral(user.getOrcid()));
         }
         
+        if (user.getTitle() != null)
+        {
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(user.getTitle()));
+        }
+        
+        if (user.getPhone() != null)
+        {
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(user.getPhone()));
+        }
+
+        if (user.getAddress() != null)
+        {
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_ADDRESS, PoddRdfConstants.VF.createLiteral(user.getAddress()));
+        }
+        
+        if (user.getPosition() != null)
+        {
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_POSITION, PoddRdfConstants.VF.createLiteral(user.getPosition()));
+        }
+        
+        
         this.log.debug("User has {} roles", roles.size());
         final Iterator<Role> iterator = roles.iterator();
         while(iterator.hasNext())
