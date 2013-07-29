@@ -62,6 +62,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
+import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -255,6 +256,53 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
+    public PoddUser getUserDetails(final String userIdentifier) throws PoddClientException
+    {
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final ClientResource resource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS) + userIdentifier);
+        resource.getCookies().addAll(this.currentCookies);
+        
+        try
+        {
+            final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+            
+            if(!resource.getStatus().equals(Status.SUCCESS_OK))
+            {
+                throw new PoddClientException("Server returned a non-success status code: "
+                        + resource.getStatus().toString());
+            }
+            
+            final InputStream stream = getResponse.getStream();
+            
+            if(stream == null)
+            {
+                throw new PoddClientException("Did not receive valid response from server");
+            }
+            
+            final RDFFormat format =
+                    Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
+            
+            Model model = Rio.parse(stream, "", format);
+            
+            throw new RuntimeException("TODO: Implement me");
+        }
+        catch(final RDFParseException e)
+        {
+            throw new PoddClientException("Failed to parse RDF", e);
+        }
+        catch(final ResourceException e)
+        {
+            throw new PoddClientException("Failed to communicate with PODD Server", e);
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Input output exception while parsing RDF", e);
+        }
+    }
+    
+    @Override
     public boolean isLoggedIn()
     {
         return !this.currentCookies.isEmpty();
@@ -442,6 +490,13 @@ public class RestletPoddClientImpl implements PoddClient
         this.log.info("cookies: {}", this.currentCookies);
         
         return this.listArtifactsInternal(false, true);
+    }
+    
+    @Override
+    public List<PoddUser> listUsers() throws PoddClientException
+    {
+        // Implement this when the service is available
+        throw new RuntimeException("TODO: Implement me!");
     }
     
     /*
