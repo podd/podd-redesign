@@ -321,41 +321,75 @@ public class AbstractResourceImplTest
     }
     
     /**
-     * 
-     * Load a new test PoddUser
+     * Load a new test PoddUser. Does not check for presence of mandatory attributes.
      * 
      * @return A String representation of the unique URI assigned to the new User
      */
     protected String loadTestUser(final String testIdentifier, final String testPassword, final String testFirstName,
-            final String testLastName, final String testHomePage, final String testOrganization,
+            final String testLastName, final String testEmail, final String testHomePage, final String testOrganization,
             final String testOrcid, final String testTitle, final String testPhone, final String testAddress,
             final String testPosition, final Map<URI, URI> roles) throws Exception
     {
         // - create a Model of user
         final Model userInfoModel = new LinkedHashModel();
         final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
-                PoddRdfConstants.VF.createLiteral(testPassword));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(testFirstName));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
-                PoddRdfConstants.VF.createLiteral(testLastName));
-        userInfoModel
+        if (testIdentifier != null)
+        {
+            userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
+                    PoddRdfConstants.VF.createLiteral(testIdentifier));
+        }
+        if (testPassword != null)
+        {
+            userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
+                    PoddRdfConstants.VF.createLiteral(testPassword));
+        }
+        if (testFirstName != null)
+        {
+            userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
+                    PoddRdfConstants.VF.createLiteral(testFirstName));
+        }
+        if (testLastName != null)
+        {
+            userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
+                    PoddRdfConstants.VF.createLiteral(testLastName));
+        }
+        if (testHomePage != null)
+        {
+            userInfoModel
                 .add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE, PoddRdfConstants.VF.createURI(testHomePage));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
-                PoddRdfConstants.VF.createLiteral(testOrganization));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral(testOrcid));
-        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL,
-                PoddRdfConstants.VF.createLiteral(testIdentifier));
-        
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(testTitle));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(testPhone));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ADDRESS,
-                PoddRdfConstants.VF.createLiteral(testAddress));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_POSITION,
+        }
+        if (testOrganization != null)
+        {
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
+                    PoddRdfConstants.VF.createLiteral(testOrganization));
+        }
+        if (testOrcid != null)
+        {
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral(testOrcid));
+        }
+        if (testEmail != null)
+        {
+            userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL,
+                    PoddRdfConstants.VF.createLiteral(testEmail));
+        }
+        if (testTitle != null)
+        {
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(testTitle));
+        }
+        if (testPhone != null)
+        {
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(testPhone));
+        }
+        if (testAddress != null)
+        {
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ADDRESS,
+                    PoddRdfConstants.VF.createLiteral(testAddress));
+        }
+        if (testPosition != null)
+        {
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_POSITION,
                 PoddRdfConstants.VF.createLiteral(testPosition));
+        }
         
         // prepare: add Role Mappings
         for(Map.Entry<URI, URI> entry : roles.entrySet())
