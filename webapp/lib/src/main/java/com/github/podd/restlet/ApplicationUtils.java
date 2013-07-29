@@ -356,7 +356,6 @@ public class ApplicationUtils
                 new PoddUser("testUser", "testPassword".toCharArray(), "Test", "User", "test.user@example.com",
                         PoddUserStatus.ACTIVE, testUserHomePage, "CSIRO", "Orcid-Test-User");
         final URI testUserUri = nextRealm.addUser(testUser);
-        nextRealm.map(testUser, PoddRoles.AUTHENTICATED.getRole());
         
         final URI testAdminUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testAdmin");
         final PoddUser testAdminUser =
@@ -365,7 +364,6 @@ public class ApplicationUtils
                         "Orcid-Test-Admin");
         final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
         nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
-        nextRealm.map(testAdminUser, PoddRoles.AUTHENTICATED.getRole());
         
         final URI testArtifactUri = PoddRdfConstants.VF.createURI("http://purl.org/podd/ns/artifact/artifact89");
         nextRealm.map(testAdminUser, PoddRoles.PROJECT_ADMIN.getRole(), testArtifactUri);
