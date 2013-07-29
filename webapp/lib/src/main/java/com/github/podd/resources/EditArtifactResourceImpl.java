@@ -81,8 +81,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         // Once we find the artifact URI, check authentication for it immediately
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactUri)));
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         
         final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
         
@@ -146,7 +145,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        final RDFFormat outputFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML); 
+        final RDFFormat outputFormat =
+                Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         // - do the artifact update
         try
         {
@@ -200,8 +200,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("requesting to edit artifact (HTML): {}, {}", artifactUri, objectToEdit);
         
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                Collections.singleton(PoddRdfConstants.VF.createURI(artifactUri)));
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
@@ -225,13 +224,14 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         try
         {
             URI objectUri = null;
-
+            
             // objectUri
             if(objectToEdit == null)
             {
                 // set the top object as the object URI
-                final List<PoddObjectLabel> topObjectLabels = this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(ontologyID));
-                if (topObjectLabels.size() > 0)
+                final List<PoddObjectLabel> topObjectLabels =
+                        this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(ontologyID));
+                if(topObjectLabels.size() > 0)
                 {
                     objectUri = topObjectLabels.get(0).getObjectURI();
                 }
@@ -240,13 +240,14 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 objectUri = PoddRdfConstants.VF.createURI(objectToEdit);
             }
-            if (objectUri != null)
+            if(objectUri != null)
             {
                 dataModel.put("objectUri", objectUri.toString());
             }
-
+            
             // objectType
-            final List<PoddObjectLabel> objectTypes = this.getPoddArtifactManager().getObjectTypes(ontologyID, objectUri);
+            final List<PoddObjectLabel> objectTypes =
+                    this.getPoddArtifactManager().getObjectTypes(ontologyID, objectUri);
             if(objectTypes == null || objectTypes.isEmpty())
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not determine type of object");
@@ -256,7 +257,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             
             // Parent Details
             final Model parentDetails = this.getPoddArtifactManager().getParentDetails(ontologyID, objectUri);
-            if (parentDetails.size() == 1)
+            if(parentDetails.size() == 1)
             {
                 final Statement statement = parentDetails.iterator().next();
                 dataModel.put("parentUri", statement.getSubject().stringValue());

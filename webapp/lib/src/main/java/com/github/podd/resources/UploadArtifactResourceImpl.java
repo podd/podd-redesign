@@ -153,9 +153,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     public Representation getUploadArtifactPage(final Representation entity) throws ResourceException
     {
         // even though this only does a page READ, we're checking authorization for CREATE since the
-        // page
-        // is for creating a new artifact via a file upload
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
+        // page is for creating a new artifact via a file upload
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
         this.log.info("@Get UploadArtifactFile Page");
         
@@ -175,7 +174,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     @Post(":html")
     public Representation uploadArtifactFileHtml(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
         this.log.info("@Post UploadArtifactFile Page");
         
@@ -200,7 +199,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     public Representation uploadArtifactToRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
         this.log.info("@Post uploadArtifactFile RDF ({})", variant.getMediaType().getName());
         
@@ -294,7 +293,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     public Representation uploadArtifactToText(final Representation entity, final Variant variant)
         throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
+        this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         
         this.log.info("@Post uploadArtifactFile ({})", variant.getMediaType().getName());
         

@@ -49,7 +49,7 @@ public abstract class PoddWebServiceApplication extends Application
      * @return True if the request is authenticated, and false otherwise.
      */
     public abstract boolean authenticate(PoddAction action, Request request, Response response,
-            Collection<URI> optionalObjectUris);
+            URI optionalObjectUri);
     
     public abstract Model getAliasesConfiguration();
     

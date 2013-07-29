@@ -113,8 +113,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 
                 for(final InferredOWLOntologyID nextPublishedArtifact : publishedArtifacts)
                 {
-                    if(this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ,
-                            Arrays.asList(nextPublishedArtifact.getOntologyIRI().toOpenRDFURI()), false))
+                    if(this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, nextPublishedArtifact
+                            .getOntologyIRI().toOpenRDFURI(), false))
                     {
                         // If the authentication succeeded add the artifact
                         publishedResults.add(nextPublishedArtifact);
@@ -140,7 +140,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 for(final InferredOWLOntologyID nextUnpublishedArtifact : unpublishedArtifacts)
                 {
                     if(this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
-                            Arrays.asList(nextUnpublishedArtifact.getOntologyIRI().toOpenRDFURI()), false))
+                            nextUnpublishedArtifact.getOntologyIRI().toOpenRDFURI(), false))
                     {
                         // If the authentication succeeded add the artifact
                         unpublishedResults.add(nextUnpublishedArtifact);

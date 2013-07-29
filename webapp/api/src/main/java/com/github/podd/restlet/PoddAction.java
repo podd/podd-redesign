@@ -32,6 +32,14 @@ public enum PoddAction
             PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), false),
     
     /**
+     * An action by a user asking to delete an existing artifact.
+     * 
+     * By default both project and repository administrator users are allowed to delete artifacts.
+     */
+    ARTIFACT_DELETE(true, "Could not delete artifact.", new HashSet<Role>(Arrays.asList(
+            PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), true),
+    
+    /**
      * An action by a user asking to update an existing artifact.
      * 
      * By default administrator, project-admin and project-member users are allowed to update

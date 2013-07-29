@@ -63,17 +63,16 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
         final boolean includeDoNotDisplayProperties = Boolean.valueOf(includeDoNotDisplayPropertiesString);
         
         // - metadata policy (optional, default is to exclude sub-properties of poddBase:contains)
-        final String metadataPolicyString =
-                this.getQuery().getFirstValue(PoddWebConstants.KEY_METADATA_POLICY, true);
+        final String metadataPolicyString = this.getQuery().getFirstValue(PoddWebConstants.KEY_METADATA_POLICY, true);
         
         MetadataPolicy containsPropertyPolicy = MetadataPolicy.EXCLUDE_CONTAINS;
-        if (metadataPolicyString != null)
+        if(metadataPolicyString != null)
         {
-            if (metadataPolicyString.equalsIgnoreCase(PoddWebConstants.METADATA_ONLY_CONTAINS))
+            if(metadataPolicyString.equalsIgnoreCase(PoddWebConstants.METADATA_ONLY_CONTAINS))
             {
                 containsPropertyPolicy = MetadataPolicy.ONLY_CONTAINS;
             }
-            else if (metadataPolicyString.equalsIgnoreCase(PoddWebConstants.METADATA_ALL))
+            else if(metadataPolicyString.equalsIgnoreCase(PoddWebConstants.METADATA_ALL))
             {
                 containsPropertyPolicy = MetadataPolicy.INCLUDE_ALL;
             }
@@ -81,7 +80,15 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("@Get Metadata: {} ({})", objectType, variant.getMediaType().getName());
         
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
+        if(artifactUri == null)
+        {
+            // looks like adding a new Artifact (ie, a new Project)
+            this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
+        }
+        else
+        {
+            this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
+        }
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);

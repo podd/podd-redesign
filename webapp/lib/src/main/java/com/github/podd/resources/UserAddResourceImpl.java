@@ -64,9 +64,8 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         this.log.info("authenticated user: {}", user);
         
         // identify needed Action
-        final PoddAction action = PoddAction.USER_CREATE;
+        this.checkAuthentication(PoddAction.USER_CREATE);
         
-        this.checkAuthentication(action, Collections.<URI> emptySet());
         // completed checking authorization
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
@@ -94,7 +93,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
     public Representation addUserRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         // check authentication first
-        this.checkAuthentication(PoddAction.USER_CREATE, Collections.<URI> emptyList());
+        this.checkAuthentication(PoddAction.USER_CREATE);
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         

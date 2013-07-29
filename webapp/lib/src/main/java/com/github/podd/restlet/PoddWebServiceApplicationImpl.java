@@ -2,7 +2,10 @@ package com.github.podd.restlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -133,7 +136,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
      */
     @Override
     public boolean authenticate(final PoddAction action, final Request request, final Response response,
-            final Collection<URI> optionalObjectUris)
+            final URI optionalObjectUri)
     {
         if(!action.isAuthRequired())
         {
@@ -177,7 +180,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             return true;
         }
         
-        else if(optionalObjectUris == null || optionalObjectUris.isEmpty())
+        else if(optionalObjectUri == null)
         {
             this.log.error("Action requires object URIs and none were given: {}", action);
             
@@ -186,12 +189,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         else
         {
             final Collection<Role> rolesCommonAcrossGivenObjects =
-                    this.getRealm().getCommonRolesForObjects(request.getClientInfo().getUser(), optionalObjectUris);
+                    this.getRealm().getRolesForObject(request.getClientInfo().getUser(), optionalObjectUri);
             
             if(!action.matchesForRoles(rolesCommonAcrossGivenObjects))
             {
                 this.log.error("Authenticated user does not have enough privileges to execute the given action: {}"
-                        + " on the given objects: {}", action, optionalObjectUris);
+                        + " on the given objects: {}", action, optionalObjectUri);
                 return false;
             }
         }
@@ -275,7 +278,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.debug("attaching user add service to path={}", userAddPath);
         router.attach(userAddPath, UserAddResourceImpl.class);
         
-        // TODO: add routes for other user management pages. (Edit User, Change Password, Modify Roles etc.)
+        // TODO: add routes for other user management pages. (Edit User, Change Password, Modify
+        // Roles etc.)
         
         // Add a route for the List Artifacts page.
         final String listArtifactsPath = PoddWebConstants.PATH_ARTIFACT_LIST;

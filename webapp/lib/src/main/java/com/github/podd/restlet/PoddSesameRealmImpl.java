@@ -335,7 +335,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
      * @return
      */
     @Override
-    protected String buildSparqlQueryForCommonObjectRoles(final String userIdentifier, final Collection<URI> objectUris)
+    protected String buildSparqlQueryForCommonObjectRoles(final String userIdentifier, final URI objectUri)
     {
         this.log.debug("Building SPARQL query for common Roles across Objects");
         
@@ -376,21 +376,9 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" <" + PoddWebConstants.PODD_ROLEMAPPEDOBJECT + "> ");
         query.append(" ?object . ");
         
-        if(!objectUris.isEmpty())
-        {
-            query.append(" FILTER ( ?object IN (");
-            boolean first = true;
-            for(final URI objectUri : objectUris)
-            {
-                if(!first)
-                {
-                    query.append(", ");
-                }
-                first = false;
-                query.append("<" + objectUri.stringValue() + ">");
-            }
-            query.append(") ) ");
-        }
+        query.append(" FILTER ( ?object IN (");
+        query.append("<" + objectUri.stringValue() + ">");
+        query.append(") ) ");
         
         query.append(" } ");
         
@@ -547,11 +535,11 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
      * For a given User, this method finds Role Mappings common across ALL the given object URIs.
      * 
      * @param user
-     * @param objectUris
+     * @param objectUri
      * @return A Collection of Roles that are common for ALL given object URIs
      */
     @Override
-    public Collection<Role> getCommonRolesForObjects(final User user, final Collection<URI> objectUris)
+    public Collection<Role> getRolesForObject(final User user, final URI objectUri)
     {
         if(user == null)
         {
@@ -565,7 +553,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         {
             conn = this.getRepository().getConnection();
             
-            final String query = this.buildSparqlQueryForCommonObjectRoles(user.getIdentifier(), objectUris);
+            final String query = this.buildSparqlQueryForCommonObjectRoles(user.getIdentifier(), objectUri);
             
             if(this.log.isDebugEnabled())
             {

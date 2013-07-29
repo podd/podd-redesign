@@ -42,7 +42,7 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
     protected boolean checkAuthentication(final PoddAction action) throws ResourceException
     {
         // throws an error on failure
-        return this.checkAuthentication(action, Collections.<URI> emptyList(), true);
+        return this.checkAuthentication(action, null, true);
     }
     
     /**
@@ -58,7 +58,7 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
      *             with Status.CLIENT_ERROR_UNAUTHORIZED (HTTP 401) if the user is not authorised to
      *             perform the given action
      */
-    protected boolean checkAuthentication(final PoddAction action, final Collection<URI> optionalObjectUris)
+    protected boolean checkAuthentication(final PoddAction action, final URI optionalObjectUris)
         throws ResourceException
     {
         // throws an error on failure
@@ -84,15 +84,9 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
      *             with Status.CLIENT_ERROR_UNAUTHORIZED (HTTP 401) if the user is not authorised to
      *             perform the given action
      */
-    protected boolean checkAuthentication(final PoddAction action, final Collection<URI> optionalObjectUris,
+    protected boolean checkAuthentication(final PoddAction action, final URI optionalObjectUris,
             final boolean throwExceptionOnFailure) throws ResourceException
     {
-        if(optionalObjectUris == null)
-        {
-            throw new RuntimeException(
-                    "NULL received for Object URI Collection. Resource should pass an empty Collection at least.");
-        }
-        
         if(this.getPoddApplication().authenticate(action, this.getRequest(), this.getResponse(), optionalObjectUris))
         {
             return true;

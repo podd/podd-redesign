@@ -69,17 +69,17 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
         final String parentUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_IDENTIFIER);
-        final String parentPredicateUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_PREDICATE_IDENTIFIER);
+        final String parentPredicateUri =
+                this.getQuery().getFirstValue(PoddWebConstants.KEY_PARENT_PREDICATE_IDENTIFIER);
         
         if(artifactUri == null)
         {
             // looks like adding a new Artifact (ie, a new Project)
-            this.checkAuthentication(PoddAction.ARTIFACT_CREATE, Collections.<URI> emptySet());
+            this.checkAuthentication(PoddAction.ARTIFACT_CREATE);
         }
         else
         {
-            this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                    Collections.singleton(PoddRdfConstants.VF.createURI(artifactUri)));
+            this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         }
         
         final PoddObjectLabel objectTypeLabel = this.getObjectTypeLabel(artifactUri, objectType);
@@ -96,12 +96,12 @@ public class AddObjectResourceImpl extends AbstractPoddResourceImpl
         {
             // adding a child object to an existing artifact
             
-            if (parentUri == null)
+            if(parentUri == null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "parent URI not specified");
             }
             
-            if (parentPredicateUri == null)
+            if(parentPredicateUri == null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "parent predicate URI not specified");
             }

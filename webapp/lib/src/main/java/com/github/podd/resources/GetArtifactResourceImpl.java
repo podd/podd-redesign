@@ -71,8 +71,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("requesting get artifact (HTML): {}, {}, {}", artifactString, versionString, objectToView);
         
-        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
-                Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactString)));
+        // FIXME: The artifact may be published here
+        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, PoddRdfConstants.VF.createURI(artifactString));
         // completed checking authorization
         
         final User user = this.getRequest().getClientInfo().getUser();
@@ -100,7 +100,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
         dataModel.put("pageTitle", "View Artifact");
-
+        
         try
         {
             this.populateDataModelWithArtifactData(ontologyID, objectToView, dataModel);
@@ -141,8 +141,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             
             this.log.info("requesting get artifact ({}): {}", variant.getMediaType().getName(), artifactString);
             
+            // FIXME: The artifact may be published here
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
-                    Collections.<URI> singleton(PoddRdfConstants.VF.createURI(artifactString)));
+                    PoddRdfConstants.VF.createURI(artifactString));
             // completed checking authorization
             
             final User user = this.getRequest().getClientInfo().getUser();
@@ -161,7 +162,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             
             final String includeInferredString =
-                    this.getRequest().getResourceRef().getQueryAsForm().getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
+                    this.getRequest().getResourceRef().getQueryAsForm()
+                            .getFirstValue(PoddWebConstants.KEY_INCLUDE_INFERRED, true);
             final boolean includeInferred = Boolean.valueOf(includeInferredString);
             
             this.getPoddApplication()
@@ -251,9 +253,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // FIXME: determine based on project status and user authorization
         dataModel.put("canEditObject", true);
         
-        //FIXME: should be set based on the current object and user authorization
+        // FIXME: should be set based on the current object and user authorization
         dataModel.put("canAddChildren", true);
-
+        
         dataModel.put("selectedObjectCount", 0);
         dataModel.put("childHierarchyList", Collections.emptyList());
         
@@ -275,15 +277,16 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      * @throws OpenRDFException
      */
     private void populateParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri,
-            final Map<String, Object> dataModel) throws OpenRDFException {
-
+            final Map<String, Object> dataModel) throws OpenRDFException
+    {
+        
         final Model parentDetails = this.getPoddArtifactManager().getParentDetails(ontologyID, objectUri);
-        if (parentDetails.size() == 1)
+        if(parentDetails.size() == 1)
         {
             final Statement statement = parentDetails.iterator().next();
             
             final Map<String, String> parentMap = new HashMap<>();
-
+            
             final String parentUriString = statement.getSubject().stringValue();
             parentMap.put("uri", parentUriString);
             
@@ -293,23 +296,28 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             // - parent's Title
             String parentLabel = "Missing Title";
             final PoddObjectLabel objectLabel = this.getPoddArtifactManager().getObjectLabel(ontologyID, parentUri);
-            if (objectLabel != null) {
+            if(objectLabel != null)
+            {
                 parentLabel = objectLabel.getLabel();
             }
             parentMap.put("label", parentLabel);
             
             // - parent relationship Label
             String predicateLabel = "Missing parent relationship";
-            final PoddObjectLabel predicateLabelModel = this.getPoddArtifactManager().getObjectLabel(ontologyID, parentPredicateUri);
-            if (predicateLabelModel != null) {
+            final PoddObjectLabel predicateLabelModel =
+                    this.getPoddArtifactManager().getObjectLabel(ontologyID, parentPredicateUri);
+            if(predicateLabelModel != null)
+            {
                 predicateLabel = predicateLabelModel.getLabel();
             }
             parentMap.put("relationship", predicateLabel);
             
             // - parent's Type
             String parentType = "Unknown Type";
-            final List<PoddObjectLabel> objectTypes = this.getPoddArtifactManager().getObjectTypes(ontologyID, parentUri);
-            if (objectTypes.size() > 0) {
+            final List<PoddObjectLabel> objectTypes =
+                    this.getPoddArtifactManager().getObjectTypes(ontologyID, parentUri);
+            if(objectTypes.size() > 0)
+            {
                 parentType = objectTypes.get(0).getLabel();
             }
             parentMap.put("type", parentType);

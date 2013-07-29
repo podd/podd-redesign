@@ -166,84 +166,11 @@ public class PoddSesameRealmTest
         this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object2URI);
         
         // -verify: common Role for 1 Object
-        final Collection<Role> commonRolesForObject1 =
-                this.testRealm.getCommonRolesForObjects(user1, Collections.singleton(object1URI));
+        final Collection<Role> commonRolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
         Assert.assertEquals("Should be only 1 role", 1, commonRolesForObject1.size());
         Assert.assertTrue("Project_Member role missing",
                 commonRolesForObject1.contains(PoddRoles.PROJECT_MEMBER.getRole()));
         
-        // -verify: common Roles between Objects 1 and 2
-        final Collection<Role> commonRolesForObjects1And2 =
-                this.testRealm.getCommonRolesForObjects(user1, Arrays.asList(object1URI, object2URI));
-        Assert.assertEquals("Should be 1 common role", 1, commonRolesForObjects1And2.size());
-        Assert.assertTrue("Project_Member role missing",
-                commonRolesForObjects1And2.contains(PoddRoles.PROJECT_MEMBER.getRole()));
-        
-        // -verify: common Roles between Objects 1 and 3
-        final Collection<Role> commonRolesForObjects1And3 =
-                this.testRealm.getCommonRolesForObjects(user1, Arrays.asList(object1URI, object3URI));
-        Assert.assertEquals("Should be no common role", 0, commonRolesForObjects1And3.size());
-        
-        // -verify: common Roles between Objects 1,2,3
-        final Collection<Role> commonRolesForObjects123 =
-                this.testRealm.getCommonRolesForObjects(user1, Arrays.asList(object1URI, object2URI, object3URI));
-        Assert.assertEquals("Should be no common role", 0, commonRolesForObjects123.size());
-        
-        // -verify: common Roles between Objects 3 and 4
-        final Collection<Role> commonRolesForObjects3And4 =
-                this.testRealm.getCommonRolesForObjects(user1, Arrays.asList(object3URI, object4URI));
-        Assert.assertEquals("Should be 1 common role", 2, commonRolesForObjects3And4.size());
-        Assert.assertTrue("Project_Admin role missing",
-                commonRolesForObjects3And4.contains(PoddRoles.PROJECT_ADMIN.getRole()));
-        Assert.assertTrue("Project_Observer role missing",
-                commonRolesForObjects3And4.contains(PoddRoles.PROJECT_OBSERVER.getRole()));
-        
-        // -verify: common Roles between Objects 1,2,4
-        final Collection<Role> commonRolesForObjects124 =
-                this.testRealm.getCommonRolesForObjects(user1, Arrays.asList(object1URI, object2URI, object4URI));
-        Assert.assertEquals("Should be 0 common roles", 0, commonRolesForObjects124.size());
-        
-        // -verify: common Roles between Objects 1 and 2 for User 2
-        final Collection<Role> user2CommonRolesForObjects1And2 =
-                this.testRealm.getCommonRolesForObjects(user2, Arrays.asList(object1URI, object2URI));
-        Assert.assertEquals("Should be 1 common role", 1, user2CommonRolesForObjects1And2.size());
-        Assert.assertTrue("Role_A role missing", user2CommonRolesForObjects1And2.contains(PoddRoles.ROLE_A.getRole()));
-    }
-    
-    /**
-     * Test that common Roles between DIFFERENT users for the requires set of Objects are not
-     * considered together.
-     */
-    @Test
-    public void testGetCommonRolesForObjectsWithMultipleUsers() throws Exception
-    {
-        // -prepare: users
-        final PoddUser user1 = this.addTestUser("john@example.com");
-        final PoddUser user2 = this.addTestUser("bob@hope.com");
-        final PoddUser user3 = this.addTestUser("tim@hope.com");
-        
-        // -prepare: test objects
-        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
-        final URI object2URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:2");
-        final URI object3URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:3");
-        
-        // -prepare: map Users - Roles and Objects together
-        this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
-        this.testRealm.map(user1, PoddRoles.PROJECT_ADMIN.getRole(), object2URI);
-        this.testRealm.map(user1, PoddRoles.PROJECT_OBSERVER.getRole(), object3URI);
-        
-        this.testRealm.map(user2, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
-        this.testRealm.map(user2, PoddRoles.PROJECT_MEMBER.getRole(), object2URI);
-        this.testRealm.map(user2, PoddRoles.PROJECT_MEMBER.getRole(), object3URI);
-        
-        this.testRealm.map(user3, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
-        this.testRealm.map(user3, PoddRoles.PROJECT_MEMBER.getRole(), object2URI);
-        this.testRealm.map(user3, PoddRoles.PROJECT_MEMBER.getRole(), object3URI);
-        
-        // -verify: user 1 common Roles for Objects
-        final Collection<Role> commonRolesForObject1 =
-                this.testRealm.getCommonRolesForObjects(user1, Arrays.asList(object1URI, object2URI, object3URI));
-        Assert.assertEquals("Should 0 common Roles", 0, commonRolesForObject1.size());
     }
     
     /**
@@ -263,8 +190,7 @@ public class PoddSesameRealmTest
         this.testRealm.map(user1, PoddRoles.AUTHENTICATED.getRole());
         
         // -verify: common Role for Object 1
-        final Collection<Role> commonRolesForObject1 =
-                this.testRealm.getCommonRolesForObjects(user1, Collections.singleton(object1URI));
+        final Collection<Role> commonRolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
         Assert.assertEquals("Should be 0 Roles", 0, commonRolesForObject1.size());
         
         // RdfUtils.printContents(this.testRepository, PoddSesameRealmTest.userMgtContext);
@@ -293,24 +219,11 @@ public class PoddSesameRealmTest
         this.testRealm.map(user2, PoddRoles.ROLE_A.getRole(), object2URI);
         
         // -verify: common Role for 1 Object
-        final Collection<Role> commonRolesForObject1 =
-                this.testRealm.getCommonRolesForObjects(user1, Collections.singleton(object1URI));
+        final Collection<Role> commonRolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
         Assert.assertEquals("Should be only 1 role", 1, commonRolesForObject1.size());
         Assert.assertTrue("Project_Member role missing",
                 commonRolesForObject1.contains(PoddRoles.PROJECT_MEMBER.getRole()));
         
-        // -verify: common Roles between Objects 1 and 2
-        final Collection<Role> commonRolesForObjects1And2 =
-                this.testRealm.getCommonRolesForObjects(user1, Arrays.asList(object1URI, object2URI));
-        Assert.assertEquals("Should be 1 common role", 1, commonRolesForObjects1And2.size());
-        Assert.assertTrue("Project_Member role missing",
-                commonRolesForObjects1And2.contains(PoddRoles.PROJECT_MEMBER.getRole()));
-        
-        // -verify: common Roles between Objects 1 and 2 for User 2
-        final Collection<Role> user2CommonRolesForObjects1And2 =
-                this.testRealm.getCommonRolesForObjects(user2, Arrays.asList(object1URI, object2URI));
-        Assert.assertEquals("Should be 1 common role", 1, user2CommonRolesForObjects1And2.size());
-        Assert.assertTrue("Role_A role missing", user2CommonRolesForObjects1And2.contains(PoddRoles.ROLE_A.getRole()));
     }
     
     @Test

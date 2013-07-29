@@ -58,9 +58,15 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     @Get
     public Representation attachFileReferencePageHtml(final Representation entity) throws ResourceException
     {
-        // TODO: set required object URIs
-        final Collection<URI> objectUris = Collections.<URI> emptySet();
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, objectUris);
+        // check mandatory parameter: artifact IRI
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        if(artifactUri == null)
+        {
+            this.log.error("Artifact ID not submitted");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
+        }
+        
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         
         this.log.info("attachFileRefHtml");
         final User user = this.getRequest().getClientInfo().getUser();
@@ -92,8 +98,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
         
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT,
-                Collections.singleton(PoddRdfConstants.VF.createURI(artifactUri)));
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         
         // check mandatory parameter: artifact version IRI
         final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER);

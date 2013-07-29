@@ -3,6 +3,7 @@
  */
 package com.github.podd.resources;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -43,15 +45,18 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
         boolean result;
         try
         {
-            final String artifactId = this.getQueryValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+            final String artifactUri = this.getQueryValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
             
-            if(artifactId == null)
+            if(artifactUri == null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
                         "Did not find an artifacturi parameter in the request");
             }
+            
+            this.checkAuthentication(PoddAction.ARTIFACT_DELETE, PoddRdfConstants.VF.createURI(artifactUri));
+            
             final InferredOWLOntologyID currentVersion =
-                    this.getPoddArtifactManager().getArtifact(IRI.create(artifactId));
+                    this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             
             result = this.getPoddApplication().getPoddArtifactManager().deleteArtifact(currentVersion);
             
@@ -73,9 +78,17 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
     }
     
     @Get
-    public Representation editArtifactPageHtml(final Representation entity) throws ResourceException
+    public Representation deleteArtifactPageHtml(final Representation entity) throws ResourceException
     {
-        this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null);
+        // check mandatory parameter: artifact IRI
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        if(artifactUri == null)
+        {
+            this.log.error("Artifact ID not submitted");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
+        }
+        
+        this.checkAuthentication(PoddAction.ARTIFACT_DELETE, PoddRdfConstants.VF.createURI(artifactUri));
         
         this.log.info("deleteArtifactHtml");
         final User user = this.getRequest().getClientInfo().getUser();

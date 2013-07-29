@@ -78,7 +78,8 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
             action = PoddAction.CURRENT_USER_READ;
         }
         
-        this.checkAuthentication(action, Collections.<URI> emptySet());
+        this.checkAuthentication(action);
+        
         // completed checking authorization
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
@@ -151,7 +152,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
             action = PoddAction.CURRENT_USER_READ;
         }
         
-        this.checkAuthentication(action, Collections.<URI> emptySet());
+        this.checkAuthentication(action);
         
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);

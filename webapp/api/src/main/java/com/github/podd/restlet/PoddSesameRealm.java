@@ -47,12 +47,12 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
     protected abstract Role buildRoleFromSparqlResult(final BindingSet bindingSet);
     
     protected abstract String buildSparqlQueryForCommonObjectRoles(final String userIdentifier,
-            final Collection<URI> objectUris);
+            final URI objectUri);
     
     @Override
     protected abstract String buildSparqlQueryToFindUser(final String userIdentifier, boolean findAllUsers);
     
-    public abstract Collection<Role> getCommonRolesForObjects(User user, Collection<URI> objectUris);
+    public abstract Collection<Role> getRolesForObject(User user, URI objectUri);
     
     @Override
     protected abstract RestletUtilRole getRoleByName(final String name);
