@@ -397,6 +397,9 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     /**
      * Overridden to build a SPARQL query to retrieve details of a PoddUser.
      * 
+     * NOTE: For finding users, only User Identifier and secret are Mandatory fields. This is not
+     * indicative of mandatory parameters when creating new users.
+     * 
      * @param userIdentifier
      *            The unique identifier of the User to search for.
      * @return A String representation of the SPARQL Select query
@@ -449,12 +452,12 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
         query.append(" . ");
         
-        query.append(" ?");
+        query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddWebConstants.PODD_USER_ORCID + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORCID);
-        query.append(" . ");
+        query.append(" . } ");
         
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
@@ -463,19 +466,19 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(PoddSesameRealm.PARAM_USER_SECRET);
         query.append(" . ");
         
-        query.append(" ?");
+        query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddWebConstants.PODD_USER_HOMEPAGE + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
-        query.append(" . ");
+        query.append(" . } ");
         
-        query.append(" ?");
+        query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddWebConstants.PODD_USER_ORGANIZATION + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
-        query.append(" . ");
+        query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
@@ -526,8 +529,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(PoddSesameRealm.PARAM_USER_POSITION);
         query.append(" . } ");
         
-        // TODO: firstname, lastname, email are mandatory. add optional parameters: ORCID,
-        // Organization
         if(!findAllUsers)
         {
             query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
