@@ -74,13 +74,13 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         userInfoModel
                 .add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL, PoddRdfConstants.VF.createLiteral(testEmail));
         
-        // prepare: add 'Authenticated User' Role
+        // prepare: add 'Repository Admin User' Role
         final URI authenticatedRoleMapping =
                 PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
         userInfoModel.add(authenticatedRoleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
         userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
-                PoddRoles.AUTHENTICATED.getURI());
+                PoddRoles.ADMIN.getURI());
         
         // prepare: add 'Project Observer' Role of an imaginary project
         final URI observerRoleMapping =
@@ -117,7 +117,6 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
         final Map<URI, URI> roles = new HashMap<URI, URI>();
-        roles.put(PoddRoles.AUTHENTICATED.getURI(), null);
         roles.put(PoddRoles.ADMIN.getURI(), null);
         roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
         String testUserUri =
@@ -137,7 +136,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 20);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 17);
         
         com.github.podd.utils.DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -152,7 +151,6 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
         final Map<URI, URI> roles = new HashMap<URI, URI>();
-        roles.put(PoddRoles.AUTHENTICATED.getURI(), null);
         roles.put(PoddRoles.ADMIN.getURI(), null);
         roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
         String testUserUri = this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null,
@@ -170,7 +168,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 13);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 10);
         
         //com.github.podd.utils.DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,

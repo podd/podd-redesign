@@ -5,10 +5,13 @@ package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -26,6 +29,7 @@ import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.PoddRoles;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -154,7 +158,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 16);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 13);
         
         // DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Not the expected identifier", "testAdminUser",
@@ -162,7 +166,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         
         // verify: Roles are valid PoddRoles
         final Set<Value> roleSet = resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects();
-        Assert.assertEquals("Not expected number of Roles", 3, roleSet.size());
+        Assert.assertEquals("Not expected number of Roles", 2, roleSet.size());
         final Iterator<Value> iterator = roleSet.iterator();
         while(iterator.hasNext())
         {
@@ -170,6 +174,38 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
             final RestletUtilRole roleByUri = PoddRoles.getRoleByUri((URI)next);
             Assert.assertNotNull("Role is not a PoddRole", roleByUri);
         }
+    }
+    
+    //FIXME: incomplete
+    @Ignore
+    @Test
+    public void testGetUserRolesWithOptionalUrisRdf() throws Exception
+    {
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final Map<URI, URI> roles = new HashMap<URI, URI>();
+        roles.put(PoddRoles.ADMIN.getURI(), null);
+        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        String testUserUri = this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null,
+                null, null, null, null, null, roles);
+        
+        // retrieve user details:
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
+        final ClientResource userDetailsClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final Model resultsModel =
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 10);
+        
+        com.github.podd.utils.DebugUtils.printContents(resultsModel);
+
+        
     }
     
 }
