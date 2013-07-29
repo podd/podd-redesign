@@ -77,11 +77,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                     clientInfo.getRoles().add(role);
                 }
                 
-                if(clientInfo.isAuthenticated())
-                {
-                    clientInfo.getRoles().add(PoddRoles.AUTHENTICATED.getRole());
-                }
-                
                 // Add roles common to group members
                 final Set<Role> groupRoles = PoddSesameRealmImpl.this.findRoles(userGroups);
                 
@@ -138,8 +133,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     // ======================= end inner classes ==========================
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
-    private final ValueFactory vf = PoddRdfConstants.VF;
     
     /**
      * Constructor
@@ -365,32 +358,44 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" WHERE ");
         query.append(" { ");
         
-        int i = 0;
-        for(final URI objectUri : objectUris)
+        final String roleMappingVar = " ?mapping ";
+        
+        query.append(roleMappingVar);
+        query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ");
+        query.append(" \"");
+        query.append(NTriplesUtil.escapeString(userIdentifier));
+        query.append("\" . ");
+        
+        query.append(roleMappingVar);
+        query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_ROLE);
+        query.append(" . ");
+        
+        query.append(roleMappingVar);
+        query.append(" <" + PoddWebConstants.PODD_ROLEMAPPEDOBJECT + "> ");
+        query.append(" ?object . ");
+        
+        if(!objectUris.isEmpty())
         {
-            final String roleMappingVar = " ?_anyMapping" + i;
-            i++;
-            
-            query.append(roleMappingVar);
-            query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ");
-            query.append(" \"");
-            query.append(NTriplesUtil.escapeString(userIdentifier));
-            query.append("\" . ");
-            
-            query.append(roleMappingVar);
-            query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ");
-            query.append(" ?");
-            query.append(PoddSesameRealm.PARAM_ROLE);
-            query.append(" . ");
-            
-            query.append(roleMappingVar);
-            query.append(" <" + PoddWebConstants.PODD_ROLEMAPPEDOBJECT + "> ");
-            query.append(" <");
-            query.append(objectUri.stringValue());
-            query.append("> . ");
+            query.append(" FILTER ( ?object IN (");
+            boolean first = true;
+            for(final URI objectUri : objectUris)
+            {
+                if(!first)
+                {
+                    query.append(", ");
+                }
+                first = false;
+                query.append("<" + objectUri.stringValue() + ">");
+            }
+            query.append(") ) ");
         }
         
         query.append(" } ");
+        
+        this.log.info(query.toString());
+        
         return query.toString();
     }
     
