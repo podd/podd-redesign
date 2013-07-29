@@ -157,6 +157,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         {
             return true;
         }
+        else if(request.getClientInfo().getRoles().contains(PoddRoles.ADMIN.getRole()))
+        {
+            // All admins can do everything if they are authenticated
+            return true;
+        }
         else if(!action.matchesForRoles(request.getClientInfo().getRoles()))
         {
             this.log.error("Authenticated user does not have enough privileges to execute the given action: {}", action);
