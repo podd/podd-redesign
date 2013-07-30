@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -231,5 +232,11 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         }
     }
     
+    @Ignore
+    @Test
+    public void testErrorAddUserWithExistingIdentifier() throws Exception
+    {
+        //TODO: implement me
+    }
     
 }
