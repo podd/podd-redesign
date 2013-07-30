@@ -84,7 +84,8 @@ function createUserFormValidator(){
 	}
 	var validInput = validateUserInfo();
 	var validPassword = validateUserPassword();
-	return validUserId && validInput && validPassword;
+	var validUserName = validateUserNameAndEmail();
+	return validUserId && validInput && validPassword && validUserName;
 }
 /*
  * Validate the users data fields (except password) */
@@ -139,6 +140,26 @@ function validateUserInfo(){
 		document.getElementById('errorAddress').innerHTML = 'Required field';
 	}
 
+	return validInput;
+}
+
+/**
+ * Validate that userName and email are the same.
+ * 
+ * @returns {Boolean}
+ */
+function validateUserNameAndEmail(){
+	var validInput = true;
+	
+	// fields requiring validation
+	var email = document.getElementById('email');
+	var userName = document.getElementById('userName');
+	
+	if(email.value != userName.value){
+		validInput = false;
+		document.getElementById('errorUserName').innerHTML = '';
+		document.getElementById('errorUserName').innerHTML = 'Username and email must match';
+	}
 	return validInput;
 }
 
