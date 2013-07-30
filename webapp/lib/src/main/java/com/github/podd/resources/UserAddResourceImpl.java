@@ -84,8 +84,8 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
-     * Handle an HTTP POST request submitting RDF data to create a new PoddUser This method can only
-     * add one user per request. On successful addition of a user, the new user's unique URI is
+     * Handle an HTTP POST request submitting RDF data to create a new PoddUser. This method can
+     * only add one user per request. On successful addition of a user, the new user's unique URI is
      * returned encapsulated in RDF.
      */
     @Post("rdf|rj|json|ttl")
@@ -108,7 +108,18 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
             
             // - create new PoddUser and add to Realm
             newUser = this.modelToUser(newUserModel);
-            newUserUri = nextRealm.addUser(newUser);
+            
+            // TODO: better to throw a specific exception (e.g. DuplicateUserException) that could
+            // be caught further below
+            try
+            {
+                newUserUri = nextRealm.addUser(newUser);
+            }
+            catch(RuntimeException e)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, e.getMessage(), e);
+            }
+            
             this.log.debug("Added new User <{}>", newUser.getIdentifier());
             
             // - map Roles for the new User
@@ -222,7 +233,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         final String phone = model.filter(null, PoddRdfConstants.PODD_USER_PHONE, null).objectString();
         final String address = model.filter(null, PoddRdfConstants.PODD_USER_ADDRESS, null).objectString();
         final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
-
+        
         final PoddUser user =
                 new PoddUser(identifier, password.toCharArray(), firstName, lastName, email, PoddUserStatus.ACTIVE,
                         homePage, organization, orcidID, title, phone, address, position);
