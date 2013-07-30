@@ -1976,7 +1976,7 @@ podd.submitCreateUser = function() {
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userFirstName>', firstName, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userLastName>', lastName, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#organization>', organisation, DATATYPE_PROPERTY, XSD_STRING));
-	  databank.add(podd.buildTriple(tempUser, '<ttp://purl.org/podd/ns/poddUser#phone>', phone, DATATYPE_PROPERTY, XSD_STRING));
+	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#phone>', phone, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#address>', address, DATATYPE_PROPERTY, XSD_STRING));
 	  
 	  if (typeof title !== 'undefined' && title !== '') {
