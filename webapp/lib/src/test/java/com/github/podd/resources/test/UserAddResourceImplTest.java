@@ -135,7 +135,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 17);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 18);
         
         com.github.podd.utils.DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -167,7 +167,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 10);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 11);
         
         //com.github.podd.utils.DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,

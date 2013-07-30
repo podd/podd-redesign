@@ -4,9 +4,11 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
@@ -160,9 +162,11 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "User not found.");
         }
-        final Set<Role> roles = realm.findRoles(poddUser);
+        //final Set<Role> roles = realm.findRoles(poddUser);
+        final Collection<Entry<Role, URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
         
-        final Model userInfoModel = this.userToModel(poddUser, roles);
+        
+        final Model userInfoModel = this.userToModel(poddUser, rolesWithObjectMappings);
         
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
@@ -183,7 +187,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
     /**
      * Helper method to create a Model containing PoddUser details and Role mappings.
      */
-    private Model userToModel(final PoddUser user, final Set<Role> roles)
+    private Model userToModel(final PoddUser user, final Collection<Entry<Role, URI>> roles)
     {
         final Model userInfoModel = new LinkedHashModel();
         
@@ -237,11 +241,11 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
         
         
         this.log.debug("User has {} roles", roles.size());
-        final Iterator<Role> iterator = roles.iterator();
-        while(iterator.hasNext())
+        
+        for(Iterator<Entry<Role, URI>> iterator = roles.iterator(); iterator.hasNext();)
         {
-            final Role role = iterator.next();
-            final RestletUtilRole roleByName = PoddRoles.getRoleByName(role.getName());
+            final Entry<Role, URI> entry = (Entry<Role, URI>) iterator.next();
+            final RestletUtilRole roleByName = PoddRoles.getRoleByName(entry.getKey().getName());
             
             final URI roleMapping =
                     PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
@@ -249,8 +253,11 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
             userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, userUri);
             
             userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, roleByName.getURI());
-            
-            // TODO: include optional object URIs that are mapped to this role
+
+            if (entry.getValue() != null)
+            {
+                userInfoModel.add(roleMapping, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, entry.getValue());
+            }
         }
         
         return userInfoModel;
