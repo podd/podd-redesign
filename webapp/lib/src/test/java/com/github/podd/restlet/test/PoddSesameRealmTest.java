@@ -7,6 +7,7 @@ import info.aduna.iteration.Iterations;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.junit.After;
@@ -211,7 +212,7 @@ public class PoddSesameRealmTest
         // -prepare: map Users - Roles and Objects together
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object2URI);
-        this.testRealm.map(user1, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
+        this.testRealm.map(user1, PoddRoles.ADMIN.getRole(), null);
         
         this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object1URI);
         this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
@@ -220,6 +221,32 @@ public class PoddSesameRealmTest
         final Collection<Role> rolesForObject1 = this.testRealm.getRolesForObject(user1, object1URI);
         Assert.assertEquals("Should be only 1 role", 1, rolesForObject1.size());
         Assert.assertTrue("Project_Member role missing", rolesForObject1.contains(PoddRoles.PROJECT_MEMBER.getRole()));
+    }
+    
+    @Test
+    public void testGetRolesWithObjectMappings() throws Exception
+    {
+        // -prepare: users
+        final PoddUser user1 = this.addTestUser("john@example.com");
+        final PoddUser user2 = this.addTestUser("bob@hope.com");
+        
+        // -prepare: test objects
+        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
+        final URI object2URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:2");
+        
+        // -prepare: map Users - Roles and Objects together
+        this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
+        this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object2URI);
+        this.testRealm.map(user1, PoddRoles.ADMIN.getRole(), null);
+        
+        this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object1URI);
+        this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
+
+        final Collection<Entry<Role,URI>> rolesForUser1 = this.testRealm.getRolesWithObjectMappings(user1);
+        Assert.assertEquals("Should be 3 role mappings", 3, rolesForUser1.size());
+        
+        final Collection<Entry<Role,URI>> rolesForUser2 = this.testRealm.getRolesWithObjectMappings(user2);
+        Assert.assertEquals("Should be 2 role mappings", 2, rolesForUser2.size());
     }
     
     @Test

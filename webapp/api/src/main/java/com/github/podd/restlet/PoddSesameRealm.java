@@ -1,6 +1,8 @@
 package com.github.podd.restlet;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
@@ -33,6 +35,7 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
     protected static final String PARAM_USER_ADDRESS = "userAddress";
     protected static final String PARAM_USER_POSITION = "userPosition";
     protected static final String PARAM_ROLE = "role";
+    protected static final String PARAM_OBJECT_URI = "objectUri";
     
     public PoddSesameRealm(final Repository repository, final URI... contexts)
     {
@@ -50,6 +53,8 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
     {
         return super.addUser(nextUser);
     }
+    
+    protected abstract Entry<Role, URI> buildMapEntryFromSparqlResult(BindingSet bindingSet);
     
     /**
      * Overridden to build a PoddUser from the data retrieved in a SPARQL result.
@@ -72,6 +77,15 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      * @return
      */
     protected abstract Role buildRoleFromSparqlResult(final BindingSet bindingSet);
+    
+    /**
+     * Build a SPARQL query which returns Roles mapped to a given user and any 
+     * optional object URIs included in the mapping.
+     * 
+     * @param userIdentifier
+     * @return
+     */
+    protected abstract String buildSparqlQueryForRolesWithObjects(String userIdentifier);
     
     /**
      * Build a SPARQL query which returns Roles common to a given user and object URI
@@ -103,6 +117,14 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      * @return A Collection of Roles between given User and object
      */
     public abstract Collection<Role> getRolesForObject(User user, URI objectUri);
+    
+    /**
+     * Retrieve Roles that a User is mapped to together with any optional object URIs. 
+     * 
+     * @param user
+     * @return A Map of <Role, object URI> pairs
+     */
+    public abstract Collection<Entry<Role,URI>> getRolesWithObjectMappings(User user);
     
     /**
      * @param name
