@@ -46,12 +46,32 @@
 <h4 class="errorMsg">${errorMessage!""}</h4>
 
 <script type="text/javascript">
-    var RecaptchaOptions = {
-        theme : 'white'
-    };
+	$(document).ready(function() {
+        podd.debug('-------------------');
+        podd.debug('initializing createUser page...');
+        podd.debug('-------------------');
+
+	
+		// Add form submission handler
+		$("#btnSubmit").click(function(event) {
+			event.preventDefault();
+			podd.debug("Attempting to create user");
+			createUserFormValidator();
+			podd.submitCreateUser();
+			return false;
+		});
+	
+		$("#btnCancel").click(function(event) {
+			event.preventDefault();
+			podd.debug("TODO: implement cancellation");
+			return false;
+		});
+	
+        podd.debug('### initialization complete ###');
+	});
 </script>
 
-<form name="create_user" enctype="multipart/form-data" action="${baseUrl}/admin/user/create" method="POST" onsubmit="return createUserFormValidator()">
+<form name="create_user" id="createUserForm">
 
 	<div id="admin_left_pane" class="fieldset_without_border">
 		<div class="legend_no_indent">Account Details</div>
@@ -102,29 +122,6 @@
                                     >
 								</#if>       
 								<label for="${status}" class="bold">${status}</label>
-							</li>
-						</#list>
-                        </#if>
-					</ol>
-                    </div>
-			</li>
-			<li>
-				<div class="fieldset_without_border radioGroup">
-					<div class="legend_no_indent radioGroup">Roles:</div>
-					<ol>
-						<#if roleObjectList??>
-                        <#list roleObjectList as role>
-							<li>
-								<#if selectedRepositoryRole?? && selectedRepositoryRole == role>
-									<input id=${role.name!""} class="narrow" name="role" type="radio" value=${role.name!""} checked
-                                    <#if !isAdmin>disabled="true"</#if>
-                                    >
-								<#else>
-									<input id=${role.name!""} class="narrow" name="role" type="radio" value=${role.name!""}
-                                    <#if !isAdmin>disabled="true"</#if>
-                                    >
-								</#if>
-								<label for=${role.name!""} class="bold">${role.description!""}</label>
 							</li>
 						</#list>
                         </#if>
@@ -187,29 +184,19 @@
 				<input id="url" name="url" type="text" value="${urlValue!""}">
                 <h6 class="errorMsg" id='urlError'>${urlError!""}</h6>
 			</li>
-
-            <#if !isAdmin>
-                <!-- display reCAPTCHA -->
-                <li>
-                <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=${captchaPublicKey}&error=${captchaError!""}"></script>
-                <noscript>
-                    <iframe src="http://www.google.com/recaptcha/api/noscript?k=${captchaPublicKey}&error=${captchaError!""}" height="300" width="500" frameborder="0"></iframe><br>
-                    <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
-                    <input type="hidden" name="recaptcha_response_field" value="manual_challenge">
-                </noscript>
-                </li>
-            </#if>
+			<li>
+				<label for="orcid" class="bold">ORCID ID:</label>
+				<input id="orcid" name="orcid" type="text" value="${orcidValue!""}">
+                <h6 class="errorMsg" id='orcidError'>${orcidError!""}</h6>
+			</li>
 
 		</ol>
 	</div>
 	
 	<div id="buttonwrapper">
-		<button type="submit">Create New User</button>
-        <#if isAdmin>
-        <a href="${baseUrl}/admin/user/list">Cancel</a>
-        <#else>
-        <a href="${baseUrl}/login">Cancel</a>
-        </#if>
+		<button type="button" id="btnSubmit" >Create New User</button>
+		<button type="button" id="btnClear" >Clear</button>
+		<button type="button" id="btnCancel" >Cancel</button>
 	</div>
 </form>
 

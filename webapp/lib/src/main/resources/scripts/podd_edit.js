@@ -24,6 +24,7 @@ var OBJECT_PROPERTY = 'http://www.w3.org/2002/07/owl#ObjectProperty';
 var DATATYPE_PROPERTY = 'http://www.w3.org/2002/07/owl#DatatypeProperty';
 var OWL_NAMED_INDIVIDUAL = 'http://www.w3.org/2002/07/owl#NamedIndividual';
 var XSD_DATETIME = 'http://www.w3.org/2001/XMLSchema#dateTime';
+var XSD_STRING = 'http://www.w3.org/2001/XMLSchema#string';
 var RDFS_LABEL = 'http://www.w3.org/2000/01/rdf-schema#label';
 
 var DETAILS_LIST_Selector = '#details ol';
@@ -1943,6 +1944,83 @@ podd.submitPoddObjectUpdate = function(
             podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
+};
+
+/**
+ * @memberOf podd
+ * 
+ * Submit the "Add User" form to create a new PoddUser
+ * This method is closely bound to the element IDs used in admin_createUser.html
+ */
+podd.submitCreateUser = function() {
+	  
+	  var userName = $('#userName').val();
+	  var email = $('#email').val();
+	  var password = $('#password').val();
+	  var title = $('#title').val();
+	  var firstName = $('#firstName').val();
+	  var lastName = $('#lastName').val();
+	  var organisation = $('#organisation').val();
+	  var position = $('#position').val();
+	  var phone = $('#phone').val();
+	  var address = $('#address').val();
+	  var url = $('#url').val();
+	  var orcid = $('#orcid').val();
+
+	  var databank = podd.newDatabank();
+	  var tempUser = '<urn:temp:user>';
+	  
+	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userIdentifier>', userName, DATATYPE_PROPERTY, XSD_STRING));
+	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userEmail>', email, DATATYPE_PROPERTY, XSD_STRING));
+	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userSecret>', password, DATATYPE_PROPERTY, XSD_STRING));
+	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userFirstName>', firstName, DATATYPE_PROPERTY, XSD_STRING));
+	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userLastName>', lastName, DATATYPE_PROPERTY, XSD_STRING));
+	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#organization>', organisation, DATATYPE_PROPERTY, XSD_STRING));
+	  databank.add(podd.buildTriple(tempUser, '<ttp://purl.org/podd/ns/poddUser#phone>', phone, DATATYPE_PROPERTY, XSD_STRING));
+	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#address>', address, DATATYPE_PROPERTY, XSD_STRING));
+	  
+	  if (typeof title !== 'undefined' && title !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#title>', title, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+	  if (typeof url !== 'undefined' && url !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#homepage>', url, OBJECT_PROPERTY, 'URI'));
+	  }
+	  if (typeof position !== 'undefined' && position !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#position>', position, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+	  if (typeof orcid !== 'undefined' && orcid !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#orcid>', orcid, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+	  
+	  var modifiedTriples = $.toJSON(databank.dump({
+		format : 'application/json'
+	  }));
+	  podd.debug("As JSON: " + modifiedTriples);
+	  
+	  requestUrl = podd.baseUrl + '/admin/user/add';
+	  
+	  $.ajax({
+	        url : requestUrl,
+	        type : 'POST',
+	        data : modifiedTriples,
+	        contentType : 'application/rdf+json', // what we're sending
+	        beforeSend : function(xhr) {
+	            xhr.setRequestHeader("Accept", "application/rdf+json");
+	        },
+	        success : function(resultData, status, xhr) {
+	            podd.debug('[addUser] ### SUCCESS ### ' + resultData);
+	            // podd.debug('[updatePoddObject] ' + xhr.responseText);
+	            var message = '<div>Successfully added User.<pre>' + xhr.responseText + '</pre></div>';
+	            podd.updateErrorMessageList(message);
+
+	        },
+	        error : function(xhr, status, error) {
+	            podd.debug('[addUser] $$$ ERROR $$$ ' + error);
+	            podd.debug(xhr.statusText);
+	            
+	            podd.displaySummaryErrorMessage(xhr.responseText);
+	        }
+	    });	  
 };
 
 /**
