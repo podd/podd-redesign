@@ -117,7 +117,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
             }
             catch(RuntimeException e)
             {
-                throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, e.getMessage(), e);
+                throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, e);
             }
             
             this.log.debug("Added new User <{}>", newUser.getIdentifier());
