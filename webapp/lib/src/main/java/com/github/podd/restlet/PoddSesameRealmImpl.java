@@ -5,9 +5,7 @@ package com.github.podd.restlet;
 
 import java.util.AbstractMap;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
@@ -155,6 +153,11 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     public URI addUser(final PoddUser nextUser)
     {
+        if (this.findUser(nextUser.getIdentifier()) != null)
+        {
+            throw new RuntimeException("User already exists");
+        }
+        
         final URI nextUserUUID = super.addUser(nextUser);
         
         this.log.debug("adding org, orcid, uri");

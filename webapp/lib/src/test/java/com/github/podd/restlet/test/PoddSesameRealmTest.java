@@ -118,9 +118,6 @@ public class PoddSesameRealmTest
         final String testUserId1 = "john@example.com";
         final PoddUser testUser = this.addTestUser(testUserId1);
         
-        // - add a test user
-        this.testRealm.addUser(testUser);
-        
         final RestletUtilUser retrievedUser = this.testRealm.findUser(testUserId1);
         Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
         Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
@@ -131,6 +128,36 @@ public class PoddSesameRealmTest
                 recvdPoddUser.getHomePage());
         Assert.assertEquals("Returned user Organization different to original", "Some Organization",
                 recvdPoddUser.getOrganization());
+    }
+    
+    @Test
+    public void testAddDuplicateUser() throws Exception
+    {
+        final String testUserId = "john@example.com";
+        
+        // create test user
+        final URI testUserHomePage1 = PoddRdfConstants.VF.createURI("http://example.org/john");
+        final PoddUser testUser1 =
+                new PoddUser(testUserId, "secret".toCharArray(), "First", "Last", testUserId, PoddUserStatus.ACTIVE,
+                        testUserHomePage1, "UQ", "john_ORCID_111");
+        this.testRealm.addUser(testUser1);
+        
+        // second test user
+        final URI testUserHomePage2 = PoddRdfConstants.VF.createURI("http://example.org/john.cloned");
+        final PoddUser testUser2 =
+                new PoddUser(testUserId, "secret".toCharArray(), "Jason", "Bourne", testUserId, PoddUserStatus.ACTIVE,
+                        testUserHomePage2, "CSIRO", "john_ORCID_cloned22");
+
+        // try to add another user with same identifier
+        try
+        {
+            this.testRealm.addUser(testUser2);
+            Assert.fail("Should throw a RuntimeException when trying to add a dupliate user");
+        }
+        catch(RuntimeException e)
+        {
+            Assert.assertEquals("Not the expected Exception", "User already exists", e.getMessage());
+        }
     }
     
     @Test
@@ -171,7 +198,8 @@ public class PoddSesameRealmTest
         // -verify: common Role for 1 Object
         final Collection<Role> rolesForObject3 = this.testRealm.getRolesForObject(user1, object3URI);
         Assert.assertEquals("Should be 2 roles", 2, rolesForObject3.size());
-        Assert.assertTrue("Project_Observer role missing", rolesForObject3.contains(PoddRoles.PROJECT_OBSERVER.getRole()));
+        Assert.assertTrue("Project_Observer role missing",
+                rolesForObject3.contains(PoddRoles.PROJECT_OBSERVER.getRole()));
         Assert.assertTrue("Project_Admin role missing", rolesForObject3.contains(PoddRoles.PROJECT_ADMIN.getRole()));
     }
     
@@ -241,11 +269,11 @@ public class PoddSesameRealmTest
         
         this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object1URI);
         this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
-
-        final Collection<Entry<Role,URI>> rolesForUser1 = this.testRealm.getRolesWithObjectMappings(user1);
+        
+        final Collection<Entry<Role, URI>> rolesForUser1 = this.testRealm.getRolesWithObjectMappings(user1);
         Assert.assertEquals("Should be 3 role mappings", 3, rolesForUser1.size());
         
-        final Collection<Entry<Role,URI>> rolesForUser2 = this.testRealm.getRolesWithObjectMappings(user2);
+        final Collection<Entry<Role, URI>> rolesForUser2 = this.testRealm.getRolesWithObjectMappings(user2);
         Assert.assertEquals("Should be 2 role mappings", 2, rolesForUser2.size());
     }
     
@@ -277,7 +305,8 @@ public class PoddSesameRealmTest
                 user1Roles.contains(PoddRoles.PROJECT_MEMBER.getRole()));
         
         final Set<Role> user2Roles = this.testRealm.findRoles(user2);
-        Assert.assertTrue("Project Observer role wasn't allocated to user 2", user2Roles.contains(PoddRoles.PROJECT_OBSERVER.getRole()));
+        Assert.assertTrue("Project Observer role wasn't allocated to user 2",
+                user2Roles.contains(PoddRoles.PROJECT_OBSERVER.getRole()));
     }
     
     /**
@@ -334,8 +363,6 @@ public class PoddSesameRealmTest
         final String testUserId1 = "john@example.com";
         final PoddUser testUser = this.addTestUser(testUserId1);
         
-        // - add a test user
-        this.testRealm.addUser(testUser);
         Assert.assertEquals("Returned user different to original", testUser, this.testRealm.findUser(testUserId1));
         
         // - map ADMIN and PROJECT_ADMIN Roles to the test user
