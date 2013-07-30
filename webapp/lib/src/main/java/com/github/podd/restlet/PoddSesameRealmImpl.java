@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
@@ -149,13 +148,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         this.setVerifier(new DefaultPoddSesameRealmVerifier());
     }
     
-    /**
-     * This method adds a User entry to the Realm and underlying Sesame Repository including
-     * PODD-specific user parameters.
-     * 
-     * @param nextUser
-     * @return
-     */
     @Override
     public URI addUser(final PoddUser nextUser)
     {
@@ -242,16 +234,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         return nextUserUUID;
     }
     
-    /**
-     * Overridden to build a PoddUser from the data retrieved in a SPARQL result.
-     * 
-     * @param userIdentifier
-     *            The unique identifier of the User.
-     * @param bindingSet
-     *            Results of a single user from SPARQL.
-     * @return A RestletUtilUser account.
-     * 
-     */
     @Override
     protected PoddUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
     {
@@ -314,12 +296,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         return result;
     }
     
-    /**
-     * Retrieve a Restlet Role from the values retrieved via SPARQL
-     * 
-     * @param bindingSet
-     * @return
-     */
     @Override
     protected Role buildRoleFromSparqlResult(final BindingSet bindingSet)
     {
@@ -327,31 +303,12 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         return PoddRoles.getRoleByUri(roleUri).getRole();
     }
     
-    /**
-     * Build a SPARQL query which returns Roles common to a given user across all given object URIs
-     * 
-     * @param userIdentifier
-     * @param objectUris
-     * @return
-     */
     @Override
-    protected String buildSparqlQueryForCommonObjectRoles(final String userIdentifier, final URI objectUri)
+    protected String buildSparqlQueryForObjectRoles(final String userIdentifier, final URI objectUri)
     {
-        this.log.debug("Building SPARQL query for common Roles across Objects");
+        this.log.debug("Building SPARQL query for Roles between User and object URI");
         
         final StringBuilder query = new StringBuilder();
-        
-        /*
-         * SELECT ?role WHERE {
-         * 
-         * ?_anyMapping0 <roleMappedUser> :userIdentifier . ?_anyMapping0 <roleMappedRole> ?role .
-         * ?_anyMapping0 <roleMappedObject> <objectUri_0> .
-         * 
-         * ?_anyMapping1 <roleMappedUser> :userIdentifier . ?_anyMapping1 <roleMappedRole> ?role .
-         * ?_anyMapping1 <roleMappedObject> <objectUri_1> .
-         * 
-         * ... }
-         */
         
         query.append(" SELECT ?");
         query.append(PoddSesameRealm.PARAM_ROLE);
@@ -382,21 +339,11 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         query.append(" } ");
         
-        this.log.info(query.toString());
+        this.log.debug(query.toString());
         
         return query.toString();
     }
     
-    /**
-     * Overridden to build a SPARQL query to retrieve details of a PoddUser.
-     * 
-     * NOTE: For finding users, only User Identifier and secret are Mandatory fields. This is not
-     * indicative of mandatory parameters when creating new users.
-     * 
-     * @param userIdentifier
-     *            The unique identifier of the User to search for.
-     * @return A String representation of the SPARQL Select query
-     */
     @Override
     protected String buildSparqlQueryToFindUser(final String userIdentifier, final boolean findAllUsers)
     {
@@ -531,13 +478,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         return query.toString();
     }
     
-    /**
-     * For a given User, this method finds Role Mappings common across ALL the given object URIs.
-     * 
-     * @param user
-     * @param objectUri
-     * @return A Collection of Roles that are common for ALL given object URIs
-     */
     @Override
     public Collection<Role> getRolesForObject(final User user, final URI objectUri)
     {
@@ -553,7 +493,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         {
             conn = this.getRepository().getConnection();
             
-            final String query = this.buildSparqlQueryForCommonObjectRoles(user.getIdentifier(), objectUri);
+            final String query = this.buildSparqlQueryForObjectRoles(user.getIdentifier(), objectUri);
             
             if(this.log.isDebugEnabled())
             {
@@ -614,7 +554,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     }
     
     /**
-     * @param nextRoleMappingStatement
+     * @param uri
      * @return
      */
     @Override
@@ -624,17 +564,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         return nextStandardRole;
     }
     
-    /**
-     * This method maps a User to a Role with an optional URIs.
-     * 
-     * Example 1: John (User) is a PROJECT_MEMBER (Role) of the "Water Stress" project (URI).
-     * 
-     * Example 2: Bob (User) is an ADMIN (Role) for the whole repository (no URI).
-     * 
-     * @param user
-     * @param role
-     * @param optionalObjectUri
-     */
     @Override
     public void map(final User user, final Role role, final URI optionalObjectUri)
     {
