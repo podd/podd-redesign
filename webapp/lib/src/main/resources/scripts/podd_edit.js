@@ -2009,10 +2009,8 @@ podd.submitCreateUser = function() {
 	        },
 	        success : function(resultData, status, xhr) {
 	            podd.debug('[addUser] ### SUCCESS ### ' + resultData);
-	            // podd.debug('[updatePoddObject] ' + xhr.responseText);
-	            var message = '<div>Successfully added User.<pre>' + xhr.responseText + '</pre></div>';
-	            podd.updateErrorMessageList(message);
-
+	            // redirect to User Details Page
+	        	window.location.href = podd.baseUrl + '/user/' + userName;
 	        },
 	        error : function(xhr, status, error) {
 	            podd.debug('[addUser] $$$ ERROR $$$ ' + error);

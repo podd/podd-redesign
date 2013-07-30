@@ -30,6 +30,34 @@
 <#-- @ftlvariable name="captchaPublicKey" type="java.lang.String" -->
 <#-- @ftlvariable name="captchaError" type="java.lang.String" -->
 
+<script type="text/javascript">
+	$(document).ready(function() {
+        podd.debug('-------------------');
+        podd.debug('initializing createUser page...');
+        podd.debug('-------------------');
+
+	
+		// Add form submission handler
+		$("#btnSubmit").click(function(event) {
+			event.preventDefault();
+			podd.debug("Attempting to create user");
+			var validInput = createUserFormValidator();
+			if (validInput) {
+				podd.submitCreateUser();
+			}
+			return false;
+		});
+	
+		$("#btnCancel").click(function(event) {
+			event.preventDefault();
+			podd.debug("TODO: implement cancellation");
+			return false;
+		});
+	
+        podd.debug('### initialization complete ###');
+	});
+</script>
+
 <div id="title_pane">
     <h3>${title}</h3>
 </div>
@@ -45,31 +73,14 @@
 <p>
 <h4 class="errorMsg">${errorMessage!""}</h4>
 
-<script type="text/javascript">
-	$(document).ready(function() {
-        podd.debug('-------------------');
-        podd.debug('initializing createUser page...');
-        podd.debug('-------------------');
-
-	
-		// Add form submission handler
-		$("#btnSubmit").click(function(event) {
-			event.preventDefault();
-			podd.debug("Attempting to create user");
-			createUserFormValidator();
-			podd.submitCreateUser();
-			return false;
-		});
-	
-		$("#btnCancel").click(function(event) {
-			event.preventDefault();
-			podd.debug("TODO: implement cancellation");
-			return false;
-		});
-	
-        podd.debug('### initialization complete ###');
-	});
-</script>
+<#-- add general error messages -->
+<ol id="errorMsgList">
+	<#if generalErrorList?? && generalErrorList?has_content>
+	    <#list generalErrorList as errorMsg>
+	    <li class="errorMsg">${errorMsg}</li>
+	    </#list>
+	</#if>
+</ol>
 
 <form name="create_user" id="createUserForm">
 
