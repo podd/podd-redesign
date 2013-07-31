@@ -108,8 +108,17 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testGetUserDetailsOfOtherUserByAdministrator() throws Exception
     {
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final Map<URI, URI> roles = new HashMap<URI, URI>();
+        roles.put(PoddRoles.ADMIN.getURI(), null);
+        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
+                "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
+                roles);        
+        
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "testUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
@@ -117,7 +126,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         
         final String body = results.getText();
         Assert.assertTrue(body.contains("User Name: "));
-        Assert.assertTrue(body.contains("test.user"));
+        Assert.assertTrue(body.contains("testuser@podd.com"));
         this.assertFreemarker(body);
     }
     

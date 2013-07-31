@@ -5,7 +5,6 @@ package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -97,29 +96,10 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
         }
         else
         {
-            this.log.debug("Populating user info for {}", user);
+            dataModel.put("requestedUser", poddUser);
             
-            final Map<String, Object> tempUserMap = new HashMap<String, Object>();
-            tempUserMap.put("userName", poddUser.getIdentifier());
-            tempUserMap.put("email", poddUser.getEmail());
-            tempUserMap.put("status", poddUser.getUserStatus());
-            
-            tempUserMap.put("firstName", poddUser.getFirstName());
-            tempUserMap.put("lastName", poddUser.getLastName());
-            tempUserMap.put("affiliation", poddUser.getOrganization());
-            tempUserMap.put("orcid", poddUser.getOrcid());
-            tempUserMap.put("homepage", poddUser.getHomePage());
-            
-            final Set<Role> roles = realm.findRoles(user);
-            tempUserMap.put("repositoryRoleList", roles);
-            
-            // FIXME: - these should be persisted in and retrieved from the Repository
-            tempUserMap.put("title", "Mr");
-            tempUserMap.put("phoneNumber", "009988334");
-            tempUserMap.put("postalAddress", "88, Some Street, Some Suburb, QLD 4300");
-            tempUserMap.put("position", "Some position");
-            
-            dataModel.put("requestedUser", tempUserMap);
+            final Set<Role> roles = realm.findRoles(poddUser);
+            dataModel.put("repositoryRoleList", roles);
         }
         
         // Output the base template, with contentTemplate from the dataModel defining the
