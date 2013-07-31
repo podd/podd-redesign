@@ -87,6 +87,11 @@ public interface PoddWebConstants
     public static final String PATH_USER_ADD = "admin/user/add";
     
     /**
+     * Path to "edit user" page
+     */
+    public static final String PATH_USER_EDIT = "user/edit/";
+
+    /**
      * Path to list artifacts
      */
     public static final String PATH_ARTIFACT_LIST = "artifacts";
