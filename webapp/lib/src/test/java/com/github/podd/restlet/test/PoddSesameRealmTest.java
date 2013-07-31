@@ -131,34 +131,33 @@ public class PoddSesameRealmTest
     }
     
     @Test
-    public void testAddDuplicateUser() throws Exception
+    public void testOverwriteUser() throws Exception
     {
         final String testUserId = "john@example.com";
         
         // create test user
-        final URI testUserHomePage1 = PoddRdfConstants.VF.createURI("http://example.org/john");
+        final URI testUser1HomePage
+        = PoddRdfConstants.VF.createURI("http://example.org/john");
         final PoddUser testUser1 =
                 new PoddUser(testUserId, "secret".toCharArray(), "First", "Last", testUserId, PoddUserStatus.ACTIVE,
-                        testUserHomePage1, "UQ", "john_ORCID_111");
+                        testUser1HomePage, "UQ", "john_ORCID_111");
         this.testRealm.addUser(testUser1);
         
         // second test user
-        final URI testUserHomePage2 = PoddRdfConstants.VF.createURI("http://example.org/john.cloned");
+        final URI testUser2HomePage = PoddRdfConstants.VF.createURI("http://example.org/john.cloned");
+        final String testUser2FirstName = "Jason";
+        final String testUser2LastName = "Bourne";
         final PoddUser testUser2 =
-                new PoddUser(testUserId, "secret".toCharArray(), "Jason", "Bourne", testUserId, PoddUserStatus.ACTIVE,
-                        testUserHomePage2, "CSIRO", "john_ORCID_cloned22");
+                new PoddUser(testUserId, "secret".toCharArray(), testUser2FirstName, "Bourne", testUserId, PoddUserStatus.ACTIVE,
+                        testUser2HomePage, "CSIRO", "john_ORCID_cloned22");
 
-        // try to add another user with same identifier
-        try
-        {
-            this.testRealm.addUser(testUser2);
-            Assert.fail("Should throw a RuntimeException when trying to add a dupliate user");
-        }
-        catch(RuntimeException e)
-        {
-            Assert.assertEquals("Not the expected Exception", "User already exists", e.getMessage());
-        }
-    }
+        // add another user with same identifier (should overwrite)
+        this.testRealm.addUser(testUser2);
+        
+        PoddUser userFromRealm = (PoddUser)this.testRealm.findUser(testUserId);
+        Assert.assertEquals("First name was not overwritten", testUser2FirstName, userFromRealm.getFirstName());
+        Assert.assertEquals("Last name was not overwritten", testUser2LastName, userFromRealm.getLastName());
+        Assert.assertEquals("Home Page was not overwritten", testUser2HomePage, userFromRealm.getHomePage());    }
     
     @Test
     public void testGetRolesForObjectWithMiscCombinations() throws Exception
