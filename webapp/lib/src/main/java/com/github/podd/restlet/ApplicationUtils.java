@@ -353,7 +353,7 @@ public class ApplicationUtils
         
         final URI testUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testUser");
         final PoddUser testUser =
-                new PoddUser("testUser", "testPassword".toCharArray(), "Test", "User", "test.user@example.com",
+                new PoddUser("anotherUser", "anotherPassword".toCharArray(), "Test", "User", "test.user@example.com",
                         PoddUserStatus.ACTIVE, testUserHomePage, "CSIRO", "Orcid-Test-User");
         final URI testUserUri = nextRealm.addUser(testUser);
         
