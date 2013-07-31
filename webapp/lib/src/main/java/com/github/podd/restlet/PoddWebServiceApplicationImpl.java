@@ -2,10 +2,7 @@ package com.github.podd.restlet;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -51,6 +48,7 @@ import com.github.podd.resources.SearchOntologyResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserAddResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
+import com.github.podd.resources.UserEditResourceImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -278,7 +276,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.debug("attaching user add service to path={}", userAddPath);
         router.attach(userAddPath, UserAddResourceImpl.class);
         
-        // TODO: add routes for other user management pages. (Edit User, Change Password, Modify
+        // Add a route for Edit User page.
+        final String userEditPath = PoddWebConstants.PATH_USER_EDIT + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
+        this.log.debug("attaching user edit service to path={}", userEditPath);
+        router.attach(userEditPath, UserEditResourceImpl.class);
+        
+        // TODO: add routes for other user management pages. (Change Password, Modify
         // Roles etc.)
         
         // Add a route for the List Artifacts page.
