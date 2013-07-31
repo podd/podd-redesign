@@ -266,10 +266,63 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     /**
      * Test error trying to edit other user details as non-admin user
      */
-    @Ignore
     @Test
     public void testErrorEditOtherUserNonAdminRdf() throws Exception
     {
-        Assert.fail("Not Implemented");
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final Map<URI, URI> roles = new HashMap<URI, URI>();
+        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
+                "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
+                roles);
+        
+        // prepare: retrieve Details of existing User
+        final ClientResource userDetailsClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final Model userInfoModel =
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 15);
+        // this.log.info("Retrieved [{}] details. ", testIdentifier);
+        // DebugUtils.printContents(userInfoModel);
+        
+        // prepare: modify existing User's details
+        final String modifiedFirstName = "Totally";
+        final String modifiedLastName = "Newman";
+        
+        final Resource userUri =
+                userInfoModel.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).subjects().iterator().next();
+        
+        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
+        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
+        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
+                PoddRdfConstants.VF.createLiteral(modifiedFirstName));
+        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
+                PoddRdfConstants.VF.createLiteral(modifiedLastName));
+        
+        // try to submit modified details to Edit User Service
+        final ClientResource userEditClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Rio.write(userInfoModel, out, format);
+        final Representation input = new StringRepresentation(out.toString(), mediaType);
+        
+        try
+        {
+                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
+                        Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
+                Assert.fail("Should have thrown a ResourceException due to lack of authorization");
+        }
+        catch (ResourceException e)
+        {
+            Assert.assertEquals("Should have been Unauthorized",  Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
     }
 }
