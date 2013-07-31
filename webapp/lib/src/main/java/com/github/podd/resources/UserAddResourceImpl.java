@@ -128,7 +128,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                 final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
                 
                 final URI mappedObject =
-                        newUserModel.filter(mappingUri, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
+                        newUserModel.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
                 
                 this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
                         role.getName(), mappedObject);

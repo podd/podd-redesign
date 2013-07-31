@@ -107,7 +107,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         userInfoModel.add(observerRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
         userInfoModel.add(observerRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
                 PoddRoles.PROJECT_OBSERVER.getURI());
-        userInfoModel.add(observerRoleMapping, PoddWebConstants.PODD_ROLEMAPPEDOBJECT,
+        userInfoModel.add(observerRoleMapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT,
                 PoddRdfConstants.VF.createURI("urn:podd:some:project"));
         
         final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));

@@ -39,7 +39,6 @@ import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
-import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Customises RestletUtilSesameRealm.java to use PODDUsers and PoddRoles.
@@ -165,19 +164,19 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             
             if(nextUser.getOrganization() != null)
             {
-                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_ORGANIZATION,
+                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_ORGANIZATION,
                         this.vf.createLiteral(nextUser.getOrganization()), this.getContexts());
             }
             
             if(nextUser.getOrcid() != null)
             {
-                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_ORCID, this.vf.createLiteral(nextUser.getOrcid()),
+                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_ORCID, this.vf.createLiteral(nextUser.getOrcid()),
                         this.getContexts());
             }
             
             if(nextUser.getHomePage() != null)
             {
-                conn.add(nextUserUUID, PoddWebConstants.PODD_USER_HOMEPAGE, nextUser.getHomePage(), this.getContexts());
+                conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_HOMEPAGE, nextUser.getHomePage(), this.getContexts());
             }
             
             if(nextUser.getTitle() != null)
@@ -353,7 +352,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         query.append(" OPTIONAL{ ");
         query.append(roleMappingVar);
-        query.append(" <" + PoddWebConstants.PODD_ROLEMAPPEDOBJECT + "> ");
+        query.append(" <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_OBJECT_URI);
         query.append(" . } ");
@@ -392,7 +391,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" . ");
         
         query.append(roleMappingVar);
-        query.append(" <" + PoddWebConstants.PODD_ROLEMAPPEDOBJECT + "> ");
+        query.append(" <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ");
         query.append(" ?object . ");
         
         query.append(" FILTER ( ?object IN (");
@@ -456,7 +455,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddWebConstants.PODD_USER_ORCID + "> ");
+        query.append(" <" + PoddRdfConstants.PODD_USER_ORCID + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORCID);
         query.append(" . } ");
@@ -470,14 +469,14 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddWebConstants.PODD_USER_HOMEPAGE + "> ");
+        query.append(" <" + PoddRdfConstants.PODD_USER_HOMEPAGE + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_HOMEPAGE);
         query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddWebConstants.PODD_USER_ORGANIZATION + "> ");
+        query.append(" <" + PoddRdfConstants.PODD_USER_ORGANIZATION + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         query.append(" . } ");
@@ -715,7 +714,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             
             if(optionalObjectUri != null)
             {
-                conn.add(this.vf.createStatement(nextRoleMappingUUID, PoddWebConstants.PODD_ROLEMAPPEDOBJECT,
+                conn.add(this.vf.createStatement(nextRoleMappingUUID, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT,
                         optionalObjectUri), this.getContexts());
             }
             

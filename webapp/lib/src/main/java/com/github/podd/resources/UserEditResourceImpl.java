@@ -184,7 +184,7 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
                 final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
                 
                 final URI mappedObject =
-                        modifiedUserModel.filter(mappingUri, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
+                        modifiedUserModel.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
                 
                 this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", poddUser.getIdentifier(),
                         role.getName(), mappedObject);

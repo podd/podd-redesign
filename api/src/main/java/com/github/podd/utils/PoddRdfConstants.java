@@ -330,6 +330,9 @@ public interface PoddRdfConstants
     public static final URI PODD_USER_POSITION =  PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_USER, "position");
 
+    /** http://purl.org/podd/ns/poddUser#roleMappedObject */
+    public static final URI PODD_ROLEMAPPEDOBJECT = VF.createURI(PODD_USER, "roleMappedObject");
+    
     /**
      * TODO: Temporary domain for specifying error messages in RDF 
      */
@@ -359,6 +362,15 @@ public interface PoddRdfConstants
     public static final URI ERR_CONTAINS = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_ERROR, "contains");
 
-
-
+    /**
+     * @Deprecated Unused. Remove if not needed.
+     */
+    public static final URI SCOPE_ARTIFACT = PoddRdfConstants.VF
+            .createURI("http://purl.org/podd/poddBase#PoddArtifact");
+    
+    /**
+     * @Deprecated Unused. Remove if not needed.
+     */
+    public static final URI SCOPE_REPOSITORY = PoddRdfConstants.VF
+            .createURI("http://purl.org/podd/poddBase#PoddRepository");
 }

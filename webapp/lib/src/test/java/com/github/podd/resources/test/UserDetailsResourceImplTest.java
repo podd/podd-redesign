@@ -216,7 +216,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("Not the expected User URI", testUserUri, 
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
         Assert.assertEquals("Not the expected object URI", testObjectUri, 
-                resultsModel.filter(null, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
+                resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
     }
     
 }

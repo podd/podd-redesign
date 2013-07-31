@@ -236,7 +236,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
 
             if (entry.getValue() != null)
             {
-                userInfoModel.add(roleMapping, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, entry.getValue());
+                userInfoModel.add(roleMapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, entry.getValue());
             }
         }
         

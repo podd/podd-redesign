@@ -30,7 +30,6 @@ import com.github.podd.restlet.PoddSesameRealmImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
-import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author kutila
@@ -348,7 +347,7 @@ public class PoddSesameRealmTest
         Assert.assertEquals(2, list3.size());
         
         // verify: 2 RoleMappedObject statements exist in the repository
-        final List<Statement> list4 = this.getStatementList(null, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, null);
+        final List<Statement> list4 = this.getStatementList(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null);
         Assert.assertFalse(list4.isEmpty());
         Assert.assertEquals(2, list4.size());
     }

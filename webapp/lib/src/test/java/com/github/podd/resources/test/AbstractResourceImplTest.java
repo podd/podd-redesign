@@ -404,7 +404,7 @@ public class AbstractResourceImplTest
             userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, role);
             if(mappedObject != null)
             {
-                userInfoModel.add(roleMapping, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, mappedObject);
+                userInfoModel.add(roleMapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, mappedObject);
             }
         }
         

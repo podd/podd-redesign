@@ -3,7 +3,6 @@
  */
 package com.github.podd.utils;
 
-import org.openrdf.model.URI;
 
 /**
  * @author kutila
@@ -11,22 +10,6 @@ import org.openrdf.model.URI;
  */
 public interface PoddWebConstants
 {
-    public static final URI SCOPE_ARTIFACT = PoddRdfConstants.VF
-            .createURI("http://purl.org/podd/poddBase#PoddArtifact");
-    
-    public static final URI SCOPE_REPOSITORY = PoddRdfConstants.VF
-            .createURI("http://purl.org/podd/poddBase#PoddRepository");
-    
-    public static final URI PODD_ROLEMAPPEDOBJECT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER,
-            "roleMappedObject");
-    
-    public static final URI PODD_USER_ORGANIZATION = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER,
-            "organization");
-    
-    public static final URI PODD_USER_ORCID = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER, "orcid");
-    
-    public static final URI PODD_USER_HOMEPAGE = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_USER, "uri");
-    
     public static final String DEF_CHALLENGE_AUTH_METHOD = "digest";
     
     public static final String COOKIE_NAME = "PODDAuthentication";
