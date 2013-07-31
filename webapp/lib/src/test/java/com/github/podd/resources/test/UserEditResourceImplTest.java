@@ -43,11 +43,48 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     /**
      * Test display of current user Edit page
      */
-    @Ignore
     @Test
     public void testEditCurrentUserHtml() throws Exception
     {
-        Assert.fail("Not Implemented");
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final String testHomePage = "http:///www.john.doe.com";
+        final Map<URI, URI> roles = new HashMap<URI, URI>();
+        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        final String testFirstName = "John";
+        final String testLastName = "Doe";
+        final String testOrganization = "CSIRO";
+        final String testOrcid = "john-orcid";
+        final String testTitle = "Mr";
+        final String testPhone = "000333434";
+        final String testAddress = "Some Address";
+        final String testPosition = "Researcher";
+        this.loadTestUser(testIdentifier, "testuserpassword", testFirstName, testLastName, testIdentifier,
+                testHomePage, testOrganization, testOrcid, testTitle, testPhone, testAddress, testPosition,
+                roles);
+        
+        
+        final ClientResource userEditClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        System.out.println(body);
+        this.assertFreemarker(body);
+        
+        Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
+        Assert.assertTrue("Page missing title", body.contains(testTitle));
+        Assert.assertTrue("Page missing first name", body.contains(testFirstName));
+        Assert.assertTrue("Page missing last name", body.contains(testLastName));
+        Assert.assertTrue("Page missing organization", body.contains(testOrganization));
+        Assert.assertTrue("Page missing phone", body.contains(testPhone));
+        Assert.assertTrue("Page missing position", body.contains(testPosition));
+        Assert.assertTrue("Page missing address", body.contains(testAddress));
+        Assert.assertTrue("Page missing home page", body.contains(testHomePage));
+        Assert.assertTrue("Page missing orcid", body.contains(testOrcid));
     }
     
     /**

@@ -3,7 +3,6 @@
 <#-- @ftlvariable name="roleObjectList" type="java.util.ArrayList<podd.model.user.RepositoryRole>" -->
 <#-- @ftlvariable name="requestedUser" type="podd.model.user.User" -->
 <#-- @ftlvariable name="isAdmin" type="boolean" -->
-<#-- @ftlvariable name="hasChanged" type="boolean" -->
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
 <#-- @ftlvariable name="userNameError" type="java.lang.String" -->
 <#-- @ftlvariable name="emailError" type="java.lang.String" -->
@@ -31,22 +30,19 @@
 
     <p>
     <h4 class="errorMsg">${errorMessage!""}</h4>
-	<#if hasChanged>
-		<h4>PODD has detected a change in your institutional details. Would you like to update your PODD account and contact details?</h4>
-	</#if>
 
     <#if requestedUser?? && requestedUser?has_content>
 
         <#if isAdmin?? && isAdmin>
-        <form name="edit_user" enctype="multipart/form-data" action="${baseUrl}/admin/user/${requestedUser.userName!"unknown-username"}/edit" method="POST" onsubmit="return validateUserInfo()">
+        <form name="edit_user" enctype="multipart/form-data" action="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}/edit" method="POST" onsubmit="return validateUserInfo()">
             <#else>
-        <form name="edit_user" enctype="multipart/form-data" action="${baseUrl}/user/${requestedUser.userName!"unknown-username"}/edit" method="POST" onsubmit="return validateUserInfo()">
+        <form name="edit_user" enctype="multipart/form-data" action="${baseUrl}/user/${requestedUser.identifier!"unknown-username"}/edit" method="POST" onsubmit="return validateUserInfo()">
         </#if>
 
         <div id="admin_left_pane" class="fieldset_without_border">
 			<div class="legend_no_indent">Account Details</div>
 			<ol>
-				<li><span class="bold">User Name: </span>${requestedUser.userName!""}</li>
+				<li><span class="bold">User Name: </span>${requestedUser.identifier!""}</li>
 				<li>
 					<label for="email" class="bold">Email Address:
 						<span icon="required"></span>
@@ -62,29 +58,12 @@
 							<ol>
 								<#list statusList as status>
 									<li>
-										<#if requestedUser.status?? && requestedUser.status == status>
+										<#if requestedUser.userStatus?? && requestedUser.userStatus == status>
 											<input id="${status}" class="narrow" name="status" type="radio" value="${status}" checked>       
 										<#else>
 											<input id="${status}" class="narrow" name="status" type="radio" value="${status}">
 										</#if>       
 										<label for="${status}" class="bold">${status}</label>
-									</li>
-								</#list>
-							</ol>
-						</div>
-					</li>
-					<li>
-						<div class="fieldset_without_border radioGroup">
-							<div class="legend_no_indent radioGroup">Roles:</div>
-							<ol>
-								<#list roleObjectList as role>
-									<li>
-										<#if requestedUser.repositoryRole?? && requestedUser.repositoryRole == role>
-											<input id=${role.name!""} class="narrow" name="role" type="radio" value=${role.name!""} checked>
-										<#else>
-											<input id=${role.name!""} class="narrow" name="role" type="radio" value=${role.name!""}>
-										</#if>
-										<label for=${role.name!""} class="bold">${role.description!""}</label>
 									</li>
 								</#list>
 							</ol>
@@ -123,7 +102,7 @@
 					<label for="organisation" class="bold">Organisation/Institution:
 						<span icon="required"></span>
 					</label>
-					<input id="organisation" name="organisation" type="text" value="${requestedUser.affiliation!""}">
+					<input id="organisation" name="organisation" type="text" value="${requestedUser.organization!""}">
 					<h6 class="errorMsg" id='errorOrganisation'>${organisationError!""}</h6>
 				</li>
 				<li>
@@ -135,20 +114,25 @@
 					<label for="phone" class="bold">Phone Number:
 						<span icon="required"></span>
 					</label>
-					<input id="phone" name="phone" type="text" value="${requestedUser.phoneNumber!""}">
+					<input id="phone" name="phone" type="text" value="${requestedUser.phone!""}">
 					<h6 class="errorMsg" id='errorPhone'>${phoneError!""}</h6>
 				</li>
 				<li>
 					<label for="address" class="bold">Mailing Address:
 						<span icon="required"></span>
 					</label>
-					<textarea id="address" name="address" cols="30" rows="4">${requestedUser.postalAddress!""}</textarea>
+					<textarea id="address" name="address" cols="30" rows="4">${requestedUser.address!""}</textarea>
 					<h6 class="errorMsg" id='errorAddress'>${addressError!""}</h6>
 				</li>
 				<li>
 					<label for="url" class="bold">URL:</label>
-					<input id="url" name="url" type="text" value="${requestedUser.homepage!""}">
+					<input id="url" name="url" type="text" value="${requestedUser.homePage!""}">
                     <h6 class="errorMsg" id='errorURL'>${urlError!""}</h6>
+				</li>
+				<li>
+					<label for="orcid" class="bold">ORCID ID:</label>
+					<input id="orcid" name="orcid" type="text" value="${requestedUser.orcid!""}">
+                    <h6 class="errorMsg" id='errorOrcid'>${urlError!""}</h6>
 				</li>
 			</ol>
 		</div>
@@ -156,9 +140,9 @@
 		<div id="buttonwrapper">
 			<button type="submit">Update Details</button>
 	        <#if isAdmin?? && isAdmin>
-	        <a href="${baseUrl}/admin/user/${requestedUser.userName!"unknown-username"}">Cancel</a>
+	        <a href="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}">Cancel</a>
 	        	<#else>
-	        <a href="${baseUrl}/user/${requestedUser.userName!"unknown-username"}">Cancel</a>
+	        <a href="${baseUrl}/user/${requestedUser.identifier!"unknown-username"}">Cancel</a>
 	        </#if>
 		</div>
     </#if>

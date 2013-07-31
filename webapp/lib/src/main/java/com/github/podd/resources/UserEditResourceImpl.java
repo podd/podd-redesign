@@ -42,6 +42,7 @@ import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
+import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -79,7 +80,7 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
-        // Even though this page only displays user information, since the intention of the page is
+        // Even though this page only displays user information, since the intention is
         // to modify user information, the Action is considered as a "User Edit".
         PoddAction action = PoddAction.OTHER_USER_EDIT;
         if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
@@ -90,7 +91,7 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "editUser.html.ftl");
-        dataModel.put("pageTitle", "Edit PODD User Page");
+        dataModel.put("pageTitle", "Edit PODD User");
         dataModel.put("title", "Edit User");
         dataModel.put("authenticatedUsername", user.getIdentifier());
         
@@ -105,13 +106,10 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         {
             dataModel.put("requestedUser", poddUser);
             
-            final Set<Role> roles = realm.findRoles(poddUser);
-            dataModel.put("repositoryRoleList", roles);
+            PoddUserStatus[] statuses = PoddUserStatus.values();
+            dataModel.put("statusList", statuses);
         }
         
-        
-        // Output the base template, with contentTemplate from the dataModel defining the
-        // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
