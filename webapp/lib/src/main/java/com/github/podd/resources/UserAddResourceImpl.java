@@ -73,9 +73,8 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("title", "Create User");
         dataModel.put("authenticatedUsername", user.getIdentifier());
         
-        final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        
-        // FIXME - complete necessary info for Add User page
+        PoddUserStatus[] statuses = PoddUserStatus.values();
+        dataModel.put("statusList", statuses);
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page

@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -39,6 +38,25 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserAddResourceImplTest extends AbstractResourceImplTest
 {
+ 
+    /**
+     * Test display of add new user page
+     */
+    @Test
+    public void testAddUserHtml() throws Exception
+    {
+        final ClientResource userAddClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        this.assertFreemarker(body);
+        
+        Assert.assertTrue("Page missing INACTIVE status", body.contains("INACTIVE"));
+    }
     
     /**
      * Test adding a PoddUser without using the utility method AbstractResourceImplTest.loadTestUser() 
@@ -177,6 +195,27 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
     }
 
+    /**
+     * Test displaying of add new user page fails when not an administrative user
+     */
+    @Test
+    public void testErrorAddUserWithoutAdminPrivilegesHtml() throws Exception
+    {
+        final ClientResource userAddClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
+        
+        try
+        {
+                RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
+                Assert.fail("Should have thrown a ResourceException");
+        }
+        catch (ResourceException e)
+        {
+            Assert.assertEquals("Expected an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+    }
+    
     @Test
     public void testErrorAddUserWithIdentifierNotMatchingEmailRdf() throws Exception
     {
