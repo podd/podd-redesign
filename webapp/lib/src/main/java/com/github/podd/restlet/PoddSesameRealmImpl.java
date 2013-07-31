@@ -153,11 +153,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     public URI addUser(final PoddUser nextUser)
     {
-        if (this.findUser(nextUser.getIdentifier()) != null)
-        {
-            throw new RuntimeException("User already exists");
-        }
-        
         final URI nextUserUUID = super.addUser(nextUser);
         
         this.log.debug("adding org, orcid, uri");

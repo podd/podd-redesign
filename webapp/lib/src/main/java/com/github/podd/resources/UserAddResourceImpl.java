@@ -109,16 +109,11 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
             // - create new PoddUser and add to Realm
             newUser = this.modelToUser(newUserModel);
             
-            // TODO: better to throw a specific exception (e.g. DuplicateUserException) that could
-            // be caught further below
-            try
+            if (nextRealm.findUser(newUser.getIdentifier()) != null)
             {
-                newUserUri = nextRealm.addUser(newUser);
+                throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, "User already exists");
             }
-            catch(RuntimeException e)
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, e);
-            }
+            newUserUri = nextRealm.addUser(newUser);
             
             this.log.debug("Added new User <{}>", newUser.getIdentifier());
             
