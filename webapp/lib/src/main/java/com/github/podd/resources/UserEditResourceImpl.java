@@ -39,9 +39,9 @@ import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
-import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -79,14 +79,14 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
-        // TODO: identify needed Action
-        PoddAction action = PoddAction.OTHER_USER_READ;
+        // Even though this page only displays user information, since the intention of the page is
+        // to modify user information, the Action is considered as a "User Edit".
+        PoddAction action = PoddAction.OTHER_USER_EDIT;
         if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
         {
-            action = PoddAction.CURRENT_USER_READ;
+            action = PoddAction.CURRENT_USER_EDIT;
         }
-        this.checkAuthentication(action);
-        
+        this.checkAuthentication(action);        
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "editUser.html.ftl");
@@ -118,19 +118,41 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
     
     /**
      * Handle an HTTP POST request submitting RDF data to edit an existing PoddUser.
-     * 
-     * FIXME: Implement me, just copied code from addUserRdf
      */
     @Post("rdf|rj|json|ttl")
     public Representation editUserRdf(final Representation entity, final Variant variant) throws ResourceException
     {
+        this.log.info("editUserRdf");
+        
+        final String requestedUserIdentifier =
+                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
+        this.log.info("requesting details of user: {}", requestedUserIdentifier);
+        
+        if(requestedUserIdentifier == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit");
+        }
+        
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
+
         // check authentication first
-        this.checkAuthentication(PoddAction.USER_CREATE);
+        PoddAction action = PoddAction.OTHER_USER_EDIT;
+        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
+        {
+            action = PoddAction.CURRENT_USER_EDIT;
+        }
+        this.checkAuthentication(action);        
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         
-        URI newUserUri = null;
-        PoddUser modifiedUser = null;
+        final RestletUtilUser currentUser = nextRealm.findUser(requestedUserIdentifier);
+        if (currentUser == null || !(currentUser instanceof PoddUser))
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");
+        }
+        final PoddUser poddUser = (PoddUser) currentUser;
+        URI userUri = null;
         try
         {
             // - get input stream with RDF content
@@ -139,23 +161,20 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model modifiedUserModel = Rio.parse(inputStream, "", inputFormat);
             
-            // - create new PoddUser and add to Realm
-            modifiedUser = this.modelToUser(modifiedUserModel);
             
-            // TODO: better to throw a specific exception (e.g. DuplicateUserException) that could
-            // be caught further below
-            try
-            {
-                newUserUri = nextRealm.addUser(modifiedUser);
-            }
-            catch(RuntimeException e)
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, e);
-            }
+            // - create PoddUser with edited details
+            this.modelToUser(modifiedUserModel, poddUser);
             
-            this.log.debug("Added new User <{}>", modifiedUser.getIdentifier());
+            this.log.info("Received Modified User Details for [{}]", requestedUserIdentifier);
+            DebugUtils.printContents(modifiedUserModel);
+            this.log.info("User will be modified to: " + poddUser.getFirstName() + " " + poddUser.getLastName());
             
-            // - map Roles for the new User
+            // add User to Realm, overwriting the previous record
+            userUri = nextRealm.addUser(poddUser);
+            
+            this.log.debug("Updated User <{}>", poddUser.getIdentifier());
+            
+            // - re-map Roles for the User
             final Iterator<Resource> iterator =
                     modifiedUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects().iterator();
             while(iterator.hasNext())
@@ -169,20 +188,20 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
                 final URI mappedObject =
                         modifiedUserModel.filter(mappingUri, PoddWebConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
                 
-                this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", modifiedUser.getIdentifier(),
+                this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", poddUser.getIdentifier(),
                         role.getName(), mappedObject);
                 if(mappedObject != null)
                 {
-                    nextRealm.map(modifiedUser, role.getRole(), mappedObject);
+                    nextRealm.map(poddUser, role.getRole(), mappedObject);
                 }
                 else
                 {
-                    nextRealm.map(modifiedUser, role.getRole());
+                    nextRealm.map(poddUser, role.getRole());
                 }
             }
             
             // - check the User was successfully added to the Realm
-            final RestletUtilUser findUser = nextRealm.findUser(modifiedUser.getIdentifier());
+            final RestletUtilUser findUser = nextRealm.findUser(poddUser.getIdentifier());
             if(findUser == null)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to add user");
@@ -205,8 +224,8 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         try
         {
             final Model model = new LinkedHashModel();
-            model.add(newUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PoddRdfConstants.VF.createLiteral(modifiedUser.getIdentifier()));
+            model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
+                    PoddRdfConstants.VF.createLiteral(poddUser.getIdentifier()));
             Rio.write(model, output, outputFormat);
         }
         catch(final OpenRDFException e)
@@ -218,59 +237,75 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
-     * Helper method to construct a {@link PoddUser} from information in the given {@link Model}.
+     * Helper method to update the {@link PoddUser} with information in the given {@link Model}.
      * 
      * @param model
      * @return
      * @throws ResourceException
      *             if mandatory data is missing.
      */
-    private PoddUser modelToUser(final Model model)
+    private void modelToUser(final Model model, final PoddUser currentUser)
     {
-        final String identifier = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
-        if(identifier == null || identifier.trim().length() == 0)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Identifier cannot be empty");
-        }
+        // User identifier and email are fixed and cannot be changed
         
         final String password = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
-        if(password == null || password.trim().length() == 0)
+        if (password != null)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Password cannot be empty");
+            currentUser.setSecret(password.toCharArray());
         }
         
         final String firstName = model.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString();
-        final String lastName = model.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString();
-        // PODD-specific requirement. First/Last names are mandatory.
-        if(firstName == null || lastName == null)
+        if(firstName != null)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User First/Last name cannot be empty");
+            currentUser.setFirstName(firstName);
         }
         
-        // PODD-specific requirement. Email has to be present and equal to the user Identifier.
-        final String email = model.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).objectString();
-        if(email == null)
+        final String lastName = model.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString();
+        if(lastName != null)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Email cannot be empty");
-        }
-        else if(!email.equalsIgnoreCase(identifier))
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
-                    "User Email has to be the same as User Identifier");
+            currentUser.setLastName(lastName);
         }
         
         final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
+        if (homePage != null)
+        {
+            currentUser.setHomePage(homePage);
+        }
+        
         final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
+        if (organization != null)
+        {
+            currentUser.setOrganization(organization);
+        }
+        
         final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
+        if (orcidID != null)
+        {
+            currentUser.setOrcid(orcidID);
+        }
+        
         final String title = model.filter(null, PoddRdfConstants.PODD_USER_TITLE, null).objectString();
+        if (title != null)
+        {
+            currentUser.setTitle(title);
+        }
+        
         final String phone = model.filter(null, PoddRdfConstants.PODD_USER_PHONE, null).objectString();
+        if (phone != null)
+        {
+            currentUser.setPhone(phone);
+        }
+        
         final String address = model.filter(null, PoddRdfConstants.PODD_USER_ADDRESS, null).objectString();
+        if (address != null)
+        {
+            currentUser.setAddress(address);
+        }
+        
         final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
-        
-        final PoddUser user =
-                new PoddUser(identifier, password.toCharArray(), firstName, lastName, email, PoddUserStatus.ACTIVE,
-                        homePage, organization, orcidID, title, phone, address, position);
-        
-        return user;
+        if (position != null)
+        {
+            currentUser.setPosition(position);
+        }
     }
 }

@@ -108,6 +108,21 @@ public enum PoddAction
             false),
     
     /**
+     * An action by a user asking to edit their details
+     * 
+     * By default all authenticated users can edit their user details.
+     */
+    CURRENT_USER_EDIT(true, "Could not edit current user details", Collections.<Role> emptySet(), false),
+    
+    /**
+     * An action by a user asking to edit information about another user.
+     * 
+     * By default if they are not administrators, they will not be able to edit information about
+     * other users.
+     */
+    OTHER_USER_EDIT(true, "Could not edit other user details", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
+            
+    /**
      * An action by an administrator asking to edit repository roles for a user.
      * 
      * By default only administrators are allowed to edit repository roles.
