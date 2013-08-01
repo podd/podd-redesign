@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.Timeout;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -55,6 +56,7 @@ import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -328,7 +330,7 @@ public class AbstractResourceImplTest
     protected String loadTestUser(final String testIdentifier, final String testPassword, final String testFirstName,
             final String testLastName, final String testEmail, final String testHomePage, final String testOrganization,
             final String testOrcid, final String testTitle, final String testPhone, final String testAddress,
-            final String testPosition, final Map<URI, URI> roles) throws Exception
+            final String testPosition, final Map<URI, URI> roles, final PoddUserStatus testStatus) throws Exception
     {
         // - create a Model of user
         final Model userInfoModel = new LinkedHashModel();
@@ -390,6 +392,16 @@ public class AbstractResourceImplTest
             userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_POSITION,
                 PoddRdfConstants.VF.createLiteral(testPosition));
         }
+        if(testStatus != null)
+        {
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS,
+                    PoddRdfConstants.VF.createLiteral(testStatus.name()));
+        }
+        else
+        {
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS,
+                    PoddRdfConstants.VF.createLiteral(PoddUserStatus.INACTIVE.name()));
+        }        
         
         // prepare: add Role Mappings
         for(Map.Entry<URI, URI> entry : roles.entrySet())

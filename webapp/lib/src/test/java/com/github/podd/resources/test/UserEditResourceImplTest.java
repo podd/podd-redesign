@@ -29,6 +29,7 @@ import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.PoddRoles;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -61,7 +62,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         final String testPosition = "Researcher";
         this.loadTestUser(testIdentifier, "testuserpassword", testFirstName, testLastName, testIdentifier,
                 testHomePage, testOrganization, testOrcid, testTitle, testPhone, testAddress, testPosition,
-                roles);
+                roles, PoddUserStatus.ACTIVE);
         
         
         final ClientResource userEditClientResource =
@@ -97,103 +98,6 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         final String testIdentifier = "testAdminUser";
-        
-        // prepare: retrieve Details of existing User
-        final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model userInfoModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 14);
-        // this.log.info("Retrieved [{}] details. ", testIdentifier);
-        // DebugUtils.printContents(userInfoModel);
-        
-        // prepare: modify existing User's details
-        final String modifiedFirstName = "Totally";
-        final String modifiedLastName = "Newman";
-        
-        final Resource userUri =
-                userInfoModel.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).subjects().iterator().next();
-        
-        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
-        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(modifiedFirstName));
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
-                PoddRdfConstants.VF.createLiteral(modifiedLastName));
-        
-        // submit modified details to Edit User Service
-        final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(userInfoModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
-        final Representation modifiedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response has correct identifier
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // verify: details have been correctly updated (by retrieving User details again)
-        final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
-        
-        final Representation updatedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 14);
-        
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Unexpected user URI", userUri.stringValue(),
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next()
-                        .stringValue());
-        Assert.assertEquals("First name was not modified", modifiedFirstName,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString());
-        Assert.assertEquals("Last name was not modified", modifiedLastName,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString());
-        Assert.assertEquals("Role count should not have changed", 2,
-                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
-    }
-    
-    /**
-     * Test display of other user Edit page as Administrator
-     */
-    @Ignore
-    @Test
-    public void testEditOtherUserHtml() throws Exception
-    {
-        Assert.fail("Not Implemented");
-    }
-    
-    /**
-     * Test authenticated edit of other user details as Administrator
-     */
-    @Test
-    public void testEditOtherUserRdf() throws Exception
-    {
-        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
-        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
-        
-        // prepare: add a Test User account
-        final String testIdentifier = "testuser@podd.com";
-        final Map<URI, URI> roles = new HashMap<URI, URI>();
-        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
-        this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
-                "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
-                roles);
         
         // prepare: retrieve Details of existing User
         final ClientResource userDetailsClientResource =
@@ -261,8 +165,110 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString());
         Assert.assertEquals("Last name was not modified", modifiedLastName,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString());
+        Assert.assertEquals("Role count should not have changed", 2,
+                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
+    }
+    
+    /**
+     * Test display of other user Edit page as Administrator
+     */
+    @Ignore
+    @Test
+    public void testEditOtherUserHtml() throws Exception
+    {
+        Assert.fail("Not Implemented");
+    }
+    
+    /**
+     * Test authenticated edit of other user details as Administrator
+     */
+    @Test
+    public void testEditOtherUserRdf() throws Exception
+    {
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final Map<URI, URI> roles = new HashMap<URI, URI>();
+        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
+                "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
+                roles, PoddUserStatus.ACTIVE);
+        
+        // prepare: retrieve Details of existing User
+        final ClientResource userDetailsClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final Model userInfoModel =
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 16);
+        // this.log.info("Retrieved [{}] details. ", testIdentifier);
+        // DebugUtils.printContents(userInfoModel);
+        
+        // prepare: modify existing User's details
+        final String modifiedFirstName = "Totally";
+        final String modifiedLastName = "Newman";
+        
+        final Resource userUri =
+                userInfoModel.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).subjects().iterator().next();
+        
+        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
+        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
+        userInfoModel.remove(userUri, PoddRdfConstants.PODD_USER_STATUS, null);
+        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
+                PoddRdfConstants.VF.createLiteral(modifiedFirstName));
+        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
+                PoddRdfConstants.VF.createLiteral(modifiedLastName));
+        userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS,
+                PoddRdfConstants.VF.createLiteral(PoddUserStatus.INACTIVE.name()));
+        
+        // submit modified details to Edit User Service
+        final ClientResource userEditClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Rio.write(userInfoModel, out, format);
+        final Representation input = new StringRepresentation(out.toString(), mediaType);
+        
+        final Representation modifiedResults =
+                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        // verify: response has correct identifier
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
+                        RDFFormat.RDFXML, 1);
+        Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        
+        // verify: details have been correctly updated (by retrieving User details again)
+        final ClientResource userDetailsClientResource2 =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+        
+        final Representation updatedResults =
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final Model resultsModel =
+                this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
+                        format, 16);
+        
+        Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        Assert.assertEquals("Unexpected user URI", userUri.stringValue(),
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next()
+                        .stringValue());
+        Assert.assertEquals("First name was not modified", modifiedFirstName,
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString());
+        Assert.assertEquals("Last name was not modified", modifiedLastName,
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString());
         Assert.assertEquals("Role count should not have changed", 1,
                 resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
+        Assert.assertEquals("Status was not modified", PoddUserStatus.INACTIVE.name(),
+                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString());
     }
     
     /**
@@ -315,7 +321,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
-                roles);
+                roles, PoddUserStatus.ACTIVE);
         
         // prepare: retrieve Details of existing User
         final ClientResource userDetailsClientResource =
@@ -326,7 +332,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model userInfoModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 15);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 16);
         // this.log.info("Retrieved [{}] details. ", testIdentifier);
         // DebugUtils.printContents(userInfoModel);
         

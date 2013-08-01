@@ -30,6 +30,7 @@ import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.PoddRoles;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -88,6 +89,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
                 PoddRdfConstants.VF.createLiteral("n/a"));
         userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral("n/a"));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, PoddRdfConstants.VF.createLiteral("INACTIVE"));
         
         userInfoModel
                 .add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL, PoddRdfConstants.VF.createLiteral(testEmail));
@@ -140,7 +142,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         String testUserUri =
                 this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                         "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address",
-                        "Researcher", roles);
+                        "Researcher", roles, PoddUserStatus.ACTIVE);
 
         // verify: 
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
@@ -154,13 +156,15 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 18);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 19);
         
         com.github.podd.utils.DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         Assert.assertEquals("Unexpected user URI", testUserUri,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
+        Assert.assertEquals("Unexpected user Status", PoddUserStatus.ACTIVE.name(),
+                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString());
     }
     
     @Test
@@ -172,7 +176,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         roles.put(PoddRoles.ADMIN.getURI(), null);
         roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
         String testUserUri = this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null,
-                null, null, null, null, null, roles);
+                null, null, null, null, null, roles, PoddUserStatus.ACTIVE);
 
         // verify: 
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
@@ -186,7 +190,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 11);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 12);
         
         //com.github.podd.utils.DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
@@ -281,7 +285,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         roles.put(PoddRoles.ADMIN.getURI(), null);
         roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null,
-                null, null, null, null, null, roles);
+                null, null, null, null, null, roles, PoddUserStatus.ACTIVE);
         
         // prepare: add another User account with same Identifier/email
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;

@@ -220,6 +220,13 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                     "User Email has to be the same as User Identifier");
         }
         
+        PoddUserStatus status = PoddUserStatus.INACTIVE;
+        String statusString = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString();
+        if (statusString != null && statusString.equalsIgnoreCase(PoddUserStatus.ACTIVE.name()))
+        {
+            status = PoddUserStatus.ACTIVE;
+        }
+        
         final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
         final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
         final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
@@ -229,7 +236,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
         
         final PoddUser user =
-                new PoddUser(identifier, password.toCharArray(), firstName, lastName, email, PoddUserStatus.ACTIVE,
+                new PoddUser(identifier, password.toCharArray(), firstName, lastName, email, status,
                         homePage, organization, orcidID, title, phone, address, position);
         
         return user;

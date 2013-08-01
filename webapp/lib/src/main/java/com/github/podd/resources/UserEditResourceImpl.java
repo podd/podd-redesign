@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -26,7 +25,6 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.security.Role;
 import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -304,6 +302,16 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         if (position != null)
         {
             currentUser.setPosition(position);
+        }
+        
+        final String statusString = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString();
+        if (statusString != null && statusString.equalsIgnoreCase(PoddUserStatus.ACTIVE.name()))
+        {
+            currentUser.setUserStatus(PoddUserStatus.ACTIVE);
+        }
+        else
+        {
+            currentUser.setUserStatus(PoddUserStatus.INACTIVE);
         }
     }
 }

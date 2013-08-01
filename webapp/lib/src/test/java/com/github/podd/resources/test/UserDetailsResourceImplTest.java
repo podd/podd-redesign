@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -30,6 +29,7 @@ import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.PoddRoles;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -115,7 +115,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
-                roles);        
+                roles, PoddUserStatus.ACTIVE);        
         
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
@@ -167,7 +167,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 14);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 15);
         
         // DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Not the expected identifier", "testAdminUser",
@@ -196,7 +196,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         roles.put(PoddRoles.PROJECT_ADMIN.getURI(), testObjectUri);
         final String testUserUri =
                 this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null, null,
-                        null, null, null, null, roles);
+                        null, null, null, null, roles, PoddUserStatus.ACTIVE);
         
         // retrieve user details:
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
@@ -210,13 +210,15 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 11);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 12);
         
         // verify:
         Assert.assertEquals("Not the expected User URI", testUserUri, 
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
         Assert.assertEquals("Not the expected object URI", testObjectUri, 
                 resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
+        Assert.assertEquals("Not the expected User Status", PoddUserStatus.ACTIVE.name(), 
+                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString());
     }
     
 }

@@ -39,6 +39,7 @@ import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
+import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -219,6 +220,15 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
             userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_POSITION, PoddRdfConstants.VF.createLiteral(user.getPosition()));
         }
         
+        if (user.getUserStatus() != null)
+        {
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddRdfConstants.VF.createLiteral(user.getUserStatus().name()));
+        }
+        else
+        {
+            //INACTIVE by default
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddRdfConstants.VF.createLiteral(PoddUserStatus.INACTIVE.name()));
+        }
         
         this.log.debug("User has {} roles", roles.size());
         
