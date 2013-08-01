@@ -127,6 +127,26 @@ public class PoddSesameRealmTest
                 recvdPoddUser.getHomePage());
         Assert.assertEquals("Returned user Organization different to original", "Some Organization",
                 recvdPoddUser.getOrganization());
+        Assert.assertEquals("Returned user has incorrect status", PoddUserStatus.ACTIVE, recvdPoddUser.getUserStatus());
+    }
+    
+    @Test
+    public void testAddUserWithInactiveStatus() throws Exception
+    {
+        final String testIdentifier = "xTest@example.com";
+        final PoddUser testUser =
+                new PoddUser(testIdentifier, "secret".toCharArray(), "First", "Last", testIdentifier,
+                        PoddUserStatus.INACTIVE, PoddRdfConstants.VF.createURI("http://example.org/" + testIdentifier),
+                        "Some Organization", "SOME_ORCID_ID");
+        this.testRealm.addUser(testUser);
+        
+        final RestletUtilUser retrievedUser = this.testRealm.findUser(testIdentifier);
+        Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
+        Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
+        
+        final PoddUser recvdPoddUser = (PoddUser)retrievedUser;
+        Assert.assertEquals("Returned user has incorrect status", PoddUserStatus.INACTIVE,
+                recvdPoddUser.getUserStatus());
     }
     
     @Test

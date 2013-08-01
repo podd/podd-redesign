@@ -203,6 +203,14 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                         this.vf.createLiteral(nextUser.getPosition()), this.getContexts());
             }
             
+            PoddUserStatus status = PoddUserStatus.INACTIVE;
+            if(nextUser.getUserStatus() != null)
+            {
+                status = nextUser.getUserStatus();
+            }
+            conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_STATUS, this.vf.createLiteral(status.name()),
+                    this.getContexts());
+            
             conn.commit();
         }
         catch(final RepositoryException e)
@@ -262,7 +270,13 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 new PoddUser(userIdentifier, bindingSet.getValue(PoddSesameRealm.PARAM_USER_SECRET).stringValue()
                         .toCharArray(), bindingSet.getValue(PoddSesameRealm.PARAM_USER_FIRSTNAME).stringValue(),
                         bindingSet.getValue(PoddSesameRealm.PARAM_USER_LASTNAME).stringValue(), bindingSet.getValue(
-                                PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.ACTIVE);
+                                PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.INACTIVE);
+
+        Value statusVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_STATUS);
+        if (statusVal != null && statusVal.stringValue().equalsIgnoreCase("ACTIVE"))
+        {
+            result.setUserStatus(PoddUserStatus.ACTIVE);
+        }
         
         final Value organizationVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         if(organizationVal != null)
@@ -467,6 +481,13 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(PoddSesameRealm.PARAM_USER_SECRET);
         query.append(" . ");
         
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddRdfConstants.PODD_USER_STATUS + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_STATUS);
+        query.append(" . ");
+
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddRdfConstants.PODD_USER_HOMEPAGE + "> ");
