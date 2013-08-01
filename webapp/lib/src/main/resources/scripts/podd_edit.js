@@ -1957,6 +1957,7 @@ podd.submitCreateUser = function() {
 	  var userName = $('#userName').val();
 	  var email = $('#email').val();
 	  var password = $('#password').val();
+	  var status = $('input:radio[name=status]:checked').val();
 	  var title = $('#title').val();
 	  var firstName = $('#firstName').val();
 	  var lastName = $('#lastName').val();
@@ -1978,7 +1979,10 @@ podd.submitCreateUser = function() {
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#organization>', organisation, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#phone>', phone, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#address>', address, DATATYPE_PROPERTY, XSD_STRING));
-	  
+
+	  if (typeof status !== 'undefined' && status !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#status>', status, DATATYPE_PROPERTY, XSD_STRING));
+	  }
 	  if (typeof title !== 'undefined' && title !== '') {
 		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#title>', title, DATATYPE_PROPERTY, XSD_STRING));
 	  }

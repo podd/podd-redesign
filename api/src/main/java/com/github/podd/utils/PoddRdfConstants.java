@@ -302,6 +302,10 @@ public interface PoddRdfConstants
     public static final URI PODD_FILE_REPOSITORY_SECRET = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositorySecret");
 
+    /** http://purl.org/podd/ns/poddUser#status */
+    public static final URI PODD_USER_STATUS =  PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_USER, "status");
+
     /** http://purl.org/podd/ns/poddUser#homepage */
     public static final URI PODD_USER_HOMEPAGE =  PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_USER, "homepage");
