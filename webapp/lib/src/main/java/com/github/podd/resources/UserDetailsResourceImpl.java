@@ -222,12 +222,12 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
         
         if (user.getUserStatus() != null)
         {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddRdfConstants.VF.createLiteral(user.getUserStatus().name()));
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, user.getUserStatus().getURI());
         }
         else
         {
             //INACTIVE by default
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddRdfConstants.VF.createLiteral(PoddUserStatus.INACTIVE.name()));
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         }
         
         this.log.debug("User has {} roles", roles.size());

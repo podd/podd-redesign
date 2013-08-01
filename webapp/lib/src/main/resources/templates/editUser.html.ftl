@@ -59,11 +59,15 @@
 								<#list statusList as status>
 									<li>
 										<#if requestedUser.userStatus?? && requestedUser.userStatus == status>
-											<input id="${status}" class="narrow" name="status" type="radio" value="${status}" checked>       
+											<input id="${status.URI}" class="narrow" name="status" type="radio" value="${status.URI}" checked
+											<#if !isAdmin> disabled="true"</#if>
+											>       
 										<#else>
-											<input id="${status}" class="narrow" name="status" type="radio" value="${status}">
+											<input id="${status.URI}" class="narrow" name="status" type="radio" value="${status.URI}"
+											<#if !isAdmin> disabled="true"</#if>
+											>
 										</#if>       
-										<label for="${status}" class="bold">${status}</label>
+										<label for="${status.URI}" class="bold">${status.label}</label>
 									</li>
 								</#list>
 							</ol>

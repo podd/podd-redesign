@@ -221,10 +221,10 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         }
         
         PoddUserStatus status = PoddUserStatus.INACTIVE;
-        String statusString = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString();
-        if (statusString != null && statusString.equalsIgnoreCase(PoddUserStatus.ACTIVE.name()))
+        final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
+        if (statusUri != null)
         {
-            status = PoddUserStatus.ACTIVE;
+            status = PoddUserStatus.getUserStatusByUri(statusUri);
         }
         
         final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();

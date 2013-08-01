@@ -25,7 +25,7 @@
             <ol>
                 <li><span class="bold">User Name: </span>${requestedUser.identifier!""}</li>
                 <li><span class="bold">Email Address: </span>${requestedUser.email!""}</li>
-                <li><span class="bold">Status: </span>${requestedUser.userStatus!""}</li>
+                <li><span class="bold">Status: </span>${requestedUser.userStatus.label!""}</li>
                 
 				<#if repositoryRoleList??>
 	                <li><span class="bold">Roles: </span></li>

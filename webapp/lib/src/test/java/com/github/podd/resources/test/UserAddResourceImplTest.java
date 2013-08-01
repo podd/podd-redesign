@@ -56,14 +56,17 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final String body = results.getText();
         this.assertFreemarker(body);
         
-        Assert.assertTrue("Page missing INACTIVE status", body.contains("INACTIVE"));
+        System.out.println(body);
+        
+        Assert.assertTrue("Page missing INACTIVE status", body.contains(PoddUserStatus.INACTIVE.getLabel()));
+        Assert.assertTrue("Page missing password field", body.contains("password"));
     }
     
     /**
      * Test adding a PoddUser without using the utility method AbstractResourceImplTest.loadTestUser() 
      */
     @Test
-    public void testAddUserRdfBasic() throws Exception
+    public void testAddUserBasicRdf() throws Exception
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
@@ -89,7 +92,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
                 PoddRdfConstants.VF.createLiteral("n/a"));
         userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral("n/a"));
-        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, PoddRdfConstants.VF.createLiteral("INACTIVE"));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         
         userInfoModel
                 .add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL, PoddRdfConstants.VF.createLiteral(testEmail));
@@ -163,8 +166,8 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         Assert.assertEquals("Unexpected user URI", testUserUri,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
-        Assert.assertEquals("Unexpected user Status", PoddUserStatus.ACTIVE.name(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString());
+        Assert.assertEquals("Unexpected user Status", PoddUserStatus.ACTIVE.getURI(),
+                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
     }
     
     @Test
@@ -176,7 +179,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         roles.put(PoddRoles.ADMIN.getURI(), null);
         roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
         String testUserUri = this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null,
-                null, null, null, null, null, roles, PoddUserStatus.ACTIVE);
+                null, null, null, null, null, roles, null);
 
         // verify: 
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
@@ -192,11 +195,13 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final Model resultsModel =
                 this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 12);
         
-        //com.github.podd.utils.DebugUtils.printContents(resultsModel);
+        com.github.podd.utils.DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         Assert.assertEquals("Unexpected user URI", testUserUri,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
+        Assert.assertEquals("User Status was not set to INACTIVE by default", PoddUserStatus.INACTIVE.getURI(),
+                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
     }
 
     /**
@@ -276,7 +281,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
     }
     
     @Test
-    public void testErrorAddDuplicateUser() throws Exception
+    public void testErrorAddDuplicateUserRdf() throws Exception
     {
         final String testIdentifier = "testuser@podd.com";
 

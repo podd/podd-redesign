@@ -267,8 +267,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString());
         Assert.assertEquals("Role count should not have changed", 1,
                 resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
-        Assert.assertEquals("Status was not modified", PoddUserStatus.INACTIVE.name(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString());
+        Assert.assertEquals("Status was not modified", PoddUserStatus.INACTIVE.getURI(),
+                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
     }
     
     /**

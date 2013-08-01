@@ -24,7 +24,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.Timeout;
-import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -394,13 +393,11 @@ public class AbstractResourceImplTest
         }
         if(testStatus != null)
         {
-            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS,
-                    PoddRdfConstants.VF.createLiteral(testStatus.name()));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, testStatus.getURI());
         }
         else
         {
-            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS,
-                    PoddRdfConstants.VF.createLiteral(PoddUserStatus.INACTIVE.name()));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         }        
         
         // prepare: add Role Mappings

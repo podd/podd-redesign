@@ -224,8 +224,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             {
                 status = nextUser.getUserStatus();
             }
-            conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_STATUS, this.vf.createLiteral(status.name()),
-                    this.getContexts());
+            conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_STATUS, status.getURI(), this.getContexts());
             
             conn.commit();
         }
@@ -288,11 +287,13 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                         bindingSet.getValue(PoddSesameRealm.PARAM_USER_LASTNAME).stringValue(), bindingSet.getValue(
                                 PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.INACTIVE);
 
+        PoddUserStatus userStatus = PoddUserStatus.INACTIVE;
         Value statusVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_STATUS);
-        if (statusVal != null && statusVal.stringValue().equalsIgnoreCase("ACTIVE"))
+        if (statusVal != null && statusVal instanceof URI)
         {
-            result.setUserStatus(PoddUserStatus.ACTIVE);
+            userStatus = PoddUserStatus.getUserStatusByUri((URI)statusVal);
         }
+        result.setUserStatus(userStatus);
         
         final Value organizationVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         if(organizationVal != null)

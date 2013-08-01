@@ -167,7 +167,7 @@ public class PoddSesameRealmTest
         final String testUser2FirstName = "Jason";
         final String testUser2LastName = "Bourne";
         final PoddUser testUser2 =
-                new PoddUser(testUserId, "secret".toCharArray(), testUser2FirstName, "Bourne", testUserId, PoddUserStatus.ACTIVE,
+                new PoddUser(testUserId, "secret".toCharArray(), testUser2FirstName, "Bourne", testUserId, PoddUserStatus.INACTIVE,
                         testUser2HomePage, "CSIRO", "john_ORCID_cloned22");
 
         // try to add another user with same identifier
@@ -187,7 +187,9 @@ public class PoddSesameRealmTest
         PoddUser userFromRealm = (PoddUser)this.testRealm.findUser(testUserId);
         Assert.assertEquals("First name was not overwritten", testUser2FirstName, userFromRealm.getFirstName());
         Assert.assertEquals("Last name was not overwritten", testUser2LastName, userFromRealm.getLastName());
-        Assert.assertEquals("Home Page was not overwritten", testUser2HomePage, userFromRealm.getHomePage());    }
+        Assert.assertEquals("Home Page was not overwritten", testUser2HomePage, userFromRealm.getHomePage()); 
+        Assert.assertEquals("Status was not overwritten", PoddUserStatus.INACTIVE, userFromRealm.getUserStatus()); 
+    }
     
     @Test
     public void testGetRolesForObjectWithMiscCombinations() throws Exception

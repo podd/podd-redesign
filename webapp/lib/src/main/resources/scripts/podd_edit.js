@@ -1981,7 +1981,7 @@ podd.submitCreateUser = function() {
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#address>', address, DATATYPE_PROPERTY, XSD_STRING));
 
 	  if (typeof status !== 'undefined' && status !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#status>', status, DATATYPE_PROPERTY, XSD_STRING));
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#status>', status, OBJECT_PROPERTY, 'URI'));
 	  }
 	  if (typeof title !== 'undefined' && title !== '') {
 		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#title>', title, DATATYPE_PROPERTY, XSD_STRING));

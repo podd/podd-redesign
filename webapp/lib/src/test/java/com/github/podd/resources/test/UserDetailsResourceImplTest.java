@@ -217,8 +217,8 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
         Assert.assertEquals("Not the expected object URI", testObjectUri, 
                 resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
-        Assert.assertEquals("Not the expected User Status", PoddUserStatus.ACTIVE.name(), 
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString());
+        Assert.assertEquals("Not the expected User Status", PoddUserStatus.ACTIVE.getURI(), 
+                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
     }
     
 }
