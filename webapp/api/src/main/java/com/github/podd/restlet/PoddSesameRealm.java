@@ -1,7 +1,6 @@
 package com.github.podd.restlet;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.openrdf.model.URI;
@@ -43,7 +42,7 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
     }
     
     /**
-     * This method adds a User entry to the Realm and underlying Sesame Repository including
+     * This method adds a new User entry to the Realm and underlying Sesame Repository including
      * PODD-specific user parameters.
      * 
      * @param nextUser
@@ -150,5 +149,13 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      * @param optionalObjectUri
      */
     public abstract void map(User user, Role role, URI optionalObjectUri);
+    
+    /**
+     * This method modifies a User entry that already exists in the underlying Sesame Repository.
+     * 
+     * @param nextUser
+     * @return
+     */
+    public abstract URI updateUser(final PoddUser nextUser);
     
 }

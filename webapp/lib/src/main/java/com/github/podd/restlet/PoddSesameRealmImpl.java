@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
+import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
@@ -152,9 +153,24 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     public URI addUser(final PoddUser nextUser)
     {
+        return this.addUser(nextUser, true);
+    }
+    
+    protected URI addUser(final PoddUser nextUser, final boolean isNew)
+    {
+        final RestletUtilUser oldUser = this.findUser(nextUser.getIdentifier());
+        if (isNew && oldUser != null)
+        {
+            throw new RuntimeException("User already exists");
+        }
+        else if (!isNew && oldUser == null)
+        {
+            throw new RuntimeException("Could not modify User (does not exist)");
+        }
+        
         final URI nextUserUUID = super.addUser(nextUser);
         
-        this.log.debug("adding org, orcid, uri");
+        this.log.debug("adding PODD specific parameters");
         
         RepositoryConnection conn = null;
         try
@@ -774,4 +790,10 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         }
     }
     
+    @Override
+    public URI updateUser(final PoddUser nextUser)
+    {
+        return this.addUser(nextUser, false);
+    }
+
 }

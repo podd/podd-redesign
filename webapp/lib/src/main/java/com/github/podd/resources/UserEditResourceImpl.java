@@ -165,8 +165,8 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
             DebugUtils.printContents(modifiedUserModel);
             this.log.info("User will be modified to: " + poddUser.getFirstName() + " " + poddUser.getLastName());
             
-            // add User to Realm, overwriting the previous record
-            userUri = nextRealm.addUser(poddUser);
+            // modify User record in the Realm
+            userUri = nextRealm.updateUser(poddUser);
             
             this.log.debug("Updated User <{}>", poddUser.getIdentifier());
             

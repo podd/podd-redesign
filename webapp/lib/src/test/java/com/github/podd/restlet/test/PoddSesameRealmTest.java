@@ -150,7 +150,7 @@ public class PoddSesameRealmTest
     }
     
     @Test
-    public void testOverwriteUser() throws Exception
+    public void testUpdateUser() throws Exception
     {
         final String testUserId = "john@example.com";
         
@@ -170,8 +170,19 @@ public class PoddSesameRealmTest
                 new PoddUser(testUserId, "secret".toCharArray(), testUser2FirstName, "Bourne", testUserId, PoddUserStatus.ACTIVE,
                         testUser2HomePage, "CSIRO", "john_ORCID_cloned22");
 
-        // add another user with same identifier (should overwrite)
-        this.testRealm.addUser(testUser2);
+        // try to add another user with same identifier
+        try
+        {
+            this.testRealm.addUser(testUser2);
+            Assert.fail("Should have thrown an Exception as User identifier already exists");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertTrue("Not the expected Exception", e.getMessage().contains("User already exists"));
+        }
+        
+        // modify the existing User
+        this.testRealm.updateUser(testUser2);
         
         PoddUser userFromRealm = (PoddUser)this.testRealm.findUser(testUserId);
         Assert.assertEquals("First name was not overwritten", testUser2FirstName, userFromRealm.getFirstName());
