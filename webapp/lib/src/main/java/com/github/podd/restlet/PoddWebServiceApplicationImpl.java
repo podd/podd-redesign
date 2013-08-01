@@ -21,12 +21,14 @@ import org.restlet.data.Protocol;
 import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Role;
+import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
+import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
@@ -50,6 +52,8 @@ import com.github.podd.resources.UserAddResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
 import com.github.podd.resources.UserEditResourceImpl;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddUser;
+import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 import freemarker.template.Configuration;
@@ -154,6 +158,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             // response
             return false;
         }
+        else if (this.isUserInactive(request.getClientInfo().getUser()))
+        {
+            this.log.error("Authenticates user is Inactive. user={}", request.getClientInfo().getUser());
+            return false;
+        }
         else if(!action.isRoleRequired())
         {
             return true;
@@ -205,7 +214,39 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         
         return true;
     }
-    
+
+    /**
+     * @param user
+     * @return false if the User's status is ACTIVE, true in all other cases
+     */
+    private boolean isUserInactive(final User user)
+    {
+        if (user == null)
+        {
+            return true;
+        }
+        
+        if(user instanceof PoddUser)
+        {
+            if(((PoddUser)user).getUserStatus() == PoddUserStatus.ACTIVE)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            RestletUtilUser findUser = this.getRealm().findUser(user.getIdentifier());
+            if (findUser != null && findUser instanceof PoddUser)
+            {
+                if (((PoddUser)findUser).getUserStatus() == PoddUserStatus.ACTIVE)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Call this method to clean up resources used by PODD. At present it shuts down the Repository.
      */
