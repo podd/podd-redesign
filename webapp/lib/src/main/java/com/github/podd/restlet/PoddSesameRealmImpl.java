@@ -111,7 +111,9 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             
             final PoddUser result =
                     new PoddUser(identifier, (char[])null, checkUser.getFirstName(), checkUser.getLastName(),
-                            checkUser.getEmail(), PoddUserStatus.ACTIVE);
+                            checkUser.getEmail(), checkUser.getUserStatus(), checkUser.getHomePage(),
+                            checkUser.getOrganization(), checkUser.getOrcid(), checkUser.getTitle(),
+                            checkUser.getPhone(), checkUser.getAddress(), checkUser.getPosition());
             
             return result;
         }
