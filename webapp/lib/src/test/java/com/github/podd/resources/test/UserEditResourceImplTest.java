@@ -48,24 +48,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testEditCurrentUserHtml() throws Exception
     {
-        // prepare: add a Test User account
-        final String testIdentifier = "testuser@podd.com";
-        final String testHomePage = "http:///www.john.doe.com";
-        final Map<URI, URI> roles = new HashMap<URI, URI>();
-        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
-        final String testFirstName = "John";
-        final String testLastName = "Doe";
-        final String testOrganization = "CSIRO";
-        final String testOrcid = "john-orcid";
-        final String testTitle = "Mr";
-        final String testPhone = "000333434";
-        final String testAddress = "Some Address";
-        final String testPosition = "Researcher";
-        this.loadTestUser(testIdentifier, "testuserpassword", testFirstName, testLastName, testIdentifier,
-                testHomePage, testOrganization, testOrcid, testTitle, testPhone, testAddress, testPosition,
-                roles, PoddUserStatus.ACTIVE);
-        
-        
+        final String testIdentifier = "testAdminUser";
         final ClientResource userEditClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
         
@@ -78,15 +61,11 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         this.assertFreemarker(body);
         
         Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
-        Assert.assertTrue("Page missing title", body.contains(testTitle));
-        Assert.assertTrue("Page missing first name", body.contains(testFirstName));
-        Assert.assertTrue("Page missing last name", body.contains(testLastName));
-        Assert.assertTrue("Page missing organization", body.contains(testOrganization));
-        Assert.assertTrue("Page missing phone", body.contains(testPhone));
-        Assert.assertTrue("Page missing position", body.contains(testPosition));
-        Assert.assertTrue("Page missing address", body.contains(testAddress));
-        Assert.assertTrue("Page missing home page", body.contains(testHomePage));
-        Assert.assertTrue("Page missing orcid", body.contains(testOrcid));
+        Assert.assertTrue("Page missing first name", body.contains("Test Admin"));
+        Assert.assertTrue("Page missing last name", body.contains("User"));
+        Assert.assertTrue("Page missing organization", body.contains("UQ"));
+        Assert.assertTrue("Page missing home page", body.contains("http://www.example.com/testAdmin"));
+        Assert.assertTrue("Page missing orcid", body.contains("Orcid-Test-Admin"));
     }
     
     /**
@@ -228,13 +207,50 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
-     * Test display of other user Edit page as Administrator
+     * Test display of another user's Edit page as Administrator
      */
-    @Ignore
     @Test
     public void testEditOtherUserHtml() throws Exception
     {
-        Assert.fail("Not Implemented");
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final String testHomePage = "http:///www.john.doe.com";
+        final Map<URI, URI> roles = new HashMap<URI, URI>();
+        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        final String testFirstName = "John";
+        final String testLastName = "Doe";
+        final String testOrganization = "CSIRO";
+        final String testOrcid = "john-orcid";
+        final String testTitle = "Mr";
+        final String testPhone = "000333434";
+        final String testAddress = "Some Address";
+        final String testPosition = "Researcher";
+        this.loadTestUser(testIdentifier, "testuserpassword", testFirstName, testLastName, testIdentifier,
+                testHomePage, testOrganization, testOrcid, testTitle, testPhone, testAddress, testPosition,
+                roles, PoddUserStatus.ACTIVE);
+        
+        
+        final ClientResource userEditClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        //System.out.println(body);
+        this.assertFreemarker(body);
+        
+        Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
+        Assert.assertTrue("Page missing title", body.contains(testTitle));
+        Assert.assertTrue("Page missing first name", body.contains(testFirstName));
+        Assert.assertTrue("Page missing last name", body.contains(testLastName));
+        Assert.assertTrue("Page missing organization", body.contains(testOrganization));
+        Assert.assertTrue("Page missing phone", body.contains(testPhone));
+        Assert.assertTrue("Page missing position", body.contains(testPosition));
+        Assert.assertTrue("Page missing address", body.contains(testAddress));
+        Assert.assertTrue("Page missing home page", body.contains(testHomePage));
+        Assert.assertTrue("Page missing orcid", body.contains(testOrcid));
     }
     
     /**
@@ -356,11 +372,23 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     /**
      * Test error trying to display other user Edit page as non-admin user
      */
-    @Ignore
     @Test
     public void testErrorEditOtherUserNonAdminHtml() throws Exception
     {
-        Assert.fail("Not Implemented");
+        final String testIdentifier = "testAdminUser";
+        final ClientResource userEditClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        
+        try
+        {
+            RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null, MediaType.TEXT_HTML,
+                    Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
+            Assert.fail("Should have thrown a ResourceException");
+        }
+        catch(ResourceException e)
+        {
+            Assert.assertEquals("Expected UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
     }
     
     /**
