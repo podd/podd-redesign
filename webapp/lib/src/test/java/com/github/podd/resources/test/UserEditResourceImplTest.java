@@ -93,7 +93,6 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
      * 
      * FIXME: investigate why this test fails. 
      */
-    @Ignore
     @Test
     public void testEditCurrentUserRdf() throws Exception
     {
@@ -230,8 +229,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 PoddRdfConstants.VF.createLiteral(modifiedFirstName));
         userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
                 PoddRdfConstants.VF.createLiteral(modifiedLastName));
-        userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS,
-                PoddRdfConstants.VF.createLiteral(PoddUserStatus.INACTIVE.name()));
+        userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         
         // submit modified details to Edit User Service
         final ClientResource userEditClientResource =

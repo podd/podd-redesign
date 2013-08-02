@@ -304,14 +304,12 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
             currentUser.setPosition(position);
         }
         
-        final String statusString = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectString();
-        if (statusString != null && statusString.equalsIgnoreCase(PoddUserStatus.ACTIVE.name()))
+        PoddUserStatus status = PoddUserStatus.INACTIVE;
+        final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
+        if (statusUri != null)
         {
-            currentUser.setUserStatus(PoddUserStatus.ACTIVE);
+            status = PoddUserStatus.getUserStatusByUri(statusUri);
         }
-        else
-        {
-            currentUser.setUserStatus(PoddUserStatus.INACTIVE);
-        }
+        currentUser.setUserStatus(status);
     }
 }
