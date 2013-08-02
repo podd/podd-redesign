@@ -226,14 +226,13 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
     }
     
     @Test
-    public void testErrorAddUserWithIdentifierNotMatchingEmailRdf() throws Exception
+    public void testErrorAddUserWithoutEmailRdf() throws Exception
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         // prepare: create a Model of user
         final String testIdentifier = "wrong@restlet-test.org";
-        final String testEmail = "testuser@restlet-test.org";
         final String testPassword = "testpassword";
         final String testFirstName = "First";
         final String testLastName = "Last";
@@ -241,15 +240,13 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final Model userInfoModel = new LinkedHashModel();
         final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(testEmail));
+                PoddRdfConstants.VF.createLiteral(testIdentifier));
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
                 PoddRdfConstants.VF.createLiteral(testPassword));
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
                 PoddRdfConstants.VF.createLiteral(testFirstName));
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
                 PoddRdfConstants.VF.createLiteral(testLastName));
-        userInfoModel
-                .add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL, PoddRdfConstants.VF.createLiteral(testIdentifier));
         
         // prepare: add 'Authenticated User' Role
         final URI authenticatedRoleMapping =
@@ -269,14 +266,14 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         {
             RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
                     Status.SUCCESS_OK, this.testWithAdminPrivileges);
-            Assert.fail("Should have failed due to mismatching identifier");
+            Assert.fail("Should have failed due to missing email");
         }
         catch(final ResourceException e)
         {
             // verify: the cause (simple string matching, not checking for valid RDF content)
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
             final String body = userAddClientResource.getResponseEntity().getText();
-            Assert.assertTrue("Expected cause is missing", body.contains("User Email has to be the same as User Identifier"));
+            Assert.assertTrue("Expected cause is missing", body.contains("User Email cannot be empty"));
         }
     }
     

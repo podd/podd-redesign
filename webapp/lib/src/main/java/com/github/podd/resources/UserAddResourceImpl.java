@@ -214,11 +214,6 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Email cannot be empty");
         }
-        else if(!email.equalsIgnoreCase(identifier))
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
-                    "User Email has to be the same as User Identifier");
-        }
         
         PoddUserStatus status = PoddUserStatus.INACTIVE;
         final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();

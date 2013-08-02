@@ -28,8 +28,7 @@
 			podd.debug("Attempting to update user");
 			podd.emptyErrorMessages();
 			var validInput = validateUserInfo();
-			var validUserName = validateUserNameAndEmail();
-			if (validInput && validUserName) {
+			if (validInput) {
 				podd.submitUserEdit();
 			}
 			return false;
