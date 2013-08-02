@@ -33,8 +33,6 @@
 				 		<li><span class="bold">&nbsp;&nbsp;&nbsp;&nbsp;</span>${role.name!""}</li>
 					</#list>
                 </#if>
-                
-                
             </ol>
         </div>
 
@@ -55,18 +53,16 @@
 
 
         <div id="buttonwrapper">
-            <#if isAdmin?? && isAdmin>
-                <a href="${baseUrl}/user/edit/${requestedUser.identifier!"unknown-username"}">Edit User</a>
-                <a href="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}/editpwd">Change Password</a>
-                <#if authenticatedUsername != requestedUser.identifier>
-                    <a href="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}/delete">Delete User</a>
-                </#if>
-                </div>
-                </div> <!-- main -->
-            <#else>
-                <a href="${baseUrl}/user/edit/${requestedUser.identifier!"unknown-username"}">Edit User</a>
-                <a href="${baseUrl}/user/${requestedUser.identifier!"unknown-username"}/editpwd">Change Password</a>
-                </div>
+            <a href="${baseUrl}/user/edit/${requestedUser.identifier!"unknown-username"}">Edit User</a>
+            <a href="${baseUrl}/user/editroles/${requestedUser.identifier!"unknown-username"}">Manage Roles</a>
+            <a href="${baseUrl}/user/editpwd/${requestedUser.identifier!"unknown-username"}">Change Password</a>
+            <#if isAdmin?? && isAdmin && authenticatedUsername != requestedUser.identifier>
+                <a href="${baseUrl}/user/${requestedUser.identifier!"unknown-username"}/delete">Delete User</a>
             </#if>
+        </div>
+    </#if>
+    
+    <#if isAdmin?? && isAdmin>
+        </div> <!-- main -->
     </#if>
 </div>	<!-- content pane -->

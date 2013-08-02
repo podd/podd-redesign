@@ -21,16 +21,16 @@
     <h4 class="errorMsg">${errorMessage!""}</h4>
 
 	<#if isAdmin?? && isAdmin>
-		<form name="edit_user_pwd" enctype="multipart/form-data" action="${baseUrl}/admin/user/${requestedUser.userName!"unknown-username"}/editpwd" method="POST" onsubmit="return validateUserPassword()">
+		<form name="edit_user_pwd" enctype="multipart/form-data" action="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}/editpwd" method="POST" onsubmit="return validateUserPassword()">
 	<#else>
-		<form name="edit_user_pwd" enctype="multipart/form-data" action="${baseUrl}/user/${requestedUser.userName!"unknown-username"}/editpwd" method="POST" onsubmit="return validateUserPassword()">
+		<form name="edit_user_pwd" enctype="multipart/form-data" action="${baseUrl}/user/${requestedUser.identifier!"unknown-username"}/editpwd" method="POST" onsubmit="return validateUserPassword()">
 	</#if>
 
     <#if requestedUser?? && requestedUser?has_content>
 		<div id="admin_left_pane" class="fieldset_without_border">
 			<ol>
-				<li><span class="bold">User Name: </span>${requestedUser.userName!""}</li>
-				<#if !isAdmin?? || !isAdmin || authenticatedUser == requestedUser>
+				<li><span class="bold">User Name: </span>${requestedUser.identifier!""}</li>
+				<#if !isAdmin?? || !isAdmin || authenticatedUserIdentifier == requestedUser.identifier>
                 <li>
 					<label for="oldPassword" class="bold">Old Password:
 						<span icon="required"></span>
@@ -40,14 +40,14 @@
 				</li>
                 </#if>
                 <li>
-					<label for="password" class="bold">Password:
+					<label for="password" class="bold">New Password:
 						<span icon="required"></span>
 					</label>
 					<input id="password" name="password" type="password">
 					<h6 class="errorMsg" id='errorPassword'></h6>
 				</li>
 				<li>
-					<label for="confirmPassword" class="bold">Confirm Password:
+					<label for="confirmPassword" class="bold">Confirm New Password:
 						<span icon="required"></span>
 					</label>
 					<input id="confirmPassword" name="confirmPassword" type="password">
@@ -58,7 +58,7 @@
 		
 		<div id="buttonwrapper">
 			<button type="submit">Save Password</button>
-            <a href="${baseUrl}/admin/user/${requestedUser.userName!"unknown-username"}">Cancel</a>
+            <a href="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}">Cancel</a>
 		</div>
 	</#if>
 	</form>
