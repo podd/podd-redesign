@@ -1949,10 +1949,34 @@ podd.submitPoddObjectUpdate = function(
 /**
  * @memberOf podd
  * 
- * Submit the "Add User" form to create a new PoddUser
- * This method is closely bound to the element IDs used in admin_createUser.html
+ * Submit the "Add User" form to create a new PoddUser.
  */
-podd.submitCreateUser = function() {
+podd.submitUserCreate = function() {
+	podd.debug("[submitUserCreate] adding a new user...");
+	podd.submitUserDetails(true);
+};
+
+/**
+ * @memberOf podd
+ * 
+ * Submit the "Edit User" form to update a PoddUser's details.
+ */
+podd.submitUserEdit = function() {
+	podd.debug("[submitUserEdit] updating user details...");
+	podd.submitUserDetails(false);
+};
+
+/**
+ * @memberOf podd
+ * 
+ * Submit add/edit user forms. This method is closely bound to the element IDs
+ * used in admin_createUser.html and editUser.html
+ * 
+ * @param isNewUser
+ *            {boolean} If true indicates that a new user is being added, false
+ *            indicates updating an existing user's details.
+ */
+podd.submitUserDetails = function(isNewUser) {
 	  
 	  var userName = $('#userName').val();
 	  var email = $('#email').val();
@@ -1973,13 +1997,16 @@ podd.submitCreateUser = function() {
 	  
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userIdentifier>', userName, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userEmail>', email, DATATYPE_PROPERTY, XSD_STRING));
-	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userSecret>', password, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userFirstName>', firstName, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userLastName>', lastName, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#organization>', organisation, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#phone>', phone, DATATYPE_PROPERTY, XSD_STRING));
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#address>', address, DATATYPE_PROPERTY, XSD_STRING));
 
+	  if (isNewUser) {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userSecret>', password, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+	  
 	  if (typeof status !== 'undefined' && status !== '') {
 		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#status>', status, OBJECT_PROPERTY, 'URI'));
 	  }
@@ -2001,7 +2028,12 @@ podd.submitCreateUser = function() {
 	  }));
 	  podd.debug("As JSON: " + modifiedTriples);
 	  
-	  requestUrl = podd.baseUrl + '/admin/user/add';
+	  var requestUrl = podd.baseUrl;
+	  if (isNewUser) {
+		requestUrl = requestUrl + '/admin/user/add';  
+	  } else {
+		  requestUrl = requestUrl + '/user/edit/' + userName;  
+	  }
 	  
 	  $.ajax({
 	        url : requestUrl,
@@ -2012,12 +2044,12 @@ podd.submitCreateUser = function() {
 	            xhr.setRequestHeader("Accept", "application/rdf+json");
 	        },
 	        success : function(resultData, status, xhr) {
-	            podd.debug('[addUser] ### SUCCESS ### ' + resultData);
+	            podd.debug('[submitUserDetails] ### SUCCESS ### ' + resultData);
 	            // redirect to User Details Page
 	        	window.location.href = podd.baseUrl + '/user/' + userName;
 	        },
 	        error : function(xhr, status, error) {
-	            podd.debug('[addUser] $$$ ERROR $$$ ' + error);
+	            podd.debug('[submitUserDetails] $$$ ERROR $$$ ' + error);
 	            podd.debug(xhr.statusText);
 	            
 	            podd.displaySummaryErrorMessage(xhr.responseText);

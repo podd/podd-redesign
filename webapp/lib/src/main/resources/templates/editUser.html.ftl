@@ -15,6 +15,37 @@
 <#-- @ftlvariable name="addressError" type="java.lang.String" -->
 <#-- @ftlvariable name="urlError" type="java.lang.String" -->
 
+<script type="text/javascript">
+	$(document).ready(function() {
+        podd.debug('-------------------');
+        podd.debug('initializing editUser page...');
+        podd.debug('-------------------');
+
+	
+		// Add form submission handler
+		$("#btnSubmit").click(function(event) {
+			event.preventDefault();
+			podd.debug("Attempting to update user");
+			podd.emptyErrorMessages();
+			var validInput = validateUserInfo();
+			var validUserName = validateUserNameAndEmail();
+			if (validInput && validUserName) {
+				podd.submitUserEdit();
+			}
+			return false;
+		});
+	
+		$("#btnCancel").click(function(event) {
+			event.preventDefault();
+			podd.debug("TODO: implement cancellation");
+			return false;
+		});
+	
+        podd.debug('### initialization complete ###');
+	});
+</script>
+
+
 <div id="title_pane">
     <h3>Edit User Details</h3>
 </div>
@@ -31,23 +62,29 @@
     <p>
     <h4 class="errorMsg">${errorMessage!""}</h4>
 
+	<#-- add general error messages -->
+	<ol id="errorMsgList">
+		<#if generalErrorList?? && generalErrorList?has_content>
+		    <#list generalErrorList as errorMsg>
+		    <li class="errorMsg">${errorMsg}</li>
+		    </#list>
+		</#if>
+	</ol>
+
     <#if requestedUser?? && requestedUser?has_content>
 
-        <#if isAdmin?? && isAdmin>
-        <form name="edit_user" enctype="multipart/form-data" action="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}/edit" method="POST" onsubmit="return validateUserInfo()">
-            <#else>
-        <form name="edit_user" enctype="multipart/form-data" action="${baseUrl}/user/${requestedUser.identifier!"unknown-username"}/edit" method="POST" onsubmit="return validateUserInfo()">
-        </#if>
-
+		<form name="edit_user" id="editUserForm">
         <div id="admin_left_pane" class="fieldset_without_border">
 			<div class="legend_no_indent">Account Details</div>
 			<ol>
-				<li><span class="bold">User Name: </span>${requestedUser.identifier!""}</li>
 				<li>
-					<label for="email" class="bold">Email Address:
-						<span icon="required"></span>
-					</label>
-					<input id="email" name="email" type="text" value="${requestedUser.email!""}">
+					<span class="bold">User Name: </span>${requestedUser.identifier!""}
+					<input id="userName" name="userName" type="hidden" value="${requestedUser.identifier!""}">
+                    <h6 class="errorMsg" id='errorUserName'></h6>
+				</li>
+				<li>
+					<span class="bold">Email Address: </span>${requestedUser.email!""}
+					<input id="email" name="email" type="hidden" value="${requestedUser.email!""}">
                     <h6 class="errorMsg" id='errorEmail'></h6>
 					<h6 class="errorMsg" id='validationError'>${emailError!""}</h6>
 				</li>
@@ -142,12 +179,8 @@
 		</div>
 		
 		<div id="buttonwrapper">
-			<button type="submit">Update Details</button>
-	        <#if isAdmin?? && isAdmin>
-	        <a href="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}">Cancel</a>
-	        	<#else>
-	        <a href="${baseUrl}/user/${requestedUser.identifier!"unknown-username"}">Cancel</a>
-	        </#if>
+			<button type="button" id="btnSubmit" >Update Details</button>
+			<button type="button" id="btnCancel" >Cancel</button>
 		</div>
     </#if>
 	</form>

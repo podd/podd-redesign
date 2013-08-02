@@ -43,7 +43,7 @@
 			podd.debug("Attempting to create user");
 			var validInput = createUserFormValidator();
 			if (validInput) {
-				podd.submitCreateUser();
+				podd.submitUserCreate();
 			}
 			return false;
 		});
