@@ -3,11 +3,20 @@
  */
 package com.github.podd.resources;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
@@ -18,19 +27,20 @@ import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.restletutils.RestletUtilUser;
+import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
- * 
- * User Password resource
+ * This resource handles User password change.
  * 
  * @author kutila
- * 
  */
 public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
 {
@@ -96,13 +106,101 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
-     * Password change requests should be submitted to UserEditResource.
+     * Handle password change requests
      */
     @Post("rdf|rj|ttl")
     public Representation editPasswordRdf(final Representation entity, final Variant variant) throws ResourceException
     {
-        this.log.warn("Not implemented! POST with RDF data to UserEditResource");
-        return null;
+        this.log.info("changePasswordRdf");
+        
+        final String changePwdUserIdentifier =
+                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
+        this.log.info("requesting change password of user: {}", changePwdUserIdentifier);
+        
+        if(changePwdUserIdentifier == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user");
+        }
+        
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
+
+        // check authentication first
+        PoddAction action = PoddAction.OTHER_USER_EDIT;
+        if(user != null && changePwdUserIdentifier.equals(user.getIdentifier()))
+        {
+            action = PoddAction.CURRENT_USER_EDIT;
+        }
+        this.checkAuthentication(action);        
+        
+        final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
+        
+        final RestletUtilUser changePwdUser = nextRealm.findUser(changePwdUserIdentifier);
+        if (changePwdUser == null || !(changePwdUser instanceof PoddUser))
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");
+        }
+        final PoddUser poddUser = (PoddUser) changePwdUser;
+        URI userUri = null;
+        try
+        {
+            // - get input stream with RDF content
+            final InputStream inputStream = entity.getStream();
+            final RDFFormat inputFormat =
+                    Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
+            final Model modifiedUserModel = Rio.parse(inputStream, "", inputFormat);
+            
+            userUri = this.changePassword(nextRealm, modifiedUserModel, poddUser, user.getIdentifier());
+        }
+        catch (Exception e)
+        {
+            //TODO - throw appropriate exception
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
+        }
+            
+        // - prepare response
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
+        final RDFFormat outputFormat =
+                Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
+        try
+        {
+            final Model model = new LinkedHashModel();
+            model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
+                    PoddRdfConstants.VF.createLiteral(poddUser.getIdentifier()));
+            Rio.write(model, output, outputFormat);
+        }
+        catch(final OpenRDFException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
+        }
+        
+        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
+    }
+
+    private URI changePassword(PoddSesameRealm nextRealm, Model model, PoddUser changePwdUser, String authenticatedUserIdentifier)
+    {
+        final String identifierInModel = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
+        
+        // verify user identifier specified inside Model is same as that from the request
+        if (!changePwdUser.getIdentifier().equals(identifierInModel))
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Problem with input: user identifiers don't match");
+        }
+
+        final String newPassword = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
+
+        if (changePwdUser.getIdentifier().equals(authenticatedUserIdentifier))
+        {
+            // TODO: verify old password is correct
+            final String oldPassword = model.filter(null, PoddRdfConstants.PODD_USER_OLDSECRET, null).objectString();
+            this.log.warn("XXXXXXXXXXXXXXX: Old Password [{}] verification is NOT IMPLEMENTED", oldPassword);
+        }
+        
+        this.log.info("", newPassword);
+        
+        // update sesame Realm with new password
+        changePwdUser.setSecret(newPassword.toCharArray());
+        return nextRealm.updateUser(changePwdUser);
     }
     
 }

@@ -5,6 +5,36 @@
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
 <#-- @ftlvariable name="errorOldPassword" type="java.lang.String" -->
 
+<script type="text/javascript">
+	$(document).ready(function() {
+        podd.debug('-------------------');
+        podd.debug('initializing Change Password page...');
+        podd.debug('-------------------');
+
+	
+		// Add form submission handler
+		$("#btnSubmit").click(function(event) {
+			event.preventDefault();
+			podd.debug("Attempting to update password");
+			podd.emptyErrorMessages();
+			var validInput = validateUserPassword();
+			if (validInput) {
+				podd.submitUserPassword();
+			}
+			return false;
+		});
+	
+		$("#btnCancel").click(function(event) {
+			event.preventDefault();
+			window.location.href = podd.baseUrl + '/user/${requestedUser.identifier}';
+			return false;
+		});
+	
+        podd.debug('### initialization complete ###');
+	});
+</script>
+
+
 <div id="title_pane">
     <h3>Change User Password</h3>
 </div>
@@ -20,11 +50,16 @@
 	<p>
     <h4 class="errorMsg">${errorMessage!""}</h4>
 
-	<#if isAdmin?? && isAdmin>
-		<form name="edit_user_pwd" enctype="multipart/form-data" action="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}/editpwd" method="POST" onsubmit="return validateUserPassword()">
-	<#else>
-		<form name="edit_user_pwd" enctype="multipart/form-data" action="${baseUrl}/user/${requestedUser.identifier!"unknown-username"}/editpwd" method="POST" onsubmit="return validateUserPassword()">
-	</#if>
+	<#-- add general error messages -->
+	<ol id="errorMsgList">
+		<#if generalErrorList?? && generalErrorList?has_content>
+		    <#list generalErrorList as errorMsg>
+		    <li class="errorMsg">${errorMsg}</li>
+		    </#list>
+		</#if>
+	</ol>
+
+	<form name="edit_user_pwd" id="editUserPwdForm">
 
     <#if requestedUser?? && requestedUser?has_content>
 		<div id="admin_left_pane" class="fieldset_without_border">
@@ -43,6 +78,7 @@
 					<label for="password" class="bold">New Password:
 						<span icon="required"></span>
 					</label>
+					<input id="userName" name="userName" type="hidden" value="${requestedUser.identifier!""}">
 					<input id="password" name="password" type="password">
 					<h6 class="errorMsg" id='errorPassword'></h6>
 				</li>
@@ -57,8 +93,8 @@
 		</div>
 		
 		<div id="buttonwrapper">
-			<button type="submit">Save Password</button>
-            <a href="${baseUrl}/admin/user/${requestedUser.identifier!"unknown-username"}">Cancel</a>
+			<button type="button" id="btnSubmit" >Save Password</button>
+			<button type="button" id="btnCancel" >Cancel</button>
 		</div>
 	</#if>
 	</form>

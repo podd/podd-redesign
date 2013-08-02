@@ -334,6 +334,10 @@ public interface PoddRdfConstants
     public static final URI PODD_USER_POSITION =  PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_USER, "position");
 
+    /** http://purl.org/podd/ns/poddUser#oldSecret */
+    public static final URI PODD_USER_OLDSECRET =  PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_USER, "oldSecret");
+
     /** http://purl.org/podd/ns/poddUser#roleMappedObject */
     public static final URI PODD_ROLEMAPPEDOBJECT = VF.createURI(PODD_USER, "roleMappedObject");
     

@@ -1950,60 +1950,118 @@ podd.submitPoddObjectUpdate = function(
  * @memberOf podd
  * 
  * Submit the "Add User" form to create a new PoddUser.
+ * This method is closely bound to the element IDs used in admin_createUser.html
  */
 podd.submitUserCreate = function() {
 	podd.debug("[submitUserCreate] adding a new user...");
-	podd.submitUserDetails(true);
+	
+	var userName = $('#userName').val();
+	var email = $('#email').val();
+	var password = $('#password').val();
+	var status = $('input:radio[name=status]:checked').val();
+	var title = $('#title').val();
+	var firstName = $('#firstName').val();
+	var lastName = $('#lastName').val();
+	var organisation = $('#organisation').val();
+	var position = $('#position').val();
+	var phone = $('#phone').val();
+	var address = $('#address').val();
+	var url = $('#url').val();
+	var orcid = $('#orcid').val();
+
+	var pathToSubmitTo = '/admin/user/add';
+
+	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
+			phone, address, url, orcid, undefined);
 };
 
 /**
  * @memberOf podd
  * 
  * Submit the "Edit User" form to update a PoddUser's details.
+ * This method is closely bound to the element IDs used in editUser.html
  */
 podd.submitUserEdit = function() {
 	podd.debug("[submitUserEdit] updating user details...");
-	podd.submitUserDetails(false);
+	
+	var userName = $('#userName').val();
+	var email = $('#email').val();
+	var password = $('#password').val();
+	var status = $('input:radio[name=status]:checked').val();
+	var title = $('#title').val();
+	var firstName = $('#firstName').val();
+	var lastName = $('#lastName').val();
+	var organisation = $('#organisation').val();
+	var position = $('#position').val();
+	var phone = $('#phone').val();
+	var address = $('#address').val();
+	var url = $('#url').val();
+	var orcid = $('#orcid').val();
+
+	var pathToSubmitTo = '/user/edit/' + userName;
+	  
+	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
+			phone, address, url, orcid, undefined);
 };
 
 /**
  * @memberOf podd
  * 
- * Submit add/edit user forms. This method is closely bound to the element IDs
- * used in admin_createUser.html and editUser.html
+ * Submit add/edit user forms.
  * 
- * @param isNewUser
- *            {boolean} If true indicates that a new user is being added, false
- *            indicates updating an existing user's details.
+ * @param submitPath
+ *            {String} Mandatory, the path to which User Data are to be
+ *            submitted.
+ * @param userName
+ * @param email
+ * @param password
+ * @param status
+ *            {URI} The User's current status
+ * @param title
+ * @param firstName
+ * @param lastName
+ * @param organisation
+ * @param position
+ * @param phone
+ * @param address
+ * @param url
+ *            {URI} User's home page
+ * @param orcid
+ * @param oldPassword
  */
-podd.submitUserDetails = function(isNewUser) {
+podd.submitUserData = function(submitPath, userName, email, password, status, title, firstName, lastName,
+		organisation, position, phone, address, url, orcid, oldPassword) {
 	  
-	  var userName = $('#userName').val();
-	  var email = $('#email').val();
-	  var password = $('#password').val();
-	  var status = $('input:radio[name=status]:checked').val();
-	  var title = $('#title').val();
-	  var firstName = $('#firstName').val();
-	  var lastName = $('#lastName').val();
-	  var organisation = $('#organisation').val();
-	  var position = $('#position').val();
-	  var phone = $('#phone').val();
-	  var address = $('#address').val();
-	  var url = $('#url').val();
-	  var orcid = $('#orcid').val();
-
 	  var databank = podd.newDatabank();
 	  var tempUser = '<urn:temp:user>';
 	  
 	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userIdentifier>', userName, DATATYPE_PROPERTY, XSD_STRING));
-	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userEmail>', email, DATATYPE_PROPERTY, XSD_STRING));
-	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userFirstName>', firstName, DATATYPE_PROPERTY, XSD_STRING));
-	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userLastName>', lastName, DATATYPE_PROPERTY, XSD_STRING));
-	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#organization>', organisation, DATATYPE_PROPERTY, XSD_STRING));
-	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#phone>', phone, DATATYPE_PROPERTY, XSD_STRING));
-	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#address>', address, DATATYPE_PROPERTY, XSD_STRING));
+	  
+	  if (typeof email !== 'undefined' && email !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userEmail>', email, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+	  
+	  if (typeof firstName !== 'undefined' && firstName !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userFirstName>', firstName, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+	  
+	  if (typeof lastName !== 'undefined' && lastName !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userLastName>', lastName, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+	  
+	  if (typeof organisation !== 'undefined' && organisation !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#organization>', organisation, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+	  
+	  if (typeof phone !== 'undefined' && phone !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#phone>', phone, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+	  
+	  if (typeof address !== 'undefined' && address !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#address>', address, DATATYPE_PROPERTY, XSD_STRING));
+	  }
 
-	  if (isNewUser) {
+	  if (typeof password !== 'undefined' && password !== '') {
 		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userSecret>', password, DATATYPE_PROPERTY, XSD_STRING));
 	  }
 	  
@@ -2023,17 +2081,17 @@ podd.submitUserDetails = function(isNewUser) {
 		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#orcid>', orcid, DATATYPE_PROPERTY, XSD_STRING));
 	  }
 	  
+	  // only when current user is changing his/her password
+	  if (typeof oldPassword !== 'undefined' && oldPassword !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#oldSecret>', oldPassword, DATATYPE_PROPERTY, XSD_STRING));
+	  }
+
 	  var modifiedTriples = $.toJSON(databank.dump({
 		format : 'application/json'
 	  }));
 	  podd.debug("As JSON: " + modifiedTriples);
 	  
-	  var requestUrl = podd.baseUrl;
-	  if (isNewUser) {
-		requestUrl = requestUrl + '/admin/user/add';  
-	  } else {
-		  requestUrl = requestUrl + '/user/edit/' + userName;  
-	  }
+	  var requestUrl = podd.baseUrl + submitPath;
 	  
 	  $.ajax({
 	        url : requestUrl,
@@ -2044,17 +2102,29 @@ podd.submitUserDetails = function(isNewUser) {
 	            xhr.setRequestHeader("Accept", "application/rdf+json");
 	        },
 	        success : function(resultData, status, xhr) {
-	            podd.debug('[submitUserDetails] ### SUCCESS ### ' + resultData);
+	            podd.debug('[submitUserData] ### SUCCESS ### ' + resultData);
 	            // redirect to User Details Page
 	        	window.location.href = podd.baseUrl + '/user/' + userName;
 	        },
 	        error : function(xhr, status, error) {
-	            podd.debug('[submitUserDetails] $$$ ERROR $$$ ' + error);
+	            podd.debug('[submitUserData] $$$ ERROR $$$ ' + error);
 	            podd.debug(xhr.statusText);
 	            
 	            podd.displaySummaryErrorMessage(xhr.responseText);
 	        }
 	    });	  
+};
+
+podd.submitUserPassword = function() {
+
+	var userName = $('#userName').val();
+	var password = $('#password').val();
+	var oldPassword = $('#oldPassword').val();
+	
+	var pathToSubmitTo = '/user/editpwd/' + userName;
+	
+	podd.submitUserData(pathToSubmitTo, userName, undefined, password, undefined, undefined, undefined, undefined, undefined, undefined,
+			undefined, undefined, undefined, undefined, oldPassword);
 };
 
 /**
