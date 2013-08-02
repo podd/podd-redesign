@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
@@ -89,9 +90,60 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
-     * Test authenticated edit of current user details
      * 
-     * FIXME: investigate why this test fails. 
+     */
+    @Test
+    public void testEditCurrentUserPasswordRdf() throws Exception
+    {
+        final String testIdentifier = "testAdminUser";
+        final String testPassword = "modifiedPassword";
+        final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
+
+        // prepare: create Model with modified password and user identifier
+        final Model userInfoModel = new LinkedHashModel();
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
+                PoddRdfConstants.VF.createLiteral(testIdentifier));
+        userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
+                PoddRdfConstants.VF.createLiteral(testPassword));
+        
+        // submit new password to Edit User Service
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
+        final ClientResource userEditClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Rio.write(userInfoModel, out, format);
+        final Representation input = new StringRepresentation(out.toString(), mediaType);
+        
+        final Representation modifiedResults =
+                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        // verify: response has correct identifier
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
+                        RDFFormat.RDFXML, 1);
+        Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        
+        // verify: request with old login details should fail
+        final ClientResource userDetailsClientResource2 =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+        try
+        {
+            RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
+                    Status.CLIENT_ERROR_UNAUTHORIZED, this.testWithAdminPrivileges);
+            Assert.fail("Should have thrown a ResourceException as password should now be invalid");
+        }
+        catch(ResourceException e)
+        {
+            Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+    }
+    
+    /**
+     * Test authenticated edit of current user details
      */
     @Test
     public void testEditCurrentUserRdf() throws Exception
