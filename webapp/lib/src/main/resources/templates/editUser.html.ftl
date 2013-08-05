@@ -110,8 +110,8 @@
 						</div>
 					</li>
 				<#else>
-					<li><span class="bold">Status: </span>${requestedUser.status!""}</li>
-					<li><span class="bold">Role: </span>${requestedUser.repositoryRole.description!""}</li>
+					<li><span class="bold">Status: </span>${requestedUser.userStatus.label!""}</li>
+					<input id="status" name="status" type="hidden" value="${requestedUser.userStatus.URI!""}">
 				</#if>
 			</ol>
 		</div>

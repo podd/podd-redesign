@@ -1987,7 +1987,12 @@ podd.submitUserEdit = function() {
 	var userName = $('#userName').val();
 	var email = $('#email').val();
 	var password = $('#password').val();
+	
 	var status = $('input:radio[name=status]:checked').val();
+	if (typeof status == 'undefined' || status == 'undefined') {
+		status = $('#status').val();
+	}
+	
 	var title = $('#title').val();
 	var firstName = $('#firstName').val();
 	var lastName = $('#lastName').val();
@@ -1999,7 +2004,7 @@ podd.submitUserEdit = function() {
 	var orcid = $('#orcid').val();
 
 	var pathToSubmitTo = '/user/edit/' + userName;
-	  
+
 	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
 			phone, address, url, orcid, undefined);
 };
