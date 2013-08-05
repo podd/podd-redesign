@@ -37,7 +37,6 @@ import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -45,7 +44,8 @@ import com.github.podd.utils.PoddWebConstants;
 
 /**
  * 
- * User Edit resource
+ * User Edit resource to modify PODD User details, except password changes.
+ * Password changes should be made using the {@link UserPasswordResourceImpl}.
  * 
  * @author kutila
  * 
@@ -161,14 +161,10 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
             // - create PoddUser with edited details
             this.modelToUser(modifiedUserModel, poddUser);
             
-            this.log.info("Received Modified User Details for [{}]", requestedUserIdentifier);
-            DebugUtils.printContents(modifiedUserModel);
-            this.log.info("User will be modified to: " + poddUser.getFirstName() + " " + poddUser.getLastName());
-            
             // modify User record in the Realm
             userUri = nextRealm.updateUser(poddUser);
             
-            this.log.debug("Updated User <{}>", poddUser.getIdentifier());
+            this.log.debug("Updated User <{}>", poddUser);
             
             // - re-map Roles for the User
             final Iterator<Resource> iterator =
@@ -244,10 +240,11 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
     {
         // User identifier and email are fixed and cannot be changed
         
+        // Password change is not allowed from this User Edit Service. Print a warning.
         final String password = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
         if (password != null)
         {
-            currentUser.setSecret(password.toCharArray());
+            this.log.warn("Attempting to change password via User Edit Service. Disallowed.");
         }
         
         final String firstName = model.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString();
@@ -309,6 +306,10 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         if (statusUri != null)
         {
             status = PoddUserStatus.getUserStatusByUri(statusUri);
+        }
+        else
+        {
+            this.log.warn("User Status was not sent. Setting the User status to INACTIVE");
         }
         currentUser.setUserStatus(status);
     }

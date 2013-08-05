@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -69,10 +68,10 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
-     * 
+     * Verify that changing password using the Edit User Interface has no effect
      */
     @Test
-    public void testEditCurrentUserPasswordRdf() throws Exception
+    public void testErrorEditCurrentUserPasswordRdf() throws Exception
     {
         final String testIdentifier = "testAdminUser";
         final String testPassword = "modifiedPassword";
@@ -84,6 +83,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 PoddRdfConstants.VF.createLiteral(testIdentifier));
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
                 PoddRdfConstants.VF.createLiteral(testPassword));
+        userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.ACTIVE.getURI());
         
         // submit new password to Edit User Service
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
@@ -106,18 +106,18 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
-        // verify: request with old login details should fail
+        // verify: request with old login details should still succeed
         final ClientResource userDetailsClientResource2 =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                    Status.CLIENT_ERROR_UNAUTHORIZED, this.testWithAdminPrivileges);
-            Assert.fail("Should have thrown a ResourceException as password should now be invalid");
+                    Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
         }
         catch(ResourceException e)
         {
-            Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            Assert.fail("Should have succeeded as password was not changed");
         }
     }
     
