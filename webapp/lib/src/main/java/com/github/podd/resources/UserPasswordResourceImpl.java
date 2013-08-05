@@ -4,6 +4,7 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
@@ -22,8 +23,12 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
+import org.restlet.security.LocalVerifier;
+import org.restlet.security.MapVerifier;
 import org.restlet.security.Role;
+import org.restlet.security.SecretVerifier;
 import org.restlet.security.User;
+import org.restlet.security.Verifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,9 +157,8 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
             
             userUri = this.changePassword(nextRealm, modifiedUserModel, poddUser, user.getIdentifier());
         }
-        catch (Exception e)
+        catch (IOException | OpenRDFException e)
         {
-            //TODO - throw appropriate exception
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
         }
             
@@ -181,25 +185,51 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
     {
         final String identifierInModel = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
         
-        // verify user identifier specified inside Model is same as that from the request
+        // verify user identifier in Model is same as that from the request
         if (!changePwdUser.getIdentifier().equals(identifierInModel))
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Problem with input: user identifiers don't match");
         }
 
-        final String newPassword = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
-
+        // changing own password, verify old password.
+        //TODO: is there a better way of doing this?
         if (changePwdUser.getIdentifier().equals(authenticatedUserIdentifier))
         {
-            // TODO: verify old password is correct
             final String oldPassword = model.filter(null, PoddRdfConstants.PODD_USER_OLDSECRET, null).objectString();
-            this.log.warn("XXXXXXXXXXXXXXX: Old Password [{}] verification is NOT IMPLEMENTED", oldPassword);
+            
+            final Verifier verifier = nextRealm.getVerifier();
+            if (verifier == null)
+            {
+                this.log.warn("Could not access Verifier to check old password");
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
+            }
+        
+            char[] localSecret = null;
+            if (verifier instanceof MapVerifier)
+            {
+                localSecret = ((MapVerifier)verifier).getLocalSecret(identifierInModel);
+            }
+            else if (verifier instanceof LocalVerifier)
+            {
+                localSecret = ((LocalVerifier)verifier).getLocalSecret(identifierInModel);
+            }
+            else
+            {
+                this.log.warn("Could not access Verifier to check old password");
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
+            }
+            
+            if (!SecretVerifier.compare(localSecret, oldPassword.toCharArray()))
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "Old password is invalid.");
+            }
         }
         
-        this.log.info("", newPassword);
-        
         // update sesame Realm with new password
+        final String newPassword = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
+        this.log.info("[DEBUG] new password is [{}]", newPassword);
         changePwdUser.setSecret(newPassword.toCharArray());
+        
         return nextRealm.updateUser(changePwdUser);
     }
     
