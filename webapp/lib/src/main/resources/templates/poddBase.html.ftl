@@ -80,9 +80,9 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				// If OAS failed to load, do not fail
-			    if(oas.rdf.addAnnotationHandlers) {
-				    // oas.rdf.showAnnotationPoints("[about]");
-				    oas.rdf.addAnnotationHandlers();
+			    if(oas.addAnnotationHandlers) {
+				    // oas.showAnnotationPoints("[about]");
+				    oas.addAnnotationHandlers();
 				}
 				else if(typeof console != "undefined" && console.log) {
 					console.log("OAS failed to load");
