@@ -1,0 +1,150 @@
+<#-- @ftlvariable name="baseUrl" type="java.lang.String" -->
+<#-- @ftlvariable name="authenticatedUser" type="podd.model.user.User" -->
+<#-- @ftlvariable name="requestedUser" type="podd.model.user.User" -->
+<#-- @ftlvariable name="isAdmin" type="boolean" -->
+<#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
+<#-- @ftlvariable name="errorOldPassword" type="java.lang.String" -->
+
+<script type="text/javascript">
+	$(document).ready(function() {
+        podd.debug('-------------------');
+        podd.debug('initializing Edit User Roles page...');
+        podd.debug('-------------------');
+
+		podd.roles = [];
+		<#if allRolesList?? && allRolesList?has_content>
+		    <#list allRolesList as role>
+		    	var aRole = {};
+		    	aRole.uri = '${role.URI!'unknown'}';
+		    	aRole.name = '${role.getName()!'unknown'}';
+		    	aRole.description = '${role.description!'no description'}';
+		    	podd.debug('The Role = ' + aRole.uri + ', ' + aRole.name + ', ' + aRole.description);
+		    	podd.roles.push(aRole);
+		    </#list>
+		</#if>
+		podd.debug('All Roles size = ' + podd.roles.length);
+		
+		//podd.getRoleMetadata(podd.roles);
+
+		// Add handler for DeleteLink
+	    $(".deleteLink").click(function() {
+	     	var tr = $(this).closest('tr');
+        	tr.fadeOut(400, function(){
+            	tr.remove();
+        	});
+        	return false;
+	    });
+
+		// Add new Row to Roles table
+		$("#btnAddRole").click(function(event) {
+			event.preventDefault();
+			podd.debug("Attempting to add new User Role");
+			podd.showAddRoleDialog();
+			
+		});
+	
+		// Add form submission handler
+		$("#btnSubmit").click(function(event) {
+			event.preventDefault();
+			podd.debug("Attempting to update User Roles");
+			podd.emptyErrorMessages();
+			var validInput = validateUserPassword();
+			if (validInput) {
+				podd.submitUserPassword();
+			}
+			return false;
+		});
+	
+		$("#btnCancel").click(function(event) {
+			event.preventDefault();
+			window.location.href = podd.baseUrl + '/user/${requestedUser.identifier}';
+			return false;
+		});
+	
+        podd.debug('### initialization complete ###');
+	});
+</script>
+
+
+<div id="title_pane">
+    <h3>Change User Roles</h3>
+</div>
+
+<div id="content_pane">
+
+<#if isAdmin?? && isAdmin>
+	<#include "admin_aux.html.ftl"/>
+
+<div id="main">
+</#if>
+
+	<p>
+    <h4 class="errorMsg">${errorMessage!""}</h4>
+
+	<#-- add general error messages -->
+	<ol id="errorMsgList">
+		<#if generalErrorList?? && generalErrorList?has_content>
+		    <#list generalErrorList as errorMsg>
+		    <li class="errorMsg">${errorMsg}</li>
+		    </#list>
+		</#if>
+	</ol>
+
+	<form name="edit_user_roles" id="editUserRolesForm">
+
+    <#if requestedUser?? && requestedUser?has_content>
+		<div id="admin_left_pane" class="fieldset_without_border">
+			<ol>
+				<li><span class="bold">User Name: </span>${requestedUser.identifier!""}</li>
+			</ol>
+				
+	    <table id="roleTable" class="tablesorter {sortlist: [[0,0]]}" cellspacing="0">
+			<thead>
+				<tr>
+				    <th>Role</th>
+				    <th>Mapped Object</th>
+					<th></th>
+				</tr>
+			</thead>
+	        <tfoot>
+	        <!-- empty table row, so that the footer appears and table looks complete -->
+	            <tr>
+	                <td></td>
+	                <td></td>
+	                <td></td>
+	            </tr>
+	        </tfoot>
+	        <tbody>
+
+				<#list repositoryRoleList as role>
+					<tr>
+			    		<td>
+			    			<label class="bold">${role.key}</label>
+			    		</td>
+			    		<td>
+			    			<#if role.value?? >
+			    				<label><a href="${role.value.objectURI}">${role.value.label}</a></label>
+			    		 	</#if>
+			    		</td>
+            			<td>
+                			<a class="deleteLink" href="">delete</a>
+            			</td>			    		
+		    		</tr>
+		    	</#list>
+			</tbody>
+	    </table>
+		</div>
+		
+		<div id="buttonwrapper">
+			<button type="button" id="btnAddRole" >Add New Role</button>
+			<button type="button" id="btnSubmit" >Save Roles</button>
+			<button type="button" id="btnCancel" >Cancel</button>
+		</div>
+	</#if>
+	</form>
+	
+<#if isAdmin?? && isAdmin>
+	</div>
+</#if>
+
+</div>  <!-- content pane -->

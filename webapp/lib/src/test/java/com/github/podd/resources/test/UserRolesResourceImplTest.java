@@ -31,7 +31,9 @@ import org.restlet.resource.ClientResource;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.api.test.TestConstants;
 import com.github.podd.restlet.PoddRoles;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
@@ -41,6 +43,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserRolesResourceImplTest extends AbstractResourceImplTest
 {
+
     
     /**
      * Tests editing of a PODD User's Roles.  
@@ -181,6 +184,46 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("Should be no Roles", 0,
                 resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null)
                         .objects().size());
+    }
+
+    @Test
+    public void testUserRolesPageHtml() throws Exception
+    {
+        final InferredOWLOntologyID artifactID =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+
+        
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), artifactID.getOntologyIRI().toOpenRDFURI()));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_MEMBER.getURI(), artifactID.getOntologyIRI().toOpenRDFURI()));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_OBSERVER.getURI(), artifactID.getOntologyIRI().toOpenRDFURI()));
+        this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
+                "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
+                roles, PoddUserStatus.ACTIVE);
+        
+        
+        final ClientResource userEditRolesClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_ROLES + testIdentifier));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userEditRolesClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        System.out.println(body);
+        this.assertFreemarker(body);
+        
+//        Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
+//        Assert.assertTrue("Page missing old password", body.contains("Old Password"));
+//        Assert.assertTrue("Page missing confirm password", body.contains("Confirm New Password"));
+//        Assert.assertTrue("Page missing save button", body.contains("Save Password"));
+//        Assert.assertTrue("Page missing cancel button", body.contains("Cancel"));
     }
     
 }
