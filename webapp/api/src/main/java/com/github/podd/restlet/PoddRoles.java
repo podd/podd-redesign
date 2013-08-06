@@ -22,16 +22,19 @@ import com.github.ansell.restletutils.RestletUtilRole;
 public enum PoddRoles implements RestletUtilRole
 {
     ADMIN("Administrator", "A repository administrator of the PODD System",
-            "http://purl.org/podd/oas/roles/administrator", true),
+            "http://purl.org/podd/ns/poddUser#RoleAdministrator", true),
     
+    PROJECT_CREATOR("Project Creator", "A User who can create new projects",
+            "http://purl.org/podd/ns/poddUser#RoleProjectCreator", true),
+            
     PROJECT_MEMBER("Project member", "A user who is a member of a particular project",
-            "http://purl.org/podd/oas/roles/project_member", true),
+            "http://purl.org/podd/ns/poddUser#RoleProjectMember", true),
     
     PROJECT_OBSERVER("Project observer", "A user who is an observer of a particular project",
-            "http://purl.org/podd/oas/roles/project_observer", true),
+            "http://purl.org/podd/ns/poddUser#RoleProjectObserver", true),
     
     PROJECT_ADMIN("Project Administrator", "A user who is an administrator of a particular project",
-            "http://purl.org/podd/oas/roles/project_administrator", true),
+            "http://purl.org/podd/ns/poddUser#RoleProjectAdministrator", true),
     
     ;
     
