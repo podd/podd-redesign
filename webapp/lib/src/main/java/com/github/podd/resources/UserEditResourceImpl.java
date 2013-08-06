@@ -6,8 +6,11 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -25,6 +28,7 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
+import org.restlet.security.Role;
 import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,6 +173,19 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
             // - re-map Roles for the User
             final Iterator<Resource> iterator =
                     modifiedUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects().iterator();
+            if (iterator.hasNext())
+            {
+                // new Roles have been sent, remove old Role Mappings in Realm
+                // Will this work when the same Role is mapped for different objects?
+                final Set<Role> oldRoles = nextRealm.findRoles(poddUser);
+                for(Iterator<Role> iterator2 = oldRoles.iterator(); iterator2.hasNext();)
+                {
+                    final Role role = iterator2.next();
+                    nextRealm.unmap(poddUser, role);
+                    this.log.debug("User [{}] unmapped from Role [{}]", poddUser.getIdentifier(), role.getName());
+                }
+            }
+            
             while(iterator.hasNext())
             {
                 final Resource mappingUri = iterator.next();
@@ -301,6 +318,7 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
             currentUser.setPosition(position);
         }
         
+        // TODO: no longer seems such a good idea! Simply updating the Status if sent seems better.
         PoddUserStatus status = PoddUserStatus.INACTIVE;
         final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
         if (statusUri != null)
