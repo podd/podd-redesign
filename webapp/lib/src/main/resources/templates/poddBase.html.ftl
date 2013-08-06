@@ -68,22 +68,21 @@
 			podd = {};
 			podd.baseUrl = "${baseUrl}";
 			
+			// setup the global OAS object
 			oas = {};
-			oas.baseUrl = "${baseUrl}/../oas/";
-			oas.rdf = {};
-			oas.autocomplete = {};
 			oas.ontology = {};
+			oas.baseUrl = "http://ppodd2-cbr.vm.csiro.au/oas/";
 		</script>
     
-		<script src="${baseUrl}/../oas/resources/static/scripts/oas.js" type="text/javascript"></script>
-	    <script src="${baseUrl}/../oas/resources/static/scripts/oas-debug-helper.js" type="text/javascript"></script>
+		<script src="http://ppodd2-cbr.vm.csiro.au/oas/resources/static/scripts/oas.js" type="text/javascript"></script>
+	    <script src="http://ppodd2-cbr.vm.csiro.au/oas/resources/static/scripts/oas-debug-helper.js" type="text/javascript"></script>
 
 		<script type="text/javascript">
 			$(document).ready(function() {
 				// If OAS failed to load, do not fail
-			    if(oas.rdf.addAnnotationHandlers) {
-				    // oas.rdf.showAnnotationPoints("[about]");
-				    oas.rdf.addAnnotationHandlers();
+			    if(typeof oas != "undefined" && typeof oas.addAnnotationHandlers != "undefined) {
+				    // oas.showAnnotationPoints("[about]");
+				    oas.addAnnotationHandlers();
 				}
 				else if(typeof console != "undefined" && console.log) {
 					console.log("OAS failed to load");
