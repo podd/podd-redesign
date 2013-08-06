@@ -6,18 +6,12 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
@@ -28,16 +22,13 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.security.Role;
 import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;
-import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
@@ -169,45 +160,6 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
             userUri = nextRealm.updateUser(poddUser);
             
             this.log.debug("Updated User <{}>", poddUser);
-            
-            // - re-map Roles for the User
-            final Iterator<Resource> iterator =
-                    modifiedUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects().iterator();
-            if (iterator.hasNext())
-            {
-                // new Roles have been sent, remove old Role Mappings in Realm
-                // Will this work when the same Role is mapped for different objects?
-                final Set<Role> oldRoles = nextRealm.findRoles(poddUser);
-                for(Iterator<Role> iterator2 = oldRoles.iterator(); iterator2.hasNext();)
-                {
-                    final Role role = iterator2.next();
-                    nextRealm.unmap(poddUser, role);
-                    this.log.debug("User [{}] unmapped from Role [{}]", poddUser.getIdentifier(), role.getName());
-                }
-            }
-            
-            while(iterator.hasNext())
-            {
-                final Resource mappingUri = iterator.next();
-                
-                final URI roleUri =
-                        modifiedUserModel.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI();
-                final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
-                
-                final URI mappedObject =
-                        modifiedUserModel.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
-                
-                this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", poddUser.getIdentifier(),
-                        role.getName(), mappedObject);
-                if(mappedObject != null)
-                {
-                    nextRealm.map(poddUser, role.getRole(), mappedObject);
-                }
-                else
-                {
-                    nextRealm.map(poddUser, role.getRole());
-                }
-            }
             
             // - check the User was successfully added to the Realm
             final RestletUtilUser findUser = nextRealm.findUser(poddUser.getIdentifier());
