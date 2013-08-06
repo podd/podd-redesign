@@ -80,7 +80,7 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				// If OAS failed to load, do not fail
-			    if(typeof oas != "undefined" && typeof oas.addAnnotationHandlers != "undefined) {
+			    if(typeof oas != "undefined" && typeof oas.addAnnotationHandlers != "undefined") {
 				    // oas.showAnnotationPoints("[about]");
 				    oas.addAnnotationHandlers();
 				}
