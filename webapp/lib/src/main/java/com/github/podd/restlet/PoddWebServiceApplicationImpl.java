@@ -52,6 +52,7 @@ import com.github.podd.resources.UserAddResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
 import com.github.podd.resources.UserEditResourceImpl;
 import com.github.podd.resources.UserPasswordResourceImpl;
+import com.github.podd.resources.UserRolesResourceImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
@@ -330,11 +331,10 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
 
         // Add a route for Edit User Roles page.
         final String userEditRolesPath = PoddWebConstants.PATH_USER_EDIT_ROLES + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
-        //this.log.debug("attaching edit user roles service to path={}", userEditRolesPath);
-        //router.attach(userEditRolesPath, UserPasswordResourceImpl.class);
+        this.log.debug("attaching edit user roles service to path={}", userEditRolesPath);
+        router.attach(userEditRolesPath, UserRolesResourceImpl.class);
 
-        // TODO: add routes for other user management pages. (Change Password, Modify
-        // Roles etc.)
+        // TODO: add routes for other user management pages. (List/Delete Users)
         
         // Add a route for the List Artifacts page.
         final String listArtifactsPath = PoddWebConstants.PATH_ARTIFACT_LIST;
