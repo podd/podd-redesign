@@ -6,7 +6,9 @@ package com.github.podd.resources.test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.AbstractMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -139,9 +141,9 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
-        final Map<URI, URI> roles = new HashMap<URI, URI>();
-        roles.put(PoddRoles.ADMIN.getURI(), null);
-        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project")));
         String testUserUri =
                 this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                         "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address",
@@ -175,9 +177,9 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
-        final Map<URI, URI> roles = new HashMap<URI, URI>();
-        roles.put(PoddRoles.ADMIN.getURI(), null);
-        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project")));
         String testUserUri = this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null,
                 null, null, null, null, null, roles, null);
 
@@ -283,9 +285,9 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "testuser@podd.com";
 
         // prepare: add a Test User account
-        final Map<URI, URI> roles = new HashMap<URI, URI>();
-        roles.put(PoddRoles.ADMIN.getURI(), null);
-        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project")));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null,
                 null, null, null, null, null, roles, PoddUserStatus.ACTIVE);
         

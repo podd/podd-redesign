@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -329,7 +330,7 @@ public class AbstractResourceImplTest
     protected String loadTestUser(final String testIdentifier, final String testPassword, final String testFirstName,
             final String testLastName, final String testEmail, final String testHomePage, final String testOrganization,
             final String testOrcid, final String testTitle, final String testPhone, final String testAddress,
-            final String testPosition, final Map<URI, URI> roles, final PoddUserStatus testStatus) throws Exception
+            final String testPosition, final List<Map.Entry<URI, URI>> roles, final PoddUserStatus testStatus) throws Exception
     {
         // - create a Model of user
         final Model userInfoModel = new LinkedHashModel();
@@ -401,7 +402,7 @@ public class AbstractResourceImplTest
         }        
         
         // prepare: add Role Mappings
-        for(Map.Entry<URI, URI> entry : roles.entrySet())
+        for(Map.Entry<URI, URI> entry : roles)
         {
             URI role = entry.getKey();
             URI mappedObject = entry.getValue();

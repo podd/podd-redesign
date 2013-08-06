@@ -5,8 +5,10 @@ package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.AbstractMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -110,9 +112,9 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     {
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
-        final Map<URI, URI> roles = new HashMap<URI, URI>();
-        roles.put(PoddRoles.ADMIN.getURI(), null);
-        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project"));
+        final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project")));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
                 roles, PoddUserStatus.ACTIVE);        
@@ -191,9 +193,9 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         // prepare: add a Test User account
         final String testIdentifier = "testuser@podd.com";
         final URI testObjectUri = PoddRdfConstants.VF.createURI("urn:podd:some-project");
-        final Map<URI, URI> roles = new HashMap<URI, URI>();
-        roles.put(PoddRoles.ADMIN.getURI(), null);
-        roles.put(PoddRoles.PROJECT_ADMIN.getURI(), testObjectUri);
+        final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), testObjectUri));
         final String testUserUri =
                 this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null, null,
                         null, null, null, null, roles, PoddUserStatus.ACTIVE);
