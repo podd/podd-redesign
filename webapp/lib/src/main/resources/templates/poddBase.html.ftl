@@ -68,15 +68,14 @@
 			podd = {};
 			podd.baseUrl = "${baseUrl}";
 			
+			// setup the global OAS object
 			oas = {};
-			oas.baseUrl = "${baseUrl}/../oas/";
-			oas.rdf = {};
-			oas.autocomplete = {};
 			oas.ontology = {};
+			oas.baseUrl = "http://ppodd2-cbr.vm.csiro.au/oas/";
 		</script>
     
-		<script src="${baseUrl}/../oas/resources/static/scripts/oas.js" type="text/javascript"></script>
-	    <script src="${baseUrl}/../oas/resources/static/scripts/oas-debug-helper.js" type="text/javascript"></script>
+		<script src="http://ppodd2-cbr.vm.csiro.au/oas/resources/static/scripts/oas.js" type="text/javascript"></script>
+	    <script src="http://ppodd2-cbr.vm.csiro.au/oas/resources/static/scripts/oas-debug-helper.js" type="text/javascript"></script>
 
 		<script type="text/javascript">
 			$(document).ready(function() {
