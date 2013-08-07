@@ -47,7 +47,6 @@ import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
@@ -114,44 +113,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("allRolesList", PoddRoles.values());
 
             // - include user's current Roles and optional mapped objects
-            final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList = new LinkedList<Entry<RestletUtilRole, PoddObjectLabel>>();
-            
-            final Collection<Entry<Role,URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
-            for(Iterator<Entry<Role, URI>> iterator = rolesWithObjectMappings.iterator(); iterator.hasNext();)
-            {
-                final Entry<Role, URI> entry = iterator.next();
-                try
-                {
-                    final RestletUtilRole roleByName = PoddRoles.getRoleByName(entry.getKey().getName());
-                    PoddObjectLabel poddObjectLabel = null;
-                    
-                    final URI artifactUri = entry.getValue();
-                    if(artifactUri != null)
-                    {
-                        final InferredOWLOntologyID artifact =
-                                this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-                        final List<PoddObjectLabel> topObjectLabels =
-                                this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(artifact));
-                        if(!topObjectLabels.isEmpty())
-                        {
-                            poddObjectLabel = topObjectLabels.get(0);
-                        }
-                    }
-                    roleList.add(new AbstractMap.SimpleEntry<RestletUtilRole, PoddObjectLabel>(roleByName,
-                            poddObjectLabel));
-
-                }
-                catch (OpenRDFException e)
-                {
-                    //TODO - handle this
-                    e.printStackTrace();
-                }
-                catch (UnmanagedArtifactIRIException e)
-                {
-                    //TODO - handle this
-                    e.printStackTrace();
-                }
-            }
+            final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList = getUsersRoles(realm, poddUser);
             
             dataModel.put("repositoryRoleList", roleList);
         }
@@ -161,7 +123,54 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-    
+
+    /**
+     * Retrieve the Roles that are mapped to this User, together with details of any optional mapped objects.
+     * 
+     * TODO: Retrieve Repository Roles and Project Roles separately so that they can be displayed separately
+     *  in the Role Management screen. Reason behind this is that it is better to make Project Roles read-only from
+     *  this view.
+     * 
+     * @param realm
+     * @param poddUser
+     */
+    private List<Entry<RestletUtilRole, PoddObjectLabel>> getUsersRoles(final PoddSesameRealm realm,
+            final PoddUser poddUser)
+    {
+        final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList = new LinkedList<Entry<RestletUtilRole, PoddObjectLabel>>();
+        
+        final Collection<Entry<Role,URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
+        for(Iterator<Entry<Role, URI>> iterator = rolesWithObjectMappings.iterator(); iterator.hasNext();)
+        {
+            final Entry<Role, URI> entry = iterator.next();
+                final RestletUtilRole roleByName = PoddRoles.getRoleByName(entry.getKey().getName());
+                PoddObjectLabel poddObjectLabel = null;
+                
+            final URI artifactUri = entry.getValue();
+            if(artifactUri != null)
+            {
+                try
+                {
+                    final InferredOWLOntologyID artifact =
+                            this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
+                    final List<PoddObjectLabel> topObjectLabels =
+                            this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(artifact));
+                    if(!topObjectLabels.isEmpty())
+                    {
+                        poddObjectLabel = topObjectLabels.get(0);
+                    }
+                }
+                catch(OpenRDFException | UnmanagedArtifactIRIException e)
+                {
+                    // either the artifact mapped to this Role does not exist, or a Label for it
+                    // could not be retrieved
+                    this.log.warn("Failed to retrieve Role Mapped Object [{}]", artifactUri);
+                }
+            }
+            roleList.add(new AbstractMap.SimpleEntry<RestletUtilRole, PoddObjectLabel>(roleByName, poddObjectLabel));
+        }
+        return roleList;
+    }
     
     
     /**
@@ -272,5 +281,4 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
 
-    
 }
