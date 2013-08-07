@@ -27,6 +27,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
@@ -244,6 +245,27 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("Expected Platform 1 not found", 1,
                 resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Platform 1")).size());
     }
+
+    /**
+     * Test successful search for a PODD Project in RDF/XML
+     */
+    @Test
+    public void testSearchRdfForProjects() throws Exception
+    {
+        // prepare:
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Project"};
+        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
+        
+        final Model resultModel = this.internalTestSearchRdf("Cot", searchTypes, requestMediaType, testArtifact.getOntologyIRI().toString());
+        
+        // verify:
+        Assert.assertEquals("Not the expected number of results", 1, resultModel.size());
+        Assert.assertTrue("Expected Project not found", resultModel.filter(null, RDFS.LABEL, null).objectString().contains("Cotton Leaf Morphology"));
+    }
+
 
     /**
      * Test successful search for a FOR Codes in RDF/XML
