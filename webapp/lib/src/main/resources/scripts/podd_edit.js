@@ -1912,19 +1912,34 @@ podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
 
 		var option = $('option:selected', dropDown);
 		if (typeof option !== 'undefined' && option.val() !== '') {
-			var roleUri = '' + option.val();
+			var roleUri = option.val();
 			var roleName = option.text();
 			
 			podd.debug('Selected Role: ' + roleUri);
 			
-		    var td = $('<td>', {
+		    var deleteLink = $('<a>', {
+		        name : 'name_delete_role',
+		        text : 'delete', 
+		        class : 'deleteLink',
+		        click : function(event) {
+					     	var tr = $(this).closest('tr');
+				        	tr.fadeOut(400, function(){
+				            	tr.remove();
+				        	});
+				        	return false;
+		        		} 
+		    });
+			
+		    var span = $('<span>', {
+		    	class : 'role_span',
 		    	text : roleName,
 		        value : roleUri,
-		    });			
+		    });
+		    
 			var tr = $('<tr>');
-			tr.append(td);
+			tr.append($('<td></td>').append(span));
 			tr.append('<td></td>');
-			tr.append('<td><a class="deleteLink" href="">delete</a></td>');
+			tr.append($('<td></td>').append(deleteLink));
 			$('#roleTable > tbody:last').append(tr);
 			
 		} else {
@@ -2216,6 +2231,59 @@ podd.submitUserPassword = function() {
 	
 	podd.submitUserData(pathToSubmitTo, userName, undefined, password, undefined, undefined, undefined, undefined, undefined, undefined,
 			undefined, undefined, undefined, undefined, oldPassword);
+};
+
+podd.submitUserRoles = function(userName) {
+	
+	podd.debug('[submitUserRoles] ' + userName);
+	var pathToSubmitTo = '/user/editroles/' + userName;
+
+	var roleDatabank = podd.newDatabank(); 
+	
+	$('tbody > tr').each(function(index) {
+	    var roleUri = $('.role_span', this).attr('value');
+	    podd.debug('[submitUserRoles] role = ' + roleUri);
+	    
+	    //TODO - not yet supported
+	    var roleMappedObject = undefined;
+	    
+	    var mappingUri = $.rdf.blank('_:mapping' + index);
+	    
+	    roleDatabank.add(podd.buildTriple(mappingUri, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>', 'http://purl.org/oas/RoleMapping', OBJECT_PROPERTY, 'URI'));
+	    roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/oas/roleMappedRole>', roleUri, OBJECT_PROPERTY, 'URI'));
+	    if (roleMappedObject != undefined) {
+	    	roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/podd/ns/poddUser#roleMappedObject>', roleMappedObject, OBJECT_PROPERTY, 'URI'));
+	    }
+	});
+	
+	//ajax POST
+	var modifiedTriples = $.toJSON(roleDatabank.dump({
+		format : 'application/json'
+	}));
+	podd.debug("As JSON: " + modifiedTriples);
+	  
+	var requestUrl = podd.baseUrl + pathToSubmitTo;
+	  
+	$.ajax({
+	        url : requestUrl,
+	        type : 'POST',
+	        data : modifiedTriples,
+	        contentType : 'application/rdf+json', // what we're sending
+	        beforeSend : function(xhr) {
+	            xhr.setRequestHeader("Accept", "application/rdf+json");
+	        },
+	        success : function(resultData, status, xhr) {
+	            podd.debug('[submitUserRoles] ### SUCCESS ### ' + resultData);
+	            // redirect to User Details Page
+	        	window.location.href = podd.baseUrl + '/user/' + userName;
+	        },
+	        error : function(xhr, status, error) {
+	            podd.debug('[submitUserRoles] $$$ ERROR $$$ ' + error);
+	            podd.debug(xhr.statusText);
+	            
+	            podd.displaySummaryErrorMessage(xhr.responseText);
+	        }
+	});	  
 };
 
 /**

@@ -47,6 +47,7 @@ import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
@@ -109,8 +110,11 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         {
             dataModel.put("requestedUser", poddUser);
             
-            // - user's current Roles
-            final List<Entry<Role, PoddObjectLabel>> roleList = new LinkedList<Entry<Role, PoddObjectLabel>>();
+            // - include all available PoddRoles
+            dataModel.put("allRolesList", PoddRoles.values());
+
+            // - include user's current Roles and optional mapped objects
+            final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList = new LinkedList<Entry<RestletUtilRole, PoddObjectLabel>>();
             
             final Collection<Entry<Role,URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
             for(Iterator<Entry<Role, URI>> iterator = rolesWithObjectMappings.iterator(); iterator.hasNext();)
@@ -118,25 +122,24 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                 final Entry<Role, URI> entry = iterator.next();
                 try
                 {
-                    final URI artifactUri = entry.getValue();
-                    if (artifactUri != null)
-                    {
-                        final InferredOWLOntologyID artifact = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
-                        final List<PoddObjectLabel> topObjectLabels = this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(artifact));
-                        if (!topObjectLabels.isEmpty())
-                        {
-                            roleList.add(new AbstractMap.SimpleEntry<Role, PoddObjectLabel>(entry.getKey(), topObjectLabels.get(0)));
-                        }
-                        else
-                        {
-                            roleList.add(new AbstractMap.SimpleEntry<Role, PoddObjectLabel>(entry.getKey(), null));
-                        }
-                    }
-                    else
-                    {
-                        roleList.add(new AbstractMap.SimpleEntry<Role, PoddObjectLabel>(entry.getKey(), null));
-                    }
+                    final RestletUtilRole roleByName = PoddRoles.getRoleByName(entry.getKey().getName());
+                    PoddObjectLabel poddObjectLabel = null;
                     
+                    final URI artifactUri = entry.getValue();
+                    if(artifactUri != null)
+                    {
+                        final InferredOWLOntologyID artifact =
+                                this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
+                        final List<PoddObjectLabel> topObjectLabels =
+                                this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(artifact));
+                        if(!topObjectLabels.isEmpty())
+                        {
+                            poddObjectLabel = topObjectLabels.get(0);
+                        }
+                    }
+                    roleList.add(new AbstractMap.SimpleEntry<RestletUtilRole, PoddObjectLabel>(roleByName,
+                            poddObjectLabel));
+
                 }
                 catch (OpenRDFException e)
                 {
@@ -151,9 +154,6 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             }
             
             dataModel.put("repositoryRoleList", roleList);
-            
-            // - include all available PoddRoles
-            dataModel.put("allRolesList", PoddRoles.values());
         }
         
         // Output the base template, with contentTemplate from the dataModel defining the
@@ -215,7 +215,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             {
                 final Role role = iterator1.next();
                 nextRealm.unmap(poddUser, role);
-                this.log.info("**** User [{}] unmapped from Role [{}]", poddUser.getIdentifier(), role.getName());
+                this.log.debug(" User [{}] unmapped from Role [{}]", poddUser.getIdentifier(), role.getName());
             }
             
             // - map new Roles for the User

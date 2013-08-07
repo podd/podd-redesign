@@ -11,6 +11,8 @@
         podd.debug('initializing Edit User Roles page...');
         podd.debug('-------------------');
 
+		podd.userName = '${requestedUser.identifier!""}';
+
 		podd.roles = [];
 		<#if allRolesList?? && allRolesList?has_content>
 		    <#list allRolesList as role>
@@ -24,8 +26,8 @@
 		</#if>
 		podd.debug('All Roles size = ' + podd.roles.length);
 		
-		// Add handler for DeleteLink
-	    $(".deleteLink").click(function() {
+		// Add handler for deleting Roles populated at page load time
+	    $(".deleteLinkStatic").click(function() {
 	     	var tr = $(this).closest('tr');
         	tr.fadeOut(400, function(){
             	tr.remove();
@@ -36,7 +38,6 @@
 		// Add new Row to Roles table
 		$("#btnAddRole").click(function(event) {
 			event.preventDefault();
-			podd.debug("Attempting to add new User Role");
 			podd.showAddRoleDialog();
 			
 		});
@@ -44,12 +45,8 @@
 		// Add form submission handler
 		$("#btnSubmit").click(function(event) {
 			event.preventDefault();
-			podd.debug("Attempting to update User Roles");
 			podd.emptyErrorMessages();
-			var validInput = validateUserPassword();
-			if (validInput) {
-				podd.submitUserPassword();
-			}
+			podd.submitUserRoles(podd.userName);
 			return false;
 		});
 	
@@ -118,15 +115,15 @@
 				<#list repositoryRoleList as role>
 					<tr>
 			    		<td>
-			    			<label>${role.key}</label>
+			    			<span class="role_span" value="${role.key.URI!""}">${role.key.getName()!""}</span>
 			    		</td>
 			    		<td>
 			    			<#if role.value?? >
-			    				<label><a href="${role.value.objectURI}">${role.value.label}</a></label>
+			    				<span><a href="${role.value.objectURI}">${role.value.label}</a></span>
 			    		 	</#if>
 			    		</td>
             			<td>
-                			<a class="deleteLink" href="">delete</a>
+                			<a class="deleteLinkStatic" href="">delete</a>
             			</td>			    		
 		    		</tr>
 		    	</#list>
