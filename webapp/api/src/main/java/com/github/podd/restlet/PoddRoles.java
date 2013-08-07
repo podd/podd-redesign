@@ -25,16 +25,16 @@ public enum PoddRoles implements RestletUtilRole
             "http://purl.org/podd/ns/poddUser#RoleAdministrator", true),
     
     PROJECT_CREATOR("Project Creator", "A User who can create new projects",
-            "http://purl.org/podd/ns/poddUser#RoleProjectCreator", true),
+            "http://purl.org/podd/ns/poddUser#RoleTopObjectCreator", true),
             
     PROJECT_MEMBER("Project Member", "A user who is a member of a particular project",
-            "http://purl.org/podd/ns/poddUser#RoleProjectMember", true),
+            "http://purl.org/podd/ns/poddUser#RoleTopObjectMember", true),
     
     PROJECT_OBSERVER("Project Observer", "A user who is an observer of a particular project",
-            "http://purl.org/podd/ns/poddUser#RoleProjectObserver", true),
+            "http://purl.org/podd/ns/poddUser#RoleTopObjectObserver", true),
     
     PROJECT_ADMIN("Project Administrator", "A user who is an administrator of a particular project",
-            "http://purl.org/podd/ns/poddUser#RoleProjectAdministrator", true),
+            "http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator", true),
     
     ;
     
