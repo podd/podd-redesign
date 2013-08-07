@@ -1848,6 +1848,92 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
 };
 
 /**
+ * Display a Dialog to add a new Role to a PODD User.
+ */
+podd.showAddRoleDialog = function() {
+    var select = $('<select>', {
+        name : 'name_role',
+    });
+
+    var defaultOption = $('<option>', {
+        value : '',
+        text : 'Please Select',
+    });
+    select.append(defaultOption);
+
+    $.each(podd.roles, function(index, nextChild) {
+        var option = $('<option>', {
+            value : nextChild.uri,
+            text : nextChild.name,
+        });
+        
+        select.append(option);
+    });
+    
+    var continueLink = $('<a>', {
+        name : 'name_add_role_link',
+        text : 'Continue', 
+        class : 'button'
+    });
+    
+    var div = $('<div>', {
+        name : 'add_role',
+    });
+
+    podd.addRoleDialogContinueHandler(continueLink, select);
+   
+    div.append('<p>Select Role</p>')
+    div.append(select);
+    div.append('<br><br>');
+    div.append(continueLink);
+    
+	var dialog = $("#dialog").dialog({
+		autoOpen : false,
+		modal: true,
+	    dialogClass: "dialog_class",
+	    close: function () {
+    		div.remove();
+  		}  
+	});
+	dialog.append(div);
+	dialog.dialog("open");
+    
+    podd.debug('[showAddRole] finished');
+};
+
+/**
+ * Add handler for the "Continue" link in the Add Role Dialog.
+ * 
+ */
+podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
+
+	theLink.click(function(event) {
+		$('#dialog').dialog('close');
+
+		var option = $('option:selected', dropDown);
+		if (typeof option !== 'undefined' && option.val() !== '') {
+			var roleUri = '' + option.val();
+			var roleName = option.text();
+			
+			podd.debug('Selected Role: ' + roleUri);
+			
+		    var td = $('<td>', {
+		    	text : roleName,
+		        value : roleUri,
+		    });			
+			var tr = $('<tr>');
+			tr.append(td);
+			tr.append('<td></td>');
+			tr.append('<td><a class="deleteLink" href="">delete</a></td>');
+			$('#roleTable > tbody:last').append(tr);
+			
+		} else {
+			podd.debug('option was undefined');
+		}
+	});
+};
+
+/**
  * Invoke the Edit Artifact Service to update the artifact with changed object
  * attributes. { isNew: boolean, property: String value of predicate URI
  * surrounded by angle brackets, newValue: String, (Should be surrounded by

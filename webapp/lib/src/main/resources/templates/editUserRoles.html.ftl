@@ -24,8 +24,6 @@
 		</#if>
 		podd.debug('All Roles size = ' + podd.roles.length);
 		
-		//podd.getRoleMetadata(podd.roles);
-
 		// Add handler for DeleteLink
 	    $(".deleteLink").click(function() {
 	     	var tr = $(this).closest('tr');
@@ -65,6 +63,7 @@
 	});
 </script>
 
+<div id="dialog" title="Add Role"></div>
 
 <div id="title_pane">
     <h3>Change User Roles</h3>
@@ -119,7 +118,7 @@
 				<#list repositoryRoleList as role>
 					<tr>
 			    		<td>
-			    			<label class="bold">${role.key}</label>
+			    			<label>${role.key}</label>
 			    		</td>
 			    		<td>
 			    			<#if role.value?? >

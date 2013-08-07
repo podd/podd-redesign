@@ -109,6 +109,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         {
             dataModel.put("requestedUser", poddUser);
             
+            // - user's current Roles
             final List<Entry<Role, PoddObjectLabel>> roleList = new LinkedList<Entry<Role, PoddObjectLabel>>();
             
             final Collection<Entry<Role,URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
@@ -151,7 +152,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             
             dataModel.put("repositoryRoleList", roleList);
             
-            //TODO - include Role URI also
+            // - include all available PoddRoles
             dataModel.put("allRolesList", PoddRoles.values());
         }
         
