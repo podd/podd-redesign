@@ -404,6 +404,59 @@ podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRow
 };
 
 /**
+ * @memberOf podd
+ * 
+ * Add handler for the "Continue" link in the Add Role Dialog.
+ * 
+ * @param theLink
+ *            {object} The "Continue" link
+ * @param dropDown
+ *            {object} The HTML Select where a Role is chosen
+ */
+podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
+
+	theLink.click(function(event) {
+		$('#dialog').dialog('close');
+
+		var option = $('option:selected', dropDown);
+		if (typeof option !== 'undefined' && option.val() !== '') {
+			var roleUri = option.val();
+			var roleName = option.text();
+			
+			podd.debug('Selected Role: ' + roleUri);
+			
+		    var deleteLink = $('<a>', {
+		        name : 'name_delete_role',
+		        text : 'delete', 
+		        class : 'deleteLink',
+		        click : function(event) {
+					     	var tr = $(this).closest('tr');
+				        	tr.fadeOut(400, function(){
+				            	tr.remove();
+				        	});
+				        	return false;
+		        		} 
+		    });
+			
+		    var span = $('<span>', {
+		    	class : 'role_span',
+		    	text : roleName,
+		        value : roleUri,
+		    });
+		    
+			var tr = $('<tr>');
+			tr.append($('<td></td>').append(span));
+			tr.append('<td></td>');
+			tr.append($('<td></td>').append(deleteLink));
+			$('#roleTable > tbody:last').append(tr);
+			
+		} else {
+			podd.debug('option was undefined');
+		}
+	});
+};
+
+/**
  * On leaving a text field (short/long), check if the contents of the field have
  * changed and if so, request the artifact databank to be updated.
  * 
@@ -1902,53 +1955,6 @@ podd.showAddRoleDialog = function() {
 };
 
 /**
- * Add handler for the "Continue" link in the Add Role Dialog.
- * 
- */
-podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
-
-	theLink.click(function(event) {
-		$('#dialog').dialog('close');
-
-		var option = $('option:selected', dropDown);
-		if (typeof option !== 'undefined' && option.val() !== '') {
-			var roleUri = option.val();
-			var roleName = option.text();
-			
-			podd.debug('Selected Role: ' + roleUri);
-			
-		    var deleteLink = $('<a>', {
-		        name : 'name_delete_role',
-		        text : 'delete', 
-		        class : 'deleteLink',
-		        click : function(event) {
-					     	var tr = $(this).closest('tr');
-				        	tr.fadeOut(400, function(){
-				            	tr.remove();
-				        	});
-				        	return false;
-		        		} 
-		    });
-			
-		    var span = $('<span>', {
-		    	class : 'role_span',
-		    	text : roleName,
-		        value : roleUri,
-		    });
-		    
-			var tr = $('<tr>');
-			tr.append($('<td></td>').append(span));
-			tr.append('<td></td>');
-			tr.append($('<td></td>').append(deleteLink));
-			$('#roleTable > tbody:last').append(tr);
-			
-		} else {
-			podd.debug('option was undefined');
-		}
-	});
-};
-
-/**
  * Invoke the Edit Artifact Service to update the artifact with changed object
  * attributes. { isNew: boolean, property: String value of predicate URI
  * surrounded by angle brackets, newValue: String, (Should be surrounded by
@@ -2071,9 +2077,10 @@ podd.submitUserCreate = function() {
 	var orcid = $('#orcid').val();
 
 	var pathToSubmitTo = '/admin/user/add';
+	var redirectUrl = podd.baseUrl + '/user/' + userName;
 
 	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
-			phone, address, url, orcid, undefined);
+			phone, address, url, orcid, undefined, redirectUrl);
 };
 
 /**
@@ -2105,9 +2112,10 @@ podd.submitUserEdit = function() {
 	var orcid = $('#orcid').val();
 
 	var pathToSubmitTo = '/user/edit/' + userName;
+	var redirectUrl = podd.baseUrl + '/user/' + userName;
 
 	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
-			phone, address, url, orcid, undefined);
+			phone, address, url, orcid, undefined, redirectUrl);
 };
 
 /**
@@ -2134,9 +2142,11 @@ podd.submitUserEdit = function() {
  *            {URI} User's home page
  * @param orcid
  * @param oldPassword
+ * @param redirectUrl
+ * 			  {string} The URL to redirect after successful completion
  */
 podd.submitUserData = function(submitPath, userName, email, password, status, title, firstName, lastName,
-		organisation, position, phone, address, url, orcid, oldPassword) {
+		organisation, position, phone, address, url, orcid, oldPassword, redirectUrl) {
 	  
 	  var databank = podd.newDatabank();
 	  var tempUser = '<urn:temp:user>';
@@ -2209,8 +2219,7 @@ podd.submitUserData = function(submitPath, userName, email, password, status, ti
 	        },
 	        success : function(resultData, status, xhr) {
 	            podd.debug('[submitUserData] ### SUCCESS ### ' + resultData);
-	            // redirect to User Details Page
-	        	window.location.href = podd.baseUrl + '/user/' + userName;
+	        	window.location.href = redirectUrl;
 	        },
 	        error : function(xhr, status, error) {
 	            podd.debug('[submitUserData] $$$ ERROR $$$ ' + error);
@@ -2221,6 +2230,12 @@ podd.submitUserData = function(submitPath, userName, email, password, status, ti
 	    });	  
 };
 
+/**
+ * @memberOf podd
+ *
+ * Submit Change Password form.
+ * 
+ */
 podd.submitUserPassword = function() {
 
 	var userName = $('#userName').val();
@@ -2229,10 +2244,25 @@ podd.submitUserPassword = function() {
 	
 	var pathToSubmitTo = '/user/editpwd/' + userName;
 	
+	var redirectUrl = podd.baseUrl + '/user/' + userName;
+	if (oldPassword != undefined && oldPassword !== ''){
+		redirectUrl = podd.baseUrl + '/loginpage';
+	}
+		
+	
 	podd.submitUserData(pathToSubmitTo, userName, undefined, password, undefined, undefined, undefined, undefined, undefined, undefined,
-			undefined, undefined, undefined, undefined, oldPassword);
+			undefined, undefined, undefined, undefined, oldPassword, redirectUrl);
 };
 
+/**
+ * @memberOf podd
+ * 
+ * Submit updated User Roles. Builds a databank from the Roles added in the page
+ * and submits as RDF.
+ * 
+ * @param userName
+ *            {string} The User whose Roles are being updated
+ */
 podd.submitUserRoles = function(userName) {
 	
 	podd.debug('[submitUserRoles] ' + userName);
