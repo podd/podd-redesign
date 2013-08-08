@@ -15,6 +15,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
+import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;
@@ -129,23 +130,26 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-
-        // check authentication first
+        
+        // - set Action and check authorization
         PoddAction action = PoddAction.OTHER_USER_EDIT;
+        boolean changeOwnPassword = false;
         if(user != null && changePwdUserIdentifier.equals(user.getIdentifier()))
         {
             action = PoddAction.CURRENT_USER_EDIT;
+            changeOwnPassword = true;
         }
-        this.checkAuthentication(action);        
+        this.checkAuthentication(action);
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         
         final RestletUtilUser changePwdUser = nextRealm.findUser(changePwdUserIdentifier);
-        if (changePwdUser == null || !(changePwdUser instanceof PoddUser))
+        if(changePwdUser == null || !(changePwdUser instanceof PoddUser))
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");
         }
-        final PoddUser poddUser = (PoddUser) changePwdUser;
+        final PoddUser poddUser = (PoddUser)changePwdUser;
+        
         URI userUri = null;
         try
         {
@@ -155,13 +159,26 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model modifiedUserModel = Rio.parse(inputStream, "", inputFormat);
             
-            userUri = this.changePassword(nextRealm, modifiedUserModel, poddUser, user.getIdentifier());
+            userUri = this.changePassword(nextRealm, modifiedUserModel, poddUser, changeOwnPassword);
         }
-        catch (IOException | OpenRDFException e)
+        catch(IOException | OpenRDFException e)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
         }
-            
+        
+        // - set Credentials Cookie to expire so that User has to login again
+        if(changeOwnPassword)
+        {
+            final CookieSetting credentialsCookie =
+                    this.getResponse().getCookieSettings().getFirst(PoddWebConstants.COOKIE_NAME);
+            if(credentialsCookie != null)
+            {
+                credentialsCookie.setMaxAge(0);
+                this.getResponse().getCookieSettings().add(credentialsCookie);
+                this.log.debug("Set max Age of Credentials Cookie to expire");
+            }
+        }
+        
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         final RDFFormat outputFormat =
@@ -180,36 +197,38 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
-
-    private URI changePassword(PoddSesameRealm nextRealm, Model model, PoddUser changePwdUser, String authenticatedUserIdentifier)
+    
+    private URI changePassword(final PoddSesameRealm nextRealm, final Model model, final PoddUser changePwdUser,
+            final boolean changeOwnPassword)
     {
-        final String identifierInModel = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
+        final String identifierInModel =
+                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
         
         // verify user identifier in Model is same as that from the request
-        if (!changePwdUser.getIdentifier().equals(identifierInModel))
+        if(!changePwdUser.getIdentifier().equals(identifierInModel))
         {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Problem with input: user identifiers don't match");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Problem with input: user identifiers don't match");
         }
-
+        
         // changing own password, verify old password.
-        //TODO: is there a better way of doing this?
-        if (changePwdUser.getIdentifier().equals(authenticatedUserIdentifier))
+        if(changeOwnPassword)
         {
             final String oldPassword = model.filter(null, PoddRdfConstants.PODD_USER_OLDSECRET, null).objectString();
             
             final Verifier verifier = nextRealm.getVerifier();
-            if (verifier == null)
+            if(verifier == null)
             {
                 this.log.warn("Could not access Verifier to check old password");
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
             }
-        
+            
             char[] localSecret = null;
-            if (verifier instanceof MapVerifier)
+            if(verifier instanceof MapVerifier)
             {
                 localSecret = ((MapVerifier)verifier).getLocalSecret(identifierInModel);
             }
-            else if (verifier instanceof LocalVerifier)
+            else if(verifier instanceof LocalVerifier)
             {
                 localSecret = ((LocalVerifier)verifier).getLocalSecret(identifierInModel);
             }
@@ -219,7 +238,7 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
             }
             
-            if (!SecretVerifier.compare(localSecret, oldPassword.toCharArray()))
+            if(!SecretVerifier.compare(localSecret, oldPassword.toCharArray()))
             {
                 throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "Old password is invalid.");
             }
