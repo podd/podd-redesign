@@ -794,6 +794,13 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     }
     
     @Override
+    public void unmap(final User user, final Role role, final URI optionalObjectUri)
+    {
+        //FIXME: not implemented
+        throw new RuntimeException("unmap(user, role, uri) is NOT IMPLEMENTED");
+    }
+    
+    @Override
     public URI updateUser(final PoddUser nextUser)
     {
         return this.addUser(nextUser, false);

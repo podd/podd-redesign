@@ -155,6 +155,11 @@ public interface PoddWebConstants
     public static final String KEY_ARTIFACT_VERSION_IDENTIFIER = "versionuri";
     
     /**
+     * Key used to indicate that the request is to "delete" a resource
+     */
+    public static final String KEY_DELETE = "delete";
+    
+    /**
      * Key used to represent an object as part of a request
      */
     public static final String KEY_OBJECT_IDENTIFIER = "objecturi";

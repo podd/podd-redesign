@@ -28,7 +28,12 @@
 		
 		// Add handler for deleting Roles populated at page load time
 	    $(".deleteLinkStatic").click(function() {
+	    
 	     	var tr = $(this).closest('tr');
+	     	
+	     	// TODO: uncomment when delete functionality works in server
+	     	//podd.submitUserRoleDelete(podd.userName, tr);
+	     	
         	tr.fadeOut(400, function(){
             	tr.remove();
         	});
