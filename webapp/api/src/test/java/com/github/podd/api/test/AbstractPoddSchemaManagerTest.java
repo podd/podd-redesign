@@ -966,13 +966,13 @@ public abstract class AbstractPoddSchemaManagerTest
     public final void testUploadSchemaOntologyWithOntologyIRIAndVersionIRI() throws Exception
     {
         final String[] resourcePaths =
-                { "/ontologies/dcTerms.owl", "/ontologies/foaf.owl", "/ontologies/poddUser.owl",
-                        "/ontologies/poddBase.owl", };
+                { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
+                        PoddRdfConstants.PATH_PODD_BASE, };
         
         for(final String path : resourcePaths)
         {
             final InputStream testInputStream = this.getClass().getResourceAsStream(path);
-            
+            Assert.assertNotNull("Missing test resource: " + path, testInputStream);
             this.testSchemaManager.uploadSchemaOntology(testInputStream, RDFFormat.RDFXML);
         }
         
