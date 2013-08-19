@@ -110,10 +110,10 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("requestedUser", poddUser);
             
             // - include all available PoddRoles
-            dataModel.put("allRolesList", PoddRoles.values());
+            dataModel.put("allRolesList", PoddRoles.getRepositoryRoles());
 
             // - include user's current Roles and optional mapped objects
-            final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList = getUsersRoles(realm, poddUser);
+            final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList = this.getUsersRoles(realm, poddUser);
             
             dataModel.put("repositoryRoleList", roleList);
         }
@@ -125,14 +125,16 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
     }
 
     /**
-     * Retrieve the Roles that are mapped to this User, together with details of any optional mapped objects.
+     * Retrieve the Roles that are mapped to this User, together with details of any optional mapped
+     * objects.
      * 
-     * TODO: Retrieve Repository Roles and Project Roles separately so that they can be displayed separately
-     *  in the Role Management screen. Reason behind this is that it is better to make Project Roles read-only from
-     *  this view.
+     * TODO: Retrieve Repository Roles and Project Roles separately so that they can be displayed
+     * separately in the Role Management screen. Reason behind this is that it is better to make
+     * Project Roles read-only from this view.
      * 
      * @param realm
      * @param poddUser
+     *            The PODD User whose Roles are requested
      */
     private List<Entry<RestletUtilRole, PoddObjectLabel>> getUsersRoles(final PoddSesameRealm realm,
             final PoddUser poddUser)

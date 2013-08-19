@@ -1,0 +1,40 @@
+/**
+ * 
+ */
+package com.github.podd.restlet.test;
+
+import java.util.List;
+
+
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.github.ansell.restletutils.RestletUtilRole;
+import com.github.podd.restlet.PoddRoles;
+
+/**
+ * @author kutila
+ *
+ */
+public class PoddRolesTest
+{
+    @Test
+    public void testGetRepositoryRoles() throws Exception
+    {
+        final List<PoddRoles> repositoryRoles = PoddRoles.getRepositoryRoles();
+        Assert.assertEquals("Expected 2 Repository Roles", 2, repositoryRoles.size());
+        
+        Assert.assertTrue("Missing Admin role", repositoryRoles.contains(PoddRoles.ADMIN));
+        Assert.assertTrue("Missing Project_Creator role", repositoryRoles.contains(PoddRoles.PROJECT_CREATOR));
+    }
+    
+    @Test
+    public void testGetRoleByName() throws Exception
+    {
+        final String testRoleName = PoddRoles.ADMIN.getName();
+        
+        RestletUtilRole roleByName = PoddRoles.getRoleByName(testRoleName);
+        Assert.assertEquals("Role has incorrect URI", PoddRoles.ADMIN.getURI(), roleByName.getURI());
+    }
+}

@@ -37,6 +37,21 @@ public enum PoddRoles implements RestletUtilRole
             "http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator", true),
     
     ;
+
+    /**
+     * @return Retrieve PoddRoles that are Repository-wide (e.g. Administrator Role)
+     */
+    public static List<PoddRoles> getRepositoryRoles()
+    {
+        final List<PoddRoles> result = new ArrayList<PoddRoles>();
+        
+        // NOTE: Is it worth to add an extra attribute to a PoddRole to specify whether it is
+        // a Project or Repository level Role?
+        result.add(ADMIN);
+        result.add(PROJECT_CREATOR);
+        
+        return result;
+    }    
     
     public static RestletUtilRole getRoleByName(final String name)
     {
