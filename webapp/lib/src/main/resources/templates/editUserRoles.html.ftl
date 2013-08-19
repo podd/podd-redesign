@@ -112,6 +112,7 @@
 	        </tfoot>
 	        <tbody>
 
+			<#if userRoleList?? && userRoleList?has_content>
 				<#list userRoleList as role>
 					<tr>
 			    		<td>
@@ -127,6 +128,8 @@
             			</td>			    		
 		    		</tr>
 		    	</#list>
+		    </#if>
+			    	
 			</tbody>
 	    </table>
 		</div>
