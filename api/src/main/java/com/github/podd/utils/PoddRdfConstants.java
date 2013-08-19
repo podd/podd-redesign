@@ -373,6 +373,13 @@ public interface PoddRdfConstants
             PoddRdfConstants.PODD_ERROR, "contains");
 
     /**
+     * [http://purl.org/podd/ns/artifact/artifact89]
+     * 
+     * A dummy Artifact URI for test purposes.
+     */
+    public static final URI TEST_ARTIFACT = PoddRdfConstants.VF.createURI("http://purl.org/podd/ns/artifact/artifact89");
+    
+    /**
      * @Deprecated Unused. Remove if not needed.
      */
     public static final URI SCOPE_ARTIFACT = PoddRdfConstants.VF
