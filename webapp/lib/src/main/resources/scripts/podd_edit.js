@@ -2138,7 +2138,7 @@ podd.submitUserEdit = function() {
  * @param position
  * @param phone
  * @param address
- * @param url
+ * @param homePage
  *            {URI} User's home page
  * @param orcid
  * @param oldPassword
@@ -2146,7 +2146,7 @@ podd.submitUserEdit = function() {
  * 			  {string} The URL to redirect after successful completion
  */
 podd.submitUserData = function(submitPath, userName, email, password, status, title, firstName, lastName,
-		organisation, position, phone, address, url, orcid, oldPassword, redirectUrl) {
+		organisation, position, phone, address, homePage, orcid, oldPassword, redirectUrl) {
 	  
 	  var databank = podd.newDatabank();
 	  var tempUser = '<urn:temp:user>';
@@ -2187,8 +2187,8 @@ podd.submitUserData = function(submitPath, userName, email, password, status, ti
 	  if (typeof title !== 'undefined' && title !== '') {
 		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#title>', title, DATATYPE_PROPERTY, XSD_STRING));
 	  }
-	  if (typeof url !== 'undefined' && url !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#homepage>', url, OBJECT_PROPERTY, 'URI'));
+	  if (typeof homePage !== 'undefined' && homePage !== '') {
+		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#homepage>', homePage, OBJECT_PROPERTY, 'URI'));
 	  }
 	  if (typeof position !== 'undefined' && position !== '') {
 		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#position>', position, DATATYPE_PROPERTY, XSD_STRING));
