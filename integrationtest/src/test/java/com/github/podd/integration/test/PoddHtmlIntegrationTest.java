@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.github.ansell.restletutils.test.RestletTestUtils;
 
 /**
  * Tests the PODD web applicaiton with text/html requests, which should mimic those from browsers.
@@ -84,7 +85,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testCreateDeleteCreateSameOntologyUri() throws IOException
     {
-        this.login("testAdminUser", "testAdminPassword");
+        this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         
         this.getWebTester().gotoPage("/service/testontologies/ontologymanager/upload");
         
@@ -185,7 +186,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testCreateDeleteCreateSameOntologyUriMultipleTimes() throws IOException
     {
-        this.login("testAdminUser", "testAdminPassword");
+        this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         
         // Create temp file using the new Java-7 NIO API
         final Path tempOntologyFile =
@@ -265,7 +266,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testCreateOntologyPostRdfWebService() throws IOException
     {
-        this.login("testAdminUser", "testAdminPassword");
+        this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         
         this.getWebTester().gotoPage("/service/testontologies/ontologymanager/upload");
         
@@ -324,7 +325,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testCreateOntologyPostRdfWebServiceMediumSize() throws IOException, URISyntaxException
     {
-        this.login("testAdminUser", "testAdminPassword");
+        this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         
         this.getWebTester().gotoPage("/service/testontologies/ontologymanager/upload");
         
@@ -642,7 +643,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testFailEmptyOntologyManagerDelete()
     {
-        this.login("testAdminUser", "testAdminPassword");
+        this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         
         try
         {
@@ -673,7 +674,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testFailEmptyOntologyManagerDeleteNonAdmin()
     {
-        this.login("testUser", "testPassword");
+        this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD);
         
         try
         {
@@ -790,11 +791,13 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testHtmlLogin()
     {
-        this.login("testUser", "testPassword");
+        this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD);
         
         // we should be at the index page with a 200 HTTP status after login
         this.getWebTester().assertResponseCode(200);
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/"));
+        
+        System.out.println(this.getWebTester().getPageSource());
         
         // verify that the Login link has disappeared
         this.getWebTester().assertTextNotPresent("Login");
@@ -815,7 +818,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testHtmlLoginAdmin()
     {
-        this.login("testAdminUser", "testAdminPassword");
+        this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         
         // we should be at the index page with a 200 HTTP status after login
         this.getWebTester().assertResponseCode(200);
@@ -840,7 +843,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testHtmlLoginInvalidCredentials()
     {
-        this.login("testUser", "wrongPassword");
+        this.login(RestletTestUtils.TEST_USERNAME, "wrongPassword");
         
         // we should be at the index page with a 200 status code, but not logged in
         this.getWebTester().assertResponseCode(200);
@@ -892,13 +895,14 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testUserDetailsPage()
     {
-        this.login("testUser", "testPassword");
+        this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD);
         this.getWebTester().assertResponseCode(200);
         
         this.getWebTester().clickLinkWithText("User page");
         this.getWebTester().assertResponseCode(200);
         
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/testUser"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
+                .endsWith("/" + RestletTestUtils.TEST_USERNAME));
         
         // verify user details page headings are present
         this.getWebTester().assertTextPresent("Account Details");
@@ -915,14 +919,14 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testUserDetailsPageAsAdmin()
     {
-        this.login("testAdminUser", "testAdminPassword");
+        this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         this.getWebTester().assertResponseCode(200);
         
         this.getWebTester().clickLinkWithText("User page");
         this.getWebTester().assertResponseCode(200);
         
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/testAdminUser"));
+                .endsWith("/" + RestletTestUtils.TEST_ADMIN_USERNAME));
         
         // verify user details page headings are present
         this.getWebTester().assertTextPresent("Account Details");
@@ -940,7 +944,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testUserDetailsPageOfNonExistentUser()
     {
-        this.login("testAdminUser", "testAdminPassword");
+        this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         this.getWebTester().assertResponseCode(200);
         
         try
@@ -966,13 +970,14 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testUserDetailsPageOfOtherUserAsAdmin()
     {
-        this.login("testAdminUser", "testAdminPassword");
+        this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         this.getWebTester().assertResponseCode(200);
         
-        this.getWebTester().gotoPage("/user/testUser");
+        this.getWebTester().gotoPage("/user/" + RestletTestUtils.TEST_USERNAME);
         this.getWebTester().assertResponseCode(200);
         
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/testUser"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
+                .endsWith("/" + RestletTestUtils.TEST_USERNAME));
         
         // verify user details page headings are present
         this.getWebTester().assertTextPresent("Account Details");
@@ -989,12 +994,12 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
     @Test
     public void testUserDetailsPageOfOtherUserUnauthorized()
     {
-        this.login("testUser", "testPassword");
+        this.login(RestletTestUtils.TEST_USERNAME, RestletTestUtils.TEST_PASSWORD);
         this.getWebTester().assertResponseCode(200);
         
         try
         {
-            this.getWebTester().gotoPage("/user/testAdminUser");
+            this.getWebTester().gotoPage("/user/" + RestletTestUtils.TEST_ADMIN_USERNAME);
             Assert.fail("An exception should've been thrown here.");
         }
         catch(final TestingEngineResponseException e)
@@ -1004,7 +1009,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         this.getWebTester().assertResponseCode(401);
         
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/testAdminUser"));
+                .endsWith("/" + RestletTestUtils.TEST_ADMIN_USERNAME));
         
         // verify an error indication is present
         this.getWebTester().assertTextPresent("ERROR");

@@ -139,4 +139,9 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
             throw e;
         }
     }
+    
+    protected void login(String username, char[] password)
+    {
+        this.login(username, new String(password));
+    }
 }
