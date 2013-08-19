@@ -11,10 +11,9 @@
 <div id="content_pane">
     <#if isAdmin?? && isAdmin>
         <#include "admin_aux.html.ftl"/>
-
-    <div id="main">
     </#if>
 
+    <div id="main">
 
 	<p>
     <h4 class="errorMsg">${errorMessage!""}</h4>
@@ -54,7 +53,9 @@
 
         <div id="buttonwrapper">
             <a href="${baseUrl}/user/edit/${requestedUser.identifier!"unknown-username"}">Edit User</a>
-            <a href="${baseUrl}/user/editroles/${requestedUser.identifier!"unknown-username"}">Manage Roles</a>
+            <#if isAdmin?? && isAdmin>
+            	<a href="${baseUrl}/user/editroles/${requestedUser.identifier!"unknown-username"}">Manage Roles</a>
+            </#if>
             <a href="${baseUrl}/user/editpwd/${requestedUser.identifier!"unknown-username"}">Change Password</a>
             <#if isAdmin?? && isAdmin && authenticatedUsername != requestedUser.identifier>
                 <a href="${baseUrl}/user/${requestedUser.identifier!"unknown-username"}/delete">Delete User</a>
@@ -62,7 +63,5 @@
         </div>
     </#if>
     
-    <#if isAdmin?? && isAdmin>
-        </div> <!-- main -->
-    </#if>
+    </div> <!-- main -->
 </div>	<!-- content pane -->
