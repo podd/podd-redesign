@@ -93,7 +93,7 @@ public abstract class AbstractPoddArtifactManagerTest
      * All of the unit tests individually timeout after 30 seconds.
      */
     @Rule
-    public Timeout timeout = new Timeout(60000);
+    public Timeout timeout = new Timeout(30000);
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -1238,26 +1238,16 @@ public abstract class AbstractPoddArtifactManagerTest
                             for(int j = 0; j < 10; j++)
                             {
                                 final int k = j % 7;
-                                // final String nextPrefix = "urn:test" + k + "#";
-                                // IRI.create(nextPrefix, "test");
                                 final String nextUri = "urn:test" + k + "#test" + j;
                                 // load test artifact
                                 final InputStream inputStream4Artifact =
                                         this.getClass().getResourceAsStream(
                                                 TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1);
-                                InferredOWLOntologyID artifactId;
-                                artifactId =
+                                InferredOWLOntologyID artifactId =
                                         AbstractPoddArtifactManagerTest.this.testArtifactManager.loadArtifact(
                                                 inputStream4Artifact, RDFFormat.RDFXML);
-                                AbstractPoddArtifactManagerTest.this.verifyLoadedArtifact(artifactId, 7,
-                                        TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1_CONCRETE_TRIPLES,
-                                        TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1_INFERRED_TRIPLES, false);
-                                final IRI result = IRI.create(nextUri);
-                                result.hashCode();
-                                // count.addAndGet(result.length());
                             }
                             count.incrementAndGet();
-                            closeLatch.countDown();
                         }
                         catch(OpenRDFException | PoddException | IOException | OWLException e)
                         {
@@ -1268,6 +1258,10 @@ public abstract class AbstractPoddArtifactManagerTest
                         {
                             ie.printStackTrace();
                             Assert.fail("Failed in test: " + number);
+                        }
+                        finally
+                        {
+                            closeLatch.countDown();
                         }
                     }
                 };
