@@ -119,6 +119,13 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
             // - map Roles for the new User
             final Iterator<Resource> iterator =
                     newUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects().iterator();
+            
+            // - add Project Creator Role if nothing else has been specified
+            if (!iterator.hasNext())
+            {
+                nextRealm.map(newUser, PoddRoles.PROJECT_CREATOR.getRole());
+            }
+            
             while(iterator.hasNext())
             {
                 final Resource mappingUri = iterator.next();

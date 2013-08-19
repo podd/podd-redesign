@@ -10,11 +10,13 @@ import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
@@ -172,6 +174,48 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
                 resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
     }
     
+    /**
+     * Tests that a new User created without any Role Mappings is given the Project_creator Role 
+     */
+    @Test
+    public void testAddUserWithNoRolesMapsProjectCreatorRoleRdf() throws Exception
+    {
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
+        String testUserUri = this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier, null, null,
+                null, null, null, null, null, roles, null);
+
+        // verify: 
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+
+        final ClientResource userDetailsClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final Model resultsModel =
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 8);
+        
+        com.github.podd.utils.DebugUtils.printContents(resultsModel);
+        Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        Assert.assertEquals("Unexpected user URI", testUserUri,
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
+        Assert.assertEquals("User Status was not set to INACTIVE by default", PoddUserStatus.INACTIVE.getURI(),
+                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+        
+        // verify: Project Creator Role has been assigned by default
+        final Set<Resource> roleMappings = resultsModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
+        Assert.assertEquals("No Role Mappings set", 1, roleMappings.size());
+        final Resource roleMappingUri = (Resource) roleMappings.toArray()[0];
+        Assert.assertEquals("Project_Creator Role not mapped", PoddRoles.PROJECT_CREATOR.getURI(),
+                resultsModel.filter(roleMappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI());
+    }
+
     @Test
     public void testAddUserWithOnlyMandatoryAttributesRdf() throws Exception
     {
