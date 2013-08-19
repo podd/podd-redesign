@@ -151,6 +151,15 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
     public abstract void map(User user, Role role, URI optionalObjectUri);
     
     /**
+     * This method unmaps a User from a Role with an optional URI.
+     * 
+     * @param user
+     * @param role
+     * @param optionalObjectUri
+     */
+    public abstract void unmap(final User user, final Role role, final URI optionalObjectUri);
+    
+    /**
      * This method modifies a User entry that already exists in the underlying Sesame Repository.
      * 
      * @param nextUser
