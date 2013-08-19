@@ -320,6 +320,7 @@ public class ApplicationUtils
          */
         try
         {
+            // TODO: Use a manifest file to load up the current versions here
             application.getPoddSchemaManager().uploadSchemaOntology(
                     ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS), RDFFormat.RDFXML);
             application.getPoddSchemaManager().uploadSchemaOntology(

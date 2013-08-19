@@ -106,7 +106,9 @@ public class RdfUtilityTest
     @Test
     public void testInputStreamToModel() throws Exception
     {
-        final InputStream resourceStream = this.getClass().getResourceAsStream("/ontologies/poddScience.owl");
+        final InputStream resourceStream = this.getClass().getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE);
+        Assert.assertNotNull("Missing test resource", PoddRdfConstants.PATH_PODD_SCIENCE);
+        
         final Model model = RdfUtility.inputStreamToModel(resourceStream, RDFFormat.RDFXML);
         
         Assert.assertNotNull("Model was NULL", model);
@@ -120,7 +122,7 @@ public class RdfUtilityTest
         for(final Object[] testData : this.testDatas)
         {
             final InputStream inputStream = this.getClass().getResourceAsStream((String)testData[0]);
-            Assert.assertNotNull("Null resource", inputStream);
+            Assert.assertNotNull("Missing test resource", (String)testData[0]);
             
             final boolean isConnected = RdfUtility.isConnectedStructure(inputStream, (RDFFormat)testData[1]);
             Assert.assertEquals("Not the expected validity", testData[2], isConnected);
@@ -132,7 +134,7 @@ public class RdfUtilityTest
     {
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(RdfUtilityTest.TEST_ARTIFACT_INVALID_3_TOP_OBJECTS);
-        Assert.assertNotNull("Null resource", inputStream);
+        Assert.assertNotNull("Missing test resource", RdfUtilityTest.TEST_ARTIFACT_INVALID_3_TOP_OBJECTS);
         
         final boolean isConnected = RdfUtility.isConnectedStructure(inputStream, RDFFormat.TURTLE);
         Assert.assertEquals("Not the expected validity", false, isConnected);
