@@ -110,12 +110,12 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("requestedUser", poddUser);
             
             // - include all available PoddRoles
-            dataModel.put("allRolesList", PoddRoles.getRepositoryRoles());
+            dataModel.put("repositoryRolesList", PoddRoles.getRepositoryRoles());
 
             // - include user's current Roles and optional mapped objects
             final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList = this.getUsersRoles(realm, poddUser);
             
-            dataModel.put("repositoryRoleList", roleList);
+            dataModel.put("userRoleList", roleList);
         }
         
         // Output the base template, with contentTemplate from the dataModel defining the

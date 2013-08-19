@@ -14,8 +14,8 @@
 		podd.userName = '${requestedUser.identifier!""}';
 
 		podd.roles = [];
-		<#if allRolesList?? && allRolesList?has_content>
-		    <#list allRolesList as role>
+		<#if repositoryRolesList?? && repositoryRolesList?has_content>
+		    <#list repositoryRolesList as role>
 		    	var aRole = {};
 		    	aRole.uri = '${role.URI!'unknown'}';
 		    	aRole.name = '${role.getName()!'unknown'}';
@@ -112,7 +112,7 @@
 	        </tfoot>
 	        <tbody>
 
-				<#list repositoryRoleList as role>
+				<#list userRoleList as role>
 					<tr>
 			    		<td>
 			    			<span class="role_span" value="${role.key.URI!""}">${role.key.getName()!""}</span>
