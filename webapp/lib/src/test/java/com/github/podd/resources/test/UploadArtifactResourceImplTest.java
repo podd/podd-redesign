@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
@@ -367,10 +368,12 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         
         final String nextTestArtifact = IOUtils.toString(inputStream4Artifact);
         
-        final AtomicInteger count = new AtomicInteger(0);
+        final AtomicInteger threadSuccessCount = new AtomicInteger(0);
+        final AtomicInteger perThreadSuccessCount = new AtomicInteger(0);
         final CountDownLatch openLatch = new CountDownLatch(1);
         // Changing this from 8 to 9 on my machine may be triggering a restlet bug
         final int threadCount = 8;
+        final int perThreadCount = 3;
         final CountDownLatch closeLatch = new CountDownLatch(threadCount);
         for(int i = 0; i < threadCount; i++)
         {
@@ -382,42 +385,51 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                         try
                         {
                             openLatch.await();
-                            for(int j = 0; j < 11; j++)
+                            for(int j = 0; j < perThreadCount; j++)
                             {
-                                final ClientResource uploadArtifactClientResource =
-                                        new ClientResource(
-                                                UploadArtifactResourceImplTest.this
-                                                        .getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+                                ClientResource uploadArtifactClientResource = null;
                                 
-                                final Representation input =
-                                        UploadArtifactResourceImplTest.this.buildRepresentationFromResource(
-                                                TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1,
-                                                MediaType.APPLICATION_RDF_XML);
-                                
-                                final Representation results =
-                                        RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource,
-                                                Method.POST, input, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK,
-                                                UploadArtifactResourceImplTest.this.testWithAdminPrivileges);
-                                
-                                // verify: results (expecting the added artifact's ontology IRI)
-                                final String body = results.getText();
-                                
-                                final Collection<InferredOWLOntologyID> ontologyIDs =
-                                        OntologyUtils.stringToOntologyID(body, RDFFormat.RDFXML);
-                                
-                                Assert.assertNotNull("No ontology IDs in response", ontologyIDs);
-                                Assert.assertEquals("More than 1 ontology ID in response", 1, ontologyIDs.size());
-                                Assert.assertTrue("Ontology ID not of expected format", ontologyIDs.iterator().next()
-                                        .toString().contains("artifact:1:version:1"));
+                                try
+                                {
+                                    uploadArtifactClientResource =
+                                            new ClientResource(
+                                                    UploadArtifactResourceImplTest.this
+                                                            .getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+                                    
+                                    final Representation input =
+                                            UploadArtifactResourceImplTest.this.buildRepresentationFromResource(
+                                                    TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1,
+                                                    MediaType.APPLICATION_RDF_XML);
+                                    
+                                    final Representation results =
+                                            RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource,
+                                                    Method.POST, input, MediaType.APPLICATION_RDF_XML,
+                                                    Status.SUCCESS_OK,
+                                                    UploadArtifactResourceImplTest.this.testWithAdminPrivileges);
+                                    
+                                    // verify: results (expecting the added artifact's ontology IRI)
+                                    final String body = results.getText();
+                                    
+                                    final Collection<InferredOWLOntologyID> ontologyIDs =
+                                            OntologyUtils.stringToOntologyID(body, RDFFormat.RDFXML);
+                                    
+                                    Assert.assertNotNull("No ontology IDs in response", ontologyIDs);
+                                    Assert.assertEquals("More than 1 ontology ID in response", 1, ontologyIDs.size());
+                                    Assert.assertTrue("Ontology ID not of expected format", ontologyIDs.iterator()
+                                            .next().toString().contains("artifact:1:version:1"));
+                                    perThreadSuccessCount.incrementAndGet();
+                                }
+                                finally
+                                {
+                                    if(uploadArtifactClientResource != null)
+                                    {
+                                        uploadArtifactClientResource.release();
+                                    }
+                                }
                             }
-                            count.incrementAndGet();
+                            threadSuccessCount.incrementAndGet();
                         }
-                        catch(InterruptedException ie)
-                        {
-                            ie.printStackTrace();
-                            Assert.fail("Failed in test: " + number);
-                        }
-                        catch(IOException | OpenRDFException e)
+                        catch(Throwable e)
                         {
                             e.printStackTrace();
                             Assert.fail("Failed in test: " + number);
@@ -433,10 +445,12 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         // all threads are waiting on the latch.
         openLatch.countDown(); // release the latch
         // all threads are now running concurrently.
-        closeLatch.await();
+        closeLatch.await(25000, TimeUnit.MILLISECONDS);
         // Verify that there were no failures, as the count is only incremented for successes, where
         // the closeLatch must always be called, even for failures
-        Assert.assertEquals(threadCount, count.get());
+        Assert.assertEquals("Some threads did not complete successfully", perThreadCount * threadCount,
+                perThreadSuccessCount.get());
+        Assert.assertEquals("Some threads did not complete successfully", threadCount, threadSuccessCount.get());
         
     }
     
