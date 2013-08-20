@@ -1,6 +1,6 @@
 PODD is an OWL ontology database used for scientific project management
 
-Copyright (C) 2009-2013 The University Of Queensland
+Copyright (C) ${year} ${owner}
 
 This program is free software: you can redistribute it and/or modify it under the terms of the
 GNU Affero General Public License as published by the Free Software Foundation, either version 3
