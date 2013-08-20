@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,9 +15,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -35,7 +39,10 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
+import org.restlet.Client;
 import org.restlet.Component;
+import org.restlet.Context;
+import org.restlet.Server;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
@@ -72,15 +79,20 @@ public class AbstractResourceImplTest
     public TemporaryFolder tempDirectory = new TemporaryFolder();
     
     /**
-     * Timeout tests after 30 seconds.
+     * Timeout tests after 60 seconds.
      */
     @Rule
-    public Timeout timeout = new Timeout(30000);
+    public Timeout timeout = new Timeout(60000);
+    
+    /**
+     * The set of ports that have been used in tests so far in this virtual machine.
+     */
+    private static final Set<Integer> usedPorts = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>());
     
     /**
      * Determines the TEST_PORT number to use for the test server
      */
-    protected int TEST_PORT;
+    protected int testPort;
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -176,7 +188,8 @@ public class AbstractResourceImplTest
     protected FileRepresentation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
         throws IOException
     {
-        final Path target = this.testDir.resolve(Paths.get(resourcePath).getFileName());
+        final Path target =
+                this.testDir.resolve(UUID.randomUUID().toString() + "." + Paths.get(resourcePath).getFileName());
         
         try (final InputStream input = this.getClass().getResourceAsStream(resourcePath))
         {
@@ -211,34 +224,34 @@ public class AbstractResourceImplTest
         return results.getText();
     }
     
-    /**
-     * Copied from sshj net.schmizz.sshj.util.BasicFixture.java
-     * 
-     * @return
-     */
-    private int getFreePort()
+    private static synchronized int getFreePort()
     {
-        try
+        int result = -1;
+        while(result <= 0)
         {
-            ServerSocket s = null;
-            try
+            try (ServerSocket ss = new ServerSocket(0))
             {
-                s = new ServerSocket(0);
-                s.setReuseAddress(true);
-                return s.getLocalPort();
-            }
-            finally
-            {
-                if(s != null)
+                ss.setReuseAddress(true);
+                result = ss.getLocalPort();
+                if(usedPorts.contains(result))
                 {
-                    s.close();
+                    result = -1;
+                }
+                else
+                {
+                    usedPorts.add(result);
+                    try (DatagramSocket ds = new DatagramSocket(result);)
+                    {
+                        ds.setReuseAddress(true);
+                    }
                 }
             }
+            catch(IOException e)
+            {
+                result = -1;
+            }
         }
-        catch(final IOException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return result;
     }
     
     /**
@@ -269,11 +282,11 @@ public class AbstractResourceImplTest
     {
         if(!path.startsWith("/"))
         {
-            return "http://localhost:" + this.TEST_PORT + "/podd/" + path;
+            return "http://localhost:" + this.testPort + "/podd/" + path;
         }
         else
         {
-            return "http://localhost:" + this.TEST_PORT + "/podd" + path;
+            return "http://localhost:" + this.testPort + "/podd" + path;
         }
     }
     
@@ -328,69 +341,73 @@ public class AbstractResourceImplTest
      * @return A String representation of the unique URI assigned to the new User
      */
     protected String loadTestUser(final String testIdentifier, final String testPassword, final String testFirstName,
-            final String testLastName, final String testEmail, final String testHomePage, final String testOrganization,
-            final String testOrcid, final String testTitle, final String testPhone, final String testAddress,
-            final String testPosition, final List<Map.Entry<URI, URI>> roles, final PoddUserStatus testStatus) throws Exception
+            final String testLastName, final String testEmail, final String testHomePage,
+            final String testOrganization, final String testOrcid, final String testTitle, final String testPhone,
+            final String testAddress, final String testPosition, final List<Map.Entry<URI, URI>> roles,
+            final PoddUserStatus testStatus) throws Exception
     {
         // - create a Model of user
         final Model userInfoModel = new LinkedHashModel();
         final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
-        if (testIdentifier != null)
+        if(testIdentifier != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
                     PoddRdfConstants.VF.createLiteral(testIdentifier));
         }
-        if (testPassword != null)
+        if(testPassword != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
                     PoddRdfConstants.VF.createLiteral(testPassword));
         }
-        if (testFirstName != null)
+        if(testFirstName != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
                     PoddRdfConstants.VF.createLiteral(testFirstName));
         }
-        if (testLastName != null)
+        if(testLastName != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
                     PoddRdfConstants.VF.createLiteral(testLastName));
         }
-        if (testHomePage != null)
+        if(testHomePage != null)
         {
-            userInfoModel
-                .add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE, PoddRdfConstants.VF.createURI(testHomePage));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE,
+                    PoddRdfConstants.VF.createURI(testHomePage));
         }
-        if (testOrganization != null)
+        if(testOrganization != null)
         {
             userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
                     PoddRdfConstants.VF.createLiteral(testOrganization));
         }
-        if (testOrcid != null)
+        if(testOrcid != null)
         {
-            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral(testOrcid));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID,
+                    PoddRdfConstants.VF.createLiteral(testOrcid));
         }
-        if (testEmail != null)
+        if(testEmail != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL,
                     PoddRdfConstants.VF.createLiteral(testEmail));
         }
-        if (testTitle != null)
+        if(testTitle != null)
         {
-            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(testTitle));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_TITLE,
+                    PoddRdfConstants.VF.createLiteral(testTitle));
         }
-        if (testPhone != null)
+        if(testPhone != null)
         {
-            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(testPhone));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_PHONE,
+                    PoddRdfConstants.VF.createLiteral(testPhone));
         }
-        if (testAddress != null)
+        if(testAddress != null)
         {
             userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ADDRESS,
                     PoddRdfConstants.VF.createLiteral(testAddress));
         }
-        if (testPosition != null)
+        if(testPosition != null)
         {
             userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_POSITION,
-                PoddRdfConstants.VF.createLiteral(testPosition));
+                    PoddRdfConstants.VF.createLiteral(testPosition));
         }
         if(testStatus != null)
         {
@@ -399,7 +416,7 @@ public class AbstractResourceImplTest
         else
         {
             userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
-        }        
+        }
         
         // prepare: add Role Mappings
         for(Map.Entry<URI, URI> entry : roles)
@@ -442,7 +459,7 @@ public class AbstractResourceImplTest
         // return the unique URI assigned to this User
         Resource next = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
         return next.stringValue();
-    }    
+    }
     
     /**
      * Create a new server for each test.
@@ -456,10 +473,12 @@ public class AbstractResourceImplTest
     {
         this.component = new Component();
         
-        this.TEST_PORT = this.getFreePort();
+        this.testPort = AbstractResourceImplTest.getFreePort();
         
+        Server httpServer = new Server(this.component.getContext().createChildContext(), Protocol.HTTP, this.testPort);
         // Add a new HTTP server listening on the given TEST_PORT.
-        this.component.getServers().add(Protocol.HTTP, this.TEST_PORT);
+        this.component.getServers().add(httpServer);
+        setupThreading(httpServer.getContext());
         
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);
@@ -481,7 +500,27 @@ public class AbstractResourceImplTest
         // Start the component.
         this.component.start();
         
+        setupThreading(nextApplication.getContext());
+        setupThreading(this.component.getContext());
+        for(Client nextClient : this.component.getClients())
+        {
+            setupThreading(nextClient.getContext());
+        }
+        
         this.testDir = this.tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
+    }
+    
+    protected static void setupThreading(Context nextContext)
+    {
+        if(nextContext != null)
+        {
+            nextContext.getParameters().add("maxThreads", "512");
+            nextContext.getParameters().add("minThreads", "100");
+            nextContext.getParameters().add("lowThreads", "145");
+            nextContext.getParameters().add("maxQueued", "100");
+            nextContext.getParameters().add("maxTotalConnections", "100");
+            //nextContext.getParameters().add("maxIoIdleTimeMs", "100");
+        }
     }
     
     /**
@@ -503,6 +542,5 @@ public class AbstractResourceImplTest
         // nullify the reference to the component
         this.component = null;
     }
-
     
 }
