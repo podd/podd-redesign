@@ -143,7 +143,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model userInfoModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 15);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 11);
         // this.log.info("Retrieved [{}] details. ", testIdentifier);
         // DebugUtils.printContents(userInfoModel);
         
@@ -193,7 +193,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         
         final Model resultsModel =
                 this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 15);
+                        format, 11);
         
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -204,7 +204,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString());
         Assert.assertEquals("Last name was not modified", modifiedLastName,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString());
-        Assert.assertEquals("Role count should not have changed", 2,
+        Assert.assertEquals("Role count should not have changed", 1,
                 resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
     }
     

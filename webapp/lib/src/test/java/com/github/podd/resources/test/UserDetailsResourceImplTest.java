@@ -169,7 +169,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 15);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 11);
         
         // DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Not the expected identifier", "testAdminUser",
@@ -177,7 +177,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         
         // verify: Roles are valid PoddRoles
         final Set<Value> roleSet = resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects();
-        Assert.assertEquals("Not expected number of Roles", 2, roleSet.size());
+        Assert.assertEquals("Not expected number of Roles", 1, roleSet.size());
         final Iterator<Value> iterator = roleSet.iterator();
         while(iterator.hasNext())
         {

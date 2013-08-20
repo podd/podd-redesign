@@ -476,6 +476,7 @@ public class AbstractResourceImplTest
         // The application cannot be setup properly until it is attached, as it requires
         // Application.getContext() to not return null
         ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
+        ApplicationUtils.setupTestUser(nextApplication);
         
         // Start the component.
         this.component.start();
