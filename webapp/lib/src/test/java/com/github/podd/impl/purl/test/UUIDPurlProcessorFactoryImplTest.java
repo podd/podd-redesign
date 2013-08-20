@@ -1,4 +1,4 @@
-/*
+/**
  * PODD is an OWL ontology database used for scientific project management
  * 
  * Copyright (C) 2009-2013 The University Of Queensland
