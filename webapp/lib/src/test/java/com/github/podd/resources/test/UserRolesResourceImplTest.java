@@ -210,13 +210,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
      * Tests failure to add a PODD User's Roles.
      * 
      * A non-admin user attempts to add Project_Observer Role and Repository Admin Role to another test user.
-     * Adding Admin Role is rejected as the user does not have enough privileges.
-     * 
-     * NOTE: This test expects that Role additions are attempted in the order: 
-     *  - Project Observer (succeeds)
-     *  - Admin (fails)
-     * 
-     * This order cannot be guaranteed and therefore the test could fail.
+     * Request is rejected as user does not have enough privileges to add Repository Admin Role.
      */
     @Test
     public void testErrorEditUserRolesAddInsufficientPrivilegesRdf() throws Exception
@@ -268,7 +262,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
         
-        // verify: Test User Roles have been partially updated
+        // verify: No changes to mapped Roles
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
         final Representation updatedResults =
@@ -276,26 +270,29 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         final Model resultsModel =
                 this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 19);
+                        format, 15);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
                 resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
         
-        // verify: 2 Roles are mapped (an increase of 1)
+        // verify: 1 Roles mapped
         final Collection<Resource> roleMappings = resultsModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
-        Assert.assertEquals("Incorrect no. of Project Roles", 2, roleMappings.size());
+        Assert.assertEquals("Incorrect no. of Project Roles", 1, roleMappings.size());
         
-        // verify: Project Observer Role was successfully mapped
+        // verify: Project Creator Role still exists
         final Collection<Resource> subjects =
-                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI())
+                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_CREATOR.getURI())
                         .subjects();
-        Assert.assertEquals("Incorrect no. of Project Observer Roles", 1, subjects.size());
+        Assert.assertEquals("Incorrect no. of Project Creator Roles", 1, subjects.size());
     }
     
     
     /**
-     * Tests removal of a PODD User's Roles. 
+     * Tests failure to remove a PODD User's Roles.
+     * 
+     * A non-admin user attempts to remove Project_Observer Roles from another test user.
+     * Request is rejected as user does not have privileges to modify Roles of one of the Projects.
      */
     @Test
     public void testErrorEditUserRolesDeleteInsufficientPrivilegesRdf() throws Exception
@@ -349,7 +346,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         }
         
         
-        // verify: The Role has been correctly deleted
+        // verify: No change to Roles
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
         final Representation updatedResults =
@@ -357,7 +354,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         final Model resultsModel =
                 this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 16);
+                        format, 20);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
@@ -366,12 +363,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final Set<Resource> observerMappings =
                 resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI())
                         .subjects();
-        Assert.assertEquals("Expected only 1 Project_Observer mapping", 1, observerMappings.size());
-        
-        final Resource mapping = (Resource)observerMappings.toArray()[0];
-        Assert.assertEquals("Project_Observer Role is not for expected Project",
-                testProject1Uri,
-                resultsModel.filter(mapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
+        Assert.assertEquals("Project_Observer mappings have changed", 2, observerMappings.size());
     }
 
     @Test

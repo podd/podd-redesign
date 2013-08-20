@@ -178,13 +178,9 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
      * Handle an HTTP POST request submitting RDF data to update (i.e. map/unmap) a PoddUser's
      * Roles. <br>
      * <br>
-     * User authorization is checked for each Role to modify, and the process aborted on failure.
-     * Therefore, it is possible that this service will update <b>some</b> of the Roles that it is
-     * requested to update and fail. For example, if a non-admin user, who is Project_Admin for a
-     * particular project, attempts to update another user as a Project_Observer for his/her project
-     * and another non-related project, the request will fail when attempting to update the
-     * non-related project role. The other Role update could have succeeded if it was attempted
-     * first.
+     * User authorization is checked for each Role to modify. The service proceeds to modify Role
+     * mappings in the Realm only if the current user has sufficient privileges carry out ALL the
+     * modifications.
      */
     @Post("rdf|rj|json|ttl")
     public Representation editUserRolesRdf(final Representation entity, final Variant variant) throws ResourceException
@@ -224,12 +220,12 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         
         final List<Entry<Role, URI>> rolesToEdit = this.extractRoleMappingsFromRequestBody(entity);
         
+        // - check authorization for each Role mapping
         for (Entry<Role, URI> entry : rolesToEdit)
         {
             final Role role = entry.getKey();
             final URI mappedUri = entry.getValue();
             
-            // check authorization for each Role mapping
             PoddAction action = PoddAction.PROJECT_ROLE_EDIT;
             if (PoddRoles.getRepositoryRoles().contains(role))
             {
@@ -241,6 +237,13 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                 }
             }
             this.checkAuthentication(action, mappedUri); 
+        }
+            
+        // - do the mapping/unmapping of Roles
+        for (Entry<Role, URI> entry : rolesToEdit)
+        {
+            final Role role = entry.getKey();
+            final URI mappedUri = entry.getValue();
             
             if (isDelete)
             {
@@ -253,7 +256,6 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                 this.log.info(" User [{}] mapped to Role [{}], [{}]", poddUser.getIdentifier(), role.getName(), mappedUri);
             }
         }
-            
         
         // - prepare response
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
