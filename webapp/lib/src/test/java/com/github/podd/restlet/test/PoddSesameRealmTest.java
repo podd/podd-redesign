@@ -410,4 +410,52 @@ public class PoddSesameRealmTest
         Assert.assertEquals(1, this.testRealm.findRoles(testUser).size());
     }
     
+    /**
+     * Test that mappings between a User, a Role and an optional Object URI can be removed.
+     */
+    @Test
+    public void testUnmapSimple() throws Exception
+    {
+        // -prepare: user and test object
+        final PoddUser user1 = this.addTestUser("john@example.com");
+        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
+        
+        // -map Users with Roles and Objects together
+        this.testRealm.map(user1, PoddRoles.ADMIN.getRole());
+        this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
+        
+        // -verify: ADMIN role mapping
+        final List<Statement> list1 =
+                this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
+        Assert.assertFalse(list1.isEmpty());
+        Assert.assertEquals(1, list1.size());
+        
+        // verify: PROJECT_MEMBER role mapping
+        final List<Statement> list2 =
+                this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_MEMBER.getURI());
+        Assert.assertFalse(list2.isEmpty());
+        Assert.assertEquals(1, list2.size());
+
+        
+        // unmap Project_Member Role
+        this.testRealm.unmap(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
+        
+        
+        // verify: no PROJECT_MEMBER role mapping exists
+        final List<Statement> list3 =
+                this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_MEMBER.getURI());
+        Assert.assertTrue(list3.isEmpty());
+        
+        // verify: Admin Role Mapping exist in the repository
+        final List<Statement> list4 =
+                this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
+        Assert.assertFalse(list4.isEmpty());
+        Assert.assertEquals(1, list4.size());
+        
+        
+        this.testRealm.unmap(user1, PoddRoles.PROJECT_ADMIN.getRole(), object1URI);
+    }
+    
+
+    
 }
