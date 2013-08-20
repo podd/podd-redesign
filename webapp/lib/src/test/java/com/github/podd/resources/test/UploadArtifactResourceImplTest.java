@@ -375,7 +375,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final CountDownLatch openLatch = new CountDownLatch(1);
         // Changing this from 8 to 9 on my machine may be triggering a restlet bug
         final int threadCount = 9;
-        final int perThreadCount = 7;
+        final int perThreadCount = 2;
         final CountDownLatch closeLatch = new CountDownLatch(threadCount);
         for(int i = 0; i < threadCount; i++)
         {
@@ -386,7 +386,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                     {
                         try
                         {
-                            openLatch.await(30000, TimeUnit.MILLISECONDS);
+                            openLatch.await(55000, TimeUnit.MILLISECONDS);
                             threadStartCount.incrementAndGet();
                             for(int j = 0; j < perThreadCount; j++)
                             {
@@ -451,7 +451,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         // all threads are waiting on the latch.
         openLatch.countDown(); // release the latch
         // all threads are now running concurrently.
-        closeLatch.await(25000, TimeUnit.MILLISECONDS);
+        closeLatch.await(50000, TimeUnit.MILLISECONDS);
         //closeLatch.await();
         // Verify that there were no startup failures
         Assert.assertEquals("Some threads did not all start successfully", threadCount, threadStartCount.get());
