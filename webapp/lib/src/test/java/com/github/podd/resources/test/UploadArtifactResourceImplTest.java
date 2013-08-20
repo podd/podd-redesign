@@ -369,7 +369,8 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         
         final AtomicInteger count = new AtomicInteger(0);
         final CountDownLatch openLatch = new CountDownLatch(1);
-        final int threadCount = 9;
+        // Changing this from 8 to 9 on my machine may be triggering a restlet bug
+        final int threadCount = 8;
         final CountDownLatch closeLatch = new CountDownLatch(threadCount);
         for(int i = 0; i < threadCount; i++)
         {
@@ -381,7 +382,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                         try
                         {
                             openLatch.await();
-                            for(int j = 0; j < 2; j++)
+                            for(int j = 0; j < 11; j++)
                             {
                                 final ClientResource uploadArtifactClientResource =
                                         new ClientResource(
