@@ -146,6 +146,7 @@ public class PoddRestletIntegrationTestComponent extends Component
             // setup the application after attaching it, as it requires Application.getContext() to
             // not be null during the setup process
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
+            ApplicationUtils.setupTestUser(nextApplication);
         }
         catch(final OpenRDFException | UnsupportedRDFormatException | IOException e)
         {
