@@ -4,12 +4,18 @@
 package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.vocabulary.RDF;
@@ -24,11 +30,14 @@ import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
+import org.semanticweb.owlapi.model.OWLException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.api.test.AbstractPoddArtifactManagerTest;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
+import com.github.podd.exception.PoddException;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -42,9 +51,8 @@ import com.github.podd.utils.PoddWebConstants;
 public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
 {
     /**
-     * Test Upload attempt with an artifact that is inconsistent. 
-     * Results in an HTTP 500 Internal Server Error with detailed error causes
-     * in the RDF body. 
+     * Test Upload attempt with an artifact that is inconsistent. Results in an HTTP 500 Internal
+     * Server Error with detailed error causes in the RDF body.
      */
     @Test
     public void testErrorUploadWithInconsistentArtifactRdf() throws Exception
@@ -60,8 +68,8 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final RDFFormat responseFormat = RDFFormat.forMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                    mediaType, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+            RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input, mediaType,
+                    Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
         }
         catch(final ResourceException e)
         {
@@ -72,25 +80,22 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
             final Model model = Rio.parse(inputStream, "", responseFormat);
             
-            //DebugUtils.printContents(model);
+            // DebugUtils.printContents(model);
             
             Assert.assertEquals("Not the expected results size", 13, model.size());
             
             final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR).subjects();
-            Assert.assertEquals("Not the expected number of Errors", 1, errors.size()); 
+            Assert.assertEquals("Not the expected number of Errors", 1, errors.size());
             final Resource topError = errors.iterator().next();
             
             // Resource level error details
             Assert.assertEquals("Not the expected HTTP Status Code", "500",
-                    model.filter(topError, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, null)
-                            .objectString());
+                    model.filter(topError, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, null).objectString());
             Assert.assertEquals("Not the expected Reason Phrase", "Internal Server Error",
-                    model.filter(topError, PoddRdfConstants.HTTP_REASON_PHRASE, null)
-                            .objectString());
+                    model.filter(topError, PoddRdfConstants.HTTP_REASON_PHRASE, null).objectString());
             Assert.assertEquals("Not the expected RDFS:comment", "Error loading artifact to PODD",
-                    model.filter(topError, RDFS.COMMENT, null)
-                            .objectString());
-
+                    model.filter(topError, RDFS.COMMENT, null).objectString());
+            
             Assert.assertEquals("Expected 1 child error node", 1,
                     model.filter(topError, PoddRdfConstants.ERR_CONTAINS, null).size());
             final Resource errorNode = model.filter(topError, PoddRdfConstants.ERR_CONTAINS, null).objectResource();
@@ -102,12 +107,11 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals("Not the expected error source", "urn:temp:inconsistentArtifact:1",
                     model.filter(errorNode, PoddRdfConstants.ERR_SOURCE, null).objectString());
         }
-    }    
+    }
     
     /**
-     * Test Upload attempt with an artifact that is inconsistent. 
-     * Results in an HTTP 500 Internal Server Error with detailed error causes
-     * in the RDF body. 
+     * Test Upload attempt with an artifact that is inconsistent. Results in an HTTP 500 Internal
+     * Server Error with detailed error causes in the RDF body.
      */
     @Test
     public void testErrorUploadWithNotInOwlDlProfileArtifactRdf() throws Exception
@@ -123,8 +127,8 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final RDFFormat responseFormat = RDFFormat.forMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                    mediaType, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
+            RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input, mediaType,
+                    Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
         }
         catch(final ResourceException e)
         {
@@ -134,26 +138,22 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             final String body = uploadArtifactClientResource.getResponseEntity().getText();
             ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
             final Model model = Rio.parse(inputStream, "", responseFormat);
-
-            //DebugUtils.printContents(model);
+            
+            // DebugUtils.printContents(model);
             
             Assert.assertEquals("Not the expected results size", 18, model.size());
             
             final Set<Resource> errors = model.filter(null, RDF.TYPE, PoddRdfConstants.ERR_TYPE_TOP_ERROR).subjects();
-            Assert.assertEquals("Not the expected number of Errors", 1, errors.size()); 
+            Assert.assertEquals("Not the expected number of Errors", 1, errors.size());
             final Resource topError = errors.iterator().next();
             
             // Resource level error details
             Assert.assertEquals("Not the expected HTTP Status Code", "500",
-                    model.filter(topError, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, null)
-                            .objectString());
+                    model.filter(topError, PoddRdfConstants.HTTP_STATUS_CODE_VALUE, null).objectString());
             Assert.assertEquals("Not the expected Reason Phrase", "Internal Server Error",
-                    model.filter(topError, PoddRdfConstants.HTTP_REASON_PHRASE, null)
-                            .objectString());
+                    model.filter(topError, PoddRdfConstants.HTTP_REASON_PHRASE, null).objectString());
             Assert.assertEquals("Not the expected RDFS:comment", "Error loading artifact to PODD",
-                    model.filter(topError, RDFS.COMMENT, null)
-                            .objectString());
-            
+                    model.filter(topError, RDFS.COMMENT, null).objectString());
             
             // Error cause details
             Assert.assertEquals("Not the expected Exception class", OntologyNotInProfileException.class.getName(),
@@ -169,7 +169,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                                     .createLiteral("ClassAssertion(owl:Individual <mailto:helen.daily@csiro.au>)"))
                             .size());
         }
-    }    
+    }
     
     /**
      * Test unauthenticated access to "upload artifact" leads to an UNAUTHORIZED error.
@@ -222,7 +222,6 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
         }
     }
-    
     
     /**
      * Test authenticated access to the upload Artifact page in HTML
@@ -354,6 +353,90 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("More than 1 ontology ID in response", 1, ontologyIDs.size());
         Assert.assertTrue("Ontology ID not of expected format",
                 ontologyIDs.iterator().next().toString().contains("artifact:1:version:1"));
+    }
+    
+    @Test
+    public final void testLoadArtifactConcurrency() throws Exception
+    {
+        // load test artifact
+        final InputStream inputStream4Artifact =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1);
+        
+        Assert.assertNotNull("Could not find test resource: " + TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1,
+                inputStream4Artifact);
+        
+        final String nextTestArtifact = IOUtils.toString(inputStream4Artifact);
+        
+        final AtomicInteger count = new AtomicInteger(0);
+        final CountDownLatch openLatch = new CountDownLatch(1);
+        final int threadCount = 9;
+        final CountDownLatch closeLatch = new CountDownLatch(threadCount);
+        for(int i = 0; i < threadCount; i++)
+        {
+            final int number = i;
+            Runnable runner = new Runnable()
+                {
+                    public void run()
+                    {
+                        try
+                        {
+                            openLatch.await();
+                            for(int j = 0; j < 2; j++)
+                            {
+                                final ClientResource uploadArtifactClientResource =
+                                        new ClientResource(
+                                                UploadArtifactResourceImplTest.this
+                                                        .getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+                                
+                                final Representation input =
+                                        UploadArtifactResourceImplTest.this.buildRepresentationFromResource(
+                                                TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1,
+                                                MediaType.APPLICATION_RDF_XML);
+                                
+                                final Representation results =
+                                        RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource,
+                                                Method.POST, input, MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK,
+                                                UploadArtifactResourceImplTest.this.testWithAdminPrivileges);
+                                
+                                // verify: results (expecting the added artifact's ontology IRI)
+                                final String body = results.getText();
+                                
+                                final Collection<InferredOWLOntologyID> ontologyIDs =
+                                        OntologyUtils.stringToOntologyID(body, RDFFormat.RDFXML);
+                                
+                                Assert.assertNotNull("No ontology IDs in response", ontologyIDs);
+                                Assert.assertEquals("More than 1 ontology ID in response", 1, ontologyIDs.size());
+                                Assert.assertTrue("Ontology ID not of expected format", ontologyIDs.iterator().next()
+                                        .toString().contains("artifact:1:version:1"));
+                            }
+                            count.incrementAndGet();
+                        }
+                        catch(InterruptedException ie)
+                        {
+                            ie.printStackTrace();
+                            Assert.fail("Failed in test: " + number);
+                        }
+                        catch(IOException | OpenRDFException e)
+                        {
+                            e.printStackTrace();
+                            Assert.fail("Failed in test: " + number);
+                        }
+                        finally
+                        {
+                            closeLatch.countDown();
+                        }
+                    }
+                };
+            new Thread(runner, "TestThread" + number).start();
+        }
+        // all threads are waiting on the latch.
+        openLatch.countDown(); // release the latch
+        // all threads are now running concurrently.
+        closeLatch.await();
+        // Verify that there were no failures, as the count is only incremented for successes, where
+        // the closeLatch must always be called, even for failures
+        Assert.assertEquals(threadCount, count.get());
+        
     }
     
 }
