@@ -36,7 +36,7 @@
 	
 		$("#btnCancel").click(function(event) {
 			event.preventDefault();
-			podd.debug("TODO: implement cancellation");
+			window.location.href = podd.baseUrl + '/user/${requestedUser.identifier}';
 			return false;
 		});
 	
