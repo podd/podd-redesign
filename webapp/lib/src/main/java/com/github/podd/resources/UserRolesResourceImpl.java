@@ -176,13 +176,15 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
     
     /**
      * Handle an HTTP POST request submitting RDF data to update (i.e. map/unmap) a PoddUser's
-     * Roles. User authorization to perform update is checked for each passed in Role and the
-     * process is aborted at first failure. Therefore, it is possible that this service will only
-     * update some of the Roles that it is requested to update.
-     * 
-     * For example, if non-admin user A, who is a Project_Admin of project_x, attempts to update
-     * user B as a Project_Observer for project_x and as a Repository Admin, only the first one
-     * will succeed.
+     * Roles. <br>
+     * <br>
+     * User authorization is checked for each Role to modify, and the process aborted on failure.
+     * Therefore, it is possible that this service will update <b>some</b> of the Roles that it is
+     * requested to update and fail. For example, if a non-admin user, who is Project_Admin for a
+     * particular project, attempts to update another user as a Project_Observer for his/her project
+     * and another non-related project, the request will fail when attempting to update the
+     * non-related project role. The other Role update could have succeeded if it was attempted
+     * first.
      */
     @Post("rdf|rj|json|ttl")
     public Representation editUserRolesRdf(final Representation entity, final Variant variant) throws ResourceException
@@ -220,7 +222,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         }
         this.log.info(" edit Roles is a 'delete' = {}", isDelete);
         
-        final List<Entry<Role, URI>> rolesToEdit = this.extractRolesFromRequest(entity);
+        final List<Entry<Role, URI>> rolesToEdit = this.extractRoleMappingsFromRequestBody(entity);
         
         for (Entry<Role, URI> entry : rolesToEdit)
         {
@@ -277,19 +279,21 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
      * @param entity
      * @return
      */
-    private List<Entry<Role, URI>>  extractRolesFromRequest(final Representation entity)
+    private List<Entry<Role, URI>>  extractRoleMappingsFromRequestBody(final Representation entity)
     {
         final List<Entry<Role, URI>> roles = new LinkedList<Entry<Role, URI>>();
         
         try
         {
+            // parse input content to a Model
             final InputStream inputStream = entity.getStream();
             final RDFFormat inputFormat =
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model model = Rio.parse(inputStream, "", inputFormat);
 
-            final Collection<Resource> subjects = model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
-            for(Iterator<Resource> iterator = subjects.iterator(); iterator.hasNext();)
+            // extract Role Mapping info (User details are ignored as multiple users are not supported)
+            final Collection<Resource> roleMappingUris = model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
+            for(Iterator<Resource> iterator = roleMappingUris.iterator(); iterator.hasNext();)
             {
                 final Resource mappingUri = iterator.next();
                 
@@ -300,7 +304,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                 final URI mappedObject =
                         model.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
                 
-                this.log.info("Mapping Role <{}> with Optional Object <{}>", role.getName(), mappedObject);
+                this.log.debug("Extracted Role <{}> with Optional Object <{}>", role.getName(), mappedObject);
                 roles.add(new AbstractMap.SimpleEntry<Role, URI>(role.getRole(), mappedObject));
             }
 
