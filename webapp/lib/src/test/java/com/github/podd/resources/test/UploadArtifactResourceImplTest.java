@@ -370,9 +370,11 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         
         final AtomicInteger threadSuccessCount = new AtomicInteger(0);
         final AtomicInteger perThreadSuccessCount = new AtomicInteger(0);
+        final AtomicInteger threadStartCount = new AtomicInteger(0);
+        final AtomicInteger perThreadStartCount = new AtomicInteger(0);
         final CountDownLatch openLatch = new CountDownLatch(1);
         // Changing this from 8 to 9 on my machine may be triggering a restlet bug
-        final int threadCount = 8;
+        final int threadCount = 9;
         final int perThreadCount = 3;
         final CountDownLatch closeLatch = new CountDownLatch(threadCount);
         for(int i = 0; i < threadCount; i++)
@@ -385,8 +387,10 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                         try
                         {
                             openLatch.await();
+                            threadStartCount.incrementAndGet();
                             for(int j = 0; j < perThreadCount; j++)
                             {
+                                perThreadStartCount.incrementAndGet();
                                 ClientResource uploadArtifactClientResource = null;
                                 
                                 try
@@ -446,12 +450,15 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         openLatch.countDown(); // release the latch
         // all threads are now running concurrently.
         closeLatch.await(25000, TimeUnit.MILLISECONDS);
+        // Verify that there were no startup failures
+        Assert.assertEquals("Some threads did not all start successfully", threadCount, threadStartCount.get());
+        Assert.assertEquals("Some thread loops did not start successfully", perThreadCount * threadCount,
+                perThreadStartCount.get());
         // Verify that there were no failures, as the count is only incremented for successes, where
         // the closeLatch must always be called, even for failures
-        Assert.assertEquals("Some threads did not complete successfully", perThreadCount * threadCount,
+        Assert.assertEquals("Some thread loops did not complete successfully", perThreadCount * threadCount,
                 perThreadSuccessCount.get());
         Assert.assertEquals("Some threads did not complete successfully", threadCount, threadSuccessCount.get());
-        
     }
     
 }
