@@ -322,14 +322,6 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
     private InferredOWLOntologyID uploadFileAndLoadArtifactIntoPodd(final InputStream inputStream,
             final RDFFormat format) throws ResourceException
     {
-        /*
-         * Guess mime type using any23 final MIMEType parsedContentType =
-         * MIMEType.parse(contentType);
-         * 
-         * final MIMEType guessedMIMEType = new TikaMIMETypeDetector().guessMIMEType(filename,
-         * inputStream, parsedContentType); final MediaType finalMimeType =
-         * MediaType.valueOf(guessedMIMEType.toString());
-         */
         final PoddArtifactManager artifactManager =
                 ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
         try
@@ -337,10 +329,6 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             if(artifactManager != null)
             {
                 final InferredOWLOntologyID loadedArtifact = artifactManager.loadArtifact(inputStream, format);
-                // resultsMap.put("iri", loadedArtifact.getOntologyIRI().toString());
-                // resultsMap.put("versionIri", loadedArtifact.getVersionIRI().toString());
-                // resultsMap.put("inferredIri",
-                // loadedArtifact.getInferredOntologyIRI().toString());
                 return loadedArtifact;
             }
             else
