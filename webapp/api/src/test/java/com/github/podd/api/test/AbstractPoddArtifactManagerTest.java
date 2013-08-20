@@ -1209,14 +1209,6 @@ public abstract class AbstractPoddArtifactManagerTest
         }
     }
     
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
-     * .
-     * 
-     * Tests loading an artifact which imports a previous version of a schema ontology (i.e.
-     * poddScience v1)
-     */
     @Test
     public final void testLoadArtifactConcurrency() throws Exception
     {
