@@ -176,7 +176,8 @@ public class AbstractResourceImplTest
     protected FileRepresentation buildRepresentationFromResource(final String resourcePath, final MediaType mediaType)
         throws IOException
     {
-        final Path target = this.testDir.resolve(Paths.get(resourcePath).getFileName());
+        final Path target =
+                this.testDir.resolve(UUID.randomUUID().toString() + "." + Paths.get(resourcePath).getFileName());
         
         try (final InputStream input = this.getClass().getResourceAsStream(resourcePath))
         {
@@ -328,69 +329,73 @@ public class AbstractResourceImplTest
      * @return A String representation of the unique URI assigned to the new User
      */
     protected String loadTestUser(final String testIdentifier, final String testPassword, final String testFirstName,
-            final String testLastName, final String testEmail, final String testHomePage, final String testOrganization,
-            final String testOrcid, final String testTitle, final String testPhone, final String testAddress,
-            final String testPosition, final List<Map.Entry<URI, URI>> roles, final PoddUserStatus testStatus) throws Exception
+            final String testLastName, final String testEmail, final String testHomePage,
+            final String testOrganization, final String testOrcid, final String testTitle, final String testPhone,
+            final String testAddress, final String testPosition, final List<Map.Entry<URI, URI>> roles,
+            final PoddUserStatus testStatus) throws Exception
     {
         // - create a Model of user
         final Model userInfoModel = new LinkedHashModel();
         final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
-        if (testIdentifier != null)
+        if(testIdentifier != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
                     PoddRdfConstants.VF.createLiteral(testIdentifier));
         }
-        if (testPassword != null)
+        if(testPassword != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERSECRET,
                     PoddRdfConstants.VF.createLiteral(testPassword));
         }
-        if (testFirstName != null)
+        if(testFirstName != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERFIRSTNAME,
                     PoddRdfConstants.VF.createLiteral(testFirstName));
         }
-        if (testLastName != null)
+        if(testLastName != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERLASTNAME,
                     PoddRdfConstants.VF.createLiteral(testLastName));
         }
-        if (testHomePage != null)
+        if(testHomePage != null)
         {
-            userInfoModel
-                .add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE, PoddRdfConstants.VF.createURI(testHomePage));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_HOMEPAGE,
+                    PoddRdfConstants.VF.createURI(testHomePage));
         }
-        if (testOrganization != null)
+        if(testOrganization != null)
         {
             userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
                     PoddRdfConstants.VF.createLiteral(testOrganization));
         }
-        if (testOrcid != null)
+        if(testOrcid != null)
         {
-            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral(testOrcid));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ORCID,
+                    PoddRdfConstants.VF.createLiteral(testOrcid));
         }
-        if (testEmail != null)
+        if(testEmail != null)
         {
             userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL,
                     PoddRdfConstants.VF.createLiteral(testEmail));
         }
-        if (testTitle != null)
+        if(testTitle != null)
         {
-            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(testTitle));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_TITLE,
+                    PoddRdfConstants.VF.createLiteral(testTitle));
         }
-        if (testPhone != null)
+        if(testPhone != null)
         {
-            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(testPhone));
+            userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_PHONE,
+                    PoddRdfConstants.VF.createLiteral(testPhone));
         }
-        if (testAddress != null)
+        if(testAddress != null)
         {
             userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_ADDRESS,
                     PoddRdfConstants.VF.createLiteral(testAddress));
         }
-        if (testPosition != null)
+        if(testPosition != null)
         {
             userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_POSITION,
-                PoddRdfConstants.VF.createLiteral(testPosition));
+                    PoddRdfConstants.VF.createLiteral(testPosition));
         }
         if(testStatus != null)
         {
@@ -399,7 +404,7 @@ public class AbstractResourceImplTest
         else
         {
             userInfoModel.add(tempUserUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
-        }        
+        }
         
         // prepare: add Role Mappings
         for(Map.Entry<URI, URI> entry : roles)
@@ -442,7 +447,7 @@ public class AbstractResourceImplTest
         // return the unique URI assigned to this User
         Resource next = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
         return next.stringValue();
-    }    
+    }
     
     /**
      * Create a new server for each test.
@@ -502,6 +507,5 @@ public class AbstractResourceImplTest
         // nullify the reference to the component
         this.component = null;
     }
-
     
 }
