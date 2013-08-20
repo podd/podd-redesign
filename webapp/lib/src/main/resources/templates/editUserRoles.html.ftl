@@ -31,8 +31,7 @@
 	    
 	     	var tr = $(this).closest('tr');
 	     	
-	     	// TODO: uncomment when delete functionality works in server
-	     	//podd.submitUserRoleDelete(podd.userName, tr);
+	     	podd.submitUserRoleDelete(podd.userName, tr);
 	     	
         	tr.fadeOut(400, function(){
             	tr.remove();
@@ -45,14 +44,6 @@
 			event.preventDefault();
 			podd.showAddRoleDialog();
 			
-		});
-	
-		// Add form submission handler
-		$("#btnSubmit").click(function(event) {
-			event.preventDefault();
-			podd.emptyErrorMessages();
-			podd.submitUserRoles(podd.userName);
-			return false;
 		});
 	
 		$("#btnCancel").click(function(event) {
@@ -104,7 +95,7 @@
 				<tr>
 				    <th>Role</th>
 				    <th>Mapped Object</th>
-					<th></th>
+					<th>Action</th>
 				</tr>
 			</thead>
 	        <tfoot>
@@ -141,8 +132,7 @@
 		
 		<div id="buttonwrapper">
 			<button type="button" id="btnAddRole" >Add New Role</button>
-			<button type="button" id="btnSubmit" >Save Roles</button>
-			<button type="button" id="btnCancel" >Cancel</button>
+			<button type="button" id="btnCancel" >Return to User Details</button>
 		</div>
 	</#if>
 	</form>
