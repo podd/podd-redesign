@@ -284,6 +284,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
         
+        this.log.info("Returning from upload artifact {}", artifactId);
+        
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
                 .getDefaultMIMEType()));
     }
