@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -90,10 +92,10 @@ import com.github.podd.utils.PoddRdfConstants;
 public abstract class AbstractPoddArtifactManagerTest
 {
     /**
-     * All of the unit tests individually timeout after 30 seconds.
+     * All of the unit tests individually timeout after 60 seconds.
      */
     @Rule
-    public Timeout timeout = new Timeout(30000);
+    public Timeout timeout = new Timeout(60000);
     
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -1221,9 +1223,18 @@ public abstract class AbstractPoddArtifactManagerTest
         // prepare:
         this.loadSchemaOntologies();
         
+        // load test artifact
+        final InputStream inputStream4Artifact =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1);
+        
+        Assert.assertNotNull("Could not find test resource: " + TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1,
+                inputStream4Artifact);
+        
+        final String nextTestArtifact = IOUtils.toString(inputStream4Artifact);
+        
         final AtomicInteger count = new AtomicInteger(0);
         final CountDownLatch openLatch = new CountDownLatch(1);
-        final int threadCount = 2;
+        final int threadCount = 15;
         final CountDownLatch closeLatch = new CountDownLatch(threadCount);
         for(int i = 0; i < threadCount; i++)
         {
@@ -1235,17 +1246,13 @@ public abstract class AbstractPoddArtifactManagerTest
                         try
                         {
                             openLatch.await();
-                            for(int j = 0; j < 10; j++)
+                            for(int j = 0; j < 5; j++)
                             {
-                                final int k = j % 7;
-                                final String nextUri = "urn:test" + k + "#test" + j;
-                                // load test artifact
-                                final InputStream inputStream4Artifact =
-                                        this.getClass().getResourceAsStream(
-                                                TestConstants.TEST_ARTIFACT_IMPORT_PSCIENCEv1);
+                                ByteArrayInputStream inputStream =
+                                        new ByteArrayInputStream(nextTestArtifact.getBytes(StandardCharsets.UTF_8));
                                 InferredOWLOntologyID artifactId =
                                         AbstractPoddArtifactManagerTest.this.testArtifactManager.loadArtifact(
-                                                inputStream4Artifact, RDFFormat.RDFXML);
+                                                inputStream, RDFFormat.RDFXML);
                             }
                             count.incrementAndGet();
                         }
@@ -1271,6 +1278,8 @@ public abstract class AbstractPoddArtifactManagerTest
         openLatch.countDown(); // release the latch
         // all threads are now running concurrently.
         closeLatch.await();
+        // Verify that there were no failures, as the count is only incremented for successes, where
+        // the closeLatch must always be called, even for failures
         Assert.assertEquals(threadCount, count.get());
         
     }
