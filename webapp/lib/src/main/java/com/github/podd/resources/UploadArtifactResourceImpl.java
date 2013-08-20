@@ -255,7 +255,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 
                 for(final Statement nextTopObjectType : topObjectTypes)
                 {
-                    writer.handleStatement(nextTopObjectType);
+                    writer.handleStatement(PoddRdfConstants.VF.createStatement(nextTopObjectType.getSubject(),
+                            nextTopObjectType.getPredicate(), nextTopObjectType.getObject()));
                 }
             }
             catch(final OpenRDFException e)
