@@ -92,6 +92,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final IOException e)
         {
+            this.log.error("Could not create temporary directory for ontology upload", e);
             throw new RuntimeException("Could not create temporary directory", e);
         }
     }
@@ -203,9 +204,9 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("@Post uploadArtifactFile RDF ({})", variant.getMediaType().getName());
         
-        final InferredOWLOntologyID artifactMap = this.doUpload(entity);
+        final InferredOWLOntologyID artifactId = this.doUpload(entity);
         
-        this.log.info("Successfully loaded artifact {}", artifactMap);
+        this.log.info("Successfully loaded artifact {}", artifactId);
         
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         
@@ -217,21 +218,23 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             writer.startRDF();
             final Model model =
-                    OntologyUtils.ontologyIDsToModel(Arrays.asList(artifactMap), new LinkedHashModel(), false);
+                    OntologyUtils.ontologyIDsToModel(Arrays.asList(artifactId), new LinkedHashModel(), false);
             final Set<Resource> ontologies = model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects();
             
             for(final Resource nextOntology : ontologies)
             {
                 writer.handleStatement(PoddRdfConstants.VF.createStatement(nextOntology, RDF.TYPE, OWL.ONTOLOGY));
                 
-                final Set<Value> versions = model.filter(nextOntology, OWL.VERSIONIRI, null).objects();
-                
-                if(!versions.isEmpty())
+                for(final Value nextVersion : model.filter(nextOntology, OWL.VERSIONIRI, null).objects())
                 {
-                    for(final Value nextVersion : versions)
+                    if(nextVersion instanceof URI)
                     {
                         writer.handleStatement(PoddRdfConstants.VF.createStatement(nextOntology, OWL.VERSIONIRI,
                                 nextVersion));
+                    }
+                    else
+                    {
+                        this.log.error("Not including version IRI that was not a URI: {}", nextVersion);
                     }
                 }
             }
@@ -242,12 +245,12 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 conn = this.getPoddRepositoryManager().getRepository().getConnection();
                 final URI topObjectIRI =
-                        this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactMap, conn);
+                        this.getPoddArtifactManager().getSesameManager().getTopObjectIRI(artifactId, conn);
                 
-                writer.handleStatement(PoddRdfConstants.VF.createStatement(artifactMap.getOntologyIRI().toOpenRDFURI(),
+                writer.handleStatement(PoddRdfConstants.VF.createStatement(artifactId.getOntologyIRI().toOpenRDFURI(),
                         PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT, topObjectIRI));
                 final Set<Statement> topObjectTypes =
-                        Iterations.asSet(conn.getStatements(topObjectIRI, RDF.TYPE, null, true, artifactMap
+                        Iterations.asSet(conn.getStatements(topObjectIRI, RDF.TYPE, null, true, artifactId
                                 .getVersionIRI().toOpenRDFURI()));
                 
                 for(final Statement nextTopObjectType : topObjectTypes)
