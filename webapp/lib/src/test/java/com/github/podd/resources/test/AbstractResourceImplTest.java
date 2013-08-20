@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,9 +15,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -78,9 +82,14 @@ public class AbstractResourceImplTest
     public Timeout timeout = new Timeout(30000);
     
     /**
+     * The set of ports that have been used in tests so far in this virtual machine.
+     */
+    private static final Set<Integer> usedPorts = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>());
+    
+    /**
      * Determines the TEST_PORT number to use for the test server
      */
-    protected int TEST_PORT;
+    protected int testPort;
     
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
@@ -212,34 +221,34 @@ public class AbstractResourceImplTest
         return results.getText();
     }
     
-    /**
-     * Copied from sshj net.schmizz.sshj.util.BasicFixture.java
-     * 
-     * @return
-     */
-    private int getFreePort()
+    private static synchronized int getFreePort()
     {
-        try
+        int result = -1;
+        while(result <= 0)
         {
-            ServerSocket s = null;
-            try
+            try (ServerSocket ss = new ServerSocket(0))
             {
-                s = new ServerSocket(0);
-                s.setReuseAddress(true);
-                return s.getLocalPort();
-            }
-            finally
-            {
-                if(s != null)
+                ss.setReuseAddress(true);
+                result = ss.getLocalPort();
+                if(usedPorts.contains(result))
                 {
-                    s.close();
+                    result = -1;
+                }
+                else
+                {
+                    usedPorts.add(result);
+                    try (DatagramSocket ds = new DatagramSocket(result);)
+                    {
+                        ds.setReuseAddress(true);
+                    }
                 }
             }
+            catch(IOException e)
+            {
+                result = -1;
+            }
         }
-        catch(final IOException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return result;
     }
     
     /**
@@ -270,11 +279,11 @@ public class AbstractResourceImplTest
     {
         if(!path.startsWith("/"))
         {
-            return "http://localhost:" + this.TEST_PORT + "/podd/" + path;
+            return "http://localhost:" + this.testPort + "/podd/" + path;
         }
         else
         {
-            return "http://localhost:" + this.TEST_PORT + "/podd" + path;
+            return "http://localhost:" + this.testPort + "/podd" + path;
         }
     }
     
@@ -461,10 +470,10 @@ public class AbstractResourceImplTest
     {
         this.component = new Component();
         
-        this.TEST_PORT = this.getFreePort();
+        this.testPort = AbstractResourceImplTest.getFreePort();
         
         // Add a new HTTP server listening on the given TEST_PORT.
-        this.component.getServers().add(Protocol.HTTP, this.TEST_PORT);
+        this.component.getServers().add(Protocol.HTTP, this.testPort);
         
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);
@@ -482,8 +491,18 @@ public class AbstractResourceImplTest
         // Application.getContext() to not return null
         ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
         
+        nextApplication.getContext().getParameters().set("maxQueued", "1024");
+        nextApplication.getContext().getParameters().set("lowThreads", "256");
+        nextApplication.getContext().getParameters().set("maxThreads", "512");
+        nextApplication.getContext().getParameters().set("tracing", "true");
+        
         // Start the component.
         this.component.start();
+        
+        this.component.getContext().getParameters().set("maxQueued", "1024");
+        this.component.getContext().getParameters().set("lowThreads", "256");
+        this.component.getContext().getParameters().set("maxThreads", "512");
+        this.component.getContext().getParameters().set("tracing", "true");
         
         this.testDir = this.tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
     }
