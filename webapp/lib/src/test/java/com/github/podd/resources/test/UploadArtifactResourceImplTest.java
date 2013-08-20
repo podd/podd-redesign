@@ -375,7 +375,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final CountDownLatch openLatch = new CountDownLatch(1);
         // Changing this from 8 to 9 on my machine may be triggering a restlet bug
         final int threadCount = 9;
-        final int perThreadCount = 5;
+        final int perThreadCount = 7;
         final CountDownLatch closeLatch = new CountDownLatch(threadCount);
         for(int i = 0; i < threadCount; i++)
         {
