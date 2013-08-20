@@ -20,7 +20,7 @@ import com.github.podd.restlet.PoddWebServiceApplication;
 
 public abstract class AbstractPoddResourceImpl extends ServerResource
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     public AbstractPoddResourceImpl()
     {

@@ -72,10 +72,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
 {
-    
     private static final String UPLOAD_PAGE_TITLE_TEXT = "PODD Upload New Artifact";
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private final Path tempDirectory;
     

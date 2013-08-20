@@ -39,7 +39,10 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
+import org.restlet.Client;
 import org.restlet.Component;
+import org.restlet.Context;
+import org.restlet.Server;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
@@ -472,8 +475,10 @@ public class AbstractResourceImplTest
         
         this.testPort = AbstractResourceImplTest.getFreePort();
         
+        Server httpServer = new Server(this.component.getContext().createChildContext(), Protocol.HTTP, this.testPort);
         // Add a new HTTP server listening on the given TEST_PORT.
-        this.component.getServers().add(Protocol.HTTP, this.testPort);
+        this.component.getServers().add(httpServer);
+        setupThreading(httpServer.getContext());
         
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);
@@ -491,20 +496,30 @@ public class AbstractResourceImplTest
         // Application.getContext() to not return null
         ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
         
-        nextApplication.getContext().getParameters().set("maxQueued", "1024");
-        nextApplication.getContext().getParameters().set("lowThreads", "256");
-        nextApplication.getContext().getParameters().set("maxThreads", "512");
-        nextApplication.getContext().getParameters().set("tracing", "true");
-        
         // Start the component.
         this.component.start();
         
-        this.component.getContext().getParameters().set("maxQueued", "1024");
-        this.component.getContext().getParameters().set("lowThreads", "256");
-        this.component.getContext().getParameters().set("maxThreads", "512");
-        this.component.getContext().getParameters().set("tracing", "true");
+        setupThreading(nextApplication.getContext());
+        setupThreading(this.component.getContext());
+        for(Client nextClient : this.component.getClients())
+        {
+            setupThreading(nextClient.getContext());
+        }
         
         this.testDir = this.tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
+    }
+    
+    protected static void setupThreading(Context nextContext)
+    {
+        if(nextContext != null)
+        {
+            nextContext.getParameters().add("maxThreads", "512");
+            nextContext.getParameters().add("minThreads", "100");
+            nextContext.getParameters().add("lowThreads", "145");
+            nextContext.getParameters().add("maxQueued", "100");
+            nextContext.getParameters().add("maxTotalConnections", "100");
+            //nextContext.getParameters().add("maxIoIdleTimeMs", "100");
+        }
     }
     
     /**

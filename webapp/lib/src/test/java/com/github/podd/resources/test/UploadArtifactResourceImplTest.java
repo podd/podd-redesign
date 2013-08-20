@@ -375,7 +375,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final CountDownLatch openLatch = new CountDownLatch(1);
         // Changing this from 8 to 9 on my machine may be triggering a restlet bug
         final int threadCount = 9;
-        final int perThreadCount = 3;
+        final int perThreadCount = 5;
         final CountDownLatch closeLatch = new CountDownLatch(threadCount);
         for(int i = 0; i < threadCount; i++)
         {
@@ -386,7 +386,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                     {
                         try
                         {
-                            openLatch.await();
+                            openLatch.await(30000, TimeUnit.MILLISECONDS);
                             threadStartCount.incrementAndGet();
                             for(int j = 0; j < perThreadCount; j++)
                             {
@@ -399,6 +399,8 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                                             new ClientResource(
                                                     UploadArtifactResourceImplTest.this
                                                             .getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+                                    
+                                    AbstractResourceImplTest.setupThreading(uploadArtifactClientResource.getContext());
                                     
                                     final Representation input =
                                             UploadArtifactResourceImplTest.this.buildRepresentationFromResource(
@@ -450,6 +452,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         openLatch.countDown(); // release the latch
         // all threads are now running concurrently.
         closeLatch.await(25000, TimeUnit.MILLISECONDS);
+        //closeLatch.await();
         // Verify that there were no startup failures
         Assert.assertEquals("Some threads did not all start successfully", threadCount, threadStartCount.get());
         Assert.assertEquals("Some thread loops did not start successfully", perThreadCount * threadCount,
