@@ -156,6 +156,12 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             artifactMap = this.uploadFileAndLoadArtifactIntoPodd(inputStream, format);
         }
         
+        // Map uploading user as Project Administrator for this artifact so that they can edit it
+        // and assign permissions to it in the future
+        PoddSesameRealm realm = this.getPoddApplication().getRealm();
+        realm.map(this.getRequest().getClientInfo().getUser(), PoddRoles.PROJECT_ADMIN.getRole(), artifactMap
+                .getOntologyIRI().toOpenRDFURI());
+        
         return artifactMap;
     }
     
@@ -192,12 +198,6 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         this.log.info("@Post UploadArtifactFile Page");
         
         final InferredOWLOntologyID artifactMap = this.doUpload(entity);
-        
-        // Map uploading user as Project Administrator for this artifact so that they can edit it
-        // and assign permissions to it in the future
-        PoddSesameRealm realm = this.getPoddApplication().getRealm();
-        realm.map(this.getRequest().getClientInfo().getUser(), PoddRoles.PROJECT_ADMIN.getRole(), artifactMap
-                .getOntologyIRI().toOpenRDFURI());
         
         this.log.info("Successfully loaded artifact {}", artifactMap);
         
