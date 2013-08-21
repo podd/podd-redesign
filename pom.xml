@@ -1,3 +1,21 @@
+<!--
+
+    PODD is an OWL ontology database used for scientific project management
+
+    Copyright (C) 2009-2013 The University Of Queensland
+
+    This program is free software: you can redistribute it and/or modify it under the terms of the
+    GNU Affero General Public License as published by the Free Software Foundation, either version 3
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+    even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License along with this program.
+    If not, see <http://www.gnu.org/licenses/>.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -435,6 +453,13 @@
 		</dependencies>
 	</dependencyManagement>
 	<build>
+		<plugins>
+			<!-- Run the license plugin once over all source files. -->
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -575,8 +600,49 @@
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.6.2.201302030002</version>
+					<version>0.6.3.201306030806</version>
 				</plugin>
+				<plugin>
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>2.2</version>
+					<inherited>false</inherited>
+					<configuration>
+						<basedir>${basedir}</basedir>
+						<header>${basedir}/conf/LicenseHeader.txt</header>
+						<properties>
+							<owner>The University Of Queensland</owner>
+							<year>2009-2013</year>
+						</properties>
+						<quiet>false</quiet>
+						<failIfMissing>true</failIfMissing>
+						<aggregate>true</aggregate>
+						<strictCheck>true</strictCheck>
+						<excludes>
+							<exclude>conf/*</exclude>
+							<exclude>**/.*/**</exclude>
+							<exclude>**/resources/**/*</exclude>
+							<exclude>**/LICENSE*</exclude>
+							<exclude>**/NOTICE</exclude>
+							<exclude>**/RELEASE_NOTES.md</exclude>
+							<exclude>**/README.md</exclude>
+							<exclude>**/*.csv</exclude>
+						</excludes>
+						<useDefaultExcludes>true</useDefaultExcludes>
+						<useDefaultMapping>true</useDefaultMapping>
+						<encoding>UTF-8</encoding>
+					</configuration>
+					<executions>
+						<execution>
+							<id>check-headers</id>
+							<phase>process-sources</phase>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
