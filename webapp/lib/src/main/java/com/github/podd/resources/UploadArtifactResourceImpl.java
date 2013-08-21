@@ -69,6 +69,8 @@ import org.slf4j.LoggerFactory;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
+import com.github.podd.restlet.PoddRoles;
+import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -190,6 +192,12 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         this.log.info("@Post UploadArtifactFile Page");
         
         final InferredOWLOntologyID artifactMap = this.doUpload(entity);
+        
+        // Map uploading user as Project Administrator for this artifact so that they can edit it
+        // and assign permissions to it in the future
+        PoddSesameRealm realm = this.getPoddApplication().getRealm();
+        realm.map(this.getRequest().getClientInfo().getUser(), PoddRoles.PROJECT_ADMIN.getRole(), artifactMap
+                .getOntologyIRI().toOpenRDFURI());
         
         this.log.info("Successfully loaded artifact {}", artifactMap);
         
