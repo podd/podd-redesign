@@ -123,7 +123,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             
             // - include all available PoddRoles
             dataModel.put("repositoryRolesList", PoddRoles.getRepositoryRoles());
-
+            
             // - include user's current Roles and optional mapped objects
             final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList = this.getUsersRoles(realm, poddUser);
             
@@ -135,7 +135,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
-
+    
     /**
      * Retrieve the Roles that are mapped to this User, together with details of any optional mapped
      * objects.
@@ -151,15 +151,16 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
     private List<Entry<RestletUtilRole, PoddObjectLabel>> getUsersRoles(final PoddSesameRealm realm,
             final PoddUser poddUser)
     {
-        final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList = new LinkedList<Entry<RestletUtilRole, PoddObjectLabel>>();
+        final List<Entry<RestletUtilRole, PoddObjectLabel>> roleList =
+                new LinkedList<Entry<RestletUtilRole, PoddObjectLabel>>();
         
-        final Collection<Entry<Role,URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
+        final Collection<Entry<Role, URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
         for(Iterator<Entry<Role, URI>> iterator = rolesWithObjectMappings.iterator(); iterator.hasNext();)
         {
             final Entry<Role, URI> entry = iterator.next();
-                final RestletUtilRole roleByName = PoddRoles.getRoleByName(entry.getKey().getName());
-                PoddObjectLabel poddObjectLabel = null;
-                
+            final RestletUtilRole roleByName = PoddRoles.getRoleByName(entry.getKey().getName());
+            PoddObjectLabel poddObjectLabel = null;
+            
             final URI artifactUri = entry.getValue();
             if(artifactUri != null)
             {
@@ -186,7 +187,6 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         return roleList;
     }
     
-    
     /**
      * Handle an HTTP POST request submitting RDF data to update (i.e. map/unmap) a PoddUser's
      * Roles. <br>
@@ -202,30 +202,29 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-
         
         final String userIdentifier =
                 (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
         this.log.info("editing Roles of user: {}", userIdentifier);
-
+        
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-
+        
         // - validate User whose Roles are to be edited
         if(userIdentifier == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit Roles");
         }
         final RestletUtilUser restletUserToUpdate = nextRealm.findUser(userIdentifier);
-        if (restletUserToUpdate == null || !(restletUserToUpdate instanceof PoddUser))
+        if(restletUserToUpdate == null || !(restletUserToUpdate instanceof PoddUser))
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");
         }
-        final PoddUser poddUser = (PoddUser) restletUserToUpdate;
-
+        final PoddUser poddUser = (PoddUser)restletUserToUpdate;
+        
         // - retrieve 'delete' parameter
         boolean isDelete = false;
         final String deleteQueryParam = this.getQuery().getFirstValue(PoddWebConstants.KEY_DELETE);
-        if (deleteQueryParam != null)
+        if(deleteQueryParam != null)
         {
             isDelete = Boolean.valueOf(deleteQueryParam);
         }
@@ -234,31 +233,30 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         final List<Entry<Role, URI>> rolesToEdit = this.extractRoleMappingsFromRequestBody(entity);
         
         // - check authorization for each Role mapping
-        for (Entry<Role, URI> entry : rolesToEdit)
+        for(Entry<Role, URI> entry : rolesToEdit)
         {
             final Role role = entry.getKey();
             final URI mappedUri = entry.getValue();
             
             PoddAction action = PoddAction.PROJECT_ROLE_EDIT;
-            if (PoddRoles.getRepositoryRoles().contains(role))
+            if(PoddRoles.getRepositoryRoles().contains(role))
             {
                 action = PoddAction.REPOSITORY_ROLE_EDIT;
                 if(mappedUri != null)
                 {
-                    throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
-                            "Unwanted optional Object URI found");
+                    throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Unwanted optional Object URI found");
                 }
             }
-            this.checkAuthentication(action, mappedUri); 
+            this.checkAuthentication(action, mappedUri);
         }
-            
+        
         // - do the mapping/unmapping of Roles
-        for (Entry<Role, URI> entry : rolesToEdit)
+        for(Entry<Role, URI> entry : rolesToEdit)
         {
             final Role role = entry.getKey();
             final URI mappedUri = entry.getValue();
             
-            if (isDelete)
+            if(isDelete)
             {
                 nextRealm.unmap(poddUser, role, mappedUri);
                 this.log.info(" User [{}] unmapped from Role [{}]", poddUser.getIdentifier(), role.getName());
@@ -266,7 +264,8 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             else
             {
                 nextRealm.map(poddUser, role, mappedUri);
-                this.log.info(" User [{}] mapped to Role [{}], [{}]", poddUser.getIdentifier(), role.getName(), mappedUri);
+                this.log.info(" User [{}] mapped to Role [{}], [{}]", poddUser.getIdentifier(), role.getName(),
+                        mappedUri);
             }
         }
         
@@ -288,13 +287,13 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
-
+    
     /**
      * 
      * @param entity
      * @return
      */
-    private List<Entry<Role, URI>>  extractRoleMappingsFromRequestBody(final Representation entity)
+    private List<Entry<Role, URI>> extractRoleMappingsFromRequestBody(final Representation entity)
     {
         final List<Entry<Role, URI>> roles = new LinkedList<Entry<Role, URI>>();
         
@@ -305,15 +304,16 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             final RDFFormat inputFormat =
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model model = Rio.parse(inputStream, "", inputFormat);
-
-            // extract Role Mapping info (User details are ignored as multiple users are not supported)
-            final Collection<Resource> roleMappingUris = model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
+            
+            // extract Role Mapping info (User details are ignored as multiple users are not
+            // supported)
+            final Collection<Resource> roleMappingUris =
+                    model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
             for(Iterator<Resource> iterator = roleMappingUris.iterator(); iterator.hasNext();)
             {
                 final Resource mappingUri = iterator.next();
                 
-                final URI roleUri =
-                        model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI();
+                final URI roleUri = model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI();
                 final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
                 
                 final URI mappedObject =
@@ -322,7 +322,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                 this.log.debug("Extracted Role <{}> with Optional Object <{}>", role.getName(), mappedObject);
                 roles.add(new AbstractMap.SimpleEntry<Role, URI>(role.getRole(), mappedObject));
             }
-
+            
             return roles;
         }
         catch(final IOException e)
@@ -334,5 +334,5 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
         }
     }
-
+    
 }

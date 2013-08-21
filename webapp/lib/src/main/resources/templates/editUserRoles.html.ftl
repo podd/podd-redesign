@@ -117,6 +117,8 @@
 			    		<td>
 			    			<#if role.value?? >
 			    				<span><a href="${role.value.objectURI}">${role.value.label}</a></span>
+			    			<#else>
+			    				<span>Repository wide role</span>
 			    		 	</#if>
 			    		</td>
             			<td>
