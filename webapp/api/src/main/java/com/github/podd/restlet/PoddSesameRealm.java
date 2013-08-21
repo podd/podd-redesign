@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.restlet;
+package com.github.podd.restlet;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.openrdf.model.URI;
@@ -94,8 +95,8 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
     protected abstract Role buildRoleFromSparqlResult(final BindingSet bindingSet);
     
     /**
-     * Build a SPARQL query which returns Roles mapped to a given user and any 
-     * optional object URIs included in the mapping.
+     * Build a SPARQL query which returns Roles mapped to a given user and any optional object URIs
+     * included in the mapping.
      * 
      * @param userIdentifier
      * @return
@@ -106,8 +107,11 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      * Build a SPARQL query which returns Roles common to a given user and object URI
      * 
      * @param userIdentifier
-     * @param objectUris
-     * @return
+     *            A user identifier or null to match all users for the given object URI.
+     * @param objectUri
+     *            The object URI to find roles for.
+     * @return A SPARQL query which will find the object roles for the given object, restricting the
+     *         results to a user if it is supplied.
      */
     protected abstract String buildSparqlQueryForObjectRoles(final String userIdentifier, final URI objectUri);
     
@@ -130,16 +134,28 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      * @param user
      * @param objectUri
      * @return A Collection of Roles between given User and object
+     * @deprecated Use {@link #getRolesForObjectAlternate(User, URI)} instead.
      */
+    @Deprecated
     public abstract Collection<Role> getRolesForObject(User user, URI objectUri);
     
     /**
-     * Retrieve Roles that a User is mapped to together with any optional object URIs. 
+     * For a given User and object URI, this method finds Role Mappings between them. In this method
+     * the user is optional and may be set to null.
+     * 
+     * @param user
+     * @param objectUri
+     * @return A Collection of Roles between given User and object
+     */
+    public abstract Map<User, Collection<Role>> getRolesForObjectAlternate(User user, URI objectUri);
+    
+    /**
+     * Retrieve Roles that a User is mapped to together with any optional object URIs.
      * 
      * @param user
      * @return A Map of <Role, object URI> pairs
      */
-    public abstract Collection<Entry<Role,URI>> getRolesWithObjectMappings(User user);
+    public abstract Collection<Entry<Role, URI>> getRolesWithObjectMappings(User user);
     
     /**
      * @param name

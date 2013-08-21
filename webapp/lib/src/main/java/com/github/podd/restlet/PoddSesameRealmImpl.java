@@ -17,11 +17,17 @@
 package com.github.podd.restlet;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -177,11 +183,11 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     protected URI addUser(final PoddUser nextUser, final boolean isNew)
     {
         final RestletUtilUser oldUser = this.findUser(nextUser.getIdentifier());
-        if (isNew && oldUser != null)
+        if(isNew && oldUser != null)
         {
             throw new RuntimeException("User already exists");
         }
-        else if (!isNew && oldUser == null)
+        else if(!isNew && oldUser == null)
         {
             throw new RuntimeException("Could not modify User (does not exist)");
         }
@@ -281,19 +287,18 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     {
         final URI roleUri = this.vf.createURI(bindingSet.getValue(PoddSesameRealm.PARAM_ROLE).stringValue());
         final Role role = PoddRoles.getRoleByUri(roleUri).getRole();
-
+        
         URI objectUri = null;
-        if (bindingSet.getValue(PoddSesameRealm.PARAM_OBJECT_URI) != null)
+        if(bindingSet.getValue(PoddSesameRealm.PARAM_OBJECT_URI) != null)
         {
             objectUri = this.vf.createURI(bindingSet.getValue(PoddSesameRealm.PARAM_OBJECT_URI).stringValue());
         }
-
+        
         this.log.info("Building map entry: {}, <{}>", role.getName(), objectUri);
-
-
+        
         return new AbstractMap.SimpleEntry<Role, URI>(role, objectUri);
     }
-
+    
     @Override
     protected PoddUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
     {
@@ -304,10 +309,10 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                         .toCharArray(), bindingSet.getValue(PoddSesameRealm.PARAM_USER_FIRSTNAME).stringValue(),
                         bindingSet.getValue(PoddSesameRealm.PARAM_USER_LASTNAME).stringValue(), bindingSet.getValue(
                                 PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.INACTIVE);
-
+        
         PoddUserStatus userStatus = PoddUserStatus.INACTIVE;
         Value statusVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_STATUS);
-        if (statusVal != null && statusVal instanceof URI)
+        if(statusVal != null && statusVal instanceof URI)
         {
             userStatus = PoddUserStatus.getUserStatusByUri((URI)statusVal);
         }
@@ -420,8 +425,11 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         final StringBuilder query = new StringBuilder();
         
-        query.append(" SELECT ?");
+        query.append(" SELECT DISTINCT ?");
         query.append(PoddSesameRealm.PARAM_ROLE);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        
         query.append(" WHERE ");
         query.append(" { ");
         
@@ -429,9 +437,9 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         query.append(roleMappingVar);
         query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ");
-        query.append(" \"");
-        query.append(NTriplesUtil.escapeString(userIdentifier));
-        query.append("\" . ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" . ");
         
         query.append(roleMappingVar);
         query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ");
@@ -442,6 +450,13 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(roleMappingVar);
         query.append(" <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ");
         query.append(" ?object . ");
+        
+        if(userIdentifier != null)
+        {
+            query.append(" FILTER ( ?userUri IN (");
+            query.append("\"" + NTriplesUtil.escapeString(userIdentifier) + "\"");
+            query.append(") ) ");
+        }
         
         query.append(" FILTER ( ?object IN (");
         query.append("<" + objectUri.stringValue() + ">");
@@ -522,7 +537,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_STATUS);
         query.append(" . ");
-
+        
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddRdfConstants.PODD_USER_HOMEPAGE + "> ");
@@ -598,19 +613,39 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     public Collection<Role> getRolesForObject(final User user, final URI objectUri)
     {
+        Set<Role> results = new HashSet<Role>();
+        
+        Collection<Collection<Role>> allResults = getRolesForObjectAlternate(user, objectUri).values();
+        
+        for(Collection<Role> nextResult : allResults)
+        {
+            results.addAll(nextResult);
+        }
+        
+        return results;
+    }
+    
+    @Override
+    public Map<User, Collection<Role>> getRolesForObjectAlternate(final User user, final URI objectUri)
+    {
         if(user == null)
         {
             throw new NullPointerException("User was null");
         }
         
-        final Collection<Role> roleCollection = new HashSet<Role>();
+        final ConcurrentMap<User, Collection<Role>> roleCollection = new ConcurrentHashMap<User, Collection<Role>>();
         
         RepositoryConnection conn = null;
         try
         {
             conn = this.getRepository().getConnection();
+            String userIdentifier = null;
+            if(user != null)
+            {
+                userIdentifier = user.getIdentifier();
+            }
             
-            final String query = this.buildSparqlQueryForObjectRoles(user.getIdentifier(), objectUri);
+            final String query = this.buildSparqlQueryForObjectRoles(userIdentifier, objectUri);
             
             if(this.log.isDebugEnabled())
             {
@@ -630,8 +665,25 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 
                 while(queryResult.hasNext())
                 {
-                    final Role role = this.buildRoleFromSparqlResult(queryResult.next());
-                    roleCollection.add(role);
+                    BindingSet bindingSet = queryResult.next();
+
+                    final Role role = this.buildRoleFromSparqlResult(bindingSet);
+                    
+                    if(!bindingSet.hasBinding(PARAM_USER_URI))
+                    {
+                        throw new RuntimeException("Query did not bind a user to the role");
+                    }
+                    
+                    RestletUtilUser nextUser =
+                            this.findUser(bindingSet.getBinding(PARAM_USER_URI).getValue().stringValue());
+                    
+                    Collection<Role> nextRoles = new HashSet<Role>();
+                    Collection<Role> putIfAbsent = roleCollection.putIfAbsent(nextUser, nextRoles);
+                    if(putIfAbsent != null)
+                    {
+                        nextRoles = putIfAbsent;
+                    }
+                    nextRoles.add(role);
                 }
             }
             finally
@@ -658,17 +710,17 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         return roleCollection;
     }
-
+    
     @Override
-    public Collection<Entry<Role,URI>> getRolesWithObjectMappings(User user)
+    public Collection<Entry<Role, URI>> getRolesWithObjectMappings(User user)
     {
         if(user == null)
         {
             throw new NullPointerException("User was null");
         }
         
-        //final Map<Role, URI> roleMap = new HashMap<Role, URI>();
-        final Collection<Entry<Role,URI>> roleCollection = new HashSet<Entry<Role,URI>>();
+        // final Map<Role, URI> roleMap = new HashMap<Role, URI>();
+        final Collection<Entry<Role, URI>> roleCollection = new HashSet<Entry<Role, URI>>();
         
         RepositoryConnection conn = null;
         try
@@ -696,7 +748,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 while(queryResult.hasNext())
                 {
                     final Entry<Role, URI> roleEntry = this.buildMapEntryFromSparqlResult(queryResult.next());
-                    //roleMap.put(roleEntry.getKey(), roleEntry.getValue());
+                    // roleMap.put(roleEntry.getKey(), roleEntry.getValue());
                     roleCollection.add(roleEntry);
                 }
             }
@@ -746,7 +798,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         final RestletUtilRole nextStandardRole = PoddRoles.getRoleByUri(uri);
         return nextStandardRole;
     }
-
+    
     /**
      * Copied from RestletUtilSesameRealm.java
      */
@@ -831,7 +883,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     public void unmap(final User user, final Role role, final URI optionalObjectUri)
     {
-        if (optionalObjectUri == null)
+        if(optionalObjectUri == null)
         {
             super.unmap(role, SesameRealmConstants.OAS_ROLEMAPPEDUSER, user.getIdentifier());
             return;
@@ -855,7 +907,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             query.append(" WHERE ");
             query.append(" { ");
             query.append("   ?roleMappingUri a <" + SesameRealmConstants.OAS_ROLEMAPPING + "> . ");
-            query.append("   ?roleMappingUri <" +  SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ?identifier . ");
+            query.append("   ?roleMappingUri <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ?identifier . ");
             query.append("   ?roleMappingUri <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ?role . ");
             query.append("   ?roleMappingUri <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ?object . ");
             query.append("   FILTER(str(?identifier) = \"" + NTriplesUtil.escapeString(user.getIdentifier()) + "\") ");
@@ -877,7 +929,8 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             {
                 if(!queryResult.hasNext())
                 {
-                    this.log.info("Could not find any role mappings to remove for this role: {}, object <{}>, and this target: {}",
+                    this.log.info(
+                            "Could not find any role mappings to remove for this role: {}, object <{}>, and this target: {}",
                             role, optionalObjectUri, user.getIdentifier());
                 }
                 
@@ -964,5 +1017,5 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     {
         return this.addUser(nextUser, false);
     }
-
+    
 }
