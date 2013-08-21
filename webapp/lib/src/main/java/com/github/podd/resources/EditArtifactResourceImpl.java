@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +30,6 @@ import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -56,7 +54,6 @@ import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
@@ -267,6 +264,11 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             // TODO: handle case where more than 1 type is found
             dataModel.put("objectType", objectTypes.get(0));
+            
+            if (PoddRdfConstants.PODD_SCIENCE_PROJECT.equals(objectTypes.get(0).getObjectURI()))
+            {
+                dataModel.put("showParticipants", "true");
+            }
             
             // Parent Details
             final Model parentDetails = this.getPoddArtifactManager().getParentDetails(ontologyID, objectUri);

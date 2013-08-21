@@ -317,6 +317,10 @@ public interface PoddRdfConstants
     public static final URI PODD_FILE_REPOSITORY_SECRET = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.DATA_REPOSITORY, "hasDataRepositorySecret");
 
+    /** http://purl.org/podd/ns/poddScience#Project */
+    public static final Object PODD_SCIENCE_PROJECT = PoddRdfConstants.VF
+            .createURI(PoddRdfConstants.PODD_SCIENCE, "Project");
+    
     /** http://purl.org/podd/ns/poddUser#status */
     public static final URI PODD_USER_STATUS =  PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_USER, "status");
@@ -403,4 +407,5 @@ public interface PoddRdfConstants
      */
     public static final URI SCOPE_REPOSITORY = PoddRdfConstants.VF
             .createURI("http://purl.org/podd/poddBase#PoddRepository");
+
 }
