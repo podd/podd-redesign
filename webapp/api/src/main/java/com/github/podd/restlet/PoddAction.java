@@ -42,7 +42,7 @@ public enum PoddAction
      * By default both project and repository administrator users are allowed to create artifacts.
      */
     ARTIFACT_CREATE(true, "Could not create artifact.", new HashSet<Role>(Arrays.asList(
-            PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), false),
+            PoddRoles.ADMIN.getRole(), PoddRoles.PROJECT_CREATOR.getRole())), false),
     
     /**
      * An action by a user asking to update an existing artifact.
