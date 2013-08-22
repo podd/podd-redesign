@@ -111,6 +111,9 @@ public final class RestletUtils
     
     /**
      * Extracts role mappings, optionally to object URIs, from the given RDF statements.
+     * <p>
+     * NOTE: This method does not fail if Repository roles contain object URIs or if Project Roles
+     * do not contain object URIs. The user must determine when and how to fail in these cases.
      * 
      * @param model
      *            A set of RDF statements defining role mappings
