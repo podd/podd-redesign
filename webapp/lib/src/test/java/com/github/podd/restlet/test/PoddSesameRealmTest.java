@@ -376,6 +376,36 @@ public class PoddSesameRealmTest
         Assert.assertTrue("User list did not contain user2", users.contains(user2));
     }
     
+    @Test
+    public void testGetUserByStatus() throws Exception
+    {
+        // -prepare: users
+        final PoddUser user1 = this.addTestUser("albert@hope.com");
+        final PoddUser user2 = this.addTestUser("bob@hope.com");
+        final PoddUser user3 = this.addTestUser("charles@hope.com");
+        final PoddUser user4 = this.addTestUser("david@hope.com");
+        final PoddUser user5 = this.addTestUser("elmo@hope.com");
+        
+        // - ACTIVE users
+        final List<PoddUser> activeUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, false, 10, 0);
+        Assert.assertEquals("Not the expected number of active Users", 5, activeUsers.size());
+        Assert.assertEquals("Results not in ascending order", "albert@hope.com", activeUsers.get(0).getIdentifier());
+        
+        // - INACTIVE users
+        final List<PoddUser> inactiveUsers = this.testRealm.getUserByStatus(PoddUserStatus.INACTIVE, false, 10, 0);
+        Assert.assertEquals("Not the expected number of active Users", 0, inactiveUsers.size());
+        
+        // - order by DESC(identifier) and limit of 3
+        final List<PoddUser> filteredUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, true, 3, 0);
+        Assert.assertEquals("Not the expected number of Users after filtering", 3, filteredUsers.size());
+        Assert.assertEquals("Results not in descending order", "elmo@hope.com", filteredUsers.get(0).getIdentifier());
+        
+        // - order by identifier and offset of 2
+        final List<PoddUser> offsetUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, false, 10, 2);
+        Assert.assertEquals("Not the expected number of Users after offsetting", 3, offsetUsers.size());
+        Assert.assertEquals("Results not in ascending order", "charles@hope.com", offsetUsers.get(0).getIdentifier());
+    }
+    
     /**
      * Test that mappings between a User, a Role and an optional Object URI can be added.
      */

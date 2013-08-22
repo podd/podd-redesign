@@ -17,6 +17,7 @@
 package com.github.podd.restlet;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -29,6 +30,7 @@ import org.restlet.security.User;
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.utils.PoddUser;
+import com.github.podd.utils.PoddUserStatus;
 
 /**
  * Abstract class which customises RestletUtilSesameRealm.java to use PODDUsers and PoddRoles.
@@ -127,6 +129,19 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      */
     @Override
     protected abstract String buildSparqlQueryToFindUser(final String userIdentifier, boolean findAllUsers);
+
+    /**
+     * Build a SPARQL query to retrieve details of PODD Users who have the given Status.
+     * 
+     * @param status
+     * @param orderByField
+     * @param isDescending
+     * @param limit
+     * @param offset
+     * @return
+     */
+    protected abstract String buildSparqlQueryToGetUserByStatus(final PoddUserStatus status, final String orderByField,
+            final boolean isDescending, final int limit, final int offset);
     
     /**
      * For a given User and object URI, this method finds Role Mappings between them.
@@ -168,6 +183,17 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      */
     @Override
     protected abstract RestletUtilRole getRoleByUri(final URI uri);
+
+    /**
+     * This method searches for PODD Users having the given Status.
+     * 
+     * @param status
+     * @param isDescending
+     * @param limit
+     * @param offset
+     * @return A List of PODDUsers
+     */
+    public abstract List<PoddUser> getUserByStatus(PoddUserStatus status, boolean isDescending, int limit, int offset);
     
     /**
      * This method maps a User to a Role with an optional URI.
@@ -198,5 +224,6 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      * @return
      */
     public abstract URI updateUser(final PoddUser nextUser);
+
     
 }
