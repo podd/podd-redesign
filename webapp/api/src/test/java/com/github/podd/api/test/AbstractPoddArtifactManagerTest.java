@@ -600,9 +600,18 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         finally
         {
-            if(this.testRepositoryConnection.isOpen())
+            try
             {
-                this.testRepositoryConnection.close();
+                if(this.testRepositoryConnection.isOpen())
+                {
+                    this.testRepositoryConnection.close();
+                }
+            }
+            finally
+            {
+                this.testRepositoryManager.getRepository().shutDown();
+                this.testRepositoryManager = null;
+                this.testRepositoryConnection = null;
             }
         }
     }
