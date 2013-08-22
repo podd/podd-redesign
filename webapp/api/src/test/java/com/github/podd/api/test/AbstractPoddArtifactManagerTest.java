@@ -595,7 +595,8 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             if(this.testRepositoryConnection.isActive())
             {
-                this.testRepositoryConnection.rollback();
+                this.log.warn("Found active transaction after test");
+                //this.testRepositoryConnection.rollback();
             }
         }
         finally
