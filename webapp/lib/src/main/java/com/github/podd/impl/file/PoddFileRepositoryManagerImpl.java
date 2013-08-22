@@ -209,10 +209,6 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         {
             try
             {
-                if(conn != null && conn.isActive())
-                {
-                    conn.rollback();
-                }
                 if(conn != null && conn.isOpen())
                 {
                     conn.close();
