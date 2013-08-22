@@ -24,7 +24,7 @@
 <div id="filter">
 	<form name="list_user" action="${baseUrl}/admin/user/list" method="POST" onsubmit="">
 		<div id="userFilter" class="fieldset">
-			<div class="legend">Filter <a href="javascript:animatedcollapse.toggle('filterContent')" title="View Filter"><img src="${baseUrl}/images/toggle.png" alt=""></a></div>
+			<div class="legend">Filter <a href="javascript:animatedcollapse.toggle('filterContent')" title="View Filter"><img src="${baseUrl}/resources/images/toggle.png" alt=""></a></div>
 			<div id="filterContent">
 			<ol>
 				<li class="bold">Institution:</li>
@@ -105,8 +105,7 @@
 			<tr> 
 			    <th>UserName</th> 
 			    <th>Full Name</th> 
-			    <th>Institution</th> 
-			    <th>Roles</th> 
+			    <th>Organization</th> 
 			    <th>Status</th> 
 			    <th>Last Access</th>
 			</tr> 
@@ -114,11 +113,11 @@
 		<tfoot>
 			<tr id="pager">
 				<td colspan="6">
-                    <img class="first" src="${baseUrl}/images/btn_first.png" alt="first" title="First">
-                    <img class="prev" src="${baseUrl}/images/btn_prev.png" alt="previous" title="Previous">
+                    <img class="first" src="${baseUrl}/resources/images/btn_first.png" alt="first" title="First">
+                    <img class="prev" src="${baseUrl}/resources/images/btn_prev.png" alt="previous" title="Previous">
                     <label class="pagedisplay"></label>
-                    <img class="next" src="${baseUrl}/images/btn_next.png" alt="next" title="Next">
-                    <img class="last" src="${baseUrl}/images/btn_last.png" alt="last" title="Last">
+                    <img class="next" src="${baseUrl}/resources/images/btn_next.png" alt="next" title="Next">
+                    <img class="last" src="${baseUrl}/resources/images/btn_last.png" alt="last" title="Last">
 					<select class="pagesize"> 
 						<option value="10" selected>10</option>
 						<option value="20">20</option> 
@@ -131,11 +130,10 @@
 		<tbody>
 			<#list userObjectList as user>
 			<tr>
-				<td><a href="${baseUrl}/admin/user/${user.userName!"unknown-username"}">${user.userName!""}</a></td>
+				<td><a href="${baseUrl}/user/${user.identifier!"unknown-username"}">${user.identifier!""}</a></td>
 				<td>${user.firstName!""} ${user.lastName!""}</td>
-				<td>${user.affiliation!""}</td>
-				<td>${user.repositoryRole.description!""}</td>
-				<td>${user.status!""}</td>
+				<td>${user.organization!""}</td>
+				<td>${user.userStatus!""}</td>
 				<#if user.lastLoginTimeAsDate??>
 					<td>${user.lastLoginTimeAsDate?datetime?string.medium_short}</td>
 				<#else>
@@ -151,8 +149,8 @@
 
 </div>  <!-- content pane -->
 
-<script type="text/javascript" src="${baseUrl}/scripts/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="${baseUrl}/scripts/jquery.tablesorter.pager.js"></script>
+<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="${baseUrl}/resources/scripts/jquery.tablesorter.pager.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() { 
 		$("#table")
@@ -164,7 +162,7 @@
 	});
 </script>
 
-<script type="text/javascript" src="${baseUrl}/scripts/animatedcollapse.js">
+<script type="text/javascript" src="${baseUrl}/resources/scripts/animatedcollapse.js">
 /***********************************************
 * Animated Collapsible DIV v2.4- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
 * This notice MUST stay intact for legal use

@@ -4,6 +4,7 @@
 package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +47,8 @@ public class UserListResourceImpl extends AbstractPoddResourceImpl
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
+     * FIXME: incomplete implementation
+     * 
      * Display the User List HTML page 
      */
     @Get(":html")
@@ -64,9 +67,13 @@ public class UserListResourceImpl extends AbstractPoddResourceImpl
         
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final List<RestletUtilUser> users = realm.getUsers();
-        dataModel.put("users", users);
+        final List<PoddUser> poddUsers = new ArrayList<PoddUser>();
+        for (RestletUtilUser restletUtilUser : users)
+        {
+            poddUsers.add((PoddUser)restletUtilUser);
+        }
         
-        //FIXME: incomplete implementation
+        dataModel.put("userObjectList", poddUsers);
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page

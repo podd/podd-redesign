@@ -47,6 +47,22 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals("", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
     }
+
+    @Test
+    public void testGetUsersHtml() throws Exception
+    {
+        final ClientResource userListRolesClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userListRolesClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        System.out.println(body);
+        this.assertFreemarker(body);
+        
+    }
     
     @Test
     public void testGetUsersRdf() throws Exception
