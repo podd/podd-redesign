@@ -100,7 +100,7 @@ public interface PoddWebConstants
     /**
      * Path to "list users" page
      */
-    public static final String PATH_USER_LIST = "admin/user/list/";
+    public static final String PATH_USER_LIST = "admin/user/list";
     
     /**
      * Path to list artifacts
