@@ -78,7 +78,7 @@ public abstract class AbstractDataReferenceManagerTest
         this.testRepository.initialize();
         
         this.testRepositoryConnection = this.testRepository.getConnection();
-        this.testRepositoryConnection.begin(); // Transaction per each test
+        // this.testRepositoryConnection.begin(); // Transaction per each test
         
         this.testDataReferenceManager.setDataProcessorRegistry(this.testRegistry);
     }
@@ -87,7 +87,7 @@ public abstract class AbstractDataReferenceManagerTest
     public void tearDown() throws Exception
     {
         this.testRegistry.clear();
-        this.testRepositoryConnection.rollback();
+        // this.testRepositoryConnection.rollback();
         this.testRepositoryConnection.close();
         this.testRepository.shutDown();
         
