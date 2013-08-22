@@ -25,19 +25,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
-import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
-import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.Form;
@@ -53,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
+import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.DataReferenceConstants;
 import com.github.podd.client.api.PoddClient;
@@ -287,7 +287,8 @@ public class RestletPoddClientImpl implements PoddClient
                 throw new PoddClientException("Did not receive valid response from server");
             }
             
-            RDFFormat format = Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
+            final RDFFormat format =
+                    Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
             
             return OntologyUtils.modelToOntologyIDs(Rio.parse(stream, "", format));
         }
@@ -335,16 +336,17 @@ public class RestletPoddClientImpl implements PoddClient
                 throw new PoddClientException("Did not receive valid response from server");
             }
             
-            RDFFormat format = Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
+            final RDFFormat format =
+                    Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
             
-            Model model = Rio.parse(stream, "", format);
+            final Model model = Rio.parse(stream, "", format);
             
             DebugUtils.printContents(model);
             
-            Set<Value> aliases = model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objects();
+            final Set<Value> aliases = model.filter(null, PoddRdfConstants.PODD_BASE_HAS_ALIAS, null).objects();
             
-            List<String> aliasResults = new ArrayList<String>(aliases.size());
-            for(Value nextAlias : aliases)
+            final List<String> aliasResults = new ArrayList<String>(aliases.size());
+            for(final Value nextAlias : aliases)
             {
                 aliasResults.add(((Literal)nextAlias).getLabel());
             }
@@ -378,6 +380,12 @@ public class RestletPoddClientImpl implements PoddClient
         this.log.info("cookies: {}", this.currentCookies);
         
         return this.listArtifactsInternal(true, false);
+    }
+    
+    @Override
+    public Map<RestletUtilRole, Collection<URI>> listRoles() throws PoddClientException
+    {
+        throw new PoddClientException("TODO: Implement me!");
     }
     
     /*
