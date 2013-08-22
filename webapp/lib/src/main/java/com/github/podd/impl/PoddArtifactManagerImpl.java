@@ -1099,30 +1099,29 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 this.getOWLManager().removeCache(inferredOWLOntologyID);
             }
             
-            if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isOpen())
+            try
             {
-                try
-                {
-                    temporaryRepositoryConnection.close();
-                }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Found exception closing repository connection", e);
-                }
-            }
-            tempRepository.shutDown();
-            
-            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
-            {
-                try
+                if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
                 {
                     permanentRepositoryConnection.close();
                 }
-                catch(final RepositoryException e)
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Found exception closing repository connection", e);
+            }
+            try
+            {
+                if(temporaryRepositoryConnection != null && temporaryRepositoryConnection.isOpen())
                 {
-                    this.log.error("Found exception closing repository connection", e);
+                    temporaryRepositoryConnection.close();
                 }
             }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Found exception closing repository connection", e);
+            }
+            tempRepository.shutDown();
         }
     }
     
@@ -1428,7 +1427,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             format = RDFFormat.RDFXML;
         }
-
+        
         // check if the specified artifact URI refers to a managed artifact
         InferredOWLOntologyID artifactID = null;
         try
