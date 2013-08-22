@@ -168,8 +168,7 @@ public class PoddSesameRealmTest
         final String testUserId = "john@example.com";
         
         // create test user
-        final URI testUser1HomePage
-        = PoddRdfConstants.VF.createURI("http://example.org/john");
+        final URI testUser1HomePage = PoddRdfConstants.VF.createURI("http://example.org/john");
         final PoddUser testUser1 =
                 new PoddUser(testUserId, "secret".toCharArray(), "First", "Last", testUserId, PoddUserStatus.ACTIVE,
                         testUser1HomePage, "UQ", "john_ORCID_111");
@@ -180,16 +179,16 @@ public class PoddSesameRealmTest
         final String testUser2FirstName = "Jason";
         final String testUser2LastName = "Bourne";
         final PoddUser testUser2 =
-                new PoddUser(testUserId, "secret".toCharArray(), testUser2FirstName, "Bourne", testUserId, PoddUserStatus.INACTIVE,
-                        testUser2HomePage, "CSIRO", "john_ORCID_cloned22");
-
+                new PoddUser(testUserId, "secret".toCharArray(), testUser2FirstName, "Bourne", testUserId,
+                        PoddUserStatus.INACTIVE, testUser2HomePage, "CSIRO", "john_ORCID_cloned22");
+        
         // try to add another user with same identifier
         try
         {
             this.testRealm.addUser(testUser2);
             Assert.fail("Should have thrown an Exception as User identifier already exists");
         }
-        catch (RuntimeException e)
+        catch(final RuntimeException e)
         {
             Assert.assertTrue("Not the expected Exception", e.getMessage().contains("User already exists"));
         }
@@ -197,11 +196,11 @@ public class PoddSesameRealmTest
         // modify the existing User
         this.testRealm.updateUser(testUser2);
         
-        PoddUser userFromRealm = (PoddUser)this.testRealm.findUser(testUserId);
+        final PoddUser userFromRealm = (PoddUser)this.testRealm.findUser(testUserId);
         Assert.assertEquals("First name was not overwritten", testUser2FirstName, userFromRealm.getFirstName());
         Assert.assertEquals("Last name was not overwritten", testUser2LastName, userFromRealm.getLastName());
-        Assert.assertEquals("Home Page was not overwritten", testUser2HomePage, userFromRealm.getHomePage()); 
-        Assert.assertEquals("Status was not overwritten", PoddUserStatus.INACTIVE, userFromRealm.getUserStatus()); 
+        Assert.assertEquals("Home Page was not overwritten", testUser2HomePage, userFromRealm.getHomePage());
+        Assert.assertEquals("Status was not overwritten", PoddUserStatus.INACTIVE, userFromRealm.getUserStatus());
     }
     
     @Test
@@ -353,6 +352,30 @@ public class PoddSesameRealmTest
                 user2Roles.contains(PoddRoles.PROJECT_OBSERVER.getRole()));
     }
     
+    @Test
+    public void testGetUsers() throws Exception
+    {
+        // -prepare: users
+        final PoddUser user1 = this.addTestUser("john@example.com");
+        final PoddUser user2 = this.addTestUser("bob@hope.com");
+        
+        // -prepare: test objects
+        final URI object1URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:1");
+        final URI object2URI = PoddRdfConstants.VF.createURI("urn:podd:artifact:2");
+        
+        // -prepare: map Users - Roles and Objects together
+        this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
+        
+        this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
+        
+        // - get User List
+        final List<RestletUtilUser> users = this.testRealm.getUsers();
+        Assert.assertNotNull("NULL returned for user list", users);
+        Assert.assertEquals("Incorrect number of Users in list", 2, users.size());
+        Assert.assertTrue("User list did not contain user1", users.contains(user1));
+        Assert.assertTrue("User list did not contain user2", users.contains(user2));
+    }
+    
     /**
      * Test that mappings between a User, a Role and an optional Object URI can be added.
      */
@@ -448,11 +471,9 @@ public class PoddSesameRealmTest
                 this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_MEMBER.getURI());
         Assert.assertFalse(list2.isEmpty());
         Assert.assertEquals(1, list2.size());
-
         
         // unmap Project_Member Role
         this.testRealm.unmap(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
-        
         
         // verify: no PROJECT_MEMBER role mapping exists
         final List<Statement> list3 =
@@ -465,10 +486,7 @@ public class PoddSesameRealmTest
         Assert.assertFalse(list4.isEmpty());
         Assert.assertEquals(1, list4.size());
         
-        
         this.testRealm.unmap(user1, PoddRoles.PROJECT_ADMIN.getRole(), object1URI);
     }
-    
-
     
 }

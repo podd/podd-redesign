@@ -480,6 +480,8 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
+        query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_SECRET);
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_FIRSTNAME);
