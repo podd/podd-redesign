@@ -53,6 +53,16 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         }
         catch(final RepositoryException e)
         {
+            try
+            {
+                this.repository.shutDown();
+            }
+            catch(RepositoryException e1)
+            {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            
             throw new RuntimeException("Could not initialise PoddRepositoryManager with an in-memory repository");
         }
     }
