@@ -69,6 +69,7 @@ import com.github.podd.impl.file.SSHFileReferenceProcessorFactoryImpl;
 import com.github.podd.impl.purl.PoddPurlManagerImpl;
 import com.github.podd.impl.purl.UUIDPurlProcessorFactoryImpl;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;

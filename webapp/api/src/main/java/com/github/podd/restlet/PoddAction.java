@@ -25,6 +25,8 @@ import java.util.Set;
 
 import org.restlet.security.Role;
 
+import com.github.podd.utils.PoddRoles;
+
 /**
  * Provides constants to use in the authentication interface, including whether authentication is
  * required for a particular action and what the error message should be if a request fails.

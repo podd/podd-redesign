@@ -49,12 +49,12 @@ import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;
-import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -118,7 +118,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model model = Rio.parse(inputStream, "", inputFormat);
             
-            rolesToEdit = RestletUtils.extractRoleMappings(model);
+            rolesToEdit = PoddRoles.extractRoleMappings(model);
         }
         catch(IOException | RDFParseException | UnsupportedRDFormatException e1)
         {
@@ -294,7 +294,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             final Map<RestletUtilRole, Collection<URI>> mappings = RestletUtils.getUsersRoles(realm, poddUser);
             final Model results = new LinkedHashModel();
             
-            RestletUtils.dumpRoleMappings(mappings, results);
+            PoddRoles.dumpRoleMappings(mappings, results);
             
             // - prepare response
             final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);

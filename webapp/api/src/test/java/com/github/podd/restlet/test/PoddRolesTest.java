@@ -22,7 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.ansell.restletutils.RestletUtilRole;
-import com.github.podd.restlet.PoddRoles;
+import com.github.podd.utils.PoddRoles;
 
 /**
  * @author kutila

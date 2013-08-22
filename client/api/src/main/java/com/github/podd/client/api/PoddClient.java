@@ -20,12 +20,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 
+import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRoles;
 
 /**
  * An interface defining the operations that are currently implemented by the PODD Web Services.
@@ -129,6 +133,17 @@ public interface PoddClient
      * @return True if the client was logged in after the last request, and false otherwise.
      */
     boolean isLoggedIn();
+    
+    /**
+     * List the roles that have been assigned to the currently logged in user.
+     * 
+     * @return A map of {@link RestletUtilRole}s identifying PODD repository and project roles.
+     *         Repository roles are indicated by null entries in the collections mapped to each
+     *         role. Repository roles can further be verified by checking
+     *         {@link PoddRoles#getRepositoryRoles()}.
+     * @throws PoddClientException
+     */
+    Map<RestletUtilRole, Collection<URI>> listRoles() throws PoddClientException;
     
     /**
      * 

@@ -186,7 +186,7 @@ public abstract class AbstractPoddOWLManagerTest
         this.testRepository = new SailRepository(new MemoryStore());
         this.testRepository.initialize();
         this.testRepositoryConnection = this.testRepository.getConnection();
-        this.testRepositoryConnection.begin();
+        // this.testRepositoryConnection.begin();
     }
     
     /**
@@ -195,7 +195,7 @@ public abstract class AbstractPoddOWLManagerTest
     @After
     public void tearDown() throws Exception
     {
-        this.testRepositoryConnection.rollback();
+        // this.testRepositoryConnection.rollback();
         this.testRepositoryConnection.close();
         this.testRepository.shutDown();
         

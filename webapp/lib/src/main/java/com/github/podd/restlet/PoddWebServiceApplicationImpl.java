@@ -71,6 +71,7 @@ import com.github.podd.resources.UserListResourceImpl;
 import com.github.podd.resources.UserPasswordResourceImpl;
 import com.github.podd.resources.UserRolesResourceImpl;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;

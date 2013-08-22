@@ -595,14 +595,24 @@ public abstract class AbstractPoddArtifactManagerTest
         {
             if(this.testRepositoryConnection.isActive())
             {
-                this.testRepositoryConnection.rollback();
+                this.log.warn("Found active transaction after test");
+                //this.testRepositoryConnection.rollback();
             }
         }
         finally
         {
-            if(this.testRepositoryConnection.isOpen())
+            try
             {
-                this.testRepositoryConnection.close();
+                if(this.testRepositoryConnection.isOpen())
+                {
+                    this.testRepositoryConnection.close();
+                }
+            }
+            finally
+            {
+                this.testRepositoryManager.getRepository().shutDown();
+                this.testRepositoryManager = null;
+                this.testRepositoryConnection = null;
             }
         }
     }
@@ -1222,6 +1232,7 @@ public abstract class AbstractPoddArtifactManagerTest
         }
     }
     
+    @Ignore("TODO: Enable periodically to debug concurrency issues")
     @Test
     public final void testLoadArtifactConcurrency() throws Exception
     {
