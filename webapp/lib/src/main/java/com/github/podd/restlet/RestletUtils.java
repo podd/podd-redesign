@@ -117,18 +117,21 @@ public final class RestletUtils
      * @return A map of roles to collections of optional object URIs. If the collection contains a
      *         null element, then the role was not mapped to an object URI in at least one case.
      */
-    public static Map<RestletUtilRole, Collection<URI>> extractRoleMappings(Model model)
+    public static Map<RestletUtilRole, Collection<URI>> extractRoleMappings(Model model, URI... contexts)
     {
         final ConcurrentMap<RestletUtilRole, Collection<URI>> results = new ConcurrentHashMap<>();
         
         // extract Role Mapping info (User details are ignored as multiple users are not
         // supported)
-        for(Resource mappingUri : model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects())
+        for(Resource mappingUri : model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts)
+                .subjects())
         {
-            final URI roleUri = model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI();
+            final URI roleUri =
+                    model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null, contexts).objectURI();
             final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
             
-            final URI mappedObject = model.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
+            final URI mappedObject =
+                    model.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null, contexts).objectURI();
             
             // this.log.debug("Extracted Role <{}> with Optional Object <{}>", role.getName(),
             // mappedObject);
