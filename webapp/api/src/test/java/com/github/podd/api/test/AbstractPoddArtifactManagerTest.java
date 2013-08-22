@@ -1231,6 +1231,7 @@ public abstract class AbstractPoddArtifactManagerTest
         }
     }
     
+    @Ignore("TODO: Enable periodically to debug concurrency issues")
     @Test
     public final void testLoadArtifactConcurrency() throws Exception
     {
