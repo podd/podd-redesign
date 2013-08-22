@@ -93,6 +93,11 @@
 				<li>
 					<button type="submit">Filter</button>
 				</li>
+				
+				<li>
+					<!-- TODO: remove this message after implementing the missing features. -->
+					(Filters, paging and sorting results are not yet supported.)
+				</li>
 			</ol>
 			</div> <!-- filter content -->
 		</div>
