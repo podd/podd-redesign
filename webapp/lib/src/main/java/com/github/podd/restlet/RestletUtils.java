@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -106,6 +107,30 @@ public final class RestletUtils
         }
         
         return results;
+    }
+    
+    /**
+     * Dumps the role mappings from the given map to the given model, optionally into the given
+     * contexts.
+     */
+    public static void dumpRoleMappings(Map<RestletUtilRole, Collection<URI>> mappings, final Model model,
+            final URI... contexts)
+    {
+        for(RestletUtilRole nextRole : mappings.keySet())
+        {
+            for(URI nextObjectUri : mappings.get(nextRole))
+            {
+                BNode mappingUri = PoddRdfConstants.VF.createBNode();
+                
+                model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
+                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
+                
+                if(nextObjectUri != null)
+                {
+                    model.add(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, nextObjectUri, contexts);
+                }
+            }
+        }
     }
     
     public static Map<String, Object> getBaseDataModel(final Request nextRequest)
