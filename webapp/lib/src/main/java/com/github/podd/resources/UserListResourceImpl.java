@@ -46,21 +46,20 @@ import com.github.podd.utils.PoddWebConstants;
 public class UserListResourceImpl extends AbstractPoddResourceImpl
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
+    
     /**
      * FIXME: incomplete implementation
      * 
-     * Display the User List HTML page 
+     * Display the User List HTML page
      */
     @Get(":html")
     public Representation getUsersHtml(final Representation entity, final Variant variant) throws ResourceException
     {
         this.log.info("getUsersHtml");
-     
+        
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         this.checkAuthentication(PoddAction.OTHER_USER_READ);
-    
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "admin_listUsers.html.ftl");
@@ -69,7 +68,7 @@ public class UserListResourceImpl extends AbstractPoddResourceImpl
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final List<RestletUtilUser> users = realm.getUsers();
         final List<PoddUser> poddUsers = new ArrayList<PoddUser>();
-        for (RestletUtilUser restletUtilUser : users)
+        for(final RestletUtilUser restletUtilUser : users)
         {
             poddUsers.add((PoddUser)restletUtilUser);
         }
@@ -78,26 +77,24 @@ public class UserListResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("statusList", PoddUserStatus.values());
         dataModel.put("roleObjectList", PoddRoles.values());
         
-        
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
-
     }
     
     /**
-     * Get a list of PODD Users 
+     * Get a list of PODD Users
      */
     @Get(":rdf|rj|json|ttl")
     public Representation getUsersRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         this.log.info("getUsersRdf");
-     
+        
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         this.checkAuthentication(PoddAction.OTHER_USER_READ);
-    
+        
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final Model resultModel = this.userListToModel(realm.getUsers());
         
@@ -109,30 +106,30 @@ public class UserListResourceImpl extends AbstractPoddResourceImpl
         {
             Rio.write(resultModel, output, outputFormat);
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response", e);
         }
-        catch(UnsupportedRDFormatException e)
+        catch(final UnsupportedRDFormatException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not parse input format", e);
         }
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
-
+    
     /**
      * Convert the User Details into a Model. Role information is not included.
      * 
      * @param users
      * @return
      */
-    private Model userListToModel(List<RestletUtilUser> users)
+    private Model userListToModel(final List<RestletUtilUser> users)
     {
         final Model model = new LinkedHashModel();
-        for (RestletUtilUser u : users)
+        for(final RestletUtilUser u : users)
         {
-            final PoddUser user = (PoddUser) u;
+            final PoddUser user = (PoddUser)u;
             
             final URI userUri = user.getUri();
             model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
@@ -142,8 +139,7 @@ public class UserListResourceImpl extends AbstractPoddResourceImpl
                     PoddRdfConstants.VF.createLiteral(user.getFirstName()));
             model.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
                     PoddRdfConstants.VF.createLiteral(user.getLastName()));
-            model.add(userUri, SesameRealmConstants.OAS_USEREMAIL,
-                    PoddRdfConstants.VF.createLiteral(user.getEmail()));
+            model.add(userUri, SesameRealmConstants.OAS_USEREMAIL, PoddRdfConstants.VF.createLiteral(user.getEmail()));
             
             if(user.getHomePage() != null)
             {
@@ -158,37 +154,38 @@ public class UserListResourceImpl extends AbstractPoddResourceImpl
             
             if(user.getOrcid() != null)
             {
-                model.add(userUri, PoddRdfConstants.PODD_USER_ORCID,
-                        PoddRdfConstants.VF.createLiteral(user.getOrcid()));
+                model.add(userUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral(user.getOrcid()));
             }
             
-            if (user.getTitle() != null)
+            if(user.getTitle() != null)
             {
                 model.add(userUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(user.getTitle()));
             }
             
-            if (user.getPhone() != null)
+            if(user.getPhone() != null)
             {
                 model.add(userUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(user.getPhone()));
             }
-
-            if (user.getAddress() != null)
+            
+            if(user.getAddress() != null)
             {
-                model.add(userUri, PoddRdfConstants.PODD_USER_ADDRESS, PoddRdfConstants.VF.createLiteral(user.getAddress()));
+                model.add(userUri, PoddRdfConstants.PODD_USER_ADDRESS,
+                        PoddRdfConstants.VF.createLiteral(user.getAddress()));
             }
             
-            if (user.getPosition() != null)
+            if(user.getPosition() != null)
             {
-                model.add(userUri, PoddRdfConstants.PODD_USER_POSITION, PoddRdfConstants.VF.createLiteral(user.getPosition()));
+                model.add(userUri, PoddRdfConstants.PODD_USER_POSITION,
+                        PoddRdfConstants.VF.createLiteral(user.getPosition()));
             }
             
-            if (user.getUserStatus() != null)
+            if(user.getUserStatus() != null)
             {
                 model.add(userUri, PoddRdfConstants.PODD_USER_STATUS, user.getUserStatus().getURI());
             }
             else
             {
-                //INACTIVE by default
+                // INACTIVE by default
                 model.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
             }
         }
