@@ -17,7 +17,9 @@
 package com.github.podd.restlet;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -54,9 +56,9 @@ public enum PoddRoles implements RestletUtilRole
     /**
      * @return Retrieve PoddRoles that are Repository-wide (e.g. Administrator Role)
      */
-    public static List<PoddRoles> getRepositoryRoles()
+    public static Set<RestletUtilRole> getRepositoryRoles()
     {
-        final List<PoddRoles> result = new ArrayList<PoddRoles>();
+        final Set<RestletUtilRole> result = new HashSet<>();
         
         // NOTE: Is it worth to add an extra attribute to a PoddRole to specify whether it is
         // a Project or Repository level Role?

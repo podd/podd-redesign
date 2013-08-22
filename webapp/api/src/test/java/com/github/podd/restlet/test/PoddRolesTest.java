@@ -16,9 +16,7 @@
  */
 package com.github.podd.restlet.test;
 
-import java.util.List;
-
-
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,14 +26,14 @@ import com.github.podd.restlet.PoddRoles;
 
 /**
  * @author kutila
- *
+ * 
  */
 public class PoddRolesTest
 {
     @Test
     public void testGetRepositoryRoles() throws Exception
     {
-        final List<PoddRoles> repositoryRoles = PoddRoles.getRepositoryRoles();
+        final Set<RestletUtilRole> repositoryRoles = PoddRoles.getRepositoryRoles();
         Assert.assertEquals("Expected 2 Repository Roles", 2, repositoryRoles.size());
         
         Assert.assertTrue("Missing Admin role", repositoryRoles.contains(PoddRoles.ADMIN));
