@@ -121,7 +121,17 @@ public enum PoddAction
      */
     OTHER_USER_READ(true, "Could not retrieve other user details", Collections.singleton(PoddRoles.ADMIN.getRole()),
             false),
-    
+
+    /**
+     * An action by a user asking to list other users.
+     * 
+     * By default administrators can perform this action while project creators and project
+     * administrators can also list other users for the purpose of assigning them Roles in their
+     * projects.
+     */
+    OTHER_USER_SEARCH(true, "Could not find other users", new HashSet<Role>(Arrays.asList(
+            PoddRoles.PROJECT_CREATOR.getRole(), PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), false),
+
     /**
      * An action by a user asking to edit their details
      * 
