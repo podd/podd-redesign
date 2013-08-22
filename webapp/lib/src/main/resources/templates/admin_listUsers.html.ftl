@@ -59,9 +59,9 @@
 						<#if roleObjectList??>
                         <#list roleObjectList as role>
 							<#if selectedRole?? && selectedRole == role.name!"">
-								<option value="${role.name!""}" selected>${role.description!""}</option>
+								<option value="${role.URI!""}" selected>${role.getName()!""}</option>
 							<#else>
-								<option value="${role.name!""}">${role.description!""}</option>
+								<option value="${role.URI!""}">${role.getName()!""}</option>
 							</#if>
 						</#list>
                         </#if>
@@ -80,9 +80,9 @@
                         <#if statusList??>
 						<#list statusList as status>
 							<#if selectedStatus?? && selectedStatus == status>
-								<option value="${status}" selected>${status}</option>
+								<option value="${status.URI}" selected>${status.label}</option>
 							<#else>
-								<option value="${status}">${status}</option>
+								<option value="${status.URI}">${status.label}</option>
 							</#if>
 						</#list>
                         </#if>

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddAction;
+import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
@@ -72,8 +73,11 @@ public class UserListResourceImpl extends AbstractPoddResourceImpl
         {
             poddUsers.add((PoddUser)restletUtilUser);
         }
-        
         dataModel.put("userObjectList", poddUsers);
+        
+        dataModel.put("statusList", PoddUserStatus.values());
+        dataModel.put("roleObjectList", PoddRoles.values());
+        
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page
