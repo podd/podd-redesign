@@ -187,9 +187,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                         model.filter(null, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null).subjects();
                 for(final Resource subjectUri : subjectUris)
                 {
-                    final RepositoryResult<Statement> statements =
-                            conn.getStatements(subjectUri, null, null, false, context);
-                    if(statements.hasNext())
+                    if(conn.hasStatement(subjectUri, null, null, false, context))
                     {
                         throw new FileRepositoryIncompleteException(model,
                                 "Subject URIs used in Model already exist in Management Graph");
