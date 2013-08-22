@@ -176,6 +176,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         try
         {
             connection = this.getRepositoryManager().getRepository().getConnection();
+            connection.begin();
             
             List<InferredOWLOntologyID> requestedArtifactIds =
                     this.getSesameManager().getAllOntologyVersions(artifactId.getOntologyIRI(), connection,
@@ -194,7 +195,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 }
             }
             
-            connection.begin();
             this.getSesameManager().deleteOntologies(requestedArtifactIds, connection,
                     this.getRepositoryManager().getArtifactManagementGraph());
             connection.commit();
