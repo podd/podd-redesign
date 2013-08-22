@@ -417,7 +417,7 @@ podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRow
 podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
 
 	theLink.click(function(event) {
-		$('#dialog').dialog('close');
+		$('#add_role_dialog').dialog('close');
 
 		var option = $('option:selected', dropDown);
 		if (typeof option !== 'undefined' && option.val() !== '') {
@@ -434,12 +434,7 @@ podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
 		        class : 'deleteLink',
 		        click : function(event) {
 					     	var tr = $(this).closest('tr');
-					     	
-					     	podd.submitUserRoleDelete(podd.userName, tr);
-					     	
-				        	tr.fadeOut(400, function(){
-				            	tr.remove();
-				        	});
+					     	podd.showDeleteRoleConfirmDialog(podd.userName, tr);
 				        	return false;
 		        		} 
 		    });
@@ -452,7 +447,7 @@ podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
 		    
 			var tr = $('<tr>');
 			tr.append($('<td></td>').append(span));
-			tr.append('<td></td>');
+			tr.append('<td>Repository wide role</td>');
 			tr.append($('<td></td>').append(deleteLink));
 			$('#roleTable > tbody:last').append(tr);
 			
@@ -1946,7 +1941,7 @@ podd.showAddRoleDialog = function() {
     div.append('<br><br>');
     div.append(continueLink);
     
-	var dialog = $("#dialog").dialog({
+	var dialog = $("#add_role_dialog").dialog({
 		autoOpen : false,
 		modal: true,
 	    dialogClass: "dialog_class",
@@ -1959,6 +1954,65 @@ podd.showAddRoleDialog = function() {
     
     podd.debug('[showAddRole] finished');
 };
+
+/**
+ * Display a Dialog asking for confirmation of deleting a PODD User's Role.
+ */
+podd.showDeleteRoleConfirmDialog = function(userName, rowToDelete) {
+	
+	var roleUri = $('.role_span', rowToDelete).attr('value');
+	var roleName = $('.role_span', rowToDelete).text();
+	
+    var confirmationMessage = 'Delete Role "' + roleName + '"?';
+    
+    var confirmLink = $('<a>', {
+        name : 'name_delete_role_link',
+        text : 'Confirm', 
+        class : 'button',
+        click : function(){
+        	podd.debug('Clicked Confirmation Link');
+        	$('#delete_role_dialog').dialog('close');
+        	
+         	podd.submitUserRoleDelete(userName, roleUri);
+         	rowToDelete.fadeOut(400, function(){
+         		rowToDelete.remove();
+        	});
+        }
+    });
+    
+    var cancelLink = $('<a>', {
+        name : 'name_cancel_delete_role_link',
+        text : 'Cancel', 
+        class : 'button',
+        click : function(){
+        	$('#delete_role_dialog').dialog('close');
+        }
+    });
+    
+    var div = $('<div/>', {
+    	id : 'buttonwrapper',
+        name : 'delete_role'
+    });
+    
+    div.append('<p>' + confirmationMessage + '</p>')
+    div.append('<br><br>');
+    div.append(confirmLink);
+    div.append(cancelLink);
+    
+	var dialog = $("#delete_role_dialog").dialog({
+		autoOpen : false,
+		modal: true,
+	    dialogClass: "dialog_class",
+	    close: function () {
+    		div.remove();
+  		}  
+	});
+	dialog.append(div);
+	dialog.dialog("open");
+    
+    podd.debug('[showDeleteRoleConfirmDialog] finished');
+};
+
 
 /**
  * Invoke the Edit Artifact Service to update the artifact with changed object
@@ -2270,15 +2324,14 @@ podd.submitUserPassword = function() {
  * @param deletedRow
  *            {object} Table Row containing Role to be deleted
  */
-podd.submitUserRoleDelete = function(userName, deletedRow) {
+podd.submitUserRoleDelete = function(userName, roleUri) {
 
 	podd.debug('[submitUserRoleDelete] ' + userName);
 	var pathToSubmitTo = PATH_USER_ROLES + userName + '?delete=true';
 
 	var roleDatabank = podd.newDatabank();
 
-	if (deletedRow !== undefined) {
-		var roleUri = $('.role_span', deletedRow).attr('value');
+	if (roleUri !== undefined) {
 		podd.debug('[submitUserRoleDelete] role = ' + roleUri);
 
 		var mappingUri = $.rdf.blank('_:mapping34');

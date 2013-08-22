@@ -28,14 +28,8 @@
 		
 		// Add handler for deleting Roles populated at page load time
 	    $(".deleteLinkStatic").click(function() {
-	    
 	     	var tr = $(this).closest('tr');
-	     	
-	     	podd.submitUserRoleDelete(podd.userName, tr);
-	     	
-        	tr.fadeOut(400, function(){
-            	tr.remove();
-        	});
+	     	podd.showDeleteRoleConfirmDialog(podd.userName, tr);
         	return false;
 	    });
 
@@ -56,7 +50,8 @@
 	});
 </script>
 
-<div id="dialog" title="Add Role"></div>
+<div id="add_role_dialog" title="Add Role"></div>
+<div id="delete_role_dialog" title="Delete Role"></div>
 
 <div id="title_pane">
     <h3>Change User Roles</h3>
