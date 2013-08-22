@@ -17,14 +17,19 @@
 package com.github.podd.restlet;
 
 import java.io.StringWriter;
+import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -49,12 +54,19 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.Role;
 import org.restlet.security.User;
+import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
+import com.github.podd.api.PoddArtifactManager;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddObjectLabel;
+import com.github.podd.utils.PoddObjectLabelImpl;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddUser;
 
 import freemarker.template.Configuration;
 
@@ -68,6 +80,30 @@ import freemarker.template.Configuration;
 public final class RestletUtils
 {
     private static final Logger log = LoggerFactory.getLogger(RestletUtils.class);
+    
+    /**
+     * Dumps the role mappings from the given map to the given model, optionally into the given
+     * contexts.
+     */
+    public static void dumpRoleMappings(final Map<RestletUtilRole, Collection<URI>> mappings, final Model model,
+            final URI... contexts)
+    {
+        for(final RestletUtilRole nextRole : mappings.keySet())
+        {
+            for(final URI nextObjectUri : mappings.get(nextRole))
+            {
+                final BNode mappingUri = PoddRdfConstants.VF.createBNode();
+                
+                model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
+                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
+                
+                if(nextObjectUri != null)
+                {
+                    model.add(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, nextObjectUri, contexts);
+                }
+            }
+        }
+    }
     
     /**
      * Extracts role mappings, optionally to object URIs, from the given RDF statements.
@@ -107,30 +143,6 @@ public final class RestletUtils
         }
         
         return results;
-    }
-    
-    /**
-     * Dumps the role mappings from the given map to the given model, optionally into the given
-     * contexts.
-     */
-    public static void dumpRoleMappings(Map<RestletUtilRole, Collection<URI>> mappings, final Model model,
-            final URI... contexts)
-    {
-        for(RestletUtilRole nextRole : mappings.keySet())
-        {
-            for(URI nextObjectUri : mappings.get(nextRole))
-            {
-                BNode mappingUri = PoddRdfConstants.VF.createBNode();
-                
-                model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
-                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
-                
-                if(nextObjectUri != null)
-                {
-                    model.add(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, nextObjectUri, contexts);
-                }
-            }
-        }
     }
     
     public static Map<String, Object> getBaseDataModel(final Request nextRequest)
@@ -245,6 +257,83 @@ public final class RestletUtils
     {
         // The template representation is based on Freemarker.
         return new TemplateRepresentation(templateName, freemarkerConfiguration, dataModel, mediaType);
+    }
+    
+    public static Map<RestletUtilRole, Collection<URI>> getUsersRoles(final PoddSesameRealm realm,
+            final PoddUser poddUser)
+    {
+        final ConcurrentMap<RestletUtilRole, Collection<URI>> results = new ConcurrentHashMap<>();
+        
+        // extract Role Mapping info (User details are ignored as multiple users are not
+        // supported)
+        final Collection<Entry<Role, URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
+        for(final Entry<Role, URI> entry : rolesWithObjectMappings)
+        {
+            final RestletUtilRole role = PoddRoles.getRoleByName(entry.getKey().getName());
+            final URI artifactUri = entry.getValue();
+            
+            Collection<URI> nextObjectUris = new HashSet<>();
+            final Collection<URI> putIfAbsent = results.putIfAbsent(role, nextObjectUris);
+            if(putIfAbsent != null)
+            {
+                nextObjectUris = putIfAbsent;
+            }
+            nextObjectUris.add(artifactUri);
+        }
+        
+        return results;
+    }
+    
+    /**
+     * Retrieve the Roles that are mapped to this User, together with details of any optional mapped
+     * objects.
+     * 
+     * @param realm
+     * @param poddUser
+     *            The PODD User whose Roles are requested
+     */
+    public static List<Entry<RestletUtilRole, PoddObjectLabel>> getUsersRoles(final PoddSesameRealm realm,
+            final PoddUser poddUser, final PoddArtifactManager artifactManager)
+    {
+        final Map<RestletUtilRole, Collection<URI>> roles = RestletUtils.getUsersRoles(realm, poddUser);
+        
+        final List<Entry<RestletUtilRole, PoddObjectLabel>> results =
+                new LinkedList<Entry<RestletUtilRole, PoddObjectLabel>>();
+        
+        for(final RestletUtilRole role : roles.keySet())
+        {
+            for(final URI artifactUri : roles.get(role))
+            {
+                PoddObjectLabel poddObjectLabel = null;
+                
+                if(artifactUri != null)
+                {
+                    try
+                    {
+                        final InferredOWLOntologyID artifact = artifactManager.getArtifact(IRI.create(artifactUri));
+                        final List<PoddObjectLabel> topObjectLabels =
+                                artifactManager.getTopObjectLabels(Arrays.asList(artifact));
+                        if(!topObjectLabels.isEmpty())
+                        {
+                            poddObjectLabel = topObjectLabels.get(0);
+                        }
+                        else
+                        {
+                            RestletUtils.log.error("Failed to find label for artifact, returning URI as label");
+                            poddObjectLabel = new PoddObjectLabelImpl(artifact, artifactUri, artifactUri.stringValue());
+                        }
+                    }
+                    catch(OpenRDFException | UnmanagedArtifactIRIException e)
+                    {
+                        // either the artifact mapped to this Role does not exist, or a Label for it
+                        // could not be retrieved
+                        RestletUtils.log.warn("Failed to retrieve Role Mapped Object [{}]", artifactUri);
+                    }
+                }
+                results.add(new AbstractMap.SimpleEntry<RestletUtilRole, PoddObjectLabel>(role, poddObjectLabel));
+            }
+        }
+        return results;
     }
     
     /**
