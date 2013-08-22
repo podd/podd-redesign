@@ -1269,16 +1269,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         finally
         {
             // release resources
-            if(repositoryConnection != null && repositoryConnection.isOpen())
+            try
             {
-                try
+                if(repositoryConnection != null && repositoryConnection.isOpen())
                 {
                     repositoryConnection.close();
                 }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Found exception closing repository connection", e);
-                }
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Found exception closing repository connection", e);
             }
         }
     }
