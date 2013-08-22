@@ -54,7 +54,7 @@
         <div id="buttonwrapper">
             <a href="${baseUrl}/user/edit/${requestedUser.identifier!"unknown-username"}">Edit User</a>
             <#if isAdmin?? && isAdmin>
-            	<a href="${baseUrl}/user/editroles/${requestedUser.identifier!"unknown-username"}">Manage Roles</a>
+            	<a href="${baseUrl}/user/roles/${requestedUser.identifier!"unknown-username"}">Manage Roles</a>
             </#if>
             <a href="${baseUrl}/user/editpwd/${requestedUser.identifier!"unknown-username"}">Change Password</a>
             <#if isAdmin?? && isAdmin && authenticatedUsername != requestedUser.identifier>

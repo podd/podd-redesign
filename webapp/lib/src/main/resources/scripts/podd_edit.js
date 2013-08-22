@@ -29,6 +29,7 @@ var RDFS_LABEL = 'http://www.w3.org/2000/01/rdf-schema#label';
 
 var DETAILS_LIST_Selector = '#details ol';
 
+var PATH_USER_ROLES = '/user/roles/';
 
 var PODD_CREATED_AT = '<http://purl.org/podd/ns/poddBase#createdAt>';
 var PODD_LAST_MODIFIED = '<http://purl.org/podd/ns/poddBase#lastModified>';
@@ -2272,7 +2273,7 @@ podd.submitUserPassword = function() {
 podd.submitUserRoleDelete = function(userName, deletedRow) {
 
 	podd.debug('[submitUserRoleDelete] ' + userName);
-	var pathToSubmitTo = '/user/editroles/' + userName + '?delete=true';
+	var pathToSubmitTo = PATH_USER_ROLES + userName + '?delete=true';
 
 	var roleDatabank = podd.newDatabank();
 
@@ -2330,7 +2331,7 @@ podd.submitUserRoleDelete = function(userName, deletedRow) {
 podd.submitUserRoleAdd = function(userName, roleUri) {
 	
 	podd.debug('[submitUserRoles] ' + userName);
-	var pathToSubmitTo = '/user/editroles/' + userName;
+	var pathToSubmitTo = PATH_USER_ROLES + userName;
 
 	var roleDatabank = podd.newDatabank(); 
 	
