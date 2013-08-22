@@ -38,9 +38,9 @@ import org.restlet.security.Role;
 
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.PoddSesameRealmImpl;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
 

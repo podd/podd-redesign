@@ -32,9 +32,9 @@ import org.openrdf.model.vocabulary.RDF;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.podd.restlet.PoddRoles;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddRoles;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
