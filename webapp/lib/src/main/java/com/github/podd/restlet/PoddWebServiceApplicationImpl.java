@@ -67,6 +67,7 @@ import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserAddResourceImpl;
 import com.github.podd.resources.UserDetailsResourceImpl;
 import com.github.podd.resources.UserEditResourceImpl;
+import com.github.podd.resources.UserListResourceImpl;
 import com.github.podd.resources.UserPasswordResourceImpl;
 import com.github.podd.resources.UserRolesResourceImpl;
 import com.github.podd.utils.PoddRdfConstants;
@@ -329,6 +330,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
                 PoddWebConstants.PATH_USER_DETAILS + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
         this.log.debug("attaching user details service to path={}", userDetailsPath);
         router.attach(userDetailsPath, UserDetailsResourceImpl.class);
+        
+        // Add a route for List Users page.
+        final String userListPath = PoddWebConstants.PATH_USER_LIST;
+        this.log.debug("attaching user list service to path={}", userListPath);
+        router.attach(userListPath, UserListResourceImpl.class);
         
         // Add a route for Add User page.
         final String userAddPath = PoddWebConstants.PATH_USER_ADD;
