@@ -668,7 +668,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 while(queryResult.hasNext())
                 {
                     BindingSet bindingSet = queryResult.next();
-
+                    
                     final Role role = this.buildRoleFromSparqlResult(bindingSet);
                     
                     if(!bindingSet.hasBinding(PARAM_USER_URI))
@@ -700,13 +700,16 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         }
         finally
         {
-            try
+            if(conn != null)
             {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Failure to close connection", e);
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Failure to close connection", e);
+                }
             }
         }
         
@@ -766,13 +769,16 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         }
         finally
         {
-            try
+            if(conn != null)
             {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Failure to close connection", e);
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Failure to close connection", e);
+                }
             }
         }
         
