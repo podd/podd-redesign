@@ -1148,7 +1148,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                         repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2.toString());
                 graphQuery2.setBinding("propertyUri", property);
                 
-                this.log.info("Created SPARQL {} \n   with propertyUri bound to {}", sb2, property);
+                this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}", sb2, property);
                 
                 final Model queryResults2 = this.executeGraphQuery(graphQuery2, contexts);
                 results.addAll(queryResults2);
