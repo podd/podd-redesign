@@ -239,6 +239,8 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             final URI mappedUri = entry.getValue();
             
             PoddAction action = PoddAction.PROJECT_ROLE_EDIT;
+            // FIXME: The following will never be true as PoddRoles objects are distinct from
+            // Restlet Role objects
             if(PoddRoles.getRepositoryRoles().contains(role))
             {
                 action = PoddAction.REPOSITORY_ROLE_EDIT;
@@ -275,10 +277,9 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                 Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         try
         {
-            final Model model = new LinkedHashModel();
-            model.add(poddUser.getUri(), SesameRealmConstants.OAS_USERIDENTIFIER,
-                    PoddRdfConstants.VF.createLiteral(poddUser.getIdentifier()));
-            Rio.write(model, output, outputFormat);
+            Rio.write(Arrays.asList(PoddRdfConstants.VF.createStatement(poddUser.getUri(),
+                    SesameRealmConstants.OAS_USERIDENTIFIER,
+                    PoddRdfConstants.VF.createLiteral(poddUser.getIdentifier()))), output, outputFormat);
         }
         catch(final OpenRDFException e)
         {
