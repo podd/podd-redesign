@@ -252,6 +252,12 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not parse input");
         }
         
+        if(rolesToEdit.isEmpty())
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Did not specify any role edits in body of request");
+        }
+        
         // - check authorization for each Role mapping
         for(RestletUtilRole role : rolesToEdit.keySet())
         {
