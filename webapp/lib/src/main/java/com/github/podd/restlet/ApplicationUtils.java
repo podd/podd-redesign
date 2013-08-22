@@ -184,7 +184,7 @@ public class ApplicationUtils
         return result;
     }
     
-    public static Repository getNewRepository()
+    public static Repository getNewRepository() throws RepositoryException
     {
         // FIXME: Enable this before deploying
         final String repositoryUrl = ""; // PropertyUtil.getProperty(OasProperties.PROPERTY_SESAME_URL,
@@ -206,6 +206,7 @@ public class ApplicationUtils
             }
             catch(final RepositoryException ex)
             {
+                repository.shutDown();
                 throw new RuntimeException("Could not initialise Sesame In Memory repository");
             }
         }
@@ -223,6 +224,7 @@ public class ApplicationUtils
             }
             catch(final RepositoryException ex)
             {
+                repository.shutDown();
                 throw new RuntimeException("Could not initialise Sesame HTTP repository with URL=" + repositoryUrl);
             }
         }
@@ -364,7 +366,6 @@ public class ApplicationUtils
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
-        
         
         final URI testAdminUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testAdmin");
         final PoddUser testAdminUser =
