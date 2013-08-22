@@ -17,15 +17,26 @@
 package com.github.podd.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
+import org.openrdf.model.BNode;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.RDF;
 import org.restlet.security.Role;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
+import com.github.ansell.restletutils.SesameRealmConstants;
 
 /**
  * The Roles available for PODD users.
@@ -41,7 +52,7 @@ public enum PoddRoles implements RestletUtilRole
     
     PROJECT_CREATOR("Project Creator", "A User who can create new projects",
             "http://purl.org/podd/ns/poddUser#RoleTopObjectCreator", true),
-            
+    
     PROJECT_MEMBER("Project Member", "A user who is a member of a particular project",
             "http://purl.org/podd/ns/poddUser#RoleTopObjectMember", true),
     
@@ -52,7 +63,7 @@ public enum PoddRoles implements RestletUtilRole
             "http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator", true),
     
     ;
-
+    
     /**
      * @return Retrieve PoddRoles that are Repository-wide (e.g. Administrator Role)
      */
@@ -66,7 +77,7 @@ public enum PoddRoles implements RestletUtilRole
         result.add(PROJECT_CREATOR);
         
         return result;
-    }    
+    }
     
     public static RestletUtilRole getRoleByName(final String name)
     {
@@ -107,6 +118,8 @@ public enum PoddRoles implements RestletUtilRole
         
         return result;
     }
+    
+    private final static Logger log = LoggerFactory.getLogger(PoddRoles.class);
     
     private final Role role;
     
@@ -162,6 +175,70 @@ public enum PoddRoles implements RestletUtilRole
     public boolean isAssignable()
     {
         return this.isAssignable;
+    }
+    
+    /**
+     * Dumps the role mappings from the given map to the given model, optionally into the given
+     * contexts.
+     */
+    public static void dumpRoleMappings(final Map<RestletUtilRole, Collection<URI>> mappings, final Model model,
+            final URI... contexts)
+    {
+        for(final RestletUtilRole nextRole : mappings.keySet())
+        {
+            for(final URI nextObjectUri : mappings.get(nextRole))
+            {
+                final BNode mappingUri = PoddRdfConstants.VF.createBNode();
+                
+                model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
+                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
+                
+                if(nextObjectUri != null)
+                {
+                    model.add(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, nextObjectUri, contexts);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Extracts role mappings, optionally to object URIs, from the given RDF statements.
+     * <p>
+     * NOTE: This method does not fail if Repository roles contain object URIs or if Project Roles
+     * do not contain object URIs. The user must determine when and how to fail in these cases.
+     * 
+     * @param model
+     *            A set of RDF statements defining role mappings
+     * @return A map of roles to collections of optional object URIs. If the collection contains a
+     *         null element, then the role was not mapped to an object URI in at least one case.
+     */
+    public static Map<RestletUtilRole, Collection<URI>> extractRoleMappings(final Model model, final URI... contexts)
+    {
+        final ConcurrentMap<RestletUtilRole, Collection<URI>> results = new ConcurrentHashMap<>();
+        
+        // extract Role Mapping info (User details are ignored as multiple users are not
+        // supported)
+        for(final Resource mappingUri : model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts)
+                .subjects())
+        {
+            final URI roleUri =
+                    model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null, contexts).objectURI();
+            final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
+            
+            final URI mappedObject =
+                    model.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null, contexts).objectURI();
+            
+            log.debug("Extracted Role <{}> with Optional Object <{}>", role.getName(), mappedObject);
+            Collection<URI> nextObjectUris = new HashSet<>();
+            final Collection<URI> putIfAbsent = results.putIfAbsent(role, nextObjectUris);
+            if(putIfAbsent != null)
+            {
+                nextObjectUris = putIfAbsent;
+            }
+            nextObjectUris.add(mappedObject);
+        }
+        
+        return results;
     }
     
 }
