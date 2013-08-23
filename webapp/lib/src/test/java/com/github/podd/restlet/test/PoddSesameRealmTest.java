@@ -393,7 +393,7 @@ public class PoddSesameRealmTest
         
         // - INACTIVE users
         final List<PoddUser> inactiveUsers = this.testRealm.getUserByStatus(PoddUserStatus.INACTIVE, false, 10, 0);
-        Assert.assertEquals("Not the expected number of active Users", 0, inactiveUsers.size());
+        Assert.assertEquals("Not the expected number of inactive Users", 0, inactiveUsers.size());
         
         // - order by DESC(identifier) and limit of 3
         final List<PoddUser> filteredUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, true, 3, 0);
@@ -406,6 +406,40 @@ public class PoddSesameRealmTest
         Assert.assertEquals("Results not in ascending order", "charles@hope.com", offsetUsers.get(0).getIdentifier());
     }
     
+    @Test
+    public void testSearchUser() throws Exception
+    {
+        // -prepare: users
+        this.addTestUser("albert@hope.com");
+        this.addTestUser("bob@hope.com");
+        this.addTestUser("charles@hope.com");
+        this.addTestUser("david@hope.com");
+        this.addTestUser("elmo@hope.com");
+        
+        // - users matching search term 'b'
+        final List<PoddUser> activeUsers = this.testRealm.searchUser("b", null, false, 10, 0);
+        Assert.assertEquals("Not the expected number of Users", 2, activeUsers.size());
+        Assert.assertEquals("Results not in ascending order", "albert@hope.com", activeUsers.get(0).getIdentifier());
+        Assert.assertEquals("Results not in ascending order", "bob@hope.com", activeUsers.get(1).getIdentifier());
+
+        // - INACTIVE users matching search term 'b'
+        final List<PoddUser> inactiveUsers = this.testRealm.searchUser("b", PoddUserStatus.INACTIVE, false, 10, 0);
+        Assert.assertEquals("Not the expected number of Users", 0, inactiveUsers.size());
+        
+        // - users matching search term "dav" and ACTIVE
+        final List<PoddUser> filteredUsers = this.testRealm.searchUser("dav", PoddUserStatus.ACTIVE, true, -1, 0);
+        Assert.assertEquals("Not the expected number of matching Users", 1, filteredUsers.size());
+        Assert.assertEquals("Not the expected result", "david@hope.com", filteredUsers.get(0).getIdentifier());
+
+        // - all users with NULL
+        final List<PoddUser> allUsers = this.testRealm.searchUser(null, null, false, -1, 0);
+        Assert.assertEquals("Not the expected number of total Users", 5, allUsers.size());
+        
+        // - all users with empty searchTerm
+        final List<PoddUser> allUsers2 = this.testRealm.searchUser("", null, false, -1, 0);
+        Assert.assertEquals("Not the expected number of total Users", 5, allUsers2.size());
+    }
+
     /**
      * Test that mappings between a User, a Role and an optional Object URI can be added.
      */

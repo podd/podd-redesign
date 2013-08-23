@@ -763,7 +763,119 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         return query.toString();
     }
 
-    
+    protected String buildSparqlQueryToSearchUsers(final PoddUserStatus status, final String orderByField,
+            final boolean isDescending, final int limit, final int offset)
+    {
+        this.log.debug("Building SPARQL query");
+        
+        final StringBuilder query = new StringBuilder();
+        
+        query.append(" SELECT ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_SECRET);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_FIRSTNAME);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_LASTNAME);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_EMAIL);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_STATUS);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
+        
+        
+        query.append(" WHERE ");
+        query.append(" { ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" a <" + SesameRealmConstants.OAS_USER + "> . ");
+        
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + SesameRealmConstants.OAS_USERIDENTIFIER + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
+        query.append(" . ");
+
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddRdfConstants.PODD_USER_ORGANIZATION + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
+        query.append(" . } ");
+        
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_FIRSTNAME);
+        query.append(" . } ");
+        
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + SesameRealmConstants.OAS_USERLASTNAME + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_LASTNAME);
+        query.append(" . } ");
+        
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + SesameRealmConstants.OAS_USEREMAIL + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_EMAIL);
+        query.append(" . } ");
+        
+        // return a dummy password
+        query.append(" VALUES ?" + PoddSesameRealm.PARAM_USER_SECRET + " { \"not_available\" } . ");
+        
+        // filter by Status if provided
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddRdfConstants.PODD_USER_STATUS + "> ");
+        if (status == null)
+        {
+            query.append(" ?");
+            query.append(PoddSesameRealm.PARAM_USER_STATUS);
+        }
+        else
+        {
+            query.append(" <" + status.getURI() + "> ");
+        }
+        query.append(" . ");
+        
+        // filter for "searchTerm" in label
+        query.append(" FILTER(CONTAINS( LCASE(?" + PoddSesameRealm.PARAM_USER_IDENTIFIER + ") , LCASE(?"
+                + PoddSesameRealm.PARAM_SEARCH_TERM + ") )) ");
+        
+        query.append(" } ");
+        
+        if (isDescending)
+        {
+            query.append(" ORDER BY DESC(" + orderByField + ") ");
+        }
+        else
+        {
+            query.append(" ORDER BY " + orderByField);
+        }
+        
+        if (limit > -1)
+        {
+            query.append(" LIMIT " + limit);
+        }
+        
+        if (offset > 0)
+        {
+            query.append(" OFFSET " + offset);
+        }
+        
+        return query.toString();
+    }
+            
     
     @Override
     public Collection<Role> getRolesForObject(final User user, final URI objectUri)
@@ -992,7 +1104,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             final String orderBy = "?" + PoddSesameRealm.PARAM_USER_IDENTIFIER;
             final String query = this.buildSparqlQueryToGetUserByStatus(status, orderBy, isDescending, limit, offset);
             
-            this.log.info("getUserByStatus: query={}", query);
+            this.log.debug("getUserByStatus: query={}", query);
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             
@@ -1039,6 +1151,66 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         }
         
 
+        return result;
+    }
+    
+    @Override
+    public List<PoddUser> searchUser(String searchTerm, final PoddUserStatus status, final boolean isDescending,
+            final int limit, final int offset)
+    {
+        final List<PoddUser> result = new ArrayList<PoddUser>();
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepository().getConnection();
+            
+            final String orderBy = "?" + PoddSesameRealm.PARAM_USER_IDENTIFIER;
+            final String query = this.buildSparqlQueryToSearchUsers(status, orderBy, isDescending, limit, offset);
+            
+            this.log.debug("searchUser: query={}", query);
+            
+            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+            
+            if (searchTerm == null)
+            {
+                // could this lead to an inefficient sparql query?
+                searchTerm = "";
+            }
+            tupleQuery.setBinding(PoddSesameRealm.PARAM_SEARCH_TERM, PoddRdfConstants.VF.createLiteral(searchTerm));
+            
+            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            
+            try
+            {
+                while(queryResult.hasNext())
+                {
+                    final BindingSet bindingSet = queryResult.next();
+                    Binding binding = bindingSet.getBinding("userIdentifier");
+                    
+                    result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
+                }
+            }
+            finally
+            {
+                queryResult.close();
+            }
+        }
+        catch(final RepositoryException | MalformedQueryException | QueryEvaluationException e)
+        {
+            throw new RuntimeException("Failure searching users in repository", e);
+        }
+        finally
+        {
+            try
+            {
+                conn.close();
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Failure to close connection", e);
+            }
+        }
         return result;
     }
     

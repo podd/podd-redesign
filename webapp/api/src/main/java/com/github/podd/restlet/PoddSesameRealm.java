@@ -54,6 +54,7 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
     protected static final String PARAM_USER_POSITION = "userPosition";
     protected static final String PARAM_ROLE = "role";
     protected static final String PARAM_OBJECT_URI = "objectUri";
+    protected static final String PARAM_SEARCH_TERM = "searchTerm";
     
     public PoddSesameRealm(final Repository repository, final URI... contexts)
     {
@@ -194,6 +195,24 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      * @return A List of PODDUsers
      */
     public abstract List<PoddUser> getUserByStatus(PoddUserStatus status, boolean isDescending, int limit, int offset);
+    
+    /**
+     * Search for PODD Users.
+     * 
+     * @param searchTerm
+     *            Match users whose first/last name or identifier contain this searchTerm. Can be NULL.
+     * @param status
+     *            Match users with the given status. Can be NULL.
+     * @param isDescending
+     *            If true, results are ordered in descending order of identifier.
+     * @param limit
+     *            Maximum no. of results to return. -1 indicates no limit.
+     * @param offset
+     *            Results are returned starting from the offset.
+     * @return
+     */
+    public abstract List<PoddUser> searchUser(String searchTerm, PoddUserStatus status, boolean isDescending,
+            int limit, int offset);
     
     /**
      * This method maps a User to a Role with an optional URI.
