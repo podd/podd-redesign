@@ -72,6 +72,21 @@
 			return false;
 		});
 	
+		<#if showParticipants??>
+			// autocomplete for Principal Investigator
+			var input = $('#pi');
+			var hiddenValueElement = $('#pi_hidden');
+			
+			podd.addUserFields(input, hiddenValueElement, podd.artifactDatabank);
+			
+			// TODO
+			// autocomplete for Project Administrators
+			// autocomplete for Project Members
+			// autocomplete for Project Observers
+			
+		</#if>
+	
+	
         podd.debug('### initialization complete ###');
 	});
 </script>
@@ -120,6 +135,7 @@
 		            </li>
 		            <li>
 		                <input autocomplete="off" class="wide ac_input" id="pi" name="pi" value="">
+		                <input type="hidden" id="pi_hidden" name="pi_hidden" value="">
 		                <br>Only one Principal Investigator is allowed.
 		                Principal Investigators have Project Administrator status by default.
 		                <h6 class="errorMsg"></h6>

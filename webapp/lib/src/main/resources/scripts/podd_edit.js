@@ -31,10 +31,14 @@ var DETAILS_LIST_Selector = '#details ol';
 
 var PATH_USER_ROLES = '/user/roles/';
 var PATH_USER_DETAILS = '/user/details/';
+var PATH_USER_SEARCH = '/user/search';
 
 var PODD_CREATED_AT = '<http://purl.org/podd/ns/poddBase#createdAt>';
 var PODD_LAST_MODIFIED = '<http://purl.org/podd/ns/poddBase#lastModified>';
 var DUMMY_Datetime = '1970-01-01T00:00:00';
+
+var PROPERTY_HAS_PI = 'http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator';
+
 // --------------------------------
 
 /**
@@ -55,8 +59,8 @@ jQuery.ajaxSettings.traditional = true;
  *            databank
  * @param searchTypes
  * @param artifactUri
- * @param isNew
- *            boolean
+ * @param isUserSearch
+ *            {boolean} If true, autocomplete search is for Users
  */
 podd.addAutoCompleteHandler = function(
 /* object */autoComplete,
@@ -64,16 +68,22 @@ podd.addAutoCompleteHandler = function(
 /* object */nextArtifactDatabank,
 /* object array */searchTypes,
 /* object */artifactUri,
-/* boolean */isNew) {
+/* boolean */isUserSearch) {
 
 	autoComplete.autocomplete({
         delay : 500, // milliseconds
         minLength : 2, // min length to trigger
         
         source : function(request, callbackFunction) {
-            request.searchTypes = searchTypes;
-            request.artifactUri = artifactUri;
-            podd.searchOntologyService(request, callbackFunction);
+        	if (isUserSearch == true) {
+        		podd.debug('Search for User: ' + request.term);
+        		podd.searchUserService(request, callbackFunction);
+        	} else {
+        		podd.debug('Search for Resource: ' + request.term);
+	            request.searchTypes = searchTypes;
+	            request.artifactUri = artifactUri;
+	            podd.searchOntologyService(request, callbackFunction);
+        	}
         },
 
         focus : function(event, ui) {
@@ -222,7 +232,7 @@ podd.addCloneHandler = function(input, params) {
             }
             
             if (isAutoComplete) {
-    			podd.addAutoCompleteHandler(clonedField, hiddenValueElement, nextArtifactDatabank, searchTypes, artifactUri, isNew);
+    			podd.addAutoCompleteHandler(clonedField, hiddenValueElement, nextArtifactDatabank, searchTypes, artifactUri, false);
             }
             
             var li = $("<li>");
@@ -550,6 +560,22 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
 };
 
 /**
+ * Add Project Participan fields into databank
+ * 
+ * @param input
+ * @param hiddenValueElement
+ */
+podd.addUserFields = function(input, hiddenValueElement, nextArtifactDatabank) {
+	podd.debug('[addUserFields] started');
+	podd.addAutoCompleteHandler(input, hiddenValueElement, undefined, undefined, undefined, true);
+	podd.debug('[addUserFields] added autocomplete handler');
+	
+//	podd.addTextFieldBlurHandler(input, hiddenValueElement, PROPERTY_HAS_PI, '',
+//			OBJECT_PROPERTY, nextArtifactDatabank, true);
+//	podd.debug('[addUserFields] added blur handler');
+};
+
+/**
  * Build an RDF triple from the given subject, property and object.
  * 
  * @param subjectUri
@@ -797,7 +823,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
 				var input = podd.addFieldInputText(nextField, aValue, 'text');
 				var hiddenValueElement = podd.addFieldInputText(nextField, aValue, 'hidden');
 				podd.addAutoCompleteHandler(input, hiddenValueElement,
-						nextArtifactDatabank, searchTypes, artifactUri, isNew);
+						nextArtifactDatabank, searchTypes, artifactUri, false);
 				podd.addTextFieldBlurHandler(input, hiddenValueElement, nextField.propertyUri,
 						aValue.valueUri, nextField.propertyType,
 						nextArtifactDatabank, isNew);
@@ -1671,14 +1697,23 @@ podd.parseSearchResults = function(/* string */searchURL, /* rdf/json */data) {
     // podd.debug("About to create query");
     var myQuery = $.rdf({
         databank : nextDatabank
-    }).where('?pUri <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel');
+    })
+    //
+    .where('?pUri <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel')
+    // only exists for Search User responses
+    .optional('?pUri <http://purl.org/oas/userIdentifier> ?pIdentifier');
     var bindings = myQuery.select();
 
     var nodeChildren = [];
     $.each(bindings, function(index, value) {
         var nextChild = {};
         nextChild.label = value.pLabel.value;
-        nextChild.value = value.pUri.value;
+        
+        if (value.pIdentifier !== undefined && value.pIdentifier !== 'undefined') {
+        	nextChild.value = value.pIdentifier.value;
+        } else {
+            nextChild.value = value.pUri.value;
+        }
 
         nodeChildren.push(nextChild);
     });
@@ -1771,6 +1806,44 @@ podd.searchOntologyService = function(
         },
         error : function(xhr, status, error) {
             podd.debug(status + '[searchOntologyService] $$$ ERROR $$$ ' + error);
+            
+            podd.displaySummaryErrorMessage(xhr.responseText);
+        }
+    });
+};
+
+/**
+ * Call Search User Resource Service using AJAX, convert the RDF response to
+ * a JSON array and invoke the specified callback function.
+ * 
+ * @param request
+ *            {object} Contains the 'search term'
+ * @param callbackFunction
+ *            {function} To be invoked on completion of the search request
+ */
+podd.searchUserService = function(request, callbackFunction) {
+
+    var requestUrl = podd.baseUrl + PATH_USER_SEARCH;
+
+    podd.debug('[searchUserService] Searching for users matching "' + request.term + '".');
+
+    queryParams = {
+        searchterm : request.term,
+    };
+
+    $.ajax({
+        url : requestUrl,
+        type : 'GET',
+        data : queryParams,
+        dataType : 'json',
+        success : function(data, status, xhr) {
+            podd.debug('[searchUserService] Response: ' + data.toString());
+            var formattedData = podd.parseSearchResults(requestUrl, data);
+            podd.debug('[searchUserService] No. of search results = ' + formattedData.length);
+            callbackFunction(formattedData);
+        },
+        error : function(xhr, status, error) {
+            podd.debug(status + '[searchUserService] $$$ ERROR $$$ ' + error);
             
             podd.displaySummaryErrorMessage(xhr.responseText);
         }
