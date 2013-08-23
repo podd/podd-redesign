@@ -1154,6 +1154,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         return result;
     }
     
+    //TODO: search in first/last name as well as identifier
     @Override
     public List<PoddUser> searchUser(String searchTerm, final PoddUserStatus status, final boolean isDescending,
             final int limit, final int offset)
