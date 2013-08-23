@@ -70,6 +70,7 @@ import com.github.podd.resources.UserEditResourceImpl;
 import com.github.podd.resources.UserListResourceImpl;
 import com.github.podd.resources.UserPasswordResourceImpl;
 import com.github.podd.resources.UserRolesResourceImpl;
+import com.github.podd.resources.UserSearchResourceImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
@@ -337,6 +338,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.debug("attaching user list service to path={}", userListPath);
         router.attach(userListPath, UserListResourceImpl.class);
         
+        // Add a route for Search Users Service.
+        final String userSearchPath = PoddWebConstants.PATH_USER_SEARCH;
+        this.log.debug("attaching user search service to path={}", userSearchPath);
+        router.attach(userSearchPath, UserSearchResourceImpl.class);
+
         // Add a route for Add User page.
         final String userAddPath = PoddWebConstants.PATH_USER_ADD;
         this.log.debug("attaching user add service to path={}", userAddPath);

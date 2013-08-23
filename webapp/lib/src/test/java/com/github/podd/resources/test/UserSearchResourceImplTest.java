@@ -1,0 +1,83 @@
+/**
+ * 
+ */
+package com.github.podd.resources.test;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Status;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ClientResource;
+
+import com.github.ansell.restletutils.SesameRealmConstants;
+import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddRoles;
+import com.github.podd.utils.PoddUserStatus;
+import com.github.podd.utils.PoddWebConstants;
+
+/**
+ * @author kutila
+ * 
+ */
+public class UserSearchResourceImplTest extends AbstractResourceImplTest
+{
+    
+    @Test
+    public void testSearchUsersRdf() throws Exception
+    {
+        // prepare: add a Test User account
+        final String testIdentifier = "testuser@podd.com";
+        final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+                .createURI("urn:podd:some-project")));
+        final String testUserUri =
+                this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
+                        "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address",
+                        "Researcher", roles, PoddUserStatus.ACTIVE);
+        
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
+        final ClientResource userSearchClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_SEARCH));
+        
+        userSearchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "anoth");
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userSearchClientResource, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final Model resultsModel =
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 6);
+        
+        // verify:
+        final Set<Resource> subjects =
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects();
+        Assert.assertEquals("Not the expected number of Users", 1, subjects.size());
+        
+        Assert.assertEquals(
+                "Not the expected User",
+                1,
+                resultsModel
+                        .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
+                                PoddRdfConstants.VF.createLiteral("anotherUser")).subjects().size());
+    }
+    
+}
