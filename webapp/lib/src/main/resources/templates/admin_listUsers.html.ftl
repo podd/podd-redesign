@@ -135,7 +135,7 @@
 		<tbody>
 			<#list userObjectList as user>
 			<tr>
-				<td><a href="${baseUrl}/user/${user.identifier!"unknown-username"}">${user.identifier!""}</a></td>
+				<td><a href="${baseUrl}/user/details/${user.identifier!"unknown-username"}">${user.identifier!""}</a></td>
 				<td>${user.firstName!""} ${user.lastName!""}</td>
 				<td>${user.organization!""}</td>
 				<td>${user.userStatus!""}</td>

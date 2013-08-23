@@ -75,7 +75,7 @@ public interface PoddWebConstants
     /**
      * Path to "user details" page
      */
-    public static final String PATH_USER_DETAILS = "user/";
+    public static final String PATH_USER_DETAILS = "user/details/";
 
     /**
      * Path to "add user" page
@@ -101,6 +101,11 @@ public interface PoddWebConstants
      * Path to "list users" page
      */
     public static final String PATH_USER_LIST = "admin/user/list";
+
+    /**
+     * Path to "search users" service
+     */
+    public static final String PATH_USER_SEARCH = "user/search";
     
     /**
      * Path to list artifacts

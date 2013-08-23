@@ -42,7 +42,7 @@
 	
 		$("#btnCancel").click(function(event) {
 			event.preventDefault();
-			window.location.href = podd.baseUrl + '/user/${requestedUser.identifier}';
+			window.location.href = podd.baseUrl + '/user/details/${requestedUser.identifier}';
 			return false;
 		});
 	

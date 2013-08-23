@@ -30,6 +30,7 @@ var RDFS_LABEL = 'http://www.w3.org/2000/01/rdf-schema#label';
 var DETAILS_LIST_Selector = '#details ol';
 
 var PATH_USER_ROLES = '/user/roles/';
+var PATH_USER_DETAILS = '/user/details/';
 
 var PODD_CREATED_AT = '<http://purl.org/podd/ns/poddBase#createdAt>';
 var PODD_LAST_MODIFIED = '<http://purl.org/podd/ns/poddBase#lastModified>';
@@ -2137,7 +2138,7 @@ podd.submitUserCreate = function() {
 	var orcid = $('#orcid').val();
 
 	var pathToSubmitTo = '/admin/user/add';
-	var redirectUrl = podd.baseUrl + '/user/' + userName;
+	var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + userName;
 
 	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
 			phone, address, url, orcid, undefined, redirectUrl);
@@ -2172,7 +2173,7 @@ podd.submitUserEdit = function() {
 	var orcid = $('#orcid').val();
 
 	var pathToSubmitTo = '/user/edit/' + userName;
-	var redirectUrl = podd.baseUrl + '/user/' + userName;
+	var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + userName;
 
 	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
 			phone, address, url, orcid, undefined, redirectUrl);
@@ -2304,7 +2305,7 @@ podd.submitUserPassword = function() {
 	
 	var pathToSubmitTo = '/user/editpwd/' + userName;
 	
-	var redirectUrl = podd.baseUrl + '/user/' + userName;
+	var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + userName;
 	if (oldPassword != undefined && oldPassword !== ''){
 		redirectUrl = podd.baseUrl + '/loginpage';
 	}
