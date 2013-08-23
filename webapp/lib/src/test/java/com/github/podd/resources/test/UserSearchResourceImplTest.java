@@ -9,13 +9,12 @@ import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
@@ -24,7 +23,6 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
-import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
@@ -47,10 +45,9 @@ public class UserSearchResourceImplTest extends AbstractResourceImplTest
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
                 .createURI("urn:podd:some-project")));
-        final String testUserUri =
-                this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
-                        "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address",
-                        "Researcher", roles, PoddUserStatus.ACTIVE);
+        this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
+                "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
+                roles, PoddUserStatus.ACTIVE);
         
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
@@ -65,19 +62,11 @@ public class UserSearchResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 6);
+                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 2);
         
         // verify:
-        final Set<Resource> subjects =
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects();
-        Assert.assertEquals("Not the expected number of Users", 1, subjects.size());
-        
-        Assert.assertEquals(
-                "Not the expected User",
-                1,
-                resultsModel
-                        .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                                PoddRdfConstants.VF.createLiteral("anotherUser")).subjects().size());
+        Assert.assertEquals("Not the expected User", "Test User, CSIRO", resultsModel.filter(null, RDFS.LABEL, null)
+                .objectString());
     }
     
 }
