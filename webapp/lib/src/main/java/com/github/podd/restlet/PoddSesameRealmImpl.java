@@ -848,9 +848,20 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         }
         query.append(" . ");
         
-        // filter for "searchTerm" in label
-        query.append(" FILTER(CONTAINS( LCASE(?" + PoddSesameRealm.PARAM_USER_IDENTIFIER + ") , LCASE(?"
-                + PoddSesameRealm.PARAM_SEARCH_TERM + ") )) ");
+        // concatenate identifier, first and last names for searching
+        query.append(" BIND(CONCAT(");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_FIRSTNAME);
+        query.append(" , \" \" , ?");
+        query.append(PoddSesameRealm.PARAM_USER_LASTNAME);
+        query.append(" , \" \" , ?");
+        query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
+        query.append(" ) AS ?name)");
+        
+        // filter for "searchTerm" in ?name
+        query.append(" FILTER( ");
+        query.append(" CONTAINS( LCASE(?name) , LCASE(?" + PoddSesameRealm.PARAM_SEARCH_TERM + ") ) ");
+        query.append(") ");
         
         query.append(" } ");
         
