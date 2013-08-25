@@ -138,6 +138,11 @@ public interface PoddWebConstants
     public static final String PATH_ARTIFACT_DELETE = "artifact/delete";
     
     /**
+     * Path to edit an artifact's Participants.
+     */
+    public static final String PATH_ARTIFACT_ROLES = "artifact/roles";
+    
+    /**
      * Path to the file reference attachment service
      */
     public static final String PATH_ATTACH_FILE_REF = "attachref";

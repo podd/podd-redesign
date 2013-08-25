@@ -108,7 +108,7 @@
 
 <#if isProject?? && isProject>
 <br />
-<#include "projectParticipantDetails.html.ftl"/>
+<!--#include "projectParticipantDetails.html.ftl"/-->
 </#if>
 
 <br />
@@ -123,6 +123,9 @@
 	    <#if  canEditObject?? && canEditObject>
         <a href="${baseUrl}/artifact/edit?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Edit Object</a>
         </#if>
+		<#if isProject?? && isProject>
+	        <a href="${baseUrl}/artifact/roles?artifacturi=${artifactUri?url!"unknown-artifacturi"}">Edit Participants</a>
+		</#if>
         <#if  canAddChildren?? && canAddChildren>
 	    	<a id="createChildObject" value="createChildObject">Add Child Object</a>
         </#if>
