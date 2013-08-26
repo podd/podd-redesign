@@ -886,7 +886,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         return query.toString();
     }
-            
+    
     
     @Override
     public Collection<Role> getRolesForObject(final User user, final URI objectUri)
@@ -906,11 +906,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     public Map<User, Collection<Role>> getRolesForObjectAlternate(final User user, final URI objectUri)
     {
-        if(user == null)
-        {
-            throw new NullPointerException("User was null");
-        }
-        
         final ConcurrentMap<User, Collection<Role>> roleCollection = new ConcurrentHashMap<User, Collection<Role>>();
         
         RepositoryConnection conn = null;
@@ -938,7 +933,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             {
                 if(!queryResult.hasNext())
                 {
-                    this.log.warn("Could not find role with mappings for user: {}", user.getIdentifier());
+                    this.log.warn("Could not find role with mappings for user: {}", userIdentifier);
                 }
                 
                 while(queryResult.hasNext())
