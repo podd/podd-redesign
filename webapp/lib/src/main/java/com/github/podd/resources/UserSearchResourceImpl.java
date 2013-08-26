@@ -68,8 +68,7 @@ public class UserSearchResourceImpl extends AbstractPoddResourceImpl
         final Model resultModel = new LinkedHashModel();
         for(final PoddUser resultUser : resultList)
         {
-            final String label =
-                    resultUser.getFirstName() + " " + resultUser.getLastName() + ", " + resultUser.getOrganization();
+            final String label = resultUser.getUserLabel();
             resultModel.add(resultUser.getUri(), RDFS.LABEL, PoddRdfConstants.VF.createLiteral(label));
             resultModel.add(resultUser.getUri(), SesameRealmConstants.OAS_USERIDENTIFIER,
                     PoddRdfConstants.VF.createLiteral(resultUser.getIdentifier()));
