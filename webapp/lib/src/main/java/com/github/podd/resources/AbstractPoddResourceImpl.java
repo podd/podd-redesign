@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.resources;
+package com.github.podd.resources;
 
 import java.util.List;
 
 import org.openrdf.model.URI;
+import org.restlet.data.CookieSetting;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.Variant;
@@ -33,6 +34,7 @@ import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddWebServiceApplication;
+import com.github.podd.utils.PoddWebConstants;
 
 public abstract class AbstractPoddResourceImpl extends ServerResource
 {
@@ -107,6 +109,25 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
         }
         else if(throwExceptionOnFailure)
         {
+            // Strategies for fixing #81
+            // If they have an existing cookie then we tell them to discard it
+            // CookieSetting cookie =
+            // this.getResponse().getCookieSettings().getFirst(PoddWebConstants.COOKIE_NAME, false);
+            // if(cookie != null)
+            // {
+            // cookie.setMaxAge(0);
+            // }
+            // TODO: Test the following strategy if the strategy above does not work
+            // if(this.getResponse().getCookieSettings().removeAll(PoddWebConstants.COOKIE_NAME,
+            // true))
+            // {
+            // this.getResponse()
+            // .getCookieSettings()
+            // .add(new CookieSetting(0, PoddWebConstants.COOKIE_NAME, "",
+            // this.getRequest().getRootRef()
+            // .getPath(), this.getRequest().getResourceRef().getHostDomain(), "Reset cookie", 0,
+            // true));
+            // }
             this.log.warn("Client unauthorized. Throwing a ResourceException");
             throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, action.getErrorMessage());
         }

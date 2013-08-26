@@ -86,5 +86,9 @@
 			<artifactId>bcprov-jdk15on</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.github.ansell.property-util</groupId>
+			<artifactId>property-util</artifactId>
+		</dependency>
 	</dependencies>
 </project>

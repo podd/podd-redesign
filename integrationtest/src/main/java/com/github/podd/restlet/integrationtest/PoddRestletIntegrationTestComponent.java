@@ -141,12 +141,12 @@ public class PoddRestletIntegrationTestComponent extends Component
         {
             nextApplication = new PoddWebServiceApplicationImpl();
             
+            String resetKey = new PropertyUtil("podd").get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
             // Add a route for the reset service.
-            final String resetPath =
-                    "/reset/" + PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
+            final String resetPath = "/reset/" + resetKey;
             this.log.info("attaching reset service to path={}", resetPath);
             final TestResetResourceImpl reset = new TestResetResourceImpl(nextApplication);
-            this.setResetKey(PropertyUtil.get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, ""));
+            this.setResetKey(resetKey);
             
             this.getDefaultHost().attach(resetPath, reset);
             
