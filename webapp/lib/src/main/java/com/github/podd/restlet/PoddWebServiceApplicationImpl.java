@@ -62,6 +62,7 @@ import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.ListArtifactsResourceImpl;
 import com.github.podd.resources.ListDataRepositoriesResourceImpl;
+import com.github.podd.resources.ArtifactRolesResourceImpl;
 import com.github.podd.resources.SearchOntologyResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserAddResourceImpl;
@@ -389,6 +390,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.debug("attaching Edit Artifact service to path={}", editArtifact);
         router.attach(editArtifact, EditArtifactResourceImpl.class);
         
+        // Add a route for the Artifact Role edit page.
+        final String artifactRoles = PoddWebConstants.PATH_ARTIFACT_ROLES;
+        this.log.debug("attaching Edit Artifact Roles service to path={}", artifactRoles);
+        router.attach(artifactRoles, ArtifactRolesResourceImpl.class);
+
         // Add a route for the Delete Artifact page.
         final String deleteArtifact = PoddWebConstants.PATH_ARTIFACT_DELETE;
         this.log.debug("attaching Delete Artifact service to path={}", deleteArtifact);
