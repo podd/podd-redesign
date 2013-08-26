@@ -3,10 +3,16 @@
  */
 package com.github.podd.resources;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -27,6 +33,7 @@ import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
+import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -78,27 +85,29 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
-            dataModel.put("piUri", PoddRoles.PROJECT_ADMIN.getURI());
+            dataModel.put("piUri", PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getURI());
             dataModel.put("adminUri", PoddRoles.PROJECT_ADMIN.getURI());
             dataModel.put("memberUri", PoddRoles.PROJECT_MEMBER.getURI());
             dataModel.put("observerUri", PoddRoles.PROJECT_OBSERVER.getURI());
-/*            
-            final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-            final Map<User, Collection<Role>> participantMap =
-                    nextRealm.getRolesForObjectAlternate(null, ontologyID.getOntologyIRI().toOpenRDFURI());
             
-            this.log.info("{} different users participate in this Project", participantMap.size());
-            Collection<User> keySet = participantMap.keySet();
-            for(Iterator iterator = keySet.iterator(); iterator.hasNext();)
+            Map<PoddRoles, List<PoddUser>> roleUserMap =
+                    this.getUsersForRole(Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR,
+                            PoddRoles.PROJECT_ADMIN, PoddRoles.PROJECT_MEMBER, PoddRoles.PROJECT_OBSERVER), artifactUri);
+            
+            // TODO - add user labels/identifiers
+            List<PoddUser> piList = roleUserMap.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR);
+            if (piList != null && piList.size() == 1)
             {
-                User user2 = (User)iterator.next();
-                Collection<Role> roles = participantMap.get(user2);
+                dataModel.put("pi", piList.get(0).getUserLabel());
             }
             
-*/            
-            // FIXME: get current project roles and populate them in here
-            dataModel.put("pi", "Prof P Investigator");
-            dataModel.put("admin", "Dr ECA Admin");
+            List<PoddUser> adminList = roleUserMap.get(PoddRoles.PROJECT_ADMIN);
+            if (adminList != null && !adminList.isEmpty())
+            {
+                dataModel.put("admin", adminList.get(0).getUserLabel());
+            }
+//            dataModel.put("member", roleUserMap.get(PoddRoles.PROJECT_MEMBER));
+//            dataModel.put("observer", roleUserMap.get(PoddRoles.PROJECT_OBSERVER));
             
         }
         catch(final Exception e)
@@ -107,10 +116,45 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         }
         
         dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
-        dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
+        //dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
         
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
 
+    
+    private Map<PoddRoles, List<PoddUser>> getUsersForRole(final List<PoddRoles> rolesOfInterest, final String artifactUri)
+    {
+        final ConcurrentMap<PoddRoles, List<PoddUser>> userList = new ConcurrentHashMap<PoddRoles, List<PoddUser>>();
+        
+        final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
+        final Map<User, Collection<Role>> participantMap =
+                nextRealm.getRolesForObjectAlternate(null, PoddRdfConstants.VF.createURI(artifactUri));
+        
+        final Collection<User> keySet = participantMap.keySet();
+        for(Iterator<User> iterator = keySet.iterator(); iterator.hasNext();)
+        {
+            User user = iterator.next();
+            Collection<Role> rolesOfUser = participantMap.get(user);
+            
+            for (PoddRoles roleOfInterest : rolesOfInterest)
+            {
+                if (rolesOfUser.contains(roleOfInterest.getRole()))
+                {
+                    this.log.info("User {} has Role {} ", user.getIdentifier(), roleOfInterest.getName());
+                    
+                    List<PoddUser> nextRoles = new ArrayList<PoddUser>();
+                    List<PoddUser> putIfAbsent = userList.putIfAbsent(roleOfInterest, nextRoles);
+                    if(putIfAbsent != null)
+                    {
+                        nextRoles = putIfAbsent;
+                    }
+                    nextRoles.add((PoddUser)nextRealm.findUser(user.getIdentifier()));
+                }
+            }
+        }
+        
+        return userList;
+    }
+    
 }
