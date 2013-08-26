@@ -191,6 +191,16 @@ public class PoddUser extends RestletUtilUser
     }
     
     /**
+     * Get a String identifying the human User and his/her affiliation.
+     *  
+     * @return
+     */
+    public String getUserLabel()
+    {
+        return this.getFirstName() + " " + this.getLastName() + ", " + this.getOrganization();
+    }
+    
+    /**
      * Set the URL of a home page containing details about the User. This value is usually set by
      * the user.
      * 
