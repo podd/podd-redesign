@@ -265,11 +265,6 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             // TODO: handle case where more than 1 type is found
             dataModel.put("objectType", objectTypes.get(0));
             
-            if (PoddRdfConstants.PODD_SCIENCE_PROJECT.equals(objectTypes.get(0).getObjectURI()))
-            {
-                dataModel.put("showParticipants", "true");
-            }
-            
             // Parent Details
             final Model parentDetails = this.getPoddArtifactManager().getParentDetails(ontologyID, objectUri);
             if(parentDetails.size() == 1)

@@ -72,21 +72,6 @@
 			return false;
 		});
 	
-		<#if showParticipants??>
-			// autocomplete for Principal Investigator
-			var input = $('#pi');
-			var hiddenValueElement = $('#pi_hidden');
-			
-			podd.addUserFields(input, hiddenValueElement, podd.artifactDatabank);
-			
-			// TODO
-			// autocomplete for Project Administrators
-			// autocomplete for Project Members
-			// autocomplete for Project Observers
-			
-		</#if>
-	
-	
         podd.debug('### initialization complete ###');
 	});
 </script>
@@ -119,56 +104,6 @@
 	        </div>
 	    </div>  <!-- details - Collapsible div -->
 	 
-	 <#if showParticipants??>
-		 <!-- Project Participants -->
-		<h3 class="underlined_heading">Project Participants
-			<a href="javascript:animatedcollapse.toggle('project_participants')" icon="toggle" title="View Project Participants"></a>
-		</h3>
-
-		<div style="display: block;" fade="1" id="project_participants">
-		    <div id="participants" class="fieldset">
-		        <ol>
-		            <li>
-		                <label for="pi" class="bold">Principal Investigator:
-		                    <span icon="required"></span>
-		                </label>
-		            </li>
-		            <li>
-		                <input autocomplete="off" class="wide ac_input" id="pi" name="pi" value="">
-		                <input type="hidden" id="pi_hidden" name="pi_hidden" value="">
-		                <br>Only one Principal Investigator is allowed.
-		                Principal Investigators have Project Administrator status by default.
-		                <h6 class="errorMsg"></h6>
-		            </li>
-		            <li>
-		                <label for="admin" class="bold">Project Administrators: </label>
-		            </li>
-		            <li>
-		                <textarea autocomplete="off" class="high ac_input" id="admin" name="admin"></textarea>
-		                <br>Project Administrators will have Create, Read, Update and Delete access to all project objects.
-		                <h6 class="errorMsg"></h6>
-		            </li>
-		            <li>
-		                <label for="member" class="bold">Project Members: </label>
-		            </li>
-		            <li>
-		                <textarea autocomplete="off" class="high ac_input" id="member" name="member"></textarea><br>
-		                Project Members will have Create, Read and Update access to all project objects.
-		                <h6 class="errorMsg"></h6>
-		            </li>
-		            <li>
-		                <label for="observer" class="bold">Project Observers: </label>
-		            </li>
-		            <li>
-		                <textarea autocomplete="off" class="high ac_input" id="observer" name="observer"></textarea>
-		                <br>Project Observer will have Read only access to all project objects.
-		                <h6 class="errorMsg"></h6>
-		            </li>
-		       </ol>
-		    </div>
-		</div>  <!-- Collapsable div -->
-	</#if>
-	    
 		<h3 class="underlined_heading"> </h3> <!-- just want the line -->
 		<div id="buttonwrapper">
 	    	<button type="button" id="btnSubmit" name="createObject" value="createObject">Submit</button>
