@@ -85,13 +85,14 @@ public class ApplicationUtils
 {
     private static final Logger log = LoggerFactory.getLogger(ApplicationUtils.class);
     
-    public static ChallengeAuthenticator getNewAuthenticator(final Realm nextRealm, final Context newChildContext)
+    public static ChallengeAuthenticator getNewAuthenticator(final Realm nextRealm, final Context newChildContext,
+            final PropertyUtil propertyUtil)
     {
         ChallengeAuthenticator result = null;
         
         // FIXME: read from a property
         final String authMethod =
-                PropertyUtil.get(PoddWebConstants.PROPERTY_CHALLENGE_AUTH_METHOD,
+                propertyUtil.get(PoddWebConstants.PROPERTY_CHALLENGE_AUTH_METHOD,
                         PoddWebConstants.DEF_CHALLENGE_AUTH_METHOD);
         
         if(authMethod.equalsIgnoreCase("digest"))
@@ -263,7 +264,7 @@ public class ApplicationUtils
         nextPurlRegistry.clear();
         final PoddPurlProcessorFactory nextPurlProcessorFactory = new UUIDPurlProcessorFactoryImpl();
         
-        final String purlPrefix = PropertyUtil.get(PoddWebConstants.PROPERTY_PURL_PREFIX, null);
+        final String purlPrefix = application.getPropertyUtil().get(PoddWebConstants.PROPERTY_PURL_PREFIX, null);
         ((UUIDPurlProcessorFactoryImpl)nextPurlProcessorFactory).setPrefix(purlPrefix);
         
         nextPurlRegistry.add(nextPurlProcessorFactory);
@@ -380,7 +381,7 @@ public class ApplicationUtils
         
         // final Context authenticatorChildContext = applicationContext.createChildContext();
         final ChallengeAuthenticator newAuthenticator =
-                ApplicationUtils.getNewAuthenticator(nextRealm, applicationContext);
+                ApplicationUtils.getNewAuthenticator(nextRealm, applicationContext, application.getPropertyUtil());
         application.setAuthenticator(newAuthenticator);
         
         application.setRealm(nextRealm);

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.restlet;
+package com.github.podd.restlet;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -24,6 +24,7 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.security.ChallengeAuthenticator;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.api.PoddRepositoryManager;
@@ -62,8 +63,7 @@ public abstract class PoddWebServiceApplication extends Application
      *            these should be used to check client authority.
      * @return True if the request is authenticated, and false otherwise.
      */
-    public abstract boolean authenticate(PoddAction action, Request request, Response response,
-            URI optionalObjectUri);
+    public abstract boolean authenticate(PoddAction action, Request request, Response response, URI optionalObjectUri);
     
     public abstract Model getAliasesConfiguration();
     
@@ -141,4 +141,10 @@ public abstract class PoddWebServiceApplication extends Application
      * @param nextFreemarkerConfiguration
      */
     public abstract void setTemplateConfiguration(Configuration nextFreemarkerConfiguration);
+    
+    /**
+     * 
+     * @return The {@link PropertyUtil} instance for this {@link PoddWebServiceApplication}.
+     */
+    public abstract PropertyUtil getPropertyUtil();
 }

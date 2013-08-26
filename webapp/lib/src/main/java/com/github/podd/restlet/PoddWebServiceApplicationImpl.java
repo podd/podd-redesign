@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.restlet;
+package com.github.podd.restlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +41,7 @@ import org.restlet.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.CrossOriginResourceSharingFilter;
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilSesameRealm;
@@ -108,6 +109,8 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     private PoddDataRepositoryManager poddDataRepositoryManager;
     
     private Model aliasesConfiguration = new LinkedHashModel();
+    
+    private PropertyUtil propertyUtil = new PropertyUtil("podd");
     
     /**
      * Default Constructor.
@@ -179,7 +182,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             // response
             return false;
         }
-        else if (this.isUserInactive(request.getClientInfo().getUser()))
+        else if(this.isUserInactive(request.getClientInfo().getUser()))
         {
             this.log.error("Authenticates user is Inactive. user={}", request.getClientInfo().getUser());
             return false;
@@ -235,14 +238,14 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         
         return true;
     }
-
+    
     /**
      * @param user
      * @return false if the User's status is ACTIVE, true in all other cases
      */
     private boolean isUserInactive(final User user)
     {
-        if (user == null)
+        if(user == null)
         {
             return true;
         }
@@ -257,9 +260,9 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         else
         {
             RestletUtilUser findUser = this.getRealm().findUser(user.getIdentifier());
-            if (findUser != null && findUser instanceof PoddUser)
+            if(findUser != null && findUser instanceof PoddUser)
             {
-                if (((PoddUser)findUser).getUserStatus() == PoddUserStatus.ACTIVE)
+                if(((PoddUser)findUser).getUserStatus() == PoddUserStatus.ACTIVE)
                 {
                     return false;
                 }
@@ -267,7 +270,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         }
         return true;
     }
-
+    
     /**
      * Call this method to clean up resources used by PODD. At present it shuts down the Repository.
      */
@@ -342,7 +345,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String userSearchPath = PoddWebConstants.PATH_USER_SEARCH;
         this.log.debug("attaching user search service to path={}", userSearchPath);
         router.attach(userSearchPath, UserSearchResourceImpl.class);
-
+        
         // Add a route for Add User page.
         final String userAddPath = PoddWebConstants.PATH_USER_ADD;
         this.log.debug("attaching user add service to path={}", userAddPath);
@@ -354,15 +357,17 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(userEditPath, UserEditResourceImpl.class);
         
         // Add a route for Change User Password page.
-        final String userChangePasswordPath = PoddWebConstants.PATH_USER_EDIT_PWD + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
+        final String userChangePasswordPath =
+                PoddWebConstants.PATH_USER_EDIT_PWD + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
         this.log.debug("attaching user change password service to path={}", userChangePasswordPath);
         router.attach(userChangePasswordPath, UserPasswordResourceImpl.class);
-
+        
         // Add a route for Edit User Roles page.
-        final String userEditRolesPath = PoddWebConstants.PATH_USER_EDIT_ROLES + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
+        final String userEditRolesPath =
+                PoddWebConstants.PATH_USER_EDIT_ROLES + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
         this.log.debug("attaching edit user roles service to path={}", userEditRolesPath);
         router.attach(userEditRolesPath, UserRolesResourceImpl.class);
-
+        
         // TODO: add routes for other user management pages. (List/Delete Users)
         
         // Add a route for the List Artifacts page.
@@ -606,6 +611,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         super.stop();
         this.cleanUpResources();
         this.log.info("== Shutting down PODD Web Application ==");
+    }
+    
+    @Override
+    public PropertyUtil getPropertyUtil()
+    {
+        return this.propertyUtil;
     }
     
 }
