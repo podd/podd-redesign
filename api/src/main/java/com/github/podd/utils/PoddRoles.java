@@ -60,7 +60,11 @@ public enum PoddRoles implements RestletUtilRole
             "http://purl.org/podd/ns/poddUser#RoleTopObjectObserver", true),
     
     PROJECT_ADMIN("Project Administrator", "A user who is an administrator of a particular project",
-            "http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator", true),
+            "http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator", true), 
+            
+    PROJECT_PRINCIPAL_INVESTIGATOR("Principal Investigator",
+            "A user who is the lead of a particular project and has the ability to publish the project",
+            "http://purl.org/podd/ns/poddUser#RoleTopObjectPrincipalInvestigator", true),
     
     ;
     

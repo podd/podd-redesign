@@ -90,7 +90,7 @@ public enum PoddAction
      * By default only the administrators and project-admin users are allowed to publish projects.
      */
     ARTIFACT_PUBLISH(true, "Could not publish artifact", new HashSet<Role>(Arrays.asList(
-            PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), true),
+            PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getRole(), PoddRoles.ADMIN.getRole())), true),
     
     /**
      * An action by an administrator asking to create a new user, or update an existing user.
