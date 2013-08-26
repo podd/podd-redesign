@@ -437,7 +437,7 @@ podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
 			
 			podd.debug('Selected Role: ' + roleUri);
 			
-			podd.submitUserRoleAdd(podd.userName, roleUri);
+			podd.submitUserRoleAdd(podd.userName, roleUri, undefined);
 			
 		    var deleteLink = $('<a>', {
 		        name : 'name_delete_role',
@@ -560,19 +560,40 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
 };
 
 /**
- * Add Project Participan fields into databank
+ * Add Project Participant field
  * 
  * @param input
  * @param hiddenValueElement
  */
-podd.addUserFields = function(input, hiddenValueElement, nextArtifactDatabank) {
-	podd.debug('[addUserFields] started');
+podd.addProjectRoleHandlers = function(input, hiddenValueElement, artifactIri, roleUri) {
+	podd.debug('[addProjectRoleHandlers] started');
 	podd.addAutoCompleteHandler(input, hiddenValueElement, undefined, undefined, undefined, true);
-	podd.debug('[addUserFields] added autocomplete handler');
+	podd.debug('[addProjectRoleHandlers] added autocomplete handler');
+
+    input.blur(function(event) {
+        var userIdentifier = '' + $(this).val();
+        
+        if (typeof hiddenValueElement !== 'undefined' && userIdentifier !== '') {
+        	userIdentifier = hiddenValueElement.val();
+        }
+        podd.debug("[blur] triggered with new value: " + userIdentifier);
+        
+        // TODO - update Role via AJAX call
+        podd.submitUserRoleAdd(userIdentifier, roleUri, artifactIri);
+        
+    });
 	
-//	podd.addTextFieldBlurHandler(input, hiddenValueElement, PROPERTY_HAS_PI, '',
-//			OBJECT_PROPERTY, nextArtifactDatabank, true);
-//	podd.debug('[addUserFields] added blur handler');
+	// TODO - add Clone Handler
+	var nextField = {};
+	nextField.propertyRange = PROPERTY_HAS_PI;
+	nextField.propertyLabel = 'pi';
+	var nextFieldValue = {};
+	nextFieldValue.displayValue = 'Type Here';
+	var clonedInput = podd.addFieldInputText(nextField, nextFieldValue, 'text');
+	var clonedHiddenValueElement = podd.addFieldInputText(nextField, nextFieldValue, 'hidden');
+	
+	
+	podd.debug('[addProjectRoleHandlers] completed');
 };
 
 /**
@@ -2455,7 +2476,7 @@ podd.submitUserRoleDelete = function(userName, roleUri) {
  * @param roleUri
  *            {string} The Role to be added
  */
-podd.submitUserRoleAdd = function(userName, roleUri) {
+podd.submitUserRoleAdd = function(userName, roleUri, roleMappedObject) {
 	
 	podd.debug('[submitUserRoles] ' + userName);
 	var pathToSubmitTo = PATH_USER_ROLES + userName;
@@ -2463,9 +2484,6 @@ podd.submitUserRoleAdd = function(userName, roleUri) {
 	var roleDatabank = podd.newDatabank(); 
 	
     podd.debug('[submitUserRoles] role = ' + roleUri);
-	    
-    //TODO - not yet supported
-    var roleMappedObject = undefined;
 	    
     var mappingUri = $.rdf.blank('_:mapping45');
 	    

@@ -24,18 +24,12 @@
 			return false;
 		});
 	
-		// autocomplete for Principal Investigator
-		var input = $('#pi');
-		var hiddenValueElement = $('#pi_hidden');
+		// add Handlers for the Fields
+		podd.addProjectRoleHandlers($('#pi'), $('#pi_hidden'), podd.artifactIri, '${piUri!""}');
+		podd.addProjectRoleHandlers($('#admin'), $('#admin_hidden'), podd.artifactIri, '${adminUri!""}');
+		podd.addProjectRoleHandlers($('#member'), $('#member_hidden'), podd.artifactIri, '${memberUri!""}');
+		podd.addProjectRoleHandlers($('#observer'), $('#observer_hidden'), podd.artifactIri, '${observerUri!""}');
 		
-		podd.addAutoCompleteHandler(input, hiddenValueElement, undefined, undefined, undefined, true);
-		podd.debug('added autocomplete handler to #pi');
-		
-		// TODO
-		// autocomplete for Project Administrators
-		// autocomplete for Project Members
-		// autocomplete for Project Observers
-			
         podd.debug('### initialization complete ###');
 	});
 </script>
@@ -78,30 +72,43 @@
 		                <br>Only the Principal Investigator can publish a Project.
 		                Principal Investigators have Project Administrator status by default.
 		                <h6 class="errorMsg">${piError!""}</h6>
+		                <br>
 		            </li>
 		            <li>
-		                <label for="admin" class="bold">Project Administrators: </label>
+		                <label for="admin" class="bold">Project Administrators:
+		                	<span icon="addField" class="clonable"></span>
+		                </label>
 		            </li>
 		            <li>
-		                <textarea autocomplete="off" class="high ac_input" id="admin" name="admin">${admin!""}</textarea>
+		                <input autocomplete="off" class="wide ac_input" id="admin" name="admin" value="${admin!""}">
+		                <input type="hidden" id="admin_hidden" name="admin_hidden" value="">
 		                <br>Project Administrators will have Create, Read, Update and Delete access to all project objects.
 		                <h6 class="errorMsg">${adminError!""}</h6>
+		                <br>
 		            </li>
 		            <li>
-		                <label for="member" class="bold">Project Members: </label>
+		                <label for="member" class="bold">Project Members: 
+		                	<span icon="addField" class="clonable"></span>
+		                </label>
 		            </li>
 		            <li>
-		                <textarea autocomplete="off" class="high ac_input" id="member" name="member">${member!""}</textarea><br>
-		                Project Members will have Create, Read and Update access to all project objects.
+		                <input autocomplete="off" class="wide ac_input" id="member" name="member" value="${member!""}">
+			            <input type="hidden" id="member_hidden" name="member_hidden" value="">
+		                <br>Project Members will have Create, Read and Update access to all project objects.
 		                <h6 class="errorMsg">${memberError!""}</h6>
+		                <br>
 		            </li>
 		            <li>
-		                <label for="observer" class="bold">Project Observers: </label>
+		                <label for="observer" class="bold">Project Observers: 
+		                	<span icon="addField" class="clonable"></span>
+		                </label>
 		            </li>
 		            <li>
-		                <textarea autocomplete="off" class="high ac_input" id="observer" name="observer">${observer!""}</textarea>
+		                <input autocomplete="off" class="wide ac_input" id="observer" name="observer" value="${observer!""}">
+			            <input type="hidden" id="observer_hidden" name="observer_hidden" value="">
 		                <br>Project Observer will have Read only access to all project objects.
 		                <h6 class="errorMsg">${observerError!""}</h6>
+		                <br>
 		            </li>
 		       </ol>
 		    </div>
