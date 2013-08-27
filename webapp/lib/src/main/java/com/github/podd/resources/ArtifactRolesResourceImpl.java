@@ -104,17 +104,10 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
                 dataModel.put("piIdentifier", piList.get(0).getIdentifier());
             }
             
-            // - add Project Admin details
-            List<PoddUser> adminList = roleUserMap.get(PoddRoles.PROJECT_ADMIN);
-            if (adminList != null && !adminList.isEmpty())
-            {
-                dataModel.put("admins", adminList);
-            }
-            
-            // TODO - add member and observer labels/identifiers
-//            dataModel.put("member", roleUserMap.get(PoddRoles.PROJECT_MEMBER));
-//            dataModel.put("observer", roleUserMap.get(PoddRoles.PROJECT_OBSERVER));
-            
+            // - add other Project Role participants
+            dataModel.put("admins", roleUserMap.get(PoddRoles.PROJECT_ADMIN));
+            dataModel.put("members", roleUserMap.get(PoddRoles.PROJECT_MEMBER));
+            dataModel.put("observers", roleUserMap.get(PoddRoles.PROJECT_OBSERVER));
         }
         catch(final Exception e)
         {
