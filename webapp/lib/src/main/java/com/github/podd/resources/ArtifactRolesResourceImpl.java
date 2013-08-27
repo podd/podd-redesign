@@ -6,8 +6,6 @@ package com.github.podd.resources;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -94,18 +92,22 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
                     this.getUsersForRole(Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR,
                             PoddRoles.PROJECT_ADMIN, PoddRoles.PROJECT_MEMBER, PoddRoles.PROJECT_OBSERVER), artifactUri);
             
-            // TODO - add user labels/identifiers
+            // - add PI user label and identifier
             List<PoddUser> piList = roleUserMap.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR);
             if (piList != null && piList.size() == 1)
             {
-                dataModel.put("pi", piList.get(0).getUserLabel());
+                dataModel.put("piLabel", piList.get(0).getUserLabel());
+                dataModel.put("piIdentifier", piList.get(0).getIdentifier());
             }
             
+            // - add Project Admin details
             List<PoddUser> adminList = roleUserMap.get(PoddRoles.PROJECT_ADMIN);
             if (adminList != null && !adminList.isEmpty())
             {
-                dataModel.put("admin", adminList.get(0).getUserLabel());
+                dataModel.put("admins", adminList);
             }
+            
+            // TODO - add member and observer labels/identifiers
 //            dataModel.put("member", roleUserMap.get(PoddRoles.PROJECT_MEMBER));
 //            dataModel.put("observer", roleUserMap.get(PoddRoles.PROJECT_OBSERVER));
             
@@ -116,13 +118,22 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         }
         
         dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
-        //dataModel.put("versionIri", ontologyID.getVersionIRI().toString());
         
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
 
-    
+    /**
+     * Helper method to find PODD Users who are assigned the 'roles of interest' for the given
+     * artifact.
+     * 
+     * For security purposes, the returned Users only have their Identifier, First name, Last name,
+     * Status and Organization filled.
+     * 
+     * @param rolesOfInterest
+     * @param artifactUri
+     * @return
+     */
     private Map<PoddRoles, List<PoddUser>> getUsersForRole(final List<PoddRoles> rolesOfInterest, final String artifactUri)
     {
         final ConcurrentMap<PoddRoles, List<PoddUser>> userList = new ConcurrentHashMap<PoddRoles, List<PoddUser>>();
@@ -149,7 +160,14 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
                     {
                         nextRoles = putIfAbsent;
                     }
-                    nextRoles.add((PoddUser)nextRealm.findUser(user.getIdentifier()));
+                    
+                    final PoddUser tempUser = (PoddUser)nextRealm.findUser(user.getIdentifier());
+                    final PoddUser userToReturn =
+                            new PoddUser(tempUser.getIdentifier(), null, tempUser.getFirstName(),
+                                    tempUser.getLastName(), null, tempUser.getUserStatus(), null,
+                                    tempUser.getOrganization(), null);
+                    
+                    nextRoles.add(userToReturn);
                 }
             }
         }
