@@ -559,39 +559,98 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
     
 };
 
+podd.addElementToList = function(list, roleUri, userLabel, userIdentifier) {
+	podd.debug('[addElementToList] add item: ' + userIdentifier + ' to Role ' + roleUri);
+	
+    var deleteLink = $('<a>', {
+        name : roleUri,
+        text : 'delete', 
+        class : 'deleteLinkStatic',
+        click : function(event) {
+			    	podd.debug('Remove: ' + userIdentifier + ' as a <' + roleUri + '> for project ' + podd.artifactIri);
+			    	podd.submitUserRoleDelete(userIdentifier, roleUri, podd.artifactIri);
+			     	
+			     	var liToRemove = $(this).closest('li');
+					podd.debug('Going to remove ' + liToRemove);	     	
+			     	liToRemove.fadeOut(400, function(){
+		         		liToRemove.remove();
+		        	});
+			     	
+		        	return false;
+        		} 
+    });
+
+    var span = $('<span>', {
+    	text : userLabel,
+        value : userIdentifier,
+    });
+
+	span.append(deleteLink);
+	
+	var li = $('<li>');
+	li.append(span);
+	list.append(li);
+	
+	podd.debug('[addElementToList] completed');
+};
+
 /**
- * Add Project Participant field
+ * Add Blur Handler for Project Role
  * 
  * @param input
  * @param hiddenValueElement
+ * @param list
+ * @param artifactIri
+ * @param roleUri
  */
-podd.addProjectRoleHandlers = function(input, hiddenValueElement, artifactIri, roleUri) {
-	podd.debug('[addProjectRoleHandlers] started');
-	podd.addAutoCompleteHandler(input, hiddenValueElement, undefined, undefined, undefined, true);
-	podd.debug('[addProjectRoleHandlers] added autocomplete handler');
-
+podd.addProjectRoleBlurHandler2 = function(input, hiddenValueElement, list, artifactIri, roleUri) {
+	
     input.blur(function(event) {
-        var userIdentifier = '' + $(this).val();
+        var newUserIdentifier = hiddenValueElement.val();
         
-        if (typeof hiddenValueElement !== 'undefined' && userIdentifier !== '') {
-        	userIdentifier = hiddenValueElement.val();
+        if (typeof newUserIdentifier !== undefined && newUserIdentifier !== '') {
+        	podd.debug("[blur] triggered with new value: " + newUserIdentifier);
+        	
+        	// - update Role via AJAX call
+            podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
+            
+            podd.addElementToList(list, roleUri, $(this).val(), newUserIdentifier);
+            
+            // clear the elements
+            $(this).val("");
+            hiddenValueElement.val("");
+        } else {
+        	podd.debug("[blur] value is empty:  " + newUserIdentifier);
         }
-        podd.debug("[blur] triggered with new value: " + userIdentifier);
-        
-        // TODO - update Role via AJAX call
-        podd.submitUserRoleAdd(userIdentifier, roleUri, artifactIri);
-        
     });
+};
+
+
+
+podd.addProjectRoleBlurHandler = function(input, hiddenValueElement, artifactIri, roleUri, originalIdentifier) {
+	var nextOriginalIdentifier = '' + originalIdentifier;
 	
-	// TODO - add Clone Handler
-	var nextField = {};
-	nextField.propertyRange = PROPERTY_HAS_PI;
-	nextField.propertyLabel = 'pi';
-	var nextFieldValue = {};
-	nextFieldValue.displayValue = 'Type Here';
-	var clonedInput = podd.addFieldInputText(nextField, nextFieldValue, 'text');
-	var clonedHiddenValueElement = podd.addFieldInputText(nextField, nextFieldValue, 'hidden');
-	
+    input.blur(function(event) {
+        var newUserIdentifier = '' + $(this).val();
+        
+        if (typeof hiddenValueElement !== 'undefined' && newUserIdentifier !== '') {
+        	newUserIdentifier = hiddenValueElement.val();
+        }
+        
+        if (nextOriginalIdentifier !== newUserIdentifier  && newUserIdentifier !== '') {
+        	podd.debug("[blur] triggered with new value: " + newUserIdentifier + " was " + nextOriginalIdentifier);
+        	
+        	// - update Role via AJAX call
+            podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
+            
+            // Unbind this handler and create a new one with the new value as the original value
+            $(this).unbind("blur");
+            podd.addProjectRoleBlurHandler(input, hiddenValueElement, artifactIri, roleUri, newUserIdentifier);
+        	
+        } else {
+        	podd.debug("[blur] no change in value: was " + nextOriginalIdentifier + ", is " + newUserIdentifier);
+        }
+    });
 	
 	podd.debug('[addProjectRoleHandlers] completed');
 };
@@ -2416,10 +2475,12 @@ podd.submitUserPassword = function() {
  * 
  * @param userName
  *            {string} User whose Roles are being updated
- * @param deletedRow
- *            {object} Table Row containing Role to be deleted
+ * @param roleUri
+ *            {string} URI of Role to be deleted
+ * @param objectUri
+ * 			  {string} Optional URI mapping for the Role to be deleted
  */
-podd.submitUserRoleDelete = function(userName, roleUri) {
+podd.submitUserRoleDelete = function(userName, roleUri, objectUri) {
 
 	podd.debug('[submitUserRoleDelete] ' + userName);
 	var pathToSubmitTo = PATH_USER_ROLES + userName + '?delete=true';
@@ -2435,6 +2496,11 @@ podd.submitUserRoleDelete = function(userName, roleUri) {
 				'http://purl.org/oas/RoleMapping', OBJECT_PROPERTY, 'URI'));
 		roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/oas/roleMappedRole>', roleUri, OBJECT_PROPERTY,
 				'URI'));
+		if (typeof objectUri !== undefined && objectUri !== '') {
+			roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/oas/roleMappedObject>', objectUri, OBJECT_PROPERTY,
+			'URI'));
+		}
+		
 	}
 
 	// ajax POST

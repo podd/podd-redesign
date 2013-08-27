@@ -24,11 +24,41 @@
 			return false;
 		});
 	
-		// add Handlers for the Fields
-		podd.addProjectRoleHandlers($('#pi'), $('#pi_hidden'), podd.artifactIri, '${piUri!""}');
-		podd.addProjectRoleHandlers($('#admin'), $('#admin_hidden'), podd.artifactIri, '${adminUri!""}');
-		podd.addProjectRoleHandlers($('#member'), $('#member_hidden'), podd.artifactIri, '${memberUri!""}');
-		podd.addProjectRoleHandlers($('#observer'), $('#observer_hidden'), podd.artifactIri, '${observerUri!""}');
+		$(".deleteLinkStatic").click(function() {
+	     	var identifier = $(this).closest('span').attr('value');
+	     	var roleUri = $(this).attr('name');
+	    	podd.debug('Remove: ' + identifier + ' as a <' + roleUri + '> for project ' + podd.artifactIri);
+	    	podd.submitUserRoleDelete(identifier, roleUri, podd.artifactIri);
+	     	
+	     	var liToRemove = $(this).closest('li');
+			podd.debug('Going to remove ' + liToRemove);	     	
+	     	liToRemove.fadeOut(400, function(){
+         		liToRemove.remove();
+        	});
+	     	
+        	return false;
+	    });
+	
+	
+		// add Handlers for PI
+		var piInput = $('#pi');
+		var piHiddenValueElement =  $('#pi_hidden');
+		podd.addAutoCompleteHandler(piInput, piHiddenValueElement, undefined, undefined, undefined, true);
+		podd.addProjectRoleBlurHandler(piInput, piHiddenValueElement, podd.artifactIri, '${piUri!""}', '${piIdentifier!""}');
+		
+		
+		// add Handlers for Project Admin
+		var adminInput = $('#admin');
+		var adminHiddenValueElement = $('#admin_hidden');
+		var adminList = $('#admin_list');
+		
+		podd.addAutoCompleteHandler(adminInput, adminHiddenValueElement, undefined, undefined, undefined, true);
+		podd.addProjectRoleBlurHandler2(adminInput, adminHiddenValueElement, adminList, podd.artifactIri, '${adminUri!""}');
+		
+
+		
+		//podd.addProjectRoleHandlers($('#member'), $('#member_hidden'), podd.artifactIri, '${memberUri!""}');
+		//podd.addProjectRoleHandlers($('#observer'), $('#observer_hidden'), podd.artifactIri, '${observerUri!""}');
 		
         podd.debug('### initialization complete ###');
 	});
@@ -67,25 +97,45 @@
 		                </label>
 		            </li>
 		            <li>
-		                <input autocomplete="off" class="wide ac_input" id="pi" name="pi" value="${pi!""}">
-		                <input type="hidden" id="pi_hidden" name="pi_hidden" value="">
+		                <input autocomplete="off" class="wide ac_input" id="pi" name="pi" value="${piLabel!""}">
+		                <input type="hidden" id="pi_hidden" name="pi_hidden" value="${piIdentifier!""}">
+		                <h6 class="errorMsg">${piError!""}</h6>
 		                <br>Only the Principal Investigator can publish a Project.
 		                Principal Investigators have Project Administrator status by default.
 		                <h6 class="errorMsg">${piError!""}</h6>
 		                <br>
 		            </li>
+		            
 		            <li>
 		                <label for="admin" class="bold">Project Administrators:
-		                	<span icon="addField" class="clonable"></span>
+	                	<a id="add_padmin" title="Add Project Administrator" icon="addField"></a>
 		                </label>
 		            </li>
+		            
 		            <li>
-		                <input autocomplete="off" class="wide ac_input" id="admin" name="admin" value="${admin!""}">
+		            	<ul id="admin_list">
+			            <#if admins?? && admins?has_content>
+				            <#list admins as admin>
+					            <li>
+					            	<span value="${admin.identifier!""}">
+					            		${admin.userLabel!""}
+					            		<a name="${adminUri!""}" class="deleteLinkStatic" href="">delete</a>
+					            	</span>
+					            </li>
+				            </#list>
+			            </#if>
+		            	</ul>
+		            </li>
+		            <li>
+		                <input autocomplete="off" class="wide ac_input" id="admin" name="admin" value="">
 		                <input type="hidden" id="admin_hidden" name="admin_hidden" value="">
+	                	<a id="add_padmin" class="button" href="">Add</a>
 		                <br>Project Administrators will have Create, Read, Update and Delete access to all project objects.
 		                <h6 class="errorMsg">${adminError!""}</h6>
 		                <br>
 		            </li>
+
+<!--		            
 		            <li>
 		                <label for="member" class="bold">Project Members: 
 		                	<span icon="addField" class="clonable"></span>
@@ -110,6 +160,7 @@
 		                <h6 class="errorMsg">${observerError!""}</h6>
 		                <br>
 		            </li>
+-->		            
 		       </ol>
 		    </div>
 		</div>  <!-- Collapsable div -->
