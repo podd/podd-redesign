@@ -14,7 +14,7 @@
         podd.debug('initializing...');
         podd.debug('-------------------');
 
-		podd.artifactIri = '${artifactIri!"undefined"}';
+		podd.artifactIri = '${artifactUri!"undefined"}';
 		
 		podd.debug("artifact IRI: " + podd.artifactIri);
 		
@@ -81,6 +81,21 @@
 	    </#list>
 	</#if>
 </ol>
+
+	<div id="project_details">  <!-- Collapsible div -->
+	    <div id="projectInfo" class="fieldset">
+	        <div class="legend">Project Summary Information</div>
+	        <ol>
+	        <li><span class="bold">ID:</span>
+	        	<a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${projectObject.objectURI?url}">${projectObject.objectURI!""}</a>
+	        </li>
+	        <li><span class="bold">Title: </span>${projectObject.label!""}</li>
+	        </ol>
+	    </div>
+	</div>  <!-- projectDetails - Collapsable div -->
+	<br>
+
+
 	<form id="editObjectForm">
 	 
 		 <!-- Project Participants -->

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.openrdf.OpenRDFException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -29,6 +30,7 @@ import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
@@ -83,6 +85,8 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
+            dataModel.put("projectObject", this.getProjectDetails(ontologyID));
+            
             dataModel.put("piUri", PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getURI());
             dataModel.put("adminUri", PoddRoles.PROJECT_ADMIN.getURI());
             dataModel.put("memberUri", PoddRoles.PROJECT_MEMBER.getURI());
@@ -117,7 +121,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
         }
         
-        dataModel.put("artifactIri", ontologyID.getOntologyIRI().toString());
+        dataModel.put("artifactUri", ontologyID.getOntologyIRI().toString());
         
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
@@ -175,4 +179,23 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         return userList;
     }
     
+    /**
+     * Helper method to retrieve display details for Project Top Object.
+     * 
+     * @param ontologyID
+     * @return
+     * @throws OpenRDFException
+     */
+    private PoddObjectLabel getProjectDetails(final InferredOWLOntologyID ontologyID)
+    throws OpenRDFException
+    {
+        // find and set top-object of this artifact as the object to display
+        final List<PoddObjectLabel> topObjectLabels =
+                this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(ontologyID));
+        if(topObjectLabels == null || topObjectLabels.size() != 1)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
+        }
+        return topObjectLabels.get(0);
+    }
 }
