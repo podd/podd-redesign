@@ -384,7 +384,30 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public Map<RestletUtilRole, Collection<URI>> listRoles(String userIdentifier) throws PoddClientException
+    public Map<RestletUtilRole, Collection<String>> listRoles(final InferredOWLOntologyID artifactId)
+        throws PoddClientException
+    {
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_ROLES));
+        resource.getCookies().addAll(this.currentCookies);
+        resource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactId.getOntologyIRI().toString());
+        
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final Representation get = resource.get(MediaType.APPLICATION_RDF_TURTLE);
+        
+        try
+        {
+            return PoddRoles.extractRoleMappingsArtifact(this.parseRdf(get));
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Could not parse role details due to an IOException", e);
+        }
+        
+    }
+    
+    @Override
+    public Map<RestletUtilRole, Collection<URI>> listRoles(final String userIdentifier) throws PoddClientException
     {
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
         resource.getCookies().addAll(this.currentCookies);
@@ -399,7 +422,7 @@ public class RestletPoddClientImpl implements PoddClient
         
         try
         {
-            return PoddRoles.extractRoleMappings(this.parseRdf(get));
+            return PoddRoles.extractRoleMappingsUser(this.parseRdf(get));
         }
         catch(final IOException e)
         {

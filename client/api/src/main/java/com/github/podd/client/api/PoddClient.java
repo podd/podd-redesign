@@ -135,18 +135,29 @@ public interface PoddClient
     boolean isLoggedIn();
     
     /**
-     * List the roles that have been assigned to the currently logged in user.
+     * List the roles that have been assigned to the given user, or the currently logged in user if
+     * the user is not specified.
      * 
      * @param userIdentifier
      *            If not null, specifies a specific user to request information about.
      * 
-     * @return A map of {@link RestletUtilRole}s identifying PODD repository and project roles.
-     *         Repository roles are indicated by null entries in the collections mapped to each
-     *         role. Repository roles can further be verified by checking
-     *         {@link PoddRoles#getRepositoryRoles()}.
+     * @return A map of {@link RestletUtilRole}s identifying roles that have been given to the user,
+     *         optionally to artifacts that the role maps to for this user.
      * @throws PoddClientException
      */
     Map<RestletUtilRole, Collection<URI>> listRoles(String userIdentifier) throws PoddClientException;
+    
+    /**
+     * List the roles that have been assigned to the given artifact.
+     * 
+     * @param artifactId
+     *            The {@link InferredOWLOntologyID} identifying an artifact to fetch roles for.
+     * 
+     * @return A map of {@link RestletUtilRole}s identifying PODD roles attached to the given
+     *         artifact to users who have each role.
+     * @throws PoddClientException
+     */
+    Map<RestletUtilRole, Collection<String>> listRoles(InferredOWLOntologyID artifactId) throws PoddClientException;
     
     /**
      * 

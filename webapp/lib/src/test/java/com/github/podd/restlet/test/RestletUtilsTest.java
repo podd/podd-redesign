@@ -69,7 +69,7 @@ public class RestletUtilsTest
     @Test
     public void testExtractRoleMappingsEmpty()
     {
-        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappings(new LinkedHashModel());
+        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(new LinkedHashModel());
         
         Assert.assertTrue(roleMappings.isEmpty());
     }
@@ -86,7 +86,7 @@ public class RestletUtilsTest
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
         
-        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappings(model);
+        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());
         
         Assert.assertEquals(1, roleMappings.size());
@@ -107,7 +107,7 @@ public class RestletUtilsTest
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_ADMIN.getURI());
         
-        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappings(model);
+        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());
         
         Assert.assertEquals(1, roleMappings.size());
@@ -130,7 +130,7 @@ public class RestletUtilsTest
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
         model.add(resource, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, objectUri);
         
-        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappings(model);
+        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());
         
         Assert.assertEquals(1, roleMappings.size());
@@ -153,7 +153,7 @@ public class RestletUtilsTest
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_ADMIN.getURI());
         model.add(resource, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, objectUri);
         
-        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappings(model);
+        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
         Assert.assertFalse(roleMappings.isEmpty());
         
         Assert.assertEquals(1, roleMappings.size());

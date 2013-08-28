@@ -118,7 +118,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model model = Rio.parse(inputStream, "", inputFormat);
             
-            rolesToEdit = PoddRoles.extractRoleMappings(model);
+            rolesToEdit = PoddRoles.extractRoleMappingsUser(model);
         }
         catch(IOException | RDFParseException | UnsupportedRDFormatException e1)
         {
@@ -271,7 +271,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
             final Map<RestletUtilRole, Collection<URI>> mappings = RestletUtils.getUsersRoles(realm, poddUser);
             final Model results = new LinkedHashModel();
             
-            PoddRoles.dumpRoleMappings(mappings, results);
+            PoddRoles.dumpRoleMappingsUser(mappings, results);
             
             // - prepare response
             final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);

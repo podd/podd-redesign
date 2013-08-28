@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.model.BNode;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -60,13 +61,139 @@ public enum PoddRoles implements RestletUtilRole
             "http://purl.org/podd/ns/poddUser#RoleTopObjectObserver", true),
     
     PROJECT_ADMIN("Project Administrator", "A user who is an administrator of a particular project",
-            "http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator", true), 
-            
+            "http://purl.org/podd/ns/poddUser#RoleTopObjectAdministrator", true),
+    
     PROJECT_PRINCIPAL_INVESTIGATOR("Principal Investigator",
             "A user who is the lead of a particular project and has the ability to publish the project",
             "http://purl.org/podd/ns/poddUser#RoleTopObjectPrincipalInvestigator", true),
     
     ;
+    
+    private final static Logger log = LoggerFactory.getLogger(PoddRoles.class);
+    
+    /**
+     * Dumps the role mappings from the given map to the given model, optionally into the given
+     * contexts.
+     */
+    public static void dumpRoleMappingsUser(final Map<RestletUtilRole, Collection<URI>> mappings, final Model model,
+            final URI... contexts)
+    {
+        for(final RestletUtilRole nextRole : mappings.keySet())
+        {
+            for(final URI nextObjectUri : mappings.get(nextRole))
+            {
+                final BNode mappingUri = PoddRdfConstants.VF.createBNode();
+                
+                model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
+                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
+                
+                if(nextObjectUri != null)
+                {
+                    model.add(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, nextObjectUri, contexts);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Dumps the role mappings from the given map to the given model, optionally into the given
+     * contexts.
+     */
+    public static void dumpRoleMappingsArtifact(final Map<RestletUtilRole, Collection<String>> mappings,
+            final Model model, final URI... contexts)
+    {
+        for(final RestletUtilRole nextRole : mappings.keySet())
+        {
+            for(final String nextUserIdentifier : mappings.get(nextRole))
+            {
+                final BNode mappingUri = PoddRdfConstants.VF.createBNode();
+                
+                model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
+                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
+                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDUSER,
+                        PoddRdfConstants.VF.createLiteral(nextUserIdentifier), contexts);
+            }
+        }
+    }
+    
+    /**
+     * Extracts role mappings for an object, to users who have the role, from the given RDF
+     * statements.
+     * 
+     * @param model
+     *            A set of RDF statements defining role mappings
+     * @return A map of roles to collections of users who have the role.
+     */
+    public static Map<RestletUtilRole, Collection<String>> extractRoleMappingsArtifact(final Model model,
+            final URI... contexts)
+    {
+        final ConcurrentMap<RestletUtilRole, Collection<String>> results = new ConcurrentHashMap<>();
+        
+        // extract Role Mapping info (User details are ignored as multiple users are not
+        // supported)
+        for(final Resource mappingUri : model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts)
+                .subjects())
+        {
+            final URI roleUri =
+                    model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null, contexts).objectURI();
+            final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
+            
+            final Literal mappedObject =
+                    model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDUSER, null, contexts).objectLiteral();
+            
+            PoddRoles.log.debug("Extracted Role <{}> with Optional Object <{}>", role.getName(), mappedObject);
+            Collection<String> nextObjectUris = new HashSet<>();
+            final Collection<String> putIfAbsent = results.putIfAbsent(role, nextObjectUris);
+            if(putIfAbsent != null)
+            {
+                nextObjectUris = putIfAbsent;
+            }
+            nextObjectUris.add(mappedObject.stringValue());
+        }
+        
+        return results;
+    }
+    
+    /**
+     * Extracts role mappings, optionally to object URIs, from the given RDF statements.
+     * <p>
+     * NOTE: This method does not fail if Repository roles contain object URIs or if Project Roles
+     * do not contain object URIs. The user must determine when and how to fail in these cases.
+     * 
+     * @param model
+     *            A set of RDF statements defining role mappings
+     * @return A map of roles to collections of optional object URIs. If the collection contains a
+     *         null element, then the role was not mapped to an object URI in at least one case.
+     */
+    public static Map<RestletUtilRole, Collection<URI>> extractRoleMappingsUser(final Model model,
+            final URI... contexts)
+    {
+        final ConcurrentMap<RestletUtilRole, Collection<URI>> results = new ConcurrentHashMap<>();
+        
+        // extract Role Mapping info (User details are ignored as multiple users are not
+        // supported)
+        for(final Resource mappingUri : model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts)
+                .subjects())
+        {
+            final URI roleUri =
+                    model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null, contexts).objectURI();
+            final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
+            
+            final URI mappedObject =
+                    model.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null, contexts).objectURI();
+            
+            PoddRoles.log.debug("Extracted Role <{}> with Optional Object <{}>", role.getName(), mappedObject);
+            Collection<URI> nextObjectUris = new HashSet<>();
+            final Collection<URI> putIfAbsent = results.putIfAbsent(role, nextObjectUris);
+            if(putIfAbsent != null)
+            {
+                nextObjectUris = putIfAbsent;
+            }
+            nextObjectUris.add(mappedObject);
+        }
+        
+        return results;
+    }
     
     /**
      * @return Retrieve PoddRoles that are Repository-wide (e.g. Administrator Role)
@@ -123,8 +250,6 @@ public enum PoddRoles implements RestletUtilRole
         return result;
     }
     
-    private final static Logger log = LoggerFactory.getLogger(PoddRoles.class);
-    
     private final Role role;
     
     private final URI uri;
@@ -179,70 +304,6 @@ public enum PoddRoles implements RestletUtilRole
     public boolean isAssignable()
     {
         return this.isAssignable;
-    }
-    
-    /**
-     * Dumps the role mappings from the given map to the given model, optionally into the given
-     * contexts.
-     */
-    public static void dumpRoleMappings(final Map<RestletUtilRole, Collection<URI>> mappings, final Model model,
-            final URI... contexts)
-    {
-        for(final RestletUtilRole nextRole : mappings.keySet())
-        {
-            for(final URI nextObjectUri : mappings.get(nextRole))
-            {
-                final BNode mappingUri = PoddRdfConstants.VF.createBNode();
-                
-                model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
-                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
-                
-                if(nextObjectUri != null)
-                {
-                    model.add(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, nextObjectUri, contexts);
-                }
-            }
-        }
-    }
-    
-    /**
-     * Extracts role mappings, optionally to object URIs, from the given RDF statements.
-     * <p>
-     * NOTE: This method does not fail if Repository roles contain object URIs or if Project Roles
-     * do not contain object URIs. The user must determine when and how to fail in these cases.
-     * 
-     * @param model
-     *            A set of RDF statements defining role mappings
-     * @return A map of roles to collections of optional object URIs. If the collection contains a
-     *         null element, then the role was not mapped to an object URI in at least one case.
-     */
-    public static Map<RestletUtilRole, Collection<URI>> extractRoleMappings(final Model model, final URI... contexts)
-    {
-        final ConcurrentMap<RestletUtilRole, Collection<URI>> results = new ConcurrentHashMap<>();
-        
-        // extract Role Mapping info (User details are ignored as multiple users are not
-        // supported)
-        for(final Resource mappingUri : model.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts)
-                .subjects())
-        {
-            final URI roleUri =
-                    model.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null, contexts).objectURI();
-            final RestletUtilRole role = PoddRoles.getRoleByUri(roleUri);
-            
-            final URI mappedObject =
-                    model.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null, contexts).objectURI();
-            
-            log.debug("Extracted Role <{}> with Optional Object <{}>", role.getName(), mappedObject);
-            Collection<URI> nextObjectUris = new HashSet<>();
-            final Collection<URI> putIfAbsent = results.putIfAbsent(role, nextObjectUris);
-            if(putIfAbsent != null)
-            {
-                nextObjectUris = putIfAbsent;
-            }
-            nextObjectUris.add(mappedObject);
-        }
-        
-        return results;
     }
     
 }
