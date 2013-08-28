@@ -162,7 +162,7 @@
 		            <li>
 		                <input autocomplete="off" class="wide ac_input" id="admin" name="admin" value="">
 		                <input type="hidden" id="admin_hidden" name="admin_hidden" value="">
-	                	<a id="add_padmin" class="button" href="">Add</a>
+	                	<a id="add_padmin" class="button" href="javascript:void(0);">Add</a>
 		                <br>Project Administrators will have Create, Read, Update and Delete access to all project objects.
 		                <h6 class="errorMsg">${adminError!""}</h6>
 		                <br>
@@ -191,6 +191,7 @@
 		            <li>
 		                <input autocomplete="off" class="wide ac_input" id="member" name="member" value="">
 			            <input type="hidden" id="member_hidden" name="member_hidden" value="">
+	                	<a id="add_pmember" class="button" href="javascript:void(0);">Add</a>
 		                <br>Project Members will have Create, Read and Update access to all project objects.
 		                <h6 class="errorMsg">${memberError!""}</h6>
 		                <br>
@@ -220,6 +221,7 @@
 		            <li>
 		                <input autocomplete="off" class="wide ac_input" id="observer" name="observer" value="${observer!""}">
 			            <input type="hidden" id="observer_hidden" name="observer_hidden" value="">
+	                	<a id="add_pobserver" class="button" href="javascript:void(0);">Add</a>
 		                <br>Project Observer will have Read only access to all project objects.
 		                <h6 class="errorMsg">${observerError!""}</h6>
 		                <br>
