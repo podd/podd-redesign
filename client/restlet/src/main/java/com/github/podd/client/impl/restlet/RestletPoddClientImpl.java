@@ -386,9 +386,12 @@ public class RestletPoddClientImpl implements PoddClient
     @Override
     public Map<RestletUtilRole, Collection<URI>> listRoles(String userIdentifier) throws PoddClientException
     {
-        final ClientResource resource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES) + userIdentifier);
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
         resource.getCookies().addAll(this.currentCookies);
+        if(userIdentifier != null)
+        {
+            resource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
+        }
         
         this.log.info("cookies: {}", this.currentCookies);
         

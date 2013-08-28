@@ -136,7 +136,9 @@ public interface PoddClient
     
     /**
      * List the roles that have been assigned to the currently logged in user.
-     * @param userIdentifier TODO
+     * 
+     * @param userIdentifier
+     *            If not null, specifies a specific user to request information about.
      * 
      * @return A map of {@link RestletUtilRole}s identifying PODD repository and project roles.
      *         Repository roles are indicated by null entries in the collections mapped to each

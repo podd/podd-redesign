@@ -82,17 +82,17 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
-        final String userIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
-        this.log.info("editing Roles of user: {}", userIdentifier);
+        String userIdentifier = getUserParameter();
         
-        final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
+        this.log.info("editing Roles of user: {}", userIdentifier);
         
         // - validate User whose Roles are to be edited
         if(userIdentifier == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit Roles");
         }
+        
+        final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final RestletUtilUser restletUserToUpdate = nextRealm.findUser(userIdentifier);
         if(restletUserToUpdate == null || !(restletUserToUpdate instanceof PoddUser))
         {
@@ -195,33 +195,22 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("getRoleManagementHtml");
         
-        final String requestedUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
-        this.log.info("requesting role management of user: {}", requestedUserIdentifier);
-        
-        if(requestedUserIdentifier == null)
-        {
-            // no identifier specified.
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user");
-        }
-        
-        final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
-        
-        // identify needed Action
+        String requestedUserIdentifier = getUserParameter();
         PoddAction action = PoddAction.OTHER_USER_EDIT;
-        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
+        if(requestedUserIdentifier != null)
         {
-            action = PoddAction.CURRENT_USER_EDIT;
+            action = getAction(requestedUserIdentifier);
         }
         
+        this.log.info("requesting role management for user: {}", requestedUserIdentifier);
         this.checkAuthentication(action);
+        
         // completed checking authorization
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "editUserRoles.html.ftl");
         dataModel.put("pageTitle", "User Role Management");
-        dataModel.put("authenticatedUserIdentifier", user.getIdentifier());
+        dataModel.put("authenticatedUserIdentifier", this.getRequest().getClientInfo().getUser().getIdentifier());
         
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
@@ -258,29 +247,17 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("getRoleManagementHtml");
         
-        final String requestedUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
-        this.log.info("requesting role management of user: {}", requestedUserIdentifier);
-        
-        if(requestedUserIdentifier == null)
-        {
-            // no identifier specified.
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user");
-        }
-        
-        final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
-        
-        // identify needed Action
+        String requestedUserIdentifier = getUserParameter();
         PoddAction action = PoddAction.OTHER_USER_EDIT;
-        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
+        if(requestedUserIdentifier != null)
         {
-            action = PoddAction.CURRENT_USER_EDIT;
+            action = getAction(requestedUserIdentifier);
         }
         
+        this.log.info("requesting role management for user: {}", requestedUserIdentifier);
         this.checkAuthentication(action);
-        // completed checking authorization
         
+        // completed checking authorization
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
         
@@ -313,6 +290,52 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                     .getDefaultMIMEType()));
             
         }
+    }
+    
+    /**
+     * @param requestedUserIdentifier
+     * @return
+     */
+    private PoddAction getAction(String requestedUserIdentifier)
+    {
+        PoddAction action = PoddAction.OTHER_USER_EDIT;
+        
+        if(this.getRequest().getClientInfo().isAuthenticated())
+        {
+            // Special case where they attached the user identifier and it was the same as the
+            // logged in user
+            if(requestedUserIdentifier.equals(this.getRequest().getClientInfo().getUser().getIdentifier()))
+            {
+                action = PoddAction.CURRENT_USER_EDIT;
+            }
+        }
+        return action;
+    }
+    
+    /**
+     * @return
+     * @throws ResourceException
+     */
+    private String getUserParameter() throws ResourceException
+    {
+        String requestedUserIdentifier = (String)this.getQuery().getFirstValue(PoddWebConstants.KEY_USER_IDENTIFIER);
+        
+        if(requestedUserIdentifier == null)
+        {
+            if(this.getRequest().getClientInfo().isAuthenticated())
+            {
+                // Default to requesting information about the logged in user
+                requestedUserIdentifier = this.getRequest().getClientInfo().getUser().getIdentifier();
+            }
+            else
+            {
+                this.log.error("Did not specify user for roles resource and not logged in");
+                // no identifier specified.
+                // throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                // "Did not specify user");
+            }
+        }
+        return requestedUserIdentifier;
     }
     
 }

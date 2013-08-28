@@ -363,11 +363,10 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         this.log.debug("attaching user change password service to path={}", userChangePasswordPath);
         router.attach(userChangePasswordPath, UserPasswordResourceImpl.class);
         
-        // Add a route for Edit User Roles page.
-        final String userEditRolesPath =
-                PoddWebConstants.PATH_USER_ROLES + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
-        this.log.debug("attaching edit user roles service to path={}", userEditRolesPath);
-        router.attach(userEditRolesPath, UserRolesResourceImpl.class);
+        // Add a route for User Roles page.
+        final String userRolesPath = PoddWebConstants.PATH_USER_ROLES;
+        this.log.debug("attaching user roles service to path={}", userRolesPath);
+        router.attach(userRolesPath, UserRolesResourceImpl.class);
         
         // TODO: add routes for other user management pages. (List/Delete Users)
         
@@ -399,7 +398,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String artifactRoles = PoddWebConstants.PATH_ARTIFACT_ROLES;
         this.log.debug("attaching Edit Artifact Roles service to path={}", artifactRoles);
         router.attach(artifactRoles, ArtifactRolesResourceImpl.class);
-
+        
         // Add a route for the Delete Artifact page.
         final String deleteArtifact = PoddWebConstants.PATH_ARTIFACT_DELETE;
         this.log.debug("attaching Delete Artifact service to path={}", deleteArtifact);
