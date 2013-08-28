@@ -65,8 +65,8 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     {
         final Map<String, List<InferredOWLOntologyID>> results = new HashMap<String, List<InferredOWLOntologyID>>();
         
-        final String publishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_PUBLISHED);
-        final String unpublishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_UNPUBLISHED);
+        final String publishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_PUBLISHED, true);
+        final String unpublishedString = this.getQuery().getFirstValue(PoddWebConstants.KEY_UNPUBLISHED, true);
         
         // default to both published and unpublished to start with
         boolean published = true;

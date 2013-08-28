@@ -102,7 +102,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         
         // - retrieve 'delete' parameter
         boolean isDelete = false;
-        final String deleteQueryParam = this.getQuery().getFirstValue(PoddWebConstants.KEY_DELETE);
+        final String deleteQueryParam = this.getQuery().getFirstValue(PoddWebConstants.KEY_DELETE, true);
         if(deleteQueryParam != null)
         {
             isDelete = Boolean.valueOf(deleteQueryParam);
@@ -318,7 +318,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
      */
     private String getUserParameter() throws ResourceException
     {
-        String requestedUserIdentifier = (String)this.getQuery().getFirstValue(PoddWebConstants.KEY_USER_IDENTIFIER);
+        String requestedUserIdentifier = (String)this.getQuery().getFirstValue(PoddWebConstants.KEY_USER_IDENTIFIER, true);
         
         if(requestedUserIdentifier == null)
         {

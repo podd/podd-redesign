@@ -54,7 +54,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         this.log.info("getArtifactRolesHtml");
         
         // the artifact in which editing is requested
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         if(artifactUri == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");

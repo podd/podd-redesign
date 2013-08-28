@@ -54,7 +54,7 @@ public class UserSearchResourceImpl extends AbstractPoddResourceImpl
         this.checkAuthentication(PoddAction.OTHER_USER_SEARCH);
         
         // - get input search term (mandatory)
-        final String searchTerm = this.getQuery().getFirstValue(PoddWebConstants.KEY_SEARCHTERM);
+        final String searchTerm = this.getQuery().getFirstValue(PoddWebConstants.KEY_SEARCHTERM, true);
         if(searchTerm == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Search term not submitted");

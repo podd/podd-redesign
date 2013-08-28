@@ -129,7 +129,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         else
         {
             
-            String formatString = this.getQuery().getFirstValue("format");
+            String formatString = this.getQuery().getFirstValue("format", true);
             
             if(formatString == null)
             {

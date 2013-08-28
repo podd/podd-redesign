@@ -67,14 +67,14 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         
         // search term - mandatory parameter
-        final String searchTerm = this.getQuery().getFirstValue(PoddWebConstants.KEY_SEARCHTERM);
+        final String searchTerm = this.getQuery().getFirstValue(PoddWebConstants.KEY_SEARCHTERM, true);
         if(searchTerm == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Search term not submitted");
         }
         
         // artifact ID - optional parameter
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         InferredOWLOntologyID ontologyID = null;
         if(artifactUri != null)
         {
@@ -150,7 +150,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
     public Representation postRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         // artifact ID - optional parameter
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         InferredOWLOntologyID ontologyID = null;
         if(artifactUri != null)
         {

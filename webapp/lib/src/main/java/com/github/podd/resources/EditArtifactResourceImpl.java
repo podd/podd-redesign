@@ -199,14 +199,14 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         this.log.info("getEditArtifactHtml");
         
         // the artifact in which editing is requested
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         if(artifactUri == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact ID not submitted");
         }
         
         // Podd object to be edited. NULL indicates top object is to be edited.
-        final String objectToEdit = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER);
+        final String objectToEdit = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
         
         this.log.info("requesting to edit artifact (HTML): {}, {}", artifactUri, objectToEdit);
         

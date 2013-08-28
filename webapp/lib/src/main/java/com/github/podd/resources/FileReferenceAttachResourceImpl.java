@@ -72,7 +72,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     public Representation attachFileReferencePageHtml(final Representation entity) throws ResourceException
     {
         // check mandatory parameter: artifact IRI
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         if(artifactUri == null)
         {
             this.log.error("Artifact ID not submitted");
@@ -104,7 +104,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         throws ResourceException
     {
         // check mandatory parameter: artifact IRI
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         if(artifactUri == null)
         {
             this.log.error("Artifact ID not submitted");
@@ -114,7 +114,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         
         // check mandatory parameter: artifact version IRI
-        final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER);
+        final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
         if(versionUri == null)
         {
             this.log.error("Artifact Version IRI not submitted");
@@ -122,7 +122,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         }
         
         // check optional parameter: whether file references should be verified. Defaults to NO
-        final String verifyFileRefs = this.getQuery().getFirstValue(PoddWebConstants.KEY_VERIFICATION_POLICY);
+        final String verifyFileRefs = this.getQuery().getFirstValue(PoddWebConstants.KEY_VERIFICATION_POLICY, true);
         DataReferenceVerificationPolicy verificationPolicy = DataReferenceVerificationPolicy.DO_NOT_VERIFY;
         if(verifyFileRefs != null && Boolean.valueOf(verifyFileRefs))
         {

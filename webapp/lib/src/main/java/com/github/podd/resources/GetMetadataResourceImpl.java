@@ -64,14 +64,14 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
     public Representation getRdf(final Variant variant) throws ResourceException
     {
         // - object Type (mandatory)
-        final String objectType = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER);
+        final String objectType = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, true);
         if(objectType == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Type of Object to create not specified");
         }
         
         // - artifact URI (optional)
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         
         // - include Do-Not-Display properties (optional, defaults to false)
         final String includeDoNotDisplayPropertiesString =

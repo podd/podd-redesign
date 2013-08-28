@@ -93,7 +93,7 @@ public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
     public Representation deleteArtifactPageHtml(final Representation entity) throws ResourceException
     {
         // check mandatory parameter: artifact IRI
-        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER);
+        final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         if(artifactUri == null)
         {
             this.log.error("Artifact ID not submitted");
