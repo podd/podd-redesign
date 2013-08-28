@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.github.podd</groupId>
         <artifactId>podd-prototype-parent</artifactId>
-        <version>0.3</version>
+        <version>0.4-SNAPSHOT</version>
     </parent>
     <artifactId>podd-prototype-csiro</artifactId>
     <name>PODD :: Prototype For CSIRO</name>
