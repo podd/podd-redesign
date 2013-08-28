@@ -26,6 +26,19 @@
 	        </#list>
 	    </#if>
 		
+		podd.roledata['${memberUri}'] = [];
+	    <#if members?? && members?has_content>
+	        <#list members as member>
+	        	podd.roledata['${memberUri}'].push('${member.identifier}');
+	        </#list>
+	    </#if>
+
+		podd.roledata['${observerUri}'] = [];
+	    <#if observers?? && observers?has_content>
+	        <#list observers as observer>
+	        	podd.roledata['${observerUri}'].push('${observer.identifier}');
+	        </#list>
+	    </#if>
 		
 		$("#btnCancel").click(function(event) {
 			event.preventDefault();
@@ -43,16 +56,27 @@
 		podd.addPiBlurHandler(piInput, piHiddenValueElement, podd.artifactIri, '${piUri!""}', '${piIdentifier!""}');
 		
 		
-		// add Handlers for Project Admin
+		// - add Handlers for Project Admins
 		var adminInput = $('#admin');
 		var adminHiddenValueElement = $('#admin_hidden');
 		var adminList = $('#admin_list');
 		podd.addAutoCompleteHandler(adminInput, adminHiddenValueElement, undefined, undefined, undefined, true);
 		podd.addProjectRoleBlurHandler(adminInput, adminHiddenValueElement, adminList, podd.artifactIri, '${adminUri!""}');
 		
-		//podd.addProjectRoleHandlers($('#member'), $('#member_hidden'), podd.artifactIri, '${memberUri!""}');
-		//podd.addProjectRoleHandlers($('#observer'), $('#observer_hidden'), podd.artifactIri, '${observerUri!""}');
+		// - add Handlers for Project Members
+		var memberInput = $('#member');
+		var memberHiddenValueElement = $('#member_hidden');
+		var memberList = $('#member_list');
+		podd.addAutoCompleteHandler(memberInput, memberHiddenValueElement, undefined, undefined, undefined, true);
+		podd.addProjectRoleBlurHandler(memberInput, memberHiddenValueElement, memberList, podd.artifactIri, '${memberUri!""}');
 		
+		// - add Handlers for Project Observers
+		var observerInput = $('#observer');
+		var observerHiddenValueElement = $('#observer_hidden');
+		var observerList = $('#observer_list');
+		podd.addAutoCompleteHandler(observerInput, observerHiddenValueElement, undefined, undefined, undefined, true);
+		podd.addProjectRoleBlurHandler(observerInput, observerHiddenValueElement, observerList, podd.artifactIri, '${observerUri!""}');
+
         podd.debug('### initialization complete ###');
 	});
 </script>
@@ -114,6 +138,7 @@
 		                <br>
 		            </li>
 		            
+	<!-- Project Admins -->
 		            <li>
 		                <label for="admin" class="bold">Project Administrators:
 	                	<a id="add_padmin" title="Add Project Administrator" icon="addField"></a>
@@ -143,23 +168,54 @@
 		                <br>
 		            </li>
 
-<!--		            
+	<!-- Project Members -->
 		            <li>
 		                <label for="member" class="bold">Project Members: 
 		                	<span icon="addField" class="clonable"></span>
 		                </label>
 		            </li>
 		            <li>
-		                <input autocomplete="off" class="wide ac_input" id="member" name="member" value="${member!""}">
+		            	<ul id="member_list">
+			            <#if members?? && members?has_content>
+				            <#list members as member>
+					            <li>
+					            	<span value="${member.identifier!""}">
+					            		${member.userLabel!""}
+					            		<a name="${memberUri!""}" class="deleteLinkStatic" href="">delete</a>
+					            	</span>
+					            </li>
+				            </#list>
+			            </#if>
+		            	</ul>
+		            </li>
+		            <li>
+		                <input autocomplete="off" class="wide ac_input" id="member" name="member" value="">
 			            <input type="hidden" id="member_hidden" name="member_hidden" value="">
 		                <br>Project Members will have Create, Read and Update access to all project objects.
 		                <h6 class="errorMsg">${memberError!""}</h6>
 		                <br>
 		            </li>
+
+	<!-- Project Observers -->
+		            
 		            <li>
 		                <label for="observer" class="bold">Project Observers: 
 		                	<span icon="addField" class="clonable"></span>
 		                </label>
+		            </li>
+		            <li>
+		            	<ul id="observer_list">
+			            <#if observers?? && observers?has_content>
+				            <#list observers as observer>
+					            <li>
+					            	<span value="${observer.identifier!""}">
+					            		${observer.userLabel!""}
+					            		<a name="${observerUri!""}" class="deleteLinkStatic" href="">delete</a>
+					            	</span>
+					            </li>
+				            </#list>
+			            </#if>
+		            	</ul>
 		            </li>
 		            <li>
 		                <input autocomplete="off" class="wide ac_input" id="observer" name="observer" value="${observer!""}">
@@ -168,7 +224,7 @@
 		                <h6 class="errorMsg">${observerError!""}</h6>
 		                <br>
 		            </li>
--->		            
+		            
 		       </ol>
 		    </div>
 		</div>  <!-- Collapsable div -->
