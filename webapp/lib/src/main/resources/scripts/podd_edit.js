@@ -415,6 +415,9 @@ podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRow
     return textarea;
 };
 
+/**
+ * TODO
+ */
 podd.addElementToList = function(list, roleUri, userLabel, userIdentifier) {
 	podd.debug('[addElementToList] add item: ' + userIdentifier + ' to Role ' + roleUri);
 
@@ -440,6 +443,9 @@ podd.addElementToList = function(list, roleUri, userLabel, userIdentifier) {
 	podd.debug('[addElementToList] completed');
 };
 
+/**
+ * TODO
+ */
 podd.addListItemDeleteHandler = function(deleteLink) {
 	
 	deleteLink.click(function(event) {
@@ -2283,8 +2289,8 @@ podd.submitPoddObjectUpdate = function(
         success : function(resultData, status, xhr) {
             podd.debug('[updatePoddObject] ### SUCCESS ### ' + resultData);
             // podd.debug('[updatePoddObject] ' + xhr.responseText);
-            var message = '<div>Successfully edited artifact.<pre>' + xhr.responseText + '</pre></div>';
-            podd.updateErrorMessageList(message);
+            // var message = '<div>Successfully edited artifact.<pre>' + xhr.responseText + '</pre></div>';
+            // podd.debug(message);
 
             // The results of an update query are minimal
             var tempDatabank = podd.newDatabank();
