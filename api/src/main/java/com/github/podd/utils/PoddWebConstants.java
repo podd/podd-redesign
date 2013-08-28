@@ -95,7 +95,7 @@ public interface PoddWebConstants
     /**
      * Path to "edit user" page
      */
-    public static final String PATH_USER_EDIT_ROLES = "user/roles/";
+    public static final String PATH_USER_ROLES = "user/roles/";
 
     /**
      * Path to "list users" page

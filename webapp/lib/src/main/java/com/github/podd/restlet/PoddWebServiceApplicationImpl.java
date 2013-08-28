@@ -365,7 +365,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         
         // Add a route for Edit User Roles page.
         final String userEditRolesPath =
-                PoddWebConstants.PATH_USER_EDIT_ROLES + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
+                PoddWebConstants.PATH_USER_ROLES + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
         this.log.debug("attaching edit user roles service to path={}", userEditRolesPath);
         router.attach(userEditRolesPath, UserRolesResourceImpl.class);
         

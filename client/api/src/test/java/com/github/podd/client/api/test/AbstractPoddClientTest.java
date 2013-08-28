@@ -438,18 +438,17 @@ public abstract class AbstractPoddClientTest
     }
     
     /**
-     * Test method for {@link com.github.podd.client.api.PoddClient#listRoles()} .
+     * Test method for {@link com.github.podd.client.api.PoddClient#listRoles(String)} .
      */
     @Test
     public final void testListRoles() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
-        final Map<RestletUtilRole, Collection<URI>> roles = this.testClient.listRoles();
+        final Map<RestletUtilRole, Collection<URI>> roles = this.testClient.listRoles(AbstractPoddClientTest.TEST_ADMIN_USER);
         
         Assert.assertEquals(1, roles.size());
         Assert.assertTrue(roles.containsKey(PoddRoles.ADMIN));
-        Assert.assertEquals(0, roles.get(PoddRoles.ADMIN).size());
     }
     
     /**
