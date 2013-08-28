@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>com.github.podd</groupId>
 		<artifactId>podd-webapp-parent</artifactId>
-		<version>0.2.1-SNAPSHOT</version>
+		<version>0.3</version>
 	</parent>
 	<artifactId>podd-webapp-api</artifactId>
 	<name>PODD :: Webapp API</name>
