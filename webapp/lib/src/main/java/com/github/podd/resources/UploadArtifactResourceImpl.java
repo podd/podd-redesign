@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,8 +62,6 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.OWLException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.PoddException;
@@ -160,6 +157,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         // and assign permissions to it in the future
         PoddSesameRealm realm = this.getPoddApplication().getRealm();
         realm.map(this.getRequest().getClientInfo().getUser(), PoddRoles.PROJECT_ADMIN.getRole(), artifactMap
+                .getOntologyIRI().toOpenRDFURI());
+        realm.map(this.getRequest().getClientInfo().getUser(), PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getRole(), artifactMap
                 .getOntologyIRI().toOpenRDFURI());
         
         return artifactMap;
