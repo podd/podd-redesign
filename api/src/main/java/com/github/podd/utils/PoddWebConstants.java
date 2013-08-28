@@ -170,7 +170,7 @@ public interface PoddWebConstants
     /**
      * Key used to represent user identifier part of a URL
      */
-    public static final String KEY_USER_IDENTIFIER = "identifier";
+    public static final String KEY_USER_IDENTIFIER = "useridentifier";
     
     /**
      * Key used to represent an artifact id as part of a request
