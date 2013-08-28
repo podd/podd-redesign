@@ -9,7 +9,6 @@
 <#if user??>
     <#if artifact??>
     	<h4>Artifact successfully uploaded.</h4>
-	    <p><a href="${baseUrl}/artifact/base?artifacturi=${artifact.ontologyIRI}" class="padded">View project.</a></p>
 	    <div class="fieldset" id="upload">
 			<div class="legend">Artifact Details</div>
 			<ol> 
@@ -17,6 +16,10 @@
 				<li><span class="bold">Version IRI: </span>${artifact.versionIRI}</li>
 				<li><span class="bold">Inferred IRI: </span>${artifact.inferredOntologyIRI}</li>
 			</div>
+			<div id="buttonwrapper">
+		    	<a href="${baseUrl}/artifact/base?artifacturi=${artifact.ontologyIRI}" class="padded">View project.</a>
+		    	<a href="${baseUrl}/artifact/roles?artifacturi=${artifact.ontologyIRI?url}">Edit Participants</a>
+		    </div>
 		</div>
 	<#else>    
     	<p>Upload a new Artifact.</p>
