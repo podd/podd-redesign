@@ -427,7 +427,7 @@ podd.addElementToList = function(list, roleUri, userLabel, userIdentifier) {
 	podd.addListItemDeleteHandler(deleteLink);
 
 	var span = $('<span>', {
-		text : userLabel,
+		text : userLabel + ' ',
 		value : userIdentifier,
 	});
 
