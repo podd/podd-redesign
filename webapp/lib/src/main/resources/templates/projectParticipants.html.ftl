@@ -18,44 +18,37 @@
 		
 		podd.debug("artifact IRI: " + podd.artifactIri);
 		
+		podd.roledata = {};
+		podd.roledata['${adminUri}'] = [];
+	    <#if admins?? && admins?has_content>
+	        <#list admins as admin>
+	        	podd.roledata['${adminUri}'].push('${admin.identifier}');
+	        </#list>
+	    </#if>
+		
+		
 		$("#btnCancel").click(function(event) {
 			event.preventDefault();
 			podd.redirectToGetArtifact(undefined, undefined, undefined);
 			return false;
 		});
 	
-		$(".deleteLinkStatic").click(function() {
-	     	var identifier = $(this).closest('span').attr('value');
-	     	var roleUri = $(this).attr('name');
-	    	podd.debug('Remove: ' + identifier + ' as a <' + roleUri + '> for project ' + podd.artifactIri);
-	    	podd.submitUserRoleDelete(identifier, roleUri, podd.artifactIri);
-	     	
-	     	var liToRemove = $(this).closest('li');
-			podd.debug('Going to remove ' + liToRemove);	     	
-	     	liToRemove.fadeOut(400, function(){
-         		liToRemove.remove();
-        	});
-	     	
-        	return false;
-	    });
-	
+		var deleteLink = $(".deleteLinkStatic");
+		podd.addListItemDeleteHandler(deleteLink);
 	
 		// add Handlers for PI
 		var piInput = $('#pi');
 		var piHiddenValueElement =  $('#pi_hidden');
 		podd.addAutoCompleteHandler(piInput, piHiddenValueElement, undefined, undefined, undefined, true);
-		podd.addProjectRoleBlurHandler(piInput, piHiddenValueElement, podd.artifactIri, '${piUri!""}', '${piIdentifier!""}');
+		podd.addPiBlurHandler(piInput, piHiddenValueElement, podd.artifactIri, '${piUri!""}', '${piIdentifier!""}');
 		
 		
 		// add Handlers for Project Admin
 		var adminInput = $('#admin');
 		var adminHiddenValueElement = $('#admin_hidden');
 		var adminList = $('#admin_list');
-		
 		podd.addAutoCompleteHandler(adminInput, adminHiddenValueElement, undefined, undefined, undefined, true);
-		podd.addProjectRoleBlurHandler2(adminInput, adminHiddenValueElement, adminList, podd.artifactIri, '${adminUri!""}');
-		
-
+		podd.addProjectRoleBlurHandler(adminInput, adminHiddenValueElement, adminList, podd.artifactIri, '${adminUri!""}');
 		
 		//podd.addProjectRoleHandlers($('#member'), $('#member_hidden'), podd.artifactIri, '${memberUri!""}');
 		//podd.addProjectRoleHandlers($('#observer'), $('#observer_hidden'), podd.artifactIri, '${observerUri!""}');

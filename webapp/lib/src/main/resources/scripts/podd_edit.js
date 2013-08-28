@@ -415,6 +415,148 @@ podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRow
     return textarea;
 };
 
+podd.addElementToList = function(list, roleUri, userLabel, userIdentifier) {
+	podd.debug('[addElementToList] add item: ' + userIdentifier + ' to Role ' + roleUri);
+
+	var deleteLink = $('<a>', {
+		name : roleUri,
+		text : 'delete',
+		href : '',
+		class : 'deleteLinkStatic'
+	});
+	podd.addListItemDeleteHandler(deleteLink);
+
+	var span = $('<span>', {
+		text : userLabel,
+		value : userIdentifier,
+	});
+
+	span.append(deleteLink);
+
+	var li = $('<li>');
+	li.append(span);
+	list.append(li);
+
+	podd.debug('[addElementToList] completed');
+};
+
+podd.addListItemDeleteHandler = function(deleteLink) {
+	
+	deleteLink.click(function(event) {
+     	var userIdentifier = $(this).closest('span').attr('value');
+     	var roleUri = $(this).attr('name');
+		
+    	podd.debug('Remove: ' + userIdentifier + ' from Role <' + roleUri + '> for project ' + podd.artifactIri);
+    	
+    	podd.submitUserRoleDelete(userIdentifier, roleUri, podd.artifactIri);
+     	
+    	// remove User from list
+    	var array = podd.roledata[roleUri];
+    	array.splice( $.inArray(userIdentifier, array), 1 );
+    	
+     	var liToRemove = $(this).closest('li');
+		podd.debug('Going to remove ' + liToRemove);	     	
+     	liToRemove.fadeOut(400, function(){
+     		liToRemove.remove();
+    	});
+     	
+    	return false;
+	} );
+};
+
+/**
+ * Updates the Principal Investigator Role. Is triggered upon blurring of the
+ * input field.
+ * 
+ * NOTE: The current PI (if present) is deleted and the new PI is added as the
+ * next step. Since these 2 steps are not atomic itmay lead to a situation where
+ * no PI is allocated to the project.
+ * 
+ * @param input
+ *            {object} The blurred Input field
+ * @param hiddenValueElement
+ *            {object} Hidden Input field associated with the blurred field
+ * @param artifactIri
+ *            {string} Artifact whose Roles are being managed
+ * @param roleUri
+ *            {string} Principal Investigator Role's URI
+ * @param originalIdentifier
+ *            {string} Previous Principal Investigator's User Identifier
+ */
+podd.addPiBlurHandler = function(input, hiddenValueElement, artifactIri, roleUri, originalIdentifier) {
+	
+    input.blur(function(event) {
+        var newUserIdentifier = '' + $(this).val();
+        if (typeof hiddenValueElement !== undefined && newUserIdentifier !== '') {
+        	newUserIdentifier = hiddenValueElement.val();
+        }
+        
+        if (originalIdentifier !== newUserIdentifier  && newUserIdentifier !== '') {
+        	podd.debug("[blur] triggered with new value: " + newUserIdentifier + " was " + originalIdentifier);
+        	
+        	// - remove previous PI
+        	if (originalIdentifier !== '') {
+        		podd.submitUserRoleDelete(originalIdentifier, roleUri, artifactIri);
+        	}
+        	
+        	// - add new PI
+            podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
+            
+            // Unbind this handler and create a new one with the new value as the original value
+            $(this).unbind("blur");
+            podd.addPiBlurHandler(input, hiddenValueElement, artifactIri, roleUri, newUserIdentifier);
+        	
+        } else {
+        	podd.debug("[blur] no change in value: was " + originalIdentifier + ", is " + newUserIdentifier);
+        }
+    });
+};
+
+/**
+ * Add Blur Handler for Project Role
+ * 
+ * @param input
+ *            {object} The blurred Input field
+ * @param hiddenValueElement
+ *            {object} Hidden Input field associated with the blurred field
+ * @param list
+ * 			  {object} List to be updated with participant details
+ * @param artifactIri
+ *            {string} Artifact whose Roles are being managed
+ * @param roleUri
+ *            {string} Managed Role's URI
+ * @param originalIdentifier
+ *            {string} Previous Principal Investigator's User Identifier
+ * 
+ */
+podd.addProjectRoleBlurHandler = function(input, hiddenValueElement, list, artifactIri, roleUri) {
+	
+    input.blur(function(event) {
+        var newUserIdentifier = hiddenValueElement.val();
+        
+        if (typeof newUserIdentifier !== undefined && newUserIdentifier !== '') {
+        	podd.debug("[blur] triggered with new value: " + newUserIdentifier);
+        	
+        	if ($.inArray(newUserIdentifier, podd.roledata[roleUri]) < 0) {
+        		
+	        	// - add new Role user
+	            podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
+	            
+	            podd.addElementToList(list, roleUri, $(this).val(), newUserIdentifier);
+	            podd.roledata[roleUri].push(newUserIdentifier);
+        	} else {
+        		podd.debug(newUserIdentifier + ' already exists in list of ' + roleUri);
+        	}
+        } else {
+        	podd.debug("[blur] value is empty:  " + newUserIdentifier);
+        }
+        
+        // clear the input fields
+        $(this).val("");
+        hiddenValueElement.val("");
+    });
+};
+
 /**
  * @memberOf podd
  * 
@@ -557,102 +699,6 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
         // fields may have incomplete/invalid values at this point.
     });
     
-};
-
-podd.addElementToList = function(list, roleUri, userLabel, userIdentifier) {
-	podd.debug('[addElementToList] add item: ' + userIdentifier + ' to Role ' + roleUri);
-	
-    var deleteLink = $('<a>', {
-        name : roleUri,
-        text : 'delete', 
-        class : 'deleteLinkStatic',
-        click : function(event) {
-			    	podd.debug('Remove: ' + userIdentifier + ' as a <' + roleUri + '> for project ' + podd.artifactIri);
-			    	podd.submitUserRoleDelete(userIdentifier, roleUri, podd.artifactIri);
-			     	
-			     	var liToRemove = $(this).closest('li');
-					podd.debug('Going to remove ' + liToRemove);	     	
-			     	liToRemove.fadeOut(400, function(){
-		         		liToRemove.remove();
-		        	});
-			     	
-		        	return false;
-        		} 
-    });
-
-    var span = $('<span>', {
-    	text : userLabel,
-        value : userIdentifier,
-    });
-
-	span.append(deleteLink);
-	
-	var li = $('<li>');
-	li.append(span);
-	list.append(li);
-	
-	podd.debug('[addElementToList] completed');
-};
-
-/**
- * Add Blur Handler for Project Role
- * 
- * @param input
- * @param hiddenValueElement
- * @param list
- * @param artifactIri
- * @param roleUri
- */
-podd.addProjectRoleBlurHandler2 = function(input, hiddenValueElement, list, artifactIri, roleUri) {
-	
-    input.blur(function(event) {
-        var newUserIdentifier = hiddenValueElement.val();
-        
-        if (typeof newUserIdentifier !== undefined && newUserIdentifier !== '') {
-        	podd.debug("[blur] triggered with new value: " + newUserIdentifier);
-        	
-        	// - update Role via AJAX call
-            podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
-            
-            podd.addElementToList(list, roleUri, $(this).val(), newUserIdentifier);
-            
-            // clear the elements
-            $(this).val("");
-            hiddenValueElement.val("");
-        } else {
-        	podd.debug("[blur] value is empty:  " + newUserIdentifier);
-        }
-    });
-};
-
-
-
-podd.addProjectRoleBlurHandler = function(input, hiddenValueElement, artifactIri, roleUri, originalIdentifier) {
-	var nextOriginalIdentifier = '' + originalIdentifier;
-	
-    input.blur(function(event) {
-        var newUserIdentifier = '' + $(this).val();
-        
-        if (typeof hiddenValueElement !== 'undefined' && newUserIdentifier !== '') {
-        	newUserIdentifier = hiddenValueElement.val();
-        }
-        
-        if (nextOriginalIdentifier !== newUserIdentifier  && newUserIdentifier !== '') {
-        	podd.debug("[blur] triggered with new value: " + newUserIdentifier + " was " + nextOriginalIdentifier);
-        	
-        	// - update Role via AJAX call
-            podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
-            
-            // Unbind this handler and create a new one with the new value as the original value
-            $(this).unbind("blur");
-            podd.addProjectRoleBlurHandler(input, hiddenValueElement, artifactIri, roleUri, newUserIdentifier);
-        	
-        } else {
-        	podd.debug("[blur] no change in value: was " + nextOriginalIdentifier + ", is " + newUserIdentifier);
-        }
-    });
-	
-	podd.debug('[addProjectRoleHandlers] completed');
 };
 
 /**
