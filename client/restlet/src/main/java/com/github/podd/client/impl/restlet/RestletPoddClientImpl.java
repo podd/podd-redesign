@@ -61,6 +61,7 @@ import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -383,9 +384,25 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
-    public Map<RestletUtilRole, Collection<URI>> listRoles() throws PoddClientException
+    public Map<RestletUtilRole, Collection<URI>> listRoles(String userIdentifier) throws PoddClientException
     {
-        throw new PoddClientException("TODO: Implement me!");
+        final ClientResource resource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES) + userIdentifier);
+        resource.getCookies().addAll(this.currentCookies);
+        
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final Representation get = resource.get(MediaType.APPLICATION_RDF_TURTLE);
+        
+        try
+        {
+            return PoddRoles.extractRoleMappings(this.parseRdf(get));
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Could not parse role details due to an IOException", e);
+        }
+        
     }
     
     /*

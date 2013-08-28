@@ -136,6 +136,7 @@ public interface PoddClient
     
     /**
      * List the roles that have been assigned to the currently logged in user.
+     * @param userIdentifier TODO
      * 
      * @return A map of {@link RestletUtilRole}s identifying PODD repository and project roles.
      *         Repository roles are indicated by null entries in the collections mapped to each
@@ -143,7 +144,7 @@ public interface PoddClient
      *         {@link PoddRoles#getRepositoryRoles()}.
      * @throws PoddClientException
      */
-    Map<RestletUtilRole, Collection<URI>> listRoles() throws PoddClientException;
+    Map<RestletUtilRole, Collection<URI>> listRoles(String userIdentifier) throws PoddClientException;
     
     /**
      * 

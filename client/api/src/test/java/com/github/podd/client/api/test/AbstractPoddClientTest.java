@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -29,6 +30,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
@@ -40,11 +42,13 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.client.api.PoddClient;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddRoles;
 
 /**
  * Abstract tests for {@link PoddClient}.
@@ -243,12 +247,12 @@ public abstract class AbstractPoddClientTest
             // just comment it out if this occurs
             Assert.assertEquals(afterTopObject.objectURI(), topObject.objectURI());
             
-            Model afterDataReferenceURI =
+            final Model afterDataReferenceURI =
                     afterParseRdf.filter(topObject.objectURI(), PoddRdfConstants.PODD_BASE_HAS_DATA_REFERENCE, null);
             
             Assert.assertNotEquals(topObject.objectURI(), afterDataReferenceURI.objectURI());
             
-            Model afterDataReferenceTriples = afterParseRdf.filter(afterDataReferenceURI.objectURI(), null, null);
+            final Model afterDataReferenceTriples = afterParseRdf.filter(afterDataReferenceURI.objectURI(), null, null);
             
             Assert.assertEquals("Found unexpected number of triples for data reference", 7,
                     afterDataReferenceTriples.size());
@@ -367,7 +371,7 @@ public abstract class AbstractPoddClientTest
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
         
-        List<String> repositories = this.testClient.listDataReferenceRepositories();
+        final List<String> repositories = this.testClient.listDataReferenceRepositories();
         
         System.out.println(repositories);
         
@@ -431,6 +435,20 @@ public abstract class AbstractPoddClientTest
         final Collection<InferredOWLOntologyID> results = this.testClient.listPublishedArtifacts();
         Assert.assertFalse(results.isEmpty());
         Assert.assertEquals(-1, results.size());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.client.api.PoddClient#listRoles(String)} .
+     */
+    @Test
+    public final void testListRoles() throws Exception
+    {
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        final Map<RestletUtilRole, Collection<URI>> roles = this.testClient.listRoles(AbstractPoddClientTest.TEST_ADMIN_USER);
+        
+        Assert.assertEquals(1, roles.size());
+        Assert.assertTrue(roles.containsKey(PoddRoles.ADMIN));
     }
     
     /**
@@ -598,4 +616,5 @@ public abstract class AbstractPoddClientTest
         Assert.assertTrue(model.contains(newArtifact.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, newArtifact
                 .getVersionIRI().toOpenRDFURI()));
     }
+    
 }

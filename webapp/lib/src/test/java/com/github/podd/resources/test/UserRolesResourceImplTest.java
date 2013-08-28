@@ -106,7 +106,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         
         // submit modified details to User Roles Service
         final ClientResource userRolesClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_ROLES + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES + testIdentifier));
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(newModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
@@ -179,7 +179,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         
         // submit details of Role to delete to User Roles Service
         final ClientResource userRolesClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_ROLES + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES + testIdentifier));
         userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(newModel, out, format);
@@ -259,7 +259,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         
         // submit modified details to User Roles Service
         final ClientResource userRolesClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_ROLES + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES + testIdentifier));
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(newModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
@@ -341,7 +341,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         
         // submit details of Role to delete to User Roles Service
         final ClientResource userRolesClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_ROLES + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES + testIdentifier));
         userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(newModel, out, format);
@@ -401,7 +401,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         
         
         final ClientResource userEditRolesClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_ROLES + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES + testIdentifier));
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userEditRolesClientResource, Method.GET, null,
