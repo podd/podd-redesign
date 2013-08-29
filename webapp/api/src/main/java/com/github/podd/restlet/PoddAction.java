@@ -43,8 +43,8 @@ public enum PoddAction
      * 
      * By default both project and repository administrator users are allowed to create artifacts.
      */
-    ARTIFACT_CREATE(true, "Could not create artifact.", new HashSet<Role>(Arrays.asList(
-            PoddRoles.ADMIN.getRole(), PoddRoles.PROJECT_CREATOR.getRole())), false),
+    ARTIFACT_CREATE(true, "Could not create artifact.", new HashSet<Role>(Arrays.asList(PoddRoles.ADMIN.getRole(),
+            PoddRoles.PROJECT_CREATOR.getRole())), false),
     
     /**
      * An action by a user asking to update an existing artifact.
@@ -73,9 +73,16 @@ public enum PoddAction
             PoddRoles.PROJECT_OBSERVER.getRole(), PoddRoles.PROJECT_ADMIN.getRole(),
             PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), true),
     
-    UNPUBLISHED_ARTIFACT_LIST(true, "Failed to list unpublished artifacts", new HashSet<Role>(Arrays.asList(
-            PoddRoles.PROJECT_OBSERVER.getRole(), PoddRoles.PROJECT_ADMIN.getRole(),
-            PoddRoles.PROJECT_MEMBER.getRole(), PoddRoles.ADMIN.getRole())), false),
+    /**
+     * An action by a user asking to request a list of unpublished artifacts that they have access
+     * to.
+     * 
+     * By default any authenticated user with any role must be able to initiate this action. Viewing
+     * permissions for specific artifacts is then checked using UNPUBLISHED_ARTIFACT_READ to
+     * determine whether the artifact is included in the list that is returned.
+     */
+    UNPUBLISHED_ARTIFACT_LIST(true, "Failed to list unpublished artifacts", new HashSet<Role>(PoddRoles.getRoles()),
+            false),
     
     /**
      * An action by a user asking to read a published artifact.
@@ -89,8 +96,8 @@ public enum PoddAction
      * 
      * By default only the administrators and project-admin users are allowed to publish projects.
      */
-    ARTIFACT_PUBLISH(true, "Could not publish artifact", new HashSet<Role>(Arrays.asList(
-            PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getRole())), true),
+    ARTIFACT_PUBLISH(true, "Could not publish artifact", new HashSet<Role>(
+            Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR.getRole())), true),
     
     /**
      * An action by an administrator asking to create a new user, or update an existing user.
@@ -121,7 +128,7 @@ public enum PoddAction
      */
     OTHER_USER_READ(true, "Could not retrieve other user details", Collections.singleton(PoddRoles.ADMIN.getRole()),
             false),
-
+    
     /**
      * An action by a user asking to list other users.
      * 
@@ -131,7 +138,7 @@ public enum PoddAction
      */
     OTHER_USER_SEARCH(true, "Could not find other users", new HashSet<Role>(Arrays.asList(
             PoddRoles.PROJECT_CREATOR.getRole(), PoddRoles.PROJECT_ADMIN.getRole(), PoddRoles.ADMIN.getRole())), false),
-
+    
     /**
      * An action by a user asking to edit their details
      * 
@@ -146,7 +153,7 @@ public enum PoddAction
      * other users.
      */
     OTHER_USER_EDIT(true, "Could not edit other user details", Collections.singleton(PoddRoles.ADMIN.getRole()), false),
-            
+    
     /**
      * An action by an administrator asking to edit repository roles for a user.
      * 
