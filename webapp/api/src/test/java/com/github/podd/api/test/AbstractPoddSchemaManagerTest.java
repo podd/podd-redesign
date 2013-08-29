@@ -16,6 +16,7 @@
  */
 package com.github.podd.api.test;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.After;
@@ -23,18 +24,24 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.io.UnparsableOntologyException;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.EmptyOntologyException;
+import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
@@ -123,17 +130,33 @@ public abstract class AbstractPoddSchemaManagerTest
      */
     private void loadSchemaOntologies() throws Exception
     {
-        final String[] schemaResourcePaths =
-                { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF, PoddRdfConstants.PATH_PODD_USER,
-                        PoddRdfConstants.PATH_PODD_BASE, PoddRdfConstants.PATH_PODD_SCIENCE,
-                        PoddRdfConstants.PATH_PODD_PLANT,
-                // PoddRdfConstants.PATH_PODD_ANIMAL,
-                };
-        for(final String schemaResourcePath : schemaResourcePaths)
+        loadSchemaOntologies(new PropertyUtil("podd").get(PoddRdfConstants.KEY_SCHEMAS,
+                PoddRdfConstants.PATH_DEFAULT_SCHEMAS));
+    }
+    
+    private void loadSchemaOntologies(String schemaManifest) throws OpenRDFException, IOException, OWLException,
+        PoddException
+    {
+        Model model = null;
+        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
         {
-            final InputStream in = this.getClass().getResourceAsStream(schemaResourcePath);
-            this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
+            RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+            model = Rio.parse(schemaManifestStream, "", format);
         }
+        this.testSchemaManager.uploadSchemaOntologies(model);
+        
+        // final String[] schemaResourcePaths =
+        // { PoddRdfConstants.PATH_PODD_DCTERMS, PoddRdfConstants.PATH_PODD_FOAF,
+        // PoddRdfConstants.PATH_PODD_USER,
+        // PoddRdfConstants.PATH_PODD_BASE, PoddRdfConstants.PATH_PODD_SCIENCE,
+        // PoddRdfConstants.PATH_PODD_PLANT,
+        // // PoddRdfConstants.PATH_PODD_ANIMAL,
+        // };
+        // for(final String schemaResourcePath : schemaResourcePaths)
+        // {
+        // final InputStream in = this.getClass().getResourceAsStream(schemaResourcePath);
+        // this.testSchemaManager.uploadSchemaOntology(in, RDFFormat.RDFXML);
+        // }
     }
     
     /**
