@@ -406,76 +406,8 @@ public class ApplicationUtils
             
             for(URI nextSchemaOntologyUri : schemaOntologyUris)
             {
-                Set<Value> imports = model.filter(nextSchemaOntologyUri, OWL.IMPORTS, null).objects();
-                Set<URI> nextImportsSet = new HashSet<>();
-                Set<URI> putIfAbsent = importsMap.putIfAbsent(nextSchemaOntologyUri, nextImportsSet);
-                if(putIfAbsent != null)
-                {
-                    nextImportsSet = putIfAbsent;
-                }
-                int maxIndex = 0;
-                if(imports.isEmpty())
-                {
-                    if(!nextImportsSet.isEmpty())
-                    {
-                        log.error("Found inconsistent imports set: {} {}", nextSchemaOntologyUri, nextImportsSet);
-                    }
-                }
-                else
-                {
-                    for(Value nextImport : imports)
-                    {
-                        if(nextImport instanceof URI)
-                        {
-                            if(currentVersionsMap.containsKey(nextImport))
-                            {
-                                // Map down to the current version to ensure that we can load
-                                // multiple versions simultaneously (if possible with the rest of
-                                // the system)
-                                nextImportsSet.add(currentVersionsMap.get(nextImport));
-                            }
-                            else
-                            {
-                                boolean foundAllVersion = false;
-                                // Attempt to verify if the version exists
-                                for(URI nextAllVersions : allVersionsMap.keySet())
-                                {
-                                    if(nextAllVersions.equals(nextImport))
-                                    {
-                                        foundAllVersion = true;
-                                        // this should not normally occur, as the current versions
-                                        // map should also contain this key
-                                        nextImport = currentVersionsMap.get(nextAllVersions);
-                                        nextImportsSet.add((URI)nextImport);
-                                    }
-                                    else if(allVersionsMap.get(nextAllVersions).contains(nextImport))
-                                    {
-                                        nextImportsSet.add((URI)nextImport);
-                                        foundAllVersion = true;
-                                    }
-                                }
-                                
-                                if(!foundAllVersion)
-                                {
-                                    log.warn("Could not find import: {} imports {}", nextSchemaOntologyUri, nextImport);
-                                }
-                                else
-                                {
-                                    nextImportsSet.add((URI)nextImport);
-                                }
-                            }
-                            int nextIndex = importOrder.indexOf((URI)nextImport);
-                            if(nextIndex >= maxIndex)
-                            {
-                                maxIndex = nextIndex + 1;
-                            }
-                        }
-                    }
-                }
-                log.info("adding import for {} at {}", nextSchemaOntologyUri, maxIndex);
-                // TODO: FIXME: This will not allow for multiple versions of a single schema
-                // ontology at the same time
-                importOrder.add(maxIndex, currentVersionsMap.get(nextSchemaOntologyUri));
+                mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
+                        nextSchemaOntologyUri);
             }
             
             log.info("importOrder: {}", importOrder);
@@ -566,6 +498,90 @@ public class ApplicationUtils
         // freemarker configuration
         final PoddStatusService statusService = new PoddStatusService(newTemplateConfiguration);
         application.setStatusService(statusService);
+    }
+    
+    /**
+     * @param model
+     * @param currentVersionsMap
+     * @param allVersionsMap
+     * @param importsMap
+     * @param importOrder
+     * @param nextSchemaOntologyUri
+     */
+    private static void mapAndSortImports(Model model, ConcurrentMap<URI, URI> currentVersionsMap,
+            ConcurrentMap<URI, Set<URI>> allVersionsMap, ConcurrentMap<URI, Set<URI>> importsMap,
+            List<URI> importOrder, URI nextSchemaOntologyUri)
+    {
+        Set<Value> imports = model.filter(nextSchemaOntologyUri, OWL.IMPORTS, null).objects();
+        Set<URI> nextImportsSet = new HashSet<>();
+        Set<URI> putIfAbsent = importsMap.putIfAbsent(nextSchemaOntologyUri, nextImportsSet);
+        if(putIfAbsent != null)
+        {
+            nextImportsSet = putIfAbsent;
+        }
+        int maxIndex = 0;
+        if(imports.isEmpty())
+        {
+            if(!nextImportsSet.isEmpty())
+            {
+                log.error("Found inconsistent imports set: {} {}", nextSchemaOntologyUri, nextImportsSet);
+            }
+        }
+        else
+        {
+            for(Value nextImport : imports)
+            {
+                if(nextImport instanceof URI)
+                {
+                    if(currentVersionsMap.containsKey(nextImport))
+                    {
+                        // Map down to the current version to ensure that we can load
+                        // multiple versions simultaneously (if possible with the rest of
+                        // the system)
+                        nextImportsSet.add(currentVersionsMap.get(nextImport));
+                    }
+                    else
+                    {
+                        boolean foundAllVersion = false;
+                        // Attempt to verify if the version exists
+                        for(URI nextAllVersions : allVersionsMap.keySet())
+                        {
+                            if(nextAllVersions.equals(nextImport))
+                            {
+                                foundAllVersion = true;
+                                // this should not normally occur, as the current versions
+                                // map should also contain this key
+                                nextImport = currentVersionsMap.get(nextAllVersions);
+                                nextImportsSet.add((URI)nextImport);
+                            }
+                            else if(allVersionsMap.get(nextAllVersions).contains(nextImport))
+                            {
+                                nextImportsSet.add((URI)nextImport);
+                                foundAllVersion = true;
+                            }
+                        }
+                        
+                        if(!foundAllVersion)
+                        {
+                            log.warn("Could not find import: {} imports {}", nextSchemaOntologyUri, nextImport);
+                        }
+                        else
+                        {
+                            nextImportsSet.add((URI)nextImport);
+                        }
+                    }
+                    int nextIndex = importOrder.indexOf((URI)nextImport);
+                    if(nextIndex >= maxIndex)
+                    {
+                        maxIndex = nextIndex + 1;
+                    }
+                }
+            }
+        }
+        log.info("adding import for {} at {}", nextSchemaOntologyUri, maxIndex);
+        // TODO: FIXME: This will not allow for multiple versions of a single schema
+        // ontology at the same time
+        importOrder.add(maxIndex, currentVersionsMap.get(nextSchemaOntologyUri));
     }
     
     /**
