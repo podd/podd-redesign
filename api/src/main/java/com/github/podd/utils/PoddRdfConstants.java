@@ -411,4 +411,7 @@ public interface PoddRdfConstants
     public static final URI TEST_ARTIFACT = PoddRdfConstants.VF
             .createURI("http://purl.org/podd/ns/artifact/artifact89");
     
+    public static final URI PODD_SCHEMA_CLASSPATH = PoddRdfConstants.VF
+            .createURI("http://purl.org/podd/ns/schema#classpath");
+    
 }

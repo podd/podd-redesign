@@ -412,20 +412,34 @@ public class ApplicationUtils
             
             log.info("importOrder: {}", importOrder);
             
-            // TODO: Use a manifest file to load up the current versions here
-            application.getPoddSchemaManager().uploadSchemaOntology(
-                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS), RDFFormat.RDFXML);
-            application.getPoddSchemaManager().uploadSchemaOntology(
-                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF), RDFFormat.RDFXML);
-            application.getPoddSchemaManager().uploadSchemaOntology(
-                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_USER), RDFFormat.RDFXML);
-            application.getPoddSchemaManager().uploadSchemaOntology(
-                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE), RDFFormat.RDFXML);
-            application.getPoddSchemaManager().uploadSchemaOntology(
-                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE), RDFFormat.RDFXML);
-            application.getPoddSchemaManager().uploadSchemaOntology(
-                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT), RDFFormat.RDFXML);
+            for(URI nextOrderedImport : importOrder)
+            {
+                String classpathLocation =
+                        model.filter(nextOrderedImport, PoddRdfConstants.PODD_SCHEMA_CLASSPATH, null).objectLiteral()
+                                .stringValue();
+                RDFFormat format = Rio.getParserFormatForFileName(classpathLocation);
+                try (final InputStream input = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
+                {
+                    application.getPoddSchemaManager().uploadSchemaOntology(input, format);
+                }
+            }
             
+            // TODO: Use a manifest file to load up the current versions here
+            /*
+             * application.getPoddSchemaManager().uploadSchemaOntology(
+             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_DCTERMS),
+             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
+             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_FOAF),
+             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
+             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_USER),
+             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
+             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_BASE),
+             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
+             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_SCIENCE),
+             * RDFFormat.RDFXML); application.getPoddSchemaManager().uploadSchemaOntology(
+             * ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_PODD_PLANT),
+             * RDFFormat.RDFXML);
+             */
             // Enable the following for debugging
             // dumpSchemaGraph(application, nextRepository);
         }
