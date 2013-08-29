@@ -150,11 +150,19 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 
                 for(final InferredOWLOntologyID nextUnpublishedArtifact : unpublishedArtifacts)
                 {
-                    if(this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
-                            nextUnpublishedArtifact.getOntologyIRI().toOpenRDFURI(), false))
+                    try
                     {
-                        // If the authentication succeeded add the artifact
-                        unpublishedResults.add(nextUnpublishedArtifact);
+                        if(this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, nextUnpublishedArtifact
+                                .getOntologyIRI().toOpenRDFURI(), false))
+                        {
+                            // If the authentication succeeded add the artifact
+                            unpublishedResults.add(nextUnpublishedArtifact);
+                        }
+                    }
+                    catch(ResourceException e)
+                    {
+                        // Ignore this as it should not happen with the throwExceptionOnFailure
+                        // parameter set to false.
                     }
                 }
                 results.put(PoddWebConstants.KEY_UNPUBLISHED, unpublishedResults);
