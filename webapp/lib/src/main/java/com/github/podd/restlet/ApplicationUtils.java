@@ -417,7 +417,7 @@ public class ApplicationUtils
                 String classpathLocation =
                         model.filter(nextOrderedImport, PoddRdfConstants.PODD_SCHEMA_CLASSPATH, null).objectLiteral()
                                 .stringValue();
-                RDFFormat format = Rio.getParserFormatForFileName(classpathLocation);
+                RDFFormat format = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
                 try (final InputStream input = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
                 {
                     application.getPoddSchemaManager().uploadSchemaOntology(input, format);
