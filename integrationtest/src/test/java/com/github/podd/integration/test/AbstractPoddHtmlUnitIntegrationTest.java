@@ -55,6 +55,11 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
         return this.tester;
     }
     
+    protected void login(final String username, final char[] password)
+    {
+        this.login(username, new String(password));
+    }
+    
     /**
      * Logs in the user with the given username and password using whatever method matches the
      * integration test implementing this method.
@@ -151,10 +156,5 @@ public abstract class AbstractPoddHtmlUnitIntegrationTest
         {
             throw e;
         }
-    }
-    
-    protected void login(String username, char[] password)
-    {
-        this.login(username, new String(password));
     }
 }

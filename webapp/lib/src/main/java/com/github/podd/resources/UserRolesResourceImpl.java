@@ -82,7 +82,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
-        String userIdentifier = getUserParameter();
+        final String userIdentifier = this.getUserParameter();
         
         this.log.info("editing Roles of user: {}", userIdentifier);
         
@@ -188,6 +188,26 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
+     * @param requestedUserIdentifier
+     * @return
+     */
+    private PoddAction getAction(final String requestedUserIdentifier)
+    {
+        PoddAction action = PoddAction.OTHER_USER_EDIT;
+        
+        if(this.getRequest().getClientInfo().isAuthenticated())
+        {
+            // Special case where they attached the user identifier and it was the same as the
+            // logged in user
+            if(requestedUserIdentifier.equals(this.getRequest().getClientInfo().getUser().getIdentifier()))
+            {
+                action = PoddAction.CURRENT_USER_EDIT;
+            }
+        }
+        return action;
+    }
+    
+    /**
      * Display the HTML page for User Role Management
      */
     @Get(":html")
@@ -195,11 +215,11 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("getRoleManagementHtml");
         
-        String requestedUserIdentifier = getUserParameter();
+        final String requestedUserIdentifier = this.getUserParameter();
         PoddAction action = PoddAction.OTHER_USER_EDIT;
         if(requestedUserIdentifier != null)
         {
-            action = getAction(requestedUserIdentifier);
+            action = this.getAction(requestedUserIdentifier);
         }
         
         this.log.info("requesting role management for user: {}", requestedUserIdentifier);
@@ -247,11 +267,11 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("getRoleManagementHtml");
         
-        String requestedUserIdentifier = getUserParameter();
+        final String requestedUserIdentifier = this.getUserParameter();
         PoddAction action = PoddAction.OTHER_USER_EDIT;
         if(requestedUserIdentifier != null)
         {
-            action = getAction(requestedUserIdentifier);
+            action = this.getAction(requestedUserIdentifier);
         }
         
         this.log.info("requesting role management for user: {}", requestedUserIdentifier);
@@ -293,32 +313,12 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
-     * @param requestedUserIdentifier
-     * @return
-     */
-    private PoddAction getAction(String requestedUserIdentifier)
-    {
-        PoddAction action = PoddAction.OTHER_USER_EDIT;
-        
-        if(this.getRequest().getClientInfo().isAuthenticated())
-        {
-            // Special case where they attached the user identifier and it was the same as the
-            // logged in user
-            if(requestedUserIdentifier.equals(this.getRequest().getClientInfo().getUser().getIdentifier()))
-            {
-                action = PoddAction.CURRENT_USER_EDIT;
-            }
-        }
-        return action;
-    }
-    
-    /**
      * @return
      * @throws ResourceException
      */
     private String getUserParameter() throws ResourceException
     {
-        String requestedUserIdentifier = (String)this.getQuery().getFirstValue(PoddWebConstants.KEY_USER_IDENTIFIER, true);
+        String requestedUserIdentifier = this.getQuery().getFirstValue(PoddWebConstants.KEY_USER_IDENTIFIER, true);
         
         if(requestedUserIdentifier == null)
         {

@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.api.file.PoddDataRepositoryManager;
-import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
@@ -115,19 +114,20 @@ public class ListDataRepositoriesResourceImpl extends AbstractPoddResourceImpl
         
         final Model results = new LinkedHashModel();
         
-        PoddDataRepositoryManager poddDataRepositoryManager = this.getPoddApplication().getPoddDataRepositoryManager();
+        final PoddDataRepositoryManager poddDataRepositoryManager =
+                this.getPoddApplication().getPoddDataRepositoryManager();
         
         try
         {
-            for(String nextAlias : poddDataRepositoryManager.getAllAliases())
+            for(final String nextAlias : poddDataRepositoryManager.getAllAliases())
             {
-                BNode resourceNode = PoddRdfConstants.VF.createBNode();
+                final BNode resourceNode = PoddRdfConstants.VF.createBNode();
                 results.add(resourceNode, PoddRdfConstants.PODD_BASE_HAS_ALIAS,
                         PoddRdfConstants.VF.createLiteral(nextAlias));
                 
-                PoddDataRepository<?> dataRepository = poddDataRepositoryManager.getRepository(nextAlias);
+                final PoddDataRepository<?> dataRepository = poddDataRepositoryManager.getRepository(nextAlias);
                 
-                for(URI nextType : dataRepository.getTypes())
+                for(final URI nextType : dataRepository.getTypes())
                 {
                     results.add(resourceNode, RDF.TYPE, nextType);
                 }

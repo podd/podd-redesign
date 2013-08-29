@@ -16,9 +16,7 @@
  */
 package com.github.podd.api.file;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.openrdf.model.Model;
@@ -28,7 +26,6 @@ import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.RDF;
 
 import com.github.ansell.abstractserviceloader.AbstractServiceLoader;
-import com.github.podd.api.PoddProcessorStage;
 import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -55,20 +52,14 @@ public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, Po
         super(PoddDataRepositoryFactory.class);
     }
     
-    @Override
-    public final String getKey(final PoddDataRepositoryFactory nextFactory)
+    public PoddDataRepository<?> createDataRepository(final Model model) throws DataRepositoryException
     {
-        return nextFactory.getKey();
-    }
-    
-    public PoddDataRepository<?> createDataRepository(Model model) throws DataRepositoryException
-    {
-        for(Resource nextMatchingRepository : model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY)
+        for(final Resource nextMatchingRepository : model.filter(null, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY)
                 .subjects())
         {
-            Set<Value> types = model.filter(nextMatchingRepository, RDF.TYPE, null).objects();
-            Set<URI> uriTypes = new HashSet<URI>();
-            for(Value nextType : types)
+            final Set<Value> types = model.filter(nextMatchingRepository, RDF.TYPE, null).objects();
+            final Set<URI> uriTypes = new HashSet<URI>();
+            for(final Value nextType : types)
             {
                 if(nextType instanceof URI)
                 {
@@ -76,7 +67,7 @@ public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, Po
                 }
             }
             
-            for(PoddDataRepositoryFactory factory : PoddDataRepositoryRegistry.getInstance().getAll())
+            for(final PoddDataRepositoryFactory factory : PoddDataRepositoryRegistry.getInstance().getAll())
             {
                 if(factory.canCreate(uriTypes))
                 {
@@ -86,6 +77,12 @@ public class PoddDataRepositoryRegistry extends AbstractServiceLoader<String, Po
         }
         
         throw new DataRepositoryException("Could not find any repositories in the given statements");
+    }
+    
+    @Override
+    public final String getKey(final PoddDataRepositoryFactory nextFactory)
+    {
+        return nextFactory.getKey();
     }
     
 }

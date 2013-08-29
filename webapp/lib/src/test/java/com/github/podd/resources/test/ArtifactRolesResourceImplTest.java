@@ -81,9 +81,9 @@ public class ArtifactRolesResourceImplTest extends AbstractResourceImplTest
         
         this.assertFreemarker(body);
         
-        Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 6);
+        final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 6);
         
-        Map<RestletUtilRole, Collection<String>> roles = PoddRoles.extractRoleMappingsArtifact(model);
+        final Map<RestletUtilRole, Collection<String>> roles = PoddRoles.extractRoleMappingsArtifact(model);
         
         Assert.assertEquals(2, roles.size());
         Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_ADMIN));

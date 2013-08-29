@@ -83,6 +83,12 @@ public abstract class PoddWebServiceApplication extends Application
     public abstract PoddSchemaManager getPoddSchemaManager();
     
     /**
+     * 
+     * @return The {@link PropertyUtil} instance for this {@link PoddWebServiceApplication}.
+     */
+    public abstract PropertyUtil getPropertyUtil();
+    
+    /**
      * Gets the realm which is used to manage users and roles.
      * 
      * @return
@@ -141,10 +147,4 @@ public abstract class PoddWebServiceApplication extends Application
      * @param nextFreemarkerConfiguration
      */
     public abstract void setTemplateConfiguration(Configuration nextFreemarkerConfiguration);
-    
-    /**
-     * 
-     * @return The {@link PropertyUtil} instance for this {@link PoddWebServiceApplication}.
-     */
-    public abstract PropertyUtil getPropertyUtil();
 }

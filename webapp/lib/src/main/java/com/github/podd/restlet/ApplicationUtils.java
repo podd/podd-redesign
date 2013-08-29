@@ -23,21 +23,14 @@ import info.aduna.iteration.Iterations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
-import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -114,10 +107,10 @@ public class ApplicationUtils
         {
             conn = nextRepository.getConnection();
             
-            Model model =
+            final Model model =
                     new LinkedHashModel(Iterations.asList(conn.getStatements(null, null, null, true, application
                             .getPoddRepositoryManager().getSchemaManagementGraph())));
-            for(Namespace nextNamespace : Iterations.asSet(conn.getNamespaces()))
+            for(final Namespace nextNamespace : Iterations.asSet(conn.getNamespaces()))
             {
                 model.setNamespace(nextNamespace);
             }
@@ -366,14 +359,14 @@ public class ApplicationUtils
          */
         try
         {
-            String schemaManifest =
+            final String schemaManifest =
                     application.getPropertyUtil().get(PoddRdfConstants.KEY_SCHEMAS,
                             PoddRdfConstants.PATH_DEFAULT_SCHEMAS);
             Model model = null;
             
             try (final InputStream schemaManifestStream = application.getClass().getResourceAsStream(schemaManifest);)
             {
-                RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+                final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
                 model = Rio.parse(schemaManifestStream, "", format);
             }
             

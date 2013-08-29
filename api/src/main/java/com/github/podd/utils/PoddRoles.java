@@ -75,6 +75,27 @@ public enum PoddRoles implements RestletUtilRole
      * Dumps the role mappings from the given map to the given model, optionally into the given
      * contexts.
      */
+    public static void dumpRoleMappingsArtifact(final Map<RestletUtilRole, Collection<String>> mappings,
+            final Model model, final URI... contexts)
+    {
+        for(final RestletUtilRole nextRole : mappings.keySet())
+        {
+            for(final String nextUserIdentifier : mappings.get(nextRole))
+            {
+                final BNode mappingUri = PoddRdfConstants.VF.createBNode();
+                
+                model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
+                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
+                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDUSER,
+                        PoddRdfConstants.VF.createLiteral(nextUserIdentifier), contexts);
+            }
+        }
+    }
+    
+    /**
+     * Dumps the role mappings from the given map to the given model, optionally into the given
+     * contexts.
+     */
     public static void dumpRoleMappingsUser(final Map<RestletUtilRole, Collection<URI>> mappings, final Model model,
             final URI... contexts)
     {
@@ -91,27 +112,6 @@ public enum PoddRoles implements RestletUtilRole
                 {
                     model.add(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, nextObjectUri, contexts);
                 }
-            }
-        }
-    }
-    
-    /**
-     * Dumps the role mappings from the given map to the given model, optionally into the given
-     * contexts.
-     */
-    public static void dumpRoleMappingsArtifact(final Map<RestletUtilRole, Collection<String>> mappings,
-            final Model model, final URI... contexts)
-    {
-        for(final RestletUtilRole nextRole : mappings.keySet())
-        {
-            for(final String nextUserIdentifier : mappings.get(nextRole))
-            {
-                final BNode mappingUri = PoddRdfConstants.VF.createBNode();
-                
-                model.add(mappingUri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, contexts);
-                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, nextRole.getURI(), contexts);
-                model.add(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDUSER,
-                        PoddRdfConstants.VF.createLiteral(nextUserIdentifier), contexts);
             }
         }
     }

@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.exception;
+package com.github.podd.exception;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.openrdf.model.BNode;
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -61,14 +59,14 @@ public abstract class PoddException extends Exception
      * Retrieve details about this Exception instance as a {@link Model}. This method should be
      * overridden by sub-classes to provide more specific details.
      * 
-     * @param errorResource 
+     * @param errorResource
      * 
      * @return A non-empty {@link Model} containing details about this Exception
      */
     public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = new LinkedHashModel();
-
+        
         model.add(errorResource, RDF.TYPE, PoddRdfConstants.ERR_TYPE_ERROR);
         model.add(errorResource, PoddRdfConstants.ERR_EXCEPTION_CLASS,
                 PoddRdfConstants.VF.createLiteral(this.getClass().getName()));

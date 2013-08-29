@@ -159,7 +159,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                             unpublishedResults.add(nextUnpublishedArtifact);
                         }
                     }
-                    catch(ResourceException e)
+                    catch(final ResourceException e)
                     {
                         // Ignore this as it should not happen with the throwExceptionOnFailure
                         // parameter set to false.
@@ -201,11 +201,11 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         {
             try
             {
-                List<PoddObjectLabel> results =
+                final List<PoddObjectLabel> results =
                         this.getPoddArtifactManager().getTopObjectLabels(artifactsInternal.get(nextKey));
                 dataModel.put(nextKey + "ArtifactsList", results);
             }
-            catch(OpenRDFException e)
+            catch(final OpenRDFException e)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not find labels for " + nextKey
                         + " artifacts", e);

@@ -94,22 +94,6 @@ public class OntologyNotInProfileException extends PoddException
         this.profileReport = profileReport;
     }
     
-    /**
-     * @return The OWL Ontology that was not in the given profile.
-     */
-    public OWLOntology getOntology()
-    {
-        return this.ontology;
-    }
-    
-    /**
-     * @return The OWL Profile report indicating what profile violations occurred.
-     */
-    public OWLProfileReport getProfileReport()
-    {
-        return this.profileReport;
-    }
-    
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
@@ -135,6 +119,22 @@ public class OntologyNotInProfileException extends PoddException
         }
         
         return model;
+    }
+    
+    /**
+     * @return The OWL Ontology that was not in the given profile.
+     */
+    public OWLOntology getOntology()
+    {
+        return this.ontology;
+    }
+    
+    /**
+     * @return The OWL Profile report indicating what profile violations occurred.
+     */
+    public OWLProfileReport getProfileReport()
+    {
+        return this.profileReport;
     }
     
 }

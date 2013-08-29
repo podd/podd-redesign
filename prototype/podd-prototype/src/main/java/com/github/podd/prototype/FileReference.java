@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.prototype;
+package com.github.podd.prototype;
 
 /**
  * An abstract class to represent "File Reference" objects that PODD has to maintain.

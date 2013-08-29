@@ -55,23 +55,22 @@ public class FileReferenceInvalidException extends PoddException
         this.dataReference = dataReference;
     }
     
-    public DataReference getFileReference()
-    {
-        return this.dataReference;
-    }
-    
     @Override
-    public Model getDetailsAsModel(final Resource errorResource) 
+    public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
         
-        //FIXME - untested and incomplete
+        // FIXME - untested and incomplete
         final URI fileRefUri = this.getFileReference().getObjectIri().toOpenRDFURI();
         model.add(errorResource, PoddRdfConstants.ERR_SOURCE, fileRefUri);
         model.add(fileRefUri, RDFS.LABEL, PoddRdfConstants.VF.createLiteral(this.getFileReference().getLabel()));
-    
         
         return model;
+    }
+    
+    public DataReference getFileReference()
+    {
+        return this.dataReference;
     }
     
 }

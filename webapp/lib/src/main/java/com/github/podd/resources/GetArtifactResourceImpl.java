@@ -263,7 +263,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("propertyList", orderedProperties);
         dataModel.put("completeModel", allNeededStatementsForDisplay);
         
-        if (PoddRdfConstants.PODD_SCIENCE_PROJECT.equals(label.getObjectURI()))
+        if(PoddRdfConstants.PODD_SCIENCE_PROJECT.equals(label.getObjectURI()))
         {
             dataModel.put("isProject", true);
         }

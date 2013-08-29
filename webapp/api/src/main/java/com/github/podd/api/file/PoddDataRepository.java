@@ -33,9 +33,9 @@ import com.github.podd.exception.FileReferenceNotSupportedException;
 public interface PoddDataRepository<T extends DataReference>
 {
     public final static String PROTOCOL_SSH = "SSH";
-
+    
     public final static String PROTOCOL_HTTP = "HTTP";
-
+    
     /**
      * Checks whether this {@link PoddDataRepository} instance is capable of "handling" (i.e.
      * validating) the given {@link DataReference}.

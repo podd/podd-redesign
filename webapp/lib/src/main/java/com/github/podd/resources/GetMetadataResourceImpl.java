@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.resources;
+package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collections;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;

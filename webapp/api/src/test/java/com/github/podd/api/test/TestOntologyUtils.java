@@ -28,7 +28,7 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.utils.InferredOWLOntologyID;
 
 /**
- * Static utility class containing methods to help with loading ontologies for unit tests. 
+ * Static utility class containing methods to help with loading ontologies for unit tests.
  * 
  * @author kutila
  */
@@ -55,7 +55,8 @@ public class TestOntologyUtils
         final OWLOntology assertedOntology = poddOWLManager.loadOntology(owlSource);
         poddOWLManager.dumpOntologyToRepository(assertedOntology, testRepositoryConnection);
         
-        final InferredOWLOntologyID nextInferredOntology = poddOWLManager.inferStatements(assertedOntology, testRepositoryConnection);
+        final InferredOWLOntologyID nextInferredOntology =
+                poddOWLManager.inferStatements(assertedOntology, testRepositoryConnection);
         
         return nextInferredOntology;
     }

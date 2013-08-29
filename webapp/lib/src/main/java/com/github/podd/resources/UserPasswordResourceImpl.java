@@ -66,62 +66,58 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    /**
-     * Display the HTML page for password change
-     */
-    @Get(":html")
-    public Representation getUserPasswordPageHtml(final Representation entity) throws ResourceException
+    private URI changePassword(final PoddSesameRealm nextRealm, final Model model, final PoddUser changePwdUser,
+            final boolean changeOwnPassword)
     {
-        this.log.info("getUserPasswordHtml");
+        final String identifierInModel =
+                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
         
-        final String requestedUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
-        this.log.info("requesting change password of user: {}", requestedUserIdentifier);
-        
-        if(requestedUserIdentifier == null)
+        // verify user identifier in Model is same as that from the request
+        if(!changePwdUser.getIdentifier().equals(identifierInModel))
         {
-            // no identifier specified.
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Problem with input: user identifiers don't match");
         }
         
-        final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
-        
-        // identify needed Action
-        PoddAction action = PoddAction.OTHER_USER_EDIT;
-        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
+        // changing own password, verify old password.
+        if(changeOwnPassword)
         {
-            action = PoddAction.CURRENT_USER_EDIT;
-        }
-        
-        this.checkAuthentication(action);
-        
-        // completed checking authorization
-        
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "editUserPwd.html.ftl");
-        dataModel.put("pageTitle", "Edit Password");
-        dataModel.put("authenticatedUserIdentifier", user.getIdentifier());
-        
-        final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
-        
-        if(poddUser == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "User not found.");
-        }
-        else
-        {
-            dataModel.put("requestedUser", poddUser);
+            final String oldPassword = model.filter(null, PoddRdfConstants.PODD_USER_OLDSECRET, null).objectString();
             
-            final Set<Role> roles = realm.findRoles(poddUser);
-            dataModel.put("repositoryRoleList", roles);
+            final Verifier verifier = nextRealm.getVerifier();
+            if(verifier == null)
+            {
+                this.log.warn("Could not access Verifier to check old password");
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
+            }
+            
+            char[] localSecret = null;
+            if(verifier instanceof MapVerifier)
+            {
+                localSecret = ((MapVerifier)verifier).getLocalSecret(identifierInModel);
+            }
+            else if(verifier instanceof LocalVerifier)
+            {
+                localSecret = ((LocalVerifier)verifier).getLocalSecret(identifierInModel);
+            }
+            else
+            {
+                this.log.warn("Could not access Verifier to check old password");
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
+            }
+            
+            if(!SecretVerifier.compare(localSecret, oldPassword.toCharArray()))
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "Old password is invalid.");
+            }
         }
         
-        // Output the base template, with contentTemplate from the dataModel defining the
-        // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+        // update sesame Realm with new password
+        final String newPassword = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
+        this.log.info("[DEBUG] new password is [{}]", newPassword);
+        changePwdUser.setSecret(newPassword.toCharArray());
+        
+        return nextRealm.updateUser(changePwdUser);
     }
     
     /**
@@ -211,58 +207,62 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
     
-    private URI changePassword(final PoddSesameRealm nextRealm, final Model model, final PoddUser changePwdUser,
-            final boolean changeOwnPassword)
+    /**
+     * Display the HTML page for password change
+     */
+    @Get(":html")
+    public Representation getUserPasswordPageHtml(final Representation entity) throws ResourceException
     {
-        final String identifierInModel =
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
+        this.log.info("getUserPasswordHtml");
         
-        // verify user identifier in Model is same as that from the request
-        if(!changePwdUser.getIdentifier().equals(identifierInModel))
+        final String requestedUserIdentifier =
+                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
+        this.log.info("requesting change password of user: {}", requestedUserIdentifier);
+        
+        if(requestedUserIdentifier == null)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Problem with input: user identifiers don't match");
+            // no identifier specified.
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user");
         }
         
-        // changing own password, verify old password.
-        if(changeOwnPassword)
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
+        
+        // identify needed Action
+        PoddAction action = PoddAction.OTHER_USER_EDIT;
+        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
         {
-            final String oldPassword = model.filter(null, PoddRdfConstants.PODD_USER_OLDSECRET, null).objectString();
-            
-            final Verifier verifier = nextRealm.getVerifier();
-            if(verifier == null)
-            {
-                this.log.warn("Could not access Verifier to check old password");
-                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
-            }
-            
-            char[] localSecret = null;
-            if(verifier instanceof MapVerifier)
-            {
-                localSecret = ((MapVerifier)verifier).getLocalSecret(identifierInModel);
-            }
-            else if(verifier instanceof LocalVerifier)
-            {
-                localSecret = ((LocalVerifier)verifier).getLocalSecret(identifierInModel);
-            }
-            else
-            {
-                this.log.warn("Could not access Verifier to check old password");
-                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to access Verifier");
-            }
-            
-            if(!SecretVerifier.compare(localSecret, oldPassword.toCharArray()))
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "Old password is invalid.");
-            }
+            action = PoddAction.CURRENT_USER_EDIT;
         }
         
-        // update sesame Realm with new password
-        final String newPassword = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
-        this.log.info("[DEBUG] new password is [{}]", newPassword);
-        changePwdUser.setSecret(newPassword.toCharArray());
+        this.checkAuthentication(action);
         
-        return nextRealm.updateUser(changePwdUser);
+        // completed checking authorization
+        
+        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
+        dataModel.put("contentTemplate", "editUserPwd.html.ftl");
+        dataModel.put("pageTitle", "Edit Password");
+        dataModel.put("authenticatedUserIdentifier", user.getIdentifier());
+        
+        final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
+        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
+        
+        if(poddUser == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "User not found.");
+        }
+        else
+        {
+            dataModel.put("requestedUser", poddUser);
+            
+            final Set<Role> roles = realm.findRoles(poddUser);
+            dataModel.put("repositoryRoleList", roles);
+        }
+        
+        // Output the base template, with contentTemplate from the dataModel defining the
+        // template to use for the content in the body of the page
+        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
 }

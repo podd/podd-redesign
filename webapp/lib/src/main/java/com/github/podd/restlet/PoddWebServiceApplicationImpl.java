@@ -53,6 +53,7 @@ import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.resources.AboutResourceImpl;
 import com.github.podd.resources.AddObjectResourceImpl;
+import com.github.podd.resources.ArtifactRolesResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
 import com.github.podd.resources.DeleteArtifactResourceImpl;
 import com.github.podd.resources.EditArtifactResourceImpl;
@@ -63,7 +64,6 @@ import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.ListArtifactsResourceImpl;
 import com.github.podd.resources.ListDataRepositoriesResourceImpl;
-import com.github.podd.resources.ArtifactRolesResourceImpl;
 import com.github.podd.resources.SearchOntologyResourceImpl;
 import com.github.podd.resources.UploadArtifactResourceImpl;
 import com.github.podd.resources.UserAddResourceImpl;
@@ -237,38 +237,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
             this.log.warn("Authenticated user did not have any roles: user={}", request.getClientInfo().getUser());
         }
         
-        return true;
-    }
-    
-    /**
-     * @param user
-     * @return false if the User's status is ACTIVE, true in all other cases
-     */
-    private boolean isUserInactive(final User user)
-    {
-        if(user == null)
-        {
-            return true;
-        }
-        
-        if(user instanceof PoddUser)
-        {
-            if(((PoddUser)user).getUserStatus() == PoddUserStatus.ACTIVE)
-            {
-                return false;
-            }
-        }
-        else
-        {
-            RestletUtilUser findUser = this.getRealm().findUser(user.getIdentifier());
-            if(findUser != null && findUser instanceof PoddUser)
-            {
-                if(((PoddUser)findUser).getUserStatus() == PoddUserStatus.ACTIVE)
-                {
-                    return false;
-                }
-            }
-        }
         return true;
     }
     
@@ -452,7 +420,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public Model getAliasesConfiguration(PropertyUtil propertyUtil)
+    public Model getAliasesConfiguration(final PropertyUtil propertyUtil)
     {
         // If the aliasConfiguration is empty then populate it with the default aliases here
         if(this.aliasesConfiguration.isEmpty())
@@ -513,6 +481,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
+    public PropertyUtil getPropertyUtil()
+    {
+        return this.propertyUtil;
+    }
+    
+    @Override
     public PoddSesameRealm getRealm()
     {
         return this.realm;
@@ -528,6 +502,38 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     public Configuration getTemplateConfiguration()
     {
         return this.freemarkerConfiguration;
+    }
+    
+    /**
+     * @param user
+     * @return false if the User's status is ACTIVE, true in all other cases
+     */
+    private boolean isUserInactive(final User user)
+    {
+        if(user == null)
+        {
+            return true;
+        }
+        
+        if(user instanceof PoddUser)
+        {
+            if(((PoddUser)user).getUserStatus() == PoddUserStatus.ACTIVE)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            final RestletUtilUser findUser = this.getRealm().findUser(user.getIdentifier());
+            if(findUser != null && findUser instanceof PoddUser)
+            {
+                if(((PoddUser)findUser).getUserStatus() == PoddUserStatus.ACTIVE)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     
     @Override
@@ -617,12 +623,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         super.stop();
         this.cleanUpResources();
         this.log.info("== Shutting down PODD Web Application ==");
-    }
-    
-    @Override
-    public PropertyUtil getPropertyUtil()
-    {
-        return this.propertyUtil;
     }
     
 }

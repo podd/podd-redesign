@@ -39,13 +39,13 @@ import com.github.podd.utils.PoddRdfConstants;
 public class SPARQLDataRepositoryImplFactory implements PoddDataRepositoryFactory
 {
     @Override
-    public boolean canCreate(Set<URI> types)
+    public boolean canCreate(final Set<URI> types)
     {
         return types.contains(PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY);
     }
     
     @Override
-    public PoddDataRepository<?> createDataRepository(Model statements) throws DataRepositoryException
+    public PoddDataRepository<?> createDataRepository(final Model statements) throws DataRepositoryException
     {
         if(statements.contains(null, RDF.TYPE, PoddRdfConstants.PODD_SPARQL_DATA_REPOSITORY))
         {

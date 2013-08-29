@@ -42,7 +42,7 @@ import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author kutila
- *
+ * 
  */
 public class UserPasswordResourceImplTest extends AbstractResourceImplTest
 {
@@ -53,7 +53,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "anotherUser";
         final String newPassword = "modifiedPassword";
         final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
-
+        
         // prepare: create Model with modified password and user identifier
         final Model userInfoModel = new LinkedHashModel();
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
@@ -91,12 +91,11 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
                     Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
             Assert.fail("Should have thrown a ResourceException as password should now be invalid");
         }
-        catch(ResourceException e)
+        catch(final ResourceException e)
         {
             Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
     }
-
     
     @Test
     public void testChangeOwnPasswordRdf() throws Exception
@@ -105,7 +104,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         final String oldPassword = "testAdminPassword";
         final String newPassword = "modifiedPassword";
         final URI tempUserUri = PoddRdfConstants.VF.createURI("urn:temp:user");
-
+        
         // prepare: create Model with modified password and user identifier
         final Model userInfoModel = new LinkedHashModel();
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
@@ -145,12 +144,12 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
                     Status.CLIENT_ERROR_UNAUTHORIZED, this.testWithAdminPrivileges);
             Assert.fail("Should have thrown a ResourceException as password should now be invalid");
         }
-        catch(ResourceException e)
+        catch(final ResourceException e)
         {
             Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
     }
-
+    
     @Test
     public void testPasswordChangePageHtml() throws Exception
     {
@@ -163,7 +162,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final String body = results.getText();
-        //System.out.println(body);
+        // System.out.println(body);
         this.assertFreemarker(body);
         
         Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));

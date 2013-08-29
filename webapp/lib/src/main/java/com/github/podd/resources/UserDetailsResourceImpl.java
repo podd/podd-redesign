@@ -18,7 +18,6 @@ package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -156,9 +155,8 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "User not found.");
         }
-        //final Set<Role> roles = realm.findRoles(poddUser);
+        // final Set<Role> roles = realm.findRoles(poddUser);
         final Collection<Entry<Role, URI>> rolesWithObjectMappings = realm.getRolesWithObjectMappings(poddUser);
-        
         
         final Model userInfoModel = this.userToModel(poddUser, rolesWithObjectMappings);
         
@@ -213,41 +211,45 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
                     PoddRdfConstants.VF.createLiteral(user.getOrcid()));
         }
         
-        if (user.getTitle() != null)
+        if(user.getTitle() != null)
         {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(user.getTitle()));
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_TITLE,
+                    PoddRdfConstants.VF.createLiteral(user.getTitle()));
         }
         
-        if (user.getPhone() != null)
+        if(user.getPhone() != null)
         {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(user.getPhone()));
-        }
-
-        if (user.getAddress() != null)
-        {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_ADDRESS, PoddRdfConstants.VF.createLiteral(user.getAddress()));
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_PHONE,
+                    PoddRdfConstants.VF.createLiteral(user.getPhone()));
         }
         
-        if (user.getPosition() != null)
+        if(user.getAddress() != null)
         {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_POSITION, PoddRdfConstants.VF.createLiteral(user.getPosition()));
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_ADDRESS,
+                    PoddRdfConstants.VF.createLiteral(user.getAddress()));
         }
         
-        if (user.getUserStatus() != null)
+        if(user.getPosition() != null)
+        {
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_POSITION,
+                    PoddRdfConstants.VF.createLiteral(user.getPosition()));
+        }
+        
+        if(user.getUserStatus() != null)
         {
             userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, user.getUserStatus().getURI());
         }
         else
         {
-            //INACTIVE by default
+            // INACTIVE by default
             userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         }
         
         this.log.debug("User has {} roles", roles.size());
         
-        for(Iterator<Entry<Role, URI>> iterator = roles.iterator(); iterator.hasNext();)
+        for(final Entry<Role, URI> entry2 : roles)
         {
-            final Entry<Role, URI> entry = (Entry<Role, URI>) iterator.next();
+            final Entry<Role, URI> entry = entry2;
             final RestletUtilRole roleByName = PoddRoles.getRoleByName(entry.getKey().getName());
             
             final URI roleMapping =
@@ -256,8 +258,8 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
             userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, userUri);
             
             userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, roleByName.getURI());
-
-            if (entry.getValue() != null)
+            
+            if(entry.getValue() != null)
             {
                 userInfoModel.add(roleMapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, entry.getValue());
             }

@@ -127,10 +127,11 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "testuser@podd.com";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
-        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF.createURI("urn:podd:some-project")));
+        roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
+                .createURI("urn:podd:some-project")));
         this.loadTestUser(testIdentifier, "testuserpassword", "John", "Doe", testIdentifier,
                 "http:///www.john.doe.com", "CSIRO", "john-orcid", "Mr", "000333434", "Some Address", "Researcher",
-                roles, PoddUserStatus.ACTIVE);        
+                roles, PoddUserStatus.ACTIVE);
         
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
@@ -228,11 +229,12 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                 this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 12);
         
         // verify:
-        Assert.assertEquals("Not the expected User URI", testUserUri, 
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next().stringValue());
-        Assert.assertEquals("Not the expected object URI", testObjectUri, 
+        Assert.assertEquals("Not the expected User URI", testUserUri,
+                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next()
+                        .stringValue());
+        Assert.assertEquals("Not the expected object URI", testObjectUri,
                 resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
-        Assert.assertEquals("Not the expected User Status", PoddUserStatus.ACTIVE.getURI(), 
+        Assert.assertEquals("Not the expected User Status", PoddUserStatus.ACTIVE.getURI(),
                 resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
     }
     

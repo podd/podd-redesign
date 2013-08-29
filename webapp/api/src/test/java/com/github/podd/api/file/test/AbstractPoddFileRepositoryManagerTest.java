@@ -40,11 +40,11 @@ import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.test.TestConstants;
+import com.github.podd.exception.DataRepositoryException;
+import com.github.podd.exception.DataRepositoryMappingNotFoundException;
 import com.github.podd.exception.FileReferenceInvalidException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
-import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
-import com.github.podd.exception.DataRepositoryMappingNotFoundException;
 import com.github.podd.utils.PoddRdfConstants;
 
 /**
@@ -62,10 +62,6 @@ public abstract class AbstractPoddFileRepositoryManagerTest
     
     protected PoddDataRepositoryManager testFileRepositoryManager;
     protected PoddRepositoryManager testRepositoryManager;
-    
-    protected abstract DataReference getNewValidFileReference() throws Exception;
-    
-    protected abstract DataReference getNewInvalidFileReference() throws Exception;
     
     /**
      * Build a File Repository object in memory with the given alias and Model. ALl other method
@@ -92,6 +88,8 @@ public abstract class AbstractPoddFileRepositoryManagerTest
      */
     protected abstract Model buildModelForFileRepository(final URI aliasUri, final String... aliases);
     
+    protected abstract DataReference getNewInvalidFileReference() throws Exception;
+    
     /**
      * {@link PoddDataRepositoryManager} is the object under test in this class.
      * 
@@ -99,6 +97,8 @@ public abstract class AbstractPoddFileRepositoryManagerTest
      * @throws OpenRDFException
      */
     protected abstract PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws OpenRDFException;
+    
+    protected abstract DataReference getNewValidFileReference() throws Exception;
     
     @Before
     public void setUp() throws Exception
@@ -612,11 +612,11 @@ public abstract class AbstractPoddFileRepositoryManagerTest
             // prepare: create FileReferences to test
             final Set<DataReference> dataReferences = new HashSet<DataReference>();
             final DataReference fileRefWithAlias1A = this.getNewValidFileReference();
-            fileRefWithAlias1A.setRepositoryAlias(TEST_ALIAS_1A);
+            fileRefWithAlias1A.setRepositoryAlias(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A);
             dataReferences.add(fileRefWithAlias1A);
             
             final DataReference fileRefWithAlias2A = this.getNewValidFileReference();
-            fileRefWithAlias2A.setRepositoryAlias(TEST_ALIAS_2A);
+            fileRefWithAlias2A.setRepositoryAlias(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_2A);
             dataReferences.add(fileRefWithAlias2A);
             
             this.testFileRepositoryManager.verifyDataReferences(dataReferences);
@@ -654,11 +654,11 @@ public abstract class AbstractPoddFileRepositoryManagerTest
             // prepare: create FileReferences to test
             final Set<DataReference> dataReferences = new HashSet<DataReference>();
             final DataReference fileRefWithAlias1A = this.getNewValidFileReference();
-            fileRefWithAlias1A.setRepositoryAlias(TEST_ALIAS_1A);
+            fileRefWithAlias1A.setRepositoryAlias(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A);
             dataReferences.add(fileRefWithAlias1A);
             
             final DataReference fileRefWithNoSuchFile = this.getNewInvalidFileReference();
-            fileRefWithNoSuchFile.setRepositoryAlias(TEST_ALIAS_1A);
+            fileRefWithNoSuchFile.setRepositoryAlias(AbstractPoddFileRepositoryManagerTest.TEST_ALIAS_1A);
             dataReferences.add(fileRefWithNoSuchFile);
             
             try

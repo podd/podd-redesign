@@ -19,7 +19,6 @@ package com.github.podd.restlet.integrationtest;
 import java.io.IOException;
 
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;

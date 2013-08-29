@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- /**
+/**
  * 
  */
 package com.github.podd.api;
@@ -30,7 +30,6 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
@@ -127,20 +126,6 @@ public interface PoddArtifactManager
             final InferredOWLOntologyID artifactID) throws OpenRDFException, PoddException, IOException;
     
     /**
-     * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI.
-     * 
-     * If the IRI maps to more than one version of an artifact, the most current version of the
-     * artifact is returned.
-     * 
-     * @param artifactIRI
-     *            The IRI of the Artifact to fetch. Can be either the version or the ontology IRI.
-     * @return An {@link InferredOWLOntologyID} containing the full details for the artifact.
-     * @throws UnmanagedArtifactIRIException
-     *             If the artifact is not managed.
-     */
-    InferredOWLOntologyID getArtifact(IRI artifactIRI) throws UnmanagedArtifactIRIException;
-
-    /**
      * This method takes in a {@link Model} where the statements have missing data and attempts to
      * fill this data using information from the graphs of the given ontology's import closure. <br>
      * 
@@ -161,6 +146,20 @@ public interface PoddArtifactManager
      * @throws OpenRDFException
      */
     Model fillMissingData(InferredOWLOntologyID ontologyID, Model inputModel) throws OpenRDFException;
+    
+    /**
+     * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI.
+     * 
+     * If the IRI maps to more than one version of an artifact, the most current version of the
+     * artifact is returned.
+     * 
+     * @param artifactIRI
+     *            The IRI of the Artifact to fetch. Can be either the version or the ontology IRI.
+     * @return An {@link InferredOWLOntologyID} containing the full details for the artifact.
+     * @throws UnmanagedArtifactIRIException
+     *             If the artifact is not managed.
+     */
+    InferredOWLOntologyID getArtifact(IRI artifactIRI) throws UnmanagedArtifactIRIException;
     
     /**
      * Returns the {@link InferredOWLOntologyID} for the artifact identified by the given IRI and
@@ -198,10 +197,10 @@ public interface PoddArtifactManager
      *         configurations.
      */
     PoddDataRepositoryManager getFileRepositoryManager();
-
+    
     /**
-     * Retrieves a {@link Model} containing all data required for displaying the details
-     * of the object in HTML+RDFa.
+     * Retrieves a {@link Model} containing all data required for displaying the details of the
+     * object in HTML+RDFa.
      * 
      * The returned graph has the following structure.
      * 
@@ -218,7 +217,7 @@ public interface PoddArtifactManager
      */
     Model getObjectDetailsForDisplay(final InferredOWLOntologyID artifactID, final URI objectUri)
         throws OpenRDFException;
-
+    
     /**
      * 
      * @param ontologyID
@@ -242,7 +241,7 @@ public interface PoddArtifactManager
      * @throws OpenRDFException
      */
     List<PoddObjectLabel> getObjectTypes(InferredOWLOntologyID artifactId, URI objectUri) throws OpenRDFException;
-
+    
     /**
      * Retrieve a list of <b>asserted</b> properties about the given object. The list is ordered
      * based on property weights and secondarily based on property labels.
@@ -272,12 +271,12 @@ public interface PoddArtifactManager
      *         artifacts.
      */
     PoddOWLManager getOWLManager();
-
+    
     /**
      * This method returns a {@link Model} containing a single statement which links the given
      * object with its parent object. A <i>parent</i> is connected to the given object by a property
-     * which is a sub-property of <code>PODDBase:contains</code>. If the object URI is null or does not
-     * have a parent (i.e. it is a <code>PoddTopObject</code>), an empty Model is returned.
+     * which is a sub-property of <code>PODDBase:contains</code>. If the object URI is null or does
+     * not have a parent (i.e. it is a <code>PoddTopObject</code>), an empty Model is returned.
      * 
      * @param ontologyID
      *            The ontology to which this object belongs.
@@ -324,7 +323,7 @@ public interface PoddArtifactManager
      * @throws OpenRDFException
      */
     List<PoddObjectLabel> getTopObjectLabels(List<InferredOWLOntologyID> artifacts) throws OpenRDFException;
-
+    
     /**
      * 
      * @return The list of artifacts that have been published.
@@ -379,11 +378,11 @@ public interface PoddArtifactManager
     
     /**
      * Carries out a case-insensitive search for objects whose labels match a given term. The search
-     * consists of the given ontology and its imported ontologies. An optional array of URIs can be used to limit the
-     * RDF types of objects to match. <br>
+     * consists of the given ontology and its imported ontologies. An optional array of URIs can be
+     * used to limit the RDF types of objects to match. <br>
      * 
      * @param ontologyID
-     *          The ontology and its imported ontologies make up the search space
+     *            The ontology and its imported ontologies make up the search space
      * @param searchTerm
      *            A String term which is searched for in the RDF:Labels
      * @param searchTypes
@@ -495,8 +494,8 @@ public interface PoddArtifactManager
      * @param fileReferencePolicy
      *            Indicates whether any File References found should be verified by accessing them
      *            from their source.
-     * @return A Model containing the updated artifact ID and PURL mappings for any temporary object URIs
-     *         that were passed in.
+     * @return A Model containing the updated artifact ID and PURL mappings for any temporary object
+     *         URIs that were passed in.
      * @throws OpenRDFException
      * @throws PoddException
      * @throws IOException
@@ -531,5 +530,5 @@ public interface PoddArtifactManager
      */
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
             Set<OWLOntologyID> oldSchemaOntologyIds, Set<OWLOntologyID> newSchemaOntologyIds);
-
+    
 }

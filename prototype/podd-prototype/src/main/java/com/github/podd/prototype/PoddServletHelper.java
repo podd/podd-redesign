@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.prototype;
+package com.github.podd.prototype;
 
 import info.aduna.iteration.Iterations;
 
@@ -815,8 +815,10 @@ public class PoddServletHelper
             URITranslator.doTranslation(tempRepositoryConnection, context.stringValue(), newVersionURI.stringValue(),
                     context);
             
-            // FIXME: Check for dangling objects that are no longer linked to the top object in the artifact
-            // If there are any dangling objects delete them from the temp repository before loading into OWLAPI
+            // FIXME: Check for dangling objects that are no longer linked to the top object in the
+            // artifact
+            // If there are any dangling objects delete them from the temp repository before loading
+            // into OWLAPI
             
             // load into OWLAPI
             this.log.debug("Loading podd artifact from temp repository: {}", context);

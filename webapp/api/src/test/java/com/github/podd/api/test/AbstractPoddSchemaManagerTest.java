@@ -131,17 +131,17 @@ public abstract class AbstractPoddSchemaManagerTest
      */
     private void loadSchemaOntologies() throws Exception
     {
-        loadSchemaOntologies(new PropertyUtil("podd").get(PoddRdfConstants.KEY_SCHEMAS,
+        this.loadSchemaOntologies(new PropertyUtil("podd").get(PoddRdfConstants.KEY_SCHEMAS,
                 PoddRdfConstants.PATH_DEFAULT_SCHEMAS));
     }
     
-    private void loadSchemaOntologies(String schemaManifest) throws OpenRDFException, IOException, OWLException,
+    private void loadSchemaOntologies(final String schemaManifest) throws OpenRDFException, IOException, OWLException,
         PoddException
     {
         Model model = null;
         try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
         {
-            RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
             model = Rio.parse(schemaManifestStream, "", format);
         }
         this.testSchemaManager.uploadSchemaOntologies(model);
@@ -691,6 +691,19 @@ public abstract class AbstractPoddSchemaManagerTest
     }
     
     /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     */
+    @Test
+    public final void testUploadSchemaOntologies() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        
+        Assert.assertEquals(6, schemaOntologies.size());
+    }
+    
+    /**
      * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntology(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
@@ -1014,19 +1027,6 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         
         // TODO: verify
-    }
-    
-    /**
-     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
-     */
-    @Test
-    public final void testUploadSchemaOntologies() throws Exception
-    {
-        this.loadSchemaOntologies();
-        
-        Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
-        
-        Assert.assertEquals(6, schemaOntologies.size());
     }
     
 }

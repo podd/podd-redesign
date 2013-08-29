@@ -65,25 +65,21 @@ public class FileReferenceVerificationFailureException extends PoddException
         this.validationFailures = validationFailures;
     }
     
-    public Map<DataReference, Throwable> getValidationFailures()
-    {
-        return this.validationFailures;
-    }
- 
     @Override
-    public Model getDetailsAsModel(final Resource errorResource) 
+    public Model getDetailsAsModel(final Resource errorResource)
     {
         final Model model = super.getDetailsAsModel(errorResource);
         
-        //FIXME - untested and incomplete
+        // FIXME - untested and incomplete
         final Map<DataReference, Throwable> validationFailures = this.getValidationFailures();
-        Iterator<DataReference> iterator = validationFailures.keySet().iterator();
-        while (iterator.hasNext())
+        final Iterator<DataReference> iterator = validationFailures.keySet().iterator();
+        while(iterator.hasNext())
         {
             final DataReference dataReference = iterator.next();
-            Throwable throwable = validationFailures.get(dataReference);
-            //TODO
-            model.add(dataReference.getObjectIri().toOpenRDFURI(), RDFS.LABEL, PoddRdfConstants.VF.createLiteral(throwable.getMessage()));
+            final Throwable throwable = validationFailures.get(dataReference);
+            // TODO
+            model.add(dataReference.getObjectIri().toOpenRDFURI(), RDFS.LABEL,
+                    PoddRdfConstants.VF.createLiteral(throwable.getMessage()));
             dataReference.getLabel();
             
             final BNode v = PoddRdfConstants.VF.createBNode();
@@ -97,6 +93,11 @@ public class FileReferenceVerificationFailureException extends PoddException
         }
         
         return model;
+    }
+    
+    public Map<DataReference, Throwable> getValidationFailures()
+    {
+        return this.validationFailures;
     }
     
 }

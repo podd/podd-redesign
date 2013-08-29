@@ -441,23 +441,6 @@ public abstract class AbstractPoddClientTest
      * Test method for {@link com.github.podd.client.api.PoddClient#listRoles(String)} .
      */
     @Test
-    public final void testListRolesUser() throws Exception
-    {
-        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
-        
-        final Map<RestletUtilRole, Collection<URI>> roles =
-                this.testClient.listRoles(AbstractPoddClientTest.TEST_ADMIN_USER);
-        
-        Assert.assertEquals(1, roles.size());
-        Assert.assertTrue(roles.containsKey(PoddRoles.ADMIN));
-        Assert.assertEquals(1, roles.get(PoddRoles.ADMIN).size());
-        Assert.assertNull(roles.get(PoddRoles.ADMIN).iterator().next());
-    }
-    
-    /**
-     * Test method for {@link com.github.podd.client.api.PoddClient#listRoles(String)} .
-     */
-    @Test
     public final void testListRolesArtifact() throws Exception
     {
         this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
@@ -478,6 +461,23 @@ public abstract class AbstractPoddClientTest
         Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
         Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR)
                 .iterator().next());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.client.api.PoddClient#listRoles(String)} .
+     */
+    @Test
+    public final void testListRolesUser() throws Exception
+    {
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        final Map<RestletUtilRole, Collection<URI>> roles =
+                this.testClient.listRoles(AbstractPoddClientTest.TEST_ADMIN_USER);
+        
+        Assert.assertEquals(1, roles.size());
+        Assert.assertTrue(roles.containsKey(PoddRoles.ADMIN));
+        Assert.assertEquals(1, roles.get(PoddRoles.ADMIN).size());
+        Assert.assertNull(roles.get(PoddRoles.ADMIN).iterator().next());
     }
     
     /**

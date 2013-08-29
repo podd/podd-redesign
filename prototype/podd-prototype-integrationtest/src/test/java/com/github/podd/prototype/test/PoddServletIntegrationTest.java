@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.prototype.test;
+package com.github.podd.prototype.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.junit.Assert;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

@@ -47,7 +47,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals("", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
     }
-
+    
     @Test
     public void testGetUsersHtml() throws Exception
     {

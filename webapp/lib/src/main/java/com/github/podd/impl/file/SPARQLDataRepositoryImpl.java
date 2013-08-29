@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.podd.api.file.DataReference;
+import com.github.podd.api.file.PoddDataRepository;
 import com.github.podd.api.file.SPARQLDataReference;
 import com.github.podd.exception.FileReferenceNotSupportedException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
@@ -56,7 +57,7 @@ public class SPARQLDataRepositoryImpl extends PoddFileRepositoryImpl<SPARQLDataR
             throw new FileRepositoryIncompleteException(model, "SPARQL repository configuration incomplete");
         }
         
-        if(!SPARQLDataRepositoryImpl.PROTOCOL_HTTP.equalsIgnoreCase(protocol))
+        if(!PoddDataRepository.PROTOCOL_HTTP.equalsIgnoreCase(protocol))
         {
             throw new FileRepositoryIncompleteException(model, "Protocol needs to be HTTP for SPARQL Repository");
         }

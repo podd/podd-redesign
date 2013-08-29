@@ -16,11 +16,7 @@
  */
 package com.github.podd.restlet.integrationtest;
 
-import java.io.IOException;
-
 import org.openrdf.OpenRDFException;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
 import org.restlet.Component;
 import org.restlet.data.LocalReference;
@@ -32,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.ClassLoaderDirectory;
 import com.github.ansell.restletutils.CompositeClassLoader;
 import com.github.podd.restlet.ApplicationUtils;
@@ -141,7 +136,7 @@ public class PoddRestletIntegrationTestComponent extends Component
         {
             nextApplication = new PoddWebServiceApplicationImpl();
             
-            String resetKey =
+            final String resetKey =
                     nextApplication.getPropertyUtil().get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
             // Add a route for the reset service.
             final String resetPath = "/reset/" + resetKey;

@@ -67,34 +67,6 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    @Get
-    public Representation getUserAddPageHtml(final Representation entity) throws ResourceException
-    {
-        this.log.info("addUserHtml");
-        
-        final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
-        
-        // identify needed Action
-        this.checkAuthentication(PoddAction.USER_CREATE);
-        
-        // completed checking authorization
-        
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "admin_createUser.html.ftl");
-        dataModel.put("pageTitle", "Add PODD User Page");
-        dataModel.put("title", "Create User");
-        dataModel.put("authenticatedUsername", user.getIdentifier());
-        
-        PoddUserStatus[] statuses = PoddUserStatus.values();
-        dataModel.put("statusList", statuses);
-        
-        // Output the base template, with contentTemplate from the dataModel defining the
-        // template to use for the content in the body of the page
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
-    }
-    
     /**
      * Handle an HTTP POST request submitting RDF data to create a new PoddUser. This method can
      * only add one user per request. On successful addition of a user, the new user's unique URI is
@@ -121,7 +93,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
             // - create new PoddUser and add to Realm
             newUser = this.modelToUser(newUserModel);
             
-            if (nextRealm.findUser(newUser.getIdentifier()) != null)
+            if(nextRealm.findUser(newUser.getIdentifier()) != null)
             {
                 throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, "User already exists");
             }
@@ -134,7 +106,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                     newUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects().iterator();
             
             // - add Project Creator Role if nothing else has been specified
-            if (!iterator.hasNext())
+            if(!iterator.hasNext())
             {
                 nextRealm.map(newUser, PoddRoles.PROJECT_CREATOR.getRole());
             }
@@ -198,6 +170,34 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
     
+    @Get
+    public Representation getUserAddPageHtml(final Representation entity) throws ResourceException
+    {
+        this.log.info("addUserHtml");
+        
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
+        
+        // identify needed Action
+        this.checkAuthentication(PoddAction.USER_CREATE);
+        
+        // completed checking authorization
+        
+        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
+        dataModel.put("contentTemplate", "admin_createUser.html.ftl");
+        dataModel.put("pageTitle", "Add PODD User Page");
+        dataModel.put("title", "Create User");
+        dataModel.put("authenticatedUsername", user.getIdentifier());
+        
+        final PoddUserStatus[] statuses = PoddUserStatus.values();
+        dataModel.put("statusList", statuses);
+        
+        // Output the base template, with contentTemplate from the dataModel defining the
+        // template to use for the content in the body of the page
+        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+    }
+    
     /**
      * Helper method to construct a {@link PoddUser} from information in the given {@link Model}.
      * 
@@ -237,7 +237,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         
         PoddUserStatus status = PoddUserStatus.INACTIVE;
         final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
-        if (statusUri != null)
+        if(statusUri != null)
         {
             status = PoddUserStatus.getUserStatusByUri(statusUri);
         }
@@ -251,8 +251,8 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
         
         final PoddUser user =
-                new PoddUser(identifier, password.toCharArray(), firstName, lastName, email, status,
-                        homePage, organization, orcidID, title, phone, address, position);
+                new PoddUser(identifier, password.toCharArray(), firstName, lastName, email, status, homePage,
+                        organization, orcidID, title, phone, address, position);
         
         return user;
     }

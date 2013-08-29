@@ -40,7 +40,6 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
@@ -187,23 +186,23 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
                         "Delta-T porometer", null };
         
         final Model testModel = new LinkedHashModel();
-        for(String s : objectUris)
+        for(final String s : objectUris)
         {
             testModel.add(PoddRdfConstants.VF.createURI(s), RDFS.LABEL, PoddRdfConstants.VF.createLiteral("?blank"));
         }
         
-        RDFFormat inputFormat = RDFFormat.RDFXML;
-        MediaType inputMediaType = MediaType.valueOf(inputFormat.getDefaultMIMEType());
+        final RDFFormat inputFormat = RDFFormat.RDFXML;
+        final MediaType inputMediaType = MediaType.valueOf(inputFormat.getDefaultMIMEType());
         
         // build input representation
-        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096); 
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         Rio.write(testModel, output, inputFormat);
         final Representation input = new StringRepresentation(output.toString(), inputMediaType);
         
         // invoke service
         final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.POST, input,
-                        inputMediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.POST, input, inputMediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: response
         final String body = results.getText();
@@ -247,58 +246,18 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final InferredOWLOntologyID testArtifact =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
-
-        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform"};
+        
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Platform" };
         final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
         
-        final Model resultModel = this.internalTestSearchRdf("lat", searchTypes, requestMediaType, testArtifact.getOntologyIRI().toString());
+        final Model resultModel =
+                this.internalTestSearchRdf("lat", searchTypes, requestMediaType, testArtifact.getOntologyIRI()
+                        .toString());
         
         // verify:
         Assert.assertEquals("Not the expected number of results", 1, resultModel.size());
         Assert.assertEquals("Expected Platform 1 not found", 1,
                 resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Platform 1")).size());
-    }
-
-    /**
-     * Test successful search for a PODD Project in RDF/XML
-     */
-    @Test
-    public void testSearchRdfForProjects() throws Exception
-    {
-        // prepare:
-        final InferredOWLOntologyID testArtifact =
-                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
-
-        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Project"};
-        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
-        
-        final Model resultModel = this.internalTestSearchRdf("Cot", searchTypes, requestMediaType, testArtifact.getOntologyIRI().toString());
-        
-        // verify:
-        Assert.assertEquals("Not the expected number of results", 1, resultModel.size());
-        Assert.assertTrue("Expected Project not found", resultModel.filter(null, RDFS.LABEL, null).objectString().contains("Cotton Leaf Morphology"));
-    }
-
-
-    /**
-     * Test successful search for a FOR Codes in RDF/XML
-     */
-    @Test
-    public void testSearchRdfForWildtTypeAssertion() throws Exception
-    {
-        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#WildTypeAssertion" };
-        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
-        
-        final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType, null);
-        
-        // verify:
-        Assert.assertEquals("Not the expected number of results", 4, resultModel.size());
-        Assert.assertEquals("Expected Assertion 'Yes' not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Yes")).size());
-        Assert.assertEquals("Expected Assertion 'Unknown' not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Unknown")).size());
-        Assert.assertEquals("Expected Assertion 'Not Applicable' not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Not Applicable")).size());
     }
     
     /**
@@ -320,6 +279,29 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
                 resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Pyrometer")).size());
         Assert.assertEquals("Expected Platform SC1 Porometer not found", 1,
                 resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("SC1 Porometer")).size());
+    }
+    
+    /**
+     * Test successful search for a PODD Project in RDF/XML
+     */
+    @Test
+    public void testSearchRdfForProjects() throws Exception
+    {
+        // prepare:
+        final InferredOWLOntologyID testArtifact =
+                this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#Project" };
+        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
+        
+        final Model resultModel =
+                this.internalTestSearchRdf("Cot", searchTypes, requestMediaType, testArtifact.getOntologyIRI()
+                        .toString());
+        
+        // verify:
+        Assert.assertEquals("Not the expected number of results", 1, resultModel.size());
+        Assert.assertTrue("Expected Project not found", resultModel.filter(null, RDFS.LABEL, null).objectString()
+                .contains("Cotton Leaf Morphology"));
     }
     
     /**
@@ -346,6 +328,27 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     }
     
     /**
+     * Test successful search for a FOR Codes in RDF/XML
+     */
+    @Test
+    public void testSearchRdfForWildtTypeAssertion() throws Exception
+    {
+        final String[] searchTypes = { "http://purl.org/podd/ns/poddScience#WildTypeAssertion" };
+        final MediaType requestMediaType = MediaType.APPLICATION_RDF_XML;
+        
+        final Model resultModel = this.internalTestSearchRdf("", searchTypes, requestMediaType, null);
+        
+        // verify:
+        Assert.assertEquals("Not the expected number of results", 4, resultModel.size());
+        Assert.assertEquals("Expected Assertion 'Yes' not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Yes")).size());
+        Assert.assertEquals("Expected Assertion 'Unknown' not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Unknown")).size());
+        Assert.assertEquals("Expected Assertion 'Not Applicable' not found", 1,
+                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("Not Applicable")).size());
+    }
+    
+    /**
      * Test a search in RDF/XML, with no "searchTypes" specified.
      */
     @Test
@@ -358,13 +361,19 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         
         // verify:
         Assert.assertEquals("Not the expected number of results", 203, resultModel.size());
-
-        Assert.assertEquals("dcTerms not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("The PODD Ontology for Dublin Core Terms")).size());
-        Assert.assertEquals("The PODD Ontology for Dublin Core Terms not found", 1,
-                resultModel.filter(null, null, PoddRdfConstants.VF.createLiteral("The PODD Ontology for Dublin Core Terms")).size());
+        
+        Assert.assertEquals(
+                "dcTerms not found",
+                1,
+                resultModel.filter(null, null,
+                        PoddRdfConstants.VF.createLiteral("The PODD Ontology for Dublin Core Terms")).size());
+        Assert.assertEquals(
+                "The PODD Ontology for Dublin Core Terms not found",
+                1,
+                resultModel.filter(null, null,
+                        PoddRdfConstants.VF.createLiteral("The PODD Ontology for Dublin Core Terms")).size());
     }
-
+    
     /**
      * Test successful search for a Platform in Turtle
      */

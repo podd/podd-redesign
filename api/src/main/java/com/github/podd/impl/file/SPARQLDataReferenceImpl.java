@@ -54,7 +54,7 @@ public class SPARQLDataReferenceImpl extends AbstractDataReferenceImpl implement
     @Override
     public Model toRDF()
     {
-        Model result = super.toRDF();
+        final Model result = super.toRDF();
         
         result.add(this.getObjectIri().toOpenRDFURI(), RDF.TYPE, PoddRdfConstants.PODD_BASE_DATA_REFERENCE_TYPE_SPARQL);
         

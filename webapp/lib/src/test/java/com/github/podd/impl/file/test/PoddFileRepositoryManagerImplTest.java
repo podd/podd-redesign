@@ -68,22 +68,6 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     private Path sshDir = null;
     
     @Override
-    protected DataReference getNewValidFileReference() throws Exception
-    {
-        return SSHService.getNewValidFileReference("valid-file",
-                this.tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
-                        .toPath());
-    }
-    
-    @Override
-    protected DataReference getNewInvalidFileReference() throws Exception
-    {
-        return SSHService.getNewInvalidFileReference("invalid-file",
-                this.tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
-                        .toPath());
-    }
-    
-    @Override
     protected PoddDataRepository<?> buildFileRepositoryInstance(final String alias, final Model model)
     {
         // prepare: create a mock PoddDataRepository which can only return the test alias string
@@ -153,6 +137,14 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
     }
     
     @Override
+    protected DataReference getNewInvalidFileReference() throws Exception
+    {
+        return SSHService.getNewInvalidFileReference("invalid-file",
+                this.tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                        .toPath());
+    }
+    
+    @Override
     protected PoddDataRepositoryManager getNewPoddFileRepositoryManager() throws OpenRDFException
     {
         // create a Repository Manager with an internal memory Repository
@@ -176,6 +168,14 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         testFileRepositoryManager.setOWLManager(owlManager);
         
         return testFileRepositoryManager;
+    }
+    
+    @Override
+    protected DataReference getNewValidFileReference() throws Exception
+    {
+        return SSHService.getNewValidFileReference("valid-file",
+                this.tempDirectory.newFolder("poddfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                        .toPath());
     }
     
     @Before

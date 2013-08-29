@@ -102,7 +102,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         // optional multiple parameter 'objectUri'
-        String[] objectURIStrings = this.getQuery().getValuesArray(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
+        final String[] objectURIStrings = this.getQuery().getValuesArray(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
         
         // - optional parameter 'isreplace'
         UpdatePolicy updatePolicy = UpdatePolicy.REPLACE_EXISTING;
@@ -129,8 +129,8 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             fileRefVerificationPolicy = DataReferenceVerificationPolicy.VERIFY;
         }
         
-        Collection<URI> objectUris = new ArrayList<URI>(objectURIStrings.length);
-        for(String nextObjectURIString : objectURIStrings)
+        final Collection<URI> objectUris = new ArrayList<URI>(objectURIStrings.length);
+        for(final String nextObjectURIString : objectURIStrings)
         {
             objectUris.add(PoddRdfConstants.VF.createURI(nextObjectURIString));
         }

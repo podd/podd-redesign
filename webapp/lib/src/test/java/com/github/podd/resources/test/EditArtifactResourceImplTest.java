@@ -207,7 +207,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final String[] newObjects =
                 { "urn:temp:uuid:object-rice-scan-34343-a", "urn:temp:uuid:publication35",
                         "urn:temp:uuid:publication46" };
-        for(String objectUri : newObjects)
+        for(final String objectUri : newObjects)
         {
             editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
         }
@@ -236,7 +236,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertEquals("Response did not contain an ontology ID", 1, updatedOntologyID.size());
         
         // verify: response contains object URIs and their PURLs
-        for(String objectUri : newObjects)
+        for(final String objectUri : newObjects)
         {
             final String purl =
                     model.filter(PoddRdfConstants.VF.createURI(objectUri),
@@ -270,8 +270,8 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final String incorrectArtifactID = artifactID.getOntologyIRI().toString() + "_wrong";
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, incorrectArtifactID);
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER,
-                artifactID.getVersionIRI().toString());
+        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                .getVersionIRI().toString());
         
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
         editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(false));
@@ -290,7 +290,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_NOT_FOUND, e.getStatus());
-
+            
             // TODO: verify the cause and details (as in UploadArtifactResourceImplTest)
             final String body = editArtifactClientResource.getResponseEntity().getText();
             final ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
@@ -336,7 +336,7 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_CONFLICT, e.getStatus());
-
+            
             // verify the source of error
             final String body = editArtifactClientResource.getResponseEntity().getText();
             final ByteArrayInputStream inputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));

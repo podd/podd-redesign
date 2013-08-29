@@ -57,7 +57,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
             {
                 this.repository.shutDown();
             }
-            catch(RepositoryException e1)
+            catch(final RepositoryException e1)
             {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();

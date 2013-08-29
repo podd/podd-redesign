@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.api.test;
+package com.github.podd.api.test;
 
 /**
  * Interface containing constant values for use in test verification.
@@ -74,7 +74,7 @@ public interface TestConstants
     
     /** Test resource (in RDF/XML): invalid artifact not in OWL-DL profile */
     public static final String TEST_ARTIFACT_BAD_NOT_OWL_DL = "/test/artifacts/bad-not-owl-dl.rdf";
-
+    
     /** Test resource: invalid with empty file */
     public static final String TEST_INVALID_ARTIFACT_EMPTY = "/test/ontologies/empty.owl";
     
@@ -123,7 +123,7 @@ public interface TestConstants
     /** Test resource: fragment containing a new File Reference object in Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT_TTL =
             "/test/artifacts/fragment-new-file-ref.ttl";
-
+    
     /** Test resource: fragment containing multiple objects with temporary URIs in Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_MULTIPLE_OBJECTS_TTL =
             "/test/artifacts/fragment-new-multiple-objects.ttl";
@@ -131,7 +131,7 @@ public interface TestConstants
     /** Test resource: fragment containing platform objects with temporary URIs in Turtle format */
     public static final String TEST_ARTIFACT_FRAGMENT_NEW_PLATFORM_OBJECTS =
             "/test/artifacts/fragment-new-platform-objects.ttl";
-
+    
     /**
      * Test resource: fragment modifying Demo_Investigation object to no longer contain
      * SqueekeeMaterial. In Turtle format

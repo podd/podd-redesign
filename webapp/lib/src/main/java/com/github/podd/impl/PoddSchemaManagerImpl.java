@@ -117,6 +117,27 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     @Override
+    public Set<InferredOWLOntologyID> getSchemaOntologies() throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.repositoryManager.getRepository().getConnection();
+            
+            return this.sesameManager.getAllSchemaOntologyVersions(conn,
+                    this.repositoryManager.getSchemaManagementGraph());
+        }
+        finally
+        {
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
+    }
+    
+    @Override
     public OWLOntology getSchemaOntology(final IRI schemaOntologyIRI) throws UnmanagedSchemaIRIException
     {
         throw new RuntimeException("TODO: Implement getSchemaOntology(IRI)");
@@ -483,25 +504,5 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             }
         }
         
-    }
-
-    @Override
-    public Set<InferredOWLOntologyID> getSchemaOntologies() throws OpenRDFException
-    {
-        RepositoryConnection conn = null;
-        
-        try
-        {
-            conn = this.repositoryManager.getRepository().getConnection();
-            
-            return this.sesameManager.getAllSchemaOntologyVersions(conn, this.repositoryManager.getSchemaManagementGraph());
-        }
-        finally
-        {
-            if(conn != null && conn.isOpen())
-            {
-                conn.close();
-            }
-        }
     }
 }

@@ -52,8 +52,8 @@ import com.github.podd.utils.PoddWebConstants;
 
 /**
  * 
- * User Edit resource to modify PODD User details, except password changes.
- * Password changes should be made using the {@link UserPasswordResourceImpl}.
+ * User Edit resource to modify PODD User details, except password changes. Password changes should
+ * be made using the {@link UserPasswordResourceImpl}.
  * 
  * @author kutila
  * 
@@ -62,63 +62,6 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
 {
     
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
-    /**
-     * Handle an HTTP GET request to display the Edit User page in HTML
-     * 
-     * FIXME: incomplete, initial untested code
-     */
-    @Get
-    public Representation getUserEditPageHtml(final Representation entity) throws ResourceException
-    {
-        this.log.info("editUserHtml");
-
-        final String requestedUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
-        this.log.info("requesting edit user: {}", requestedUserIdentifier);
-        
-        if(requestedUserIdentifier == null)
-        {
-            // no identifier specified.
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit");
-        }
-        
-        final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
-        
-        // Even though this page only displays user information, since the intention is
-        // to modify user information, the Action is considered as a "User Edit".
-        PoddAction action = PoddAction.OTHER_USER_EDIT;
-        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
-        {
-            action = PoddAction.CURRENT_USER_EDIT;
-        }
-        this.checkAuthentication(action);        
-        
-        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "editUser.html.ftl");
-        dataModel.put("pageTitle", "Edit PODD User");
-        dataModel.put("title", "Edit User");
-        dataModel.put("authenticatedUsername", user.getIdentifier());
-        
-        final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
-        
-        if(poddUser == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "User not found.");
-        }
-        else
-        {
-            dataModel.put("requestedUser", poddUser);
-            
-            PoddUserStatus[] statuses = PoddUserStatus.values();
-            dataModel.put("statusList", statuses);
-        }
-        
-        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
-                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
-    }
     
     /**
      * Handle an HTTP POST request submitting RDF data to edit an existing PoddUser.
@@ -139,23 +82,23 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-
+        
         // check authentication first
         PoddAction action = PoddAction.OTHER_USER_EDIT;
         if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
         {
             action = PoddAction.CURRENT_USER_EDIT;
         }
-        this.checkAuthentication(action);        
+        this.checkAuthentication(action);
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         
         final RestletUtilUser currentUser = nextRealm.findUser(requestedUserIdentifier);
-        if (currentUser == null || !(currentUser instanceof PoddUser))
+        if(currentUser == null || !(currentUser instanceof PoddUser))
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");
         }
-        final PoddUser poddUser = (PoddUser) currentUser;
+        final PoddUser poddUser = (PoddUser)currentUser;
         URI userUri = null;
         try
         {
@@ -164,7 +107,6 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
             final RDFFormat inputFormat =
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model modifiedUserModel = Rio.parse(inputStream, "", inputFormat);
-            
             
             // - create PoddUser with edited details
             this.modelToUser(modifiedUserModel, poddUser);
@@ -211,6 +153,63 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
     }
     
     /**
+     * Handle an HTTP GET request to display the Edit User page in HTML
+     * 
+     * FIXME: incomplete, initial untested code
+     */
+    @Get
+    public Representation getUserEditPageHtml(final Representation entity) throws ResourceException
+    {
+        this.log.info("editUserHtml");
+        
+        final String requestedUserIdentifier =
+                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
+        this.log.info("requesting edit user: {}", requestedUserIdentifier);
+        
+        if(requestedUserIdentifier == null)
+        {
+            // no identifier specified.
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit");
+        }
+        
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
+        
+        // Even though this page only displays user information, since the intention is
+        // to modify user information, the Action is considered as a "User Edit".
+        PoddAction action = PoddAction.OTHER_USER_EDIT;
+        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
+        {
+            action = PoddAction.CURRENT_USER_EDIT;
+        }
+        this.checkAuthentication(action);
+        
+        final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
+        dataModel.put("contentTemplate", "editUser.html.ftl");
+        dataModel.put("pageTitle", "Edit PODD User");
+        dataModel.put("title", "Edit User");
+        dataModel.put("authenticatedUsername", user.getIdentifier());
+        
+        final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
+        final PoddUser poddUser = (PoddUser)realm.findUser(requestedUserIdentifier);
+        
+        if(poddUser == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "User not found.");
+        }
+        else
+        {
+            dataModel.put("requestedUser", poddUser);
+            
+            final PoddUserStatus[] statuses = PoddUserStatus.values();
+            dataModel.put("statusList", statuses);
+        }
+        
+        return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
+                MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
+    }
+    
+    /**
      * Helper method to update the {@link PoddUser} with information in the given {@link Model}.
      * 
      * @param model
@@ -224,7 +223,7 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         
         // Password change is not allowed from this User Edit Service. Print a warning.
         final String password = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
-        if (password != null)
+        if(password != null)
         {
             this.log.warn("Attempting to change password via User Edit Service. Disallowed.");
         }
@@ -242,43 +241,43 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         }
         
         final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
-        if (homePage != null)
+        if(homePage != null)
         {
             currentUser.setHomePage(homePage);
         }
         
         final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
-        if (organization != null)
+        if(organization != null)
         {
             currentUser.setOrganization(organization);
         }
         
         final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
-        if (orcidID != null)
+        if(orcidID != null)
         {
             currentUser.setOrcid(orcidID);
         }
         
         final String title = model.filter(null, PoddRdfConstants.PODD_USER_TITLE, null).objectString();
-        if (title != null)
+        if(title != null)
         {
             currentUser.setTitle(title);
         }
         
         final String phone = model.filter(null, PoddRdfConstants.PODD_USER_PHONE, null).objectString();
-        if (phone != null)
+        if(phone != null)
         {
             currentUser.setPhone(phone);
         }
         
         final String address = model.filter(null, PoddRdfConstants.PODD_USER_ADDRESS, null).objectString();
-        if (address != null)
+        if(address != null)
         {
             currentUser.setAddress(address);
         }
         
         final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
-        if (position != null)
+        if(position != null)
         {
             currentUser.setPosition(position);
         }
@@ -286,7 +285,7 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
         // TODO: no longer seems such a good idea! Simply updating the Status if sent seems better.
         PoddUserStatus status = PoddUserStatus.INACTIVE;
         final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
-        if (statusUri != null)
+        if(statusUri != null)
         {
             status = PoddUserStatus.getUserStatusByUri(statusUri);
         }

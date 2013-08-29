@@ -187,7 +187,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         final IRI baseOntologyVersionIRI = ontologyID.getVersionIRI();
         final IRI inferredOntologyIRI = ontologyID.getInferredOntologyIRI();
         
-        synchronized(owlOntologyManager)
+        synchronized(this.owlOntologyManager)
         {
             // -- check if already cached and silently return.
             if(this.owlOntologyManager.contains(baseOntologyIRI)
@@ -278,7 +278,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
         
-        synchronized(owlOntologyManager)
+        synchronized(this.owlOntologyManager)
         {
             final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID);
             
@@ -387,7 +387,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     @Override
     public OWLOntology getOntology(final OWLOntologyID ontologyID) throws IllegalArgumentException, OWLException
     {
-        synchronized(owlOntologyManager)
+        synchronized(this.owlOntologyManager)
         {
             return this.owlOntologyManager.getOntology(ontologyID);
         }
@@ -465,7 +465,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
                             "application/rdf+xml");
             final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
             
-            synchronized(owlOntologyManager)
+            synchronized(this.owlOntologyManager)
             {
                 nextOntology = this.owlOntologyManager.createOntology();
                 
@@ -474,7 +474,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         }
         else
         {
-            synchronized(owlOntologyManager)
+            synchronized(this.owlOntologyManager)
             {
                 nextOntology = this.owlOntologyManager.loadOntologyFromOntologyDocument(owlSource);
             }
@@ -496,7 +496,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
         
         final RioParserImpl owlParser = new RioParserImpl(null);
         
-        synchronized(owlOntologyManager)
+        synchronized(this.owlOntologyManager)
         {
             final OWLOntology nextOntology = this.owlOntologyManager.createOntology();
             
@@ -518,7 +518,7 @@ public class PoddOWLManagerImpl implements PoddOWLManager
     @Override
     public boolean removeCache(final OWLOntologyID ontologyID) throws OWLException
     {
-        synchronized(owlOntologyManager)
+        synchronized(this.owlOntologyManager)
         {
             // TODO: Verify that this .contains method matches our desired semantics
             final boolean containsOntology = this.owlOntologyManager.contains(ontologyID);

@@ -16,12 +16,9 @@
  */
 package com.github.podd.api.test;
 
-import info.aduna.iteration.Iterations;
-
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -37,8 +34,6 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.util.ModelUtil;
-import org.openrdf.model.util.Namespaces;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
@@ -1123,7 +1118,7 @@ public abstract class AbstractPoddOWLManagerTest
         
         final URI contextOriginal = ValueFactoryImpl.getInstance().createURI("urn:test:context:original:");
         
-        Model statementsOriginal = new TreeModel(Rio.parse(inputStream, "", RDFFormat.RDFXML, contextOriginal));
+        final Model statementsOriginal = new TreeModel(Rio.parse(inputStream, "", RDFFormat.RDFXML, contextOriginal));
         
         Assert.assertEquals("Not the expected number of statements in Repository",
                 TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE - 9, statementsOriginal.size());
@@ -1152,7 +1147,7 @@ public abstract class AbstractPoddOWLManagerTest
                 TestConstants.EXPECTED_TRIPLE_COUNT_PODD_BASE_CONCRETE,
                 this.testRepositoryConnection.size(contextOwlapi));
         
-        Model statementsOwlapi = new TreeModel();
+        final Model statementsOwlapi = new TreeModel();
         
         this.testRepositoryConnection.export(new StatementCollector(statementsOwlapi), contextOwlapi);
         
@@ -1160,23 +1155,23 @@ public abstract class AbstractPoddOWLManagerTest
         System.out.println("RDF statements");
         System.out.println("------------");
         
-        StringWriter originalWriter = new StringWriter();
+        final StringWriter originalWriter = new StringWriter();
         Rio.write(statementsOriginal, originalWriter, RDFFormat.NTRIPLES);
         
         System.out.println("------------");
         System.out.println("OWLAPI statements");
         System.out.println("------------");
         
-        StringWriter owlapiWriter = new StringWriter();
+        final StringWriter owlapiWriter = new StringWriter();
         Rio.write(statementsOwlapi, owlapiWriter, RDFFormat.NTRIPLES);
         
         System.out.println("------------");
         System.out.println("Mismatched statements");
         System.out.println("------------");
         
-        Set<URI> displayedPredicates = new HashSet<URI>();
+        final Set<URI> displayedPredicates = new HashSet<URI>();
         
-        for(Statement nextOwlapiStatement : statementsOwlapi)
+        for(final Statement nextOwlapiStatement : statementsOwlapi)
         {
             if(!(nextOwlapiStatement.getSubject() instanceof BNode)
                     && !(nextOwlapiStatement.getObject() instanceof BNode))
@@ -1189,8 +1184,8 @@ public abstract class AbstractPoddOWLManagerTest
             }
             else
             {
-                Model originalFilter = statementsOriginal.filter(null, nextOwlapiStatement.getPredicate(), null);
-                Model owlapiFilter = statementsOwlapi.filter(null, nextOwlapiStatement.getPredicate(), null);
+                final Model originalFilter = statementsOriginal.filter(null, nextOwlapiStatement.getPredicate(), null);
+                final Model owlapiFilter = statementsOwlapi.filter(null, nextOwlapiStatement.getPredicate(), null);
                 
                 if(originalFilter.size() != owlapiFilter.size())
                 {

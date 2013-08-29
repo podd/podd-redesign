@@ -284,7 +284,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     }
     
     @Override
-    protected Entry<Role, URI> buildMapEntryFromSparqlResult(BindingSet bindingSet)
+    protected Entry<Role, URI> buildMapEntryFromSparqlResult(final BindingSet bindingSet)
     {
         final URI roleUri = this.vf.createURI(bindingSet.getValue(PoddSesameRealm.PARAM_ROLE).stringValue());
         final Role role = PoddRoles.getRoleByUri(roleUri).getRole();
@@ -312,7 +312,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                                 PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.INACTIVE);
         
         PoddUserStatus userStatus = PoddUserStatus.INACTIVE;
-        Value statusVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_STATUS);
+        final Value statusVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_STATUS);
         if(statusVal != null && statusVal instanceof URI)
         {
             userStatus = PoddUserStatus.getUserStatusByUri((URI)statusVal);
@@ -378,48 +378,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     }
     
     @Override
-    protected String buildSparqlQueryForRolesWithObjects(String userIdentifier)
-    {
-        this.log.debug("Building SPARQL query for Roles and object URIs of a User");
-        
-        final StringBuilder query = new StringBuilder();
-        
-        query.append(" SELECT ?");
-        query.append(PoddSesameRealm.PARAM_ROLE);
-        query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_OBJECT_URI);
-        query.append(" WHERE ");
-        query.append(" { ");
-        
-        final String roleMappingVar = " ?mapping ";
-        
-        query.append(roleMappingVar);
-        query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ");
-        query.append(" \"");
-        query.append(NTriplesUtil.escapeString(userIdentifier));
-        query.append("\" . ");
-        
-        query.append(roleMappingVar);
-        query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ");
-        query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_ROLE);
-        query.append(" . ");
-        
-        query.append(" OPTIONAL{ ");
-        query.append(roleMappingVar);
-        query.append(" <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ");
-        query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_OBJECT_URI);
-        query.append(" . } ");
-        
-        query.append(" } ");
-        
-        this.log.debug(query.toString());
-        
-        return query.toString();
-    }
-    
-    @Override
     protected String buildSparqlQueryForObjectRoles(final String userIdentifier, final URI objectUri)
     {
         this.log.debug("Building SPARQL query for Roles between User and object URI");
@@ -462,6 +420,48 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" FILTER ( ?object IN (");
         query.append("<" + objectUri.stringValue() + ">");
         query.append(") ) ");
+        
+        query.append(" } ");
+        
+        this.log.debug(query.toString());
+        
+        return query.toString();
+    }
+    
+    @Override
+    protected String buildSparqlQueryForRolesWithObjects(final String userIdentifier)
+    {
+        this.log.debug("Building SPARQL query for Roles and object URIs of a User");
+        
+        final StringBuilder query = new StringBuilder();
+        
+        query.append(" SELECT ?");
+        query.append(PoddSesameRealm.PARAM_ROLE);
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_OBJECT_URI);
+        query.append(" WHERE ");
+        query.append(" { ");
+        
+        final String roleMappingVar = " ?mapping ";
+        
+        query.append(roleMappingVar);
+        query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ");
+        query.append(" \"");
+        query.append(NTriplesUtil.escapeString(userIdentifier));
+        query.append("\" . ");
+        
+        query.append(roleMappingVar);
+        query.append(" <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_ROLE);
+        query.append(" . ");
+        
+        query.append(" OPTIONAL{ ");
+        query.append(roleMappingVar);
+        query.append(" <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_OBJECT_URI);
+        query.append(" . } ");
         
         query.append(" } ");
         
@@ -614,7 +614,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     }
     
     @Override
-    protected String buildSparqlQueryToGetUserByStatus(final PoddUserStatus status, final String orderByField, 
+    protected String buildSparqlQueryToGetUserByStatus(final PoddUserStatus status, final String orderByField,
             final boolean isDescending, final int limit, final int offset)
     {
         this.log.debug("Building SPARQL query");
@@ -749,7 +749,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         query.append(" } ");
         
-        if (isDescending)
+        if(isDescending)
         {
             query.append(" ORDER BY DESC(" + orderByField + ") ");
         }
@@ -762,7 +762,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         return query.toString();
     }
-
+    
     protected String buildSparqlQueryToSearchUsers(final PoddUserStatus status, final String orderByField,
             final boolean isDescending, final int limit, final int offset)
     {
@@ -788,7 +788,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_ORGANIZATION);
         
-        
         query.append(" WHERE ");
         query.append(" { ");
         query.append(" ?");
@@ -801,7 +800,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
         query.append(" . ");
-
+        
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddRdfConstants.PODD_USER_ORGANIZATION + "> ");
@@ -837,7 +836,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddRdfConstants.PODD_USER_STATUS + "> ");
-        if (status == null)
+        if(status == null)
         {
             query.append(" ?");
             query.append(PoddSesameRealm.PARAM_USER_STATUS);
@@ -865,7 +864,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         
         query.append(" } ");
         
-        if (isDescending)
+        if(isDescending)
         {
             query.append(" ORDER BY DESC(" + orderByField + ") ");
         }
@@ -874,12 +873,12 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             query.append(" ORDER BY " + orderByField);
         }
         
-        if (limit > -1)
+        if(limit > -1)
         {
             query.append(" LIMIT " + limit);
         }
         
-        if (offset > 0)
+        if(offset > 0)
         {
             query.append(" OFFSET " + offset);
         }
@@ -887,15 +886,36 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         return query.toString();
     }
     
+    /**
+     * @param role
+     * @return
+     */
+    @Override
+    protected RestletUtilRole getRoleByName(final String name)
+    {
+        final RestletUtilRole oasRole = PoddRoles.getRoleByName(name);
+        return oasRole;
+    }
+    
+    /**
+     * @param uri
+     * @return
+     */
+    @Override
+    protected RestletUtilRole getRoleByUri(final URI uri)
+    {
+        final RestletUtilRole nextStandardRole = PoddRoles.getRoleByUri(uri);
+        return nextStandardRole;
+    }
     
     @Override
     public Collection<Role> getRolesForObject(final User user, final URI objectUri)
     {
-        Set<Role> results = new HashSet<Role>();
+        final Set<Role> results = new HashSet<Role>();
         
-        Collection<Collection<Role>> allResults = getRolesForObjectAlternate(user, objectUri).values();
+        final Collection<Collection<Role>> allResults = this.getRolesForObjectAlternate(user, objectUri).values();
         
-        for(Collection<Role> nextResult : allResults)
+        for(final Collection<Role> nextResult : allResults)
         {
             results.addAll(nextResult);
         }
@@ -938,20 +958,21 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 
                 while(queryResult.hasNext())
                 {
-                    BindingSet bindingSet = queryResult.next();
+                    final BindingSet bindingSet = queryResult.next();
                     
                     final Role role = this.buildRoleFromSparqlResult(bindingSet);
                     
-                    if(!bindingSet.hasBinding(PARAM_USER_URI))
+                    if(!bindingSet.hasBinding(PoddSesameRealm.PARAM_USER_URI))
                     {
                         throw new RuntimeException("Query did not bind a user to the role");
                     }
                     
-                    RestletUtilUser nextUser =
-                            this.findUser(bindingSet.getBinding(PARAM_USER_URI).getValue().stringValue());
+                    final RestletUtilUser nextUser =
+                            this.findUser(bindingSet.getBinding(PoddSesameRealm.PARAM_USER_URI).getValue()
+                                    .stringValue());
                     
                     Collection<Role> nextRoles = new HashSet<Role>();
-                    Collection<Role> putIfAbsent = roleCollection.putIfAbsent(nextUser, nextRoles);
+                    final Collection<Role> putIfAbsent = roleCollection.putIfAbsent(nextUser, nextRoles);
                     if(putIfAbsent != null)
                     {
                         nextRoles = putIfAbsent;
@@ -988,7 +1009,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     }
     
     @Override
-    public Collection<Entry<Role, URI>> getRolesWithObjectMappings(User user)
+    public Collection<Entry<Role, URI>> getRolesWithObjectMappings(final User user)
     {
         if(user == null)
         {
@@ -1057,28 +1078,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     }
     
     /**
-     * @param role
-     * @return
-     */
-    @Override
-    protected RestletUtilRole getRoleByName(final String name)
-    {
-        final RestletUtilRole oasRole = PoddRoles.getRoleByName(name);
-        return oasRole;
-    }
-    
-    /**
-     * @param uri
-     * @return
-     */
-    @Override
-    protected RestletUtilRole getRoleByUri(final URI uri)
-    {
-        final RestletUtilRole nextStandardRole = PoddRoles.getRoleByUri(uri);
-        return nextStandardRole;
-    }
-    
-    /**
      * Copied from RestletUtilSesameRealm.java
      */
     private Dataset getSesameDataset()
@@ -1098,9 +1097,10 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     }
     
     @Override
-    public List<PoddUser> getUserByStatus(final PoddUserStatus status, boolean isDescending, final int limit, final int offset)
+    public List<PoddUser> getUserByStatus(final PoddUserStatus status, final boolean isDescending, final int limit,
+            final int offset)
     {
-        List<PoddUser> result = new ArrayList<PoddUser>();
+        final List<PoddUser> result = new ArrayList<PoddUser>();
         
         RepositoryConnection conn = null;
         try
@@ -1121,7 +1121,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 while(queryResult.hasNext())
                 {
                     final BindingSet bindingSet = queryResult.next();
-                    Binding binding = bindingSet.getBinding("userIdentifier");
+                    final Binding binding = bindingSet.getBinding("userIdentifier");
                     
                     result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
                 }
@@ -1156,68 +1156,6 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             }
         }
         
-
-        return result;
-    }
-    
-    //TODO: search in first/last name as well as identifier
-    @Override
-    public List<PoddUser> searchUser(String searchTerm, final PoddUserStatus status, final boolean isDescending,
-            final int limit, final int offset)
-    {
-        final List<PoddUser> result = new ArrayList<PoddUser>();
-        
-        RepositoryConnection conn = null;
-        try
-        {
-            conn = this.getRepository().getConnection();
-            
-            final String orderBy = "?" + PoddSesameRealm.PARAM_USER_IDENTIFIER;
-            final String query = this.buildSparqlQueryToSearchUsers(status, orderBy, isDescending, limit, offset);
-            
-            this.log.debug("searchUser: query={}", query);
-            
-            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
-            
-            if (searchTerm == null)
-            {
-                // could this lead to an inefficient sparql query?
-                searchTerm = "";
-            }
-            tupleQuery.setBinding(PoddSesameRealm.PARAM_SEARCH_TERM, PoddRdfConstants.VF.createLiteral(searchTerm));
-            
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
-            
-            try
-            {
-                while(queryResult.hasNext())
-                {
-                    final BindingSet bindingSet = queryResult.next();
-                    Binding binding = bindingSet.getBinding("userIdentifier");
-                    
-                    result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
-                }
-            }
-            finally
-            {
-                queryResult.close();
-            }
-        }
-        catch(final RepositoryException | MalformedQueryException | QueryEvaluationException e)
-        {
-            throw new RuntimeException("Failure searching users in repository", e);
-        }
-        finally
-        {
-            try
-            {
-                conn.close();
-            }
-            catch(final RepositoryException e)
-            {
-                this.log.error("Failure to close connection", e);
-            }
-        }
         return result;
     }
     
@@ -1281,6 +1219,67 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 }
             }
         }
+    }
+    
+    // TODO: search in first/last name as well as identifier
+    @Override
+    public List<PoddUser> searchUser(String searchTerm, final PoddUserStatus status, final boolean isDescending,
+            final int limit, final int offset)
+    {
+        final List<PoddUser> result = new ArrayList<PoddUser>();
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepository().getConnection();
+            
+            final String orderBy = "?" + PoddSesameRealm.PARAM_USER_IDENTIFIER;
+            final String query = this.buildSparqlQueryToSearchUsers(status, orderBy, isDescending, limit, offset);
+            
+            this.log.debug("searchUser: query={}", query);
+            
+            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+            
+            if(searchTerm == null)
+            {
+                // could this lead to an inefficient sparql query?
+                searchTerm = "";
+            }
+            tupleQuery.setBinding(PoddSesameRealm.PARAM_SEARCH_TERM, PoddRdfConstants.VF.createLiteral(searchTerm));
+            
+            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            
+            try
+            {
+                while(queryResult.hasNext())
+                {
+                    final BindingSet bindingSet = queryResult.next();
+                    final Binding binding = bindingSet.getBinding("userIdentifier");
+                    
+                    result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
+                }
+            }
+            finally
+            {
+                queryResult.close();
+            }
+        }
+        catch(final RepositoryException | MalformedQueryException | QueryEvaluationException e)
+        {
+            throw new RuntimeException("Failure searching users in repository", e);
+        }
+        finally
+        {
+            try
+            {
+                conn.close();
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Failure to close connection", e);
+            }
+        }
+        return result;
     }
     
     @Override

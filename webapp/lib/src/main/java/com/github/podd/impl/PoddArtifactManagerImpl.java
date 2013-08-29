@@ -43,7 +43,6 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -279,7 +278,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public void exportObjectMetadata(final URI objectType, final OutputStream outputStream, final RDFFormat format,
-            final boolean includeDoNotDisplayProperties, MetadataPolicy containsPropertyPolicy,
+            final boolean includeDoNotDisplayProperties, final MetadataPolicy containsPropertyPolicy,
             final InferredOWLOntologyID artifactID) throws OpenRDFException, PoddException, IOException
     {
         RepositoryConnection connection = null;
@@ -364,7 +363,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID getArtifact(final IRI artifactIRI) throws UnmanagedArtifactIRIException
     {
-        return getArtifact(artifactIRI, null);
+        return this.getArtifact(artifactIRI, null);
     }
     
     @Override
@@ -525,8 +524,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             conn = this.getRepositoryManager().getRepository().getConnection();
             
-            List<URI> typesList = this.getSesameManager().getObjectTypes(artifactId, objectUri, conn);
-            for(URI objectType : typesList)
+            final List<URI> typesList = this.getSesameManager().getObjectTypes(artifactId, objectUri, conn);
+            for(final URI objectType : typesList)
             {
                 results.add(this.getSesameManager().getObjectLabel(artifactId, objectType, conn));
             }
@@ -584,7 +583,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * InferredOWLOntologyID, org.openrdf.model.URI)
      */
     @Override
-    public Model getParentDetails(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException
+    public Model getParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException
     {
         RepositoryConnection conn = null;
         try
@@ -669,7 +668,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             conn = this.getRepositoryManager().getRepository().getConnection();
             for(final InferredOWLOntologyID artifactId : artifacts)
             {
-                URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, conn);
+                final URI objectIRI = this.getSesameManager().getTopObjectIRI(artifactId, conn);
                 results.add(this.getSesameManager().getObjectLabel(artifactId, objectIRI, conn));
             }
         }
@@ -846,7 +845,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final List<Statement> statements =
                 Iterations.asList(repositoryConnection.getStatements(null, propertyUri, null, false, context));
         
-        for(Statement s : statements)
+        for(final Statement s : statements)
         {
             final Value object = s.getObject();
             if(object instanceof Literal)
@@ -1155,7 +1154,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             if(this.log.isInfoEnabled())
             {
-                for(OWLProfileViolation violation : profileReport.getViolations())
+                for(final OWLProfileViolation violation : profileReport.getViolations())
                 {
                     this.log.info(violation.toString());
                 }
@@ -1544,9 +1543,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // NOTE: Using nested loops is rather inefficient, but these collections are not
             // expected
             // to have more than a handful of elements
-            for(URI objectUri : objectUris)
+            for(final URI objectUri : objectUris)
             {
-                for(PoddPurlReference purl : purls)
+                for(final PoddPurlReference purl : purls)
                 {
                     final URI tempUri = purl.getTemporaryURI();
                     if(objectUri.equals(tempUri))

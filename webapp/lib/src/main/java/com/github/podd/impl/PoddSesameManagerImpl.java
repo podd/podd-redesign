@@ -153,34 +153,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
     }
     
-    @Override
-    public Model fillMissingLabels(final Model inputModel, final RepositoryConnection repositoryConnection,
-            final URI... contexts) throws OpenRDFException
-    {
-        final StringBuilder graphQuery = new StringBuilder();
-        
-        graphQuery.append("CONSTRUCT { ");
-        graphQuery.append(" ?subject <" + RDFS.LABEL.stringValue() + "> ?label . ");
-        
-        graphQuery.append("} WHERE {");
-        graphQuery.append(" ?subject <" + RDFS.LABEL.stringValue() + "> ?label .  ");
-        graphQuery.append("}");
-        final GraphQuery rdfsGraphQuery =
-                repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, graphQuery.toString());
-        
-        this.log.info("Created SPARQL {}.", graphQuery);
-        
-        final Model resultModel = new LinkedHashModel();
-        for(Statement statement : inputModel)
-        {
-            rdfsGraphQuery.setBinding("subject", statement.getSubject());
-            
-            resultModel.addAll(this.executeGraphQuery(rdfsGraphQuery, contexts));
-            rdfsGraphQuery.clearBindings();
-        }
-        return resultModel;
-    }
-    
     /**
      * Helper method to execute a given SPARQL Graph query.
      * 
@@ -225,6 +197,34 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         QueryResults.report(sparqlQuery.evaluate(), results);
         
         return results;
+    }
+    
+    @Override
+    public Model fillMissingLabels(final Model inputModel, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder graphQuery = new StringBuilder();
+        
+        graphQuery.append("CONSTRUCT { ");
+        graphQuery.append(" ?subject <" + RDFS.LABEL.stringValue() + "> ?label . ");
+        
+        graphQuery.append("} WHERE {");
+        graphQuery.append(" ?subject <" + RDFS.LABEL.stringValue() + "> ?label .  ");
+        graphQuery.append("}");
+        final GraphQuery rdfsGraphQuery =
+                repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, graphQuery.toString());
+        
+        this.log.info("Created SPARQL {}.", graphQuery);
+        
+        final Model resultModel = new LinkedHashModel();
+        for(final Statement statement : inputModel)
+        {
+            rdfsGraphQuery.setBinding("subject", statement.getSubject());
+            
+            resultModel.addAll(this.executeGraphQuery(rdfsGraphQuery, contexts));
+            rdfsGraphQuery.clearBindings();
+        }
+        return resultModel;
     }
     
     @Override
@@ -282,6 +282,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
      * 
      * @deprecated Unused. Somewhat similar functionality is available in {@link getInstancesOf()}.
      */
+    @Deprecated
     @Override
     public List<URI> getAllValidMembers(final InferredOWLOntologyID artifactID, final URI propertyUri,
             final RepositoryConnection repositoryConnection) throws OpenRDFException
@@ -931,7 +932,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     
     @Override
     public Model getObjectTypeMetadata(final URI objectType, final boolean includeDoNotDisplayProperties,
-            MetadataPolicy containsPropertyPolicy, final RepositoryConnection repositoryConnection,
+            final MetadataPolicy containsPropertyPolicy, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
         final Model results = new LinkedHashModel();
@@ -1072,7 +1073,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         if(containsPropertyPolicy != MetadataPolicy.ONLY_CONTAINS)
         {
             final URI[] commonAnnotationProperties = { RDFS.LABEL, RDFS.COMMENT };
-            for(URI annotationProperty : commonAnnotationProperties)
+            for(final URI annotationProperty : commonAnnotationProperties)
             {
                 final StringBuilder annotationQuery = new StringBuilder();
                 

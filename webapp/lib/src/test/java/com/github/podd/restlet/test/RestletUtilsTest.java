@@ -32,7 +32,6 @@ import org.openrdf.model.vocabulary.RDF;
 
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.ansell.restletutils.SesameRealmConstants;
-import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 
@@ -51,7 +50,7 @@ public class RestletUtilsTest
     @Before
     public void setUp() throws Exception
     {
-        vf = PoddRdfConstants.VF;
+        this.vf = PoddRdfConstants.VF;
     }
     
     /**
@@ -69,7 +68,8 @@ public class RestletUtilsTest
     @Test
     public void testExtractRoleMappingsEmpty()
     {
-        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(new LinkedHashModel());
+        final Map<RestletUtilRole, Collection<URI>> roleMappings =
+                PoddRoles.extractRoleMappingsUser(new LinkedHashModel());
         
         Assert.assertTrue(roleMappings.isEmpty());
     }
@@ -79,31 +79,10 @@ public class RestletUtilsTest
      * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
      */
     @Test
-    public void testExtractRoleMappingsRepositoryNoObject()
-    {
-        LinkedHashModel model = new LinkedHashModel();
-        BNode resource = vf.createBNode();
-        model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
-        model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
-        
-        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
-        Assert.assertFalse(roleMappings.isEmpty());
-        
-        Assert.assertEquals(1, roleMappings.size());
-        Assert.assertTrue(roleMappings.containsKey(PoddRoles.ADMIN));
-        Assert.assertEquals(1, roleMappings.get(PoddRoles.ADMIN).size());
-        Assert.assertTrue(roleMappings.get(PoddRoles.ADMIN).contains(null));
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
-     */
-    @Test
     public void testExtractRoleMappingsProjectNoObject()
     {
-        LinkedHashModel model = new LinkedHashModel();
-        BNode resource = vf.createBNode();
+        final LinkedHashModel model = new LinkedHashModel();
+        final BNode resource = this.vf.createBNode();
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_ADMIN.getURI());
         
@@ -121,34 +100,11 @@ public class RestletUtilsTest
      * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
      */
     @Test
-    public void testExtractRoleMappingsRepositoryWithObject()
-    {
-        LinkedHashModel model = new LinkedHashModel();
-        BNode resource = vf.createBNode();
-        URI objectUri = vf.createURI("urn:test:object:uri");
-        model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
-        model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
-        model.add(resource, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, objectUri);
-        
-        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
-        Assert.assertFalse(roleMappings.isEmpty());
-        
-        Assert.assertEquals(1, roleMappings.size());
-        Assert.assertTrue(roleMappings.containsKey(PoddRoles.ADMIN));
-        Assert.assertEquals(1, roleMappings.get(PoddRoles.ADMIN).size());
-        Assert.assertTrue(roleMappings.get(PoddRoles.ADMIN).contains(objectUri));
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
-     */
-    @Test
     public void testExtractRoleMappingsProjectWithObject()
     {
-        LinkedHashModel model = new LinkedHashModel();
-        BNode resource = vf.createBNode();
-        URI objectUri = vf.createURI("urn:test:object:uri");
+        final LinkedHashModel model = new LinkedHashModel();
+        final BNode resource = this.vf.createBNode();
+        final URI objectUri = this.vf.createURI("urn:test:object:uri");
         model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_ADMIN.getURI());
         model.add(resource, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, objectUri);
@@ -160,6 +116,50 @@ public class RestletUtilsTest
         Assert.assertTrue(roleMappings.containsKey(PoddRoles.PROJECT_ADMIN));
         Assert.assertEquals(1, roleMappings.get(PoddRoles.PROJECT_ADMIN).size());
         Assert.assertTrue(roleMappings.get(PoddRoles.PROJECT_ADMIN).contains(objectUri));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
+     */
+    @Test
+    public void testExtractRoleMappingsRepositoryNoObject()
+    {
+        final LinkedHashModel model = new LinkedHashModel();
+        final BNode resource = this.vf.createBNode();
+        model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
+        model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
+        
+        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
+        Assert.assertFalse(roleMappings.isEmpty());
+        
+        Assert.assertEquals(1, roleMappings.size());
+        Assert.assertTrue(roleMappings.containsKey(PoddRoles.ADMIN));
+        Assert.assertEquals(1, roleMappings.get(PoddRoles.ADMIN).size());
+        Assert.assertTrue(roleMappings.get(PoddRoles.ADMIN).contains(null));
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.restlet.RestletUtils#extractRoleMappings(org.openrdf.model.Model)}.
+     */
+    @Test
+    public void testExtractRoleMappingsRepositoryWithObject()
+    {
+        final LinkedHashModel model = new LinkedHashModel();
+        final BNode resource = this.vf.createBNode();
+        final URI objectUri = this.vf.createURI("urn:test:object:uri");
+        model.add(resource, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
+        model.add(resource, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
+        model.add(resource, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, objectUri);
+        
+        final Map<RestletUtilRole, Collection<URI>> roleMappings = PoddRoles.extractRoleMappingsUser(model);
+        Assert.assertFalse(roleMappings.isEmpty());
+        
+        Assert.assertEquals(1, roleMappings.size());
+        Assert.assertTrue(roleMappings.containsKey(PoddRoles.ADMIN));
+        Assert.assertEquals(1, roleMappings.get(PoddRoles.ADMIN).size());
+        Assert.assertTrue(roleMappings.get(PoddRoles.ADMIN).contains(objectUri));
     }
     
     /**

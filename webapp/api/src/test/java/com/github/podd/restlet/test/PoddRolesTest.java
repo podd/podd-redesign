@@ -45,7 +45,7 @@ public class PoddRolesTest
     {
         final String testRoleName = PoddRoles.ADMIN.getName();
         
-        RestletUtilRole roleByName = PoddRoles.getRoleByName(testRoleName);
+        final RestletUtilRole roleByName = PoddRoles.getRoleByName(testRoleName);
         Assert.assertEquals("Role has incorrect URI", PoddRoles.ADMIN.getURI(), roleByName.getURI());
     }
 }

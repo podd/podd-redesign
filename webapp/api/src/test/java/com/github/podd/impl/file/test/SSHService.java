@@ -125,6 +125,29 @@ public class SSHService
     
     /**
      * 
+     * @param invalidFileIdentifier
+     *            A file that must not exist.
+     * @param tempDirectory
+     *            The directory containing the files.
+     * 
+     * @return A new DataReference instance for use by tests
+     * @throws IOException
+     */
+    public static SSHFileReference getNewInvalidFileReference(final String invalidFileIdentifier,
+            final Path tempDirectory) throws IOException
+    {
+        final SSHFileReference fileReference = new SSHFileReferenceImpl();
+        
+        final Path finalPath = tempDirectory.resolve(invalidFileIdentifier);
+        fileReference.setPath(finalPath.getParent().toString());
+        
+        fileReference.setFilename(invalidFileIdentifier);
+        
+        return fileReference;
+    }
+    
+    /**
+     * 
      * @param validFileIdentifier
      *            A file that must exist after this method returns.
      * @param tempDirectory
@@ -148,36 +171,13 @@ public class SSHService
                 fileName = fileName.substring(lastSlashPosition + 1);
             }
             
-            Path finalPath = tempDirectory.resolve(fileName);
+            final Path finalPath = tempDirectory.resolve(fileName);
             fileReference.setFilename(fileName);
             
             Files.createFile(finalPath);
             Files.copy(testFile, finalPath, StandardCopyOption.REPLACE_EXISTING);
             fileReference.setPath(finalPath.getParent().toString());
         }
-        
-        return fileReference;
-    }
-    
-    /**
-     * 
-     * @param invalidFileIdentifier
-     *            A file that must not exist.
-     * @param tempDirectory
-     *            The directory containing the files.
-     * 
-     * @return A new DataReference instance for use by tests
-     * @throws IOException
-     */
-    public static SSHFileReference getNewInvalidFileReference(final String invalidFileIdentifier,
-            final Path tempDirectory) throws IOException
-    {
-        final SSHFileReference fileReference = new SSHFileReferenceImpl();
-        
-        Path finalPath = tempDirectory.resolve(invalidFileIdentifier);
-        fileReference.setPath(finalPath.getParent().toString());
-        
-        fileReference.setFilename(invalidFileIdentifier);
         
         return fileReference;
     }

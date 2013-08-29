@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +47,6 @@ import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
@@ -75,16 +73,15 @@ import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.PoddDataRepository;
-import com.github.podd.api.file.PoddDataRepositoryFactory;
 import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.file.PoddDataRepositoryRegistry;
+import com.github.podd.exception.DataRepositoryException;
+import com.github.podd.exception.DataRepositoryMappingNotFoundException;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.FileReferenceInvalidException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
-import com.github.podd.exception.DataRepositoryException;
 import com.github.podd.exception.FileRepositoryIncompleteException;
 import com.github.podd.exception.FileRepositoryMappingExistsException;
-import com.github.podd.exception.DataRepositoryMappingNotFoundException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
@@ -243,7 +240,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                         RDFFormat.RDFXML.getDefaultMIMEType());
         final RioParserImpl owlParser = new RioParserImpl(ontologyFormatFactory);
         
-        OWLOntologyManager manager = this.getOWLManager().getOWLOntologyManager();
+        final OWLOntologyManager manager = this.getOWLManager().getOWLOntologyManager();
         OWLOntology nextOntology = null;
         
         synchronized(manager)
@@ -272,11 +269,11 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             final OWLProfileReport profileReport = nextProfile.checkOntology(nextOntology);
             if(!profileReport.isInProfile())
             {
-                if(log.isDebugEnabled())
+                if(this.log.isDebugEnabled())
                 {
-                    for(OWLProfileViolation violation : profileReport.getViolations())
+                    for(final OWLProfileViolation violation : profileReport.getViolations())
                     {
-                        log.debug(violation.toString());
+                        this.log.debug(violation.toString());
                     }
                 }
                 throw new OntologyNotInProfileException(nextOntology, profileReport, "Ontology not in OWL-DL profile");
@@ -455,7 +452,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
     {
         if(alias == null)
         {
-            log.warn("Could not find a repository with a null alias");
+            this.log.warn("Could not find a repository with a null alias");
             throw new IllegalArgumentException("Could not find a repository with a null alias");
         }
         
@@ -470,11 +467,11 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
             // size. If this hampers efficiency could switch back to on demand querying
             Iterations.addAll(conn.getStatements(null, null, null, true, context), repositories);
             final Set<Resource> matchingRepositories = new HashSet<Resource>();
-            for(Resource nextRepository : repositories.filter(null, RDF.TYPE, PoddRdfConstants.PODD_DATA_REPOSITORY)
-                    .subjects())
+            for(final Resource nextRepository : repositories.filter(null, RDF.TYPE,
+                    PoddRdfConstants.PODD_DATA_REPOSITORY).subjects())
             {
-                for(Value nextAlias : repositories.filter(nextRepository, PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS,
-                        null).objects())
+                for(final Value nextAlias : repositories.filter(nextRepository,
+                        PoddRdfConstants.PODD_DATA_REPOSITORY_ALIAS, null).objects())
                 {
                     if(nextAlias instanceof Literal && ((Literal)nextAlias).getLabel().equalsIgnoreCase(alias))
                     {
@@ -484,9 +481,9 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                 }
             }
             
-            for(Resource nextMatchingRepository : matchingRepositories)
+            for(final Resource nextMatchingRepository : matchingRepositories)
             {
-                PoddDataRepository<?> repository =
+                final PoddDataRepository<?> repository =
                         PoddDataRepositoryRegistry.getInstance().createDataRepository(
                                 repositories.filter(nextMatchingRepository, null, null));
                 
@@ -559,7 +556,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
                         this.addRepositoryMapping(alias, dataRepository, false);
                     }
                 }
-                catch(DataRepositoryException dre)
+                catch(final DataRepositoryException dre)
                 {
                     this.log.error("Found error attempting to create repository for alias", dre);
                 }
@@ -721,7 +718,7 @@ public class PoddFileRepositoryManagerImpl implements PoddDataRepositoryManager
         }
         finally
         {
-            OWLOntologyManager manager = this.getOWLManager().getOWLOntologyManager();
+            final OWLOntologyManager manager = this.getOWLManager().getOWLOntologyManager();
             
             synchronized(manager)
             {

@@ -277,7 +277,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                     Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
             Assert.fail("Should have failed authorization");
         }
-        catch(ResourceException e)
+        catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
@@ -361,7 +361,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                     Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
             Assert.fail("Should have failed authorization");
         }
-        catch(ResourceException e)
+        catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
@@ -384,6 +384,21 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
                 resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI())
                         .subjects();
         Assert.assertEquals("Project_Observer mappings have changed", 2, observerMappings.size());
+    }
+    
+    @Test
+    public void testUserRolesPageHtmlNoIdentifier() throws Exception
+    {
+        final ClientResource userRolesClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
+                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final String body = results.getText();
+        System.out.println(body);
+        this.assertFreemarker(body);
     }
     
     @Test
@@ -424,21 +439,6 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         // body.contains("Confirm New Password"));
         // Assert.assertTrue("Page missing save button", body.contains("Save Password"));
         // Assert.assertTrue("Page missing cancel button", body.contains("Cancel"));
-    }
-    
-    @Test
-    public void testUserRolesPageHtmlNoIdentifier() throws Exception
-    {
-        final ClientResource userRolesClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = results.getText();
-        System.out.println(body);
-        this.assertFreemarker(body);
     }
     
 }

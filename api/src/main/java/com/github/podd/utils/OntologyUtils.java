@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.utils;
+package com.github.podd.utils;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -34,9 +34,7 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
-import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +168,7 @@ public class OntologyUtils
      *             If there is an error while handling the statements.
      */
     public static Model ontologyIDsToModel(final Collection<InferredOWLOntologyID> input, final Model result,
-            boolean includeInferredOntologyStatements)
+            final boolean includeInferredOntologyStatements)
     {
         Model results = result;
         
@@ -181,14 +179,19 @@ public class OntologyUtils
         
         for(final InferredOWLOntologyID nextOntology : input)
         {
-            ontologyIDToRDF(nextOntology, results, includeInferredOntologyStatements);
+            OntologyUtils.ontologyIDToRDF(nextOntology, results, includeInferredOntologyStatements);
         }
         
         return results;
     }
     
+    public static Model ontologyIDsToModel(final List<InferredOWLOntologyID> input, final Model result)
+    {
+        return OntologyUtils.ontologyIDsToModel(input, result, true);
+    }
+    
     public static Model ontologyIDToRDF(final OWLOntologyID ontology, final Model result,
-            boolean includeInferredOntologyStatements)
+            final boolean includeInferredOntologyStatements)
     {
         final ValueFactory vf = ValueFactoryImpl.getInstance();
         
@@ -241,10 +244,5 @@ public class OntologyUtils
     
     private OntologyUtils()
     {
-    }
-    
-    public static Model ontologyIDsToModel(List<InferredOWLOntologyID> input, Model result)
-    {
-        return ontologyIDsToModel(input, result, true);
     }
 }

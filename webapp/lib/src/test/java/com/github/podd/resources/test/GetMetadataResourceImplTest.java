@@ -92,29 +92,28 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 1,
                 model.filter(null, OWL.ALLVALUESFROM,
                         PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "GrowthConditions")).subjects()
-                        .size());        
-
+                        .size());
+        
         Assert.assertEquals(
                 "No label for FieldConditions",
                 1,
-                model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
-                        RDFS.LABEL, null).objects().size());
+                model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), RDFS.LABEL,
+                        null).objects().size());
         
         Assert.assertEquals("Unexpected no. of properties", 12,
                 model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size());
         Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                 model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
     }
-
+    
     @Test
     public void testGetChildrenWithProjectRdf() throws Exception
     {
-        final Object[][] testData = {
-                {PoddRdfConstants.PODD_SCIENCE + "Project", 42, 7, 0},
-                {PoddRdfConstants.PODD_SCIENCE + "Investigation", 64, 12, 0},
-        };
+        final Object[][] testData =
+                { { PoddRdfConstants.PODD_SCIENCE + "Project", 42, 7, 0 },
+                        { PoddRdfConstants.PODD_SCIENCE + "Investigation", 64, 12, 0 }, };
         
-        for(Object[] element : testData)
+        for(final Object[] element : testData)
         {
             
             final String objectType = (String)element[0];
@@ -166,16 +165,17 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final String body = results.getText();
-
+        
         // verify:
         Assert.assertNull("No content since Publication cannot have child objects", body);
-//        final Model model =
-//                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 7);
-//        
-//        Assert.assertEquals("Unexpected no. of properties", 1,
-//                model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
-//        Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-//                model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        // final Model model =
+        // this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)),
+        // RDFFormat.TURTLE, 7);
+        //
+        // Assert.assertEquals("Unexpected no. of properties", 1,
+        // model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+        // Assert.assertEquals("Expected no Do-Not-Display properties", 0,
+        // model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
     }
     
     @Test
@@ -241,8 +241,11 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
         Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                 model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
-        Assert.assertEquals("Missing metadata about poddScience::refersToProcess", 5,
-                model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "refersToProcess"), null, null).size());
+        Assert.assertEquals(
+                "Missing metadata about poddScience::refersToProcess",
+                5,
+                model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "refersToProcess"), null,
+                        null).size());
     }
     
     @Test
@@ -262,7 +265,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final String body = results.getText();
-
+        
         // verify:
         final Model model =
                 this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 86);

@@ -19,7 +19,6 @@ package com.github.podd.resources;
 import java.util.List;
 
 import org.openrdf.model.URI;
-import org.restlet.data.CookieSetting;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.representation.Variant;
@@ -34,7 +33,6 @@ import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddWebServiceApplication;
-import com.github.podd.utils.PoddWebConstants;
 
 public abstract class AbstractPoddResourceImpl extends ServerResource
 {

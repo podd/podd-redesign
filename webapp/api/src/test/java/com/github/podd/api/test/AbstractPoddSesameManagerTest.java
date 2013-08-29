@@ -160,7 +160,7 @@ public abstract class AbstractPoddSesameManagerTest
      */
     private List<InferredOWLOntologyID> loadSchemaOntologies() throws Exception
     {
-        return this.loadSchemaOntologies(testRepositoryConnection);
+        return this.loadSchemaOntologies(this.testRepositoryConnection);
     }
     
     /**
@@ -395,12 +395,13 @@ public abstract class AbstractPoddSesameManagerTest
         
         // prepare: Model with test data
         final Model testModel = new LinkedHashModel();
-        for(String s : objectUris)
+        for(final String s : objectUris)
         {
             testModel.add(PoddRdfConstants.VF.createURI(s), RDFS.LABEL, PoddRdfConstants.VF.createLiteral("?blank"));
         }
         
-        Model resultModel = this.testPoddSesameManager.fillMissingLabels(testModel, testRepositoryConnection, contexts);
+        final Model resultModel =
+                this.testPoddSesameManager.fillMissingLabels(testModel, this.testRepositoryConnection, contexts);
         
         // verify: each URI has the expected label
         for(int i = 0; i < objectUris.length; i++)
@@ -900,6 +901,78 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getObjectData(InferredOWLOntologyID, URI, RepositoryConnection)}
+     * .
+     */
+    @Test
+    public void testGetObjectData() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        
+        final String[] objectUris =
+                { "http://purl.org/podd/basic-1-20130206/object:2966",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
+                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                        "http://purl.org/podd/ns/poddScience#WildType_NotApplicable", // NOT a PODD
+                                                                                      // Object
+                };
+        
+        final Object[][] expectedResults =
+                {
+                        { 20, 1, "Project#2012-0006_ Cotton Leaf Morphology",
+                                "http://purl.org/podd/basic-2-20130206/artifact:1" },
+                        { 4, 1, "Demo genotype", "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material" },
+                        { 5, 1, "Squeekee material",
+                                "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation" },
+                        { 5, 2, "Not Applicable" }, };
+        
+        // test in a loop these PODD objects for their details
+        for(int i = 0; i < objectUris.length; i++)
+        {
+            final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
+            
+            final URI[] contexts =
+                    this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
+                            this.schemaGraph);
+            
+            final Model model =
+                    this.testPoddSesameManager.getObjectData(ontologyID, objectUri, this.testRepositoryConnection,
+                            contexts);
+            
+            // verify: statement count
+            Assert.assertNotNull("NULL model as result", model);
+            
+            DebugUtils.printContents(model);
+            
+            Assert.assertEquals("Not the expected no. of statements in model", expectedResults[i][0], model.size());
+            
+            // verify: parent object
+            final Model parentFilter = model.filter(null, null, objectUri);
+            Assert.assertEquals("More than expected parent found", expectedResults[i][1], parentFilter.subjects()
+                    .size());
+            if(parentFilter.subjects().size() == 1)
+            {
+                Assert.assertTrue(
+                        "Expected Parent is missing",
+                        parentFilter.subjects().contains(
+                                ValueFactoryImpl.getInstance().createURI(expectedResults[i][3].toString())));
+            }
+            
+            // verify: label
+            Assert.assertEquals("Not the expected label", expectedResults[i][2], model.filter(null, RDFS.LABEL, null)
+                    .objectString());
+        }
+        
+        Assert.assertTrue("Expected empty Model for NULL object",
+                this.testPoddSesameManager.getObjectData(ontologyID, null, this.testRepositoryConnection).isEmpty());
+    }
+    
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getObjectDetailsForDisplay(InferredOWLOntologyID, URI, RepositoryConnection)}
      * .
      */
@@ -1024,6 +1097,59 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeContainsMetadata(URI, RepositoryConnection, URI...)}
+     * .
+     */
+    @Test
+    public void testGetObjectTypeContainsMetadata() throws Exception
+    {
+        // prepare: load schema ontologies
+        this.loadSchemaOntologies();
+        
+        // prepare: the contexts to search in - (load an artifact and get its imported schemas)
+        final InferredOWLOntologyID ontologyID =
+                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
+                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
+        final Set<IRI> directImports =
+                this.testPoddSesameManager.getDirectImports(ontologyID, this.testRepositoryConnection);
+        final List<URI> contexts = new ArrayList<URI>(directImports.size() + 2);
+        for(final IRI nextDirectImport : directImports)
+        {
+            contexts.add(nextDirectImport.toOpenRDFURI());
+        }
+        
+        // Format: Object Type, expected model size, expected relationship count, expected child
+        // object type count
+        final Object[][] testData =
+                { { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation"), 64, 9, 11 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), 40, 6, 6 }, };
+        
+        for(final Object[] element : testData)
+        {
+            final URI objectTypeToTest = (URI)element[0];
+            final int expectedModelSize = (int)element[1];
+            final int expectedChildRelationshipCount = (int)element[2];
+            final int expectedChildObjectTypes = (int)element[3];
+            
+            final Model model =
+                    this.testPoddSesameManager.getObjectTypeContainsMetadata(objectTypeToTest,
+                            this.testRepositoryConnection, contexts.toArray(new URI[0]));
+            
+            if(expectedModelSize != model.size())
+            {
+                DebugUtils.printContents(model);
+            }
+            // verify:
+            Assert.assertEquals("Not the expected statement count in Model", expectedModelSize, model.size());
+            Assert.assertEquals("Not the expected no. of child relationships", expectedChildRelationshipCount, model
+                    .filter(null, OWL.ONPROPERTY, null).objects().size());
+            Assert.assertEquals("Not the expected no. of child object types", expectedChildObjectTypes,
+                    model.filter(null, OWL.ALLVALUESFROM, null).objects().size());
+        }
+    }
+    
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getObjectTypeMetadata(URI, boolean, MetadataPolicy, RepositoryConnection, URI...)}
      * .
      */
@@ -1113,59 +1239,6 @@ public abstract class AbstractPoddSesameManagerTest
             Assert.assertEquals("Not the expected no. of non-displayable properties",
                     expectedNonDisplayablePropertyCount,
                     model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
-        }
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectTypeContainsMetadata(URI, RepositoryConnection, URI...)}
-     * .
-     */
-    @Test
-    public void testGetObjectTypeContainsMetadata() throws Exception
-    {
-        // prepare: load schema ontologies
-        this.loadSchemaOntologies();
-        
-        // prepare: the contexts to search in - (load an artifact and get its imported schemas)
-        final InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
-                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
-        final Set<IRI> directImports =
-                this.testPoddSesameManager.getDirectImports(ontologyID, this.testRepositoryConnection);
-        final List<URI> contexts = new ArrayList<URI>(directImports.size() + 2);
-        for(final IRI nextDirectImport : directImports)
-        {
-            contexts.add(nextDirectImport.toOpenRDFURI());
-        }
-        
-        // Format: Object Type, expected model size, expected relationship count, expected child
-        // object type count
-        final Object[][] testData =
-                { { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Investigation"), 64, 9, 11 },
-                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), 40, 6, 6 }, };
-        
-        for(final Object[] element : testData)
-        {
-            final URI objectTypeToTest = (URI)element[0];
-            final int expectedModelSize = (int)element[1];
-            final int expectedChildRelationshipCount = (int)element[2];
-            final int expectedChildObjectTypes = (int)element[3];
-            
-            final Model model =
-                    this.testPoddSesameManager.getObjectTypeContainsMetadata(objectTypeToTest,
-                            this.testRepositoryConnection, contexts.toArray(new URI[0]));
-            
-            if(expectedModelSize != model.size())
-            {
-                DebugUtils.printContents(model);
-            }
-            // verify:
-            Assert.assertEquals("Not the expected statement count in Model", expectedModelSize, model.size());
-            Assert.assertEquals("Not the expected no. of child relationships", expectedChildRelationshipCount, model
-                    .filter(null, OWL.ONPROPERTY, null).objects().size());
-            Assert.assertEquals("Not the expected no. of child object types", expectedChildObjectTypes,
-                    model.filter(null, OWL.ALLVALUESFROM, null).objects().size());
         }
     }
     
@@ -1373,78 +1446,6 @@ public abstract class AbstractPoddSesameManagerTest
         
         // verify:
         Assert.assertNull("Expected NULL inferredOntologyID", inferredOntologyID);
-    }
-    
-    /**
-     * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getObjectData(InferredOWLOntologyID, URI, RepositoryConnection)}
-     * .
-     */
-    @Test
-    public void testGetObjectData() throws Exception
-    {
-        // prepare: load schema ontologies and test artifact
-        this.loadSchemaOntologies();
-        final InferredOWLOntologyID ontologyID =
-                this.loadOntologyFromResource(TestConstants.TEST_ARTIFACT_20130206,
-                        TestConstants.TEST_ARTIFACT_20130206_INFERRED, RDFFormat.TURTLE);
-        
-        final String[] objectUris =
-                { "http://purl.org/podd/basic-1-20130206/object:2966",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
-                        "http://purl.org/podd/ns/poddScience#WildType_NotApplicable", // NOT a PODD
-                                                                                      // Object
-                };
-        
-        final Object[][] expectedResults =
-                {
-                        { 20, 1, "Project#2012-0006_ Cotton Leaf Morphology",
-                                "http://purl.org/podd/basic-2-20130206/artifact:1" },
-                        { 4, 1, "Demo genotype", "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material" },
-                        { 5, 1, "Squeekee material",
-                                "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation" },
-                        { 5, 2, "Not Applicable" }, };
-        
-        // test in a loop these PODD objects for their details
-        for(int i = 0; i < objectUris.length; i++)
-        {
-            final URI objectUri = ValueFactoryImpl.getInstance().createURI(objectUris[i]);
-            
-            final URI[] contexts =
-                    this.testPoddSesameManager.versionAndSchemaContexts(ontologyID, this.testRepositoryConnection,
-                            this.schemaGraph);
-            
-            final Model model =
-                    this.testPoddSesameManager.getObjectData(ontologyID, objectUri, this.testRepositoryConnection,
-                            contexts);
-            
-            // verify: statement count
-            Assert.assertNotNull("NULL model as result", model);
-            
-            DebugUtils.printContents(model);
-            
-            Assert.assertEquals("Not the expected no. of statements in model", expectedResults[i][0], model.size());
-            
-            // verify: parent object
-            final Model parentFilter = model.filter(null, null, objectUri);
-            Assert.assertEquals("More than expected parent found", expectedResults[i][1], parentFilter.subjects()
-                    .size());
-            if(parentFilter.subjects().size() == 1)
-            {
-                Assert.assertTrue(
-                        "Expected Parent is missing",
-                        parentFilter.subjects().contains(
-                                ValueFactoryImpl.getInstance().createURI(expectedResults[i][3].toString())));
-            }
-            
-            // verify: label
-            Assert.assertEquals("Not the expected label", expectedResults[i][2], model.filter(null, RDFS.LABEL, null)
-                    .objectString());
-        }
-        
-        Assert.assertTrue("Expected empty Model for NULL object",
-                this.testPoddSesameManager.getObjectData(ontologyID, null, this.testRepositoryConnection).isEmpty());
     }
     
     /**

@@ -29,7 +29,6 @@ import org.semanticweb.owlapi.model.IRI;
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.utils.InferredOWLOntologyID;
-import com.github.podd.utils.PoddRoles;
 
 /**
  * An interface defining the operations that are currently implemented by the PODD Web Services.
@@ -135,17 +134,19 @@ public interface PoddClient
     boolean isLoggedIn();
     
     /**
-     * List the roles that have been assigned to the given user, or the currently logged in user if
-     * the user is not specified.
      * 
-     * @param userIdentifier
-     *            If not null, specifies a specific user to request information about.
-     * 
-     * @return A map of {@link RestletUtilRole}s identifying roles that have been given to the user,
-     *         optionally to artifacts that the role maps to for this user.
-     * @throws PoddClientException
+     * @return A list of Strings identifying the possible values for the repository alias in calls
+     *         to {@link #attachFileReference(IRI, String, String)}.
      */
-    Map<RestletUtilRole, Collection<URI>> listRoles(String userIdentifier) throws PoddClientException;
+    List<String> listDataReferenceRepositories() throws PoddClientException;
+    
+    /**
+     * 
+     * @return A list of {@link InferredOWLOntologyID}s identifying the artifacts that the user has
+     *         access to which are published. This may include artifacts that the user cannot modify
+     *         or fork.
+     */
+    List<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException;
     
     /**
      * List the roles that have been assigned to the given artifact.
@@ -160,19 +161,17 @@ public interface PoddClient
     Map<RestletUtilRole, Collection<String>> listRoles(InferredOWLOntologyID artifactId) throws PoddClientException;
     
     /**
+     * List the roles that have been assigned to the given user, or the currently logged in user if
+     * the user is not specified.
      * 
-     * @return A list of Strings identifying the possible values for the repository alias in calls
-     *         to {@link #attachFileReference(IRI, String, String)}.
-     */
-    List<String> listDataReferenceRepositories() throws PoddClientException;
-    
-    /**
+     * @param userIdentifier
+     *            If not null, specifies a specific user to request information about.
      * 
-     * @return A list of {@link InferredOWLOntologyID}s identifying the artifacts that the user has
-     *         access to which are published. This may include artifacts that the user cannot modify
-     *         or fork.
+     * @return A map of {@link RestletUtilRole}s identifying roles that have been given to the user,
+     *         optionally to artifacts that the role maps to for this user.
+     * @throws PoddClientException
      */
-    List<InferredOWLOntologyID> listPublishedArtifacts() throws PoddClientException;
+    Map<RestletUtilRole, Collection<URI>> listRoles(String userIdentifier) throws PoddClientException;
     
     /**
      * 

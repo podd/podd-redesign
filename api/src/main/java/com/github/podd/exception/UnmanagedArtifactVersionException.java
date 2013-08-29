@@ -101,27 +101,11 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
     }
     
     /**
-     * @return The managed OWL Ontology IRI.
-     */
-    public IRI getOntologyID()
-    {
-        return this.artifactOntologyIRI;
-    }
-    
-    /**
      * @return The managed Ontology's current Version IRI.
      */
     public IRI getArtifactVersion()
     {
         return this.artifactVersionIRI;
-    }
-    
-    /**
-     * @return The unmanaged OWL Version IRI that caused this Exception.
-     */
-    public IRI getUnmanagedVersionIRI()
-    {
-        return this.unmanagedVersionIRI;
     }
     
     @Override
@@ -138,6 +122,22 @@ public class UnmanagedArtifactVersionException extends UnmanagedSchemaException
         }
         
         return model;
+    }
+    
+    /**
+     * @return The managed OWL Ontology IRI.
+     */
+    public IRI getOntologyID()
+    {
+        return this.artifactOntologyIRI;
+    }
+    
+    /**
+     * @return The unmanaged OWL Version IRI that caused this Exception.
+     */
+    public IRI getUnmanagedVersionIRI()
+    {
+        return this.unmanagedVersionIRI;
     }
     
 }

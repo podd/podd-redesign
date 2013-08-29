@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- /**
+/**
  * 
  */
 package com.github.podd.utils.test;
@@ -138,7 +138,7 @@ public class RdfUtilityTest
         for(final Object[] testData : this.testDatas)
         {
             final InputStream inputStream = this.getClass().getResourceAsStream((String)testData[0]);
-            Assert.assertNotNull("Missing test resource", (String)testData[0]);
+            Assert.assertNotNull("Missing test resource", testData[0]);
             
             final boolean isConnected = RdfUtility.isConnectedStructure(inputStream, (RDFFormat)testData[1]);
             Assert.assertEquals("Not the expected validity", testData[2], isConnected);

@@ -150,7 +150,7 @@ public class PoddObjectLabelImpl implements PoddObjectLabel
     @Override
     public String toString()
     {
-        StringBuilder b = new StringBuilder("[");
+        final StringBuilder b = new StringBuilder("[");
         b.append(" objectURI=");
         b.append(this.objectID.stringValue());
         b.append(" label=");

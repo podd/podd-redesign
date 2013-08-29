@@ -78,15 +78,6 @@ public class InconsistentOntologyException extends PoddException
         this.reasoner = reasoner;
     }
     
-    /**
-     * @return The OWL Reasoner instance containing the details about why the ontology was
-     *         inconsistent.
-     */
-    public OWLReasoner getReasoner()
-    {
-        return this.reasoner;
-    }
-    
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
@@ -109,6 +100,15 @@ public class InconsistentOntologyException extends PoddException
         }
         
         return model;
+    }
+    
+    /**
+     * @return The OWL Reasoner instance containing the details about why the ontology was
+     *         inconsistent.
+     */
+    public OWLReasoner getReasoner()
+    {
+        return this.reasoner;
     }
     
 }

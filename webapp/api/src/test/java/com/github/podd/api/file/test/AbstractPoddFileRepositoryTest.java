@@ -43,12 +43,12 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
     protected static final URI TEST_ALIAS_URI = ValueFactoryImpl.getInstance().createURI(
             "http://purl.org/podd/test_alias");
     
+    protected PoddDataRepository<T> testFileRepository;
+    
     protected final String getAliasGood()
     {
-        return testAliasGood;
+        return this.testAliasGood;
     }
-    
-    protected PoddDataRepository<T> testFileRepository;
     
     /**
      * @return A Collection of URIs representing the expected types of the test FileRepository
@@ -68,9 +68,9 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
     protected abstract T getNewNonValidatingDataReference() throws Exception;
     
     /**
-     * @return A new DataReference instance that will be validated by this repository.
+     * @return A new {@link PoddDataRepository} instance for use by the test
      */
-    protected abstract T getNewValidatingDataReference() throws Exception;
+    protected abstract PoddDataRepository<T> getNewPoddDataRepository(final Model model) throws Exception;
     
     /**
      * @return A new {@link PoddDataRepository} instance for use by the test
@@ -78,9 +78,9 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
     protected abstract PoddDataRepository<T> getNewPoddFileRepository() throws Exception;
     
     /**
-     * @return A new {@link PoddDataRepository} instance for use by the test
+     * @return A new DataReference instance that will be validated by this repository.
      */
-    protected abstract PoddDataRepository<T> getNewPoddDataRepository(final Model model) throws Exception;
+    protected abstract T getNewValidatingDataReference() throws Exception;
     
     @Before
     public void setUp() throws Exception
@@ -108,7 +108,7 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
     public void testCanHandle() throws Exception
     {
         final T fileReference = this.getNewNonValidatingDataReference();
-        fileReference.setRepositoryAlias(testAliasGood);
+        fileReference.setRepositoryAlias(this.testAliasGood);
         
         Assert.assertTrue("Repository should be able to handle this file reference",
                 this.testFileRepository.canHandle(fileReference));
@@ -118,7 +118,7 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
     public void testCanHandleWithDifferentAliases() throws Exception
     {
         final T fileReference = this.getNewNonValidatingDataReference();
-        fileReference.setRepositoryAlias(testAliasBad);
+        fileReference.setRepositoryAlias(this.testAliasBad);
         
         Assert.assertFalse("Repository should not be able to handle this file reference",
                 this.testFileRepository.canHandle(fileReference));
@@ -180,7 +180,7 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
         try
         {
             final T fileReference = this.getNewValidatingDataReference();
-            fileReference.setRepositoryAlias(testAliasGood);
+            fileReference.setRepositoryAlias(this.testAliasGood);
             this.startRepositorySource();
             Assert.assertTrue("File Reference should have been valid", this.testFileRepository.validate(fileReference));
         }
@@ -200,7 +200,7 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
         try
         {
             final T fileReference = this.getNewValidatingDataReference();
-            fileReference.setRepositoryAlias(testAliasBad);
+            fileReference.setRepositoryAlias(this.testAliasBad);
             this.testFileRepository.validate(fileReference);
             Assert.fail("Should have thrown a FileReferenceNotSupportedException");
         }
@@ -219,7 +219,7 @@ public abstract class AbstractPoddFileRepositoryTest<T extends DataReference>
         try
         {
             final T fileReference = this.getNewNonValidatingDataReference();
-            fileReference.setRepositoryAlias(testAliasGood);
+            fileReference.setRepositoryAlias(this.testAliasGood);
             this.startRepositorySource();
             Assert.assertFalse("File Reference should be invalid", this.testFileRepository.validate(fileReference));
         }

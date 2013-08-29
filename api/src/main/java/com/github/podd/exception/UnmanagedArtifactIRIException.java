@@ -74,14 +74,6 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
         this.artifactOntologyIRI = artifactOntologyIRI;
     }
     
-    /**
-     * @return The OWL Ontology IRI that was not managed.
-     */
-    public IRI getOntologyID()
-    {
-        return this.artifactOntologyIRI;
-    }
-
     @Override
     public Model getDetailsAsModel(final Resource errorResource)
     {
@@ -93,6 +85,14 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
         }
         
         return model;
+    }
+    
+    /**
+     * @return The OWL Ontology IRI that was not managed.
+     */
+    public IRI getOntologyID()
+    {
+        return this.artifactOntologyIRI;
     }
     
 }

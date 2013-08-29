@@ -91,6 +91,49 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class AbstractResourceImplTest
 {
+    private static synchronized int getFreePort()
+    {
+        int result = -1;
+        while(result <= 0)
+        {
+            try (ServerSocket ss = new ServerSocket(0))
+            {
+                ss.setReuseAddress(true);
+                result = ss.getLocalPort();
+                if(AbstractResourceImplTest.usedPorts.contains(result))
+                {
+                    result = -1;
+                }
+                else
+                {
+                    AbstractResourceImplTest.usedPorts.add(result);
+                    try (DatagramSocket ds = new DatagramSocket(result);)
+                    {
+                        ds.setReuseAddress(true);
+                    }
+                }
+            }
+            catch(final IOException e)
+            {
+                result = -1;
+            }
+        }
+        return result;
+    }
+    
+    protected static void setupThreading(final Context nextContext)
+    {
+        if(nextContext != null)
+        {
+            nextContext.getParameters().add("maxThreads", "512");
+            nextContext.getParameters().add("minThreads", "100");
+            nextContext.getParameters().add("lowThreads", "145");
+            nextContext.getParameters().add("maxQueued", "100");
+            nextContext.getParameters().add("maxTotalConnections", "100");
+            // nextContext.getParameters().add("maxIoIdleTimeMs", "100");
+        }
+    }
+    
     @Rule
     public TemporaryFolder tempDirectory = new TemporaryFolder();
     
@@ -161,7 +204,7 @@ public class AbstractResourceImplTest
     protected Model assertRdf(final InputStream inputStream, final RDFFormat format, final int expectedStatements)
         throws RDFParseException, RDFHandlerException, IOException
     {
-        return assertRdf(new InputStreamReader(inputStream), format, expectedStatements);
+        return this.assertRdf(new InputStreamReader(inputStream), format, expectedStatements);
     }
     
     /**
@@ -238,36 +281,6 @@ public class AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         return results.getText();
-    }
-    
-    private static synchronized int getFreePort()
-    {
-        int result = -1;
-        while(result <= 0)
-        {
-            try (ServerSocket ss = new ServerSocket(0))
-            {
-                ss.setReuseAddress(true);
-                result = ss.getLocalPort();
-                if(usedPorts.contains(result))
-                {
-                    result = -1;
-                }
-                else
-                {
-                    usedPorts.add(result);
-                    try (DatagramSocket ds = new DatagramSocket(result);)
-                    {
-                        ds.setReuseAddress(true);
-                    }
-                }
-            }
-            catch(IOException e)
-            {
-                result = -1;
-            }
-        }
-        return result;
     }
     
     /**
@@ -435,10 +448,10 @@ public class AbstractResourceImplTest
         }
         
         // prepare: add Role Mappings
-        for(Map.Entry<URI, URI> entry : roles)
+        for(final Map.Entry<URI, URI> entry : roles)
         {
-            URI role = entry.getKey();
-            URI mappedObject = entry.getValue();
+            final URI role = entry.getKey();
+            final URI mappedObject = entry.getValue();
             
             final URI roleMapping =
                     PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
@@ -473,7 +486,8 @@ public class AbstractResourceImplTest
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
         // return the unique URI assigned to this User
-        Resource next = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
+        final Resource next =
+                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
         return next.stringValue();
     }
     
@@ -491,10 +505,11 @@ public class AbstractResourceImplTest
         
         this.testPort = AbstractResourceImplTest.getFreePort();
         
-        Server httpServer = new Server(this.component.getContext().createChildContext(), Protocol.HTTP, this.testPort);
+        final Server httpServer =
+                new Server(this.component.getContext().createChildContext(), Protocol.HTTP, this.testPort);
         // Add a new HTTP server listening on the given TEST_PORT.
         this.component.getServers().add(httpServer);
-        setupThreading(httpServer.getContext());
+        AbstractResourceImplTest.setupThreading(httpServer.getContext());
         
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);
@@ -516,27 +531,14 @@ public class AbstractResourceImplTest
         // Start the component.
         this.component.start();
         
-        setupThreading(nextApplication.getContext());
-        setupThreading(this.component.getContext());
-        for(Client nextClient : this.component.getClients())
+        AbstractResourceImplTest.setupThreading(nextApplication.getContext());
+        AbstractResourceImplTest.setupThreading(this.component.getContext());
+        for(final Client nextClient : this.component.getClients())
         {
-            setupThreading(nextClient.getContext());
+            AbstractResourceImplTest.setupThreading(nextClient.getContext());
         }
         
         this.testDir = this.tempDirectory.newFolder(this.getClass().getSimpleName()).toPath();
-    }
-    
-    protected static void setupThreading(Context nextContext)
-    {
-        if(nextContext != null)
-        {
-            nextContext.getParameters().add("maxThreads", "512");
-            nextContext.getParameters().add("minThreads", "100");
-            nextContext.getParameters().add("lowThreads", "145");
-            nextContext.getParameters().add("maxQueued", "100");
-            nextContext.getParameters().add("maxTotalConnections", "100");
-            // nextContext.getParameters().add("maxIoIdleTimeMs", "100");
-        }
     }
     
     /**

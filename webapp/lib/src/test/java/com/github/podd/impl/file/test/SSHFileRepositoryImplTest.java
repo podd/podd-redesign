@@ -16,7 +16,6 @@
  */
 package com.github.podd.impl.file.test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -166,19 +165,18 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     }
     
     @Override
-    protected SSHFileReference getNewValidatingDataReference() throws Exception
-    {
-        return SSHService.getNewValidFileReference("validatingfile",
-                this.tempDirectory.newFolder("sshfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
-                        .toPath());
-    }
-    
-    @Override
     protected SSHFileReference getNewNonValidatingDataReference() throws Exception
     {
         return SSHService.getNewInvalidFileReference("non-validatingfile",
                 this.tempDirectory.newFolder("sshfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
                         .toPath());
+    }
+    
+    @Override
+    protected PoddDataRepository<SSHFileReference> getNewPoddDataRepository(final Model model) throws Exception
+    {
+        final PoddDataRepository result = new SSHFileRepositoryImpl(model);
+        return result;
     }
     
     /*
@@ -224,10 +222,11 @@ public class SSHFileRepositoryImplTest extends AbstractPoddFileRepositoryTest<SS
     }
     
     @Override
-    protected PoddDataRepository<SSHFileReference> getNewPoddDataRepository(final Model model) throws Exception
+    protected SSHFileReference getNewValidatingDataReference() throws Exception
     {
-        final PoddDataRepository result = new SSHFileRepositoryImpl(model);
-        return result;
+        return SSHService.getNewValidFileReference("validatingfile",
+                this.tempDirectory.newFolder("sshfilerepositoryimpltest-resources-" + UUID.randomUUID().toString())
+                        .toPath());
     }
     
     @Before

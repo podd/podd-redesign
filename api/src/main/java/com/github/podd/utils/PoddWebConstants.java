@@ -16,7 +16,6 @@
  */
 package com.github.podd.utils;
 
-
 /**
  * @author kutila
  * 
@@ -76,7 +75,7 @@ public interface PoddWebConstants
      * Path to "user details" page
      */
     public static final String PATH_USER_DETAILS = "user/details/";
-
+    
     /**
      * Path to "add user" page
      */
@@ -86,22 +85,22 @@ public interface PoddWebConstants
      * Path to "edit user" page
      */
     public static final String PATH_USER_EDIT = "user/edit/";
-
+    
     /**
      * Path to "edit user" page
      */
     public static final String PATH_USER_EDIT_PWD = "user/editpwd/";
-
+    
     /**
      * Path to "edit user" page
      */
     public static final String PATH_USER_ROLES = "user/roles";
-
+    
     /**
      * Path to "list users" page
      */
     public static final String PATH_USER_LIST = "admin/user/list";
-
+    
     /**
      * Path to "search users" service
      */
@@ -280,6 +279,5 @@ public interface PoddWebConstants
     public static final String METADATA_EXCLUDE_CONTAINS = "nocontains";
     
     public static final String METADATA_ONLY_CONTAINS = "containsonly";
-
     
 }

@@ -58,7 +58,7 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
      * generate inferred statements for schema ontologies.
      */
     @Override
-    public List<InferredOWLOntologyID> loadSchemaOntologies(RepositoryConnection conn) throws Exception
+    public List<InferredOWLOntologyID> loadSchemaOntologies(final RepositoryConnection conn) throws Exception
     {
         final List<InferredOWLOntologyID> schemaList = new ArrayList<InferredOWLOntologyID>();
         
@@ -83,12 +83,12 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         testPoddOWLManager.setReasonerFactory(reasonerFactory);
         
         // - load each schema ontology (and its inferred ontology) to the RepositoryConnection
-        for(int i = 0; i < schemaResourcePaths.length; i++)
+        for(final String schemaResourcePath : schemaResourcePaths)
         {
-            this.log.debug("Next paths: {} ", schemaResourcePaths[i]);
-            InferredOWLOntologyID loadedOntologyID =
-                    TestOntologyUtils.loadSchemaOntology(schemaResourcePaths[i], RDFFormat.RDFXML, testPoddOWLManager,
-                            conn);
+            this.log.debug("Next paths: {} ", schemaResourcePath);
+            final InferredOWLOntologyID loadedOntologyID =
+                    TestOntologyUtils
+                            .loadSchemaOntology(schemaResourcePath, RDFFormat.RDFXML, testPoddOWLManager, conn);
             schemaList.add(loadedOntologyID);
         }
         

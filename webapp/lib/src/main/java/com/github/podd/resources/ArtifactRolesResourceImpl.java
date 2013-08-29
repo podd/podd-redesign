@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilRole;
-import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
@@ -102,17 +100,17 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("memberUri", PoddRoles.PROJECT_MEMBER.getURI());
             dataModel.put("observerUri", PoddRoles.PROJECT_OBSERVER.getURI());
             
-            Collection<RestletUtilRole> nextRoles = new LinkedHashSet<>();
+            final Collection<RestletUtilRole> nextRoles = new LinkedHashSet<>();
             nextRoles.addAll(Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR, PoddRoles.PROJECT_ADMIN,
                     PoddRoles.PROJECT_MEMBER, PoddRoles.PROJECT_OBSERVER));
             
-            Map<RestletUtilRole, Collection<PoddUser>> roleUserMap = this.getUsersForRole(nextRoles, artifactUri);
+            final Map<RestletUtilRole, Collection<PoddUser>> roleUserMap = this.getUsersForRole(nextRoles, artifactUri);
             
             // - add PI user label and identifier
-            Collection<PoddUser> piList = roleUserMap.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR);
+            final Collection<PoddUser> piList = roleUserMap.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR);
             if(piList != null && piList.size() == 1)
             {
-                PoddUser nextUser = piList.iterator().next();
+                final PoddUser nextUser = piList.iterator().next();
                 dataModel.put("piLabel", nextUser.getUserLabel());
                 dataModel.put("piIdentifier", nextUser.getIdentifier());
             }
@@ -170,15 +168,15 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
         }
         
-        Collection<RestletUtilRole> nextRoles = new LinkedHashSet<>();
+        final Collection<RestletUtilRole> nextRoles = new LinkedHashSet<>();
         nextRoles.addAll(Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR, PoddRoles.PROJECT_ADMIN,
                 PoddRoles.PROJECT_MEMBER, PoddRoles.PROJECT_OBSERVER));
         
-        Map<RestletUtilRole, Collection<PoddUser>> roleUserMap =
+        final Map<RestletUtilRole, Collection<PoddUser>> roleUserMap =
                 this.getUsersForRole(nextRoles, ontologyID.getOntologyIRI().toString());
-        Map<RestletUtilRole, Collection<String>> mappings = translateMap(roleUserMap);
+        final Map<RestletUtilRole, Collection<String>> mappings = this.translateMap(roleUserMap);
         
-        Model model = new LinkedHashModel();
+        final Model model = new LinkedHashModel();
         
         PoddRoles.dumpRoleMappingsArtifact(mappings, model);
         
@@ -198,26 +196,23 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));
     }
     
-    private Map<RestletUtilRole, Collection<String>> translateMap(Map<RestletUtilRole, Collection<PoddUser>> input)
+    /**
+     * Helper method to retrieve display details for Project Top Object.
+     * 
+     * @param ontologyID
+     * @return
+     * @throws OpenRDFException
+     */
+    private PoddObjectLabel getProjectDetails(final InferredOWLOntologyID ontologyID) throws OpenRDFException
     {
-        final ConcurrentMap<RestletUtilRole, Collection<String>> userList = new ConcurrentHashMap<>();
-        
-        for(RestletUtilRole nextRole : input.keySet())
+        // find and set top-object of this artifact as the object to display
+        final List<PoddObjectLabel> topObjectLabels =
+                this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(ontologyID));
+        if(topObjectLabels == null || topObjectLabels.size() != 1)
         {
-            Collection<String> nextRoles = new LinkedHashSet<String>();
-            Collection<String> putIfAbsent = userList.putIfAbsent(nextRole, nextRoles);
-            if(putIfAbsent != null)
-            {
-                nextRoles = putIfAbsent;
-            }
-            
-            for(PoddUser nextUser : input.get(nextRole))
-            {
-                nextRoles.add(nextUser.getIdentifier());
-            }
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
         }
-        
-        return userList;
+        return topObjectLabels.get(0);
     }
     
     /**
@@ -241,19 +236,18 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
                 nextRealm.getRolesForObjectAlternate(null, PoddRdfConstants.VF.createURI(artifactUri));
         
         final Collection<User> keySet = participantMap.keySet();
-        for(Iterator<User> iterator = keySet.iterator(); iterator.hasNext();)
+        for(final User user : keySet)
         {
-            User user = iterator.next();
-            Collection<Role> rolesOfUser = participantMap.get(user);
+            final Collection<Role> rolesOfUser = participantMap.get(user);
             
-            for(RestletUtilRole roleOfInterest : rolesOfInterest)
+            for(final RestletUtilRole roleOfInterest : rolesOfInterest)
             {
                 if(rolesOfUser.contains(roleOfInterest.getRole()))
                 {
                     this.log.info("User {} has Role {} ", user.getIdentifier(), roleOfInterest.getName());
                     
                     Collection<PoddUser> nextRoles = new ArrayList<PoddUser>();
-                    Collection<PoddUser> putIfAbsent = userList.putIfAbsent(roleOfInterest, nextRoles);
+                    final Collection<PoddUser> putIfAbsent = userList.putIfAbsent(roleOfInterest, nextRoles);
                     if(putIfAbsent != null)
                     {
                         nextRoles = putIfAbsent;
@@ -273,22 +267,25 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         return userList;
     }
     
-    /**
-     * Helper method to retrieve display details for Project Top Object.
-     * 
-     * @param ontologyID
-     * @return
-     * @throws OpenRDFException
-     */
-    private PoddObjectLabel getProjectDetails(final InferredOWLOntologyID ontologyID) throws OpenRDFException
+    private Map<RestletUtilRole, Collection<String>> translateMap(final Map<RestletUtilRole, Collection<PoddUser>> input)
     {
-        // find and set top-object of this artifact as the object to display
-        final List<PoddObjectLabel> topObjectLabels =
-                this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(ontologyID));
-        if(topObjectLabels == null || topObjectLabels.size() != 1)
+        final ConcurrentMap<RestletUtilRole, Collection<String>> userList = new ConcurrentHashMap<>();
+        
+        for(final RestletUtilRole nextRole : input.keySet())
         {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
+            Collection<String> nextRoles = new LinkedHashSet<String>();
+            final Collection<String> putIfAbsent = userList.putIfAbsent(nextRole, nextRoles);
+            if(putIfAbsent != null)
+            {
+                nextRoles = putIfAbsent;
+            }
+            
+            for(final PoddUser nextUser : input.get(nextRole))
+            {
+                nextRoles.add(nextUser.getIdentifier());
+            }
         }
-        return topObjectLabels.get(0);
+        
+        return userList;
     }
 }

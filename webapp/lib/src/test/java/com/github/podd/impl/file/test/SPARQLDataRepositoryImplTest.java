@@ -123,15 +123,16 @@ public class SPARQLDataRepositoryImplTest extends AbstractPoddFileRepositoryTest
     }
     
     @Override
-    protected SPARQLDataReference getNewValidatingDataReference()
+    protected SPARQLDataReference getNewNonValidatingDataReference()
     {
         return new SPARQLDataReferenceImpl();
     }
     
     @Override
-    protected SPARQLDataReference getNewNonValidatingDataReference()
+    protected PoddDataRepository<SPARQLDataReference> getNewPoddDataRepository(final Model model) throws Exception
     {
-        return new SPARQLDataReferenceImpl();
+        final PoddDataRepository result = new SPARQLDataRepositoryImpl(model);
+        return result;
     }
     
     /*
@@ -165,10 +166,9 @@ public class SPARQLDataRepositoryImplTest extends AbstractPoddFileRepositoryTest
     }
     
     @Override
-    protected PoddDataRepository<SPARQLDataReference> getNewPoddDataRepository(final Model model) throws Exception
+    protected SPARQLDataReference getNewValidatingDataReference()
     {
-        final PoddDataRepository result = new SPARQLDataRepositoryImpl(model);
-        return result;
+        return new SPARQLDataReferenceImpl();
     }
     
     @Before

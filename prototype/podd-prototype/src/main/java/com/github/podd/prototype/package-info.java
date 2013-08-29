@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- /**
+/**
  * Package containing classes used by the prototype.
  * 
  * These classes may be copied into different packages after the prototype is completed.

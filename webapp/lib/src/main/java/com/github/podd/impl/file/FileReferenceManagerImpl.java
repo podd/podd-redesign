@@ -76,8 +76,8 @@ public class FileReferenceManagerImpl implements DataReferenceManager
         final Set<DataReference> internalFileRefResults =
                 Collections.newSetFromMap(new ConcurrentHashMap<DataReference, Boolean>());
         
-        for(final DataReferenceProcessorFactory nextProcessorFactory : this.getDataProcessorRegistry()
-                .getByStage(this.processorStage))
+        for(final DataReferenceProcessorFactory nextProcessorFactory : this.getDataProcessorRegistry().getByStage(
+                this.processorStage))
         {
             try
             {

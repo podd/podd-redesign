@@ -55,6 +55,37 @@ import com.github.podd.utils.PoddWebConstants;
 public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplTest
 {
     
+    @Parameters
+    public static Collection<Object[]> data()
+    {
+        final Object[][] data =
+                new Object[][] {
+                        // { "/test/artifacts/basic-20130206.ttl", MediaType.APPLICATION_RDF_TURTLE
+                        // },
+                        // { "/test/artifacts/project-temp-00010.ttl",
+                        // MediaType.APPLICATION_RDF_TURTLE },
+                        // { "/test/artifacts/project-temp-00100.ttl",
+                        // MediaType.APPLICATION_RDF_TURTLE },
+                        // { "/test/artifacts/project-temp-01000.ttl",
+                        // MediaType.APPLICATION_RDF_TURTLE },
+                        // { "/test/artifacts/project-temp-10000.ttl",
+                        // MediaType.APPLICATION_RDF_TURTLE },
+                        
+                        { "/test/artifacts/project-temp-00010.rdf", MediaType.APPLICATION_RDF_XML },
+                        { "/test/artifacts/project-temp-00100.rdf", MediaType.APPLICATION_RDF_XML },
+                        { "/test/artifacts/project-temp-01000.rdf", MediaType.APPLICATION_RDF_XML },
+                        { "/test/artifacts/project-temp-10000.rdf", MediaType.APPLICATION_RDF_XML },
+                        
+                        { "/test/artifacts/project-purl-01000.rdf", MediaType.APPLICATION_RDF_XML },
+                        { "/test/artifacts/project-purl-10000.rdf", MediaType.APPLICATION_RDF_XML },
+                
+                // fails
+                // { "/test/artifacts/project-purl-20000.rdf", MediaType.APPLICATION_RDF_XML },
+                
+                };
+        return Arrays.asList(data);
+    }
+    
     /**
      * log4j logger which writes to the statistics file.
      */
@@ -80,36 +111,29 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
         super();
         
         // increase test timeout
-        super.timeout = new Timeout(30000*1000);
+        super.timeout = new Timeout(30000 * 1000);
         
         this.filename = filename;
         this.mediaType = mediaType;
     }
     
-    @Parameters
-    public static Collection<Object[]> data()
+    public int getStatementCount(final String artifactUri) throws Exception
     {
-        final Object[][] data =
-                new Object[][] {
-//                        { "/test/artifacts/basic-20130206.ttl", MediaType.APPLICATION_RDF_TURTLE },
-//                        { "/test/artifacts/project-temp-00010.ttl", MediaType.APPLICATION_RDF_TURTLE },
-//                        { "/test/artifacts/project-temp-00100.ttl", MediaType.APPLICATION_RDF_TURTLE },
-//                        { "/test/artifacts/project-temp-01000.ttl", MediaType.APPLICATION_RDF_TURTLE },
-//                        { "/test/artifacts/project-temp-10000.ttl", MediaType.APPLICATION_RDF_TURTLE },
-                        
-                        { "/test/artifacts/project-temp-00010.rdf", MediaType.APPLICATION_RDF_XML },
-                        { "/test/artifacts/project-temp-00100.rdf", MediaType.APPLICATION_RDF_XML },
-                        { "/test/artifacts/project-temp-01000.rdf", MediaType.APPLICATION_RDF_XML },
-                        { "/test/artifacts/project-temp-10000.rdf", MediaType.APPLICATION_RDF_XML },
-                        
-                        { "/test/artifacts/project-purl-01000.rdf", MediaType.APPLICATION_RDF_XML },
-                        { "/test/artifacts/project-purl-10000.rdf", MediaType.APPLICATION_RDF_XML },
-                        
-                        // fails
-                        //{ "/test/artifacts/project-purl-20000.rdf", MediaType.APPLICATION_RDF_XML },
-                        
-                };
-        return Arrays.asList(data);
+        // retrieve artifact
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        // load into a Model and find statement count
+        final InputStream input = new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8));
+        final Model model = Rio.parse(input, "", RDFFormat.TURTLE);
+        
+        return model.size();
     }
     
     /**
@@ -136,7 +160,6 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
         Assert.assertFalse(body.contains("html"));
         Assert.assertFalse(body.contains("\n"));
         
-        
         // write statistics
         final StringBuilder statsMsg = new StringBuilder();
         statsMsg.append(this.filename.substring(this.filename.lastIndexOf('/') + 1) + ",");
@@ -151,25 +174,6 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
         statsMsg.append('\n');
         
         this.statsLogger.info(statsMsg.toString());
-    }
-    
-    public int getStatementCount(String artifactUri) throws Exception
-    {
-        // retrieve artifact
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // load into a Model and find statement count
-        final InputStream input = new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8));
-        final Model model = Rio.parse(input, "", RDFFormat.TURTLE);
-
-        return model.size();
     }
     
 }

@@ -163,47 +163,6 @@ public class PoddSesameRealmTest
     }
     
     @Test
-    public void testUpdateUser() throws Exception
-    {
-        final String testUserId = "john@example.com";
-        
-        // create test user
-        final URI testUser1HomePage = PoddRdfConstants.VF.createURI("http://example.org/john");
-        final PoddUser testUser1 =
-                new PoddUser(testUserId, "secret".toCharArray(), "First", "Last", testUserId, PoddUserStatus.ACTIVE,
-                        testUser1HomePage, "UQ", "john_ORCID_111");
-        this.testRealm.addUser(testUser1);
-        
-        // second test user
-        final URI testUser2HomePage = PoddRdfConstants.VF.createURI("http://example.org/john.cloned");
-        final String testUser2FirstName = "Jason";
-        final String testUser2LastName = "Bourne";
-        final PoddUser testUser2 =
-                new PoddUser(testUserId, "secret".toCharArray(), testUser2FirstName, "Bourne", testUserId,
-                        PoddUserStatus.INACTIVE, testUser2HomePage, "CSIRO", "john_ORCID_cloned22");
-        
-        // try to add another user with same identifier
-        try
-        {
-            this.testRealm.addUser(testUser2);
-            Assert.fail("Should have thrown an Exception as User identifier already exists");
-        }
-        catch(final RuntimeException e)
-        {
-            Assert.assertTrue("Not the expected Exception", e.getMessage().contains("User already exists"));
-        }
-        
-        // modify the existing User
-        this.testRealm.updateUser(testUser2);
-        
-        final PoddUser userFromRealm = (PoddUser)this.testRealm.findUser(testUserId);
-        Assert.assertEquals("First name was not overwritten", testUser2FirstName, userFromRealm.getFirstName());
-        Assert.assertEquals("Last name was not overwritten", testUser2LastName, userFromRealm.getLastName());
-        Assert.assertEquals("Home Page was not overwritten", testUser2HomePage, userFromRealm.getHomePage());
-        Assert.assertEquals("Status was not overwritten", PoddUserStatus.INACTIVE, userFromRealm.getUserStatus());
-    }
-    
-    @Test
     public void testGetRolesForObjectWithMiscCombinations() throws Exception
     {
         // -prepare: users
@@ -321,6 +280,36 @@ public class PoddSesameRealmTest
     }
     
     @Test
+    public void testGetUserByStatus() throws Exception
+    {
+        // -prepare: users
+        this.addTestUser("albert@hope.com");
+        this.addTestUser("bob@hope.com");
+        this.addTestUser("charles@hope.com");
+        this.addTestUser("david@hope.com");
+        this.addTestUser("elmo@hope.com");
+        
+        // - ACTIVE users
+        final List<PoddUser> activeUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, false, 10, 0);
+        Assert.assertEquals("Not the expected number of active Users", 5, activeUsers.size());
+        Assert.assertEquals("Results not in ascending order", "albert@hope.com", activeUsers.get(0).getIdentifier());
+        
+        // - INACTIVE users
+        final List<PoddUser> inactiveUsers = this.testRealm.getUserByStatus(PoddUserStatus.INACTIVE, false, 10, 0);
+        Assert.assertEquals("Not the expected number of inactive Users", 0, inactiveUsers.size());
+        
+        // - order by DESC(identifier) and limit of 3
+        final List<PoddUser> filteredUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, true, 3, 0);
+        Assert.assertEquals("Not the expected number of Users after filtering", 3, filteredUsers.size());
+        Assert.assertEquals("Results not in descending order", "elmo@hope.com", filteredUsers.get(0).getIdentifier());
+        
+        // - order by identifier and offset of 2
+        final List<PoddUser> offsetUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, false, 10, 2);
+        Assert.assertEquals("Not the expected number of Users after offsetting", 3, offsetUsers.size());
+        Assert.assertEquals("Results not in ascending order", "charles@hope.com", offsetUsers.get(0).getIdentifier());
+    }
+    
+    @Test
     public void testGetUserRoles() throws Exception
     {
         // -prepare: users
@@ -376,114 +365,6 @@ public class PoddSesameRealmTest
         Assert.assertTrue("User list did not contain user2", users.contains(user2));
     }
     
-    @Test
-    public void testGetUserByStatus() throws Exception
-    {
-        // -prepare: users
-        this.addTestUser("albert@hope.com");
-        this.addTestUser("bob@hope.com");
-        this.addTestUser("charles@hope.com");
-        this.addTestUser("david@hope.com");
-        this.addTestUser("elmo@hope.com");
-        
-        // - ACTIVE users
-        final List<PoddUser> activeUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, false, 10, 0);
-        Assert.assertEquals("Not the expected number of active Users", 5, activeUsers.size());
-        Assert.assertEquals("Results not in ascending order", "albert@hope.com", activeUsers.get(0).getIdentifier());
-        
-        // - INACTIVE users
-        final List<PoddUser> inactiveUsers = this.testRealm.getUserByStatus(PoddUserStatus.INACTIVE, false, 10, 0);
-        Assert.assertEquals("Not the expected number of inactive Users", 0, inactiveUsers.size());
-        
-        // - order by DESC(identifier) and limit of 3
-        final List<PoddUser> filteredUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, true, 3, 0);
-        Assert.assertEquals("Not the expected number of Users after filtering", 3, filteredUsers.size());
-        Assert.assertEquals("Results not in descending order", "elmo@hope.com", filteredUsers.get(0).getIdentifier());
-        
-        // - order by identifier and offset of 2
-        final List<PoddUser> offsetUsers = this.testRealm.getUserByStatus(PoddUserStatus.ACTIVE, false, 10, 2);
-        Assert.assertEquals("Not the expected number of Users after offsetting", 3, offsetUsers.size());
-        Assert.assertEquals("Results not in ascending order", "charles@hope.com", offsetUsers.get(0).getIdentifier());
-    }
-    
-    @Test
-    public void testSearchUser() throws Exception
-    {
-        // -prepare: users
-        this.addTestUser("albert@hope.com");
-        this.addTestUser("bob@hope.com");
-        this.addTestUser("charles@hope.com");
-        this.addTestUser("david@hope.com");
-        this.addTestUser("elmo@hope.com");
-        
-        // - users matching search term 'b'
-        final List<PoddUser> activeUsers = this.testRealm.searchUser("b", null, false, 10, 0);
-        Assert.assertEquals("Not the expected number of Users", 2, activeUsers.size());
-        Assert.assertEquals("Results not in ascending order", "albert@hope.com", activeUsers.get(0).getIdentifier());
-        Assert.assertEquals("Results not in ascending order", "bob@hope.com", activeUsers.get(1).getIdentifier());
-
-        // - INACTIVE users matching search term 'b'
-        final List<PoddUser> inactiveUsers = this.testRealm.searchUser("b", PoddUserStatus.INACTIVE, false, 10, 0);
-        Assert.assertEquals("Not the expected number of Users", 0, inactiveUsers.size());
-        
-        // - users matching search term "dav" and ACTIVE
-        final List<PoddUser> filteredUsers = this.testRealm.searchUser("dav", PoddUserStatus.ACTIVE, true, -1, 0);
-        Assert.assertEquals("Not the expected number of matching Users", 1, filteredUsers.size());
-        Assert.assertEquals("Not the expected result", "david@hope.com", filteredUsers.get(0).getIdentifier());
-
-        // - all users with NULL
-        final List<PoddUser> allUsers = this.testRealm.searchUser(null, null, false, -1, 0);
-        Assert.assertEquals("Not the expected number of total Users", 5, allUsers.size());
-        
-        // - all users with empty searchTerm
-        final List<PoddUser> allUsers2 = this.testRealm.searchUser("", null, false, -1, 0);
-        Assert.assertEquals("Not the expected number of total Users", 5, allUsers2.size());
-    }
-
-    @Test
-    public void testSearchUserByFirstname() throws Exception
-    {
-        // -prepare: users
-        final PoddUser testUser1 =
-                new PoddUser("ks1985", "secret".toCharArray(), "Kamal", "Silva", "kamal@silva.com",
-                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/kamal"),
-                        "University of Queensland", "SOME_ORCID_ID");
-        final PoddUser testUser2 =
-                new PoddUser("ns1983", "secret".toCharArray(), "Nimal", "Silva", "Nimal@silva.com",
-                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/nimal"),
-                        "CSIRO", "SOME_ORCID_ID");
-        this.testRealm.addUser(testUser1);
-        this.testRealm.addUser(testUser2);
-        
-        // - search giving First Name
-        final List<PoddUser> activeUsers = this.testRealm.searchUser("kamal", null, false, 10, 0);
-        Assert.assertEquals("Not the expected number of Users", 1, activeUsers.size());
-        Assert.assertEquals("Results not in ascending order", "ks1985", activeUsers.get(0).getIdentifier());
-    }
-    
-    @Test
-    public void testSearchUserByLastname() throws Exception
-    {
-        // -prepare: users
-        final PoddUser testUser1 =
-                new PoddUser("ks1985", "secret".toCharArray(), "Kamal", "Silva", "kamal@silva.com",
-                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/kamal"),
-                        "University of Queensland", "SOME_ORCID_ID");
-        final PoddUser testUser2 =
-                new PoddUser("ns1983", "secret".toCharArray(), "Nimal", "Silva", "Nimal@silva.com",
-                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/nimal"),
-                        "CSIRO", "SOME_ORCID_ID");
-        this.testRealm.addUser(testUser1);
-        this.testRealm.addUser(testUser2);
-        
-        
-        // - search giving Last Name
-        final List<PoddUser> activeUsers = this.testRealm.searchUser("Silva", null, false, 10, 0);
-        Assert.assertEquals("Not the expected number of Users", 2, activeUsers.size());
-        Assert.assertEquals("Results not in ascending order", "ks1985", activeUsers.get(0).getIdentifier());
-        Assert.assertEquals("Results not in ascending order", "ns1983", activeUsers.get(1).getIdentifier());
-    }
-    
     /**
      * Test that mappings between a User, a Role and an optional Object URI can be added.
      */
@@ -527,6 +408,83 @@ public class PoddSesameRealmTest
         final List<Statement> list4 = this.getStatementList(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null);
         Assert.assertFalse(list4.isEmpty());
         Assert.assertEquals(2, list4.size());
+    }
+    
+    @Test
+    public void testSearchUser() throws Exception
+    {
+        // -prepare: users
+        this.addTestUser("albert@hope.com");
+        this.addTestUser("bob@hope.com");
+        this.addTestUser("charles@hope.com");
+        this.addTestUser("david@hope.com");
+        this.addTestUser("elmo@hope.com");
+        
+        // - users matching search term 'b'
+        final List<PoddUser> activeUsers = this.testRealm.searchUser("b", null, false, 10, 0);
+        Assert.assertEquals("Not the expected number of Users", 2, activeUsers.size());
+        Assert.assertEquals("Results not in ascending order", "albert@hope.com", activeUsers.get(0).getIdentifier());
+        Assert.assertEquals("Results not in ascending order", "bob@hope.com", activeUsers.get(1).getIdentifier());
+        
+        // - INACTIVE users matching search term 'b'
+        final List<PoddUser> inactiveUsers = this.testRealm.searchUser("b", PoddUserStatus.INACTIVE, false, 10, 0);
+        Assert.assertEquals("Not the expected number of Users", 0, inactiveUsers.size());
+        
+        // - users matching search term "dav" and ACTIVE
+        final List<PoddUser> filteredUsers = this.testRealm.searchUser("dav", PoddUserStatus.ACTIVE, true, -1, 0);
+        Assert.assertEquals("Not the expected number of matching Users", 1, filteredUsers.size());
+        Assert.assertEquals("Not the expected result", "david@hope.com", filteredUsers.get(0).getIdentifier());
+        
+        // - all users with NULL
+        final List<PoddUser> allUsers = this.testRealm.searchUser(null, null, false, -1, 0);
+        Assert.assertEquals("Not the expected number of total Users", 5, allUsers.size());
+        
+        // - all users with empty searchTerm
+        final List<PoddUser> allUsers2 = this.testRealm.searchUser("", null, false, -1, 0);
+        Assert.assertEquals("Not the expected number of total Users", 5, allUsers2.size());
+    }
+    
+    @Test
+    public void testSearchUserByFirstname() throws Exception
+    {
+        // -prepare: users
+        final PoddUser testUser1 =
+                new PoddUser("ks1985", "secret".toCharArray(), "Kamal", "Silva", "kamal@silva.com",
+                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/kamal"),
+                        "University of Queensland", "SOME_ORCID_ID");
+        final PoddUser testUser2 =
+                new PoddUser("ns1983", "secret".toCharArray(), "Nimal", "Silva", "Nimal@silva.com",
+                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/nimal"), "CSIRO",
+                        "SOME_ORCID_ID");
+        this.testRealm.addUser(testUser1);
+        this.testRealm.addUser(testUser2);
+        
+        // - search giving First Name
+        final List<PoddUser> activeUsers = this.testRealm.searchUser("kamal", null, false, 10, 0);
+        Assert.assertEquals("Not the expected number of Users", 1, activeUsers.size());
+        Assert.assertEquals("Results not in ascending order", "ks1985", activeUsers.get(0).getIdentifier());
+    }
+    
+    @Test
+    public void testSearchUserByLastname() throws Exception
+    {
+        // -prepare: users
+        final PoddUser testUser1 =
+                new PoddUser("ks1985", "secret".toCharArray(), "Kamal", "Silva", "kamal@silva.com",
+                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/kamal"),
+                        "University of Queensland", "SOME_ORCID_ID");
+        final PoddUser testUser2 =
+                new PoddUser("ns1983", "secret".toCharArray(), "Nimal", "Silva", "Nimal@silva.com",
+                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/nimal"), "CSIRO",
+                        "SOME_ORCID_ID");
+        this.testRealm.addUser(testUser1);
+        this.testRealm.addUser(testUser2);
+        
+        // - search giving Last Name
+        final List<PoddUser> activeUsers = this.testRealm.searchUser("Silva", null, false, 10, 0);
+        Assert.assertEquals("Not the expected number of Users", 2, activeUsers.size());
+        Assert.assertEquals("Results not in ascending order", "ks1985", activeUsers.get(0).getIdentifier());
+        Assert.assertEquals("Results not in ascending order", "ns1983", activeUsers.get(1).getIdentifier());
     }
     
     /**
@@ -595,6 +553,47 @@ public class PoddSesameRealmTest
         Assert.assertEquals(1, list4.size());
         
         this.testRealm.unmap(user1, PoddRoles.PROJECT_ADMIN.getRole(), object1URI);
+    }
+    
+    @Test
+    public void testUpdateUser() throws Exception
+    {
+        final String testUserId = "john@example.com";
+        
+        // create test user
+        final URI testUser1HomePage = PoddRdfConstants.VF.createURI("http://example.org/john");
+        final PoddUser testUser1 =
+                new PoddUser(testUserId, "secret".toCharArray(), "First", "Last", testUserId, PoddUserStatus.ACTIVE,
+                        testUser1HomePage, "UQ", "john_ORCID_111");
+        this.testRealm.addUser(testUser1);
+        
+        // second test user
+        final URI testUser2HomePage = PoddRdfConstants.VF.createURI("http://example.org/john.cloned");
+        final String testUser2FirstName = "Jason";
+        final String testUser2LastName = "Bourne";
+        final PoddUser testUser2 =
+                new PoddUser(testUserId, "secret".toCharArray(), testUser2FirstName, "Bourne", testUserId,
+                        PoddUserStatus.INACTIVE, testUser2HomePage, "CSIRO", "john_ORCID_cloned22");
+        
+        // try to add another user with same identifier
+        try
+        {
+            this.testRealm.addUser(testUser2);
+            Assert.fail("Should have thrown an Exception as User identifier already exists");
+        }
+        catch(final RuntimeException e)
+        {
+            Assert.assertTrue("Not the expected Exception", e.getMessage().contains("User already exists"));
+        }
+        
+        // modify the existing User
+        this.testRealm.updateUser(testUser2);
+        
+        final PoddUser userFromRealm = (PoddUser)this.testRealm.findUser(testUserId);
+        Assert.assertEquals("First name was not overwritten", testUser2FirstName, userFromRealm.getFirstName());
+        Assert.assertEquals("Last name was not overwritten", testUser2LastName, userFromRealm.getLastName());
+        Assert.assertEquals("Home Page was not overwritten", testUser2HomePage, userFromRealm.getHomePage());
+        Assert.assertEquals("Status was not overwritten", PoddUserStatus.INACTIVE, userFromRealm.getUserStatus());
     }
     
 }

@@ -61,21 +61,6 @@ public class PoddPurlManagerImpl implements PoddPurlManager
     
     private PoddPurlProcessorFactoryRegistry purlProcessorFactoryRegistry;
     
-    @Override
-    public void convertTemporaryUris(final Set<PoddPurlReference> purlResults,
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws RepositoryException,
-        UpdateExecutionException
-    {
-        for(final PoddPurlReference purl : purlResults)
-        {
-            final URI inputUri = purl.getTemporaryURI();
-            final URI outputUri = purl.getPurlURI();
-            this.log.debug("Converting: {} to {}", inputUri, outputUri);
-            
-            this.convertTemporaryUri(inputUri, outputUri, repositoryConnection, contexts);
-        }
-    }
-    
     private void convertTemporaryUri(final URI inputUri, final URI outputUri,
             final RepositoryConnection repositoryConnection, final URI... contexts) throws RepositoryException
     {
@@ -111,6 +96,21 @@ public class PoddPurlManagerImpl implements PoddPurlManager
         finally
         {
             stmtsWithTempObject.close();
+        }
+    }
+    
+    @Override
+    public void convertTemporaryUris(final Set<PoddPurlReference> purlResults,
+            final RepositoryConnection repositoryConnection, final URI... contexts) throws RepositoryException,
+        UpdateExecutionException
+    {
+        for(final PoddPurlReference purl : purlResults)
+        {
+            final URI inputUri = purl.getTemporaryURI();
+            final URI outputUri = purl.getPurlURI();
+            this.log.debug("Converting: {} to {}", inputUri, outputUri);
+            
+            this.convertTemporaryUri(inputUri, outputUri, repositoryConnection, contexts);
         }
     }
     

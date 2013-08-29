@@ -52,7 +52,7 @@ public class PoddUser extends RestletUtilUser
     
     /** The user's title */
     private volatile String title;
-
+    
     /** The user's telephone */
     private volatile String phone;
     
@@ -133,6 +133,10 @@ public class PoddUser extends RestletUtilUser
         this.position = position;
     }
     
+    public String getAddress()
+    {
+        return this.address;
+    }
     
     /**
      * Get the URL of a home page containing details about the User. This value is set by the user.
@@ -154,27 +158,21 @@ public class PoddUser extends RestletUtilUser
         return this.organization;
     }
     
+    public String getPhone()
+    {
+        return this.phone;
+    }
+    
+    public String getPosition()
+    {
+        return this.position;
+    }
+    
     public String getTitle()
     {
         return this.title;
     }
     
-    public String getPhone()
-    {
-        return phone;
-    }
-
-    public String getAddress()
-    {
-        return address;
-    }
-
-    public String getPosition()
-    {
-        return position;
-    }
-
-
     /**
      * Get the Unique URI allocated to each user. This value is usually generated and set by PODD.
      * 
@@ -185,19 +183,24 @@ public class PoddUser extends RestletUtilUser
         return this.uri;
     }
     
-    public PoddUserStatus getUserStatus()
-    {
-        return this.userStatus;
-    }
-    
     /**
      * Get a String identifying the human User and his/her affiliation.
-     *  
+     * 
      * @return
      */
     public String getUserLabel()
     {
         return this.getFirstName() + " " + this.getLastName() + ", " + this.getOrganization();
+    }
+    
+    public PoddUserStatus getUserStatus()
+    {
+        return this.userStatus;
+    }
+    
+    public void setAddress(final String address)
+    {
+        this.address = address;
     }
     
     /**
@@ -221,24 +224,19 @@ public class PoddUser extends RestletUtilUser
         this.organization = organization;
     }
     
-    public void setTitle(final String title)
-    {
-        this.title = title;
-    }
-    
-    public void setPhone(String phone)
+    public void setPhone(final String phone)
     {
         this.phone = phone;
     }
-
-    public void setAddress(String address)
-    {
-        this.address = address;
-    }
-
-    public void setPosition(String position)
+    
+    public void setPosition(final String position)
     {
         this.position = position;
+    }
+    
+    public void setTitle(final String title)
+    {
+        this.title = title;
     }
     
     /**

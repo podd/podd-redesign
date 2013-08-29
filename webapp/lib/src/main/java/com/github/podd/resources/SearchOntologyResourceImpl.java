@@ -19,7 +19,6 @@ package com.github.podd.resources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -128,7 +127,8 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         }
         this.log.info("Found {} matches for this search term", results.size());
         
-        RDFFormat resultFormat = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
+        final RDFFormat resultFormat =
+                Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
         // - prepare response
         try
         {
@@ -200,15 +200,15 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             // - write the result Model into response
             Rio.write(resultModel, output, outputFormat);
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response", e);
         }
-        catch(UnsupportedRDFormatException e)
+        catch(final UnsupportedRDFormatException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not parse input format", e);
         }
-        catch(IOException e)
+        catch(final IOException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not parse input", e);
         }
