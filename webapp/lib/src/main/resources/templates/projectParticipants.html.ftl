@@ -46,6 +46,17 @@
 			return false;
 		});
 	
+		$("#pi_input_div").hide();
+	
+		$("#pi_change").click(function(event) {
+			event.preventDefault();
+			$("#pi_label_div").hide();
+			var input = $("#pi_input_div"); 
+			input.show();
+			input.focus();
+			input.selectionStart = input.selectionEnd = input.val().length;
+		});
+	
 		var deleteLink = $(".deleteLinkStatic");
 		podd.addListItemDeleteHandler(deleteLink);
 	
@@ -129,7 +140,14 @@
 		                </label>
 		            </li>
 		            <li>
-		                <input autocomplete="off" class="wide ac_input" id="pi" name="pi" value="${piLabel!""}">
+		            
+		                <div id="pi_input_div">
+		                	<input autocomplete="off" class="wide ac_input" id="pi" name="pi" value="${piLabel!""}">
+		                </div>
+		                <div id="pi_label_div">
+		                	<span>${piLabel!""}&nbsp;</span><a id="pi_change" class="changeLink" href="">change</a>
+		                </div>
+		                
 		                <input type="hidden" id="pi_hidden" name="pi_hidden" value="${piIdentifier!""}">
 		                <h6 class="errorMsg">${piError!""}</h6>
 		                <br>Only the Principal Investigator can publish a Project.

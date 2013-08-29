@@ -474,7 +474,7 @@ podd.addListItemDeleteHandler = function(deleteLink) {
  * Updates the Principal Investigator Role. Is triggered upon blurring of the
  * input field.
  * 
- * NOTE: The current PI (if present) is deleted and the new PI is added as the
+ * TODO: The current PI (if present) is deleted and the new PI is added as the
  * next step. Since these 2 steps are not atomic itmay lead to a situation where
  * no PI is allocated to the project.
  * 
@@ -492,6 +492,7 @@ podd.addListItemDeleteHandler = function(deleteLink) {
 podd.addPiBlurHandler = function(input, hiddenValueElement, artifactIri, roleUri, originalIdentifier) {
 	
     input.blur(function(event) {
+    	var newUserLabel = $(this).val();
         var newUserIdentifier = '' + $(this).val();
         if (typeof hiddenValueElement !== undefined && newUserIdentifier !== '') {
         	newUserIdentifier = hiddenValueElement.val();
@@ -508,13 +509,16 @@ podd.addPiBlurHandler = function(input, hiddenValueElement, artifactIri, roleUri
         	// - add new PI
             podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
             
-            // Unbind this handler and create a new one with the new value as the original value
-            $(this).unbind("blur");
-            podd.addPiBlurHandler(input, hiddenValueElement, artifactIri, roleUri, newUserIdentifier);
+            // - update content of hidden Input and label
+    		$('#pi_label_div span').text(newUserLabel + ' ');
+            hiddenValueElement.val(newUserIdentifier);
         	
         } else {
         	podd.debug("[blur] no change in value: was " + originalIdentifier + ", is " + newUserIdentifier);
         }
+        // hide Input and show Label DIV
+		$('#pi_input_div').hide();
+		$('#pi_label_div').show();
     });
 };
 
