@@ -19,10 +19,24 @@ package com.github.podd.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.util.ModelException;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -41,7 +55,9 @@ import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedSchemaException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.exception.UnmanagedSchemaOntologyIDException;
+import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -144,6 +160,163 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
     }
     
+    /**
+     * @param model
+     * @param currentVersionsMap
+     * @param allVersionsMap
+     * @param nextSchemaOntologyUri
+     */
+    public void mapAllVersions(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
+            final ConcurrentMap<URI, Set<URI>> allVersionsMap, final URI nextSchemaOntologyUri)
+    {
+        final Set<Value> allVersions = model.filter(nextSchemaOntologyUri, OWL.VERSIONIRI, null).objects();
+        Set<URI> nextAllVersions = new HashSet<>();
+        final Set<URI> putIfAbsent = allVersionsMap.putIfAbsent(nextSchemaOntologyUri, nextAllVersions);
+        if(putIfAbsent != null)
+        {
+            nextAllVersions = putIfAbsent;
+        }
+        // If they specified a current version add it to the set
+        if(currentVersionsMap.containsKey(nextSchemaOntologyUri))
+        {
+            nextAllVersions.add(currentVersionsMap.get(nextSchemaOntologyUri));
+        }
+        for(final Value nextVersionURI : allVersions)
+        {
+            if(nextVersionURI instanceof URI)
+            {
+                nextAllVersions.add((URI)nextVersionURI);
+            }
+            else
+            {
+                this.log.error("Version was not a URI: {} {}", nextSchemaOntologyUri, nextVersionURI);
+            }
+        }
+        
+        if(nextAllVersions.isEmpty())
+        {
+            this.log.error("Could not find any version information for schema ontology: {}", nextSchemaOntologyUri);
+        }
+    }
+    
+    /**
+     * @param model
+     * @param currentVersionsMap
+     * @param allVersionsMap
+     * @param importsMap
+     * @param importOrder
+     * @param nextSchemaOntologyUri
+     */
+    public void mapAndSortImports(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
+            final ConcurrentMap<URI, Set<URI>> allVersionsMap, final ConcurrentMap<URI, Set<URI>> importsMap,
+            final List<URI> importOrder, final URI nextSchemaOntologyUri)
+    {
+        final Set<Value> imports = model.filter(nextSchemaOntologyUri, OWL.IMPORTS, null).objects();
+        Set<URI> nextImportsSet = new HashSet<>();
+        final Set<URI> putIfAbsent = importsMap.putIfAbsent(nextSchemaOntologyUri, nextImportsSet);
+        if(putIfAbsent != null)
+        {
+            nextImportsSet = putIfAbsent;
+        }
+        int maxIndex = 0;
+        if(imports.isEmpty())
+        {
+            if(!nextImportsSet.isEmpty())
+            {
+                this.log.error("Found inconsistent imports set: {} {}", nextSchemaOntologyUri, nextImportsSet);
+            }
+        }
+        else
+        {
+            for(Value nextImport : imports)
+            {
+                if(nextImport instanceof URI)
+                {
+                    if(currentVersionsMap.containsKey(nextImport))
+                    {
+                        // Map down to the current version to ensure that we can load
+                        // multiple versions simultaneously (if possible with the rest of
+                        // the system)
+                        nextImportsSet.add(currentVersionsMap.get(nextImport));
+                    }
+                    else
+                    {
+                        boolean foundAllVersion = false;
+                        // Attempt to verify if the version exists
+                        for(final URI nextAllVersions : allVersionsMap.keySet())
+                        {
+                            if(nextAllVersions.equals(nextImport))
+                            {
+                                foundAllVersion = true;
+                                // this should not normally occur, as the current versions
+                                // map should also contain this key
+                                nextImport = currentVersionsMap.get(nextAllVersions);
+                                nextImportsSet.add((URI)nextImport);
+                            }
+                            else if(allVersionsMap.get(nextAllVersions).contains(nextImport))
+                            {
+                                nextImportsSet.add((URI)nextImport);
+                                foundAllVersion = true;
+                            }
+                        }
+                        
+                        if(!foundAllVersion)
+                        {
+                            this.log.warn("Could not find import: {} imports {}", nextSchemaOntologyUri, nextImport);
+                        }
+                        else
+                        {
+                            nextImportsSet.add((URI)nextImport);
+                        }
+                    }
+                    final int nextIndex = importOrder.indexOf(nextImport);
+                    if(nextIndex >= maxIndex)
+                    {
+                        maxIndex = nextIndex + 1;
+                    }
+                }
+            }
+        }
+        this.log.info("adding import for {} at {}", nextSchemaOntologyUri, maxIndex);
+        // TODO: FIXME: This will not allow for multiple versions of a single schema
+        // ontology at the same time
+        importOrder.add(maxIndex, currentVersionsMap.get(nextSchemaOntologyUri));
+    }
+    
+    /**
+     * @param model
+     * @param currentVersionsMap
+     * @param nextSchemaOntologyUri
+     */
+    public void mapCurrentVersion(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
+            final URI nextSchemaOntologyUri)
+    {
+        try
+        {
+            final URI nextCurrentVersionURI =
+                    model.filter(nextSchemaOntologyUri, PoddRdfConstants.OMV_CURRENT_VERSION, null).objectURI();
+            
+            if(nextCurrentVersionURI == null)
+            {
+                this.log.error("Did not find a current version for schema ontology: {}", nextSchemaOntologyUri);
+            }
+            else
+            {
+                final URI putIfAbsent = currentVersionsMap.putIfAbsent(nextSchemaOntologyUri, nextCurrentVersionURI);
+                if(putIfAbsent != null)
+                {
+                    this.log.error("Found multiple version URIs for schema ontology: {} old={} new={}",
+                            nextSchemaOntologyUri, putIfAbsent, nextCurrentVersionURI);
+                }
+            }
+        }
+        catch(final ModelException e)
+        {
+            this.log.error("Could not find a single unique current version for schema ontology: {}",
+                    nextSchemaOntologyUri);
+        }
+    }
+    
     @Override
     public void setCurrentSchemaOntologyVersion(final OWLOntologyID schemaOntologyID)
         throws UnmanagedSchemaOntologyIDException, IllegalArgumentException
@@ -167,6 +340,71 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     public void setSesameManager(final PoddSesameManager sesameManager)
     {
         this.sesameManager = sesameManager;
+    }
+    
+    @Override
+    public void uploadSchemaOntologies(final Model model) throws OpenRDFException, IOException, OWLException,
+        PoddException
+    {
+        final Set<URI> schemaOntologyUris = new HashSet<>();
+        for(final Resource nextOntology : model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects())
+        {
+            // Check to see if this is actually a version, in which case ignore it for now
+            if(nextOntology instanceof URI && !model.contains(null, OWL.VERSIONIRI, nextOntology))
+            {
+                schemaOntologyUris.add((URI)nextOntology);
+            }
+        }
+        final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        final ConcurrentMap<URI, Set<URI>> allVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
+        
+        final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
+        
+        for(final URI nextSchemaOntologyUri : schemaOntologyUris)
+        {
+            this.mapCurrentVersion(model, currentVersionsMap, nextSchemaOntologyUri);
+        }
+        
+        for(final URI nextSchemaOntologyUri : schemaOntologyUris)
+        {
+            this.mapAllVersions(model, currentVersionsMap, allVersionsMap, nextSchemaOntologyUri);
+        }
+        
+        for(final URI nextSchemaOntologyUri : schemaOntologyUris)
+        {
+            this.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
+                    nextSchemaOntologyUri);
+        }
+        
+        this.log.info("importOrder: {}", importOrder);
+        
+        this.uploadSchemaOntologiesInOrder(model, importOrder);
+    }
+    
+    /**
+     * @param model
+     * @param importOrder
+     * @throws ModelException
+     * @throws OpenRDFException
+     * @throws IOException
+     * @throws OWLException
+     * @throws PoddException
+     */
+    public void uploadSchemaOntologiesInOrder(final Model model, final List<URI> importOrder) throws ModelException,
+        OpenRDFException, IOException, OWLException, PoddException
+    {
+        for(final URI nextOrderedImport : importOrder)
+        {
+            final String classpathLocation =
+                    model.filter(nextOrderedImport, PoddRdfConstants.PODD_SCHEMA_CLASSPATH, null).objectLiteral()
+                            .stringValue();
+            final RDFFormat format = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
+            try (final InputStream input = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
+            {
+                this.uploadSchemaOntology(input, format);
+            }
+        }
     }
     
     @Override
@@ -246,5 +484,4 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         
     }
-    
 }

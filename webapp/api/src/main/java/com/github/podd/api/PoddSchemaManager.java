@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- /**
+/**
  * 
  */
 package com.github.podd.api;
@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
@@ -170,6 +171,20 @@ public interface PoddSchemaManager
      *            The PoddSesameManager
      */
     void setSesameManager(PoddSesameManager sesameManager);
+    
+    /**
+     * Uploads schema ontologies to the schema manager using the RDF statements in the manifest
+     * {@link Model}. This method must do its best to arrange for the schema ontologies to be
+     * uploaded in order of their imports.
+     * 
+     * @param manifest
+     *            A Model containing RDF statements describing the schema ontologies to upload.
+     * @throws PoddException
+     * @throws OWLException
+     * @throws IOException
+     * @throws OpenRDFException
+     */
+    void uploadSchemaOntologies(Model manifest) throws OpenRDFException, IOException, OWLException, PoddException;
     
     /**
      * Loads a Schema Ontology into the internal repository, computes inferences on the schema
