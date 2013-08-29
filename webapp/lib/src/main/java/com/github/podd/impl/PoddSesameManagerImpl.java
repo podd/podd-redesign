@@ -236,10 +236,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public List<InferredOWLOntologyID> getAllSchemaOntologyVersions(final RepositoryConnection repositoryConnection,
+    public Set<InferredOWLOntologyID> getAllSchemaOntologyVersions(final RepositoryConnection repositoryConnection,
             final URI schemaManagementGraph) throws OpenRDFException
     {
-        final List<InferredOWLOntologyID> returnList = new ArrayList<InferredOWLOntologyID>();
+        final Set<InferredOWLOntologyID> returnList = new HashSet<InferredOWLOntologyID>();
         final StringBuilder sb = new StringBuilder();
         
         sb.append("SELECT ?ontologyIri ?cv ?civ WHERE { ");
@@ -754,7 +754,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         return queryResults;
     }
-
+    
     /**
      * Given an object URI, this method attempts to retrieve its label (rdfs:label) and description
      * (rdfs:comment) encapsulated in a <code>PoddObjectLabel</code> instance.
@@ -969,8 +969,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         owlRestrictionQuery.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onClass> ?owlClass } . ");
         owlRestrictionQuery.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#onDataRange> ?valueRange } . ");
         
-        
-        
         if(!includeDoNotDisplayProperties)
         {
             owlRestrictionQuery.append(" FILTER NOT EXISTS { ?propertyUri <"
@@ -1033,8 +1031,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         switch(containsPropertyPolicy)
         {
             case EXCLUDE_CONTAINS:
-                rdfsQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue()
-                        + "> <" + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
+                rdfsQuery.append("FILTER NOT EXISTS { ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                        + PoddRdfConstants.PODD_BASE_CONTAINS.stringValue() + "> } ");
                 break;
             
             case ONLY_CONTAINS:
@@ -1045,7 +1043,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             default:
                 // do nothing. everything will be included
         }
-
+        
         rdfsQuery.append("}");
         
         final GraphQuery rdfsGraphQuery =
@@ -1058,12 +1056,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         results.addAll(rdfsQueryResults);
         
         properties.addAll(rdfsQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
-
+        
         /*
          * If no properties could be found so far, return the empty Model. Continuing further
          * results in erroneously adding statements about RDFS:Label and RDFS:Comment.
          */
-        if (properties.isEmpty())
+        if(properties.isEmpty())
         {
             return results;
         }
@@ -1071,7 +1069,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         /*
          * add statements for annotation properties RDFS:Label and RDFS:Comment
          */
-        if (containsPropertyPolicy != MetadataPolicy.ONLY_CONTAINS)
+        if(containsPropertyPolicy != MetadataPolicy.ONLY_CONTAINS)
         {
             final URI[] commonAnnotationProperties = { RDFS.LABEL, RDFS.COMMENT };
             for(URI annotationProperty : commonAnnotationProperties)
@@ -1165,7 +1163,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     results.add((URI)property, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY,
                             PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE);
                 }
-                    
+                
                 // --- for 'drop-down' type properties, add all possible options into Model
                 if(results.contains((URI)property, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE,
                         PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN))
@@ -1176,7 +1174,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                         
                         if(nextRangeTypes.isEmpty())
                         {
-                            // see if restriction exists with owl:onClass 
+                            // see if restriction exists with owl:onClass
                             nextRangeTypes =
                                     results.filter(nextRestriction,
                                             PoddRdfConstants.VF.createURI("http://www.w3.org/2002/07/owl#onClass"),
@@ -1963,7 +1961,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         else
         {
-            final List<InferredOWLOntologyID> allSchemaOntologyVersions =
+            final Set<InferredOWLOntologyID> allSchemaOntologyVersions =
                     this.getAllSchemaOntologyVersions(repositoryConnection, schemaManagementGraph);
             for(final InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
             {

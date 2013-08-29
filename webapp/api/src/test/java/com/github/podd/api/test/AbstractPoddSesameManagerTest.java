@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -161,7 +162,7 @@ public abstract class AbstractPoddSesameManagerTest
     {
         return this.loadSchemaOntologies(testRepositoryConnection);
     }
-
+    
     /**
      * Load all PODD schema ontologies and their inferred statements into the given
      * RepositoryConnection.
@@ -415,8 +416,8 @@ public abstract class AbstractPoddSesameManagerTest
     {
         this.populateSchemaManagementGraph();
         
-        final List<IRI> expectedIriList =
-                Arrays.asList(IRI.create("http://purl.org/podd/ns/poddBase"),
+        final Set<IRI> expectedIriList =
+                new HashSet<>(Arrays.asList(IRI.create("http://purl.org/podd/ns/poddBase"),
                         IRI.create("http://purl.org/podd/ns/version/poddBase/1"),
                         IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddBase/1"),
                         IRI.create("http://purl.org/podd/ns/poddScience"),
@@ -424,9 +425,9 @@ public abstract class AbstractPoddSesameManagerTest
                         IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddScience/43"),
                         IRI.create("http://purl.org/podd/ns/poddPlant"),
                         IRI.create("http://purl.org/podd/ns/version/poddPlant/2"),
-                        IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2"));
+                        IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2")));
         
-        final List<InferredOWLOntologyID> allSchemaOntologyVersions =
+        final Set<InferredOWLOntologyID> allSchemaOntologyVersions =
                 this.testPoddSesameManager
                         .getAllSchemaOntologyVersions(this.testRepositoryConnection, this.schemaGraph);
         
@@ -464,14 +465,15 @@ public abstract class AbstractPoddSesameManagerTest
                         ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasControl"),
                         ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasWildType"),
                         ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"),
-                };
+                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"), };
         
         final URI[][] expectedMembers =
                 {
                         {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType_Software"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType_Hardware"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "PlatformType_Software"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "PlatformType_Hardware"),
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
                                         "PlatformType_HardwareSoftware") },
                         
@@ -506,16 +508,18 @@ public abstract class AbstractPoddSesameManagerTest
                                         "WildType_NotApplicable"),
                                 ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
                                         "WildType_Unknown") },
-                                        
+                        
                         {
-                            ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "ANZSRC-NotApplicable"),
-                            ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT, "ANZSRC06-Biological-Sciences"),
-                            ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT,
-                                    "ANZSRC07-Agriculture-and-Veterinary-Sciences") },
-                                    
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT,
+                                        "ANZSRC-NotApplicable"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT,
+                                        "ANZSRC06-Biological-Sciences"),
+                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT,
+                                        "ANZSRC07-Agriculture-and-Veterinary-Sciences") },
+                        
                         {}, // IMPORTANT: <poddScience:Platform> is not a Collection
-                                    
-                        };
+                        
+                };
         
         // iterate through test data
         for(int i = 0; i < collectionsToTest.length; i++)
@@ -1041,14 +1045,13 @@ public abstract class AbstractPoddSesameManagerTest
             contexts.add(nextDirectImport.toOpenRDFURI());
         }
         
-        
         // Format: Object Type, includeDoNotDisplayProperties, includeContainsSubProperties,
         // expected model size, expected property count, do-not-display statement count
         final Object[][] testData =
                 {
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "NoSuchObjectType"), false,
                                 MetadataPolicy.INCLUDE_ALL, 0, -1, 0 },
-                                
+                        
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.INCLUDE_ALL, 142, 17, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
@@ -1076,27 +1079,27 @@ public abstract class AbstractPoddSesameManagerTest
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
                                 MetadataPolicy.INCLUDE_ALL, 77, 9, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
-                            MetadataPolicy.INCLUDE_ALL, 110, 14, 4 },
+                                MetadataPolicy.INCLUDE_ALL, 110, 14, 4 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 17, 2, 0 },
-
+                        
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Material"), false,
-                            MetadataPolicy.INCLUDE_ALL, 205, 22, 0 },
-                                    
+                                MetadataPolicy.INCLUDE_ALL, 205, 22, 0 },
+                
                 };
         
         for(final Object[] element : testData)
         {
             final URI objectType = (URI)element[0];
             final boolean includeDoNotDisplayProperties = (Boolean)element[1];
-            final MetadataPolicy policy = (MetadataPolicy) element[2];
+            final MetadataPolicy policy = (MetadataPolicy)element[2];
             final int expectedTripleCount = (int)element[3];
             final int expectedPropertyCount = (int)element[4];
             final int expectedNonDisplayablePropertyCount = (int)element[5];
             
             final Model model =
-                    this.testPoddSesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties,
-                            policy, this.testRepositoryConnection, contexts.toArray(new URI[0]));
+                    this.testPoddSesameManager.getObjectTypeMetadata(objectType, includeDoNotDisplayProperties, policy,
+                            this.testRepositoryConnection, contexts.toArray(new URI[0]));
             
             if(expectedTripleCount != model.size())
             {
@@ -1107,11 +1110,11 @@ public abstract class AbstractPoddSesameManagerTest
             Assert.assertEquals("Not the expected statement count in Model", expectedTripleCount, model.size());
             Assert.assertEquals("Not the expected no. of properties", expectedPropertyCount,
                     model.filter(objectType, null, null).size() - 1);
-            Assert.assertEquals("Not the expected no. of non-displayable properties", expectedNonDisplayablePropertyCount,
+            Assert.assertEquals("Not the expected no. of non-displayable properties",
+                    expectedNonDisplayablePropertyCount,
                     model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
     }
-
     
     /**
      * Test method for
@@ -1165,7 +1168,7 @@ public abstract class AbstractPoddSesameManagerTest
                     model.filter(null, OWL.ALLVALUESFROM, null).objects().size());
         }
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSesameManager#getObjectTypes(InferredOWLOntologyID, URI, RepositoryConnection)}
@@ -1391,7 +1394,7 @@ public abstract class AbstractPoddSesameManagerTest
                         "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
                         "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
                         "http://purl.org/podd/ns/poddScience#WildType_NotApplicable", // NOT a PODD
-                                                                                    // Object
+                                                                                      // Object
                 };
         
         final Object[][] expectedResults =
@@ -1467,7 +1470,7 @@ public abstract class AbstractPoddSesameManagerTest
                 {
                         { "http://purl.org/podd/basic-1-20130206/object:2966", 0, "" },
                         { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 1,
-                        "http://purl.org/podd/basic-1-20130206/object:2966" },
+                                "http://purl.org/podd/basic-1-20130206/object:2966" },
                         { "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype", 1,
                                 "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Material" },
                         { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 1,
@@ -1730,17 +1733,15 @@ public abstract class AbstractPoddSesameManagerTest
                 this.testPoddSesameManager.versionAndSchemaContexts(nextOntologyID, this.testRepositoryConnection,
                         this.schemaGraph);
         final List<URI> orderedPropertyUris =
-                this.testPoddSesameManager.getWeightedProperties(internalObjectUri, false, this.testRepositoryConnection,
-                        contexts);
+                this.testPoddSesameManager.getWeightedProperties(internalObjectUri, false,
+                        this.testRepositoryConnection, contexts);
         
         // verify:
         Assert.assertEquals("Incorrect number of statements about Internal Object", 4, orderedPropertyUris.size());
         
         final String[] expectedUris =
-                { "http://purl.org/podd/ns/poddScience#hasAbstract", 
-                        "http://purl.org/podd/ns/poddScience#publishedIn",
-                        "http://purl.org/podd/ns/poddScience#hasYear", 
-                        "http://purl.org/dc/terms/creator", };
+                { "http://purl.org/podd/ns/poddScience#hasAbstract", "http://purl.org/podd/ns/poddScience#publishedIn",
+                        "http://purl.org/podd/ns/poddScience#hasYear", "http://purl.org/dc/terms/creator", };
         for(int i = 0; i < orderedPropertyUris.size(); i++)
         {
             Assert.assertEquals("Property URI not in expected position",
@@ -1785,8 +1786,7 @@ public abstract class AbstractPoddSesameManagerTest
                         "http://purl.org/podd/ns/poddScience#hasProcess",
                         "http://purl.org/podd/ns/poddScience#hasProjectPlan",
                         "http://purl.org/podd/ns/poddScience#hasPublication",
-                        "http://purl.org/podd/ns/poddScience#hasANZSRC", 
-                        "http://purl.org/podd/ns/poddBase#createdAt",
+                        "http://purl.org/podd/ns/poddScience#hasANZSRC", "http://purl.org/podd/ns/poddBase#createdAt",
                         "http://purl.org/dc/terms/creator", };
         for(int i = 0; i < orderedPropertyUris.size(); i++)
         {
@@ -1829,8 +1829,7 @@ public abstract class AbstractPoddSesameManagerTest
         final String[] expectedUris =
                 { "http://purl.org/podd/ns/poddBase#hasLeadInstitution",
                         "http://purl.org/podd/ns/poddBase#hasStartDate",
-                        "http://purl.org/podd/ns/poddScience#hasANZSRC", 
-                        "http://purl.org/podd/ns/poddBase#createdAt",
+                        "http://purl.org/podd/ns/poddScience#hasANZSRC", "http://purl.org/podd/ns/poddBase#createdAt",
                         "http://purl.org/dc/terms/creator", };
         for(int i = 0; i < orderedPropertyUris.size(); i++)
         {

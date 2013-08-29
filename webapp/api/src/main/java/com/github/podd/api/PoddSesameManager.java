@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- /**
+/**
  * 
  */
 package com.github.podd.api;
@@ -61,15 +61,14 @@ public interface PoddSesameManager
      */
     void deleteOntologies(Collection<InferredOWLOntologyID> requestedArtifactIds,
             RepositoryConnection repositoryConnection, URI ontologyManagementGraph) throws OpenRDFException;
-
     
     /**
      * This method attempts to find the labels for a given collection of URIs. If a label could not
      * be found, the statement is removed from the returned Model.
      * 
      * @param inputModel
-     *            A {@link Model} containing a collection of statements of the form
-     *            {&lt;subject&gt; &lt;rdfs:label&gt; "?blank"}.
+     *            A {@link Model} containing a collection of statements of the form {&lt;subject&gt;
+     *            &lt;rdfs:label&gt; "?blank"}.
      * @param repositoryConnection
      * @param contexts
      * @return A {@link Model} containing the labels.
@@ -106,7 +105,7 @@ public interface PoddSesameManager
      * 
      * @since 14/05/2013
      */
-    List<InferredOWLOntologyID> getAllSchemaOntologyVersions(RepositoryConnection repositoryConnection,
+    Set<InferredOWLOntologyID> getAllSchemaOntologyVersions(RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
     
     List<URI> getAllValidMembers(InferredOWLOntologyID artifactID, URI conceptUri,
@@ -260,7 +259,7 @@ public interface PoddSesameManager
      * @since 24/06/2013
      */
     Model getObjectTypeContainsMetadata(URI objectType, RepositoryConnection repositoryConnection, URI... contexts)
-            throws OpenRDFException;
+        throws OpenRDFException;
     
     /**
      * <p>
@@ -273,7 +272,7 @@ public interface PoddSesameManager
      * @param includeDoNotDisplayProperties
      *            If true, properties that have been annotated as "Do Not Display" are also included
      * @param containsPropertyPolicy
-     *            Indicates policy regards types of properties to include in metadata 
+     *            Indicates policy regards types of properties to include in metadata
      * @param repositoryConnection
      * @param contexts
      *            The contexts from which metadata is to be retrieved
@@ -334,8 +333,8 @@ public interface PoddSesameManager
             URI managementGraph) throws OpenRDFException;
     
     /**
-     * This method identifies the given object's parent and the parent-child linking property.
-     * If the object URI is null, an empty Model is returned.
+     * This method identifies the given object's parent and the parent-child linking property. If
+     * the object URI is null, an empty Model is returned.
      * 
      * @param objectUri
      *            The Object whose parent is sought
@@ -347,8 +346,8 @@ public interface PoddSesameManager
      * 
      * @since 18/06/2013
      */
-    Model getParentDetails(URI objectUri, RepositoryConnection repositoryConnection,
-            URI... contexts) throws OpenRDFException;
+    Model getParentDetails(URI objectUri, RepositoryConnection repositoryConnection, URI... contexts)
+        throws OpenRDFException;
     
     /**
      * If the given IRI represents a version IRI of a schema ontology, the Ontology ID for this
@@ -386,6 +385,7 @@ public interface PoddSesameManager
      * included in the results.
      * 
      * Properties with an annotation poddBase:doNotDisplay are also not included in the results.
+     * 
      * @param objectUri
      *            The object whose properties are sought
      * @param excludeContainsProperties
@@ -488,5 +488,5 @@ public interface PoddSesameManager
     
     URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
-
+    
 }

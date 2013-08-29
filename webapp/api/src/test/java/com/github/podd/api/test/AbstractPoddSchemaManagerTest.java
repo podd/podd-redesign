@@ -18,6 +18,7 @@ package com.github.podd.api.test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -1013,6 +1014,19 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         
         // TODO: verify
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     */
+    @Test
+    public final void testUploadSchemaOntologies() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        
+        Assert.assertEquals(6, schemaOntologies.size());
     }
     
 }
