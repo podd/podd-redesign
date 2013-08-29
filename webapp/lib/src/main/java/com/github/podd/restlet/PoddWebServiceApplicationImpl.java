@@ -452,13 +452,14 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public Model getAliasesConfiguration()
+    public Model getAliasesConfiguration(PropertyUtil propertyUtil)
     {
         // If the aliasConfiguration is empty then populate it with the default aliases here
         if(this.aliasesConfiguration.isEmpty())
         {
             try (final InputStream input =
-                    ApplicationUtils.class.getResourceAsStream(PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE))
+                    ApplicationUtils.class.getResourceAsStream(propertyUtil.get(PoddRdfConstants.KEY_ALIASES,
+                            PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE));)
             {
                 this.setAliasesConfiguration(Rio.parse(input, "", RDFFormat.TURTLE));
             }

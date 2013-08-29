@@ -65,7 +65,7 @@ public abstract class PoddWebServiceApplication extends Application
      */
     public abstract boolean authenticate(PoddAction action, Request request, Response response, URI optionalObjectUri);
     
-    public abstract Model getAliasesConfiguration();
+    public abstract Model getAliasesConfiguration(PropertyUtil propertyUtil);
     
     /**
      * 

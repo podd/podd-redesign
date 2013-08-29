@@ -141,7 +141,8 @@ public class PoddRestletIntegrationTestComponent extends Component
         {
             nextApplication = new PoddWebServiceApplicationImpl();
             
-            String resetKey = new PropertyUtil("podd").get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
+            String resetKey =
+                    nextApplication.getPropertyUtil().get(PoddWebConstants.PROPERTY_TEST_WEBSERVICE_RESET_KEY, "");
             // Add a route for the reset service.
             final String resetPath = "/reset/" + resetKey;
             this.log.info("attaching reset service to path={}", resetPath);
@@ -153,15 +154,15 @@ public class PoddRestletIntegrationTestComponent extends Component
             // attach the web services application
             this.getDefaultHost().attach("/", nextApplication);
             
-            nextApplication.setAliasesConfiguration(Rio.parse(this.getClass().getResourceAsStream("/test-alias.ttl"),
-                    "", RDFFormat.TURTLE));
+            // nextApplication.setAliasesConfiguration(Rio.parse(this.getClass().getResourceAsStream("/test-alias.ttl"),
+            // "", RDFFormat.TURTLE));
             
             // setup the application after attaching it, as it requires Application.getContext() to
             // not be null during the setup process
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
             ApplicationUtils.setupTestUser(nextApplication);
         }
-        catch(final OpenRDFException | UnsupportedRDFormatException | IOException e)
+        catch(final OpenRDFException | UnsupportedRDFormatException e)
         {
             throw new RuntimeException("Could not setup application", e);
         }
