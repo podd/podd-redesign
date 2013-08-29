@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- package com.github.podd.resources.test;
+package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -95,10 +95,10 @@ public class AbstractResourceImplTest
     public TemporaryFolder tempDirectory = new TemporaryFolder();
     
     /**
-     * Timeout tests after 600 seconds.
+     * Timeout tests after 60 seconds.
      */
     @Rule
-    public Timeout timeout = new Timeout(600000);
+    public Timeout timeout = new Timeout(60000);
     
     /**
      * The set of ports that have been used in tests so far in this virtual machine.
@@ -535,7 +535,7 @@ public class AbstractResourceImplTest
             nextContext.getParameters().add("lowThreads", "145");
             nextContext.getParameters().add("maxQueued", "100");
             nextContext.getParameters().add("maxTotalConnections", "100");
-            //nextContext.getParameters().add("maxIoIdleTimeMs", "100");
+            // nextContext.getParameters().add("maxIoIdleTimeMs", "100");
         }
     }
     
