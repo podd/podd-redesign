@@ -768,6 +768,30 @@ public abstract class AbstractPoddSchemaManagerTest
         Assert.assertEquals(6, schemaOntologies.size());
     }
 
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Tests with a schema-manifest where imports are specified as Ontology IRIs and not version
+     * IRIs.
+     */
+    @Test
+    public final void testUploadSchemaOntologiesWithOntologyIRIImportsInvalid() throws Exception
+    {
+        /*
+         * NOTE:
+         * The test manifest has 1 version each of dcTerms and foaf with both import statements
+         * specifying Ontology IRIs instead of their version IRIs.
+         * 
+         * Imports sorting is incorrect and therefore loading fails.
+         */
+        
+        final String schemaManifest = "/test/bad-schema-manifest-imports-ontology-iris.ttl";
+        this.loadSchemaOntologies(schemaManifest);
+        
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        Assert.assertEquals(2, schemaOntologies.size());
+    }
+
     // testUploadSchemaOntologies??
     
     /**
