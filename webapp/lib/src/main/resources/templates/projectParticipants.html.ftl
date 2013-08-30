@@ -48,13 +48,10 @@
 	
 		$("#pi_input_div").hide();
 	
-		$("#pi_change").click(function(event) {
-			event.preventDefault();
+		$("#pi_label_div span").mouseover(function () {
 			$("#pi_label_div").hide();
-			var input = $("#pi_input_div"); 
-			input.show();
-			input.focus();
-			input.selectionStart = input.selectionEnd = input.val().length;
+			$("#pi_input_div").show();
+			$("#pi_input_div input").focus();
 		});
 	
 		var deleteLink = $(".deleteLinkStatic");
@@ -145,7 +142,7 @@
 		                	<input autocomplete="off" class="wide ac_input" id="pi" name="pi" value="${piLabel!""}">
 		                </div>
 		                <div id="pi_label_div">
-		                	<span>${piLabel!""}&nbsp;</span><a id="pi_change" class="changeLink" href="">change</a>
+		                	<span>${piLabel!""}&nbsp;</span>
 		                </div>
 		                
 		                <input type="hidden" id="pi_hidden" name="pi_hidden" value="${piIdentifier!""}">
