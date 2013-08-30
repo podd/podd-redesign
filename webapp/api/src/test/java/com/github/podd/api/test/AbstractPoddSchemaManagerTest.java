@@ -34,6 +34,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.UnloadableImportException;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
@@ -702,6 +703,72 @@ public abstract class AbstractPoddSchemaManagerTest
         
         Assert.assertEquals(6, schemaOntologies.size());
     }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Tests loading a collection of schemas with multiple versions
+     */
+    @Test
+    public final void testUploadSchemaOntologiesWithMultipleVersions() throws Exception
+    {
+        final String schemaManifest = "/test/schema-manifest-multiple-versions.ttl";
+        this.loadSchemaOntologies(schemaManifest);
+        
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        Assert.assertEquals(6, schemaOntologies.size());        
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Invalid schema-manifest with a non-current version of poddUser imported
+     */
+    @Test
+    public final void testUploadSchemaOntologiesWithNonCurrentVersionImport() throws Exception
+    {
+        // prepare: load invalid test schema-manifest file
+        final String schemaManifest = "/test/bad-schema-manifest-import-oldversion.ttl";
+        Model model = null;
+        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
+        {
+            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+            model = Rio.parse(schemaManifestStream, "", format);
+        }
+        
+        try
+        {
+            this.testSchemaManager.uploadSchemaOntologies(model);
+            Assert.fail("Should have failed to load schema ontologies");
+        }
+        catch(UnloadableImportException e)
+        {
+            Assert.assertTrue("Exception not due to poddUser v1",
+                    e.getMessage().contains("http://purl.org/podd/ns/version/poddUser/1"));
+        }
+        
+        // verify: no schema ontologies have been loaded
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        Assert.assertEquals(0, schemaOntologies.size());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Tests with a schema-manifest where imports are specified as Ontology IRIs and not version
+     * IRIs.
+     */
+    @Test
+    public final void testUploadSchemaOntologiesWithOntologyIRIImports() throws Exception
+    {
+        final String schemaManifest = "/test/schema-manifest-imports-ontology-iris.ttl";
+        this.loadSchemaOntologies(schemaManifest);
+        
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        Assert.assertEquals(6, schemaOntologies.size());
+    }
+
+    // testUploadSchemaOntologies??
     
     /**
      * Test method for
