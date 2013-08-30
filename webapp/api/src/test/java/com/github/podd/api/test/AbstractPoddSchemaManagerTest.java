@@ -774,6 +774,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * Tests with a schema-manifest where imports are specified as Ontology IRIs and not version
      * IRIs.
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologiesWithOntologyIRIImportsInvalid() throws Exception
     {
