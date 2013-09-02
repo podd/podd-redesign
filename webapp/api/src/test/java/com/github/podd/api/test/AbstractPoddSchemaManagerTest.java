@@ -848,6 +848,42 @@ public abstract class AbstractPoddSchemaManagerTest
         Assert.assertEquals(0, schemaOntologies.size());
     }
 
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Tests with a schema-manifest where imports are specified under Ontology IRIs.
+     * 
+     */
+    @Test
+    public final void testUploadSchemaOntologiesInvalidManifestFormat() throws Exception
+    {
+        // prepare: load invalid test schema-manifest file
+        final String schemaManifest = "/test/bad-schema-manifest-format.ttl";
+        Model model = null;
+        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
+        {
+            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+            model = Rio.parse(schemaManifestStream, "", format);
+        }
+        
+        try
+        {
+            this.testSchemaManager.uploadSchemaOntologies(model);
+            Assert.fail("Should have failed to load schema ontologies");
+        }
+        catch(SchemaManifestException e)
+        {
+            Assert.assertTrue("Not the expected Exception", e.getMessage().contains("Imports should be associated with version IRI"));
+            Assert.assertEquals("Failure not due to expected ontology", "http://example.org/podd/ns/poddB", e
+                    .getSchemaOntologyIRI().toString());
+        }
+        
+        // verify: no schema ontologies have been loaded
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        Assert.assertEquals(0, schemaOntologies.size());
+    }
+
+    
     @Test
     public final void testUploadSchemaOntologiesMissingCurrentVersionIRI() throws Exception
     {

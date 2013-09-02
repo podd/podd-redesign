@@ -390,7 +390,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         final Set<URI> schemaVersionUris = new HashSet<>();
         for(final Resource nextOntology : model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects())
         {
-            // Check to see if this is actually a version, in which case ignore it for now
             if(nextOntology instanceof URI)
             {
                 if(model.contains(null, OWL.VERSIONIRI, nextOntology))
@@ -400,6 +399,12 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 else
                 {
                     schemaOntologyUris.add((URI)nextOntology);
+                    // check ontology IRI does not have any associated owl:imports
+                    if(model.filter((URI)nextOntology, OWL.IMPORTS, null).objects().size() > 0)
+                    {
+                        throw new SchemaManifestException(IRI.create((URI)nextOntology),
+                                "Imports should be associated with version IRI");
+                    }
                 }
             }
         }
