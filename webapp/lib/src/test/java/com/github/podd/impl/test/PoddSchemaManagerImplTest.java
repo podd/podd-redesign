@@ -101,7 +101,7 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         }
         
         // prepare: order of imports
-        final String[] testImportOrderString = {
+        final String[] testImportOrderArray = {
                 "http://example.org/podd/ns/version/poddA/1", 
                 "http://example.org/podd/ns/version/poddB/2",
                 "http://example.org/podd/ns/version/poddB/1",
@@ -111,26 +111,27 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
 
         //Order: A1, B2, C2, B1, C1 fails. Is it correct?
         
-        List<URI> testImportOrder = new ArrayList<>();
-        for (String s : testImportOrderString)
+        final List<URI> testImportOrder = new ArrayList<>();
+        for (final String s : testImportOrderArray)
         {
             testImportOrder.add(PoddRdfConstants.VF.createURI(s));
         }
+        
         
         ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
         
         
         // verify: schemas successfully loaded
         final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
-        Assert.assertEquals("Expected 3 distinct schema ontologies", 3, schemaOntologies.size());
+        Assert.assertEquals("Expected 3 schema ontologies", 3, schemaOntologies.size());
         
         // verify: iterate through to ensure all versions exist
         int versionCount = 0;
-        for (String versionIri : testImportOrderString)
+        for (final String versionIri : testImportOrderArray)
         {
-            InferredOWLOntologyID schemaOntologyVersion = this.testSchemaManager.getSchemaOntologyVersion(IRI.create(versionIri));
+            final InferredOWLOntologyID schemaOntologyVersion = this.testSchemaManager.getSchemaOntologyVersion(IRI.create(versionIri));
+            Assert.assertTrue(schemaOntologyVersion != null);
             versionCount++;
-            System.out.println(schemaOntologyVersion);
         }
         Assert.assertEquals("Expected 5 distinct schema ontology versions", 5, versionCount);
     }
