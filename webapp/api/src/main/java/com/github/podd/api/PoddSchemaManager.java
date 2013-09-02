@@ -163,6 +163,7 @@ public interface PoddSchemaManager
      * 
      * @param owlManager
      *            The PoddOWLManager
+     * @deprecated We should not be passing across references to a shared PoddOWLManager.
      */
     void setOwlManager(PoddOWLManager owlManager);
     
