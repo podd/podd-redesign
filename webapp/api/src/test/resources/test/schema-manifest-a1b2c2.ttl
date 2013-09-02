@@ -38,7 +38,7 @@
 				<http://example.org/podd/ns/version/poddB/1> .
 
 <http://example.org/podd/ns/version/poddC/2> a owl:Ontology ;
-    <http://purl.org/podd/ns/schema#classpath> "/test/ontologies/version/2/c2.owl" ;
+    <http://purl.org/podd/ns/schema#classpath> "/test/ontologies/version/2/c2.2.owl" ;
 	owl:imports <http://example.org/podd/ns/version/poddA/1> ,
 				<http://example.org/podd/ns/version/poddB/2> .
     

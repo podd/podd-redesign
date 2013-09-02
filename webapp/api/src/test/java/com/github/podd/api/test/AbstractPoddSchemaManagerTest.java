@@ -741,7 +741,8 @@ public abstract class AbstractPoddSchemaManagerTest
     /**
      * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
      * 
-     * Loads a set of test ontologies that each have a single class. 
+     * Loads a set of test ontologies that each have a single class. Schema ontology versions loaded
+     * are: Av1, Bv1, Cv1 and Cv2 (Cv2 is the current version of C).
      */
     @Test
     public final void testUploadSchemaOntologiesA1B1C2() throws Exception
@@ -751,17 +752,20 @@ public abstract class AbstractPoddSchemaManagerTest
         final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
         
         Assert.assertEquals(3, schemaOntologies.size());
+        
+        // verify: older version of poddC is also present in repository
+        final InferredOWLOntologyID poddC1 =
+                this.testSchemaManager.getSchemaOntologyVersion(IRI
+                        .create("http://example.org/podd/ns/version/poddC/1"));
+        Assert.assertNotNull(poddC1);
     }
 
     /**
      * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
      * 
-     * Loads a set of test ontologies that each have a single class.
-     * Ontologies B and C have two versions each.
-     * 
-     * FIXME: test fails at present
+     * Loads a set of test ontologies that each have a single class. Ontologies B and C have two
+     * versions each.
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologiesA1B2C2() throws Exception
     {
