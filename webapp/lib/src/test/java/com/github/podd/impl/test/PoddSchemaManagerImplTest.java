@@ -16,6 +16,18 @@
  */
 package com.github.podd.impl.test;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.openrdf.model.Model;
+import org.openrdf.model.URI;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -30,6 +42,8 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.PoddSchemaManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
+import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 
 /**
  * @author Peter Ansell p_ansell@yahoo.com
@@ -72,5 +86,52 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     {
         return OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
     }
+   
     
+    @Test
+    public void testUploadSchemaOntologiesInOrder() throws Exception
+    {
+        // prepare: Model containing schema-manifest
+        final String schemaManifest = "/test/schema-manifest-a1b2c2.ttl";
+        Model model = null;
+        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
+        {
+            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
+            model = Rio.parse(schemaManifestStream, "", format);
+        }
+        
+        // prepare: order of imports
+        final String[] testImportOrderString = {
+                "http://example.org/podd/ns/version/poddA/1", 
+                "http://example.org/podd/ns/version/poddB/2",
+                "http://example.org/podd/ns/version/poddB/1",
+                "http://example.org/podd/ns/version/poddC/2", 
+                "http://example.org/podd/ns/version/poddC/1", 
+            };
+
+        //Order: A1, B2, C2, B1, C1 fails. Is it correct?
+        
+        List<URI> testImportOrder = new ArrayList<>();
+        for (String s : testImportOrderString)
+        {
+            testImportOrder.add(PoddRdfConstants.VF.createURI(s));
+        }
+        
+        ((PoddSchemaManagerImpl)this.testSchemaManager).uploadSchemaOntologiesInOrder(model, testImportOrder);
+        
+        
+        // verify: schemas successfully loaded
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        Assert.assertEquals("Expected 3 distinct schema ontologies", 3, schemaOntologies.size());
+        
+        // verify: iterate through to ensure all versions exist
+        int versionCount = 0;
+        for (String versionIri : testImportOrderString)
+        {
+            InferredOWLOntologyID schemaOntologyVersion = this.testSchemaManager.getSchemaOntologyVersion(IRI.create(versionIri));
+            versionCount++;
+            System.out.println(schemaOntologyVersion);
+        }
+        Assert.assertEquals("Expected 5 distinct schema ontology versions", 5, versionCount);
+    }
 }
