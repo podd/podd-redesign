@@ -757,6 +757,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * 
      * Tests loading a collection of schemas with multiple versions
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologiesWithMultipleVersions() throws Exception
     {
@@ -772,6 +773,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * 
      * Invalid schema-manifest with a non-current version of poddUser imported
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologiesWithNonCurrentVersionImport() throws Exception
     {
@@ -806,6 +808,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * Tests with a schema-manifest where imports are specified as Ontology IRIs and not version
      * IRIs.
      */
+    @Ignore
     @Test
     public final void testUploadSchemaOntologiesWithOntologyIRIImports1() throws Exception
     {
