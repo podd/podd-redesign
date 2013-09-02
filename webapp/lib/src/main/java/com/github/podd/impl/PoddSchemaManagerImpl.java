@@ -53,6 +53,7 @@ import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedSchemaException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.exception.UnmanagedSchemaOntologyIDException;
@@ -319,9 +320,10 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @param model
      * @param currentVersionsMap
      * @param nextSchemaOntologyUri
+     * @throws SchemaManifestException 
      */
     public void mapCurrentVersion(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
-            final URI nextSchemaOntologyUri)
+            final URI nextSchemaOntologyUri) throws SchemaManifestException
     {
         try
         {
@@ -331,6 +333,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             if(nextCurrentVersionURI == null)
             {
                 this.log.error("Did not find a current version for schema ontology: {}", nextSchemaOntologyUri);
+                throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
+                        "Did not find a current version for schema ontology");
             }
             else
             {
@@ -339,6 +343,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 {
                     this.log.error("Found multiple version URIs for schema ontology: {} old={} new={}",
                             nextSchemaOntologyUri, putIfAbsent, nextCurrentVersionURI);
+                    throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
+                            "Found multiple version IRIs for schema ontology");
                 }
             }
         }
@@ -346,6 +352,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         {
             this.log.error("Could not find a single unique current version for schema ontology: {}",
                     nextSchemaOntologyUri);
+            throw new SchemaManifestException(IRI.create(nextSchemaOntologyUri),
+                    "Could not find a single unique current version IRI for schema ontology");
         }
     }
     
