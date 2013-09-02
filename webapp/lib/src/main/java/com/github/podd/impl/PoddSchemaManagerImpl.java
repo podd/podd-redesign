@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -226,15 +227,15 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @param allVersionsMap
      * @param importsMap
      * @param importOrder
-     * @param nextSchemaOntologyUri
+     * @param nextVersionUri
      */
     public void mapAndSortImports(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
             final ConcurrentMap<URI, Set<URI>> allVersionsMap, final ConcurrentMap<URI, Set<URI>> importsMap,
-            final List<URI> importOrder, final URI nextSchemaOntologyUri)
+            final List<URI> importOrder, final URI nextVersionUri)
     {
-        final Set<Value> imports = model.filter(nextSchemaOntologyUri, OWL.IMPORTS, null).objects();
-        Set<URI> nextImportsSet = new HashSet<>();
-        final Set<URI> putIfAbsent = importsMap.putIfAbsent(nextSchemaOntologyUri, nextImportsSet);
+        final Set<Value> imports = model.filter(nextVersionUri, OWL.IMPORTS, null).objects();
+        Set<URI> nextImportsSet = new LinkedHashSet<>();
+        final Set<URI> putIfAbsent = importsMap.putIfAbsent(nextVersionUri, nextImportsSet);
         if(putIfAbsent != null)
         {
             nextImportsSet = putIfAbsent;
@@ -244,7 +245,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         {
             if(!nextImportsSet.isEmpty())
             {
-                this.log.error("Found inconsistent imports set: {} {}", nextSchemaOntologyUri, nextImportsSet);
+                this.log.error("Found inconsistent imports set: {} {}", nextVersionUri, nextImportsSet);
             }
         }
         else
@@ -253,12 +254,22 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             {
                 if(nextImport instanceof URI)
                 {
+                    if(nextImportsSet.contains(nextImport))
+                    {
+                        // avoid duplicates
+                        continue;
+                    }
+                    
                     if(currentVersionsMap.containsKey(nextImport))
                     {
                         // Map down to the current version to ensure that we can load
                         // multiple versions simultaneously (if possible with the rest of
                         // the system)
                         nextImportsSet.add(currentVersionsMap.get(nextImport));
+                    }
+                    else if(currentVersionsMap.containsValue(nextImport))
+                    {
+                        nextImportsSet.add((URI)nextImport);
                     }
                     else
                     {
@@ -283,7 +294,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                         
                         if(!foundAllVersion)
                         {
-                            this.log.warn("Could not find import: {} imports {}", nextSchemaOntologyUri, nextImport);
+                            this.log.warn("Could not find import: {} imports {}", nextVersionUri, nextImport);
                         }
                         else
                         {
@@ -298,10 +309,10 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 }
             }
         }
-        this.log.info("adding import for {} at {}", nextSchemaOntologyUri, maxIndex);
+        this.log.info("adding import for {} at {}", nextVersionUri, maxIndex);
         // TODO: FIXME: This will not allow for multiple versions of a single schema
         // ontology at the same time
-        importOrder.add(maxIndex, currentVersionsMap.get(nextSchemaOntologyUri));
+        importOrder.add(maxIndex, nextVersionUri);
     }
     
     /**
@@ -368,12 +379,20 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         PoddException
     {
         final Set<URI> schemaOntologyUris = new HashSet<>();
+        final Set<URI> schemaVersionUris = new HashSet<>();
         for(final Resource nextOntology : model.filter(null, RDF.TYPE, OWL.ONTOLOGY).subjects())
         {
             // Check to see if this is actually a version, in which case ignore it for now
-            if(nextOntology instanceof URI && !model.contains(null, OWL.VERSIONIRI, nextOntology))
+            if(nextOntology instanceof URI)
             {
-                schemaOntologyUris.add((URI)nextOntology);
+                if(model.contains(null, OWL.VERSIONIRI, nextOntology))
+                {
+                    schemaVersionUris.add((URI)nextOntology);
+                }
+                else
+                {
+                    schemaOntologyUris.add((URI)nextOntology);
+                }
             }
         }
         final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
@@ -392,10 +411,10 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             this.mapAllVersions(model, currentVersionsMap, allVersionsMap, nextSchemaOntologyUri);
         }
         
-        for(final URI nextSchemaOntologyUri : schemaOntologyUris)
+        for(final URI nextVersionUri : schemaVersionUris)
         {
             this.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
-                    nextSchemaOntologyUri);
+                    nextVersionUri);
         }
         
         this.log.info("importOrder: {}", importOrder);

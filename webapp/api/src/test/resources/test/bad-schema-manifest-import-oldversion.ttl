@@ -17,11 +17,11 @@
 # --- foaf
 <http://purl.org/podd/ns/foaf> a owl:Ontology ;
 	owl:versionIRI <http://purl.org/podd/ns/version/foaf/1> ;
-	omv:currentVersion <http://purl.org/podd/ns/version/foaf/1> ;
-	owl:imports <http://purl.org/podd/ns/version/dcTerms/1>	.
+	omv:currentVersion <http://purl.org/podd/ns/version/foaf/1>	.
 
 <http://purl.org/podd/ns/version/foaf/1> a owl:Ontology ;
-    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/foaf.owl" .
+    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/foaf.owl" ;
+	owl:imports <http://purl.org/podd/ns/version/dcTerms/1> .
 
 
 
@@ -29,28 +29,30 @@
 <http://purl.org/podd/ns/poddUser> a owl:Ontology ;
 	owl:versionIRI <http://purl.org/podd/ns/version/poddUser/1> ;
 	owl:versionIRI <http://purl.org/podd/ns/version/poddUser/2> ;
-	omv:currentVersion <http://purl.org/podd/ns/version/poddUser/2> ;
+	omv:currentVersion <http://purl.org/podd/ns/version/poddUser/2> .
+
+<http://purl.org/podd/ns/version/poddUser/1> a owl:Ontology ;
+    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/poddUser.owl" ;
 	owl:imports <http://purl.org/podd/ns/version/dcTerms/1> ,
         <http://purl.org/podd/ns/version/foaf/1> .
 
-<http://purl.org/podd/ns/version/poddUser/1> a owl:Ontology ;
-    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/poddUser.owl" .
-
 <http://purl.org/podd/ns/version/poddUser/2> a owl:Ontology ;
-    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/poddUser.owl" .
+    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/poddUser.owl" ;
+	owl:imports <http://purl.org/podd/ns/version/dcTerms/1> ,
+        <http://purl.org/podd/ns/version/foaf/1> .
 
 
 
 # --- poddBase
 <http://purl.org/podd/ns/poddBase> a owl:Ontology ;
 	owl:versionIRI <http://purl.org/podd/ns/version/poddBase/1> ;
-	omv:currentVersion <http://purl.org/podd/ns/version/poddBase/1> ; 
+	omv:currentVersion <http://purl.org/podd/ns/version/poddBase/1> .
+
+<http://purl.org/podd/ns/version/poddBase/1> a owl:Ontology ;
+    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/poddBase.owl" ; 
     owl:imports <http://purl.org/podd/ns/version/dcTerms/1> ,
         <http://purl.org/podd/ns/version/foaf/1> ,
         <http://purl.org/podd/ns/version/poddUser/2> .
-
-<http://purl.org/podd/ns/version/poddBase/1> a owl:Ontology ;
-    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/poddBase.owl" .
 
 
 
@@ -60,9 +62,9 @@
 # 
 <http://purl.org/podd/ns/poddScience> a owl:Ontology ;
 	owl:versionIRI <http://purl.org/podd/ns/version/poddScience/1> ;
-	omv:currentVersion <http://purl.org/podd/ns/version/poddScience/1> ;
-	owl:imports <http://purl.org/podd/ns/version/poddUser/1> ,
-        <http://purl.org/podd/ns/version/poddBase/1> .
+	omv:currentVersion <http://purl.org/podd/ns/version/poddScience/1> .
 
 <http://purl.org/podd/ns/version/poddScience/1> a owl:Ontology ;
-    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/poddScience.owl" .
+    <http://purl.org/podd/ns/schema#classpath> "/ontologies/version/1/poddScience.owl" ;
+	owl:imports <http://purl.org/podd/ns/version/poddUser/1> ,
+        <http://purl.org/podd/ns/version/poddBase/1> .

@@ -693,6 +693,9 @@ public abstract class AbstractPoddSchemaManagerTest
     
     /**
      * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Loads the standard set of PODD ontologies that are used.
+     * 
      */
     @Test
     public final void testUploadSchemaOntologies() throws Exception
@@ -704,6 +707,51 @@ public abstract class AbstractPoddSchemaManagerTest
         Assert.assertEquals(6, schemaOntologies.size());
     }
     
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Loads a set of test ontologies that each have a single class. 
+     */
+    @Test
+    public final void testUploadSchemaOntologiesA1B1() throws Exception
+    {
+        this.loadSchemaOntologies("/test/schema-manifest-a1b1.ttl");
+        
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        
+        Assert.assertEquals(2, schemaOntologies.size());
+    }
+
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Loads a set of test ontologies that each have a single class. 
+     */
+    @Test
+    public final void testUploadSchemaOntologiesA1B1C1() throws Exception
+    {
+        this.loadSchemaOntologies("/test/schema-manifest-a1b1c1.ttl");
+        
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        
+        Assert.assertEquals(3, schemaOntologies.size());
+    }
+
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
+     * Loads a set of test ontologies that each have a single class. 
+     */
+    @Test
+    public final void testUploadSchemaOntologiesA1B1C2() throws Exception
+    {
+        this.loadSchemaOntologies("/test/schema-manifest-a1b1c2.ttl");
+        
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        
+        Assert.assertEquals(3, schemaOntologies.size());
+    }
+
     /**
      * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
      * 
@@ -759,9 +807,9 @@ public abstract class AbstractPoddSchemaManagerTest
      * IRIs.
      */
     @Test
-    public final void testUploadSchemaOntologiesWithOntologyIRIImports() throws Exception
+    public final void testUploadSchemaOntologiesWithOntologyIRIImports1() throws Exception
     {
-        final String schemaManifest = "/test/schema-manifest-imports-ontology-iris.ttl";
+        final String schemaManifest = "/test/schema-manifest-imports-ontology-iris-1.ttl";
         this.loadSchemaOntologies(schemaManifest);
         
         final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
@@ -776,7 +824,7 @@ public abstract class AbstractPoddSchemaManagerTest
      */
     @Ignore
     @Test
-    public final void testUploadSchemaOntologiesWithOntologyIRIImportsInvalid() throws Exception
+    public final void testUploadSchemaOntologiesWithOntologyIRIImports2() throws Exception
     {
         /*
          * NOTE:
@@ -786,7 +834,7 @@ public abstract class AbstractPoddSchemaManagerTest
          * Imports sorting is incorrect and therefore loading fails.
          */
         
-        final String schemaManifest = "/test/bad-schema-manifest-imports-ontology-iris.ttl";
+        final String schemaManifest = "/test/schema-manifest-imports-ontology-iris-2.ttl";
         this.loadSchemaOntologies(schemaManifest);
         
         final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
