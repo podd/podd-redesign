@@ -16,7 +16,7 @@
 <http://example.org/podd/ns/B> a owl:Ontology ;
 	owl:versionIRI <http://example.org/podd/ns/version/poddB/1> ;
 	owl:versionIRI <http://example.org/podd/ns/version/poddB/2> ;
-	omv:currentVersion <http://example.org/podd/ns/version/poddB/1> .
+	omv:currentVersion <http://example.org/podd/ns/version/poddB/2> .
 
 <http://example.org/podd/ns/version/poddB/1> a owl:Ontology ;
     <http://purl.org/podd/ns/schema#classpath> "/test/ontologies/version/1/b1.owl" ;
