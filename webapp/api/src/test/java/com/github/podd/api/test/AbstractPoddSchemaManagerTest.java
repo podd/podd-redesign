@@ -57,7 +57,7 @@ import com.github.podd.utils.PoddRdfConstants;
  */
 public abstract class AbstractPoddSchemaManagerTest
 {
-    private PoddSchemaManager testSchemaManager;
+    protected PoddSchemaManager testSchemaManager;
     private PoddOWLManager testOwlManager;
     private PoddRepositoryManager testRepositoryManager;
     private OWLOntologyManager owlapiManager;
