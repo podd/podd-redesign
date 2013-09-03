@@ -807,10 +807,7 @@ public abstract class AbstractPoddSchemaManagerTest
      * 
      * Tests with a schema-manifest where imports are specified as Ontology IRIs and not version
      * IRIs.
-     * 
-     * FIXME: test fails.
      */
-    @Ignore
     @Test
     public final void testUploadSchemaOntologiesInvalidWithOntologyIRIImports() throws Exception
     {
@@ -828,16 +825,13 @@ public abstract class AbstractPoddSchemaManagerTest
             this.testSchemaManager.uploadSchemaOntologies(model);
             Assert.fail("Should have failed to load schema ontologies");
         }
-        catch(UnloadableImportException e)
+        catch(SchemaManifestException e)
         {
-            e.printStackTrace();
-//            Assert.assertTrue("Exception not due to poddUser v1",
-//                    e.getMessage().contains("http://purl.org/podd/ns/version/poddUser/1"));
+            Assert.assertEquals("http://example.org/podd/ns/version/poddB/1", e.getSchemaOntologyIRI().toString());
         }
         
         // verify: no schema ontologies have been loaded
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
-        Assert.assertEquals(0, schemaOntologies.size());
+        Assert.assertEquals(0, this.testSchemaManager.getCurrentSchemaOntologies().size());
     }
 
     /**
