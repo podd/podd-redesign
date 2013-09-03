@@ -37,7 +37,9 @@ import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -430,6 +432,9 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 }
             }
         }
+        
+        this.validateSchemaManifestImports(model, schemaVersionUris);
+        
         final ConcurrentMap<URI, URI> currentVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         final ConcurrentMap<URI, Set<URI>> allVersionsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
         final ConcurrentMap<URI, Set<URI>> importsMap = new ConcurrentHashMap<>(schemaOntologyUris.size());
@@ -559,4 +564,47 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         }
         
     }
+    
+    /**
+     * This method performs a consistency check between the ontology imports specified in the
+     * schema-manifest with the actual imports specified within the ontology.
+     * 
+     * If the two sets of imports are not equal, a {@link SchemaManifestException} is thrown.
+     * 
+     * @param manifestModel
+     *            Contents of the schema-manifest
+     * @param schemaVersionUris
+     *            Ontology Version IRIs to be loaded
+     * @throws IOException
+     * @throws RDFParseException
+     * @throws UnsupportedRDFormatException
+     * @throws SchemaManifestException
+     *             If the imports from the two locations are not consistent
+     */
+    public void validateSchemaManifestImports(final Model manifestModel, final Set<URI> schemaVersionUris)
+        throws IOException, RDFParseException, UnsupportedRDFormatException, SchemaManifestException
+    {
+        for(final URI nextVersionUri : schemaVersionUris)
+        {
+            final Set<Value> importsInManifest = manifestModel.filter(nextVersionUri, OWL.IMPORTS, null).objects();
+            
+            final String classpathLocation =
+                    manifestModel.filter(nextVersionUri, PoddRdfConstants.PODD_SCHEMA_CLASSPATH, null).objectLiteral()
+                            .stringValue();
+            final RDFFormat format = Rio.getParserFormatForFileName(classpathLocation, RDFFormat.RDFXML);
+            try (final InputStream input = ApplicationUtils.class.getResourceAsStream(classpathLocation);)
+            {
+                final Model model = Rio.parse(input, "", format);
+                final Set<Value> importsInOwlFile = model.filter(null, OWL.IMPORTS, null).objects();
+                
+                this.log.debug("Comparing: \n Manifest: {} \n Owl:      {}", importsInManifest, importsInOwlFile);
+                if(!importsInManifest.equals(importsInOwlFile))
+                {
+                    throw new SchemaManifestException(IRI.create(nextVersionUri),
+                            "Schema manifest imports not consistent with actual imports");
+                }
+            }
+        }
+    }
+    
 }
