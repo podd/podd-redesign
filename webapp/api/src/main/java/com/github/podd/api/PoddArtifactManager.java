@@ -43,6 +43,7 @@ import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
@@ -530,15 +531,22 @@ public interface PoddArtifactManager
      * @return The updated Ontology ID for the PODD Artifact after the schemas were updated.
      * @throws UnmanagedSchemaException
      *             If one of the new schema ontologies are not currently managed by the system.
+     * @throws UnmanagedArtifactIRIException
+     *             If the given artifact IRI is not currently managed by the system.
+     * @throws UnmanagedArtifactVersionException
+     *             If the given artifact version is not currently managed by the system.
      * @throws IOException
      *             If there are Input/Output exceptions while updating the schema imports.
      * @throws PoddException
      *             If there are PODD exceptions.
      * @throws OpenRDFException
      *             If there are OpenRDF Sesame exceptions while updating the schema imports.
+     * @throws OWLException
+     *             If there are errors processing the OWL content during or after the schema imports
+     *             updates.
      */
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
             Set<OWLOntologyID> oldSchemaOntologyIds, Set<OWLOntologyID> newSchemaOntologyIds)
-        throws UnmanagedSchemaException, OpenRDFException, PoddException, IOException;
+        throws UnmanagedSchemaException, OpenRDFException, PoddException, IOException, OWLException;
     
 }

@@ -41,16 +41,19 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.util.Namespaces;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
+import org.openrdf.sail.memory.MemoryStore;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -1143,9 +1146,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         final List<Statement> statements =
                 Iterations.asList(tempRepositoryConnection.getStatements(null, null, null, true, tempContext));
         
-        final RioMemoryTripleSource owlSource = new RioMemoryTripleSource(statements.iterator());
-        
-        owlSource.setNamespaces(tempRepositoryConnection.getNamespaces());
+        final RioMemoryTripleSource owlSource =
+                new RioMemoryTripleSource(statements.iterator(), Namespaces.asMap(Iterations
+                        .asSet(tempRepositoryConnection.getNamespaces())));
         
         final OWLOntology nextOntology = this.getOWLManager().loadOntology(owlSource);
         
@@ -1644,37 +1647,90 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID updateSchemaImports(final InferredOWLOntologyID artifactId,
             final Set<OWLOntologyID> oldSchemaOntologyIds, final Set<OWLOntologyID> newSchemaOntologyIds)
-        throws OpenRDFException, PoddException, IOException
+        throws OpenRDFException, PoddException, IOException, OWLException
     {
-        RDFFormat format = RDFFormat.RDFJSON;
-        Model model = new LinkedHashModel();
-        
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8192);
-        // Export the artifact without including the old inferred triples, and they will be
-        // regenerated using the new schema ontologies
-        this.exportArtifact(artifactId, outputStream, format, false);
-        Model parse = Rio.parse(new ByteArrayInputStream(outputStream.toByteArray()), "", format);
-        model.addAll(parse);
-        
-        for(OWLOntologyID nextNewSchemaOntologyID : newSchemaOntologyIds)
+        RepositoryConnection permanentRepositoryConnection = null;
+        RepositoryConnection tempRepositoryConnection = null;
+        Repository tempRepository = null;
+        try
         {
-            outputStream = new ByteArrayOutputStream(8192);
-            // Export the new schema ontologies, including the inferred triples
-            this.schemaManager.downloadSchemaOntology(nextNewSchemaOntologyID, outputStream, format, true);
-            try
+            
+            InferredOWLOntologyID artifactVersion =
+                    this.sesameManager.getCurrentArtifactVersion(artifactId.getOntologyIRI(),
+                            permanentRepositoryConnection, this.repositoryManager.getArtifactManagementGraph());
+            if(!artifactVersion.getVersionIRI().equals(artifactId.getVersionIRI()))
             {
-                parse = Rio.parse(new ByteArrayInputStream(outputStream.toByteArray()), "", format);
-                model.addAll(parse);
-            }
-            catch(RDFParseException | UnsupportedRDFormatException | IOException e)
-            {
-                this.log.error("Could not parse downloaded schema ontology", e);
+                throw new UnmanagedArtifactVersionException(artifactId.getOntologyIRI(),
+                        artifactVersion.getVersionIRI(), artifactId.getVersionIRI(),
+                        "Cannot update schema imports for artifact as the specified version was not found.");
             }
             
+            RDFFormat format = RDFFormat.RDFJSON;
+            
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8192);
+            // Export the artifact without including the old inferred triples, and they will be
+            // regenerated using the new schema ontologies
+            this.exportArtifact(artifactId, outputStream, format, false);
+            
+            tempRepository = this.repositoryManager.getNewTemporaryRepository();
+            tempRepositoryConnection = tempRepository.getConnection();
+            tempRepositoryConnection.begin();
+            final IRI newVersionIRI = IRI.create(this.incrementVersion(artifactVersion.getVersionIRI().toString()));
+            // FIXME: Update the version RDF statements in the repository now
+            
+            tempRepositoryConnection.add(new ByteArrayInputStream(outputStream.toByteArray()), "", format,
+                    newVersionIRI.toOpenRDFURI());
+            for(OWLOntologyID nextOldSchemaOntologyID : oldSchemaOntologyIds)
+            {
+                // Remove both a generic import and a version specific import, so this method can be
+                // used to bump generic imports to version specific imports after they are imported,
+                // if necessary.
+                tempRepositoryConnection.remove(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                        nextOldSchemaOntologyID.getOntologyIRI().toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
+                tempRepositoryConnection.remove(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                        nextOldSchemaOntologyID.getVersionIRI().toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
+            }
+            
+            for(OWLOntologyID nextNewSchemaOntologyID : newSchemaOntologyIds)
+            {
+                // Add import to the specific version
+                tempRepositoryConnection.add(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                        nextNewSchemaOntologyID.getVersionIRI().toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
+            }
+            
+            tempRepositoryConnection.commit();
+            permanentRepositoryConnection = this.repositoryManager.getRepository().getConnection();
+            permanentRepositoryConnection.begin();
+            this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
+                    newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+            permanentRepositoryConnection.commit();
         }
-        
-        //this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection, tempContext, fileReferencePolicy)
-        
+        catch(Throwable e)
+        {
+            if(permanentRepositoryConnection != null)
+            {
+                permanentRepositoryConnection.rollback();
+            }
+            if(tempRepositoryConnection != null)
+            {
+                tempRepositoryConnection.rollback();
+            }
+        }
+        finally
+        {
+            if(permanentRepositoryConnection != null)
+            {
+                permanentRepositoryConnection.close();
+            }
+            if(tempRepositoryConnection != null)
+            {
+                tempRepositoryConnection.close();
+            }
+            if(tempRepository != null)
+            {
+                tempRepository.shutDown();
+            }
+        }
         throw new RuntimeException("TODO: Implement updateSchemaImport");
     }
     
