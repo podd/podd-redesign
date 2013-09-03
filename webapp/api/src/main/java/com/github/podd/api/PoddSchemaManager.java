@@ -84,11 +84,13 @@ public interface PoddSchemaManager
         OpenRDFException;
     
     /**
+     * Gets the complete set of current PODD Schema Ontologies. That is, for each schema ontology,
+     * its current version is included.
      * 
-     * @return The set of schema ontologies.
+     * @return The set of current schema ontologies.
      * @throws OpenRDFException
      */
-    Set<InferredOWLOntologyID> getSchemaOntologies() throws OpenRDFException;
+    Set<InferredOWLOntologyID> getCurrentSchemaOntologies() throws OpenRDFException;
     
     /**
      * Gets a PODD Schema Ontology based on the given IRI. If the IRI matches a managed Schema

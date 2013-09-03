@@ -119,7 +119,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     @Override
-    public Set<InferredOWLOntologyID> getSchemaOntologies() throws OpenRDFException
+    public Set<InferredOWLOntologyID> getCurrentSchemaOntologies() throws OpenRDFException
     {
         RepositoryConnection conn = null;
         
@@ -127,7 +127,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         {
             conn = this.repositoryManager.getRepository().getConnection();
             
-            return this.sesameManager.getAllSchemaOntologyVersions(conn,
+            return this.sesameManager.getAllCurrentSchemaOntologyVersions(conn,
                     this.repositoryManager.getSchemaManagementGraph());
         }
         finally

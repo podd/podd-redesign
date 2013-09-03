@@ -413,7 +413,7 @@ public abstract class AbstractPoddSesameManagerTest
     }
     
     @Test
-    public void testGetAllSchemaOntologyVersions() throws Exception
+    public void testGetAllCurrentSchemaOntologyVersions() throws Exception
     {
         this.populateSchemaManagementGraph();
         
@@ -430,7 +430,7 @@ public abstract class AbstractPoddSesameManagerTest
         
         final Set<InferredOWLOntologyID> allSchemaOntologyVersions =
                 this.testPoddSesameManager
-                        .getAllSchemaOntologyVersions(this.testRepositoryConnection, this.schemaGraph);
+                        .getAllCurrentSchemaOntologyVersions(this.testRepositoryConnection, this.schemaGraph);
         
         Assert.assertEquals("Incorrect number of schema ontologies", 3, allSchemaOntologyVersions.size());
         for(final InferredOWLOntologyID ontoID : allSchemaOntologyVersions)

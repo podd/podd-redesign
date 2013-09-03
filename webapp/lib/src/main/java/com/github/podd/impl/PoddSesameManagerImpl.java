@@ -236,7 +236,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public Set<InferredOWLOntologyID> getAllSchemaOntologyVersions(final RepositoryConnection repositoryConnection,
+    public Set<InferredOWLOntologyID> getAllCurrentSchemaOntologyVersions(final RepositoryConnection repositoryConnection,
             final URI schemaManagementGraph) throws OpenRDFException
     {
         final Set<InferredOWLOntologyID> returnList = new HashSet<InferredOWLOntologyID>();
@@ -1963,7 +1963,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         else
         {
             final Set<InferredOWLOntologyID> allSchemaOntologyVersions =
-                    this.getAllSchemaOntologyVersions(repositoryConnection, schemaManagementGraph);
+                    this.getAllCurrentSchemaOntologyVersions(repositoryConnection, schemaManagementGraph);
             for(final InferredOWLOntologyID schemaOntology : allSchemaOntologyVersions)
             {
                 contexts.add(schemaOntology.getVersionIRI().toOpenRDFURI());

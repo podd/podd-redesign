@@ -703,7 +703,7 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies();
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
         
         Assert.assertEquals(6, schemaOntologies.size());
     }
@@ -718,7 +718,7 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b1.ttl");
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
         
         Assert.assertEquals(2, schemaOntologies.size());
     }
@@ -733,7 +733,7 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b1c1.ttl");
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
         
         Assert.assertEquals(3, schemaOntologies.size());
     }
@@ -749,7 +749,7 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b1c2.ttl");
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
         
         Assert.assertEquals(3, schemaOntologies.size());
         
@@ -771,7 +771,7 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b2c2.ttl");
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
         
         Assert.assertEquals(3, schemaOntologies.size());
     }
@@ -810,7 +810,7 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         
         // verify: no schema ontologies have been loaded
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
         Assert.assertEquals(0, schemaOntologies.size());
     }
 
@@ -848,7 +848,7 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         
         // verify: no schema ontologies have been loaded
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
         Assert.assertEquals(0, schemaOntologies.size());
     }
 
@@ -883,7 +883,7 @@ public abstract class AbstractPoddSchemaManagerTest
         }
         
         // verify: no schema ontologies have been loaded
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
         Assert.assertEquals(0, schemaOntologies.size());
     }
 

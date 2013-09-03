@@ -122,7 +122,7 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
         
         
         // verify: schemas successfully loaded
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
         Assert.assertEquals("Expected 3 schema ontologies", 3, schemaOntologies.size());
         
         // verify: iterate through to ensure all versions exist
