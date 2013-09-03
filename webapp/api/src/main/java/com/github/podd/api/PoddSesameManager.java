@@ -107,6 +107,18 @@ public interface PoddSesameManager
      */
     Set<InferredOWLOntologyID> getAllCurrentSchemaOntologyVersions(RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
+
+    /**
+     * Gets all schema ontologies configured in this PODD server. This includes current as well as previous
+     * versions of ontologies.
+     * 
+     * @param repositoryConnection
+     * @param schemaManagementGraph
+     * @return
+     * @throws OpenRDFException
+     */
+    public Set<InferredOWLOntologyID> getAllSchemaOntologyVersions(final RepositoryConnection repositoryConnection,
+            final URI schemaManagementGraph) throws OpenRDFException;
     
     List<URI> getAllValidMembers(InferredOWLOntologyID artifactID, URI conceptUri,
             RepositoryConnection repositoryConnection) throws OpenRDFException;

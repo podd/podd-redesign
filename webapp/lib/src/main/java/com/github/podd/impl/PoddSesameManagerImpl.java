@@ -267,6 +267,38 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return returnList;
     }
     
+    @Override
+    public Set<InferredOWLOntologyID> getAllSchemaOntologyVersions(final RepositoryConnection repositoryConnection,
+            final URI schemaManagementGraph) throws OpenRDFException
+    {
+        final Set<InferredOWLOntologyID> returnList = new HashSet<InferredOWLOntologyID>();
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT ?ontologyIri ?versionIri ?inferredVersionIri WHERE { ");
+        
+        sb.append(" ?ontologyIri <" + RDF.TYPE.stringValue() + "> <" + OWL.ONTOLOGY.stringValue() + "> . ");
+        sb.append(" ?ontologyIri <" + OWL.VERSIONIRI.stringValue() + "> ?versionIri . ");
+        sb.append(" ?versionIri <" + PoddRdfConstants.PODD_BASE_INFERRED_VERSION.stringValue() + "> ?inferredVersionIri . ");
+        
+        sb.append(" }");
+        
+        this.log.debug("Generated SPARQL {} ", sb);
+        
+        final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        final QueryResultCollector queryResults = this.executeSparqlQuery(query, schemaManagementGraph);
+        
+        for(final BindingSet nextResult : queryResults.getBindingSets())
+        {
+            final String nextOntologyIRI = nextResult.getValue("ontologyIri").stringValue();
+            final String nextVersionIRI = nextResult.getValue("versionIri").stringValue();
+            final String nextInferredIRI = nextResult.getValue("inferredVersionIri").stringValue();
+            
+            returnList.add(new InferredOWLOntologyID(IRI.create(nextOntologyIRI), IRI.create(nextVersionIRI), IRI
+                    .create(nextInferredIRI)));
+        }
+        return returnList;
+    }
+    
     /**
      * Given a property URI, this method attempts to return all the valid members in the Range of
      * that property.

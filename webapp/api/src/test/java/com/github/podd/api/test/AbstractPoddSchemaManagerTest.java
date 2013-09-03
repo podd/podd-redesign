@@ -482,6 +482,14 @@ public abstract class AbstractPoddSchemaManagerTest
         Assert.fail("Not yet implemented"); // TODO
     }
     
+    @Test
+    public final void testGetSchemaOntologies() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getSchemaOntologies();
+        Assert.assertEquals(6, schemaOntologies.size());
+    }
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddSchemaManager#getSchemaOntology(org.semanticweb.owlapi.model.IRI)}

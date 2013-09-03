@@ -58,6 +58,7 @@ import com.github.podd.exception.UnmanagedSchemaException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.exception.UnmanagedSchemaOntologyIDException;
 import com.github.podd.restlet.ApplicationUtils;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -128,6 +129,27 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             conn = this.repositoryManager.getRepository().getConnection();
             
             return this.sesameManager.getAllCurrentSchemaOntologyVersions(conn,
+                    this.repositoryManager.getSchemaManagementGraph());
+        }
+        finally
+        {
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
+    }
+    
+    @Override
+    public Set<InferredOWLOntologyID> getSchemaOntologies() throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.repositoryManager.getRepository().getConnection();
+            
+            return this.sesameManager.getAllSchemaOntologyVersions(conn,
                     this.repositoryManager.getSchemaManagementGraph());
         }
         finally
