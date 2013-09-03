@@ -804,6 +804,23 @@ public abstract class AbstractPoddSchemaManagerTest
     /**
      * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
      * 
+     * Loads a set of test ontologies that each have a single class. There are two versions of each
+     * ontology which no interdependency between versions.
+     */
+    @Test
+    public final void testUploadSchemaOntologiesABC4() throws Exception
+    {
+        this.loadSchemaOntologies("/test/schema-manifest-abc4.ttl");
+
+        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
+                .getCurrentSchemaOntologies().size());
+        Assert.assertEquals("Incorrect no. of total schema ontologies", 6, this.testSchemaManager.getSchemaOntologies()
+                .size());
+    }
+
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
      * Tests with a schema-manifest where imports are specified as Ontology IRIs and not version
      * IRIs.
      */
