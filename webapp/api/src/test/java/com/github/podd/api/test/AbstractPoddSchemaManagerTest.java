@@ -34,7 +34,6 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.UnloadableImportException;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
@@ -893,14 +892,6 @@ public abstract class AbstractPoddSchemaManagerTest
             Assert.assertEquals("Failure not due to expected ontology", "http://example.org/podd/ns/poddB", e
                     .getSchemaOntologyIRI().toString());
         }
-    }
-    
-    @Ignore
-    @Test
-    public final void testUploadSchemaOntologiesMissingVersionIRI() throws Exception
-    {
-        //TODO - implement
-        // no Version IRI found for an ontology
     }
 
     /**
