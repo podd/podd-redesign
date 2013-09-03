@@ -251,8 +251,6 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             final OWLOntologyID inferredOntologyID) throws ReasonerInterruptedException, TimeOutException,
         OWLOntologyCreationException, OWLOntologyChangeException
     {
-        nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-        
         final List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators =
                 new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
         axiomGenerators.add(new InferredClassAssertionAxiomGenerator());
@@ -276,10 +274,12 @@ public class PoddOWLManagerImpl implements PoddOWLManager
             importIRI = concreteOntologyID.getOntologyIRI();
         }
         
-        final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
-        
         synchronized(this.owlOntologyManager)
         {
+            final InferredOntologyGenerator iog = new InferredOntologyGenerator(nextReasoner, axiomGenerators);
+            
+            nextReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+            
             final OWLOntology nextInferredAxiomsOntology = this.owlOntologyManager.createOntology(inferredOntologyID);
             
             this.owlOntologyManager.applyChange(new AddImport(nextInferredAxiomsOntology,
