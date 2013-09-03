@@ -425,11 +425,18 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         // If the aliasConfiguration is empty then populate it with the default aliases here
         if(this.aliasesConfiguration.isEmpty())
         {
-            try (final InputStream input =
-                    ApplicationUtils.class.getResourceAsStream(propertyUtil.get(PoddRdfConstants.KEY_ALIASES,
-                            PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE));)
+            String aliasesFile =
+                    propertyUtil.get(PoddRdfConstants.KEY_ALIASES, PoddRdfConstants.PATH_DEFAULT_ALIASES_FILE);
+            try (final InputStream input = ApplicationUtils.class.getResourceAsStream(aliasesFile);)
             {
-                this.setAliasesConfiguration(Rio.parse(input, "", RDFFormat.TURTLE));
+                if(input != null)
+                {
+                    this.setAliasesConfiguration(Rio.parse(input, "", RDFFormat.TURTLE));
+                }
+                else
+                {
+                    this.log.error("Could not find default aliases resource: {}", aliasesFile);
+                }
             }
             catch(IOException | RDFParseException | UnsupportedRDFormatException e)
             {
