@@ -787,38 +787,19 @@ public abstract class AbstractPoddSchemaManagerTest
      * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
      * 
      * Loads a set of test ontologies that each have a single class.
-     * Ontology B has two versions, and C has only 1, which is not supported.
      * 
-     * FIXME: test fails at present
+     * NOTE: This scenario where Ontology B has two versions but Ontology C which imports B has only
+     * one version is not expected to occur in a production environment.
      */
-    @Ignore
     @Test
-    public final void testUploadSchemaOntologiesInvalidA1B2C1() throws Exception
+    public final void testUploadSchemaOntologiesA1B2C1() throws Exception
     {
-        // prepare: load invalid test schema-manifest file
-        final String schemaManifest = "/test/bad-schema-manifest-a1b2c1.ttl";
-        Model model = null;
-        try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
-        {
-            final RDFFormat format = Rio.getParserFormatForFileName(schemaManifest, RDFFormat.RDFXML);
-            model = Rio.parse(schemaManifestStream, "", format);
-        }
-        
-        try
-        {
-            this.testSchemaManager.uploadSchemaOntologies(model);
-            Assert.fail("Should have failed to load schema ontologies");
-        }
-        catch(UnloadableImportException e)
-        {
-            e.printStackTrace();
-//            Assert.assertTrue("Exception not due to poddUser v1",
-//                    e.getMessage().contains("http://purl.org/podd/ns/version/poddUser/1"));
-        }
-        
-        // verify: no schema ontologies have been loaded
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
-        Assert.assertEquals(0, schemaOntologies.size());
+        this.loadSchemaOntologies("/test/schema-manifest-a1b2c1.ttl");
+
+        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
+                .getCurrentSchemaOntologies().size());
+        Assert.assertEquals("Incorrect no. of total schema ontologies", 4, this.testSchemaManager.getSchemaOntologies()
+                .size());
     }
 
     /**

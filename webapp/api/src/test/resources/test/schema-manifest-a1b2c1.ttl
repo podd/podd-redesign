@@ -29,7 +29,6 @@
 
 
 # --- C
-# Bad - should have two versions of C
 <http://example.org/podd/ns/C> a owl:Ontology ;
 	owl:versionIRI <http://example.org/podd/ns/version/poddC/1> ;
 	omv:currentVersion <http://example.org/podd/ns/version/poddC/1> .
