@@ -821,6 +821,26 @@ public abstract class AbstractPoddSchemaManagerTest
     /**
      * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
      * 
+     * NOTE: In the given hierarchy, ontology C5 imports B1 and A5. B1 however imports A1.
+     * Therefore, the imports should be inconsistent. OWLAPI currently does not complain when
+     * loading this hierarchy, but the possibility of failure exists.
+     * 
+     * This hierarchy should NOT occur in a production environment.
+     */
+    @Test
+    public final void testUploadSchemaOntologiesInconsistentHierarchy() throws Exception
+    {
+        this.loadSchemaOntologies("/test/schema-manifest-inconsistent-import-hierarchy.ttl");
+        
+        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
+                .getCurrentSchemaOntologies().size());
+        Assert.assertEquals("Incorrect no. of total schema ontologies", 6, this.testSchemaManager.getSchemaOntologies()
+                .size());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.api.PoddSchemaManager#uploadSchemaOntologies(Model)} .
+     * 
      * Tests with a schema-manifest where imports are specified as Ontology IRIs and not version
      * IRIs.
      */
