@@ -48,7 +48,9 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.UnsupportedRDFormatException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -86,6 +88,7 @@ import com.github.podd.exception.PublishArtifactException;
 import com.github.podd.exception.PurlProcessorNotHandledException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
+import com.github.podd.exception.UnmanagedSchemaException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -1065,7 +1068,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     randomContext);
             
             // ensure schema ontologies are cached in memory before loading statements into OWLAPI
-            this.handleCacheSchemasInMemory(permanentRepositoryConnection, permanentRepositoryConnection, randomContext);
+            this.handleCacheSchemasInMemory(permanentRepositoryConnection, temporaryRepositoryConnection, randomContext);
             
             // TODO: This web service could be used accidentally to insert invalid file references
             inferredOWLOntologyID =
@@ -1640,8 +1643,38 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     
     @Override
     public InferredOWLOntologyID updateSchemaImports(final InferredOWLOntologyID artifactId,
-            final Set<OWLOntologyID> oldSchemaOntologyIds, final Set<OWLOntologyID> schemaOntologyId)
+            final Set<OWLOntologyID> oldSchemaOntologyIds, final Set<OWLOntologyID> newSchemaOntologyIds)
+        throws OpenRDFException, PoddException, IOException
     {
+        RDFFormat format = RDFFormat.RDFJSON;
+        Model model = new LinkedHashModel();
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8192);
+        // Export the artifact without including the old inferred triples, and they will be
+        // regenerated using the new schema ontologies
+        this.exportArtifact(artifactId, outputStream, format, false);
+        Model parse = Rio.parse(new ByteArrayInputStream(outputStream.toByteArray()), "", format);
+        model.addAll(parse);
+        
+        for(OWLOntologyID nextNewSchemaOntologyID : newSchemaOntologyIds)
+        {
+            outputStream = new ByteArrayOutputStream(8192);
+            // Export the new schema ontologies, including the inferred triples
+            this.schemaManager.downloadSchemaOntology(nextNewSchemaOntologyID, outputStream, format, true);
+            try
+            {
+                parse = Rio.parse(new ByteArrayInputStream(outputStream.toByteArray()), "", format);
+                model.addAll(parse);
+            }
+            catch(RDFParseException | UnsupportedRDFormatException | IOException e)
+            {
+                this.log.error("Could not parse downloaded schema ontology", e);
+            }
+            
+        }
+        
+        //this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection, tempContext, fileReferencePolicy)
+        
         throw new RuntimeException("TODO: Implement updateSchemaImport");
     }
     
