@@ -775,7 +775,7 @@ public abstract class AbstractPoddSchemaManagerTest
     @Test
     public final void testUploadSchemaOntologiesA1B2C2() throws Exception
     {
-        this.loadSchemaOntologies("/test/schema-manifest-a1b2c2.ttl");
+        this.loadSchemaOntologies("/test/schema-manifest-a1b2c3.ttl");
         
         Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
                 .getCurrentSchemaOntologies().size());

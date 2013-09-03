@@ -92,7 +92,7 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
     public void testUploadSchemaOntologiesInOrder() throws Exception
     {
         // prepare: Model containing schema-manifest
-        final String schemaManifest = "/test/schema-manifest-a1b2c2.ttl";
+        final String schemaManifest = "/test/schema-manifest-a1b2c3.ttl";
         Model model = null;
         try (final InputStream schemaManifestStream = this.getClass().getResourceAsStream(schemaManifest);)
         {
@@ -105,12 +105,10 @@ public class PoddSchemaManagerImplTest extends AbstractPoddSchemaManagerTest
                 "http://example.org/podd/ns/version/poddA/1", 
                 "http://example.org/podd/ns/version/poddB/2",
                 "http://example.org/podd/ns/version/poddB/1",
-                "http://example.org/podd/ns/version/poddC/2", 
+                "http://example.org/podd/ns/version/poddC/3", 
                 "http://example.org/podd/ns/version/poddC/1", 
             };
 
-        //Order: A1, B2, C2, B1, C1 fails. Is it correct?
-        
         final List<URI> testImportOrder = new ArrayList<>();
         for (final String s : testImportOrderArray)
         {

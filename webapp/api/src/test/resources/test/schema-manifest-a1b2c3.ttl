@@ -29,16 +29,16 @@
 # --- c
 <http://example.org/podd/ns/C> a owl:Ontology ;
 	owl:versionIRI <http://example.org/podd/ns/version/poddC/1> ;
-	owl:versionIRI <http://example.org/podd/ns/version/poddC/2> ;
-	omv:currentVersion <http://example.org/podd/ns/version/poddC/2> .
+	owl:versionIRI <http://example.org/podd/ns/version/poddC/3> ;
+	omv:currentVersion <http://example.org/podd/ns/version/poddC/3> .
 
 <http://example.org/podd/ns/version/poddC/1> a owl:Ontology ;
     <http://purl.org/podd/ns/schema#classpath> "/test/ontologies/version/1/c1.owl" ;
 	owl:imports <http://example.org/podd/ns/version/poddA/1> ,
 				<http://example.org/podd/ns/version/poddB/1> .
 
-<http://example.org/podd/ns/version/poddC/2> a owl:Ontology ;
-    <http://purl.org/podd/ns/schema#classpath> "/test/ontologies/version/2/c2.2.owl" ;
+<http://example.org/podd/ns/version/poddC/3> a owl:Ontology ;
+    <http://purl.org/podd/ns/schema#classpath> "/test/ontologies/version/3/c3.owl" ;
 	owl:imports <http://example.org/podd/ns/version/poddA/1> ,
 				<http://example.org/podd/ns/version/poddB/2> .
     

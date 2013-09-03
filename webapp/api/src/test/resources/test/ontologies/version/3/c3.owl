@@ -23,7 +23,7 @@
         <rdfs:label>The PODD C Ontology</rdfs:label>
         <owl:imports rdf:resource="http://example.org/podd/ns/version/poddA/1"/>
         <owl:imports rdf:resource="http://example.org/podd/ns/version/poddB/2"/>
-        <owl:versionIRI rdf:resource="http://example.org/podd/ns/version/poddC/2"/>
+        <owl:versionIRI rdf:resource="http://example.org/podd/ns/version/poddC/3"/>
     </owl:Ontology>
 
     <!-- 
@@ -38,9 +38,9 @@
 
     <owl:Class rdf:about="&poddC;classC">
         <rdfs:subClassOf rdf:resource="&poddB;ClassB"/>
-        <rdfs:label>Class C (version 2)</rdfs:label>
+        <rdfs:label>Class C (version 3)</rdfs:label>
         <definition>Definition of Class C.</definition>
-        <rdfs:comment>A detailed description of class C. This is version 2 of ClassC</rdfs:comment>
+        <rdfs:comment>A detailed description of class C. This is version 3 of ClassC</rdfs:comment>
     </owl:Class>
 </rdf:RDF>
 
