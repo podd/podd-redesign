@@ -711,9 +711,8 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies();
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
-        
-        Assert.assertEquals(6, schemaOntologies.size());
+        Assert.assertEquals(6, this.testSchemaManager.getCurrentSchemaOntologies().size());
+        Assert.assertEquals(6, this.testSchemaManager.getSchemaOntologies().size());
     }
     
     /**
@@ -726,9 +725,8 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b1.ttl");
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
-        
-        Assert.assertEquals(2, schemaOntologies.size());
+        Assert.assertEquals(2, this.testSchemaManager.getCurrentSchemaOntologies().size());
+        Assert.assertEquals(2, this.testSchemaManager.getSchemaOntologies().size());
     }
 
     /**
@@ -741,9 +739,8 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b1c1.ttl");
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
-        
-        Assert.assertEquals(3, schemaOntologies.size());
+        Assert.assertEquals(3, this.testSchemaManager.getCurrentSchemaOntologies().size());
+        Assert.assertEquals(3, this.testSchemaManager.getSchemaOntologies().size());
     }
 
     /**
@@ -757,9 +754,10 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b1c2.ttl");
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
-        
-        Assert.assertEquals(3, schemaOntologies.size());
+        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
+                .getCurrentSchemaOntologies().size());
+        Assert.assertEquals("Incorrect no. of total schema ontologies", 4, this.testSchemaManager.getSchemaOntologies()
+                .size());
         
         // verify: older version of poddC is also present in repository
         final InferredOWLOntologyID poddC1 =
@@ -779,9 +777,10 @@ public abstract class AbstractPoddSchemaManagerTest
     {
         this.loadSchemaOntologies("/test/schema-manifest-a1b2c2.ttl");
         
-        final Set<InferredOWLOntologyID> schemaOntologies = this.testSchemaManager.getCurrentSchemaOntologies();
-        
-        Assert.assertEquals(3, schemaOntologies.size());
+        Assert.assertEquals("Incorrect no. of current schema ontologies", 3, this.testSchemaManager
+                .getCurrentSchemaOntologies().size());
+        Assert.assertEquals("Incorrect no. of total schema ontologies", 5, this.testSchemaManager.getSchemaOntologies()
+                .size());
     }
 
     /**
