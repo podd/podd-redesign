@@ -236,11 +236,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public boolean deleteObject(final String artifactUri, final String versionUri, final String objectUri,
+    public InferredOWLOntologyID deleteObject(final String artifactUri, final String versionUri, final String objectUri,
             final boolean cascade) throws PoddException, OpenRDFException, IOException, OWLException
     {
-        boolean result = false;
-        
         // check if the specified artifact URI refers to a managed artifact
         InferredOWLOntologyID artifactID = null;
         try
@@ -258,14 +256,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             throw new PublishedArtifactModifyException("Attempting to modify a Published Artifact", artifactID);
         }
         
-        this.log.info("deleteObject({}, {}, {}, {}) is not implemented", artifactUri, versionUri, objectUri,
-                cascade);
+        this.log.info("deleteObject ({}) from artifact {} with cascade={}", objectUri, artifactUri, cascade);
         
         final URI objectToDelete = PoddRdfConstants.VF.createURI(objectUri);
         
-        Model model = new LinkedHashModel();
-        // TODO - implement delete logic
-        // find parentObject of objectToDelete
         // retrieve all statements about parentObject and add to Model
         // remove statement which links with objectToDelete
         
@@ -273,12 +267,15 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         if (parentDetails.subjects().size() != 1)
         {
             this.log.error("Object {} cannot be deleted. (No parent)", objectUri, artifactUri);
-            //TODO: throw something else
+            //TODO: throw something more specific
             throw new PoddRuntimeException("Object cannot be deleted. No parent.");
         }
         
         Resource parent = parentDetails.subjects().iterator().next();
         
+        Model fragmentModel = this.exportArtifact(artifactID, false);
+        fragmentModel = fragmentModel.filter(parent, null, null);
+        fragmentModel.remove(parent, null, objectToDelete);
         
         DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
         if (cascade)
@@ -287,14 +284,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         
         UpdatePolicy updatePolicy = UpdatePolicy.REPLACE_EXISTING;
-        Collection<URI> objectUris = Arrays.asList(objectToDelete /*, parent of objectUri */);
+        Collection<URI> objectUris = Arrays.asList(objectToDelete, (URI)parent);
         
         this.updateArtifact(artifactID.getOntologyIRI().toOpenRDFURI(), artifactID.getVersionIRI().toOpenRDFURI(),
-                objectUris, model, updatePolicy, danglingObjectPolicy, DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+                objectUris, fragmentModel, updatePolicy, danglingObjectPolicy, DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+
+        InferredOWLOntologyID updatedArtifactID = this.getArtifact(artifactID.getOntologyIRI());
         
-        result = true;
-        
-        return result;
+        return updatedArtifactID;
     }
 
     @Override

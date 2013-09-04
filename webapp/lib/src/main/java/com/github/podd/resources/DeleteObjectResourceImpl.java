@@ -26,11 +26,10 @@ import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -89,18 +88,13 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             final User user = this.getRequest().getClientInfo().getUser();
             this.log.info("authenticated user: {}", user);
             
-            final boolean result =  
-                    this.getPoddArtifactManager().deleteObject(artifactUri, versionUri, objectUri, cascade);
+              
+            final InferredOWLOntologyID updatedOntologyID = this.getPoddArtifactManager().deleteObject(artifactUri, versionUri, objectUri, cascade);
             this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             
-            if(result)
-            {
-                this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
-            }
-            else
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
-            }
+            this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+            // TODO - send updated artifact ID in response. Handle exception to indicate delete failed and return that separately
+            //throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
         }
         catch(final PoddException | OpenRDFException | IOException | OWLException e)
         {

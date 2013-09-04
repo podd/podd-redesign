@@ -737,53 +737,44 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      * Tests that the artifact manager can delete a PODD Object.
      */
-    @Ignore
     @Test
     public final void testDeleteObjectSuccess() throws Exception
     {
+        // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#publication45";
+        final Object[][] testData = {
+                {"http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1", 87, false},
+                {"http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 77, false},
+                { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 65, true }, 
+        };
         
-        // perform test action: delete object
-        Assert.assertTrue("Could not delete artifact", this.testArtifactManager.deleteObject(artifactID
-                .getOntologyIRI().toString(), artifactID.getVersionIRI().toString(), objectToDelete, false));
-        
-        // verify:
-        RepositoryConnection nextRepositoryConnection = null;
-        try
+        for(int i = 0; i < testData.length; i++)
         {
-            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
-            nextRepositoryConnection.begin();
+            final String objectToDelete = (String)testData[i][0];
+            final int expectedArtifactSize = (int)testData[i][1];
+            final boolean cascade = (boolean)testData[i][2];
             
-            this.verifyUpdatedArtifact(artifactID, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
-                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES - 10, nextRepositoryConnection);
+            // perform test action: delete object
+            final InferredOWLOntologyID modifiedArtifactId =
+                    this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toString(), artifactID
+                            .getVersionIRI().toString(), objectToDelete, cascade);
             
-            // verify: no publications exist
-            final List<Statement> testList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
-                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, artifactID
-                            .getVersionIRI().toOpenRDFURI()));
-            Assert.assertEquals("Graph should have 0 publications", 0, testList.size());
-        }
-        finally
-        {
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
-            {
-                nextRepositoryConnection.rollback();
-            }
-            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
-            {
-                nextRepositoryConnection.close();
-            }
-            nextRepositoryConnection = null;
+            // verify:
+            Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
+            Assert.assertEquals("Reduction in artifact size incorrect", expectedArtifactSize, artifactModel.size());
+            
+            Assert.assertTrue("Object was not deleted",
+                    artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
+            Assert.assertTrue("Object was not deleted",
+                    artifactModel.filter(null, null, PoddRdfConstants.VF.createURI(objectToDelete)).isEmpty());
         }
     }
-
+    
     @Test
     public final void testExportArtifact() throws Exception
     {
@@ -2243,9 +2234,10 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        InferredOWLOntologyID updateSchemaImports = this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
-                artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()), new HashSet<OWLOntologyID>(),
-                new HashSet<OWLOntologyID>());
+        InferredOWLOntologyID updateSchemaImports =
+                this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
+                        artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
+                        new HashSet<OWLOntologyID>(), new HashSet<OWLOntologyID>());
         
         Assert.assertEquals(updateSchemaImports.getOntologyIRI(), artifactIDv1.getOntologyIRI());
         Assert.assertNotEquals(updateSchemaImports.getVersionIRI(), artifactIDv1.getVersionIRI());

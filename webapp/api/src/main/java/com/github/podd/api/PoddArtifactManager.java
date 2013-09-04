@@ -91,13 +91,13 @@ public interface PoddArtifactManager
      * @param versionUri
      * @param objectUri
      * @param cascade
-     * @return True if the object was successfully deleted
+     * @return Updated InferredOWLOntologyID of artifact after deletion
      * @throws PoddException
      * @throws OWLException 
      * @throws IOException 
      * @throws RepositoryException 
      */
-    boolean deleteObject(String artifactUri, String versionUri, String objectUri, boolean cascade)
+    InferredOWLOntologyID deleteObject(String artifactUri, String versionUri, String objectUri, boolean cascade)
             throws PoddException, OpenRDFException, IOException, OWLException;
 
     /**
