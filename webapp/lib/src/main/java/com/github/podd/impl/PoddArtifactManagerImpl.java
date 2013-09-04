@@ -1438,6 +1438,25 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             format = RDFFormat.RDFXML;
         }
         
+        final Model model = Rio.parse(inputStream, "", format);
+        
+        return this.updateArtifact(artifactUri, versionUri, objectUris, model, updatePolicy, danglingObjectAction, fileReferenceAction);
+    }
+    
+    /**
+     * Internal updateArtifact() method which takes a {@link Model} containing the modified triples
+     * instead of an InputStream.
+     */
+    protected Model updateArtifact(final URI artifactUri, final URI versionUri, final Collection<URI> objectUris,
+            final Model model, final UpdatePolicy updatePolicy, final DanglingObjectPolicy danglingObjectAction,
+            final DataReferenceVerificationPolicy fileReferenceAction) throws OpenRDFException, IOException,
+        OWLException, PoddException
+    {
+        if(model == null)
+        {
+            throw new NullPointerException("Input Model must not be null");
+        }
+                
         // check if the specified artifact URI refers to a managed artifact
         InferredOWLOntologyID artifactID = null;
         try
@@ -1495,7 +1514,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 // create an intermediate context and add "edit" statements to it
                 final URI intContext = PoddRdfConstants.VF.createURI("urn:intermediate:", UUID.randomUUID().toString());
                 
-                tempRepositoryConnection.add(inputStream, "", format, intContext);
+                tempRepositoryConnection.add(model, intContext);
                 
                 final Collection<URI> replaceableObjects = new ArrayList<URI>(objectUris);
                 
@@ -1535,7 +1554,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             else
             {
-                tempRepositoryConnection.add(inputStream, "", format, tempContext);
+                tempRepositoryConnection.add(model, tempContext);
             }
             
             // check and update statements with default timestamp values
