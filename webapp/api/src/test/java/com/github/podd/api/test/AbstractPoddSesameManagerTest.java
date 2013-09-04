@@ -364,7 +364,7 @@ public abstract class AbstractPoddSesameManagerTest
         {
             Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
                     e.getMessage());
-            Assert.assertEquals(inferredOntologyID.getOntologyIRI(), e.getOntologyID());
+            Assert.assertEquals(inferredOntologyID.getOntologyIRI(), e.getUnmanagedOntologyIRI());
         }
         
     }
@@ -710,7 +710,7 @@ public abstract class AbstractPoddSesameManagerTest
         {
             Assert.assertEquals("Not the expected exception", "This IRI does not refer to a managed ontology",
                     e.getMessage());
-            Assert.assertEquals(ontologyIRI, e.getOntologyID());
+            Assert.assertEquals(ontologyIRI, e.getUnmanagedOntologyIRI());
         }
     }
     

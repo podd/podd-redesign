@@ -79,9 +79,9 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
     {
         final Model model = super.getDetailsAsModel(errorResource);
         
-        if(this.getOntologyID() != null)
+        if(this.getUnmanagedOntologyIRI() != null)
         {
-            model.add(errorResource, PoddRdfConstants.ERR_SOURCE, this.getOntologyID().toOpenRDFURI());
+            model.add(errorResource, PoddRdfConstants.ERR_SOURCE, this.getUnmanagedOntologyIRI().toOpenRDFURI());
         }
         
         return model;
@@ -90,7 +90,7 @@ public class UnmanagedArtifactIRIException extends UnmanagedSchemaException
     /**
      * @return The OWL Ontology IRI that was not managed.
      */
-    public IRI getOntologyID()
+    public IRI getUnmanagedOntologyIRI()
     {
         return this.artifactOntologyIRI;
     }
