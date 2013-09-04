@@ -67,14 +67,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
-    /** Constructor */
-    public EditArtifactResourceImpl()
-    {
-        super();
-    }
-    
     /**
      * Handle an HTTP POST request submitting RDF data to update an existing artifact
      */

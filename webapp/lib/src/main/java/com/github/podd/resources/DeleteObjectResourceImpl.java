@@ -42,9 +42,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
     /**
      * Accept an HTTP delete request to delete a PODD object. Upon successful deletion,
      * an HTTP 204 (No Content) response is sent to the client.

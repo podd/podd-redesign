@@ -64,9 +64,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserAddResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     /**
      * Handle an HTTP POST request submitting RDF data to create a new PoddUser. This method can
      * only add one user per request. On successful addition of a user, the new user's unique URI is

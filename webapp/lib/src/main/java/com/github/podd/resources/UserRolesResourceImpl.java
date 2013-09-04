@@ -64,8 +64,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserRolesResourceImpl extends AbstractPoddResourceImpl
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     /**
      * Handle an HTTP POST request submitting RDF data to update (i.e. map/unmap) a PoddUser's
      * Roles. <br>

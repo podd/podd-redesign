@@ -62,8 +62,6 @@ import com.github.podd.utils.PoddWebConstants;
 public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
 {
     
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     @Get(":html")
     public Representation getArtifactHtml(final Representation entity) throws ResourceException
     {

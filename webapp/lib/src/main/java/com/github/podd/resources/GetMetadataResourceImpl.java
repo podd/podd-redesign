@@ -47,14 +47,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
-    /** Constructor */
-    public GetMetadataResourceImpl()
-    {
-        super();
-    }
-    
     /**
      * Return meta-data about an object.
      */

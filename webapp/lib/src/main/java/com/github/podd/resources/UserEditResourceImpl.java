@@ -60,9 +60,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserEditResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     /**
      * Handle an HTTP POST request submitting RDF data to edit an existing PoddUser.
      */

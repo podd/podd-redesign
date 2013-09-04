@@ -59,8 +59,6 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
 {
     public static final String LIST_PAGE_TITLE_TEXT = "PODD Artifact Listing";
     
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     private Map<String, List<InferredOWLOntologyID>> getArtifactsInternal() throws ResourceException
     {
         final Map<String, List<InferredOWLOntologyID>> results = new HashMap<String, List<InferredOWLOntologyID>>();

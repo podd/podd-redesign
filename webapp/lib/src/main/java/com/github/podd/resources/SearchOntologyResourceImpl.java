@@ -55,9 +55,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     @Get("rdf|rj|json|ttl")
     public Representation getRdf(final Variant variant) throws ResourceException
     {

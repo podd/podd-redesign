@@ -63,9 +63,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     @Get(":html")
     public Representation getUserDetailsPageHtml(final Representation entity) throws ResourceException
     {

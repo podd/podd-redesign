@@ -39,8 +39,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserSearchResourceImpl extends AbstractPoddResourceImpl
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     /**
      * Search for PODD Users
      */

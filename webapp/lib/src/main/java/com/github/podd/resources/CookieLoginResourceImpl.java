@@ -36,16 +36,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class CookieLoginResourceImpl extends AbstractPoddResourceImpl implements LoginResource
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
-    /**
-     * 
-     */
-    public CookieLoginResourceImpl()
-    {
-        super();
-    }
-    
     @Override
     @Get("html")
     public Representation getLoginPageHtml(final Representation entity) throws ResourceException

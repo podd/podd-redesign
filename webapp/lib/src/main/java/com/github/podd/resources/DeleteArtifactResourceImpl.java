@@ -48,9 +48,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class DeleteArtifactResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     @Delete
     public void deleteArtifact(final Representation entity) throws ResourceException
     {

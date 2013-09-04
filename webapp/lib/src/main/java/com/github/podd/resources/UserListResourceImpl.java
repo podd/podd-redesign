@@ -45,8 +45,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserListResourceImpl extends AbstractPoddResourceImpl
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     /**
      * FIXME: incomplete implementation
      * 

@@ -62,9 +62,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     @Get
     public Representation attachFileReferencePageHtml(final Representation entity) throws ResourceException
     {

@@ -63,9 +63,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     private URI changePassword(final PoddSesameRealm nextRealm, final Model model, final PoddUser changePwdUser,
             final boolean changeOwnPassword)
     {

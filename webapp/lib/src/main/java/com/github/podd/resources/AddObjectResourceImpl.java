@@ -49,14 +49,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class AddObjectResourceImpl extends AbstractPoddResourceImpl
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
-    /** Constructor */
-    public AddObjectResourceImpl()
-    {
-        super();
-    }
-    
     /**
      * Build a PODD object using the incoming RDF
      */

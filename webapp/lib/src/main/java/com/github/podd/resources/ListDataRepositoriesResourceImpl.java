@@ -56,8 +56,6 @@ public class ListDataRepositoriesResourceImpl extends AbstractPoddResourceImpl
 {
     public static final String LIST_PAGE_TITLE_TEXT = "PODD Data Repository Listing";
     
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     /**
      * Handle http GET request to serve the list data repositories page.
      */

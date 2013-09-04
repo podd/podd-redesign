@@ -38,9 +38,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class IndexResourceImpl extends AbstractPoddResourceImpl
 {
-    
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     @Get
     public Representation getIndexPageHtml(final Representation entity) throws ResourceException
     {
