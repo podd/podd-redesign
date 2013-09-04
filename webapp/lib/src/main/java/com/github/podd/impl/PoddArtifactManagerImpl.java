@@ -1649,12 +1649,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final Set<OWLOntologyID> oldSchemaOntologyIds, final Set<OWLOntologyID> newSchemaOntologyIds)
         throws OpenRDFException, PoddException, IOException, OWLException
     {
+        if(artifactId == null)
+        {
+            throw new IllegalArgumentException("Artifact was null");
+        }
+        
         RepositoryConnection permanentRepositoryConnection = null;
         RepositoryConnection tempRepositoryConnection = null;
         Repository tempRepository = null;
         try
         {
-            
+            permanentRepositoryConnection = this.repositoryManager.getRepository().getConnection();
             InferredOWLOntologyID artifactVersion =
                     this.sesameManager.getCurrentArtifactVersion(artifactId.getOntologyIRI(),
                             permanentRepositoryConnection, this.repositoryManager.getArtifactManagementGraph());
@@ -1707,11 +1712,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             tempRepositoryConnection.commit();
-            permanentRepositoryConnection = this.repositoryManager.getRepository().getConnection();
             permanentRepositoryConnection.begin();
-            this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
+            InferredOWLOntologyID result = this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
                     newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY);
             permanentRepositoryConnection.commit();
+            
+            return result;
         }
         catch(Throwable e)
         {
@@ -1723,6 +1729,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 tempRepositoryConnection.rollback();
             }
+            throw e;
         }
         finally
         {
@@ -1739,7 +1746,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 tempRepository.shutDown();
             }
         }
-        throw new RuntimeException("TODO: Implement updateSchemaImport");
     }
     
 }

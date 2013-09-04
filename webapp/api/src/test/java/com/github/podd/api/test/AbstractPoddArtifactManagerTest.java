@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -63,6 +64,7 @@ import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -714,10 +716,10 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         catch(final UnmanagedArtifactIRIException e)
         {
-            Assert.assertNotNull("Exception did not contain the requested artifact IRI", e.getOntologyID());
+            Assert.assertNotNull("Exception did not contain the requested artifact IRI", e.getUnmanagedOntologyIRI());
             
             Assert.assertEquals("IRI on the exception did not match our expected IRI",
-                    resultArtifactId.getOntologyIRI(), e.getOntologyID());
+                    resultArtifactId.getOntologyIRI(), e.getUnmanagedOntologyIRI());
         }
         
     }
@@ -1810,7 +1812,7 @@ public abstract class AbstractPoddArtifactManagerTest
         }
         catch(final UnmanagedArtifactIRIException e)
         {
-            Assert.assertEquals("Exception not due to expected IRI", nonExistentArtifactURI, e.getOntologyID()
+            Assert.assertEquals("Exception not due to expected IRI", nonExistentArtifactURI, e.getUnmanagedOntologyIRI()
                     .toOpenRDFURI());
         }
     }
@@ -2071,14 +2073,46 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImport(org.semanticweb.owlapi.model.OWLOntologyID, Set, Set)}
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
      * .
      */
-    @Ignore
     @Test
-    public final void testUpdateSchemaImport() throws Exception
+    public final void testUpdateSchemaImportsNull() throws Exception
     {
-        Assert.fail("Not yet implemented"); // TODO
+        try
+        {
+            this.testArtifactManager.updateSchemaImports(null, new HashSet<OWLOntologyID>(),
+                    new HashSet<OWLOntologyID>());
+            Assert.fail("Should have thrown an IllegalArgumentException");
+        }
+        catch(IllegalArgumentException e)
+        {
+            Assert.assertTrue(e.getMessage().contains("Artifact was null"));
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#updateSchemaImports(InferredOWLOntologyID, Set, Set)}
+     * .
+     */
+    @Test
+    public final void testUpdateSchemaImportsUnmanaged() throws Exception
+    {
+        try
+        {
+            this.testArtifactManager.updateSchemaImports(
+                    new InferredOWLOntologyID(IRI.create("urn:test:ontology:nonexistent"), IRI
+                            .create("urn:test:ontology:version:nonexistent"), IRI
+                            .create("urn:test:ontology:inferredversion:nonexistent")), new HashSet<OWLOntologyID>(),
+                    new HashSet<OWLOntologyID>());
+            Assert.fail("Should have thrown an IllegalArgumentException");
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            Assert.assertEquals("Exception not due to the expected artifact version",
+                    IRI.create("urn:test:ontology:nonexistent"), e.getUnmanagedOntologyIRI());
+        }
     }
     
     /**
