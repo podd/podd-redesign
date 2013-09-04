@@ -30,6 +30,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.resource.ResourceException;
 import org.semanticweb.owlapi.model.IRI;
@@ -81,6 +82,23 @@ public interface PoddArtifactManager
      *             If an error occurred while deleting the artifact.
      */
     boolean deleteArtifact(InferredOWLOntologyID artifactId) throws PoddException;
+    
+    /**
+     * Deletes the specified PODD object within an artifact. The artifact containing the 
+     * object should not be currently published.
+     * 
+     * @param artifactUri
+     * @param versionUri
+     * @param objectUri
+     * @param cascade
+     * @return True if the object was successfully deleted
+     * @throws PoddException
+     * @throws OWLException 
+     * @throws IOException 
+     * @throws RepositoryException 
+     */
+    boolean deleteObject(String artifactUri, String versionUri, String objectUri, boolean cascade)
+            throws PoddException, OpenRDFException, IOException, OWLException;
     
     /**
      * Exports the given artifact to the given output stream using an RDF format.
@@ -548,5 +566,5 @@ public interface PoddArtifactManager
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
             Set<OWLOntologyID> oldSchemaOntologyIds, Set<OWLOntologyID> newSchemaOntologyIds)
         throws UnmanagedSchemaException, OpenRDFException, PoddException, IOException, OWLException;
-    
+
 }
