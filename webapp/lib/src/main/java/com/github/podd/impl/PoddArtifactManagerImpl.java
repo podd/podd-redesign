@@ -1675,22 +1675,30 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepository = this.repositoryManager.getNewTemporaryRepository();
             tempRepositoryConnection = tempRepository.getConnection();
             tempRepositoryConnection.begin();
+            // Bump the version identifier to a new value
             final IRI newVersionIRI = IRI.create(this.incrementVersion(artifactVersion.getVersionIRI().toString()));
-            // FIXME: Update the version RDF statements in the repository now
-            
             tempRepositoryConnection.add(new ByteArrayInputStream(outputStream.toByteArray()), "", format,
                     newVersionIRI.toOpenRDFURI());
+            
+            tempRepositoryConnection.remove(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, null);
+            tempRepositoryConnection.add(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
+                    newVersionIRI.toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
+            
             for(OWLOntologyID nextOldSchemaOntologyID : oldSchemaOntologyIds)
             {
                 // Remove both a generic import and a version specific import, so this method can be
                 // used to bump generic imports to version specific imports after they are imported,
                 // if necessary.
                 tempRepositoryConnection.remove(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
-                        nextOldSchemaOntologyID.getOntologyIRI().toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
+                        nextOldSchemaOntologyID.getOntologyIRI().toOpenRDFURI());
                 tempRepositoryConnection.remove(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
-                        nextOldSchemaOntologyID.getVersionIRI().toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
+                        nextOldSchemaOntologyID.getVersionIRI().toOpenRDFURI());
             }
             
+            // Even if the old version of the artifact did not import this schema, we include it now
+            // as it may be required by the others
+            // TODO: Should we have a smarter method of including new schema ontologies to old
+            // artifacts
             for(OWLOntologyID nextNewSchemaOntologyID : newSchemaOntologyIds)
             {
                 // Add import to the specific version
