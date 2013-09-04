@@ -56,6 +56,7 @@ import com.github.podd.resources.AddObjectResourceImpl;
 import com.github.podd.resources.ArtifactRolesResourceImpl;
 import com.github.podd.resources.CookieLoginResourceImpl;
 import com.github.podd.resources.DeleteArtifactResourceImpl;
+import com.github.podd.resources.DeleteObjectResourceImpl;
 import com.github.podd.resources.EditArtifactResourceImpl;
 import com.github.podd.resources.FileReferenceAttachResourceImpl;
 import com.github.podd.resources.GetArtifactResourceImpl;
@@ -396,6 +397,11 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String addObjectService = PoddWebConstants.PATH_OBJECT_ADD;
         this.log.debug("attaching Add Object service to path={}", addObjectService);
         router.attach(addObjectService, AddObjectResourceImpl.class);
+        
+        // Add a route for the Delete Object page.
+        final String deleteObject = PoddWebConstants.PATH_OBJECT_DELETE;
+        this.log.debug("attaching Delete Object service to path={}", deleteObject);
+        router.attach(deleteObject, DeleteObjectResourceImpl.class);
         
         // Add a route for Logout service
         // final String logout = "logout";
