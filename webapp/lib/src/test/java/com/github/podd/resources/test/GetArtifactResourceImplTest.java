@@ -268,10 +268,11 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = results.getText().trim();
         
         // verify: received contents are in Turtle
-        Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));
+        Assert.assertTrue("Turtle result should start with a <", body.startsWith("<http://"));
+        Assert.assertTrue("Turtle result should end with a period", body.endsWith(" ."));
         
         // verify: received contents have artifact's ontology and version IRIs
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));

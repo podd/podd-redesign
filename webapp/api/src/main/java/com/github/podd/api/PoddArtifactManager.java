@@ -99,6 +99,27 @@ public interface PoddArtifactManager
      */
     boolean deleteObject(String artifactUri, String versionUri, String objectUri, boolean cascade)
             throws PoddException, OpenRDFException, IOException, OWLException;
+
+    /**
+     * Exports the given artifact to a @{link Model}.
+     * 
+     * @param ontologyId
+     *            The {@link InferredOWLOntologyID} of the artifact to export. This must contain
+     *            both an ontology IRI and a version IRI.
+     * @param includeInferred
+     *            If true, inferred statements will be included in the exported RDF statements,
+     *            otherwise if false, only the concrete RDF statements will be exported.
+     * @return A Model containing the artifact's statements.
+     * @throws OpenRDFException
+     *             If there is an error communicating the RDF storage for the artifact.
+     * @throws PoddException
+     *             If there is an error in the PODD methods.
+     * @throws IOException
+     *             If there is an error accessing the RDF storage, or an error writing to the output
+     *             stream.
+     */
+    Model exportArtifact(InferredOWLOntologyID ontologyId, boolean includeInferred) throws OpenRDFException,
+    PoddException, IOException;
     
     /**
      * Exports the given artifact to the given output stream using an RDF format.
@@ -343,6 +364,15 @@ public interface PoddArtifactManager
      * @throws OpenRDFException
      */
     List<PoddObjectLabel> getTopObjectLabels(List<InferredOWLOntologyID> artifacts) throws OpenRDFException;
+    
+    /**
+     * Checks whether a given Ontology is Published.
+     * 
+     * @param ontologyId
+     * @return
+     * @throws OpenRDFException
+     */
+    boolean isPublished(InferredOWLOntologyID ontologyId) throws OpenRDFException;
     
     /**
      * 

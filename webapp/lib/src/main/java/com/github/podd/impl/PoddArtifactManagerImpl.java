@@ -84,6 +84,7 @@ import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.PublishArtifactException;
+import com.github.podd.exception.PublishedArtifactModifyException;
 import com.github.podd.exception.PurlProcessorNotHandledException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -238,14 +239,66 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             final boolean cascade) throws PoddException, OpenRDFException, IOException, OWLException
     {
         boolean result = false;
-        //FIXME: implement
+        
+        // check if the specified artifact URI refers to a managed artifact
+        InferredOWLOntologyID artifactID = null;
+        try
+        {
+            artifactID = this.getArtifact(IRI.create(artifactUri));
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            this.log.error("This artifact is unmanaged. [{}]", artifactUri);
+            throw e;
+        }
+        
+        if(this.isPublished(artifactID))
+        {
+            throw new PublishedArtifactModifyException("Attempting to modify a Published Artifact", artifactID);
+        }
+        
+        this.log.info("deleteObject({}, {}, {}, {}) is not implemented", artifactUri, versionUri, objectUri,
+                cascade);
+        
+        final URI objectToDelete = PoddRdfConstants.VF.createURI(objectUri);
+        
+        Model model = new LinkedHashModel();
+        // TODO - implement delete logic
+        // find parentObject of objectToDelete
+        // retrieve all statements about parentObject and add to Model
+        // remove statement which links with objectToDelete
+        
+        final Model parentDetails = this.getParentDetails(artifactID, objectToDelete);
+        if (parentDetails.subjects().size() != 1)
+        {
+            this.log.error("Object {} cannot be deleted. (No parent)", objectUri, artifactUri);
+            //TODO: throw something else
+            throw new PoddRuntimeException("Object cannot be deleted. No parent.");
+        }
+        
+        Resource parent = parentDetails.subjects().iterator().next();
+        
+        
+        DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
+        if (cascade)
+        {
+            danglingObjectPolicy = DanglingObjectPolicy.FORCE_CLEAN;
+        }
+        
+        UpdatePolicy updatePolicy = UpdatePolicy.REPLACE_EXISTING;
+        Collection<URI> objectUris = Arrays.asList(objectToDelete /*, parent of objectUri */);
+        
+        this.updateArtifact(artifactID.getOntologyIRI().toOpenRDFURI(), artifactID.getVersionIRI().toOpenRDFURI(),
+                objectUris, model, updatePolicy, danglingObjectPolicy, DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+        
+        result = true;
+        
         return result;
     }
-    
-    
+
     @Override
-    public void exportArtifact(final InferredOWLOntologyID ontologyId, final OutputStream outputStream,
-            final RDFFormat format, final boolean includeInferred) throws OpenRDFException, PoddException, IOException
+    public Model exportArtifact(final InferredOWLOntologyID ontologyId, final boolean includeInferred)
+        throws OpenRDFException, PoddException, IOException
     {
         if(ontologyId.getOntologyIRI() == null || ontologyId.getVersionIRI() == null)
         {
@@ -276,7 +329,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             connection = this.getRepositoryManager().getRepository().getConnection();
             
-            connection.export(Rio.createWriter(format, outputStream), contexts.toArray(new Resource[] {}));
+            RepositoryResult<Statement> statements = connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
+            return Iterations.addAll(statements, new LinkedHashModel());
         }
         finally
         {
@@ -285,6 +339,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 connection.close();
             }
         }
+    }
+
+    @Override
+    public void exportArtifact(final InferredOWLOntologyID ontologyId, final OutputStream outputStream,
+            final RDFFormat format, final boolean includeInferred) throws OpenRDFException, PoddException, IOException
+    {
+        final Model model = this.exportArtifact(ontologyId, includeInferred);
+        Rio.write(model, outputStream, format);
     }
     
     @Override
@@ -905,6 +967,30 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
         return oldVersion.concat("1");
+    }
+    
+    @Override
+    public boolean isPublished(final InferredOWLOntologyID ontologyId) throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repositoryManager.getRepository().getConnection();
+            
+            if(this.getSesameManager().isPublished(ontologyId, conn,
+                    this.getRepositoryManager().getArtifactManagementGraph()))
+            {
+                return true;
+            }
+        }
+        finally
+        {
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
+        return false;
     }
     
     private List<InferredOWLOntologyID> listArtifacts(final boolean published, final boolean unpublished)
