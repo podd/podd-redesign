@@ -732,6 +732,60 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#deleteObject(String, String, String, boolean)}
+     * .
+     * 
+     * Tests that the artifact manager can delete a PODD Object.
+     */
+    @Ignore
+    @Test
+    public final void testDeleteObjectSuccess() throws Exception
+    {
+        this.loadSchemaOntologies();
+        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#publication45";
+        
+        // perform test action: delete object
+        Assert.assertTrue("Could not delete artifact", this.testArtifactManager.deleteObject(artifactID
+                .getOntologyIRI().toString(), artifactID.getVersionIRI().toString(), objectToDelete, false));
+        
+        // verify:
+        RepositoryConnection nextRepositoryConnection = null;
+        try
+        {
+            nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
+            nextRepositoryConnection.begin();
+            
+            this.verifyUpdatedArtifact(artifactID, "http://purl.org/podd/basic-2-20130206/artifact:1:version:2",
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES - 10, nextRepositoryConnection);
+            
+            // verify: no publications exist
+            final List<Statement> testList =
+                    Iterations.asList(nextRepositoryConnection.getStatements(null, ValueFactoryImpl.getInstance()
+                            .createURI(PoddRdfConstants.PODD_SCIENCE, "hasPublication"), null, false, artifactID
+                            .getVersionIRI().toOpenRDFURI()));
+            Assert.assertEquals("Graph should have 0 publications", 0, testList.size());
+        }
+        finally
+        {
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isActive())
+            {
+                nextRepositoryConnection.rollback();
+            }
+            if(nextRepositoryConnection != null && nextRepositoryConnection.isOpen())
+            {
+                nextRepositoryConnection.close();
+            }
+            nextRepositoryConnection = null;
+        }
+    }
+
+    /**
+     * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, MetadataPolicy, InferredOWLOntologyID)}
      * .
      */
