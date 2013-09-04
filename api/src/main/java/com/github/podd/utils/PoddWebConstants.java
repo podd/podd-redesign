@@ -162,6 +162,11 @@ public interface PoddWebConstants
     public static final String PATH_OBJECT_ADD = "artifact/addobject";
     
     /**
+     * Path to delete object service
+     */
+    public static final String PATH_OBJECT_DELETE = "artifact/deleteobject";
+    
+    /**
      * Path to get metadata about a particular object type
      */
     public static final String PATH_GET_METADATA = "metadata";
@@ -181,6 +186,11 @@ public interface PoddWebConstants
      */
     public static final String KEY_ARTIFACT_VERSION_IDENTIFIER = "versionuri";
     
+    /**
+     * Key used to indicate that the action should be cascaded onto any child objects
+     */
+    public static final String KEY_CASCADE = "iscascade";
+
     /**
      * Key used to indicate that the request is to "delete" a resource
      */
@@ -279,5 +289,5 @@ public interface PoddWebConstants
     public static final String METADATA_EXCLUDE_CONTAINS = "nocontains";
     
     public static final String METADATA_ONLY_CONTAINS = "containsonly";
-    
+
 }
