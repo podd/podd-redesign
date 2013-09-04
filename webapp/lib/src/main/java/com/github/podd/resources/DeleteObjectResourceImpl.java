@@ -16,12 +16,16 @@
  */
 package com.github.podd.resources;
 
+import java.io.IOException;
+
+import org.openrdf.OpenRDFException;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Delete;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,8 +92,8 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             final User user = this.getRequest().getClientInfo().getUser();
             this.log.info("authenticated user: {}", user);
             
-            final boolean result = true; 
-                    //this.getPoddArtifactManager().deleteObject(artifactUri, versionUri, objectUri, cascade);
+            final boolean result =  
+                    this.getPoddArtifactManager().deleteObject(artifactUri, versionUri, objectUri, cascade);
             this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
             
             if(result)
@@ -101,7 +105,7 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
             }
         }
-        catch(final PoddException e)
+        catch(final PoddException | OpenRDFException | IOException | OWLException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                     "Could not delete artifact due to an internal error", e);

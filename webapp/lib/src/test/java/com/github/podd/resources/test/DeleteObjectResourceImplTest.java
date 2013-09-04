@@ -16,6 +16,7 @@
  */
 package com.github.podd.resources.test;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -33,6 +34,7 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
 {
+    @Ignore
     @Test
     public void testDeleteObjectBasicRdf() throws Exception
     {
