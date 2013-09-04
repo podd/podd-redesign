@@ -99,7 +99,7 @@ public interface PoddSchemaManager
      * @throws OpenRDFException
      */
     Set<InferredOWLOntologyID> getSchemaOntologies() throws OpenRDFException;
-
+    
     /**
      * Gets a PODD Schema Ontology based on the given IRI. If the IRI matches a managed Schema
      * Ontology IRI then the current version of that Schema Ontology is returned. If the IRI does
@@ -255,5 +255,21 @@ public interface PoddSchemaManager
      */
     InferredOWLOntologyID uploadSchemaOntology(OWLOntologyID schemaOntologyID, InputStream inputStream,
             RDFFormat fileFormat) throws OpenRDFException, IOException, OWLException, PoddException;
+    
+    /**
+     * Gets the exact schema ontology version specified by the parameter if it exists, or throws an
+     * exception.
+     * 
+     * @param owlOntologyID
+     *            The schema ontology to fetch.
+     * @return An {@link InferredOWLOntologyID} representing the ontology IRI and version IRI for
+     *         the schema ontology as managed by the system.
+     * @throws UnmanagedSchemaIRIException
+     *             If the schema identified by the parameter is not currently managed by the system.
+     * @throws OpenRDFException
+     *             If there was a problem with resolving or parsing the schema.
+     */
+    InferredOWLOntologyID getSchemaOntologyID(OWLOntologyID owlOntologyID) throws UnmanagedSchemaOntologyIDException,
+        OpenRDFException;
     
 }

@@ -19,6 +19,7 @@ package com.github.podd.restlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -35,6 +36,9 @@ import org.restlet.Restlet;
 import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
 import org.restlet.routing.Router;
+import org.restlet.routing.Template;
+import org.restlet.routing.TemplateRoute;
+import org.restlet.routing.Variable;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Role;
 import org.restlet.security.User;
@@ -61,6 +65,7 @@ import com.github.podd.resources.EditArtifactResourceImpl;
 import com.github.podd.resources.FileReferenceAttachResourceImpl;
 import com.github.podd.resources.GetArtifactResourceImpl;
 import com.github.podd.resources.GetMetadataResourceImpl;
+import com.github.podd.resources.GetSchemaResourceImpl;
 import com.github.podd.resources.HelpResourceImpl;
 import com.github.podd.resources.IndexResourceImpl;
 import com.github.podd.resources.ListArtifactsResourceImpl;
@@ -402,6 +407,14 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         final String deleteObject = PoddWebConstants.PATH_OBJECT_DELETE;
         this.log.debug("attaching Delete Object service to path={}", deleteObject);
         router.attach(deleteObject, DeleteObjectResourceImpl.class);
+        
+        // Add a route for the Schema retrieval service.
+        final String getSchemaService = PoddWebConstants.PATH_GET_SCHEMA;
+        this.log.debug("attaching Schema service to path={}", getSchemaService);
+        TemplateRoute schemaService = router.attach(getSchemaService, GetSchemaResourceImpl.class);
+        schemaService.getTemplate().setMatchingMode(Template.MODE_STARTS_WITH);
+        Map<String, Variable> routeVariables = schemaService.getTemplate().getVariables();
+        routeVariables.put("schemaPath", new Variable(Variable.TYPE_URI_PATH)); 
         
         // Add a route for Logout service
         // final String logout = "logout";

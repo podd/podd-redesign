@@ -172,6 +172,11 @@ public interface PoddWebConstants
     public static final String PATH_GET_METADATA = "metadata";
     
     /**
+     * Path to get schema ontologies.
+     */
+    public static final String PATH_GET_SCHEMA = "ns/{schemaPath}";
+    
+    /**
      * Key used to represent user identifier part of a URL
      */
     public static final String KEY_USER_IDENTIFIER = "useridentifier";
@@ -190,7 +195,7 @@ public interface PoddWebConstants
      * Key used to indicate that the action should be cascaded onto any child objects
      */
     public static final String KEY_CASCADE = "iscascade";
-
+    
     /**
      * Key used to indicate that the request is to "delete" a resource
      */
@@ -289,5 +294,13 @@ public interface PoddWebConstants
     public static final String METADATA_EXCLUDE_CONTAINS = "nocontains";
     
     public static final String METADATA_ONLY_CONTAINS = "containsonly";
-
+    
+    public static final String KEY_SCHEMA_URI = "schemauri";
+    
+    public static final String KEY_SCHEMA_VERSION_URI = "schemaversionuri";
+    
+    public static final String KEY_SCHEMA_PATH = "schemaPath";
+    
+    public static final String PURL_ORG_PODD_NS = "http://purl.org/podd/ns/";
+    
 }

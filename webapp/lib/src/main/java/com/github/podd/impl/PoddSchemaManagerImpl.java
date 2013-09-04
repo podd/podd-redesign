@@ -60,7 +60,6 @@ import com.github.podd.exception.UnmanagedSchemaException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.exception.UnmanagedSchemaOntologyIDException;
 import com.github.podd.restlet.ApplicationUtils;
-import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 
@@ -91,6 +90,27 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     @Override
+    public Set<InferredOWLOntologyID> getCurrentSchemaOntologies() throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        
+        try
+        {
+            conn = this.repositoryManager.getRepository().getConnection();
+            
+            return this.sesameManager.getAllCurrentSchemaOntologyVersions(conn,
+                    this.repositoryManager.getSchemaManagementGraph());
+        }
+        finally
+        {
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
+    }
+    
+    @Override
     public InferredOWLOntologyID getCurrentSchemaOntologyVersion(final IRI schemaOntologyIRI)
         throws UnmanagedSchemaIRIException, OpenRDFException
     {
@@ -114,27 +134,6 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
             {
                 conn.rollback();
             }
-            if(conn != null && conn.isOpen())
-            {
-                conn.close();
-            }
-        }
-    }
-    
-    @Override
-    public Set<InferredOWLOntologyID> getCurrentSchemaOntologies() throws OpenRDFException
-    {
-        RepositoryConnection conn = null;
-        
-        try
-        {
-            conn = this.repositoryManager.getRepository().getConnection();
-            
-            return this.sesameManager.getAllCurrentSchemaOntologyVersions(conn,
-                    this.repositoryManager.getSchemaManagementGraph());
-        }
-        finally
-        {
             if(conn != null && conn.isOpen())
             {
                 conn.close();
@@ -174,6 +173,54 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         throws UnmanagedSchemaOntologyIDException
     {
         throw new RuntimeException("TODO: Implement getSchemaOntology(OWLOntologyID)");
+    }
+    
+    @Override
+    public InferredOWLOntologyID getSchemaOntologyID(final OWLOntologyID owlOntologyID)
+        throws UnmanagedSchemaOntologyIDException, OpenRDFException
+    {
+        if(owlOntologyID == null)
+        {
+            throw new UnmanagedSchemaOntologyIDException(owlOntologyID, "NULL is not a managed schema ontology");
+        }
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repositoryManager.getRepository().getConnection();
+            conn.begin();
+            
+            final InferredOWLOntologyID version =
+                    this.sesameManager.getSchemaVersion(owlOntologyID.getVersionIRI(), conn,
+                            this.repositoryManager.getSchemaManagementGraph());
+            
+            // Check that the ontology IRI matches or return an error
+            if(version.getOntologyIRI().equals(owlOntologyID.getOntologyIRI()))
+            {
+                return version;
+            }
+            else
+            {
+                throw new UnmanagedSchemaOntologyIDException(owlOntologyID,
+                        "Version did not match the ontology IRI specified for the ontology.");
+            }
+        }
+        catch(final UnmanagedSchemaIRIException e)
+        {
+            throw new UnmanagedSchemaOntologyIDException(owlOntologyID,
+                    "Could not find the version specified for the ontology.", e);
+        }
+        finally
+        {
+            if(conn != null && conn.isActive())
+            {
+                conn.rollback();
+            }
+            if(conn != null && conn.isOpen())
+            {
+                conn.close();
+            }
+        }
     }
     
     @Override
@@ -344,7 +391,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
      * @param model
      * @param currentVersionsMap
      * @param nextSchemaOntologyUri
-     * @throws SchemaManifestException 
+     * @throws SchemaManifestException
      */
     public void mapCurrentVersion(final Model model, final ConcurrentMap<URI, URI> currentVersionsMap,
             final URI nextSchemaOntologyUri) throws SchemaManifestException
@@ -424,7 +471,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 {
                     schemaOntologyUris.add((URI)nextOntology);
                     // check ontology IRI does not have any associated owl:imports
-                    if(model.filter((URI)nextOntology, OWL.IMPORTS, null).objects().size() > 0)
+                    if(model.filter(nextOntology, OWL.IMPORTS, null).objects().size() > 0)
                     {
                         throw new SchemaManifestException(IRI.create((URI)nextOntology),
                                 "Imports should be associated with version IRI");
@@ -453,8 +500,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         for(final URI nextVersionUri : schemaVersionUris)
         {
-            this.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder,
-                    nextVersionUri);
+            this.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder, nextVersionUri);
         }
         
         this.log.info("importOrder: {}", importOrder);
