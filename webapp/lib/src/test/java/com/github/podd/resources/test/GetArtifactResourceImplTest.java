@@ -271,7 +271,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         final String body = results.getText().trim();
         
         // verify: received contents are in Turtle
-        Assert.assertTrue("Turtle result should start with a <", body.startsWith("<http://"));
+        Assert.assertTrue("Turtle result did not have namespaces", body.contains("@prefix"));
         Assert.assertTrue("Turtle result should end with a period", body.endsWith(" ."));
         
         // verify: received contents have artifact's ontology and version IRIs
