@@ -16,6 +16,8 @@
  */
 package com.github.podd.impl;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,14 +32,18 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
+import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.util.ModelException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
@@ -121,7 +127,14 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         {
             connection = this.repositoryManager.getRepository().getConnection();
             
-            connection.export(Rio.createWriter(format, outputStream), contexts.toArray(new Resource[] {}));
+            RepositoryResult<Statement> statements = connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
+            Model model = new LinkedHashModel(Iterations.asList(statements));
+            RepositoryResult<Namespace> namespaces = connection.getNamespaces();
+            for(Namespace nextNs : Iterations.asSet(namespaces))
+            {
+                model.setNamespace(nextNs);
+            }
+            Rio.write(model, Rio.createWriter(format, outputStream));
         }
         finally
         {
