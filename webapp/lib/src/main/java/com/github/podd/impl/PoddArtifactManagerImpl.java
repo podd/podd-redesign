@@ -1611,6 +1611,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         finally
         {
+            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
+            {
+                try
+                {
+                    permanentRepositoryConnection.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found exception closing repository connection", e);
+                }
+            }
+            
             // release resources
             if(inferredOWLOntologyID != null)
             {
@@ -1630,17 +1642,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             tempRepository.shutDown();
             
-            if(permanentRepositoryConnection != null && permanentRepositoryConnection.isOpen())
-            {
-                try
-                {
-                    permanentRepositoryConnection.close();
-                }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Found exception closing repository connection", e);
-                }
-            }
         }
     }
     
@@ -1660,6 +1661,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         try
         {
             permanentRepositoryConnection = this.repositoryManager.getRepository().getConnection();
+            permanentRepositoryConnection.begin();
             InferredOWLOntologyID artifactVersion =
                     this.sesameManager.getCurrentArtifactVersion(artifactId.getOntologyIRI(),
                             permanentRepositoryConnection, this.repositoryManager.getArtifactManagementGraph());
@@ -1675,7 +1677,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8192);
             // Export the artifact without including the old inferred triples, and they will be
             // regenerated using the new schema ontologies
-            this.exportArtifact(artifactId, outputStream, format, false);
+            this.exportArtifact(artifactVersion, outputStream, format, false);
             
             tempRepository = this.repositoryManager.getNewTemporaryRepository();
             tempRepositoryConnection = tempRepository.getConnection();
@@ -1685,8 +1687,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepositoryConnection.add(new ByteArrayInputStream(outputStream.toByteArray()), "", format,
                     newVersionIRI.toOpenRDFURI());
             
-            tempRepositoryConnection.remove(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, null);
-            tempRepositoryConnection.add(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
+            tempRepositoryConnection.remove(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, null);
+            tempRepositoryConnection.add(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
                     newVersionIRI.toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
             
             for(OWLOntologyID nextOldSchemaOntologyID : oldSchemaOntologyIds)
@@ -1694,27 +1696,25 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 // Remove both a generic import and a version specific import, so this method can be
                 // used to bump generic imports to version specific imports after they are imported,
                 // if necessary.
-                tempRepositoryConnection.remove(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                tempRepositoryConnection.remove(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextOldSchemaOntologyID.getOntologyIRI().toOpenRDFURI());
-                tempRepositoryConnection.remove(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                tempRepositoryConnection.remove(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextOldSchemaOntologyID.getVersionIRI().toOpenRDFURI());
             }
             
             // Even if the old version of the artifact did not import this schema, we include it now
             // as it may be required by the others
-            // TODO: Should we have a smarter method of including new schema ontologies to old
-            // artifacts
             for(OWLOntologyID nextNewSchemaOntologyID : newSchemaOntologyIds)
             {
                 // Add import to the specific version
-                tempRepositoryConnection.add(artifactId.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
+                tempRepositoryConnection.add(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
                         nextNewSchemaOntologyID.getVersionIRI().toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
             }
             
             tempRepositoryConnection.commit();
-            permanentRepositoryConnection.begin();
-            InferredOWLOntologyID result = this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
-                    newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+            InferredOWLOntologyID result =
+                    this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
+                            newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY);
             permanentRepositoryConnection.commit();
             
             return result;
