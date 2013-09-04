@@ -35,6 +35,7 @@ import java.util.UUID;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
+import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -330,7 +331,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             connection = this.getRepositoryManager().getRepository().getConnection();
             
             RepositoryResult<Statement> statements = connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
-            return Iterations.addAll(statements, new LinkedHashModel());
+            Model model = new LinkedHashModel(Iterations.asList(statements));
+            RepositoryResult<Namespace> namespaces = connection.getNamespaces();
+            for(Namespace nextNs : Iterations.asSet(namespaces))
+            {
+                model.setNamespace(nextNs);
+            }
+            return model;
         }
         finally
         {
@@ -1782,20 +1789,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         "Cannot update schema imports for artifact as the specified version was not found.");
             }
             
-            RDFFormat format = RDFFormat.RDFJSON;
-            
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8192);
             // Export the artifact without including the old inferred triples, and they will be
             // regenerated using the new schema ontologies
-            this.exportArtifact(artifactVersion, outputStream, format, false);
+            final Model model = this.exportArtifact(artifactVersion, false);
             
             tempRepository = this.repositoryManager.getNewTemporaryRepository();
             tempRepositoryConnection = tempRepository.getConnection();
             tempRepositoryConnection.begin();
             // Bump the version identifier to a new value
             final IRI newVersionIRI = IRI.create(this.incrementVersion(artifactVersion.getVersionIRI().toString()));
-            tempRepositoryConnection.add(new ByteArrayInputStream(outputStream.toByteArray()), "", format,
-                    newVersionIRI.toOpenRDFURI());
+            tempRepositoryConnection.add(model, newVersionIRI.toOpenRDFURI());
             
             tempRepositoryConnection.remove(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI, null);
             tempRepositoryConnection.add(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
