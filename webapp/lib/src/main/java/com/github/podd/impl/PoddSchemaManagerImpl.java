@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.openrdf.model.util.ModelException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
@@ -55,6 +57,7 @@ import com.github.podd.api.PoddSchemaManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.SchemaManifestException;
 import com.github.podd.exception.UnmanagedSchemaException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -83,10 +86,50 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
     }
     
     @Override
-    public void downloadSchemaOntology(final OWLOntologyID schemaOntologyID, final OutputStream outputStream,
-            final RDFFormat format, final boolean includeInferences) throws UnmanagedSchemaException
+    public void downloadSchemaOntology(final InferredOWLOntologyID ontologyId, final OutputStream outputStream,
+            final RDFFormat format, final boolean includeInferred) throws UnmanagedSchemaException,
+        RepositoryException, OpenRDFException
     {
-        throw new RuntimeException("TODO: Implement downloadSchemaOntology");
+        if(ontologyId.getOntologyIRI() == null || ontologyId.getVersionIRI() == null)
+        {
+            throw new PoddRuntimeException("Ontology IRI and Version IRI cannot be null");
+        }
+        
+        InferredOWLOntologyID schemaOntologyID = this.getSchemaOntologyID(ontologyId);
+        
+        if(includeInferred && schemaOntologyID.getInferredOntologyIRI() == null)
+        {
+            throw new PoddRuntimeException("Inferred Ontology IRI cannot be null");
+        }
+        
+        List<URI> contexts;
+        
+        if(includeInferred)
+        {
+            contexts =
+                    Arrays.asList(schemaOntologyID.getVersionIRI().toOpenRDFURI(), schemaOntologyID
+                            .getInferredOntologyIRI().toOpenRDFURI());
+        }
+        else
+        {
+            contexts = Arrays.asList(schemaOntologyID.getVersionIRI().toOpenRDFURI());
+        }
+        
+        RepositoryConnection connection = null;
+        
+        try
+        {
+            connection = this.repositoryManager.getRepository().getConnection();
+            
+            connection.export(Rio.createWriter(format, outputStream), contexts.toArray(new Resource[] {}));
+        }
+        finally
+        {
+            if(connection != null)
+            {
+                connection.close();
+            }
+        }
     }
     
     @Override

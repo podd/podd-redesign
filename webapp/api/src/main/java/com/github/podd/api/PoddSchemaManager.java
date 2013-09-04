@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
@@ -60,9 +61,12 @@ public interface PoddSchemaManager
      * @param includeInferences
      *            If true, inferred statements are also returned. If false, only the concrete RDF
      *            triples are returned.
+     * @throws UnmanagedSchemaException If the schema is not managed
+     * @throws OpenRDFException 
+     * @throws RepositoryException 
      */
-    void downloadSchemaOntology(OWLOntologyID schemaOntologyID, OutputStream outputStream, RDFFormat format,
-            boolean includeInferences) throws UnmanagedSchemaException;
+    void downloadSchemaOntology(InferredOWLOntologyID schemaOntologyID, OutputStream outputStream, RDFFormat format,
+            boolean includeInferences) throws UnmanagedSchemaException, RepositoryException, OpenRDFException;
     
     /**
      * Get the most current version of a managed Schema Ontology that contains the given

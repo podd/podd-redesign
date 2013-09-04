@@ -33,6 +33,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
 import com.github.podd.exception.UnmanagedSchemaOntologyIDException;
+import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -84,7 +85,7 @@ public class GetSchemaResourceImpl extends AbstractPoddResourceImpl
             // final User user = this.getRequest().getClientInfo().getUser();
             // this.log.info("authenticated user: {}", user);
             
-            OWLOntologyID ontologyID = null;
+            InferredOWLOntologyID ontologyID = null;
             
             if(versionString == null)
             {
