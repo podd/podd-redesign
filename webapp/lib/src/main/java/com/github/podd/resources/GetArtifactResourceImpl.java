@@ -96,6 +96,11 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 ontologyID =
                         this.getPoddArtifactManager()
                                 .getArtifact(IRI.create(artifactString), IRI.create(versionString));
+                
+                if(ontologyID == null)
+                {
+                    ontologyID = this.getPoddArtifactManager().getArtifact(IRI.create(artifactString));
+                }
             }
         }
         catch(final UnmanagedArtifactIRIException e)
