@@ -83,7 +83,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
      * Test authenticated access attempts to an unmanaged artifact gives a 404 error.
      */
     @Test
-    public void testErrorGetArtifactUnmanagedWithAuthentication() throws Exception
+    public void testErrorGetArtifactUnmanagedWithAuthenticationAdmin() throws Exception
     {
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -95,6 +95,31 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         {
             RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
+            Assert.fail("Should have thrown a ResourceException with Status Code 404");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_NOT_FOUND, e.getStatus());
+        }
+        
+    }
+    
+    /**
+     * Test authenticated access attempts to an unmanaged artifact gives a 404 error.
+     */
+    @Test
+    public void testErrorGetArtifactUnmanagedWithAuthenticationNonAdmin() throws Exception
+    {
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
+                "http://purl.org/podd/ns/artifact/artifact89");
+        
+        try
+        {
+            RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.testNoAdminPrivileges);
             Assert.fail("Should have thrown a ResourceException with Status Code 404");
         }
         catch(final ResourceException e)
