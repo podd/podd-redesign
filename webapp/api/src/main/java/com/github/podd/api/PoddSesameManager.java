@@ -362,6 +362,22 @@ public interface PoddSesameManager
         throws OpenRDFException;
     
     /**
+     * This method identifies objects that refer to the given object and the referring property. If
+     * the object URI is null, an empty Model is returned. A referring property is any sub-property
+     * of poddBase#refersTo.
+     * 
+     * @param objectUri
+     *            The Object whose referrers are sought
+     * @param repositoryConnection
+     * @param contexts
+     * @return A {@link Model} containing statements which links the referrer objects with the given
+     *         object
+     * @throws OpenRDFException
+     */
+    Model getReferringObjectDetails(URI objectUri, RepositoryConnection repositoryConnection, URI... contexts)
+        throws OpenRDFException;
+    
+    /**
      * If the given IRI represents a version IRI of a schema ontology, the Ontology ID for this
      * schema version is returned. If the given IRI represents an ontology IRI of a schema ontology,
      * the Ontology ID for the most current version of this schema ontology is returned.
@@ -500,5 +516,5 @@ public interface PoddSesameManager
     
     URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
-    
+
 }

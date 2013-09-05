@@ -1475,6 +1475,39 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return this.executeGraphQuery(graphQuery, contexts);
     }
     
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.podd.api.PoddSesameManager#getReferringObjectDetails(org.openrdf.model.URI,
+     * org.openrdf.repository.RepositoryConnection, org.openrdf.model.URI...)
+     */
+    @Override
+    public Model getReferringObjectDetails(final URI objectUri, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        if(objectUri == null)
+        {
+            return new LinkedHashModel();
+        }
+        
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("CONSTRUCT { ");
+        sb.append(" ?referrer ?refersToProperty ?poddObject ");
+        sb.append("} WHERE {");
+        sb.append(" ?referrer ?refersToProperty ?poddObject . ");
+        sb.append(" ?refersToProperty <" + RDFS.SUBPROPERTYOF.stringValue() + "> <"
+                + PoddRdfConstants.PODD_BASE_REFERS_TO.stringValue() + "> . ");
+        sb.append("}");
+        
+        final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
+        graphQuery.setBinding("poddObject", objectUri);
+        
+        this.log.debug("Created SPARQL {} \n   with poddObject bound to {}", sb, objectUri);
+        
+        return this.executeGraphQuery(graphQuery, contexts);
+    }
+  
     @Override
     public InferredOWLOntologyID getSchemaVersion(final IRI schemaVersionIRI,
             final RepositoryConnection repositoryConnection, final URI schemaManagementGraph) throws OpenRDFException,
