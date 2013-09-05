@@ -16,20 +16,32 @@
  */
 package com.github.podd.resources;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Model;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 import org.restlet.resource.Delete;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 
+import com.github.podd.exception.ArtifactModifyException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.PublishedArtifactModifyException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -37,19 +49,19 @@ import com.github.podd.utils.PoddWebConstants;
  * Delete an internal PODD object.
  * 
  * @author kutila
- *
+ * 
  */
 public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
 {
     /**
-     * Accept an HTTP delete request to delete a PODD object. Upon successful deletion,
-     * an HTTP 204 (No Content) response is sent to the client.
+     * Accept an HTTP delete request to delete a PODD object. Upon successful deletion, an HTTP 200
+     * response with the updated Inferred Ontology ID is sent to the client.
      * 
      * @param entity
      * @throws ResourceException
      */
     @Delete
-    public void deleteObject(final Representation entity) throws ResourceException
+    public Representation deleteObject(final Representation entity, final Variant variant) throws ResourceException
     {
         try
         {
@@ -58,8 +70,9 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
             }
-
-            final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
+            
+            final String versionUri =
+                    this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
             if(versionUri == null)
             {
                 this.log.error("Artifact Version IRI not submitted");
@@ -74,7 +87,7 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             }
             
             String cascadeString = this.getQueryValue(PoddWebConstants.KEY_CASCADE);
-            if (cascadeString == null)
+            if(cascadeString == null)
             {
                 cascadeString = "false";
             }
@@ -88,13 +101,31 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             final User user = this.getRequest().getClientInfo().getUser();
             this.log.info("authenticated user: {}", user);
             
-              
-            final InferredOWLOntologyID updatedOntologyID = this.getPoddArtifactManager().deleteObject(artifactUri, versionUri, objectUri, cascade);
-            this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
+            final InferredOWLOntologyID updatedOntologyID =
+                    this.getPoddArtifactManager().deleteObject(artifactUri, versionUri, objectUri, cascade);
             
-            this.getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
-            // TODO - send updated artifact ID in response. Handle exception to indicate delete failed and return that separately
-            //throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not delete artifact");
+            // - prepare response
+            final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
+            final RDFFormat outputFormat =
+                    Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
+            final Model model =
+                    OntologyUtils.ontologyIDsToModel(Arrays.asList(updatedOntologyID), new LinkedHashModel(), false);
+            Rio.write(model, output, outputFormat);
+            
+            return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat
+                    .getDefaultMIMEType()));
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact is not managed", e);
+        }
+        catch(final PublishedArtifactModifyException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Cannot modify published Artifact ", e);
+        }
+        catch(final ArtifactModifyException e)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Object cannot be deleted", e);
         }
         catch(final PoddException | OpenRDFException | IOException | OWLException e)
         {
@@ -102,5 +133,5 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
                     "Could not delete artifact due to an internal error", e);
         }
     }
-
+    
 }

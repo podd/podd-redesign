@@ -16,31 +16,39 @@
  */
 package com.github.podd.resources.test;
 
-import org.junit.Ignore;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+
+import org.junit.Assert;
 import org.junit.Test;
+import org.openrdf.model.Model;
+import org.openrdf.model.URI;
+import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author kutila
- *
+ * 
  */
 public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
 {
-    @Ignore
     @Test
     public void testDeleteObjectBasicRdf() throws Exception
     {
         // prepare: add an artifact
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#publication45";
         
         final ClientResource deleteObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_OBJECT_DELETE));
@@ -49,12 +57,44 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
                 .getOntologyIRI().toString());
         deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
                 .getVersionIRI().toString());
-        deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, 
-                "http://purl.org/podd/basic-2-20130206/artifact:1#publication45");
+        deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER,
+                objectToDelete);
         deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_CASCADE, Boolean.toString(false));
         
-        RestletTestUtils.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
-                MediaType.APPLICATION_RDF_XML, Status.SUCCESS_NO_CONTENT, this.testWithAdminPrivileges);
         
+        Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
+                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        
+        // verify: response contains updated artifact's ID
+        final String updatedArtifactDetails = results.getText();
+        Assert.assertTrue("Artifact version has not been updated properly",
+                updatedArtifactDetails.contains("artifact:1:version:2"));
+        
+        // verify: retrieve artifact and check deleted object's not present
+        final Model retrievedArtifact = this.getArtifact(artifactID.getOntologyIRI().toString(), 81);
+        final URI objectToDeleteUri = PoddRdfConstants.VF.createURI(objectToDelete);
+        Assert.assertTrue("Object not deleted", retrievedArtifact.filter(objectToDeleteUri, null, null).isEmpty());
+        Assert.assertTrue("Object not deleted", retrievedArtifact.filter(null, null, objectToDeleteUri).isEmpty());
+    }
+    
+    
+    private Model getArtifact(final String artifactUri, final int expectedStatementCount) throws Exception
+    {
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation getArtifactResult =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(getArtifactResult.getText().getBytes(StandardCharsets.UTF_8)),
+                        RDFFormat.RDFXML, expectedStatementCount);
+        
+        return model;
     }
 }
