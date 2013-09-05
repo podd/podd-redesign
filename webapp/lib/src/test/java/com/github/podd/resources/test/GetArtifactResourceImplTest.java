@@ -35,6 +35,7 @@ import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.api.test.TestConstants;
 import com.github.podd.utils.DebugUtils;
+import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -356,6 +357,52 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         // body.contains("http://dx.doi.org/10.1109/eScience.2010.44"));
         
         this.assertFreemarker(body);
+    }
+    
+    /**
+     * Test authenticated access to get Artifact in RDF/XML by a non Repository Admin User.
+     * 
+     * BUG - FIXME
+     */
+    @Ignore
+    @Test
+    public void testGetArtifactWithNonAdminUserRdf() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        
+        this.mapUserToRole("anotherUser", PoddRoles.PROJECT_ADMIN, artifactUri);
+        
+        
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+        
+        final Representation results =
+                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
+        
+        final String body = results.getText();
+        
+        // verify: received contents are in RDF
+        Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
+        Assert.assertTrue("Result does not have RDF", body.endsWith("</rdf:RDF>"));
+        
+        // verify: received contents have artifact URI
+        Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
+        
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 29);
+        
+        Assert.assertEquals(6, model.subjects().size());
+        Assert.assertEquals(15, model.predicates().size());
+        Assert.assertEquals(24, model.objects().size());
+        
+        if(this.log.isDebugEnabled())
+        {
+            DebugUtils.printContents(model);
+        }
     }
     
     /**

@@ -79,6 +79,7 @@ import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -489,6 +490,49 @@ public class AbstractResourceImplTest
         final Resource next =
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
         return next.stringValue();
+    }
+    
+    /**
+     * Maps the given User and Role with an optional object URI.
+     * 
+     * @param userIdentifier
+     * @param poddRole
+     * @param mappedObjectUri
+     * @throws Exception
+     */
+    protected void mapUserToRole(final String userIdentifier, final PoddRoles poddRole, final String mappedObjectUri) throws Exception
+    {
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
+        final Model newModel = new LinkedHashModel();
+        
+        // prepare Model with additional Role mapping
+        final URI roleMapping1Uri =
+                PoddRdfConstants.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
+        newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
+        newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, poddRole.getURI());
+        if (mappedObjectUri != null)
+        {
+            newModel.add(roleMapping1Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT,
+                    PoddRdfConstants.VF.createURI(mappedObjectUri));
+        }
+        
+        // submit modified details to User Roles Service
+        final ClientResource userRolesClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
+        userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Rio.write(newModel, out, format);
+        final Representation input = new StringRepresentation(out.toString(), mediaType);
+        final Representation modifiedResults =
+                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        final Model model =
+                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
+                        RDFFormat.RDFXML, 1);
+        Assert.assertEquals("Unexpected user identifier", userIdentifier,
+                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
     }
     
     /**
