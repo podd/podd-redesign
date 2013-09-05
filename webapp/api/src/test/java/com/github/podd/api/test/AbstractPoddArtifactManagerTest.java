@@ -94,7 +94,6 @@ import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
-import com.github.podd.exception.PoddRuntimeException;
 import com.github.podd.exception.PublishedArtifactModifyException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
@@ -749,17 +748,16 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        final Object[][] testData = {
-                {"http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1", 87, false},
-                {"http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 77, false},
-                { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 65, true }, 
-        };
+        final Object[][] testData =
+                { { "http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1", 87, false },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 77, false },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 65, true }, };
         
-        for(int i = 0; i < testData.length; i++)
+        for(final Object[] element : testData)
         {
-            final String objectToDelete = (String)testData[i][0];
-            final int expectedArtifactSize = (int)testData[i][1];
-            final boolean cascade = (boolean)testData[i][2];
+            final String objectToDelete = (String)element[0];
+            final int expectedArtifactSize = (int)element[1];
+            final boolean cascade = (boolean)element[2];
             
             // perform test action: delete object
             final InferredOWLOntologyID modifiedArtifactId =
@@ -767,7 +765,7 @@ public abstract class AbstractPoddArtifactManagerTest
                             .getVersionIRI().toString(), objectToDelete, cascade);
             
             // verify:
-            Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
+            final Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
             Assert.assertEquals("Reduction in artifact size incorrect", expectedArtifactSize, artifactModel.size());
             
             Assert.assertTrue("Object was not deleted",
@@ -782,8 +780,8 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#deleteObject(String, String, String, boolean)}
      * .
      * 
-     * Tests that deleting an object which has child objects without setting the cascade
-     * option is not allowed.
+     * Tests that deleting an object which has child objects without setting the cascade option is
+     * not allowed.
      */
     @Test
     public final void testDeleteObjectWithChildrenNoCascade() throws Exception
@@ -801,16 +799,16 @@ public abstract class AbstractPoddArtifactManagerTest
         // perform test action: delete object
         try
         {
-                this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toString(), artifactID
-                        .getVersionIRI().toString(), objectToDelete, cascade);
-                Assert.fail("Should not have allowed deletion");
+            this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toString(), artifactID.getVersionIRI()
+                    .toString(), objectToDelete, cascade);
+            Assert.fail("Should not have allowed deletion");
         }
-        catch (DisconnectedObjectException e)
+        catch(final DisconnectedObjectException e)
         {
-            Set<URI> disconnectedObjects = e.getDisconnectedObjects();
+            final Set<URI> disconnectedObjects = e.getDisconnectedObjects();
             System.out.println(disconnectedObjects);
             
-            Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
+            final Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
             Assert.assertEquals("Reduction in artifact size incorrect",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
             Assert.assertFalse("Object was deleted",
@@ -835,21 +833,21 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        InferredOWLOntologyID publishedArtifact = this.testArtifactManager.publishArtifact(artifactID);
+        final InferredOWLOntologyID publishedArtifact = this.testArtifactManager.publishArtifact(artifactID);
         
         final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#publication45";
         
         // perform test action: delete object
         try
         {
-                this.testArtifactManager.deleteObject(publishedArtifact.getOntologyIRI().toString(), publishedArtifact
-                        .getVersionIRI().toString(), objectToDelete, false);
-                Assert.fail("Should not have allowed deletion");
+            this.testArtifactManager.deleteObject(publishedArtifact.getOntologyIRI().toString(), publishedArtifact
+                    .getVersionIRI().toString(), objectToDelete, false);
+            Assert.fail("Should not have allowed deletion");
         }
-        catch (PublishedArtifactModifyException e)
+        catch(final PublishedArtifactModifyException e)
         {
             Assert.assertEquals("Failure not due to published Artifact", publishedArtifact, e.getArtifactID());
-            Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
+            final Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
             Assert.assertEquals("Reduction in artifact size incorrect",
                     TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
             Assert.assertFalse("Object was deleted",
@@ -890,7 +888,7 @@ public abstract class AbstractPoddArtifactManagerTest
         Assert.assertTrue("Object exists as a subject of some statement",
                 artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#deleteObject(String, String, String, boolean)}
@@ -919,7 +917,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     .toString(), objectToDelete, cascade);
             Assert.fail("Should not have allowed deletion");
         }
-        catch(ArtifactModifyException e)
+        catch(final ArtifactModifyException e)
         {
             Assert.assertEquals("Failure not due to object to delete", objectToDelete, e.getObjectUri().toString());
             
@@ -2311,7 +2309,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     new HashSet<OWLOntologyID>());
             Assert.fail("Should have thrown an IllegalArgumentException");
         }
-        catch(IllegalArgumentException e)
+        catch(final IllegalArgumentException e)
         {
             Assert.assertTrue(e.getMessage().contains("Artifact was null"));
         }
@@ -2381,7 +2379,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateSchemaImportsEmptySchemas() throws Exception
     {
-        List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
         
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -2390,7 +2388,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        InferredOWLOntologyID updateSchemaImports =
+        final InferredOWLOntologyID updateSchemaImports =
                 this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                         artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
                         new HashSet<OWLOntologyID>(), new HashSet<OWLOntologyID>());
@@ -2407,7 +2405,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateSchemaImportsEmptyNewSchemas() throws Exception
     {
-        List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
         
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -2423,7 +2421,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     new LinkedHashSet<OWLOntologyID>(schemaOntologies), new HashSet<OWLOntologyID>());
             Assert.fail("Removing essential ontologies should generate an OWL-related exception");
         }
-        catch(OntologyNotInProfileException e)
+        catch(final OntologyNotInProfileException e)
         {
             Assert.assertEquals(artifactIDv1.getOntologyIRI(), e.getOntology().getOntologyID().getOntologyIRI());
         }
@@ -2437,7 +2435,7 @@ public abstract class AbstractPoddArtifactManagerTest
     @Test
     public final void testUpdateSchemaImportsEmptyOldSchemas() throws Exception
     {
-        List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
+        final List<InferredOWLOntologyID> schemaOntologies = this.loadSchemaOntologies();
         
         // upload artifact
         final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
@@ -2446,7 +2444,7 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        InferredOWLOntologyID updateSchemaImports =
+        final InferredOWLOntologyID updateSchemaImports =
                 this.testArtifactManager.updateSchemaImports(new InferredOWLOntologyID(artifactIDv1.getOntologyIRI(),
                         artifactIDv1.getVersionIRI(), artifactIDv1.getInferredOntologyIRI()),
                         new HashSet<OWLOntologyID>(), new LinkedHashSet<OWLOntologyID>(schemaOntologies));

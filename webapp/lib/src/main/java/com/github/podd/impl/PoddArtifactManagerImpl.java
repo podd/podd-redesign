@@ -237,8 +237,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     }
     
     @Override
-    public InferredOWLOntologyID deleteObject(final String artifactUri, final String versionUri, final String objectUri,
-            final boolean cascade) throws PoddException, OpenRDFException, IOException, OWLException
+    public InferredOWLOntologyID deleteObject(final String artifactUri, final String versionUri,
+            final String objectUri, final boolean cascade) throws PoddException, OpenRDFException, IOException,
+        OWLException
     {
         // check if the specified artifact URI refers to a managed artifact
         InferredOWLOntologyID artifactID = null;
@@ -260,15 +261,15 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         this.log.debug("deleteObject ({}) from artifact {} with cascade={}", objectUri, artifactUri, cascade);
         
         final URI objectToDelete = PoddRdfConstants.VF.createURI(objectUri);
-
+        
         final Collection<URI> objectsToUpdate = new ArrayList<URI>();
         objectsToUpdate.add(objectToDelete);
-        final Model fragments = new LinkedHashModel(); 
+        final Model fragments = new LinkedHashModel();
         final Model artifactModel = this.exportArtifact(artifactID, false);
         
         // - find the objectToDelete's parent and remove parent-child link
         final Model parentDetails = this.getParentDetails(artifactID, objectToDelete);
-        if (parentDetails.subjects().size() != 1)
+        if(parentDetails.subjects().size() != 1)
         {
             this.log.error("Object {} cannot be deleted. (No parent)", objectUri, artifactUri);
             throw new ArtifactModifyException("Object cannot be deleted. (No parent)", artifactID, objectToDelete);
@@ -281,7 +282,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         // - remove any refersToLinks
         final Model referenceLinks = this.getReferenceLinks(artifactID, objectToDelete);
         final Set<Resource> referrers = referenceLinks.subjects();
-        for(Resource referrer : referrers)
+        for(final Resource referrer : referrers)
         {
             final Model referrerStatements = artifactModel.filter(referrer, null, null);
             referrerStatements.remove(referrer, null, objectToDelete);
@@ -291,17 +292,18 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         }
         
         DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
-        if (cascade)
+        if(cascade)
         {
             danglingObjectPolicy = DanglingObjectPolicy.FORCE_CLEAN;
         }
         
         this.updateArtifact(artifactID.getOntologyIRI().toOpenRDFURI(), artifactID.getVersionIRI().toOpenRDFURI(),
-                objectsToUpdate, fragments, UpdatePolicy.REPLACE_EXISTING, danglingObjectPolicy, DataReferenceVerificationPolicy.DO_NOT_VERIFY);
-
+                objectsToUpdate, fragments, UpdatePolicy.REPLACE_EXISTING, danglingObjectPolicy,
+                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+        
         return this.getArtifact(artifactID.getOntologyIRI());
     }
-
+    
     @Override
     public Model exportArtifact(final InferredOWLOntologyID ontologyId, final boolean includeInferred)
         throws OpenRDFException, PoddException, IOException
@@ -335,10 +337,11 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             connection = this.getRepositoryManager().getRepository().getConnection();
             
-            RepositoryResult<Statement> statements = connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
-            Model model = new LinkedHashModel(Iterations.asList(statements));
-            RepositoryResult<Namespace> namespaces = connection.getNamespaces();
-            for(Namespace nextNs : Iterations.asSet(namespaces))
+            final RepositoryResult<Statement> statements =
+                    connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
+            final Model model = new LinkedHashModel(Iterations.asList(statements));
+            final RepositoryResult<Namespace> namespaces = connection.getNamespaces();
+            for(final Namespace nextNs : Iterations.asSet(namespaces))
             {
                 model.setNamespace(nextNs);
             }
@@ -352,7 +355,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
         }
     }
-
+    
     @Override
     public void exportArtifact(final InferredOWLOntologyID ontologyId, final OutputStream outputStream,
             final RDFFormat format, final boolean includeInferred) throws OpenRDFException, PoddException, IOException
@@ -1567,7 +1570,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         
         final Model model = Rio.parse(inputStream, "", format);
         
-        return this.updateArtifact(artifactUri, versionUri, objectUris, model, updatePolicy, danglingObjectAction, fileReferenceAction);
+        return this.updateArtifact(artifactUri, versionUri, objectUris, model, updatePolicy, danglingObjectAction,
+                fileReferenceAction);
     }
     
     /**
@@ -1583,7 +1587,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             throw new NullPointerException("Input Model must not be null");
         }
-                
+        
         // check if the specified artifact URI refers to a managed artifact
         InferredOWLOntologyID artifactID = null;
         try
@@ -1813,7 +1817,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             permanentRepositoryConnection = this.repositoryManager.getRepository().getConnection();
             permanentRepositoryConnection.begin();
-            InferredOWLOntologyID artifactVersion =
+            final InferredOWLOntologyID artifactVersion =
                     this.sesameManager.getCurrentArtifactVersion(artifactId.getOntologyIRI(),
                             permanentRepositoryConnection, this.repositoryManager.getArtifactManagementGraph());
             if(!artifactVersion.getVersionIRI().equals(artifactId.getVersionIRI()))
@@ -1838,7 +1842,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             tempRepositoryConnection.add(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.VERSIONIRI,
                     newVersionIRI.toOpenRDFURI(), newVersionIRI.toOpenRDFURI());
             
-            for(OWLOntologyID nextOldSchemaOntologyID : oldSchemaOntologyIds)
+            for(final OWLOntologyID nextOldSchemaOntologyID : oldSchemaOntologyIds)
             {
                 // Remove both a generic import and a version specific import, so this method can be
                 // used to bump generic imports to version specific imports after they are imported,
@@ -1851,7 +1855,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             // Even if the old version of the artifact did not import this schema, we include it now
             // as it may be required by the others
-            for(OWLOntologyID nextNewSchemaOntologyID : newSchemaOntologyIds)
+            for(final OWLOntologyID nextNewSchemaOntologyID : newSchemaOntologyIds)
             {
                 // Add import to the specific version
                 tempRepositoryConnection.add(artifactVersion.getOntologyIRI().toOpenRDFURI(), OWL.IMPORTS,
@@ -1859,14 +1863,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             }
             
             tempRepositoryConnection.commit();
-            InferredOWLOntologyID result =
+            final InferredOWLOntologyID result =
                     this.loadInferStoreArtifact(tempRepositoryConnection, permanentRepositoryConnection,
                             newVersionIRI.toOpenRDFURI(), DataReferenceVerificationPolicy.DO_NOT_VERIFY);
             permanentRepositoryConnection.commit();
             
             return result;
         }
-        catch(Throwable e)
+        catch(final Throwable e)
         {
             if(permanentRepositoryConnection != null)
             {
