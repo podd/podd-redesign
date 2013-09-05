@@ -114,6 +114,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 // Make them authenticate first so that only authenticated users see 404 messages
                 this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, null, true);
+                // Should never hit here, but putting it here to avoid possible NPEs further on
+                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Something went wrong");
             }
         }
         

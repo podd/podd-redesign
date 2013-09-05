@@ -51,6 +51,82 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     // "/test/artifacts/basicProject-1-internal-object.rdf";
     
     /**
+     * Test unauthenticated access to a managed artifact gives an UNAUTHORIZED error and not a 404.
+     * <p>
+     * This distinction ensures that users must be logged in to see 404 exceptions for artifact
+     * retrieval, providing a level of obscurity for systems that do not have user self-signup
+     * enabled.
+     */
+    @Test
+    public void testErrorGetArtifactManagedWithoutAuthentication() throws Exception
+    {
+        // prepare: add an artifact
+        final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
+                "http://purl.org/podd/ns/artifact/artifact89");
+        
+        try
+        {
+            getArtifactClientResource.get(MediaType.TEXT_HTML);
+            Assert.fail("Should have thrown a ResourceException with Status Code 401");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+    }
+    
+    /**
+     * Test authenticated access attempts to an unmanaged artifact gives a 404 error.
+     */
+    @Test
+    public void testErrorGetArtifactUnmanagedWithAuthentication() throws Exception
+    {
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
+                "http://purl.org/podd/ns/artifact/artifact89");
+        
+        try
+        {
+            RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                    MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
+            Assert.fail("Should have thrown a ResourceException with Status Code 404");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_NOT_FOUND, e.getStatus());
+        }
+        
+    }
+    
+    /**
+     * Test unauthenticated access to an unmanaged artifact gives an UNAUTHORIZED error.
+     */
+    @Test
+    public void testErrorGetArtifactUnmanagedWithoutAuthentication() throws Exception
+    {
+        final ClientResource getArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
+        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
+                "http://purl.org/podd/ns/artifact/artifact89");
+        
+        try
+        {
+            getArtifactClientResource.get(MediaType.TEXT_HTML);
+            Assert.fail("Should have thrown a ResourceException with Status Code 401");
+        }
+        catch(final ResourceException e)
+        {
+            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+    }
+    
+    /**
      * Test access without artifactID parameter gives a BAD_REQUEST error.
      */
     @Test
@@ -67,28 +143,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         catch(final ResourceException e)
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
-        }
-    }
-    
-    /**
-     * Test unauthenticated access gives an UNAUTHORIZED error.
-     */
-    @Test
-    public void testErrorGetArtifactWithoutAuthentication() throws Exception
-    {
-        final ClientResource getArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER,
-                "http://purl.org/podd/ns/artifact/artifact89");
-        
-        try
-        {
-            getArtifactClientResource.get(MediaType.TEXT_HTML);
-            Assert.fail("Should have thrown a ResourceException with Status Code 401");
-        }
-        catch(final ResourceException e)
-        {
-            Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
     }
     
@@ -371,7 +425,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         this.mapUserToRole("anotherUser", PoddRoles.PROJECT_ADMIN, artifactUri);
-        
         
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
