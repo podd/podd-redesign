@@ -76,6 +76,7 @@ import com.github.podd.api.file.DataReferenceManager;
 import com.github.podd.api.file.PoddDataRepositoryManager;
 import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlReference;
+import com.github.podd.exception.ArtifactModifyException;
 import com.github.podd.exception.DeleteArtifactException;
 import com.github.podd.exception.DisconnectedObjectException;
 import com.github.podd.exception.EmptyOntologyException;
@@ -270,8 +271,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         if (parentDetails.subjects().size() != 1)
         {
             this.log.error("Object {} cannot be deleted. (No parent)", objectUri, artifactUri);
-            //TODO: throw something more specific
-            throw new PoddRuntimeException("Object cannot be deleted. It is not a child Object.");
+            throw new ArtifactModifyException("Object cannot be deleted. (No parent)", artifactID, objectToDelete);
         }
         final Resource parent = parentDetails.subjects().iterator().next();
         fragments.addAll(artifactModel.filter(parent, null, null));
