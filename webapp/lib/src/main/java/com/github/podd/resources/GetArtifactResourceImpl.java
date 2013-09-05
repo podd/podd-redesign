@@ -100,14 +100,26 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final UnmanagedArtifactIRIException e)
         {
-            foundException = e;
+            if(this.getRequest().getClientInfo().isAuthenticated())
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact",
+                        foundException);
+            }
+            else
+            {
+                // Make them authenticate first so that only authenticated users see 404 messages
+                this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, null, true);
+            }
         }
         
         // FIXME: Test this after publish artifact is implemented
         boolean isPublished = false;
         try
         {
-            isPublished = this.getPoddArtifactManager().isPublished(ontologyID);
+            if(ontologyID != null)
+            {
+                isPublished = this.getPoddArtifactManager().isPublished(ontologyID);
+            }
         }
         catch(OpenRDFException e)
         {
@@ -121,12 +133,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         else
         {
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI().toOpenRDFURI());
-        }
-        
-        if(foundException != null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact",
-                    foundException);
         }
         
         // completed checking authorization

@@ -65,18 +65,18 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
      * 
      * @param action
      *            The PoddAction that is to be performed.
-     * @param optionalObjectUris
-     *            Collection of object URIs to be used for authorization, or an empty Collection if
-     *            none are needed for authorization.
+     * @param optionalObjectUri
+     *            A single object URI to be used for authorization, or null if none are needed for
+     *            authorization or it could not be determined.
      * @throws ResourceException
      *             with Status.CLIENT_ERROR_UNAUTHORIZED (HTTP 401) if the user is not authorised to
      *             perform the given action
      */
-    protected boolean checkAuthentication(final PoddAction action, final URI optionalObjectUris)
+    protected boolean checkAuthentication(final PoddAction action, final URI optionalObjectUri)
         throws ResourceException
     {
         // throws an error on failure
-        return this.checkAuthentication(action, optionalObjectUris, true);
+        return this.checkAuthentication(action, optionalObjectUri, true);
     }
     
     /**
@@ -85,9 +85,9 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
      * 
      * @param action
      *            The PoddAction that is to be performed.
-     * @param optionalObjectUris
-     *            Collection of object URIs to be used for authorization, or an empty Collection if
-     *            none are needed for authorization.
+     * @param optionalObjectUri
+     *            A single object URIs to be used for authorization, or null if none are needed for
+     *            authorization or it could not be determined.
      * @param throwExceptionOnFailure
      *            If true, this method throws a ResourceException on failure instead of returning
      *            false
@@ -98,10 +98,10 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
      *             with Status.CLIENT_ERROR_UNAUTHORIZED (HTTP 401) if the user is not authorised to
      *             perform the given action
      */
-    protected boolean checkAuthentication(final PoddAction action, final URI optionalObjectUris,
+    protected boolean checkAuthentication(final PoddAction action, final URI optionalObjectUri,
             final boolean throwExceptionOnFailure) throws ResourceException
     {
-        if(this.getPoddApplication().authenticate(action, this.getRequest(), this.getResponse(), optionalObjectUris))
+        if(this.getPoddApplication().authenticate(action, this.getRequest(), this.getResponse(), optionalObjectUri))
         {
             return true;
         }
