@@ -85,7 +85,7 @@ No artifacts found
 
 <#macro addArtifactDetails aArtifact>
     <p>
-    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getOntologyID().getVersionIRI().toString())!""}"> ${aArtifact.getLabel()!" - "}</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getOntologyID().getOntologyIRI().toString())!""}"> ${aArtifact.getLabel()!" - "}</a>
 <#-- 
 	These should be uncommented and displayed.
 	

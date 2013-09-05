@@ -913,7 +913,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     {
         final Set<Role> results = new HashSet<Role>();
         
-        final Collection<Collection<Role>> allResults = this.getRolesForObjectAlternate(user, objectUri).values();
+        final Collection<Collection<Role>> allResults = this.getRolesForObjectAlternate(user.getIdentifier(), objectUri).values();
         
         for(final Collection<Role> nextResult : allResults)
         {
@@ -924,19 +924,14 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     }
     
     @Override
-    public Map<User, Collection<Role>> getRolesForObjectAlternate(final User user, final URI objectUri)
+    public Map<String, Collection<Role>> getRolesForObjectAlternate(final String userIdentifier, final URI objectUri)
     {
-        final ConcurrentMap<User, Collection<Role>> roleCollection = new ConcurrentHashMap<User, Collection<Role>>();
+        final ConcurrentMap<String, Collection<Role>> roleCollection = new ConcurrentHashMap<String, Collection<Role>>();
         
         RepositoryConnection conn = null;
         try
         {
             conn = this.getRepository().getConnection();
-            String userIdentifier = null;
-            if(user != null)
-            {
-                userIdentifier = user.getIdentifier();
-            }
             
             final String query = this.buildSparqlQueryForObjectRoles(userIdentifier, objectUri);
             
@@ -972,7 +967,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                                     .stringValue());
                     
                     Collection<Role> nextRoles = new HashSet<Role>();
-                    final Collection<Role> putIfAbsent = roleCollection.putIfAbsent(nextUser, nextRoles);
+                    final Collection<Role> putIfAbsent = roleCollection.putIfAbsent(nextUser.getIdentifier(), nextRoles);
                     if(putIfAbsent != null)
                     {
                         nextRoles = putIfAbsent;

@@ -126,7 +126,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final Exception e)
         {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model");
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to populate data model", e);
         }
         
         dataModel.put("artifactUri", ontologyID.getOntologyIRI().toString());
@@ -232,19 +232,19 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
         final ConcurrentMap<RestletUtilRole, Collection<PoddUser>> userList = new ConcurrentHashMap<>();
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final Map<User, Collection<Role>> participantMap =
+        final Map<String, Collection<Role>> participantMap =
                 nextRealm.getRolesForObjectAlternate(null, PoddRdfConstants.VF.createURI(artifactUri));
         
-        final Collection<User> keySet = participantMap.keySet();
-        for(final User user : keySet)
+        final Collection<String> keySet = participantMap.keySet();
+        for(final String userIdentifier : keySet)
         {
-            final Collection<Role> rolesOfUser = participantMap.get(user);
+            final Collection<Role> rolesOfUser = participantMap.get(userIdentifier);
             
             for(final RestletUtilRole roleOfInterest : rolesOfInterest)
             {
                 if(rolesOfUser.contains(roleOfInterest.getRole()))
                 {
-                    this.log.info("User {} has Role {} ", user.getIdentifier(), roleOfInterest.getName());
+                    this.log.info("User {} has Role {} ", userIdentifier, roleOfInterest.getName());
                     
                     Collection<PoddUser> nextRoles = new ArrayList<PoddUser>();
                     final Collection<PoddUser> putIfAbsent = userList.putIfAbsent(roleOfInterest, nextRoles);
@@ -253,7 +253,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
                         nextRoles = putIfAbsent;
                     }
                     
-                    final PoddUser tempUser = (PoddUser)nextRealm.findUser(user.getIdentifier());
+                    final PoddUser tempUser = (PoddUser)nextRealm.findUser(userIdentifier);
                     final PoddUser userToReturn =
                             new PoddUser(tempUser.getIdentifier(), null, tempUser.getFirstName(),
                                     tempUser.getLastName(), null, tempUser.getUserStatus(), null,

@@ -364,7 +364,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
      * 
      * BUG - FIXME
      */
-    @Ignore
     @Test
     public void testGetArtifactWithNonAdminUserRdf() throws Exception
     {

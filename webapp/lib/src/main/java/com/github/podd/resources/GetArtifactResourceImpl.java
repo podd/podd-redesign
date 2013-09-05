@@ -82,12 +82,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("requesting get artifact (HTML): {}, {}, {}", artifactString, versionString, objectToView);
         
-        // FIXME: The artifact may be published here
-        this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, PoddRdfConstants.VF.createURI(artifactString));
-        // completed checking authorization
-        
-        final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
+        UnmanagedArtifactIRIException foundException = null;
         
         InferredOWLOntologyID ontologyID = null;
         try
@@ -105,8 +100,39 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final UnmanagedArtifactIRIException e)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact", e);
+            foundException = e;
         }
+        
+        // FIXME: Test this after publish artifact is implemented
+        boolean isPublished = false;
+        try
+        {
+            isPublished = this.getPoddArtifactManager().isPublished(ontologyID);
+        }
+        catch(OpenRDFException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Repository exception", e);
+        }
+        
+        if(isPublished)
+        {
+            this.checkAuthentication(PoddAction.PUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI().toOpenRDFURI());
+        }
+        else
+        {
+            this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ, ontologyID.getOntologyIRI().toOpenRDFURI());
+        }
+        
+        if(foundException != null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Could not find the given artifact",
+                    foundException);
+        }
+        
+        // completed checking authorization
+        
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
@@ -267,7 +293,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         // FIXME: determine based on project status and user authorization
-        if (this.checkAuthentication(PoddAction.ARTIFACT_EDIT, theObject.getObjectURI(), false))
+        if(this.checkAuthentication(PoddAction.ARTIFACT_EDIT, theObject.getObjectURI(), false))
         {
             this.log.info("Can edit {}", objectToView);
             dataModel.put("canEditObject", true);
@@ -287,8 +313,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("childHierarchyList", Collections.emptyList());
         
         dataModel.put("util", new FreemarkerUtil());
-        
-        
         
     }
     

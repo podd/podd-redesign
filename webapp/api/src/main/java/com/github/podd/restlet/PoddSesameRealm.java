@@ -171,11 +171,11 @@ public abstract class PoddSesameRealm extends RestletUtilSesameRealm
      * For a given User and object URI, this method finds Role Mappings between them. In this method
      * the user is optional and may be set to null.
      * 
-     * @param user
+     * @param userIdentifier
      * @param objectUri
      * @return A Collection of Roles between given User and object
      */
-    public abstract Map<User, Collection<Role>> getRolesForObjectAlternate(User user, URI objectUri);
+    public abstract Map<String, Collection<Role>> getRolesForObjectAlternate(String userIdentifier, URI objectUri);
     
     /**
      * Retrieve Roles that a User is mapped to together with any optional object URIs.

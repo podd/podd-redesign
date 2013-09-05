@@ -226,10 +226,13 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         }
         else
         {
-            final Collection<Role> rolesCommonAcrossGivenObjects =
-                    this.getRealm().getRolesForObject(request.getClientInfo().getUser(), optionalObjectUri);
+            final Map<String, Collection<Role>> rolesForObjectMap =
+                    this.getRealm().getRolesForObjectAlternate(request.getClientInfo().getUser().getIdentifier(),
+                            optionalObjectUri);
+            Collection<Role> rolesCommonAcrossGivenObjects =
+                    rolesForObjectMap.get(request.getClientInfo().getUser().getIdentifier());
             
-            if(!action.matchesForRoles(rolesCommonAcrossGivenObjects))
+            if(rolesCommonAcrossGivenObjects == null || !action.matchesForRoles(rolesCommonAcrossGivenObjects))
             {
                 this.log.error("Authenticated user does not have enough privileges to execute the given action: {}"
                         + " on the given objects: {}", action, optionalObjectUri);
@@ -414,7 +417,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         TemplateRoute schemaService = router.attach(getSchemaService, GetSchemaResourceImpl.class);
         schemaService.getTemplate().setMatchingMode(Template.MODE_STARTS_WITH);
         Map<String, Variable> routeVariables = schemaService.getTemplate().getVariables();
-        routeVariables.put("schemaPath", new Variable(Variable.TYPE_URI_PATH)); 
+        routeVariables.put("schemaPath", new Variable(Variable.TYPE_URI_PATH));
         
         // Add a route for Logout service
         // final String logout = "logout";
