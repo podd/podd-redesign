@@ -822,7 +822,6 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      * Tests deleting an object which is connected to another object via a refersToXXX link.
      */
-    @Ignore
     @Test
     public final void testDeleteObjectWithReferredToLinks() throws Exception
     {
@@ -843,8 +842,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify:
         final Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
-        DebugUtils.printContents(artifactModel);
-        Assert.assertEquals("Reduction in artifact size incorrect", 75, artifactModel.size());
+        Assert.assertEquals("Reduction in artifact size incorrect", 73, artifactModel.size());
         Assert.assertTrue("Object still exists as an object of some statement",
                 artifactModel.filter(null, null, PoddRdfConstants.VF.createURI(objectToDelete)).isEmpty());
         Assert.assertTrue("Object exists as a subject of some statement",

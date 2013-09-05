@@ -259,8 +259,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         this.log.debug("deleteObject ({}) from artifact {} with cascade={}", objectUri, artifactUri, cascade);
         
         final URI objectToDelete = PoddRdfConstants.VF.createURI(objectUri);
+
+        final Collection<URI> objectsToUpdate = new ArrayList<URI>();
+        objectsToUpdate.add(objectToDelete);
+        final Model fragments = new LinkedHashModel(); 
+        final Model artifactModel = this.exportArtifact(artifactID, false);
         
-        // - find the objectToDelete's parent
+        // - find the objectToDelete's parent and remove parent-child link
         final Model parentDetails = this.getParentDetails(artifactID, objectToDelete);
         if (parentDetails.subjects().size() != 1)
         {
@@ -269,24 +274,27 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             throw new PoddRuntimeException("Object cannot be deleted. It is not a child Object.");
         }
         final Resource parent = parentDetails.subjects().iterator().next();
-        
-        final Model artifactModel = this.exportArtifact(artifactID, false);
-        final Model fragments = artifactModel.filter(parent, null, null);
-        // - remove parent-child link
+        fragments.addAll(artifactModel.filter(parent, null, null));
         fragments.remove(parent, null, objectToDelete);
-
-        // - remove any refersToLinks (TODO)
-        artifactModel.filter(null, PoddRdfConstants.PODD_BASE_REFERS_TO, objectToDelete);
+        objectsToUpdate.add((URI)parent);
         
-        
+        // - remove any refersToLinks
+        final Model referenceLinks = this.getReferenceLinks(artifactID, objectToDelete);
+        final Set<Resource> referrers = referenceLinks.subjects();
+        for(Resource referrer : referrers)
+        {
+            final Model referrerStatements = artifactModel.filter(referrer, null, null);
+            referrerStatements.remove(referrer, null, objectToDelete);
+            
+            fragments.addAll(referrerStatements);
+            objectsToUpdate.add((URI)referrer);
+        }
         
         DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
         if (cascade)
         {
             danglingObjectPolicy = DanglingObjectPolicy.FORCE_CLEAN;
         }
-        
-        final Collection<URI> objectsToUpdate = Arrays.asList(objectToDelete, (URI)parent);
         
         this.updateArtifact(artifactID.getOntologyIRI().toOpenRDFURI(), artifactID.getVersionIRI().toOpenRDFURI(),
                 objectsToUpdate, fragments, UpdatePolicy.REPLACE_EXISTING, danglingObjectPolicy, DataReferenceVerificationPolicy.DO_NOT_VERIFY);
@@ -713,6 +721,34 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     public PoddPurlManager getPurlManager()
     {
         return this.purlManager;
+    }
+    
+    public Model getReferenceLinks(final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            final URI[] contexts =
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                            this.getRepositoryManager().getSchemaManagementGraph());
+            
+            return this.getSesameManager().getReferringObjectDetails(objectUri, conn, contexts);
+        }
+        finally
+        {
+            try
+            {
+                if(conn != null && conn.isOpen())
+                {
+                    conn.close();
+                }
+            }
+            catch(final RepositoryException e)
+            {
+                throw e;
+            }
+        }
     }
     
     @Override
