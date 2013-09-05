@@ -866,16 +866,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     private Set<PoddPurlReference> handlePurls(final RepositoryConnection repositoryConnection, final URI context)
         throws PurlProcessorNotHandledException, OpenRDFException
     {
-        if(this.getPurlManager() != null)
+        if(this.getPurlManager() == null)
         {
-            this.log.info("Handling Purl generation");
-            final Set<PoddPurlReference> purlResults =
-                    this.getPurlManager().extractPurlReferences(repositoryConnection, context);
-            
-            this.getPurlManager().convertTemporaryUris(purlResults, repositoryConnection, context);
-            return purlResults;
+            return Collections.emptySet();
         }
-        return Collections.emptySet();
+        
+        this.log.info("Handling Purl generation");
+        final Set<PoddPurlReference> purlResults =
+                this.getPurlManager().extractPurlReferences(repositoryConnection, context);
+        
+        this.getPurlManager().convertTemporaryUris(purlResults, repositoryConnection, context);
+        return purlResults;
     }
     
     /**
