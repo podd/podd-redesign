@@ -267,7 +267,18 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         // FIXME: determine based on project status and user authorization
-        dataModel.put("canEditObject", true);
+        if (this.checkAuthentication(PoddAction.ARTIFACT_EDIT, theObject.getObjectURI(), false))
+        {
+            this.log.info("Can edit {}", objectToView);
+            dataModel.put("canEditObject", true);
+            dataModel.put("canDelete", true);
+        }
+        else
+        {
+            this.log.info("Can NOT edit {}", objectToView);
+            dataModel.put("canDelete", false);
+            dataModel.put("canEditObject", false);
+        }
         
         // FIXME: should be set based on the current object and user authorization
         dataModel.put("canAddChildren", true);
@@ -276,6 +287,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("childHierarchyList", Collections.emptyList());
         
         dataModel.put("util", new FreemarkerUtil());
+        
+        
+        
     }
     
     /**
