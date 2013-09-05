@@ -280,7 +280,8 @@ public interface PoddRdfConstants
     public static final URI PODD_BASE_PUBLISHED = PoddRdfConstants.VF
             .createURI(PoddRdfConstants.PODD_BASE, "Published");
     
-    // ----- file repository constants -----
+    /** http://purl.org/podd/ns/poddBase#refersTo */
+    public static final URI PODD_BASE_REFERS_TO = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "refersTo");
     
     public static final URI PODD_BASE_WEIGHT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE, "weight");
     
@@ -413,5 +414,5 @@ public interface PoddRdfConstants
     
     public static final URI PODD_SCHEMA_CLASSPATH = PoddRdfConstants.VF
             .createURI("http://purl.org/podd/ns/schema#classpath");
-    
+
 }
