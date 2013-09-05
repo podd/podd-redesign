@@ -24,7 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -775,6 +774,83 @@ public abstract class AbstractPoddArtifactManagerTest
         }
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#deleteObject(String, String, String, boolean)}
+     * .
+     * 
+     * Tests that deleting an object which has child objects without setting the cascade
+     * option is not allowed.
+     */
+    @Test
+    public final void testDeleteObjectWithChildrenNoCascade() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial";
+        final boolean cascade = false;
+        
+        // perform test action: delete object
+        try
+        {
+                this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toString(), artifactID
+                        .getVersionIRI().toString(), objectToDelete, cascade);
+                Assert.fail("Should not have allowed deletion");
+        }
+        catch (DisconnectedObjectException e)
+        {
+            Set<URI> disconnectedObjects = e.getDisconnectedObjects();
+            System.out.println(disconnectedObjects);
+            
+            Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
+            Assert.assertEquals("Reduction in artifact size incorrect",
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
+            Assert.assertFalse("Object was deleted",
+                    artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
+        }
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#deleteObject(String, String, String, boolean)}
+     * .
+     * 
+     * Tests deleting an object which is connected to another object via a refersToXXX link.
+     */
+    @Ignore
+    @Test
+    public final void testDeleteObjectWithReferredToLinks() throws Exception
+    {
+        // prepare: load schema ontologies and test artifact
+        this.loadSchemaOntologies();
+        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_WITH_REFERSTO);
+        final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_WITH_REFERSTO_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_WITH_REFERSTO_INFERRED_TRIPLES, false);
+        
+        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3";
+        final boolean cascade = true;
+        
+        // perform test action: delete object
+        final InferredOWLOntologyID modifiedArtifactId =
+                this.testArtifactManager.deleteObject(artifactID.getOntologyIRI().toString(), artifactID
+                        .getVersionIRI().toString(), objectToDelete, cascade);
+        
+        // verify:
+        final Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
+        DebugUtils.printContents(artifactModel);
+        Assert.assertEquals("Reduction in artifact size incorrect", 75, artifactModel.size());
+        Assert.assertTrue("Object still exists as an object of some statement",
+                artifactModel.filter(null, null, PoddRdfConstants.VF.createURI(objectToDelete)).isEmpty());
+        Assert.assertTrue("Object exists as a subject of some statement",
+                artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
+    }
+
     @Test
     public final void testExportArtifact() throws Exception
     {
