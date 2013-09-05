@@ -95,6 +95,7 @@ import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.PoddRuntimeException;
+import com.github.podd.exception.PublishedArtifactModifyException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
@@ -824,20 +825,36 @@ public abstract class AbstractPoddArtifactManagerTest
      * 
      * Tests deleting an object which belongs to a Published artifact is not allowed.
      */
-    @Ignore
     @Test
     public final void testDeleteObjectWithPublishedArtifact() throws Exception
     {
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
-        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_WITH_REFERSTO);
+        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
         final InferredOWLOntologyID artifactID = this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
-        this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_WITH_REFERSTO_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_WITH_REFERSTO_INFERRED_TRIPLES, false);
+        this.verifyLoadedArtifact(artifactID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
-        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3";
+        InferredOWLOntologyID publishedArtifact = this.testArtifactManager.publishArtifact(artifactID);
         
-        //TODO
+        final String objectToDelete = "http://purl.org/podd/basic-2-20130206/artifact:1#publication45";
+        
+        // perform test action: delete object
+        try
+        {
+                this.testArtifactManager.deleteObject(publishedArtifact.getOntologyIRI().toString(), publishedArtifact
+                        .getVersionIRI().toString(), objectToDelete, false);
+                Assert.fail("Should not have allowed deletion");
+        }
+        catch (PublishedArtifactModifyException e)
+        {
+            Assert.assertEquals("Failure not due to published Artifact", publishedArtifact, e.getArtifactID());
+            Model artifactModel = this.testArtifactManager.exportArtifact(artifactID, false);
+            Assert.assertEquals("Reduction in artifact size incorrect",
+                    TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, artifactModel.size());
+            Assert.assertFalse("Object was deleted",
+                    artifactModel.filter(PoddRdfConstants.VF.createURI(objectToDelete), null, null).isEmpty());
+        }
     }
     
     /**
