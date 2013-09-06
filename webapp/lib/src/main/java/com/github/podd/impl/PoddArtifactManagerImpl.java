@@ -173,11 +173,16 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             throw new PoddRuntimeException("Ontology IRI cannot be null");
         }
-        
+       
         RepositoryConnection connection = null;
         
         try
         {
+            if (this.isPublished(artifactId))
+            {
+                throw new DeleteArtifactException("Published Artifacts cannot be deleted", artifactId);
+            }
+            
             connection = this.getRepositoryManager().getRepository().getConnection();
             connection.begin();
             

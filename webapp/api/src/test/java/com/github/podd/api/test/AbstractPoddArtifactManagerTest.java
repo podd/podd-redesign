@@ -89,6 +89,7 @@ import com.github.podd.api.purl.PoddPurlManager;
 import com.github.podd.api.purl.PoddPurlProcessorFactory;
 import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.exception.ArtifactModifyException;
+import com.github.podd.exception.DeleteArtifactException;
 import com.github.podd.exception.DisconnectedObjectException;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
@@ -689,6 +690,79 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      * 
+     * Tests that the artifact manager cannot delete a published artifact.
+     */
+    @Test
+    public final void testDeleteArtifactWhenPublished() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        // invoke test method
+        InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        
+        resultArtifactId = this.testArtifactManager.publishArtifact(resultArtifactId);
+        
+        // verify:
+        this.verifyLoadedArtifact(resultArtifactId, 7,
+                TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, true);
+        
+        try
+        {
+            this.testArtifactManager.deleteArtifact(resultArtifactId);
+            Assert.fail("Should have failed to delete Published artifact");
+        }
+        catch(final DeleteArtifactException e)
+        {
+            Assert.assertNotNull("Exception did not contain the artifact ID", e.getArtifact());
+            Assert.assertEquals("IRI on the exception did not match our expected IRI",
+                    resultArtifactId.getOntologyIRI(), e.getArtifact().getOntologyIRI());
+        }
+    }
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
+     * Tests that the artifact manager cannot delete a published artifact.
+     */
+    @Test
+    public final void testDeleteArtifactWhenUnmanaged() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+
+        final String mimeType = "application/rdf+xml";
+        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
+        
+        InferredOWLOntologyID resultArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        
+        // verify:
+        this.verifyLoadedArtifact(resultArtifactId, 7,
+                TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
+
+        boolean deleted = this.testArtifactManager.deleteArtifact(resultArtifactId);
+        Assert.assertTrue("Should have deleted artifact successfully", deleted);
+        
+        deleted = this.testArtifactManager.deleteArtifact(resultArtifactId);
+        Assert.assertFalse("Should fail as artifact no longer exists", deleted);
+    }
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
      * Tests that the artifact manager can delete an artifact when there was a single version
      * loaded, and the version is given to the deleteArtifact method.
      */
@@ -728,7 +802,6 @@ public abstract class AbstractPoddArtifactManagerTest
             Assert.assertEquals("IRI on the exception did not match our expected IRI",
                     resultArtifactId.getOntologyIRI(), e.getUnmanagedOntologyIRI());
         }
-        
     }
     
     /**
