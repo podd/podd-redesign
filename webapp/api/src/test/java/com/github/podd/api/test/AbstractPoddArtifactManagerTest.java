@@ -1024,6 +1024,36 @@ public abstract class AbstractPoddArtifactManagerTest
     }
     
     @Test
+    public final void testGetChildObjects() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID ontologyID = this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(ontologyID, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final Object[][] testData =
+                { { "http://purl.org/podd/basic-1-20130206/object:2966", 6 },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 0 },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype", 0 },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation", 3},
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 1 },
+                        { "http://purl.org/podd/ns/poddScience#WildType_NotApplicable", 0 }, };
+        
+        for(final Object[] element : testData)
+        {
+            final URI objectUri = PoddRdfConstants.VF.createURI(element[0].toString());
+            final int expectedChildObjectCount = (int)element[1];
+            
+            final Set<URI> childObjects = this.testArtifactManager.getChildObjects(ontologyID, objectUri);
+            Assert.assertEquals("Not the expected number of child objects", expectedChildObjectCount,
+                    childObjects.size());
+        }
+    }
+    
+    @Test
     public final void testGetFileReferenceManager() throws Exception
     {
         Assert.assertNotNull("File Reference Manager was null", this.testArtifactManager.getFileReferenceManager());
