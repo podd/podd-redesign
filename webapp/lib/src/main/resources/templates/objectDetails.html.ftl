@@ -152,7 +152,7 @@
 	    <#if  canEditObject?? && canEditObject>
         <a href="${baseUrl}/artifact/edit?artifacturi=${artifactUri?url!"unknown-artifacturi"}&amp;objecturi=${poddObject.objectURI?url!"unknown-objecturi"}">Edit Object</a>
         </#if>
-		<#if isProject?? && isProject>
+		<#if isProject?? && isProject && canEditRoles?? && canEditRoles>
 	        <a href="${baseUrl}/artifact/roles?artifacturi=${artifactUri?url!"unknown-artifacturi"}">Edit Participants</a>
 		</#if>
         <#if  canAddChildren?? && canAddChildren>
@@ -170,7 +170,9 @@
         </#if>        
         <#if canDelete?? && canDelete>
         	<#if isProject?? && isProject>
-        		<a id="deleteProject" >Delete Project</a>
+        		<#if canDeleteProject?? && canDeleteProject>
+        			<a id="deleteProject" >Delete Project</a>
+        		</#if>
         	<#else>
         		<a id="deleteObject" >Delete</a>
         	</#if>

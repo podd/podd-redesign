@@ -47,9 +47,6 @@ import com.github.podd.utils.PoddWebConstants;
 public class GetArtifactResourceImplTest extends AbstractResourceImplTest
 {
     
-    // private static final String TEST_ARTIFACT_WITH_1_INTERNAL_OBJECT =
-    // "/test/artifacts/basicProject-1-internal-object.rdf";
-    
     /**
      * Test unauthenticated access to a managed artifact gives an UNAUTHORIZED error and not a 404.
      * <p>
@@ -233,8 +230,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         this.assertFreemarker(body);
         
-        System.out.println(body);
-        
         final Model model =
                 this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 12);
         
@@ -269,7 +264,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                         RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final String body = results.getText();
-        // System.out.println(body);
         
         // verify: received contents are in RDF/JSON
         // Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));
@@ -424,7 +418,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final String body = results.getText();
-        System.out.println(body);
+
         // verify:
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
@@ -503,9 +497,9 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Missing: Project Details", body.contains("Project Details"));
         Assert.assertTrue("Missng: ANZSRC FOR Code", body.contains("ANZSRC FOR Code:"));
         Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
-        Assert.assertTrue("Missing: Edit Participants button", body.contains("Edit Participants"));
-        Assert.assertTrue("Missing: Add Child Object button", body.contains("Add Child Object"));
         
+        Assert.assertFalse("Edit Participants button should NOT be present", body.contains("Edit Participants"));
+        Assert.assertFalse("Add Child Object button should NOT be present", body.contains("Add Child Object"));
         Assert.assertFalse("Delete button should NOT be present", body.contains("id=\"deleteObject\""));
         
         this.assertFreemarker(body);
@@ -513,8 +507,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
     
     /**
      * Test authenticated access to get Artifact in RDF/XML by a non Repository Admin User.
-     * 
-     * BUG - FIXME
      */
     @Test
     public void testGetArtifactWithNonAdminUserRdf() throws Exception

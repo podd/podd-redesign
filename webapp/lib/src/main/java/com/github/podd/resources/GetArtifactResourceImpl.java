@@ -151,7 +151,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         try
         {
-            this.populateDataModelWithArtifactData(ontologyID, objectToView, dataModel);
+            this.populateDataModelWithArtifactData(ontologyID, objectToView, dataModel, isPublished);
         }
         catch(final OpenRDFException e)
         {
@@ -243,10 +243,12 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
      *            The schema ontology graphs that should be part of the context for SPARQL
      * @param dataModel
      *            Freemarker data model to be populated
+     * @param isPublished
+     *            True if the Project is Published
      * @throws OpenRDFException
      */
     private void populateDataModelWithArtifactData(final InferredOWLOntologyID ontologyID, final String objectToView,
-            final Map<String, Object> dataModel) throws OpenRDFException
+            final Map<String, Object> dataModel, final boolean isPublished) throws OpenRDFException
     {
         
         PoddObjectLabel theObject = null;
@@ -307,22 +309,34 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         final int childrenCount = this.getPoddArtifactManager().getChildObjects(ontologyID, objectUri).size();
         dataModel.put("childCount", childrenCount);
         
-        // FIXME: determine based on project status (e.g. is published?), object (e.g. is 
-        // PoddTopObject?) and user authorization
-        if(this.checkAuthentication(PoddAction.ARTIFACT_EDIT, ontologyID.getOntologyIRI().toOpenRDFURI(), false))
+        if(!isPublished
+                && this.checkAuthentication(PoddAction.ARTIFACT_EDIT, ontologyID.getOntologyIRI().toOpenRDFURI(), false))
         {
             dataModel.put("canEditObject", true);
             dataModel.put("canDelete", true);
+            dataModel.put("canAddChildren", true);
         }
         else
         {
             dataModel.put("canDelete", false);
             dataModel.put("canEditObject", false);
+            dataModel.put("canAddChildren", false);
+        }
+
+        if(!isPublished
+                && this.checkAuthentication(PoddAction.PROJECT_ROLE_EDIT, ontologyID.getOntologyIRI().toOpenRDFURI(),
+                        false))
+        {
+            dataModel.put("canEditRoles", true);
         }
         
-        // FIXME: should be set based on the current object and user authorization
-        dataModel.put("canAddChildren", true);
-        
+        if(!isPublished
+                && this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, ontologyID.getOntologyIRI().toOpenRDFURI(),
+                        false))
+        {
+            dataModel.put("canDeleteProject", true);
+        }
+
         dataModel.put("selectedObjectCount", 0);
         dataModel.put("childHierarchyList", Collections.emptyList());
         
