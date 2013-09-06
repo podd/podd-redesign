@@ -305,7 +305,8 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("isProject", true);
         }
         
-        // FIXME: determine based on project status and user authorization
+        // FIXME: determine based on project status (e.g. is published?), object (e.g. is 
+        // PoddTopObject?) and user authorization
         if(this.checkAuthentication(PoddAction.ARTIFACT_EDIT, ontologyID.getOntologyIRI().toOpenRDFURI(), false))
         {
             dataModel.put("canEditObject", true);
