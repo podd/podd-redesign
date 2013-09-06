@@ -39,6 +39,7 @@
 		podd.objectUri = '${poddObject.objectURI!"Not Found"}';
 		podd.objectTypeUri = '${objectType.objectURI!"undefined"}';
 		podd.artifactIri = '${artifactUri!"undefined"}';
+		podd.versionIri = '${versionIri!"undefined"}';
 		
 		// Add child object clicked
 		$("#createChildObject").click(function(event) {
@@ -51,15 +52,27 @@
 		// Delete object clicked
 		$("#deleteObject").click(function(event) {
 			event.preventDefault();
-			podd.showDeleteObjectConfirmDialog(podd.artifactIri, podd.objectTypeUri);
+			var objectName = '${poddObject.label!artifactUri}';
+			var childCount = ${childCount};
+			podd.showDeleteObjectConfirmDialog(podd.artifactIri, podd.versionIri, podd.objectUri, objectName, childCount);
 		});
 	
+		// Delete project clicked
+		$("#deleteProject").click(function(event) {
+			event.preventDefault();
+			podd.debug("Clicked Delete Project");
+			//var objectName = '${poddObject.label!artifactUri}';
+			//var childCount = ${childCount};
+			//podd.showDeleteObjectConfirmDialog(podd.artifactIri, podd.versionIri, podd.objectUri, objectName, childCount);
+		});
+
 	
         podd.debug('### initialization complete ###');
 	});
 </script>
 
 <div id="dialog" title="Add Child"></div>
+<div id="delete_object_dialog" title="Delete Object"></div>
 
 <div id="title_pane">
     <#if state??>
@@ -147,7 +160,11 @@
         	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.objectURI!"unknown-pid"}">Download hierarchy attachments</a>
         </#if>        
         <#if canDelete?? && canDelete>
-        <a id="deleteObject" >Delete</a>
+        	<#if isProject?? && isProject>
+        		<a id="deleteProject" >Delete Project</a>
+        	<#else>
+        		<a id="deleteObject" >Delete</a>
+        	</#if>
         </#if>
     <#else>
     <!-- TODO: Remove me. -->

@@ -38,8 +38,6 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.IRI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
@@ -297,6 +295,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 this.getPoddArtifactManager().getObjectDetailsForDisplay(ontologyID, objectUri);
         
         dataModel.put("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
+        dataModel.put("versionIri", ontologyID.getVersionIRI().toOpenRDFURI());
         dataModel.put("propertyList", orderedProperties);
         dataModel.put("completeModel", allNeededStatementsForDisplay);
         
@@ -304,6 +303,9 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             dataModel.put("isProject", true);
         }
+        
+        final int childrenCount = this.getPoddArtifactManager().getChildObjects(ontologyID, objectUri).size();
+        dataModel.put("childCount", childrenCount);
         
         // FIXME: determine based on project status (e.g. is published?), object (e.g. is 
         // PoddTopObject?) and user authorization
