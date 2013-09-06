@@ -516,6 +516,34 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     /*
      * (non-Javadoc)
      * 
+     * Wraps PoddSesameManager.getChildObjects()
+     * 
+     * @see com.github.podd.api.PoddArtifactManager#getChildObjects()
+     */
+    @Override
+    public Set<URI> getChildObjects(final InferredOWLOntologyID ontologyID, final URI objectUri)
+        throws OpenRDFException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.getRepositoryManager().getRepository().getConnection();
+            
+            final URI[] contexts =
+                    this.getSesameManager().versionAndSchemaContexts(ontologyID, conn,
+                            this.getRepositoryManager().getSchemaManagementGraph());
+            
+            return this.getSesameManager().getChildObjects(objectUri, conn, contexts);
+        }
+        finally
+        {
+            conn.close();
+        }
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.github.podd.api.PoddArtifactManager#getFileReferenceManager()
      */
     @Override

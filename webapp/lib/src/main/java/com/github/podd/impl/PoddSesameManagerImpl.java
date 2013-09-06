@@ -466,6 +466,40 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return null;
     }
     
+    @Override
+    public Set<URI> getChildObjects(final URI objectUri, final RepositoryConnection repositoryConnection,
+            final URI... contexts) throws OpenRDFException
+    {
+        final StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT DISTINCT ?childUri ");
+        sb.append(" WHERE { ");
+        sb.append(" ?poddObject ?propertyUri ?childUri . ");
+        
+        sb.append(" ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <" + PoddRdfConstants.PODD_BASE_CONTAINS
+                + "> . ");
+        
+        sb.append(" } ");
+        
+        this.log.debug("Created SPARQL {} with poddObject bound to {}", sb, objectUri);
+        
+        final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
+        tupleQuery.setBinding("poddObject", objectUri);
+        final QueryResultCollector queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        
+        final Set<URI> resultSet = new HashSet<URI>();
+        for(final BindingSet next : queryResults.getBindingSets())
+        {
+            final Value child = next.getValue("childUri");
+            if(child instanceof URI)
+            {
+                resultSet.add((URI)child);
+            }
+        }
+        
+        return resultSet;
+    }
+    
     /*
      * (non-Javadoc)
      * 

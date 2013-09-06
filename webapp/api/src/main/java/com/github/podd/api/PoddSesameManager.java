@@ -187,7 +187,20 @@ public interface PoddSesameManager
     InferredOWLOntologyID getCurrentArtifactVersion(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedArtifactIRIException;
-    
+
+    /**
+     * Returns a {@link Set} containing the Object URIs of the given object's children. An empty Set
+     * is returned if the given object does not have any children.
+     * 
+     * @param objectUri
+     *            The object whose children are sought.
+     * @param conn
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    Set<URI> getChildObjects(URI objectUri, RepositoryConnection conn, URI... contexts) throws OpenRDFException;
+
     /**
      * Returns current version details of an ontology which has the given IRI as the Ontology IRI or
      * Version IRI.

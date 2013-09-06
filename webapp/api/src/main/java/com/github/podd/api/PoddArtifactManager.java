@@ -218,7 +218,22 @@ public interface PoddArtifactManager
      *             If the artifact is not managed.
      */
     InferredOWLOntologyID getArtifact(IRI artifactIRI, IRI versionIRI) throws UnmanagedArtifactIRIException;
+
     
+    /**
+     * Returns a {@link Set} containing the Object URIs of the given object's direct children.
+     * Direct children are objects that are linked from the given object by a property which is a
+     * sub-property of <code>PODDBase:contains</code>. An empty Set is returned if the given object
+     * does not have any children.
+     * 
+     * @param ontologyID
+     * @param objectUri
+     *            The object whose children are sought.
+     * @return A {@link Set} containing the Object URIs of the given object's children
+     * @throws OpenRDFException
+     */
+    Set<URI> getChildObjects(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException;
+
     /**
      * 
      * @return The {@link DataReferenceManager} used to create and fetch file references from
