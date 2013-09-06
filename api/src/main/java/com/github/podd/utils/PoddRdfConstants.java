@@ -110,7 +110,7 @@ public interface PoddRdfConstants
     public static final URI OWL_QUALIFIED_CARDINALITY = PoddRdfConstants.VF
             .createURI("http://www.w3.org/2002/07/owl#qualifiedCardinality");
     
-    public static final URI OWL_VERSION_IRI = PoddRdfConstants.VF.createURI(OWL.NAMESPACE, "versionIRI");
+    public static final URI OWL_VERSION_IRI = OWL.VERSIONIRI;
     
     public static final String PATH_BASE_ONTOLOGIES_VERSION_1 = "/ontologies/version/1/";
     
@@ -252,6 +252,18 @@ public interface PoddRdfConstants
     /** http://purl.org/podd/ns/poddBase#hasFileName */
     public static final URI PODD_BASE_HAS_FILENAME = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
             "hasFileName");
+    
+    public static final URI PODD_BASE_HAS_PRINCIPAL_INVESTIGATOR = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_BASE, "hasPrincipalInvestigator");
+    
+    public static final URI PODD_BASE_HAS_PROJECT_OBSERVER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasProjectObserver");
+    
+    public static final URI PODD_BASE_HAS_PROJECT_MEMBER = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_BASE,
+            "hasProjectMember");
+    
+    public static final URI PODD_BASE_HAS_PROJECT_ADMINISTRATOR = PoddRdfConstants.VF.createURI(
+            PoddRdfConstants.PODD_BASE, "hasProjectAdministrator");
     
     public static final URI PODD_BASE_HAS_PUBLICATION_STATUS = PoddRdfConstants.VF.createURI(
             PoddRdfConstants.PODD_BASE, "hasPublicationStatus");
@@ -414,5 +426,5 @@ public interface PoddRdfConstants
     
     public static final URI PODD_SCHEMA_CLASSPATH = PoddRdfConstants.VF
             .createURI("http://purl.org/podd/ns/schema#classpath");
-
+    
 }
