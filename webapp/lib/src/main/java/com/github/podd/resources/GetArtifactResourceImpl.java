@@ -306,15 +306,13 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         // FIXME: determine based on project status and user authorization
-        if(this.checkAuthentication(PoddAction.ARTIFACT_EDIT, theObject.getObjectURI(), false))
+        if(this.checkAuthentication(PoddAction.ARTIFACT_EDIT, ontologyID.getOntologyIRI().toOpenRDFURI(), false))
         {
-            this.log.info("Can edit {}", objectToView);
             dataModel.put("canEditObject", true);
             dataModel.put("canDelete", true);
         }
         else
         {
-            this.log.info("Can NOT edit {}", objectToView);
             dataModel.put("canDelete", false);
             dataModel.put("canEditObject", false);
         }
