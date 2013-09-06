@@ -70,9 +70,12 @@
 		$("#deleteProject").click(function(event) {
 			event.preventDefault();
 			podd.debug("Clicked Delete Project");
-			//var objectName = '${poddObject.label!artifactUri}';
-			//var childCount = ${childCount};
-			//podd.showDeleteArtifactConfirmDialog(podd.artifactIri, podd.versionIri, podd.objectUri, objectName, childCount);
+
+			var objectName = '${poddObject.label!artifactUri}';
+			var childCount = ${childCount};
+			var redirectUrl = '${baseUrl}/artifacts';
+			
+			podd.showDeleteObjectConfirmDialog(podd.artifactIri, podd.versionIri, 'undefined', objectName, childCount, redirectUrl);
 		});
 
 	

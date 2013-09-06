@@ -2418,10 +2418,19 @@ podd.submitDeleteObject = function(artifactUri, versionUri, objectUri, cascade, 
 
 	podd.debug("[submitDeleteObject] started");
 
+	podd.debug('objectUri = ' + objectUri);
+	podd.debug('redirect  = ' + redirectUrl);
+	
 	var requestUrl = podd.baseUrl + '/artifact/deleteobject?artifacturi=' + encodeURIComponent(artifactUri)
 			+ '&versionuri=' + encodeURIComponent(versionUri) + '&objecturi=' + encodeURIComponent(objectUri)
 			+ '&iscascade=' + cascade;
 
+	if (typeof objectUri == undefined || objectUri === 'undefined') {
+		podd.debug('Deleting an Artifact: ' + artifactUri);
+		requestUrl = podd.baseUrl + '/artifact/delete?artifacturi=' + encodeURIComponent(artifactUri) 
+			+ '&versionuri=' + encodeURIComponent(versionUri);
+	}
+	
 	$.ajax({
 		url : requestUrl,
 		type : 'DELETE',
