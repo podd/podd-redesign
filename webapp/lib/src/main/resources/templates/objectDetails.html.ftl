@@ -54,7 +54,16 @@
 			event.preventDefault();
 			var objectName = '${poddObject.label!artifactUri}';
 			var childCount = ${childCount};
-			podd.showDeleteObjectConfirmDialog(podd.artifactIri, podd.versionIri, podd.objectUri, objectName, childCount);
+			
+			
+			var redirectUrl = '${baseUrl}/artifact/base?artifacturi=${artifactUri?url}';
+			
+			<#if parentObject?? && parentObject.uri??>
+				var parentUri = '${parentObject.uri?url}';
+				redirectUrl += '&objecturi=' + parentUri;
+			</#if>
+			
+			podd.showDeleteObjectConfirmDialog(podd.artifactIri, podd.versionIri, podd.objectUri, objectName, childCount, redirectUrl);
 		});
 	
 		// Delete project clicked
@@ -63,7 +72,7 @@
 			podd.debug("Clicked Delete Project");
 			//var objectName = '${poddObject.label!artifactUri}';
 			//var childCount = ${childCount};
-			//podd.showDeleteObjectConfirmDialog(podd.artifactIri, podd.versionIri, podd.objectUri, objectName, childCount);
+			//podd.showDeleteArtifactConfirmDialog(podd.artifactIri, podd.versionIri, podd.objectUri, objectName, childCount);
 		});
 
 	

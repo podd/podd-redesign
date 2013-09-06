@@ -469,7 +469,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Missng: Project#2012...", body.contains("Project#2012-0006_ Cotton Leaf Morphology"));
         Assert.assertTrue("Missing: Edit Participants button", body.contains("Edit Participants"));
         Assert.assertTrue("Missing: Add Child Object button", body.contains("Add Child Object"));
-        Assert.assertTrue("Missing: Delete button", body.contains("id=\"deleteObject\""));
+        Assert.assertTrue("Missing: Delete Project button", body.contains("id=\"deleteProject\""));
         
         this.assertFreemarker(body);
     }

@@ -2166,6 +2166,8 @@ podd.showAddRoleDialog = function() {
 };
 
 /**
+ * @memberOf podd
+ * 
  * Display a Dialog asking for confirmation of deleting a PODD Object.
  * 
  * @param artifactUri
@@ -2174,10 +2176,67 @@ podd.showAddRoleDialog = function() {
  *            {string} URI of artifact Version IRI
  * @param objectUri
  *            {string} URI of object to delete
+ * @param objectName
+ *            {string} Name/Title of the object to delete
+ * @param childCount
+ *            {int} The number of child objects that the object to delete has
+ * @param redirectUrl
+ * 			  {string} URL to redirect to upon successful completion
  */
-podd.showDeleteObjectConfirmDialog = function(artifactUri, versionUri, objectUri) {
-    podd.debug('[showDeleteRoleConfirmDialog] started');
+podd.showDeleteObjectConfirmDialog = function(artifactUri, versionUri, objectUri, objectName, childCount, redirectUrl) {
+    podd.debug('[showDeleteObjectConfirmDialog] started');
 	
+    var cascade = false;
+    var confirmationMessage = 'Delete Object "' + objectName + '"';
+    if (childCount > 0) {
+    	confirmationMessage += ' and its child objects';
+    	cascade = true;
+    }
+    confirmationMessage += '?'
+    
+    var confirmLink = $('<a>', {
+        name : 'name_delete_object_link',
+        text : 'Confirm', 
+        class : 'button',
+        click : function(){
+        	podd.debug('Clicked Confirmation Link');
+        	$('#delete_object_dialog').dialog('close');
+        	
+         	podd.submitDeleteObject(artifactUri, versionUri, objectUri, cascade, redirectUrl);
+        }
+    });
+    
+    var cancelLink = $('<a>', {
+        name : 'name_cancel_delete_object_link',
+        text : 'Cancel', 
+        class : 'button',
+        click : function(){
+        	$('#delete_object_dialog').dialog('close');
+        }
+    });
+    
+    var div = $('<div/>', {
+    	id : 'buttonwrapper',
+        name : 'delete_object'
+    });
+    
+    div.append('<p>' + confirmationMessage + '</p>')
+    div.append('<br><br>');
+    div.append(confirmLink);
+    div.append(cancelLink);
+    
+	var dialog = $("#delete_object_dialog").dialog({
+		autoOpen : false,
+		modal: true,
+	    dialogClass: "dialog_class",
+	    close: function () {
+    		div.remove();
+  		}  
+	});
+	dialog.append(div);
+	dialog.dialog("open");
+    
+    podd.debug('[showDeleteObjectConfirmDialog] finished');
 };
 
 /**
@@ -2341,8 +2400,54 @@ podd.submitPoddObjectUpdate = function(
 /**
  * @memberOf podd
  * 
- * Submit the "Add User" form to create a new PoddUser.
- * This method is closely bound to the element IDs used in admin_createUser.html
+ * Submit the "Delete Object" request and redirect User to parent object.
+ * 
+ * @param artifactUri
+ *            {string} Ontology IRI of the artifact
+ * @param versionUri
+ *            {string} Version IRI of the artifact
+ * @param objectUri
+ *            {string} URI of the object to be deleted
+ * @param cascade
+ *            {boolean} True if any child objects are also to be deleted, false
+ *            otherwise
+ * @param redirectUrl
+ *            {string} URL to redirect to after successful completion
+ */
+podd.submitDeleteObject = function(artifactUri, versionUri, objectUri, cascade, redirectUrl) {
+
+	podd.debug("[submitDeleteObject] started");
+
+	var requestUrl = podd.baseUrl + '/artifact/deleteobject?artifacturi=' + encodeURIComponent(artifactUri)
+			+ '&versionuri=' + encodeURIComponent(versionUri) + '&objecturi=' + encodeURIComponent(objectUri)
+			+ '&iscascade=' + cascade;
+
+	$.ajax({
+		url : requestUrl,
+		type : 'DELETE',
+		contentType : 'application/rdf+json', // what we're sending
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader("Accept", "application/rdf+json");
+		},
+		success : function(resultData, status, xhr) {
+			podd.debug('[submitDeleteObject] ### SUCCESS ### ' + resultData);
+			window.location.href = redirectUrl;
+			
+		},
+		error : function(xhr, status, error) {
+			podd.debug('[submitDeleteObject] $$$ ERROR $$$ ' + error);
+			podd.debug(xhr.statusText);
+
+			podd.displaySummaryErrorMessage(xhr.responseText);
+		}
+	});
+};
+
+/**
+ * @memberOf podd
+ * 
+ * Submit the "Add User" form to create a new PoddUser. This method is closely
+ * bound to the element IDs used in admin_createUser.html
  */
 podd.submitUserCreate = function() {
 	podd.debug("[submitUserCreate] adding a new user...");
