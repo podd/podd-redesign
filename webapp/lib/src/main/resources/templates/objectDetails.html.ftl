@@ -48,6 +48,13 @@
 			podd.getCreateChildMetadata(podd.artifactIri, podd.objectTypeUri, podd.showAddChildDialog);
 		});
 	
+		// Delete object clicked
+		$("#deleteObject").click(function(event) {
+			event.preventDefault();
+			podd.showDeleteObjectConfirmDialog(podd.artifactIri, podd.objectTypeUri);
+		});
+	
+	
         podd.debug('### initialization complete ###');
 	});
 </script>
@@ -140,10 +147,7 @@
         	<a href="${baseUrl}/services/getHierarchy?option=file&URI=http://www.podd.org/object%23${poddObject.objectURI!"unknown-pid"}">Download hierarchy attachments</a>
         </#if>        
         <#if canDelete?? && canDelete>
-        <a href="${baseUrl}/artifact/delete?artifacturi=${poddObject.objectURI!"unknown-pid"}">Delete</a>
-        </#if>
-        <#if canUndelete?? && canUndelete>
-        <a href="${baseUrl}/artifact/undelete?artifacturi=${poddObject.objectURI!"unknown-pid"}">Undelete</a>
+        <a id="deleteObject" >Delete</a>
         </#if>
     <#else>
     <!-- TODO: Remove me. -->

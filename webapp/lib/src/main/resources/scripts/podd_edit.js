@@ -2166,6 +2166,21 @@ podd.showAddRoleDialog = function() {
 };
 
 /**
+ * Display a Dialog asking for confirmation of deleting a PODD Object.
+ * 
+ * @param artifactUri
+ *            {string} URI of artifact IRI
+ * @param versionUri
+ *            {string} URI of artifact Version IRI
+ * @param objectUri
+ *            {string} URI of object to delete
+ */
+podd.showDeleteObjectConfirmDialog = function(artifactUri, versionUri, objectUri) {
+    podd.debug('[showDeleteRoleConfirmDialog] started');
+	
+};
+
+/**
  * Display a Dialog asking for confirmation of deleting a PODD User's Role.
  */
 podd.showDeleteRoleConfirmDialog = function(userName, rowToDelete) {
