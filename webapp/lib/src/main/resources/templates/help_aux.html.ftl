@@ -9,7 +9,7 @@
         <li><a href="${baseUrl}/help/roles">PODD User's Roles</a></li>
         <li><a href="${baseUrl}/help/registration">Accessing PODD</a></li>
         <ul class="stylized-small">
-        	<li><a href="${baseUrl}/help/self_register">Self Registration</a></li>
+        	<li><del><a href="${baseUrl}/help/self_register">Self Registration</a></del></li>
 	        <li><a href="${baseUrl}/help/login">PODD Login</a></li>
     	    <li><del><a href="${baseUrl}/help/aaf_login">Institutional Login</a></del></li>
 	        <li><a href="${baseUrl}/help/logout">Logout</a></li>
@@ -49,7 +49,7 @@
             <li><a href="${baseUrl}/help/child_edit">Editing a Child Object</a></li>
             <li><a href="${baseUrl}/help/child_delete">Deleting a Child Object</a></li>
         </ul>
-        <li><a href="${baseUrl}/help/tab_import">TAB Import</a></li>
+        <li><del><a href="${baseUrl}/help/tab_import">TAB Import</a></del></li>
         <li><a href="${baseUrl}/help/browser">Browser Pane</a></li>
         <del>
         <li><a href="${baseUrl}/help/clipboard_copy">Copy and Paste</a></li>
