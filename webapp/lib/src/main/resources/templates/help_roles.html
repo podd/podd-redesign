@@ -1,11 +1,12 @@
 <h3 class="underlined_heading">PODD User's Roles</h3>
 <br>
+<p>A user will have roles that will assist in determining what functions they can perform and what access they will have to existing projects.</p>
+<br>
 <h4>Repository User Roles</h4>
-<p>A user will have a role that will assist in determining what functions they can perform and what access they will have to existing projects.</p>
-<p>There are four distinct categories of users for the PODD website. Each role builds on the privileges of the previous one. They are</p>
+<p>There are four distinct categories of Repository users for the PODD website. Each role builds on the privileges of the previous one. They are</p>
 <ul class="stylized">
     <li>Public users;</li>
-    <li>Registered Users;</li>
+    <li>Registered users;</li>
     <li>Project Creator;</li>
     <li>Repository Administrator.</li>
 </ul>
@@ -14,16 +15,13 @@
 <p>Public user is also known as anonymous user. They are not registered or logged in. This role has the least privilege. Privileges include:</p>
 <ul class="stylized">
     <li>Can view public acess projects;</li>
-    <li>Can search;</li>
-    <li>Can register to the system.</li>
 </ul>
 <br>
-<h5>Registered Users</h5>
-<p>Registered user is also known as repository user. This is a standard user who is registered to the system. Privileges include:</p>
+<h5>Registered User</h5>
+<p>This is a standard user who is registered to the system. Privileges include:</p>
 <ul class="stylized">
     <li>Can view public access projects;</li>
     <li>Can maintain their own user profiles;</li>
-    <li>Can search and filter projects;</li>
     <li>Can access projects based on project role.</li>
 </ul>
 <br>
@@ -32,9 +30,8 @@
 <ul class="stylized">
     <li>Can view public access projects;</li>
     <li>Can maintain their own user profiles;</li>
-    <li>Can search and filter projects;</li>
-    <li>Can access projects based on project role</li>
-    <li>Can create projects (Note that they will not have any further access over the project unless they define themselves with a project role during project creation. The default behaviour of the system is to define the Project Creator with a Project Administration role).</li>
+    <li>Can access projects based on project role;</li>
+    <li>Can create projects (Note that they will not have any further access over the project unless they define themselves with a project role during project creation. The default behaviour of the system is to define the Project Creator with Project Administrator and Project Principal Investigator roles).</li>
 </ul>
 <br>
 <h5>Repository Administrator</h5>
@@ -43,8 +40,6 @@
     <li>Can Create, Read, Update and Delete repository wide objects;</li>
     <li>Can Create, Update and Delete users;</li>
     <li>Can administer project roles;</li>
-    <li>Can search and filter projects;</li>
-    <li>Can copy and paste objects between projects;</li>
     <li>Can restore deleted objects;</li>
     <li>Can publish/unpublish projects.</li>
 </ul>
@@ -54,7 +49,7 @@
 <p>Every project must have one or more project participants. These roles define access rights over the contents of un-published projects. They are defined as four different project specific roles:</p>
 <ul class="stylized">
     <li>Project Administrator;</li>
-    <li>Principal Investigator;</li>
+    <li>Project Principal Investigator;</li>
     <li>Project Member;</li>
     <li>Project Observer.</li>
 </ul>
@@ -63,16 +58,13 @@
 <p>An administrator of a particular project (all access rights), including</p>
 <ul class="stylized">
     <li>Can Create, Read, Update and Delete project objects (CRUD);</li>
-    <li>Can copy objects between projects;</li>
-    <li>Can publish projects;</li>
     <li>Can administer project roles.</li>
 </ul>
 <br>
 <h5>Principal Investigator</h5>
-<p>Is identified as the PI and thus responsible for the project contents:</p>
+<p>Is identified as the PI and is responsible for publishing the project.</p>
 <ul class="stylized">
-    <li>Can perform all project administrator functions (CRUD);</li>
-
+    <li>Can publish projects.</li>
 </ul>
 <br>
 <h5>Project Member</h5>
