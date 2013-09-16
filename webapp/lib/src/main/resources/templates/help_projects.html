@@ -7,18 +7,20 @@
 <p>Project is a metadata object and not a data object. Data object types may be attached to Project objects.</p>
 <p>The Project object will have the following attributes:</p>
 <ul class="stylized">
-    <li>ID * (System Generated)</li>
+    <li>URI * (System Generated)</li>
     <li>Title *</li>
-    <li>Description *</li>
-    <li>Creator *</li>
-    <li>Creation Date *</li>
+    <li>Description</li>
+    <li>Lead Institution *</li>
     <li>Start Date *</li>
     <li>Duration</li>
-    <li>Lead Institution *</li>
-    <li>Project Status (Active/Inactive/Complete)</li>
+    <li>Notes</li>
+    <li>ANZSRC Field of Research Codes *</li>
     <li>Completion Date (determined by date Project Status is set to complete).</li>
+    <li>Project Status (Active/Inactive/Complete)</li>
     <li>Publication Status * (Published/Not Published)</li>
     <li>Publication Date * (determined by date publication status is set to published).</li>
+    <li>Creator *</li>
+    <li>Creation Date *</li>
 </ul>
 <br>
 <h4>Project Status</h4>
@@ -28,7 +30,7 @@
     <li>Inactive means that the project is abandoned. The project and its objects cannot be updated. All project participants will only have read access to the project. Repository wide Administrators will still have CRU access to the project, and thus can revert the status.</li>
     <li>Complete means the project is finished. Accesses will be the same for the Inactive status. The project and its objects cannot be updated. The project status can be reverted if the publication status is Not Published.</li>
 </ul>
-<p>Once a project is complete, the repository administrator or project administrator can publish the project and make it publicly accessible. Therefore, the publication status of a project can be published or not published.</p>
+<p>Once a project is complete, the principal investigator or repository administrator can publish the project and make it publicly accessible. Therefore, the publication status of a project can be published or not published.</p>
 <ul class="stylized">
     <li>Published means the Project is complete. Public anonymous users and registered users have complete read access to the project and its objects. Once published the project status cannot be changed.</li>
     <li>Not published means that the project and its objects are only accessible to the people listed as project participants. The project may either be incomplete (active) or complete.</li>

@@ -1,32 +1,32 @@
 <h3 class="underlined_heading">Listing Projects</h3>
 <br>
 <h4>Overview</h4>
-<p>A Project Object is considered the foundation object for any projects in PODD. That is, objects will exist in a hierarchy of relationships with a Project object as the top node. For this reason the first view that a user will see is the Projects tab with a list of projects that they may access.</p>
+<p>A Project Object is considered the foundation object for any projects in PODD. That is, objects will exist in a hierarchy of relationships with a Project object as the top node. For this reason the first view that a user will see is the Projects tab with a list of projects that he/she may access.</p>
 <br>
 <h4>Actors</h4>
-<p>All users, whether registered or public access, will be able to list projects. Three types project are defined in the system.&nbsp; They are:</p>
+<p>All users, whether registered or public access, will be able to list projects. Two types of projects are defined in the system.&nbsp; They are:</p>
 <ul class="stylized">
-    <li>My Projects: Projects the user is associated with (see the definition at the end of this section).</li>
-    <li>Public Projects: Public access projects (published).</li>
-    <li>All Projects: all projects in the system, including deleted projects. All projects are only available to the Repository Administrator.</li>
+    <li>Published Projects: Public access projects.</li>
+    <li>Unpublished Projects: Projects that are not published. Non-admin users will only see projects that they are associated with. *</li>
 </ul>
 <p>Different types of projects will be listed based on the user's repository roles:</p>
 <ul class="stylized">
-    <li>Public users can only list Public Projects.</li>
-    <li>Registered users/Project Creators can list My Projects and Public Projects.</li>
+    <li>Public users can only list Published Projects.</li>
+    <li>Registered users/Project Creators can list (their) Unpublished Projects and Published Projects.</li>
     <li>Administrators can list All Projects in the PODD instance.</li>
 </ul>
-<p>* A user is associated with a project if, they are defined as either an Project Administrator/Principal Investigator (CRUD access), Project Member (CRU) or Project Observer (R) of the project.</p>
+<p>* A user is associated with a project if, they are defined as either a Project Administrator/Principal Investigator (CRUD access), Project Member (CRU) or Project Observer (R) of the project.</p>
 <br>
 <h4>The Project Pane</h4>
-<p>When a user navigates to the PODD website without loging in, the default view is the Projects Pane. All Public access projects are listed in the Project Pane.</p>
-<p>Once the user logs in, the Project Pane will list all projects the user is associated with (My Projects) and all public access projects (Public Projects).</p>
+<p>When a user navigates to the PODD website without loging in, the default view is the Projects Pane. All Public access (i.e. Published) projects are listed in the Project Pane.</p>
+<p>Once the user logs in, the Project Pane will list all unpublished projects the user is associated with and all public access projects (Published Projects).</p>
 <p class="rtecenter">&nbsp;<img style="width: 690px; height: 397px;" border="1" alt="" src="${baseUrl}/resources/images/listed%20projects.jpg" /></p>
-<p class="rteleft"><em>Figure 8.1 &ndash; Default Listing Projects View in Projects Tab for a regestered user</em></p>
+<p class="rteleft"><em>Figure 8.1 &ndash; Default Listing Projects View in Projects Tab for a registered user</em></p>
 <p>As shown in Figure 8.1, for each Project object listed in the Project Pane the following information is available:</p>
 <ul class="stylized">
     <li>The Project Title (Links to Browser View of the project);</li>
-    <li>The user's project specific role (in brackets), will be either:<br />
+<!--
+	<li>The user's project specific role (in brackets), will be either:<br />
     <ul class="stylized-circle">
         <li>Project Administrator</li>
         <li>Principal Investigator</li>
@@ -37,19 +37,22 @@
     </li>
     <li>The Principal Investigator, prefaced by the term Principal Investigator (it won't be repeated if the user is the Principal Investigator);</li>
     <li>The Lead Institution, prefaced by the term Lead Institution;</li>
-    <li>Project description. First 200 charactors, whole words (no breaks in words) or to first line return, which ever comes first;</li>
+-->    
+    <li>Project description. First 200 characters, whole words (no breaks in words) or to first line return, which ever comes first;</li>
     <li>A Browse Project Link, which takes the user to the Browser View of the project (same as the link behind the project title).</li>
 </ul>
-<p>My Projects and Public Projects are separated in the view. Where a user is associated with a public access project, this project would be displayed under the heading My Projects and not Public Projects.</p>
-<p>A Repository Administrator will, by default, have a listing of All Projects. If a Repository Administrator wants to separate My Projects, Public Proects or any other Projects, he can filter the project by clicking the Filter Projects button on the Project Pane.</p>
-<p>Both My Projects and Public Projects can be hidden by clicking the collapse icon next to the headings (see Figure 8.1). All Projects can be hidden to the administrators as well.</p>
+<p>Unpublished Projects and Published Projects are separated in the view.</p>
+<p>A Repository Administrator will, by default, have a listing of All Projects.</p>
+<p>Both Unpublished Projects and Published Projects can be hidden by clicking the collapse icon next to the headings (see Figure 8.1).</p>
 <br>
 <h5>Action Buttons</h5>
 <p>There are also additional buttons displayed for different user roles:</p>
 <ul class="stylized">
-    <li><strong>Filter Projects</strong> button is visible to all registered users. It will take user to the filter function      (see Filtering Projects for details).</li>
-    <li><strong>Create Projects</strong> button is only visible to Project Creator and Repository Administrator. It will take user      to the Create Project function (see Creating a Project). &nbsp;</li>
+    <li><strong>Create Projects</strong> button is only visible to Project Creator and Repository Administrator. It will take user to the Create Project function (see Creating a Project). &nbsp;</li>
+    <li><strong>Upload Project as RDF</strong> button is visible to Project Creator and Repository Administrator. It will take user to the Upload New Project function.</li>
 </ul>
 <br>
+<!-- 
 <h5>Pagination</h5>
-<p>Where a list of projects exceeds the on screen maximum (20) a list of page numbers will be displayed at the bottom for the user to page through the project list. This pagination function will exist for both My Projects and Public Projects. So if there are more than 20 My Projects and the user selects the next page then the My Projects list would be updated and not the Public Projects list, and vice versa for Public Projects.</p>
+<p>Where a list of projects exceeds the on screen maximum (20) a list of page numbers will be displayed at the bottom for the user to page through the project list. This pagination function will exist for both Published Projects and Unpublished Projects. So if there are more than 20 Unpublished Projects and the user selects the next page then the Unpublished Projects list would be updated and not the Published Projects list, and vice versa for Published Projects.</p>
+ -->
