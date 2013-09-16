@@ -13,7 +13,7 @@
 <#-- @ftlvariable name="errorMessage" type="java.lang.String" -->
 
 <div id="title_pane">
-    <h3>Artifacts Listing</h3>
+    <h3>Projects Listing</h3>
 </div>
 
 <div id="content_pane">
@@ -29,7 +29,7 @@
 	<a href="javascript:void(0);" onclick="removeFilter()">Remove Filter</a>
     </#if>
     <#if canFilter?? && canFilter>
-    <a href="${baseUrl}/artifactsfilter/">Filter Artifacts</a>
+    <a href="${baseUrl}/artifactsfilter/">Filter Projects</a>
     </#if>
 </div>
 
@@ -37,8 +37,8 @@
 
 <#if unpublishedArtifactsList?? && unpublishedArtifactsList?has_content>
 	<#-- if the user is authenticated show the list of artifacts they have access to -->
-	<h3 class="underlined_heading">Unpublished Artifacts 
-		<a href="javascript:animatedcollapse.toggle('unpublishedArtifacts')" icon="toggle" title="View Unpublished Artifacts"></a>
+	<h3 class="underlined_heading">Unpublished Projects 
+		<a href="javascript:animatedcollapse.toggle('unpublishedArtifacts')" icon="toggle" title="View Unpublished Projects"></a>
 	</h3>
     <div id="unpublishedArtifacts">
         <#list unpublishedArtifactsList as artifact>
@@ -52,8 +52,8 @@
 </#if>
 
 <#if publishedArtifactsList?? && publishedArtifactsList?has_content>
-<h3 class="underlined_heading">Published Artifacts
-	<a href="javascript:animatedcollapse.toggle('publishedArtifacts')" icon="toggle" title="View Published Artifacts"></a>
+<h3 class="underlined_heading">Published Projects
+	<a href="javascript:animatedcollapse.toggle('publishedArtifacts')" icon="toggle" title="View Published Projects"></a>
 </h3>
 <div id="publishedArtifacts">
 	<#list publishedArtifactsList as artifact>
@@ -67,7 +67,7 @@
 </#if>
 
 <#if (!publishedArtifactsList?? || !publishedArtifactsList?has_content) && (!unpublishedArtifactsList?? || !unpublishedArtifactsList?has_content) >
-No artifacts found
+No projects found
 </#if>
 
 <#if userCanCreate?? && userCanCreate>
@@ -104,7 +104,7 @@ No artifacts found
     <script type="text/javascript">
         writeAbstractWholeWords("${(aArtifact.getDescription())!" - "}", 200);
     </script>
-    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getOntologyID().getVersionIRI().toString())!""}&amp;objectUri=${(aArtifact.getObjectURI())!""}">Browse Artifact</a>
+    <a href="${baseUrl}/artifact/base?artifacturi=${(aArtifact.getOntologyID().getVersionIRI().toString())!""}&amp;objectUri=${(aArtifact.getObjectURI())!""}">Browse Project</a>
     </p>
 </#macro>
 

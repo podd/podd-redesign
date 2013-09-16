@@ -65,7 +65,7 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
         
-        Assert.assertTrue("Page did not contain no artifacts message", body.contains("No artifacts found"));
+        Assert.assertTrue("Page did not contain no artifacts message", body.contains("No projects found"));
         this.assertFreemarker(body);
     }
     
@@ -98,11 +98,11 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
         
-        Assert.assertTrue("Missing heading on page - Artifacts Listing", body.contains("Artifacts Listing"));
+        Assert.assertTrue("Missing heading on page - Artifacts Listing", body.contains("Projects Listing"));
         Assert.assertTrue("Missng artifact 1 URI on page", body.contains(artifactUri1));
         Assert.assertTrue("Missng artifact 2 URI on page", body.contains(artifactUri2));
         
-        Assert.assertFalse("Page contained no artifacts message", body.contains("No artifacts found"));
+        Assert.assertFalse("Page contained no artifacts message", body.contains("No projects found"));
         this.assertFreemarker(body);
     }
     
