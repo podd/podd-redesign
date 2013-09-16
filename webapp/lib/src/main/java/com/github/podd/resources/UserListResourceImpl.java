@@ -129,7 +129,7 @@ public class UserListResourceImpl extends AbstractPoddResourceImpl
         {
             final PoddUser user = (PoddUser)u;
             
-            user.toModel(model);
+            user.toModel(model, false);
         }
         
         return model;

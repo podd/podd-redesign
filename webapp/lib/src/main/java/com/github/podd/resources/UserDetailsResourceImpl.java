@@ -180,7 +180,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
     {
         final Model userInfoModel = new LinkedHashModel();
         
-        user.toModel(userInfoModel);
+        user.toModel(userInfoModel, false);
         
         this.log.debug("User has {} roles", roles.size());
         

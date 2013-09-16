@@ -281,12 +281,19 @@ public class PoddUser extends RestletUtilUser
         return b.toString();
     }
     
-    public void toModel(Model model)
+    public void toModel(Model model, boolean includeSecret)
     {
         final URI userUri = this.getUri();
         model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
                 PoddRdfConstants.VF.createLiteral(this.getIdentifier()));
-        // Password should not be sent back!
+        
+        // Password should not be sent back in RDF to users!
+        if(includeSecret)
+        {
+            model.add(userUri, SesameRealmConstants.OAS_USERSECRET,
+                    PoddRdfConstants.VF.createLiteral(new String(this.getSecret())));
+        }
+        
         model.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
                 PoddRdfConstants.VF.createLiteral(this.getFirstName()));
         model.add(userUri, SesameRealmConstants.OAS_USERLASTNAME, PoddRdfConstants.VF.createLiteral(this.getLastName()));
