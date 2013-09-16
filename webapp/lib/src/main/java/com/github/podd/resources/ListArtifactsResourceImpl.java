@@ -133,13 +133,11 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                 results.put(PoddWebConstants.KEY_PUBLISHED, publishedArtifacts);
             }
             
-            if(unpublished)
+            if(unpublished && this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST, null, false))
             {
                 this.log.info("About to check for authentication to look at unpublished artifacts");
                 this.log.info("Is authenticated: {}", this.getRequest().getClientInfo().isAuthenticated());
                 this.log.info("Current user: {}", this.getRequest().getClientInfo().getUser());
-                
-                this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST);
                 
                 final List<InferredOWLOntologyID> unpublishedResults = new ArrayList<InferredOWLOntologyID>();
                 
