@@ -191,7 +191,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         }
         else if(this.isUserInactive(request.getClientInfo().getUser()))
         {
-            this.log.error("Authenticates user is Inactive. user={}", request.getClientInfo().getUser());
+            this.log.error("Authenticated user is Inactive. user={}", request.getClientInfo().getUser());
             return false;
         }
         else if(!action.isRoleRequired())

@@ -16,9 +16,11 @@
  */
 package com.github.podd.utils;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 
 import com.github.ansell.restletutils.RestletUtilUser;
+import com.github.ansell.restletutils.SesameRealmConstants;
 
 /**
  * This class represents a PODD user.
@@ -279,4 +281,63 @@ public class PoddUser extends RestletUtilUser
         return b.toString();
     }
     
+    public void toModel(Model model)
+    {
+        final URI userUri = this.getUri();
+        model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
+                PoddRdfConstants.VF.createLiteral(this.getIdentifier()));
+        // Password should not be sent back!
+        model.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
+                PoddRdfConstants.VF.createLiteral(this.getFirstName()));
+        model.add(userUri, SesameRealmConstants.OAS_USERLASTNAME, PoddRdfConstants.VF.createLiteral(this.getLastName()));
+        model.add(userUri, SesameRealmConstants.OAS_USEREMAIL, PoddRdfConstants.VF.createLiteral(this.getEmail()));
+        
+        if(this.getHomePage() != null)
+        {
+            model.add(userUri, PoddRdfConstants.PODD_USER_HOMEPAGE, this.getHomePage());
+        }
+        
+        if(this.getOrganization() != null)
+        {
+            model.add(userUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
+                    PoddRdfConstants.VF.createLiteral(this.getOrganization()));
+        }
+        
+        if(this.getOrcid() != null)
+        {
+            model.add(userUri, PoddRdfConstants.PODD_USER_ORCID, PoddRdfConstants.VF.createLiteral(this.getOrcid()));
+        }
+        
+        if(this.getTitle() != null)
+        {
+            model.add(userUri, PoddRdfConstants.PODD_USER_TITLE, PoddRdfConstants.VF.createLiteral(this.getTitle()));
+        }
+        
+        if(this.getPhone() != null)
+        {
+            model.add(userUri, PoddRdfConstants.PODD_USER_PHONE, PoddRdfConstants.VF.createLiteral(this.getPhone()));
+        }
+        
+        if(this.getAddress() != null)
+        {
+            model.add(userUri, PoddRdfConstants.PODD_USER_ADDRESS, PoddRdfConstants.VF.createLiteral(this.getAddress()));
+        }
+        
+        if(this.getPosition() != null)
+        {
+            model.add(userUri, PoddRdfConstants.PODD_USER_POSITION,
+                    PoddRdfConstants.VF.createLiteral(this.getPosition()));
+        }
+        
+        if(this.getUserStatus() != null)
+        {
+            model.add(userUri, PoddRdfConstants.PODD_USER_STATUS, this.getUserStatus().getURI());
+        }
+        else
+        {
+            // INACTIVE by default
+            model.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
+        }
+        
+    }
 }
