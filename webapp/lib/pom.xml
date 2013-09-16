@@ -227,7 +227,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.ansell.semargl</groupId>
+			<groupId>org.semarglproject</groupId>
 			<artifactId>semargl-sesame</artifactId>
 			<scope>test</scope>
 		</dependency>
