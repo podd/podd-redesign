@@ -350,6 +350,20 @@ public class PoddUser extends RestletUtilUser
         
     }
     
+    /**
+     * Creates a PoddUser object from statements in the given {@link Model}.
+     * 
+     * @param model
+     * @param allowSecret
+     *            If true, the password will be searched for.
+     * @param failIfSecretFound
+     *            If true, and if allowSecret is true, will fail if secret is found.
+     * @param requireSecret
+     *            If true, and if allowSecret is true, will fail if the secret is not found.
+     * @return A PoddUser object created from the given model.
+     * @throws ResourceException
+     *             If there are errors in the process.
+     */
     public static final PoddUser fromModel(Model model, boolean allowSecret, boolean failIfSecretFound,
             boolean requireSecret)
     {
