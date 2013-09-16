@@ -191,7 +191,16 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         // Disable currently unimplemented features
         dataModel.put("canFilter", Boolean.FALSE);
         dataModel.put("hasFilter", Boolean.FALSE);
-        dataModel.put("userCanCreate", Boolean.FALSE);
+        
+        
+        if (this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null, false))
+        {
+            dataModel.put("userCanCreate", Boolean.TRUE);    
+        }
+        else
+        {
+            dataModel.put("userCanCreate", Boolean.FALSE);
+        }
         
         this.log.info("artifacts: {}", artifactsInternal);
         

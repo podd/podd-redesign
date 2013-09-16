@@ -23,9 +23,6 @@
 </div>
 
 <div id="buttonwrapper_right">
-	<#if userCanCreate?? && userCanCreate>
-		<a href="${baseUrl}/artifact/new">Upload a new Artifact</a>
-	</#if>
 	<form id="removeFilterForm" method="POST" action="/podd/removeartifactsfilter" style="display:none">		
 	</form>
 	<#if hasFilter?? && hasFilter>
@@ -73,11 +70,12 @@
 No artifacts found
 </#if>
 
-<div id="buttonwrapper">
-     <a href="${baseUrl}/artifact/addobject?objecttypeuri=http://purl.org/podd/ns/poddScience%23Project">Create Project</a>
-     <a href="${baseUrl}/artifact/new">Upload Project as RDF</a>
-</div>
-
+<#if userCanCreate?? && userCanCreate>
+	<div id="buttonwrapper">
+	     <a href="${baseUrl}/artifact/addobject?objecttypeuri=http://purl.org/podd/ns/poddScience%23Project">Create Project</a>
+	     <a href="${baseUrl}/artifact/new">Upload Project as RDF</a>
+	</div>
+</#if>
 
 </div>  <!-- content pane -->
 
