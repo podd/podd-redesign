@@ -256,6 +256,15 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             }
             // TODO: handle case where more than 1 type is found
             dataModel.put("objectType", objectTypes.get(0));
+
+            if (objectToEdit == null)
+            {
+                dataModel.put("title", "Edit Project Object");
+            }
+            else
+            {
+                dataModel.put("title", "Edit " + objectTypes.get(0).getLabel() + " Object");
+            }
             
             // Parent Details
             final Model parentDetails = this.getPoddArtifactManager().getParentDetails(ontologyID, objectUri);
