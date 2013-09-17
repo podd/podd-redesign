@@ -1,40 +1,35 @@
 <h3 class="underlined_heading">Adding Project Participants</h3>
 <br>
 <p>Project Participants are users who have Project specific roles. They have nominated CRUD accesses to the project while the project has a Project Status of current.</p>
-<p class="rtecenter"><img alt="Adding Project Participants" style="width: 662px; height: 477px;" border="1" src="${baseUrl}/resources/images/project participants1.jpg" /></p>
-<p class="rteleft">Figure 10.2.1 &ndash; screen shot of the Project Participants section on the <strong>Create Project Object</strong> page</p>
+<p>When a  Project is created, by default the creator is given the Principal Investigator and Project Administrator roles.</p>
+<p>For authorised users, i.e. Project Administrators, there is an <strong>Edit Participants</strong> button in the <strong>View Project</strong> screen. When the button is clicked, the <strong>Project Participants</strong> screen is displayed.</p>
+<p class="rtecenter"><img alt="Adding Project Participants" style="width: 938px; height: 666px;" border="1" src="${baseUrl}/resources/images/project_participants2.jpg" /></p>
+<p class="rteleft">Figure 10.2.1 &ndash; Screenshot of the <strong>Project Participants</strong> page</p>
 <p>As shown in Figure 10.2.1, there are four types of project participants (see also <a href="./roles">Project Specific Roles</a>). They are:</p>
 <ul class="stylized">
     <li>Principal Investigator *
     <ul class="stylized-circle">
-        <li>Mandatory, a project must have a Primary Investigator.</li>
-        <li>A Primary Investigator, by default, is also a Project Administrator.</li>
-        <li>No more than one Primary Investigator at any time.</li>
-        <li>Primary Investigators can be replaced.</li>
-        <li>Additional text under the text field should read: &quot;Only one principal investigator is allowed. Principal Investigators will have Project Administrator status by default.&quot;</li>
-    </ul>
+        <li>This field is mandatory, a project must have exactly one Principal Investigator at any time.</li>
+        <li>A Principal Investigator should also be a Project Administrator in order to administer the Project.</li>
+        <li>Principal Investigator can be replaced.</li>
+        <li>To edit Principal Investigator, hover the mouse pointer over the current entry. The label will change into an editable text box.</li>
     </li>
     <li>Project Administrator
     <ul class="stylized-circle">
         <li>The project can have multiple Project Administrators.</li>
         <li>A default Project Administrator is already inserted in this field, being the person creating the project. This default can be edited out of the text field. Note this will have consequences when the creator submits the project.</li>
-        <li>Additional text under the text field should read: &quot;Project Administrators will have Create, Read, Update and Delete access to all Project objects.&quot;</li>
     </ul>
     </li>
     <li>Project Members
     <ul class="stylized-circle">
-        <li>Additional text under the text field should read: &quot;Project Members will have Create, Read and Update access to all Project objects.&quot;</li>
+        <li>Project Members have Create, Read and Update access to all Project objects, and Delete access to internal Project objects.</li>
     </ul>
     </li>
     <li>Project Observers
     <ul class="stylized-circle">
-        <li>Additional text under the text field should read: &quot;Project Observers will have Read only access to all Project objects.&quot;</li>
+        <li>Project Observers have Read only access to all Project objects.</li>
     </ul>
     </li>
 </ul>
-<p>The project participants section also provide the following two functionalities:</p>
-<ul class="stylized">
-    <li><a href="./participant_auto_complete">Auto-Completion</a>: the headers for each of the input fields links to a search dialog. They provide a selectable auto-completion functionality.</li>
-    <li><a href="./participant_search">Search for User</a>: When the user clicks on any of the input field headings (i.e. Principal  Investigator, Project Administrators, etc) a pop up dialog will  appear.</li>
-</ul>
-<p>The user adds user to each field as required. Please be advised that only existing registered user can be added in the fields. One user can have only one role in a project.</p>
+<p>Adding project participants makes use of the <a href="./participant_auto_complete">Auto-Completion</a> functionality.</p>
+<p>The user adds participants to each field as required. Please be advised that only existing registered users can be added in the fields. One user can have several roles in a project.</p>

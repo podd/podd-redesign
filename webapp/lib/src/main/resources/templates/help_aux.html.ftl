@@ -25,7 +25,7 @@
             <li><a href="${baseUrl}/help/participants">Adding Project Participants</a></li>
             <ul class="stylized-small-circle">
                 <li><a href="${baseUrl}/help/participant_auto_complete">Auto-completion Functionality</a></li>
-                <li><a href="${baseUrl}/help/participant_search">Search for Users</a></li>
+                <li><del><a href="${baseUrl}/help/participant_search">Search for Users</a></del></li>
             </ul>
             <li><a href="${baseUrl}/help/file_attach">Attaching Files</a></li>
             <ul class="stylized-small-circle">
