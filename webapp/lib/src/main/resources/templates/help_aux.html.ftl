@@ -27,7 +27,7 @@
                 <li><a href="${baseUrl}/help/participant_auto_complete">Auto-completion Functionality</a></li>
                 <li><del><a href="${baseUrl}/help/participant_search">Search for Users</a></del></li>
             </ul>
-            <li><a href="${baseUrl}/help/file_attach">Attaching Files</a></li>
+            <li><a href="${baseUrl}/help/file_attach">Attaching File References</a></li>
             <ul class="stylized-small-circle">
                 <li><a href="${baseUrl}/help/manage_files">Manage Data Items</a></li>
             </ul>
@@ -51,15 +51,6 @@
         </ul>
         <li><del><a href="${baseUrl}/help/tab_import">TAB Import</a></del></li>
         <li><a href="${baseUrl}/help/browser">Browser Pane</a></li>
-        <del>
-        <li><a href="${baseUrl}/help/clipboard_copy">Copy and Paste</a></li>
-        <ul class="stylized-small">
-            <li><a href="${baseUrl}/help/clipboard_add_predicate">Cloning Predicates via Browser Pane</a></li>
-            <li><a href="${baseUrl}/help/clipboard_add_object">Cloning Object via Browser Pane or Object View</a></li>
-            <li><a href="${baseUrl}/help/clipboard_edit">Editing Clipboard</a></li>
-            <li><a href="${baseUrl}/help/clipboard_deleted_objects">Handling Deleted Objects</a></li>
-        </ul>
-        </del>
         <li><a href="${baseUrl}/help/search">Search</a></li>
         <li class="stylized-last"><a href="${baseUrl}/help/support">Support and Help</a></li>
     </ul>
