@@ -87,12 +87,12 @@ public interface TestConstants
     /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
     public static final String TEST_ARTIFACT_NO_VERSION_INFO = "/test/artifacts/project-with-no-version-info.rdf";
     public static final int TEST_ARTIFACT_NO_VERSION_INFO_CONCRETE_TRIPLES = 29;
-    public static final int TEST_ARTIFACT_NO_VERSION_INFO_INFERRED_TRIPLES = 317;
+    public static final int TEST_ARTIFACT_NO_VERSION_INFO_INFERRED_TRIPLES = 326;
     
     /** Test resource (in RDF/XML): artifact imports v1 of PODD Science schema ontology */
     public static final String TEST_ARTIFACT_PURLS_v1 = "/test/artifacts/project-with-purls-v1.rdf";
     public static final int TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES = 25;
-    public static final int TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES = 311;
+    public static final int TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES = 320;
     
     /** Test resource (in Turtle): artifact with temporary URIs and 1 internal object having a PURL */
     public static final String TEST_ARTIFACT_TTL_1_INTERNAL_OBJECT = "/test/artifacts/connected-1-object.ttl";
