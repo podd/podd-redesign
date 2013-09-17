@@ -351,6 +351,20 @@ public class PoddUser extends RestletUtilUser
     }
     
     /**
+     * Creates a PoddUser object from statements in the given {@link Model}, without setting the
+     * password.
+     * 
+     * @param model
+     * @return A PoddUser object created from the given model.
+     * @throws ResourceException
+     *             If there are errors in the process.
+     */
+    public static final PoddUser fromModel(Model model)
+    {
+        return fromModel(model, false, false, false);
+    }
+    
+    /**
      * Creates a PoddUser object from statements in the given {@link Model}.
      * 
      * @param model
@@ -370,6 +384,7 @@ public class PoddUser extends RestletUtilUser
         final String identifier = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
         if(identifier == null || identifier.trim().length() == 0)
         {
+            // FIXME: Convert this to a PoddException
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Identifier cannot be empty");
         }
         char[] secret = null;
@@ -378,10 +393,12 @@ public class PoddUser extends RestletUtilUser
             final String password = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
             if(failIfSecretFound && password != null)
             {
+                // FIXME: Convert this to a PoddException
                 throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "User Password must not be present");
             }
             if(requireSecret && password == null || password.trim().length() == 0)
             {
+                // FIXME: Convert this to a PoddException
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Password cannot be empty");
             }
             if(password != null)
@@ -395,6 +412,7 @@ public class PoddUser extends RestletUtilUser
         // PODD-specific requirement. First/Last names are mandatory.
         if(firstName == null || lastName == null)
         {
+            // FIXME: Convert this to a PoddException
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User First/Last name cannot be empty");
         }
         
@@ -402,6 +420,7 @@ public class PoddUser extends RestletUtilUser
         final String email = model.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).objectString();
         if(email == null)
         {
+            // FIXME: Convert this to a PoddException
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Email cannot be empty");
         }
         

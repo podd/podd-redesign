@@ -286,7 +286,9 @@ public class RestletPoddClientImpl implements PoddClient
             
             Model model = Rio.parse(stream, "", format);
             
-            throw new RuntimeException("TODO: Implement me");
+            PoddUser poddUser = PoddUser.fromModel(model);
+            
+            return poddUser;
         }
         catch(final RDFParseException e)
         {
