@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.util.GraphUtil;
@@ -429,8 +430,8 @@ public abstract class AbstractPoddSesameManagerTest
                         IRI.create("urn:inferred:http://purl.org/podd/ns/version/poddPlant/2")));
         
         final Set<InferredOWLOntologyID> allSchemaOntologyVersions =
-                this.testPoddSesameManager
-                        .getAllCurrentSchemaOntologyVersions(this.testRepositoryConnection, this.schemaGraph);
+                this.testPoddSesameManager.getAllCurrentSchemaOntologyVersions(this.testRepositoryConnection,
+                        this.schemaGraph);
         
         Assert.assertEquals("Incorrect number of schema ontologies", 3, allSchemaOntologyVersions.size());
         for(final InferredOWLOntologyID ontoID : allSchemaOntologyVersions)
@@ -451,6 +452,7 @@ public abstract class AbstractPoddSesameManagerTest
     @Test
     public void testGetAllValidMembers() throws Exception
     {
+        ValueFactory vf = PoddRdfConstants.VF;
         // prepare: load schema ontologies and test artifact
         this.loadSchemaOntologies();
         final InferredOWLOntologyID ontologyID =
@@ -459,64 +461,50 @@ public abstract class AbstractPoddSesameManagerTest
         
         // Collections to test
         final URI[] collectionsToTest =
-                { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatformType"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasSex"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasSoftware"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "hasPublicationStatus"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasControl"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasWildType"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
-                        ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"), };
+                { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasPlatformType"),
+                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasSex"),
+                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasSoftware"),
+                        vf.createURI(PoddRdfConstants.PODD_BASE, "hasPublicationStatus"),
+                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasControl"),
+                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasWildType"),
+                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "hasANZSRC"),
+                        vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Platform"), };
         
         final URI[][] expectedMembers =
                 {
-                        {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "PlatformType_Software"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "PlatformType_Hardware"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "PlatformType_HardwareSoftware") },
+                        { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType_Software"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType_Hardware"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "PlatformType_HardwareSoftware") },
                         
-                        {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "Sex_NotApplicable"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Unknown"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "Sex_Hermaphrodite"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Female"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Male") },
+                        { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_NotApplicable"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Unknown"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Hermaphrodite"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Female"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "Sex_Male") },
                         
                         {}, // <poddScience:Software> is not a Collection
                         
-                        { ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "Published"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_BASE, "NotPublished"), },
+                        { vf.createURI(PoddRdfConstants.PODD_BASE, "Published"),
+                                vf.createURI(PoddRdfConstants.PODD_BASE, "NotPublished"), },
+                        
+                        { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_Yes"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_No"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_NotApplicable"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_Unknown") },
+                        
+                        { vf.createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_Yes"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_No"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_NotApplicable"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_Unknown") },
                         
                         {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "HasControl_Yes"),
-                                ValueFactoryImpl.getInstance()
-                                        .createURI(PoddRdfConstants.PODD_SCIENCE, "HasControl_No"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "HasControl_NotApplicable"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "HasControl_Unknown") },
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC-NotApplicable"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC06-Biological-Sciences"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE,
+                                        "ANZSRC07-Agriculture-and-Veterinary-Sciences"),
+                                vf.createURI(PoddRdfConstants.PODD_SCIENCE, "ANZSRC11-Medical-and-Health-Sciences")
                         
-                        {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_Yes"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE, "WildType_No"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "WildType_NotApplicable"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_SCIENCE,
-                                        "WildType_Unknown") },
-                        
-                        {
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT,
-                                        "ANZSRC-NotApplicable"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT,
-                                        "ANZSRC06-Biological-Sciences"),
-                                ValueFactoryImpl.getInstance().createURI(PoddRdfConstants.PODD_PLANT,
-                                        "ANZSRC07-Agriculture-and-Veterinary-Sciences") },
+                        },
                         
                         {}, // IMPORTANT: <poddScience:Platform> is not a Collection
                         
