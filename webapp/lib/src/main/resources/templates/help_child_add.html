@@ -1,51 +1,31 @@
 <h3 class="underlined_heading">Adding a Child Object</h3>
 <br>
-<p>With the exception of Project, all concrete objects are instantiated with a reference to the parent object. But not all objects can be a parent of another object, e.g., a Project Plan can not have a child object.</p>
-<p>Authorised users can add a child object by clicking the <strong>Add Child Object</strong> button when viewing the parent object.</p>
-<p>If the data model does not allow an object to have child objects, the <strong>Add Child Object</strong> button won't be available.</p>
+<p>With the exception of a Project, all concrete PODD objects are instantiated with a reference to the parent object. However, not all objects can be a parent of another object. For example, a <em>Project Plan</em> can not have a child object.</p>
+<p>Authorised users can add a child object by clicking the <strong>Add Child Object</strong> button when viewing the parent object. If the data model does not allow an object to have child objects, the <strong>Add Child Object</strong> button won't be available.</p>
 <br>
-<h4>Select Parent-Child Relationship and Child Object Type</h4>
-<p>The user chooses to create a child object as described above, the initial <strong>Add Child Object</strong> screen is displayed as shown in Figure 14.1.1.</p>
-<p class="rtecentre"><img style="width: 677px; height: 417px;" border="1" alt="" src="${baseUrl}/resources/images/addchild 1_0.jpg" /></p>
-<p class="rteleft"><em>Figure 14.1.1 &ndash; Example screen shot for adding a child object &amp; relationships to a parent object (Project)</em></p>
-<p>The first section on the screen is a summary of the Parent Object including (read only):</p>
-<ul class="stylized">
-    <li>ID (Note: ID must be displayed).</li>
-    <li>Type (i.e. object type)</li>
-    <li>Title</li>
-</ul>
-<p>* The user can get to the parent object view page by clicking the Object ID link.</p>
-<p>The next section is the Relationship &amp; Type section. The Relationship defines the nature of the relationship (predicate)  between the parent (subject) and  the child (object) object. The user selects the relationship&nbsp; and the type of object.</p>
-<ul class="stylized">
-    <li>These fields are drop-down lists at all times. If there is only one option then it will still be a drop down, but the single option will be selected.</li>
-    <li>The Relationship field will display the Title of the predicate and not the predicate itself.</li>
-    <li>The Child Object list will be dynamically generated when the user selects the Relationship field.</li>
-</ul>
-<p>The next section is the <strong>Continue</strong> and <strong>Cancel</strong> buttons.</p>
-<p>When satisfied with the relationship and child object the user clicks <strong>Continue</strong>. (If <strong>Cancel</strong> is clicked, the Add Child Object action is then cancelled and the user is returned to the previous <strong>View Object</strong> page).</p>
+<h4>Select Child Object Type (and Parent-Child Relationship)</h4>
+<p>When the <strong>Add Child Object</strong> button is clicked, the <strong>Add Child</strong> Dialog is displayed as shown in Figure 14.1.1 below.</p>
+<p class="rtecentre"><img style="width: 644px; height: 536px;" border="1" alt="" src="${baseUrl}/resources/images/addchild1_dialog.jpg" /></p>
+<p class="rteleft"><em>Figure 14.1.1 &ndash; Screenshot of Add Child Dialog</em></p>
+<p>The Dialog contains a drop down list containing all "Child Object Type - Parent-Child Relationship" combinations possible for the parent object  as shown in Figure 14.1.2 below.</p>  
+<p class="rtecentre"><img style="width: 385px; height: 242px;" border="1" alt="" src="${baseUrl}/resources/images/addchild2_dialog.jpg" /></p>
+<p class="rteleft"><em>Figure 14.1.2 &ndash; Screenshot showing possible "Child Object Type - Parent-Child Relationship" combinations</em></p>
+
+<p>When satisfied with the child object type and relationship, the user clicks <strong>Continue</strong>. (To cancel the process, click the Dialog's close button to return to the previous <strong>View Object</strong> page).</p>
+
 <p>The user is presented with an updated <strong>Add Child Object</strong> screen. The screen is different depending on the type of the child object.</p>
-<p class="rtecentre">&nbsp;<img style="width: 678px; height: 343px;" border="1" alt="" src="${baseUrl}/resources/images/addchild 2.jpg" /></p>
-<p class="rteleft"><em>Figure &ndash; 14.1.2 Example screen shot for updated add a child object page (Platform Object)</em></p>
+<p class="rtecentre"><img style="width: 509px; height: 380px;" border="1" alt="" src="${baseUrl}/resources/images/addchild3_platform.jpg" /></p>
+<p class="rteleft"><em>Figure 14.1.3 &ndash; Example creenshot for Add New Platform</em></p>
 <br>
 <h4>Fill in the Child Object details</h4>
-<p>As shown in Figure 14.1.2, the <strong>Add Child Object</strong> page has the following sections:</p>
+<p>The Child Object fields appearing are determined by the type of Child Object. The user has to fill these in and 
+click the <strong>Submit</strong> button when satisfied.
+Validation is performed and if any fields are in error then the user is returned to the top of the page. An error box will appear at the top of the page describing the nature of the errors.</p>
+<p>On successful submission, the following universal attributes will be automatically recorded against the new child object:</p>
 <ul class="stylized">
-    <li>Parent Details</li>
-    <li>Object Details</li>
-    <li>Refers To tables (can be zero or more than one table depending on the child object type)</li>
-    <li>File Attachment</li>
-    <li>Action buttons</li>
-</ul>
-<p><strong>Parent Details:</strong> this section is displayed on the top of the page. It is similar to the screen described in the previous screen, including the parent object&rsquo;s ID, type and title. It also includes the Parent Child object relationship, which has been set to Read Only fields based on the choices the user made in the previous screen.&nbsp;</p>
-<p><strong>Object Details:</strong> The next section on the page is the Child Object Details section. Its sub-header is based on the object that is being instantiated, so a Platform object is titled Platform Details. The fields here are determined by the object to be instantiated. Different object has deferent object details. The user completes the fields as required.</p>
-<p><strong>Refers To table:</strong> Whether this section is displayed or not is determined by the data model and the availability of the objects related. If the object can refer to any objects, the tables and the available referencing objects will be listed. The user then selects the right referenced object.</p>
-<p><strong>File Attachment: </strong>this functionality is exactly the same as <a href="./file_attach">the one when Creating a Project</a>.</p>
-<p><strong>Action Buttons: </strong>the <strong>Submit</strong>, <strong>Cancel</strong>, <strong>Reset</strong> and <strong>Reinitilize</strong> buttons are displayed at the bottom of the page. When satisfied with the object details the user clicks <strong>Submit</strong>. Validation is performed. If any fields are in error then the user is returned to the top of the page. An error box will appear at top of the page advising there are errors on the page. An error box will appear beneath the fields in error describing the nature of the error.</p>
-<p>On successful instantiation, the following universal attributes will be automatically recorded against the concrete object:</p>
-<ul class="stylized">
-    <li>ID is determined by PODD.</li>
+    <li>URI is determined by PODD.</li>
     <li>Creator is set to the current user.</li>
     <li>Creation Date is set to the current date.</li>
 </ul>
-<p>The system confirms the submission to the administrator by switching to the <strong>View</strong> tab and displaying the object details page in view (read only mode). See: <a href="./child_view">Viewing an Object for details</a>.</p>
-<p>The user can also backout and return to the previous screen by selecting the <strong>Cancel</strong> button or clear the object details by clicking the <strong>Reset</strong> button. If there is another object being edited at the same time, the user has to click <strong>Reinitialize</strong> to add the Child Object.&nbsp;</p>
+<p>The system confirms the submission to the administrator by switching to the <strong>View</strong> tab and displaying the object details page in view (read only mode). See: <a href="./child_view">Viewing a Child Object</a> for details.</p>
+<p>The user can also abort the process and return to view the parent object by selecting the <strong>Cancel</strong> button.</p>
