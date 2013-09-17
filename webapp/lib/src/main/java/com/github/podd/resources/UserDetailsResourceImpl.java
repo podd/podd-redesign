@@ -180,67 +180,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
     {
         final Model userInfoModel = new LinkedHashModel();
         
-        final URI userUri = user.getUri();
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
-                PoddRdfConstants.VF.createLiteral(user.getIdentifier()));
-        // Password should not be sent back!
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(user.getFirstName()));
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
-                PoddRdfConstants.VF.createLiteral(user.getLastName()));
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USEREMAIL,
-                PoddRdfConstants.VF.createLiteral(user.getEmail()));
-        
-        if(user.getHomePage() != null)
-        {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_HOMEPAGE, user.getHomePage());
-        }
-        
-        if(user.getOrganization() != null)
-        {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_ORGANIZATION,
-                    PoddRdfConstants.VF.createLiteral(user.getOrganization()));
-        }
-        
-        if(user.getOrcid() != null)
-        {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_ORCID,
-                    PoddRdfConstants.VF.createLiteral(user.getOrcid()));
-        }
-        
-        if(user.getTitle() != null)
-        {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_TITLE,
-                    PoddRdfConstants.VF.createLiteral(user.getTitle()));
-        }
-        
-        if(user.getPhone() != null)
-        {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_PHONE,
-                    PoddRdfConstants.VF.createLiteral(user.getPhone()));
-        }
-        
-        if(user.getAddress() != null)
-        {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_ADDRESS,
-                    PoddRdfConstants.VF.createLiteral(user.getAddress()));
-        }
-        
-        if(user.getPosition() != null)
-        {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_POSITION,
-                    PoddRdfConstants.VF.createLiteral(user.getPosition()));
-        }
-        
-        if(user.getUserStatus() != null)
-        {
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, user.getUserStatus().getURI());
-        }
-        else
-        {
-            // INACTIVE by default
-            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
-        }
+        user.toModel(userInfoModel, false);
         
         this.log.debug("User has {} roles", roles.size());
         
@@ -252,7 +192,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
             final URI roleMapping =
                     PoddRdfConstants.VF.createURI("urn:podd:rolemapping:", UUID.randomUUID().toString());
             userInfoModel.add(roleMapping, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
-            userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, userUri);
+            userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, user.getUri());
             
             userInfoModel.add(roleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, roleByName.getURI());
             

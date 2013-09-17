@@ -29,6 +29,7 @@ import org.semanticweb.owlapi.model.IRI;
 import com.github.ansell.restletutils.RestletUtilRole;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.utils.InferredOWLOntologyID;
+import com.github.podd.utils.PoddUser;
 
 /**
  * An interface defining the operations that are currently implemented by the PODD Web Services.
@@ -84,6 +85,17 @@ public interface PoddClient
     InferredOWLOntologyID attachDataReference(DataReference ref) throws PoddClientException;
     
     /**
+     * Creates a new PoddUser using the details in the given PoddUser.
+     * 
+     * @param user
+     *            The user to create.
+     * @return An instance of PoddUser containing the actual details of the created user, except for
+     *         the password.
+     * @throws PoddClientException
+     */
+    PoddUser createUser(PoddUser user) throws PoddClientException;
+    
+    /**
      * Submits a request to the PODD Delete Artifact service to delete the artifact identified by
      * the given IRI.
      * <p>
@@ -125,6 +137,17 @@ public interface PoddClient
      *         hosted locally. Returns null if a server URL has not been set.
      */
     String getPoddServerUrl();
+    
+    /**
+     * 
+     * @param userIdentifier
+     *            The user identifier to fetch details for, or null to fetch the current user
+     *            details.
+     * @return A {@link PoddUser} object containing the relevant details for the user.
+     * @throws PoddClientException
+     *             If the user is not accessible, including if the user does not exist.
+     */
+    PoddUser getUserDetails(String userIdentifier) throws PoddClientException;
     
     /**
      * Returns the current login status.
@@ -179,6 +202,15 @@ public interface PoddClient
      *         access to which are unpublished.
      */
     List<InferredOWLOntologyID> listUnpublishedArtifacts() throws PoddClientException;
+    
+    /**
+     * 
+     * @return A list of the current users registered with the system, masked by the abilities of
+     *         the current user to view each users existence. If the current user is a repository
+     *         administrator they should be able to view all users. Some other roles may only be
+     *         able to see some other users.
+     */
+    List<PoddUser> listUsers() throws PoddClientException;
     
     /**
      * Submits a request to the PODD Login service to login the user with the given username and

@@ -256,13 +256,16 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         catch(final RepositoryException e)
         {
             this.log.error("Found repository exception while adding user", e);
-            try
+            if(conn != null)
             {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Found unexpected exception while rolling back repository connection after exception");
+                try
+                {
+                    conn.rollback();
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Found unexpected exception while rolling back repository connection after exception");
+                }
             }
         }
         finally

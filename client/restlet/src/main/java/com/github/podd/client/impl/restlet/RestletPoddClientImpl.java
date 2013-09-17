@@ -16,6 +16,8 @@
  */
 package com.github.podd.client.impl.restlet;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +34,7 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
@@ -62,6 +65,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
+import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -144,6 +148,41 @@ public class RestletPoddClientImpl implements PoddClient
         catch(final IOException e)
         {
             throw new PoddClientException("Could not parse artifact details due to an IOException", e);
+        }
+    }
+    
+    @Override
+    public PoddUser createUser(final PoddUser user) throws PoddClientException
+    {
+        try
+        {
+            final Model model = new LinkedHashModel();
+            user.toModel(model, true);
+            final ByteArrayOutputStream output = new ByteArrayOutputStream(4096);
+            Rio.write(model, output, RDFFormat.RDFJSON);
+            final InputRepresentation rep =
+                    new InputRepresentation(new ByteArrayInputStream(output.toByteArray()),
+                            MediaType.valueOf(RDFFormat.RDFJSON.getDefaultMIMEType()));
+            
+            final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
+            resource.getCookies().addAll(this.currentCookies);
+            
+            this.log.info("cookies: {}", this.currentCookies);
+            
+            resource.addQueryParameter("format", RDFFormat.RDFJSON.getDefaultMIMEType());
+            
+            // Request the results in Turtle to reduce the bandwidth
+            final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_TURTLE);
+            
+            final Model parsedStatements = this.parseRdf(post);
+            
+            final PoddUser result = PoddUser.fromModel(model);
+            
+            return result;
+        }
+        catch(final IOException | RDFHandlerException | ResourceException e)
+        {
+            throw new PoddClientException("Could not parse artifact details due to an exception", e);
         }
     }
     
@@ -251,6 +290,55 @@ public class RestletPoddClientImpl implements PoddClient
         else
         {
             return this.serverUrl + path;
+        }
+    }
+    
+    @Override
+    public PoddUser getUserDetails(final String userIdentifier) throws PoddClientException
+    {
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final ClientResource resource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS) + userIdentifier);
+        resource.getCookies().addAll(this.currentCookies);
+        
+        try
+        {
+            final Representation getResponse = resource.get(RestletUtilMediaType.APPLICATION_RDF_JSON);
+            
+            if(!resource.getStatus().equals(Status.SUCCESS_OK))
+            {
+                throw new PoddClientException("Server returned a non-success status code: "
+                        + resource.getStatus().toString());
+            }
+            
+            final InputStream stream = getResponse.getStream();
+            
+            if(stream == null)
+            {
+                throw new PoddClientException("Did not receive valid response from server");
+            }
+            
+            final RDFFormat format =
+                    Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
+            
+            final Model model = Rio.parse(stream, "", format);
+            
+            final PoddUser poddUser = PoddUser.fromModel(model);
+            
+            return poddUser;
+        }
+        catch(final RDFParseException e)
+        {
+            throw new PoddClientException("Failed to parse RDF", e);
+        }
+        catch(final ResourceException e)
+        {
+            throw new PoddClientException("Failed to communicate with PODD Server", e);
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Input output exception while parsing RDF", e);
         }
     }
     
@@ -442,6 +530,13 @@ public class RestletPoddClientImpl implements PoddClient
         this.log.info("cookies: {}", this.currentCookies);
         
         return this.listArtifactsInternal(false, true);
+    }
+    
+    @Override
+    public List<PoddUser> listUsers() throws PoddClientException
+    {
+        // Implement this when the service is available
+        throw new RuntimeException("TODO: Implement me!");
     }
     
     /*

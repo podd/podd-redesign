@@ -49,6 +49,8 @@ import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
+import com.github.podd.utils.PoddUser;
+import com.github.podd.utils.PoddUserStatus;
 
 /**
  * Abstract tests for {@link PoddClient}.
@@ -261,6 +263,40 @@ public abstract class AbstractPoddClientTest
         {
             this.endFileRepositoryTest();
         }
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.client.api.PoddClient#createUser(PoddUser)}
+     */
+    @Test
+    public final void testCreateUser() throws Exception
+    {
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        PoddUser testUser =
+                new PoddUser("theNextUser", "theNextPassword".toCharArray(), "The Next", "User",
+                        "test@thenext.example.com", PoddUserStatus.ACTIVE,
+                        PoddRdfConstants.VF.createURI("http://example.com/thenext/"), "UQ", null, "Dr", "0912348765",
+                        "Brisbane", "Adjunct Professor");
+        
+        PoddUser userDetails = this.testClient.createUser(testUser);
+        
+        Assert.assertEquals("theNextUser", userDetails.getIdentifier());
+        Assert.assertNull(userDetails.getSecret());
+    }
+    
+    /**
+     * Test method for {@link com.github.podd.client.api.PoddClient#getUserDetails(String)}
+     */
+    @Test
+    public final void testGetUserDetails() throws Exception
+    {
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        PoddUser userDetails = this.testClient.getUserDetails(AbstractPoddClientTest.TEST_ADMIN_USER);
+        
+        Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, userDetails.getIdentifier());
+        Assert.assertNull(userDetails.getSecret());
     }
     
     /**
