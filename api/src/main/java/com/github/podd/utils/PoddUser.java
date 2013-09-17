@@ -23,6 +23,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
+import com.github.podd.api.purl.PoddPurlProcessorPrefixes;
 
 /**
  * This class represents a PODD user.
@@ -285,7 +286,15 @@ public class PoddUser extends RestletUtilUser
     
     public void toModel(Model model, boolean includeSecret)
     {
-        final URI userUri = this.getUri();
+        URI userUri = this.getUri();
+        
+        if(userUri == null)
+        {
+            userUri =
+                    PoddRdfConstants.VF.createURI(PoddPurlProcessorPrefixes.UUID.getTemporaryPrefix()
+                            + this.getIdentifier());
+        }
+        
         model.add(userUri, SesameRealmConstants.OAS_USERIDENTIFIER,
                 PoddRdfConstants.VF.createLiteral(this.getIdentifier()));
         
