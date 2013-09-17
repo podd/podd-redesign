@@ -1,39 +1,41 @@
-<h3 class="underlined_heading">Submit, Reset, Cancel or Reinitialize</h3>
+<h3 class="underlined_heading">Submit or Cancel</h3>
 <br>
-<p>At the bottom of the <strong>Create Project</strong> Page, there are four buttons displayed (Figure 10.1)</p>
+<p>At the bottom of the <strong>Create Project</strong> Page, there are two buttons displayed (Figure 10.1)</p>
 <ul class="stylized">
     <li>Submit</li>
-    <li>Reset</li>
     <li>Cancel</li>
-    <li>Reinitialize</li>
 </ul>
 <p>The user can select one of the buttons based on the job requirement .</p>
 <br>
 <h4>Submit</h4>
-<p>The user selects <strong>Submit</strong>. All the information entered in the previous three sections is submitted to the system. Validation is performed.</p>
-<p>If any fields are in error then the user is returned to the top of the page. An error box will appear at top of the page advising there are errors on the page. An error box will also appear beneath the fields in error describing the nature of the error and remedial action.</p>
+<p>The user selects <strong>Submit</strong>. All the information entered is submitted to the system. Validation is performed.</p>
+<p>If any fields are in error then the user is returned to the top of the page. An error box will appear at top of the page describing the nature of the errors and remedial action.</p>
 <p>If no error is detected, the system confirms the submission to the user by switching to the view tab and displaying the project details page in View Project mode (See: <a href="./view_project">Viewing a Project for details</a>).</p>
-<p>An email is sent to the Principal Investigator and Project Administrator, advising them that a project has been created for them and that they may now update the project. No response is required from the user.  The following additional values will be automatically recorded against the Project concrete object:</p>
+<p>The following additional values will be automatically recorded against the Project concrete object:</p>
 <ul class="stylized">
-    <li>Project ID, which is determined by PODD,</li>
+    <li>Project URI, which is determined by PODD,</li>
     <li>Creator is set to the current user,</li>
     <li>Creation Date is set to the current date,</li>
-    <li>Project Status is set to 'Current',</li>
-    <li>Publication Status is set to Not Published,</li>
+    <li>Project Status is set to 'Active',</li>
+    <li>Publication Status is set to 'Not Published',</li>
     <li>Last modified by is set to the current user,</li>
     <li>Last modification date is set to the current date.</li>
 </ul>
-<p>Please note that where a project is created by a Project Creator and they have removed themselves from the Project Participant fields, they will not be able to view the project details later. In this circumstance they are not directed to the <strong>View Project</strong> page. A screen advising them they have insufficient access to the project.</p>
+<p>Please note that where a project is created by a Project Creator and they have removed themselves from the Project Participant fields, they will not be able to view the project details later. In this circumstance they are not directed to the <strong>View Project</strong> page. A screen advising them they have insufficient access to the project will be displayed.</p>
 <br>
+<!-- 
 <h4>Reset</h4>
 <p>The user can also reset the <strong>Create Project</strong> page by selecting the <strong>Reset</strong> button. It means that all  details entered will be cleared. The screen remains on the <strong>Create  Project</strong> page. The current user is listed in the Principal Investigator  field. The user can then re-enter the project information and submit the project when satisfied.</p>
 <br>
+ -->
 <h4>Cancel</h4>
-<p>If the user clicks the <strong>Cancel</strong> button, the <strong>Create Project </strong>page is abandoned. All information entered will be lost, including the uploaded data files. New Project is not created and the user is then returned to the <strong>List Project</strong> Page.</p>
+<p>If the user clicks the <strong>Cancel</strong> button, the <strong>Create Project </strong>page is abandoned. All information entered will be lost. New Project is not created and the user is then returned to the <strong>List Project</strong> Page.</p>
 <br>
+<!-- 
 <h4>Reinitialize</h4>
 <p>This button works when another Project/Object is being created or edited by current user. As each user can only edit one object each time, the user need to reinitialize the system to ensure the current object can be created.</p>
 <p>If the user fills in all mandatory fields and clicks <strong>Submit</strong> when another object is being created/edited, the user will be redirected to a new screen advising that another object is being edited. The <strong>Reinitialize</strong> button will be available on the screen (see Figure 10.4.1).</p>
 <p class="rtecentre"><img style="width: 751px; height: 259px;" alt="" border="1" src="${baseUrl}/resources/images/reinitialize.jpg" /></p>
 <p class="rteleft"><em>Figure 10.4.1 &ndash; An example screen shot advising the user that another object is being created/edit and reinilialization is required. </em></p>
 <p>Once the <strong>ReInitilaze</strong> button is clicked, the user is returned to the <strong>Create Project </strong>page. The Project can then be submitted.</p>
+ -->

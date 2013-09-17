@@ -31,7 +31,7 @@
             <ul class="stylized-small-circle">
                 <li><a href="${baseUrl}/help/manage_files">Manage Data Items</a></li>
             </ul>
-            <li><a href="${baseUrl}/help/project_submit">Submit, Reset, Cancel or Reinitialize</a></li>
+            <li><a href="${baseUrl}/help/project_submit">Submit or Cancel</a></li>
         </ul>
         <li><a href="${baseUrl}/help/view_project">Viewing a Project</a></li>
         <ul class="stylized-small">
