@@ -132,7 +132,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
             }
             
             // - check the User was successfully added to the Realm
-            final RestletUtilUser findUser = nextRealm.findUser(newUser.getIdentifier());
+            final PoddUser findUser = (PoddUser)nextRealm.findUser(newUser.getIdentifier());
             if(findUser == null)
             {
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed to add user");
@@ -157,6 +157,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
             final Model model = new LinkedHashModel();
             model.add(newUserUri, SesameRealmConstants.OAS_USERIDENTIFIER,
                     PoddRdfConstants.VF.createLiteral(newUser.getIdentifier()));
+            
             Rio.write(model, output, outputFormat);
         }
         catch(final OpenRDFException e)
@@ -205,52 +206,6 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
      */
     private PoddUser modelToUser(final Model model)
     {
-        final String identifier = model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString();
-        if(identifier == null || identifier.trim().length() == 0)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Identifier cannot be empty");
-        }
-        
-        final String password = model.filter(null, SesameRealmConstants.OAS_USERSECRET, null).objectString();
-        if(password == null || password.trim().length() == 0)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Password cannot be empty");
-        }
-        
-        final String firstName = model.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString();
-        final String lastName = model.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString();
-        // PODD-specific requirement. First/Last names are mandatory.
-        if(firstName == null || lastName == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User First/Last name cannot be empty");
-        }
-        
-        // PODD-specific requirement. Email has to be present and equal to the user Identifier.
-        final String email = model.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).objectString();
-        if(email == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Email cannot be empty");
-        }
-        
-        PoddUserStatus status = PoddUserStatus.INACTIVE;
-        final URI statusUri = model.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI();
-        if(statusUri != null)
-        {
-            status = PoddUserStatus.getUserStatusByUri(statusUri);
-        }
-        
-        final URI homePage = model.filter(null, PoddRdfConstants.PODD_USER_HOMEPAGE, null).objectURI();
-        final String organization = model.filter(null, PoddRdfConstants.PODD_USER_ORGANIZATION, null).objectString();
-        final String orcidID = model.filter(null, PoddRdfConstants.PODD_USER_ORCID, null).objectString();
-        final String title = model.filter(null, PoddRdfConstants.PODD_USER_TITLE, null).objectString();
-        final String phone = model.filter(null, PoddRdfConstants.PODD_USER_PHONE, null).objectString();
-        final String address = model.filter(null, PoddRdfConstants.PODD_USER_ADDRESS, null).objectString();
-        final String position = model.filter(null, PoddRdfConstants.PODD_USER_POSITION, null).objectString();
-        
-        final PoddUser user =
-                new PoddUser(identifier, password.toCharArray(), firstName, lastName, email, status, homePage,
-                        organization, orcidID, title, phone, address, position);
-        
-        return user;
+        return PoddUser.fromModel(model, true, false, true);
     }
 }
