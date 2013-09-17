@@ -37,7 +37,6 @@
         <li><a href="${baseUrl}/help/view_project">Viewing a Project</a></li>
         <ul class="stylized-small">
             <li><a href="${baseUrl}/help/view_project_details">Viewing Project Details</a></li>
-            <li><a href="${baseUrl}/help/view_project_participants">Listing Project Participants</a></li>
             <li><a href="${baseUrl}/help/view_attached_files">Viewing Attached Files</a></li>
             <li><a href="${baseUrl}/help/view_object_hierarchy">Viewing Object Hierarchy</a></li>
         </ul>
