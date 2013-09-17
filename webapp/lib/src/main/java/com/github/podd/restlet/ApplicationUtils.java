@@ -404,7 +404,7 @@ public class ApplicationUtils
         // FIXME: Restlet MemoryRealm creates a DefaultVerifier class that is not compatible with
         // DigestAuthenticator.setWrappedVerifier
         final PoddSesameRealmImpl nextRealm =
-                new PoddSesameRealmImpl(nextRepository, PoddRdfConstants.DEF_USER_MANAGEMENT_GRAPH);
+                new PoddSesameRealmImpl(nextRepository, PoddRdfConstants.DEFAULT_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");

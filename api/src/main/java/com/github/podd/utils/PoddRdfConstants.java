@@ -34,7 +34,7 @@ public interface PoddRdfConstants
     public static final String DATA_REPOSITORY = "http://purl.org/podd/ns/dataRepository#";
     
     /** Default value is urn:podd:default:usermanagementgraph: */
-    public static final URI DEF_USER_MANAGEMENT_GRAPH = PoddRdfConstants.VF
+    public static final URI DEFAULT_USER_MANAGEMENT_GRAPH = PoddRdfConstants.VF
             .createURI("urn:podd:default:usermanagementgraph:");
     
     /** Default value is urn:podd:default:artifactmanagementgraph: */
