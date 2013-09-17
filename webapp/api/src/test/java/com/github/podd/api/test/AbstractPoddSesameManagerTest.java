@@ -1167,11 +1167,11 @@ public abstract class AbstractPoddSesameManagerTest
                                 MetadataPolicy.INCLUDE_ALL, 0, -1, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 142, 17, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 139, 16, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 86, 10, 0 },
+                                MetadataPolicy.EXCLUDE_CONTAINS, 83, 9, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 286, 34, 14 },
+                                MetadataPolicy.INCLUDE_ALL, 283, 33, 14 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 57, 7, 0 },
                         
