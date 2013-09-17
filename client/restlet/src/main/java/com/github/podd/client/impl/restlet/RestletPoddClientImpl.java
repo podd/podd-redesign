@@ -16,6 +16,8 @@
  */
 package com.github.podd.client.impl.restlet;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +34,7 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
@@ -145,6 +148,41 @@ public class RestletPoddClientImpl implements PoddClient
         catch(final IOException e)
         {
             throw new PoddClientException("Could not parse artifact details due to an IOException", e);
+        }
+    }
+    
+    @Override
+    public PoddUser createUser(final PoddUser user) throws PoddClientException
+    {
+        try
+        {
+            final Model model = new LinkedHashModel();
+            user.toModel(model, true);
+            final ByteArrayOutputStream output = new ByteArrayOutputStream(4096);
+            Rio.write(model, output, RDFFormat.RDFJSON);
+            final InputRepresentation rep =
+                    new InputRepresentation(new ByteArrayInputStream(output.toByteArray()),
+                            MediaType.valueOf(RDFFormat.RDFJSON.getDefaultMIMEType()));
+            
+            final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
+            resource.getCookies().addAll(this.currentCookies);
+            
+            this.log.info("cookies: {}", this.currentCookies);
+            
+            resource.addQueryParameter("format", RDFFormat.RDFJSON.getDefaultMIMEType());
+            
+            // Request the results in Turtle to reduce the bandwidth
+            final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_TURTLE);
+            
+            final Model parsedStatements = this.parseRdf(post);
+            
+            final PoddUser result = PoddUser.fromModel(model);
+            
+            return result;
+        }
+        catch(final IOException | RDFHandlerException | ResourceException e)
+        {
+            throw new PoddClientException("Could not parse artifact details due to an exception", e);
         }
     }
     
@@ -284,9 +322,9 @@ public class RestletPoddClientImpl implements PoddClient
             final RDFFormat format =
                     Rio.getParserFormatForMIMEType(getResponse.getMediaType().getName(), RDFFormat.RDFXML);
             
-            Model model = Rio.parse(stream, "", format);
+            final Model model = Rio.parse(stream, "", format);
             
-            PoddUser poddUser = PoddUser.fromModel(model);
+            final PoddUser poddUser = PoddUser.fromModel(model);
             
             return poddUser;
         }

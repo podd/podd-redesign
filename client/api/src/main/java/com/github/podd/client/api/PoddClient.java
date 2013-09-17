@@ -85,6 +85,17 @@ public interface PoddClient
     InferredOWLOntologyID attachDataReference(DataReference ref) throws PoddClientException;
     
     /**
+     * Creates a new PoddUser using the details in the given PoddUser.
+     * 
+     * @param user
+     *            The user to create.
+     * @return An instance of PoddUser containing the actual details of the created user, except for
+     *         the password.
+     * @throws PoddClientException
+     */
+    PoddUser createUser(PoddUser user) throws PoddClientException;
+    
+    /**
      * Submits a request to the PODD Delete Artifact service to delete the artifact identified by
      * the given IRI.
      * <p>
