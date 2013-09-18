@@ -405,7 +405,7 @@ public class PoddUser extends RestletUtilUser
                 // FIXME: Convert this to a PoddException
                 throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED, "User Password must not be present");
             }
-            if(requireSecret && password == null || password.trim().length() == 0)
+            if(requireSecret && (password == null || password.trim().length() == 0))
             {
                 // FIXME: Convert this to a PoddException
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User Password cannot be empty");

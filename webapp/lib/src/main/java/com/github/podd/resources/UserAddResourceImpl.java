@@ -75,6 +75,8 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         // check authentication first
         this.checkAuthentication(PoddAction.USER_CREATE);
         
+        this.log.info("In addUserRdf");
+        
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         
         URI newUserUri = null;
@@ -87,8 +89,18 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model newUserModel = Rio.parse(inputStream, "", inputFormat);
             
+            this.log.info("About to create user from model");
+            
             // - create new PoddUser and add to Realm
-            newUser = this.modelToUser(newUserModel);
+            newUser = PoddUser.fromModel(newUserModel, true, false, false);
+            
+            // If we didn't get a secret, then do not activate their login at this stage
+            if(newUser.getSecret() == null)
+            {
+                newUser.setUserStatus(PoddUserStatus.INACTIVE);
+            }
+            
+            this.log.info("About to create user from model");
             
             if(nextRealm.findUser(newUser.getIdentifier()) != null)
             {
@@ -96,7 +108,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
             }
             newUserUri = nextRealm.addUser(newUser);
             
-            this.log.debug("Added new User <{}>", newUser.getIdentifier());
+            this.log.info("Added new User <{}> <{}>", newUser.getIdentifier(), newUserUri);
             
             // - map Roles for the new User
             
@@ -106,7 +118,8 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                 nextRealm.map(newUser, PoddRoles.PROJECT_CREATOR.getRole());
             }
             
-            for(Resource mappingUri : newUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects())
+            for(Resource mappingUri : newUserModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING)
+                    .subjects())
             {
                 final URI roleUri =
                         newUserModel.filter(mappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI();
@@ -115,7 +128,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                 final URI mappedObject =
                         newUserModel.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
                 
-                this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
+                this.log.info("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
                         role.getName(), mappedObject);
                 if(mappedObject != null)
                 {
@@ -135,12 +148,9 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
             }
             
         }
-        catch(final IOException e)
+        catch(final IOException | OpenRDFException e)
         {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
-        }
-        catch(final OpenRDFException e)
-        {
+            this.log.error("Error creating user", e);
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
         }
         
@@ -190,18 +200,5 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         // template to use for the content in the body of the page
         return RestletUtils.getHtmlRepresentation(PoddWebConstants.PROPERTY_TEMPLATE_BASE, dataModel,
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
-    }
-    
-    /**
-     * Helper method to construct a {@link PoddUser} from information in the given {@link Model}.
-     * 
-     * @param model
-     * @return
-     * @throws ResourceException
-     *             if mandatory data is missing.
-     */
-    private PoddUser modelToUser(final Model model)
-    {
-        return PoddUser.fromModel(model, true, false, true);
     }
 }

@@ -308,11 +308,17 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     {
         this.log.debug("Building RestletUtilUser from SPARQL results");
         
+        char[] secret = null;
+        
+        if(bindingSet.hasBinding(PoddSesameRealm.PARAM_USER_SECRET))
+        {
+            secret = bindingSet.getValue(PoddSesameRealm.PARAM_USER_SECRET).stringValue().toCharArray();
+        }
+        
         final PoddUser result =
-                new PoddUser(userIdentifier, bindingSet.getValue(PoddSesameRealm.PARAM_USER_SECRET).stringValue()
-                        .toCharArray(), bindingSet.getValue(PoddSesameRealm.PARAM_USER_FIRSTNAME).stringValue(),
-                        bindingSet.getValue(PoddSesameRealm.PARAM_USER_LASTNAME).stringValue(), bindingSet.getValue(
-                                PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.INACTIVE);
+                new PoddUser(userIdentifier, secret, bindingSet.getValue(PoddSesameRealm.PARAM_USER_FIRSTNAME)
+                        .stringValue(), bindingSet.getValue(PoddSesameRealm.PARAM_USER_LASTNAME).stringValue(),
+                        bindingSet.getValue(PoddSesameRealm.PARAM_USER_EMAIL).stringValue(), PoddUserStatus.INACTIVE);
         
         PoddUserStatus userStatus = PoddUserStatus.INACTIVE;
         final Value statusVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_STATUS);
@@ -320,6 +326,13 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         {
             userStatus = PoddUserStatus.getUserStatusByUri((URI)statusVal);
         }
+        
+        // Do not allow logins from users without secrets
+        if(secret == null)
+        {
+            userStatus = PoddUserStatus.INACTIVE;
+        }
+        
         result.setUserStatus(userStatus);
         
         final Value organizationVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_ORGANIZATION);
@@ -337,13 +350,13 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         final Value homePageVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_HOMEPAGE);
         if(homePageVal != null)
         {
-            result.setHomePage(PoddRdfConstants.VF.createURI(homePageVal.stringValue()));
+            result.setHomePage((URI)homePageVal);
         }
         
         final Value uriVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_URI);
         if(uriVal != null)
         {
-            result.setUri(PoddRdfConstants.VF.createURI(uriVal.stringValue()));
+            result.setUri((URI)uriVal);
         }
         
         final Value titleVal = bindingSet.getValue(PoddSesameRealm.PARAM_USER_TITLE);
@@ -523,26 +536,26 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         query.append(PoddSesameRealm.PARAM_USER_IDENTIFIER);
         query.append(" . ");
         
-        query.append(" OPTIONAL{ ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + PoddRdfConstants.PODD_USER_ORCID + "> ");
-        query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_ORCID);
-        query.append(" . } ");
-        
-        query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_URI);
-        query.append(" <" + SesameRealmConstants.OAS_USERSECRET + "> ");
-        query.append(" ?");
-        query.append(PoddSesameRealm.PARAM_USER_SECRET);
-        query.append(" . ");
-        
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
         query.append(" <" + PoddRdfConstants.PODD_USER_STATUS + "> ");
         query.append(" ?");
         query.append(PoddSesameRealm.PARAM_USER_STATUS);
         query.append(" . ");
+        
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + SesameRealmConstants.OAS_USERSECRET + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_SECRET);
+        query.append(" . } ");
+        
+        query.append(" OPTIONAL{ ?");
+        query.append(PoddSesameRealm.PARAM_USER_URI);
+        query.append(" <" + PoddRdfConstants.PODD_USER_ORCID + "> ");
+        query.append(" ?");
+        query.append(PoddSesameRealm.PARAM_USER_ORCID);
+        query.append(" . } ");
         
         query.append(" OPTIONAL{ ?");
         query.append(PoddSesameRealm.PARAM_USER_URI);
@@ -916,7 +929,8 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     {
         final Set<Role> results = new HashSet<Role>();
         
-        final Collection<Collection<Role>> allResults = this.getRolesForObjectAlternate(user.getIdentifier(), objectUri).values();
+        final Collection<Collection<Role>> allResults =
+                this.getRolesForObjectAlternate(user.getIdentifier(), objectUri).values();
         
         for(final Collection<Role> nextResult : allResults)
         {
@@ -929,7 +943,8 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     public Map<String, Collection<Role>> getRolesForObjectAlternate(final String userIdentifier, final URI objectUri)
     {
-        final ConcurrentMap<String, Collection<Role>> roleCollection = new ConcurrentHashMap<String, Collection<Role>>();
+        final ConcurrentMap<String, Collection<Role>> roleCollection =
+                new ConcurrentHashMap<String, Collection<Role>>();
         
         RepositoryConnection conn = null;
         try
@@ -970,7 +985,8 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                                     .stringValue());
                     
                     Collection<Role> nextRoles = new HashSet<Role>();
-                    final Collection<Role> putIfAbsent = roleCollection.putIfAbsent(nextUser.getIdentifier(), nextRoles);
+                    final Collection<Role> putIfAbsent =
+                            roleCollection.putIfAbsent(nextUser.getIdentifier(), nextRoles);
                     if(putIfAbsent != null)
                     {
                         nextRoles = putIfAbsent;
