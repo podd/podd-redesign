@@ -1,54 +1,21 @@
 <h3 class="underlined_heading">Deleting a Child Object</h3>
 <br>
 <h4>Overview</h4>
-<p>This section describes where this functionality is required and how it will be displayed on screen, but also it will identify the processing rules for deletes and un-deletes.</p>
-<p>In PODD an object is not really deleted, it is merely hidden from view. At the ontology level, the object would be marked as 'deleted' and repository functions will allow access to this object based on this flag.</p>
-<p>Note that the function described here refers to deleting PODD objects only and not to deleting data streams or other object types. Project object can be deleted if it has no child objects.</p>
+<p>When an object is deleted, it is deleted in the underlying repository, and <strong>cannot be recovered</strong>.</p>
+<p>Deleting an object is cascaded to any child objects that it may have. Therefore, it is important to carefully consider the effects of deleting an object.</p>
 <br>
 <h4>Actors</h4>
 <ul class="stylized">
-    <li>Administrators can delete objects. They can also view deleted objects and their relationships throughout the database. They can restore the deleted objects as well (undelete).</li>
-    <li>All other repository roles do not have any delete/undelete functions.</li>
-</ul>
-<p>For users with project specific roles:</p>
-<ul class="stylized">
-    <li>Project Administrators can delete objects descended from a project object they have admin access to. They cannot view these deleted objects and their relationships throughout the database.      They cannot      un-delete these objects. If a project administrator deletes an object by mistake, they would have to talk to a repository administrator to get it un-deleted.</li>
-    <li>All other project roles do not have any delete/undelete functions.</li>
-</ul>
-<br>
-<h4>Rules and Constraints</h4>
-<p>The following rules and constraints are applied to the delete functionality:</p>
-<ul class="stylized">
-    <li>An object cannot be deleted if it has any existing un-deleted child objects.</li>
-    <li>When browsing a project, the predicate object count will only reflect the number of current objects. Deleted objects will not be included in the count. Even for repository administrators.</li>
-    <li>If a deleted object is directly referenced (via a PODD URL or a PURL) a screen will display stating the object no longer exists and to contact the support person if this is a problem (e.g. either providing the support email or a link to the support page).</li>
-    <li>PURLS for deleted objects will not be modified.</li>
-    <li>File data streams for deleted objects will still exist and will be in no-way modified.</li>
+    <li>Repository Administrators, Project Administrators and Project Members can delete child objects.</li>
 </ul>
 <br>
 <h4>Delete an Object</h4>
 <p>On the <strong>View Object</strong> page, if the user has the appropriate authority the object view will display a <strong>Delete</strong> button.</p>
-<p>The user clicks the <strong>Delete</strong> button, a <strong>Confirmation</strong> screen which displays the Object PID, Type, Title and Description is presented. The screen asks them to confirm they wish to delete this object.</p>
-<p>The user clicks the <strong>Confirm</strong> button. The system deletes the object and responds by marking the object as deleted. (The user can cancel the delete action by clicking the <strong>Cancel</strong> button. The screen is returned to the Object View).</p>
-<p>The message <strong>Object Deleted</strong> is displayed at the top. The parent details and Deleted Object details are listed. The parent details section includes the parent ID, type, title and relationship with the delete object. The deleted object details include the object ID, type, title and description. However, if the object has any child objects, the system will advise the user that all the child objects have to be deleted first.</p>
-<p>Once the object is deleted, only the Repository Administrators can still view objects as if they had not been deleted.&nbsp; <strong>Un-Delete</strong> button is available in this screen for the Repository Administrator to restore the object.</p>
-<p>Even for the Repository Administrator, there are visual clues to the fact that the object has been deleted:</p>
-<ul class="stylized">
-    <li>If the object is being viewed via a view pane, an additional field at the top of the screen will display the word Deleted in bold red.</li>
-    <li>The local hierarchy for the deleted object will still be visible in the deleted object's view and interactive, i.e. the admin can select the parent of the deleted object.</li>
-    <li>In the view pane, the <strong>Edit</strong>, <strong>Add</strong> <strong>Child</strong>,<strong> Copy</strong>, <strong>Paste </strong>and <strong>Delete </strong>buttons do not appear. Only the <strong>Undelete</strong> button is displayed.</li>
-    <li>An authorised user who views a deleted object can still download files from the deleted object.</li>
-    <li>In the browser view, deleted objects will be displayed as per normal, but will use a lighter font colour (i.e. gray). Hyperlinks to link to the object should be in bold light grey. Hyperlinks will still go to the object's view.</li>
-    <li>Likewise, if it is a project object that has been deleted then the project object will still be listed in the Projects tab, but in the lighter font(s). Hyperlinks will still go to the object's view or browse view.</li>
-</ul>
-<p>Note that:</p>
-<ul class="stylized">
-    <li>When a repository administrator views an object that has a deleted reference, the deleted object will be visible in the Refers To list but will be displayed in lighter fonts.</li>
-    <li>When a repository administrator edits an object that has a deleted reference, the deleted object will be visible in the Refers To list and ghosted as above, but will not have a select check box next to it.</li>
-    <li>Deleted objects cannot be included in a list of candidate Refers To objects for selection when editing an object or creating a new object.</li>
-</ul>
-<br>
-<h3>Un-delete objects</h3>
-<p>As described above, an administrator can still see deleted objects and select them to view.</p>
-<p>When viewing a deleted object there will be a <strong>Un-Delete</strong> button in the view pane. The user clicks the <strong>Undelete</strong> button. The admin user is presented with a <strong>Confirmation</strong> screen that displays the Object PID, Type, Title and Description. The screen asks them to confirm they wish to restore / un-delete this object.</p>
-<p>The user clicks the <strong>Confirm</strong> button. The system responds by removing the deleted property associated with the object. The message Object Restored is displayed at the top. The parent details and Deleted Object details are listed. The parent details section includes the parent ID, type, title and relationship with the delete object. The restored object details include the object ID, type, title and description.&nbsp; The <strong>Delete </strong>button together with <strong>Edit, Add Child, Copy</strong> and <strong>Paste</strong> buttons is displayed at the bottom.</p>
+<p>When the user clicks the <strong>Delete</strong> button, a <strong>Confirmation Dialog</strong> is presented. The Dialog contains the object's Title and asks the user to confirm that they wish to delete this object. If the object has child objects, the displayed message advises that these too will be deleted, as shown in Figure 15.1.1.</p>
+
+<p class="rtecentre"><img style="width: 599px; height: 558px;" alt="" border="1" src="${baseUrl}/resources/images/delete_withchildren.jpg" /></p>
+<p class="rteleft"><em>Figure 15.1.1 &ndash; Example screenshot of delete confirmation dialog for an object with Child Objects.</em></p>
+
+
+<p>The user clicks the <strong>Confirm</strong> button. The system deletes the object and any child objects it may have. If the user does not wish to proceed with the delete, press the <strong>Cancel</strong> button. The screen is returned to the Object View.</p>
+<p>After successful deletion, the user is directed to the <strong>View Object</strong> screen for the parent object where it can be observed that the deleted object is no longer available as a child.</p>
