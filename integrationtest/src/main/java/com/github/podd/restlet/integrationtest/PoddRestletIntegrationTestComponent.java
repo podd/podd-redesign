@@ -33,6 +33,7 @@ import com.github.ansell.restletutils.CompositeClassLoader;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.PoddWebServiceApplicationImpl;
+import com.github.podd.test.TestUtils;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
@@ -155,7 +156,7 @@ public class PoddRestletIntegrationTestComponent extends Component
             // setup the application after attaching it, as it requires Application.getContext() to
             // not be null during the setup process
             ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
-            ApplicationUtils.setupTestUser(nextApplication);
+            TestUtils.setupTestUser(nextApplication);
         }
         catch(final OpenRDFException | UnsupportedRDFormatException e)
         {
