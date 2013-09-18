@@ -63,8 +63,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     public void testEditCurrentUserHtml() throws Exception
     {
         final String testIdentifier = "testAdminUser";
-        final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
@@ -95,7 +95,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         
         // prepare: retrieve Details of existing User
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
@@ -121,8 +122,9 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 PoddRdfConstants.VF.createLiteral(modifiedLastName));
         
         // submit modified details to Edit User Service
-        final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(userInfoModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
@@ -187,8 +189,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 testHomePage, testOrganization, testOrcid, testTitle, testPhone, testAddress, testPosition, roles,
                 PoddUserStatus.ACTIVE);
         
-        final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
@@ -230,7 +232,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         
         // prepare: retrieve Details of existing User
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
@@ -258,8 +261,9 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
         
         // submit modified details to Edit User Service
-        final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(userInfoModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
@@ -277,7 +281,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         
         // verify: details have been correctly updated (by retrieving User details again)
         final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation updatedResults =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
@@ -324,8 +329,9 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
-        final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(userInfoModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
@@ -343,7 +349,9 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         
         // verify: request with old login details should still succeed
         final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
@@ -365,8 +373,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         
         // submit modified details to Edit User Service
-        final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + "noSuchUser"));
+        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, "noSuchUser");
         
         final Representation input = new StringRepresentation("Should have user model in JSON", mediaType);
         try
@@ -388,8 +396,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     public void testErrorEditOtherUserNonAdminHtml() throws Exception
     {
         final String testIdentifier = "testAdminUser";
-        final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         try
         {
@@ -423,7 +431,8 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         
         // prepare: retrieve Details of existing User
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
@@ -450,7 +459,9 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         
         // try to submit modified details to Edit User Service
         final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(userInfoModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);

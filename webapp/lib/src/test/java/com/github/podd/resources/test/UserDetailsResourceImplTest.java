@@ -63,7 +63,8 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testErrorGetUserDetailsOfNonExistentUser() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "noSuchUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, "noSuchUser");
         
         try
         {
@@ -83,7 +84,9 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testErrorGetUserDetailsOfOtherUserByNonAdmin() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
+                RestletTestUtils.TEST_ADMIN_USERNAME);
         
         try
         {
@@ -104,7 +107,9 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testErrorGetUserDetailsWithoutAuthentication() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
+                RestletTestUtils.TEST_ADMIN_USERNAME);
         
         try
         {
@@ -134,7 +139,8 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                 roles, PoddUserStatus.ACTIVE);
         
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
@@ -153,7 +159,9 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     public void testGetUserDetailsWithAuthentication() throws Exception
     {
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
+                RestletTestUtils.TEST_ADMIN_USERNAME);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
@@ -176,7 +184,9 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + "testAdminUser"));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
+                RestletTestUtils.TEST_ADMIN_USERNAME);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
@@ -219,7 +229,8 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,

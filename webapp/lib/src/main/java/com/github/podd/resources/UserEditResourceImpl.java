@@ -72,11 +72,6 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
-        if(requestedUserIdentifier == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit");
-        }
-        
         this.log.info("requesting details of user: {}", requestedUserIdentifier);
         
         final User user = this.getRequest().getClientInfo().getUser();
@@ -84,6 +79,11 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         
         // check authentication first
         this.checkAuthentication(action);
+        
+        if(requestedUserIdentifier == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit");
+        }
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         

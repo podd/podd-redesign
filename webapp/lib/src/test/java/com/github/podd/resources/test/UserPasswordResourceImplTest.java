@@ -66,7 +66,9 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         final ClientResource userPasswordClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD));
+        userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(userInfoModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
@@ -84,7 +86,8 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         
         // verify: request with old login details should fail
         final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
@@ -119,7 +122,9 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         final ClientResource userPasswordClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD));
+        userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(userInfoModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
@@ -137,7 +142,9 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         
         // verify: request with old login details should fail
         final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+        
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
@@ -155,7 +162,8 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
     {
         final String testIdentifier = "testAdminUser";
         final ClientResource userPasswordClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD));
+        userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null,
