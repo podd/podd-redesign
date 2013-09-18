@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,14 +74,26 @@ public enum PoddRoles implements RestletUtilRole
     private final static Logger log = LoggerFactory.getLogger(PoddRoles.class);
     
     private final static Set<RestletUtilRole> INTERNAL_REPOSITORY_ROLES;
+    private final static Set<Role> INTERNAL_RESTLET_ROLES;
     
     static
     {
-        Set<RestletUtilRole> temp = new HashSet<>();
-        temp.add(ADMIN);
-        temp.add(PROJECT_CREATOR);
+        Set<RestletUtilRole> tempRepositoryRoles = new HashSet<>();
+        tempRepositoryRoles.add(ADMIN);
+        tempRepositoryRoles.add(PROJECT_CREATOR);
         
-        INTERNAL_REPOSITORY_ROLES = Collections.unmodifiableSet(temp);
+        INTERNAL_REPOSITORY_ROLES = Collections.unmodifiableSet(tempRepositoryRoles);
+        
+        final Set<Role> tempRoles = Collections.newSetFromMap(new IdentityHashMap<Role, Boolean>());
+        
+        for(final RestletUtilRole nextRole : PoddRoles.values())
+        {
+            // WARNING: After Restlet-2.1RC5 Roles are only considered equal if they are the
+            // same java object, so this must not create a new Role each time
+            tempRoles.add(nextRole.getRole());
+        }
+        
+        INTERNAL_RESTLET_ROLES = Collections.unmodifiableSet(tempRoles);
     }
     
     /**
@@ -241,18 +254,9 @@ public enum PoddRoles implements RestletUtilRole
         return null;
     }
     
-    public static List<Role> getRoles()
+    public static Set<Role> getRoles()
     {
-        final List<Role> result = new ArrayList<Role>(PoddRoles.values().length);
-        
-        for(final RestletUtilRole nextRole : PoddRoles.values())
-        {
-            // WARNING: After Restlet-2.1RC5 Roles will only be considered equal if they are the
-            // same java object, so this must not create a new Role each time
-            result.add(nextRole.getRole());
-        }
-        
-        return result;
+        return INTERNAL_RESTLET_ROLES;
     }
     
     private final Role role;
