@@ -1299,131 +1299,135 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
     @Override
     public void unmap(final User user, final Role role, final URI optionalObjectUri)
     {
+        // If they only want to unmap a role without an object, then use super implementation.
         if(optionalObjectUri == null)
         {
             super.unmap(role, SesameRealmConstants.OAS_ROLEMAPPEDUSER, user.getIdentifier());
-            return;
         }
-        
-        RepositoryConnection conn = null;
-        try
+        // Do our object reliant code instead
+        else
         {
-            conn = this.getRepository().getConnection();
-            conn.begin();
-            final StringBuilder query = new StringBuilder();
-            
-            final RestletUtilRole oasRole = this.getRoleByName(role.getName());
-            
-            if(oasRole == null)
-            {
-                throw new IllegalArgumentException("Did not recognise role as a standard OAS role" + role.getName());
-            }
-            
-            query.append(" SELECT ?roleMappingUri ");
-            query.append(" WHERE ");
-            query.append(" { ");
-            query.append("   ?roleMappingUri a <" + SesameRealmConstants.OAS_ROLEMAPPING + "> . ");
-            query.append("   ?roleMappingUri <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ?identifier . ");
-            query.append("   ?roleMappingUri <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ?role . ");
-            query.append("   ?roleMappingUri <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ?object . ");
-            query.append("   FILTER(str(?identifier) = \"" + NTriplesUtil.escapeString(user.getIdentifier()) + "\") ");
-            query.append("   FILTER(?role = <" + oasRole.getURI() + "> ) ");
-            query.append("   FILTER(?object = <" + optionalObjectUri + "> ) ");
-            query.append(" } ");
-            
-            if(this.log.isDebugEnabled())
-            {
-                this.log.debug("findUser: query={}", query.toString());
-            }
-            
-            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
-            tupleQuery.setDataset(this.getSesameDataset());
-            
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
-            
+            RepositoryConnection conn = null;
             try
             {
-                if(!queryResult.hasNext())
+                conn = this.getRepository().getConnection();
+                conn.begin();
+                final StringBuilder query = new StringBuilder();
+                
+                final RestletUtilRole oasRole = this.getRoleByName(role.getName());
+                
+                if(oasRole == null)
                 {
-                    this.log.info(
-                            "Could not find any role mappings to remove for this role: {}, object <{}>, and this target: {}",
-                            role, optionalObjectUri, user.getIdentifier());
+                    throw new IllegalArgumentException("Did not recognise role as a standard OAS role" + role.getName());
                 }
                 
-                while(queryResult.hasNext())
+                query.append(" SELECT ?roleMappingUri ");
+                query.append(" WHERE ");
+                query.append(" { ");
+                query.append("   ?roleMappingUri a <" + SesameRealmConstants.OAS_ROLEMAPPING + "> . ");
+                query.append("   ?roleMappingUri <" + SesameRealmConstants.OAS_ROLEMAPPEDUSER + "> ?identifier . ");
+                query.append("   ?roleMappingUri <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ?role . ");
+                query.append("   ?roleMappingUri <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ?object . ");
+                query.append("   FILTER(str(?identifier) = \"" + NTriplesUtil.escapeString(user.getIdentifier())
+                        + "\") ");
+                query.append("   FILTER(?role = <" + oasRole.getURI() + "> ) ");
+                query.append("   FILTER(?object = <" + optionalObjectUri + "> ) ");
+                query.append(" } ");
+                
+                if(this.log.isDebugEnabled())
                 {
-                    final BindingSet bindingSet = queryResult.next();
-                    
-                    if(queryResult.hasNext())
+                    this.log.debug("findUser: query={}", query.toString());
+                }
+                
+                final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
+                tupleQuery.setDataset(this.getSesameDataset());
+                
+                final TupleQueryResult queryResult = tupleQuery.evaluate();
+                
+                try
+                {
+                    if(!queryResult.hasNext())
                     {
-                        this.log.warn(
-                                "Found duplicate roleMapping, will remove all mappings for this role: {}, object <{}>, and this target: {}",
+                        this.log.info(
+                                "Could not find any role mappings to remove for this role: {}, object <{}>, and this target: {}",
                                 role, optionalObjectUri, user.getIdentifier());
                     }
                     
-                    final Value roleMappingUri = bindingSet.getValue("roleMappingUri");
-                    
-                    if(roleMappingUri instanceof Resource)
+                    while(queryResult.hasNext())
                     {
-                        conn.remove((Resource)roleMappingUri, null, null, this.getContexts());
-                    }
-                    else
-                    {
-                        this.log.warn("This should not happen while RDF only allows URIs and blank nodes in the subject position of triples");
+                        final BindingSet bindingSet = queryResult.next();
+                        
+                        if(queryResult.hasNext())
+                        {
+                            this.log.warn(
+                                    "Found duplicate roleMapping, will remove all mappings for this role: {}, object <{}>, and this target: {}",
+                                    role, optionalObjectUri, user.getIdentifier());
+                        }
+                        
+                        final Value roleMappingUri = bindingSet.getValue("roleMappingUri");
+                        
+                        if(roleMappingUri instanceof Resource)
+                        {
+                            conn.remove((Resource)roleMappingUri, null, null, this.getContexts());
+                        }
+                        else
+                        {
+                            this.log.warn("This should not happen while RDF only allows URIs and blank nodes in the subject position of triples");
+                        }
                     }
                 }
-            }
-            finally
-            {
-                queryResult.close();
-            }
-            conn.commit();
-        }
-        catch(final RepositoryException e)
-        {
-            try
-            {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Repository Exception while rolling back connection");
-            }
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final MalformedQueryException e)
-        {
-            try
-            {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Repository Exception while rolling back connection");
-            }
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final QueryEvaluationException e)
-        {
-            try
-            {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Repository Exception while rolling back connection");
-            }
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        finally
-        {
-            try
-            {
-                conn.close();
+                finally
+                {
+                    queryResult.close();
+                }
+                conn.commit();
             }
             catch(final RepositoryException e)
             {
-                this.log.error("Failure to close connection", e);
+                try
+                {
+                    conn.rollback();
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Repository Exception while rolling back connection");
+                }
+                throw new RuntimeException("Failure finding user in repository", e);
+            }
+            catch(final MalformedQueryException e)
+            {
+                try
+                {
+                    conn.rollback();
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Repository Exception while rolling back connection");
+                }
+                throw new RuntimeException("Failure finding user in repository", e);
+            }
+            catch(final QueryEvaluationException e)
+            {
+                try
+                {
+                    conn.rollback();
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Repository Exception while rolling back connection");
+                }
+                throw new RuntimeException("Failure finding user in repository", e);
+            }
+            finally
+            {
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Failure to close connection", e);
+                }
             }
         }
     }
