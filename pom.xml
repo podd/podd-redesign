@@ -86,6 +86,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<restlet.version>2.1.1</restlet.version>
+		<restletutils.version>0.3-SNAPSHOT</restletutils.version>
 		<sesame.version>2.7.6</sesame.version>
 		<sesame-rio-extensions.version>0.4</sesame-rio-extensions.version>
 		<slf4j.version>1.7.5</slf4j.version>
@@ -415,14 +416,14 @@
 			<dependency>
 				<groupId>com.github.ansell.restlet-utils</groupId>
 				<artifactId>restlet-utils</artifactId>
-				<version>0.2</version>
+				<version>${restletutils.version}</version>
 				<scope>compile</scope>
 				<type>jar</type>
 			</dependency>
 			<dependency>
 				<groupId>com.github.ansell.restlet-utils</groupId>
 				<artifactId>restlet-utils</artifactId>
-				<version>0.2</version>
+				<version>${restletutils.version}</version>
 				<scope>test</scope>
 				<type>test-jar</type>
 			</dependency>
