@@ -55,7 +55,7 @@
 			<artifactId>podd-webapp-api</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -63,6 +63,13 @@
 			<version>${project.version}</version>
 			<type>jar</type>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>podd-webapp-lib</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -94,7 +101,7 @@
 		<dependency>
 			<groupId>com.github.ansell.restlet-utils</groupId>
 			<artifactId>restlet-utils</artifactId>
-			<scope>test</scope>
+			<scope>runtime</scope>
 			<type>test-jar</type>
 		</dependency>
 		<dependency>

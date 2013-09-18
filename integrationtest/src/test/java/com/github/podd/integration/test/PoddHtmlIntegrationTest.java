@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * Tests the PODD web applicaiton with text/html requests, which should mimic those from browsers.
@@ -962,7 +963,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         try
         {
-            this.getWebTester().gotoPage("/user/noSuchUser");
+            this.getWebTester().gotoPage(PoddWebConstants.PATH_USER_DETAILS + "noSuchUser");
             Assert.fail("An exception should've been thrown here.");
         }
         catch(final TestingEngineResponseException e)
@@ -986,7 +987,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         this.getWebTester().assertResponseCode(200);
         
-        this.getWebTester().gotoPage("/user/" + RestletTestUtils.TEST_USERNAME);
+        this.getWebTester().gotoPage(PoddWebConstants.PATH_USER_DETAILS + RestletTestUtils.TEST_USERNAME);
         this.getWebTester().assertResponseCode(200);
         
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
@@ -1012,7 +1013,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         try
         {
-            this.getWebTester().gotoPage("/user/" + RestletTestUtils.TEST_ADMIN_USERNAME);
+            this.getWebTester().gotoPage(PoddWebConstants.PATH_USER_DETAILS + RestletTestUtils.TEST_ADMIN_USERNAME);
             Assert.fail("An exception should've been thrown here.");
         }
         catch(final TestingEngineResponseException e)
