@@ -18,6 +18,7 @@ package com.github.podd.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,17 @@ public enum PoddRoles implements RestletUtilRole
     ;
     
     private final static Logger log = LoggerFactory.getLogger(PoddRoles.class);
+    
+    private final static Set<RestletUtilRole> INTERNAL_REPOSITORY_ROLES;
+    
+    static
+    {
+        Set<RestletUtilRole> temp = new HashSet<>();
+        temp.add(ADMIN);
+        temp.add(PROJECT_CREATOR);
+        
+        INTERNAL_REPOSITORY_ROLES = Collections.unmodifiableSet(temp);
+    }
     
     /**
      * Dumps the role mappings from the given map to the given model, optionally into the given
@@ -200,14 +212,7 @@ public enum PoddRoles implements RestletUtilRole
      */
     public static Set<RestletUtilRole> getRepositoryRoles()
     {
-        final Set<RestletUtilRole> result = new HashSet<>();
-        
-        // NOTE: Is it worth to add an extra attribute to a PoddRole to specify whether it is
-        // a Project or Repository level Role?
-        result.add(ADMIN);
-        result.add(PROJECT_CREATOR);
-        
-        return result;
+        return INTERNAL_REPOSITORY_ROLES;
     }
     
     public static RestletUtilRole getRoleByName(final String name)
