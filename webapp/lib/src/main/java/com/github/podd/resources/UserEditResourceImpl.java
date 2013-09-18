@@ -72,18 +72,18 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
         PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
-        this.log.info("requesting details of user: {}", requestedUserIdentifier);
+        if(requestedUserIdentifier == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit");
+        }
+        
+        this.log.info("requesting edit user: {}", requestedUserIdentifier);
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
         // check authentication first
         this.checkAuthentication(action);
-        
-        if(requestedUserIdentifier == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit");
-        }
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         
@@ -156,26 +156,22 @@ public class UserEditResourceImpl extends AbstractUserResourceImpl
     {
         this.log.info("editUserHtml");
         
-        final String requestedUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
-        this.log.info("requesting edit user: {}", requestedUserIdentifier);
+        final String requestedUserIdentifier = this.getUserParameter();
+        PoddAction action =
+                this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
         if(requestedUserIdentifier == null)
         {
-            // no identifier specified.
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit");
         }
+        
+        this.log.info("requesting edit user: {}", requestedUserIdentifier);
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
         // Even though this page only displays user information, since the intention is
         // to modify user information, the Action is considered as a "User Edit".
-        PoddAction action = PoddAction.OTHER_USER_EDIT;
-        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
-        {
-            action = PoddAction.CURRENT_USER_EDIT;
-        }
         this.checkAuthentication(action);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());

@@ -208,13 +208,16 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
     {
         this.log.info("getUserPasswordHtml");
         
-        final String requestedUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
+        final String requestedUserIdentifier = this.getUserParameter();
+        PoddAction action =
+                this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
+        
+        final boolean changeOwnPassword = (action == PoddAction.CURRENT_USER_EDIT);
+        
         this.log.info("requesting change password of user: {}", requestedUserIdentifier);
         
         if(requestedUserIdentifier == null)
         {
-            // no identifier specified.
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user");
         }
         
@@ -222,12 +225,6 @@ public class UserPasswordResourceImpl extends AbstractUserResourceImpl
         this.log.info("authenticated user: {}", user);
         
         // identify needed Action
-        PoddAction action = PoddAction.OTHER_USER_EDIT;
-        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
-        {
-            action = PoddAction.CURRENT_USER_EDIT;
-        }
-        
         this.checkAuthentication(action);
         
         // completed checking authorization
