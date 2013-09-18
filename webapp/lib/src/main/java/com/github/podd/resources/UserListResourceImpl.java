@@ -43,7 +43,7 @@ import com.github.podd.utils.PoddWebConstants;
  * 
  * @author kutila
  */
-public class UserListResourceImpl extends AbstractPoddResourceImpl
+public class UserListResourceImpl extends AbstractUserResourceImpl
 {
     /**
      * FIXME: incomplete implementation

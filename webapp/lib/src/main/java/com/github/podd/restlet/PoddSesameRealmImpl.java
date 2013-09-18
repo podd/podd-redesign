@@ -298,7 +298,7 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
             objectUri = this.vf.createURI(bindingSet.getValue(PoddSesameRealm.PARAM_OBJECT_URI).stringValue());
         }
         
-        this.log.info("Building map entry: {}, <{}>", role.getName(), objectUri);
+        this.log.debug("Building map entry: {}, <{}>", role.getName(), objectUri);
         
         return new AbstractMap.SimpleEntry<Role, URI>(role, objectUri);
     }
@@ -626,7 +626,12 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
         }
         
         query.append(" } ");
-        return query.toString();
+        
+        String queryString = query.toString();
+        
+        this.log.debug("buildSparqlQueryToFindUser: query={}", queryString);
+        
+        return queryString;
     }
     
     @Override
@@ -1334,12 +1339,11 @@ public class PoddSesameRealmImpl extends PoddSesameRealm
                 query.append("   FILTER(?object = <" + optionalObjectUri + "> ) ");
                 query.append(" } ");
                 
-                if(this.log.isDebugEnabled())
-                {
-                    this.log.debug("findUser: query={}", query.toString());
-                }
+                String queryString = query.toString();
                 
-                final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
+                this.log.debug("findUser: query={}", queryString);
+                
+                final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
                 tupleQuery.setDataset(this.getSesameDataset());
                 
                 final TupleQueryResult queryResult = tupleQuery.evaluate();

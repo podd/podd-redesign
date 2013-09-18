@@ -74,7 +74,7 @@ public interface PoddWebConstants
     /**
      * Path to "user details" page
      */
-    public static final String PATH_USER_DETAILS = "user/details/";
+    public static final String PATH_USER_DETAILS = "user/details";
     
     /**
      * Path to "add user" page
@@ -84,12 +84,12 @@ public interface PoddWebConstants
     /**
      * Path to "edit user" page
      */
-    public static final String PATH_USER_EDIT = "user/edit/";
+    public static final String PATH_USER_EDIT = "user/edit";
     
     /**
      * Path to "edit user" page
      */
-    public static final String PATH_USER_EDIT_PWD = "user/editpwd/";
+    public static final String PATH_USER_EDIT_PWD = "user/editpwd";
     
     /**
      * Path to "edit user" page

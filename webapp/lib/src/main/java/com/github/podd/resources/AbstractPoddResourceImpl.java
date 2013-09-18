@@ -188,4 +188,32 @@ public abstract class AbstractPoddResourceImpl extends ServerResource
         return super.getVariants(method);
     }
     
+    /**
+     * Determines the action to use based on whether there is a user currently logged in, and
+     * whether that user matches the given user identifier parameter.
+     * 
+     * @param requestedUserIdentifier
+     *            The user to determine the action for.
+     * @param otherUserAction
+     *            The action to return if the requested user is not the current user.
+     * @param currentUserAction
+     *            The action to return if the requested user is the current user.
+     * @return The action for the logged in user on the requested user
+     */
+    protected PoddAction getAction(final String requestedUserIdentifier, PoddAction otherUserAction,
+            PoddAction currentUserAction)
+    {
+        PoddAction action = otherUserAction;
+        
+        if(this.getRequest().getClientInfo().isAuthenticated())
+        {
+            if(requestedUserIdentifier != null
+                    && requestedUserIdentifier.equals(this.getRequest().getClientInfo().getUser().getIdentifier()))
+            {
+                action = currentUserAction;
+            }
+        }
+        return action;
+    }
+    
 }

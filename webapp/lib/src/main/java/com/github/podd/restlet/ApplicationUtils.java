@@ -421,13 +421,13 @@ public class ApplicationUtils
         
         ApplicationUtils.log.debug("testAdminUserRoles: {}, {}", testAdminUserRoles, testAdminUserRoles.size());
         
-        final User findUser = nextRealm.findUser("testAdminUser");
+        // final User findUser = nextRealm.findUser("testAdminUser");
         
-        ApplicationUtils.log.debug("findUser: {}", findUser);
-        ApplicationUtils.log.debug("findUser.getFirstName: {}", findUser.getFirstName());
-        ApplicationUtils.log.debug("findUser.getLastName: {}", findUser.getLastName());
-        ApplicationUtils.log.debug("findUser.getName: {}", findUser.getName());
-        ApplicationUtils.log.debug("findUser.getIdentifier: {}", findUser.getIdentifier());
+        // ApplicationUtils.log.debug("findUser: {}", findUser);
+        // ApplicationUtils.log.debug("findUser.getFirstName: {}", findUser.getFirstName());
+        // ApplicationUtils.log.debug("findUser.getLastName: {}", findUser.getLastName());
+        // ApplicationUtils.log.debug("findUser.getName: {}", findUser.getName());
+        // ApplicationUtils.log.debug("findUser.getIdentifier: {}", findUser.getIdentifier());
         
         // TODO: Define groups here also
         

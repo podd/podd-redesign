@@ -18,6 +18,7 @@ package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.LinkedList;
@@ -237,7 +238,7 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
     public void testAddUserWithOnlyMandatoryAttributesRdf() throws Exception
     {
         // prepare: add a Test User account
-        final String testIdentifier = "testuser@podd.com";
+        final String testIdentifier = "newPoddUser";
         final List<Map.Entry<URI, URI>> roles = new LinkedList<Map.Entry<URI, URI>>();
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.ADMIN.getURI(), null));
         roles.add(new AbstractMap.SimpleEntry<URI, URI>(PoddRoles.PROJECT_ADMIN.getURI(), PoddRdfConstants.VF
@@ -251,14 +252,14 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS + testIdentifier));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 12);
+        final Model resultsModel = this.assertRdf(new StringReader(results.getText()), format, 12);
         
         com.github.podd.utils.DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,

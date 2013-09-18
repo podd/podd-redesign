@@ -61,7 +61,7 @@ import com.github.podd.utils.PoddWebConstants;
  * 
  * @author kutila
  */
-public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
+public class UserPasswordResourceImpl extends AbstractUserResourceImpl
 {
     private URI changePassword(final PoddSesameRealm nextRealm, final Model model, final PoddUser changePwdUser,
             final boolean changeOwnPassword)
@@ -125,11 +125,15 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("changePasswordRdf");
         
-        final String changePwdUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
-        this.log.info("requesting change password of user: {}", changePwdUserIdentifier);
+        final String requestedUserIdentifier = this.getUserParameter();
+        PoddAction action =
+                this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
-        if(changePwdUserIdentifier == null)
+        final boolean changeOwnPassword = (action == PoddAction.CURRENT_USER_EDIT);
+        
+        this.log.info("requesting change password of user: {}", requestedUserIdentifier);
+        
+        if(requestedUserIdentifier == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user");
         }
@@ -137,19 +141,11 @@ public class UserPasswordResourceImpl extends AbstractPoddResourceImpl
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
-        // - set Action and check authorization
-        PoddAction action = PoddAction.OTHER_USER_EDIT;
-        boolean changeOwnPassword = false;
-        if(user != null && changePwdUserIdentifier.equals(user.getIdentifier()))
-        {
-            action = PoddAction.CURRENT_USER_EDIT;
-            changeOwnPassword = true;
-        }
         this.checkAuthentication(action);
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
         
-        final RestletUtilUser changePwdUser = nextRealm.findUser(changePwdUserIdentifier);
+        final RestletUtilUser changePwdUser = nextRealm.findUser(requestedUserIdentifier);
         if(changePwdUser == null || !(changePwdUser instanceof PoddUser))
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "User not found");

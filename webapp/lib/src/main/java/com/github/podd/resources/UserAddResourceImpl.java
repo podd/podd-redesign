@@ -62,7 +62,7 @@ import com.github.podd.utils.PoddWebConstants;
  * @author kutila
  * 
  */
-public class UserAddResourceImpl extends AbstractPoddResourceImpl
+public class UserAddResourceImpl extends AbstractUserResourceImpl
 {
     /**
      * Handle an HTTP POST request submitting RDF data to create a new PoddUser. This method can
@@ -89,7 +89,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model newUserModel = Rio.parse(inputStream, "", inputFormat);
             
-            this.log.debug("About to create user from model");
+            this.log.info("About to create user from model");
             
             // - create new PoddUser and add to Realm
             newUser = PoddUser.fromModel(newUserModel, true, false, false);
@@ -100,7 +100,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                 newUser.setUserStatus(PoddUserStatus.INACTIVE);
             }
             
-            this.log.debug("About to check if user already exists");
+            this.log.info("About to check if user already exists");
             
             if(nextRealm.findUser(newUser.getIdentifier()) != null)
             {

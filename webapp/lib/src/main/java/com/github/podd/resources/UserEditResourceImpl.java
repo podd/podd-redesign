@@ -58,7 +58,7 @@ import com.github.podd.utils.PoddWebConstants;
  * @author kutila
  * 
  */
-public class UserEditResourceImpl extends AbstractPoddResourceImpl
+public class UserEditResourceImpl extends AbstractUserResourceImpl
 {
     /**
      * Handle an HTTP POST request submitting RDF data to edit an existing PoddUser.
@@ -68,24 +68,21 @@ public class UserEditResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("editUserRdf");
         
-        final String requestedUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
-        this.log.info("requesting details of user: {}", requestedUserIdentifier);
+        final String requestedUserIdentifier = this.getUserParameter();
+        PoddAction action =
+                this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
         if(requestedUserIdentifier == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to edit");
         }
         
+        this.log.info("requesting details of user: {}", requestedUserIdentifier);
+        
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
         
         // check authentication first
-        PoddAction action = PoddAction.OTHER_USER_EDIT;
-        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
-        {
-            action = PoddAction.CURRENT_USER_EDIT;
-        }
         this.checkAuthentication(action);
         
         final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();

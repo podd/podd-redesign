@@ -61,7 +61,7 @@ import com.github.podd.utils.PoddWebConstants;
  * @author kutila
  * 
  */
-public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
+public class UserDetailsResourceImpl extends AbstractUserResourceImpl
 {
     @Get(":html")
     public Representation getUserDetailsPageHtml(final Representation entity) throws ResourceException
@@ -123,25 +123,20 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
     {
         this.log.info("getUserRdf");
         
-        final String requestedUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
-        this.log.info("requesting details of user: {}", requestedUserIdentifier);
+        final String requestedUserIdentifier = this.getUserParameter();
+        PoddAction action =
+                this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_READ, PoddAction.CURRENT_USER_READ);
         
+        this.log.info("requesting details of user: {}", requestedUserIdentifier);
         if(requestedUserIdentifier == null)
         {
+            log.info("Could not find user identifier parameter");
             // no identifier specified.
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to view");
         }
         
         final User user = this.getRequest().getClientInfo().getUser();
         this.log.info("authenticated user: {}", user);
-        
-        // identify needed Action
-        PoddAction action = PoddAction.OTHER_USER_READ;
-        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
-        {
-            action = PoddAction.CURRENT_USER_READ;
-        }
         
         this.checkAuthentication(action);
         
@@ -150,6 +145,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
         
         if(poddUser == null)
         {
+            this.log.info("User not found: {}", requestedUserIdentifier);
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "User not found.");
         }
         // final Set<Role> roles = realm.findRoles(poddUser);
@@ -167,7 +163,7 @@ public class UserDetailsResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final OpenRDFException e)
         {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response", e);
         }
         
         return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(outputFormat.getDefaultMIMEType()));

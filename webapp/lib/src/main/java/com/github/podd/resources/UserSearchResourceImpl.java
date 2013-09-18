@@ -37,7 +37,7 @@ import com.github.podd.utils.PoddWebConstants;
  * 
  * @author kutila
  */
-public class UserSearchResourceImpl extends AbstractPoddResourceImpl
+public class UserSearchResourceImpl extends AbstractUserResourceImpl
 {
     /**
      * Search for PODD Users

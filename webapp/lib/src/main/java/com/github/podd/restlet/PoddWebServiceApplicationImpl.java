@@ -309,8 +309,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(indexPagePath, IndexResourceImpl.class);
         
         // Add a route for the User Details page.
-        final String userDetailsPath =
-                PoddWebConstants.PATH_USER_DETAILS + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
+        final String userDetailsPath = PoddWebConstants.PATH_USER_DETAILS;
         this.log.debug("attaching user details service to path={}", userDetailsPath);
         router.attach(userDetailsPath, UserDetailsResourceImpl.class);
         
@@ -330,13 +329,12 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(userAddPath, UserAddResourceImpl.class);
         
         // Add a route for Edit User page.
-        final String userEditPath = PoddWebConstants.PATH_USER_EDIT + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
+        final String userEditPath = PoddWebConstants.PATH_USER_EDIT;
         this.log.debug("attaching user edit service to path={}", userEditPath);
         router.attach(userEditPath, UserEditResourceImpl.class);
         
         // Add a route for Change User Password page.
-        final String userChangePasswordPath =
-                PoddWebConstants.PATH_USER_EDIT_PWD + "{" + PoddWebConstants.KEY_USER_IDENTIFIER + "}";
+        final String userChangePasswordPath = PoddWebConstants.PATH_USER_EDIT_PWD;
         this.log.debug("attaching user change password service to path={}", userChangePasswordPath);
         router.attach(userChangePasswordPath, UserPasswordResourceImpl.class);
         
