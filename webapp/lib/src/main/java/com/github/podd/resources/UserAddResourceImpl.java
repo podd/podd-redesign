@@ -89,7 +89,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                     Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
             final Model newUserModel = Rio.parse(inputStream, "", inputFormat);
             
-            this.log.info("About to create user from model");
+            this.log.debug("About to create user from model");
             
             // - create new PoddUser and add to Realm
             newUser = PoddUser.fromModel(newUserModel, true, false, false);
@@ -100,7 +100,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
                 newUser.setUserStatus(PoddUserStatus.INACTIVE);
             }
             
-            this.log.info("About to create user from model");
+            this.log.debug("About to check if user already exists");
             
             if(nextRealm.findUser(newUser.getIdentifier()) != null)
             {
@@ -168,6 +168,7 @@ public class UserAddResourceImpl extends AbstractPoddResourceImpl
         }
         catch(final OpenRDFException e)
         {
+            this.log.error("Error generating response entity", e);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
         }
         
