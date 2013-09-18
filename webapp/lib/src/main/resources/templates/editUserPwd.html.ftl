@@ -26,7 +26,7 @@
 	
 		$("#btnCancel").click(function(event) {
 			event.preventDefault();
-			window.location.href = podd.baseUrl + '/user/details/${requestedUser.identifier}';
+			window.location.href = podd.baseUrl + '/user/details?userIdentifier=${requestedUser.identifier}';
 			return false;
 		});
 	

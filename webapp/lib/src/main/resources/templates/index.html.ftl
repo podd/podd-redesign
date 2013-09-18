@@ -9,7 +9,7 @@
 <#if user??>
     <p>Welcome, ${user.firstName!""}  ${user.lastName!""}.</p>
     <p>Places to go to: 
-	    <a href="${baseUrl}/user/details/${user.identifier!"unknown-username"}">User page</a>, 
+	    <a href="${baseUrl}/user/details?userIdentifier=${user.identifier!"unknown-username"}">User page</a>, 
 	    <a href="${baseUrl}/artifact/addobject?objecttypeuri=http://purl.org/podd/ns/poddScience%23Project">Create a new Project</a>.
     </p>
     
