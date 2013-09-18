@@ -42,6 +42,7 @@
         </ul>
         <li><a href="${baseUrl}/help/project_editing">Editing a Project</a></li>
         <li><a href="${baseUrl}/help/project_publishing">Publishing a Project</a></li>
+        <li><a href="${baseUrl}/help/project_deleting">Deleting a Project</a></li>
         <li><a href="${baseUrl}/help/child_objects">Maintaining a Child Object</a></li>
         <ul class="stylized-small">
             <li><a href="${baseUrl}/help/child_add">Adding a Child Object</a></li>
