@@ -916,7 +916,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         this.getWebTester().assertResponseCode(200);
         
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/" + RestletTestUtils.TEST_USERNAME));
+                .endsWith(RestletTestUtils.TEST_USERNAME));
         
         // verify user details page headings are present
         this.getWebTester().assertTextPresent("Account Details");
@@ -940,7 +940,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         this.getWebTester().assertResponseCode(200);
         
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/" + RestletTestUtils.TEST_ADMIN_USERNAME));
+                .endsWith(RestletTestUtils.TEST_ADMIN_USERNAME));
         
         // verify user details page headings are present
         this.getWebTester().assertTextPresent("Account Details");
@@ -963,7 +963,8 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         try
         {
-            this.getWebTester().gotoPage(PoddWebConstants.PATH_USER_DETAILS + "noSuchUser");
+            this.getWebTester().gotoPage(
+                    PoddWebConstants.PATH_USER_DETAILS + "?" + PoddWebConstants.KEY_USER_IDENTIFIER + "=noSuchUser");
             Assert.fail("An exception should've been thrown here.");
         }
         catch(final TestingEngineResponseException e)
@@ -972,7 +973,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         }
         this.getWebTester().assertResponseCode(404);
         
-        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("/noSuchUser"));
+        Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm().endsWith("noSuchUser"));
         
         // verify error message is present
         this.getWebTester().assertTextPresent("ERROR");
@@ -987,11 +988,13 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         this.login(RestletTestUtils.TEST_ADMIN_USERNAME, RestletTestUtils.TEST_ADMIN_PASSWORD);
         this.getWebTester().assertResponseCode(200);
         
-        this.getWebTester().gotoPage(PoddWebConstants.PATH_USER_DETAILS + RestletTestUtils.TEST_USERNAME);
+        this.getWebTester().gotoPage(
+                PoddWebConstants.PATH_USER_DETAILS + "?" + PoddWebConstants.KEY_USER_IDENTIFIER + "="
+                        + RestletTestUtils.TEST_USERNAME);
         this.getWebTester().assertResponseCode(200);
         
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/" + RestletTestUtils.TEST_USERNAME));
+                .endsWith(RestletTestUtils.TEST_USERNAME));
         
         // verify user details page headings are present
         this.getWebTester().assertTextPresent("Account Details");
@@ -1013,7 +1016,9 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         
         try
         {
-            this.getWebTester().gotoPage(PoddWebConstants.PATH_USER_DETAILS + RestletTestUtils.TEST_ADMIN_USERNAME);
+            this.getWebTester().gotoPage(
+                    PoddWebConstants.PATH_USER_DETAILS + "?" + PoddWebConstants.KEY_USER_IDENTIFIER + "="
+                            + RestletTestUtils.TEST_ADMIN_USERNAME);
             Assert.fail("An exception should've been thrown here.");
         }
         catch(final TestingEngineResponseException e)
@@ -1023,7 +1028,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         this.getWebTester().assertResponseCode(401);
         
         Assert.assertTrue(this.getWebTester().getTestingEngine().getPageURL().toExternalForm()
-                .endsWith("/" + RestletTestUtils.TEST_ADMIN_USERNAME));
+                .endsWith(RestletTestUtils.TEST_ADMIN_USERNAME));
         
         // verify an error indication is present
         this.getWebTester().assertTextPresent("ERROR");
