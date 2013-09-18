@@ -299,7 +299,7 @@ public class PoddUser extends RestletUtilUser
                 PoddRdfConstants.VF.createLiteral(this.getIdentifier()));
         
         // Password should not be sent back in RDF to users!
-        if(includeSecret)
+        if(includeSecret && this.getSecret() != null)
         {
             model.add(userUri, SesameRealmConstants.OAS_USERSECRET,
                     PoddRdfConstants.VF.createLiteral(new String(this.getSecret())));
