@@ -68,9 +68,14 @@ public class UserDetailsResourceImpl extends AbstractUserResourceImpl
     {
         this.log.info("getUserDetailsHtml");
         
-        final String requestedUserIdentifier =
-                (String)this.getRequest().getAttributes().get(PoddWebConstants.KEY_USER_IDENTIFIER);
+        final String requestedUserIdentifier = this.getUserParameter();
+        PoddAction action =
+                this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_READ, PoddAction.CURRENT_USER_READ);
+        
         this.log.info("requesting details of user: {}", requestedUserIdentifier);
+        
+        final User user = this.getRequest().getClientInfo().getUser();
+        this.log.info("authenticated user: {}", user);
         
         if(requestedUserIdentifier == null)
         {
@@ -78,18 +83,7 @@ public class UserDetailsResourceImpl extends AbstractUserResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not specify user to view");
         }
         
-        final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
-        
-        // identify needed Action
-        PoddAction action = PoddAction.OTHER_USER_READ;
-        if(user != null && requestedUserIdentifier.equals(user.getIdentifier()))
-        {
-            action = PoddAction.CURRENT_USER_READ;
-        }
-        
         this.checkAuthentication(action);
-        
         // completed checking authorization
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());

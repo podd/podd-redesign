@@ -48,7 +48,7 @@ import com.github.podd.utils.PoddUserStatus;
 import com.github.podd.utils.PoddWebConstants;
 
 /**
- * Test UserDetails resource at "user/{identifier}"
+ * Test UserDetails resource at "user/details?userIdentifier={identifier}"
  * 
  * @author kutila
  * 
