@@ -141,7 +141,7 @@ public class UserRolesResourceImpl extends AbstractPoddResourceImpl
                     if(mappedUri != null)
                     {
                         throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
-                                "Unwanted optional Object URI found");
+                                "Unwanted optional Object URI found for role: " + role);
                     }
                 }
                 this.checkAuthentication(action, mappedUri);
