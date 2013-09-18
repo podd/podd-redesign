@@ -462,26 +462,6 @@ public class ApplicationUtils
         application.setStatusService(statusService);
     }
     
-    /**
-     * Adds a Test User to the PODD Realm.
-     * 
-     * @param application
-     */
-    public static void setupTestUser(final PoddWebServiceApplication application)
-    {
-        final PoddSesameRealm nextRealm = application.getRealm();
-        
-        final URI testUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testUser");
-        final PoddUser testUser =
-                new PoddUser("anotherUser", "anotherPassword".toCharArray(), "Test", "User", "test.user@example.com",
-                        PoddUserStatus.ACTIVE, testUserHomePage, "CSIRO", "Orcid-Test-User");
-        final URI testUserUri = nextRealm.addUser(testUser);
-        nextRealm.map(testUser, PoddRoles.PROJECT_CREATOR.getRole());
-        nextRealm.map(testUser, PoddRoles.PROJECT_ADMIN.getRole(), PoddRdfConstants.TEST_ARTIFACT);
-        
-        ApplicationUtils.log.debug("Added Test User to PODD: {} <{}>", testUser.getIdentifier(), testUserUri);
-    }
-    
     private ApplicationUtils()
     {
     }

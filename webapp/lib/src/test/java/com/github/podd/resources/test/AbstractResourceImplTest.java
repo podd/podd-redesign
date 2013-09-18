@@ -75,6 +75,7 @@ import com.github.ansell.restletutils.test.RestletTestUtils;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.PoddWebServiceApplicationImpl;
+import com.github.podd.test.TestUtils;
 import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
@@ -500,7 +501,8 @@ public class AbstractResourceImplTest
      * @param mappedObjectUri
      * @throws Exception
      */
-    protected void mapUserToRole(final String userIdentifier, final PoddRoles poddRole, final String mappedObjectUri) throws Exception
+    protected void mapUserToRole(final String userIdentifier, final PoddRoles poddRole, final String mappedObjectUri)
+        throws Exception
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
@@ -512,7 +514,7 @@ public class AbstractResourceImplTest
                 PoddRdfConstants.VF.createURI("urn:podd:rolemapping1:", UUID.randomUUID().toString());
         newModel.add(roleMapping1Uri, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING);
         newModel.add(roleMapping1Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, poddRole.getURI());
-        if (mappedObjectUri != null)
+        if(mappedObjectUri != null)
         {
             newModel.add(roleMapping1Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT,
                     PoddRdfConstants.VF.createURI(mappedObjectUri));
@@ -570,7 +572,7 @@ public class AbstractResourceImplTest
         // The application cannot be setup properly until it is attached, as it requires
         // Application.getContext() to not return null
         ApplicationUtils.setupApplication(nextApplication, nextApplication.getContext());
-        ApplicationUtils.setupTestUser(nextApplication);
+        TestUtils.setupTestUser(nextApplication);
         
         // Start the component.
         this.component.start();

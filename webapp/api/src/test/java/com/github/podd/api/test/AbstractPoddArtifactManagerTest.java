@@ -289,11 +289,11 @@ public abstract class AbstractPoddArtifactManagerTest
                                 MetadataPolicy.INCLUDE_ALL, 0, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 142, 18, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 139, 17, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 86, 11, 0 },
+                                MetadataPolicy.EXCLUDE_CONTAINS, 83, 10, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 286, 35, 14 },
+                                MetadataPolicy.INCLUDE_ALL, 283, 34, 14 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 42, 7, 0 },
                         
@@ -1572,7 +1572,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // prepare: load poddScience v2
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology("/test/ontologies/poddScienceV2.owl", RDFFormat.RDFXML, 1265, 216,
+                this.loadInferStoreOntology("/test/ontologies/poddScienceV2.owl", RDFFormat.RDFXML, 1265, 217,
                         this.testRepositoryConnection);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, true,
                 this.testRepositoryConnection, this.schemaGraph);

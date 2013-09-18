@@ -129,7 +129,7 @@ public class RdfUtilityTest
         
         Assert.assertNotNull("Model was NULL", model);
         Assert.assertFalse("Model was empty", model.isEmpty());
-        Assert.assertEquals("Not the expected number of statements in the Model", 1277, model.size());
+        Assert.assertEquals("Not the expected number of statements in the Model", 1298, model.size());
     }
     
     @Test
