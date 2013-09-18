@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
+import com.github.podd.test.TestUtils;
 
 /**
  * Resets an application using ApplicationUtils.setupApplication.
@@ -69,6 +70,7 @@ public class TestResetResourceImpl extends Restlet
             this.application.setAliasesConfiguration(Rio.parse(this.getClass().getResourceAsStream("/test-alias.ttl"),
                     "", RDFFormat.TURTLE));
             ApplicationUtils.setupApplication(this.application, this.application.getContext());
+            TestUtils.setupTestUser(this.application);
         }
         catch(final OpenRDFException | UnsupportedRDFormatException | IOException e)
         {
