@@ -94,6 +94,13 @@ public class RestletPoddClientImpl implements PoddClient
     }
     
     @Override
+    public void addRole(final String userIdentifier, final RestletUtilRole role, final InferredOWLOntologyID artifact)
+        throws PoddClientException
+    {
+        throw new RuntimeException("TODO: Implement me");
+    }
+    
+    @Override
     public InferredOWLOntologyID appendArtifact(final InferredOWLOntologyID ontologyIRI,
             final InputStream partialInputStream, final RDFFormat format) throws PoddClientException
     {
@@ -682,6 +689,13 @@ public class RestletPoddClientImpl implements PoddClient
         throw new RuntimeException("TODO: Implement me!");
     }
     
+    @Override
+    public void removeRole(final String userIdentifier, final RestletUtilRole role, final InferredOWLOntologyID artifact)
+        throws PoddClientException
+    {
+        throw new RuntimeException("TODO: Implement me");
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -712,14 +726,14 @@ public class RestletPoddClientImpl implements PoddClient
     public InferredOWLOntologyID uploadNewArtifact(final InputStream input, final RDFFormat format)
         throws PoddClientException
     {
-        return uploadNewArtifact(input, format, DanglingObjectPolicy.REPORT,
+        return this.uploadNewArtifact(input, format, DanglingObjectPolicy.REPORT,
                 DataReferenceVerificationPolicy.DO_NOT_VERIFY);
     }
     
     @Override
     public InferredOWLOntologyID uploadNewArtifact(final InputStream input, final RDFFormat format,
-            DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
-        throws PoddClientException
+            final DanglingObjectPolicy danglingObjectPolicy,
+            final DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws PoddClientException
     {
         final InputRepresentation rep = new InputRepresentation(input, MediaType.valueOf(format.getDefaultMIMEType()));
         

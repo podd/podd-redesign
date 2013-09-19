@@ -41,6 +41,18 @@ import com.github.podd.utils.PoddUser;
 public interface PoddClient
 {
     /**
+     * Adds the given role for the given user to the given artifact
+     * 
+     * @param userIdentifier
+     * @param role
+     * @param artifact
+     * @throws PoddClientException
+     *             If there is an error setting the role for the given user.
+     */
+    void addRole(String userIdentifier, RestletUtilRole role, InferredOWLOntologyID artifact)
+        throws PoddClientException;
+    
+    /**
      * Submits a request to the PODD Edit Artifact service to append to the artifact using the RDF
      * triples that are contained in the given {@link InputStream}.
      * <p>
@@ -258,6 +270,18 @@ public interface PoddClient
     InferredOWLOntologyID publishArtifact(InferredOWLOntologyID ontologyId) throws PoddClientException;
     
     /**
+     * Removes the given role for the given user to the given artifact.
+     * 
+     * @param userIdentifier
+     * @param role
+     * @param artifact
+     * @throws PoddClientException
+     *             If there is an error removing the role for the given user.
+     */
+    void removeRole(String userIdentifier, RestletUtilRole role, InferredOWLOntologyID artifact)
+        throws PoddClientException;
+    
+    /**
      * Sets the base server URL to use when submitting requests using this client.
      * 
      * @param serverUrl
@@ -322,4 +346,5 @@ public interface PoddClient
     InferredOWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format,
             DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
         throws PoddClientException;
+    
 }
