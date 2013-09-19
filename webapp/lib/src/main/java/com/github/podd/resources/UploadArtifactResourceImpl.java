@@ -142,17 +142,6 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             
             final RDFFormat format = Rio.getParserFormatForMIMEType(formatString, RDFFormat.RDFXML);
             
-            InputStream inputStream = null;
-            
-            try
-            {
-                inputStream = entity.getStream();
-            }
-            catch(final IOException e)
-            {
-                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
-            }
-            
             // - optional parameter 'isforce'
             DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
             final String forceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_FORCE, true);
@@ -170,9 +159,17 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 fileRefVerificationPolicy = DataReferenceVerificationPolicy.VERIFY;
             }
             
-            artifactMap =
-                    this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, danglingObjectPolicy,
-                            fileRefVerificationPolicy);
+            try (final InputStream inputStream = entity.getStream();)
+            {
+                artifactMap =
+                        this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, danglingObjectPolicy,
+                                fileRefVerificationPolicy);
+            }
+            catch(final IOException e)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
+            }
+            
         }
         
         // Map uploading user as Project Administrator for this artifact so that they can edit it
