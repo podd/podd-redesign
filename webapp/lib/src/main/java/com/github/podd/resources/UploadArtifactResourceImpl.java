@@ -152,7 +152,27 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             {
                 throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
             }
-            artifactMap = this.uploadFileAndLoadArtifactIntoPodd(inputStream, format);
+            
+            // - optional parameter 'isforce'
+            DanglingObjectPolicy danglingObjectPolicy = DanglingObjectPolicy.REPORT;
+            final String forceStr = this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_WITH_FORCE, true);
+            if(forceStr != null && Boolean.valueOf(forceStr))
+            {
+                danglingObjectPolicy = DanglingObjectPolicy.FORCE_CLEAN;
+            }
+            
+            // - optional parameter 'verifyfilerefs'
+            DataReferenceVerificationPolicy fileRefVerificationPolicy = DataReferenceVerificationPolicy.DO_NOT_VERIFY;
+            final String fileRefVerifyStr =
+                    this.getQuery().getFirstValue(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES, true);
+            if(fileRefVerifyStr != null && Boolean.valueOf(fileRefVerifyStr))
+            {
+                fileRefVerificationPolicy = DataReferenceVerificationPolicy.VERIFY;
+            }
+            
+            artifactMap =
+                    this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, danglingObjectPolicy,
+                            fileRefVerificationPolicy);
         }
         
         // Map uploading user as Project Administrator for this artifact so that they can edit it
@@ -341,7 +361,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
      * @throws ResourceException
      */
     private InferredOWLOntologyID uploadFileAndLoadArtifactIntoPodd(final InputStream inputStream,
-            final RDFFormat format) throws ResourceException
+            final RDFFormat format, DanglingObjectPolicy danglingObjectPolicy,
+            DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws ResourceException
     {
         final PoddArtifactManager artifactManager =
                 ((PoddWebServiceApplication)this.getApplication()).getPoddArtifactManager();
@@ -350,8 +371,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             if(artifactManager != null)
             {
                 final InferredOWLOntologyID loadedArtifact =
-                        artifactManager.loadArtifact(inputStream, format, DanglingObjectPolicy.REPORT,
-                                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+                        artifactManager.loadArtifact(inputStream, format, danglingObjectPolicy,
+                                dataReferenceVerificationPolicy);
                 return loadedArtifact;
             }
             else
@@ -481,7 +502,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "File IO error occurred", e);
         }
         
-        return this.uploadFileAndLoadArtifactIntoPodd(inputStream, format);
+        return this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, DanglingObjectPolicy.REPORT,
+                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
     }
     
 }
