@@ -173,12 +173,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             throw new PoddRuntimeException("Ontology IRI cannot be null");
         }
-       
+        
         RepositoryConnection connection = null;
         
         try
         {
-            if (this.isPublished(artifactId))
+            if(this.isPublished(artifactId))
             {
                 throw new DeleteArtifactException("Published Artifacts cannot be deleted", artifactId);
             }
@@ -1130,6 +1130,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         return this.listArtifacts(false, true);
     }
     
+    @Override
+    public InferredOWLOntologyID loadArtifact(final InputStream inputStream, RDFFormat format) throws OpenRDFException,
+        PoddException, IOException, OWLException
+    {
+        return loadArtifact(inputStream, format, DanglingObjectPolicy.REPORT,
+                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -1137,8 +1145,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
      * org.openrdf.rio.RDFFormat)
      */
     @Override
-    public InferredOWLOntologyID loadArtifact(final InputStream inputStream, RDFFormat format) throws OpenRDFException,
-        PoddException, IOException, OWLException
+    public InferredOWLOntologyID loadArtifact(final InputStream inputStream, RDFFormat format,
+            DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
+        throws OpenRDFException, PoddException, IOException, OWLException
     {
         if(inputStream == null)
         {
@@ -1231,8 +1240,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.handleTimestamps(temporaryRepositoryConnection, PoddRdfConstants.PODD_BASE_LAST_MODIFIED, now,
                     randomContext);
             
-            this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext,
-                    DanglingObjectPolicy.REPORT);
+            this.handleDanglingObjects(ontologyIRI, temporaryRepositoryConnection, randomContext, danglingObjectPolicy);
             
             // check and ensure schema ontology imports are for version IRIs
             this.handleSchemaImports(ontologyIRI, permanentRepositoryConnection, temporaryRepositoryConnection,
@@ -1244,7 +1252,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // TODO: This web service could be used accidentally to insert invalid file references
             inferredOWLOntologyID =
                     this.loadInferStoreArtifact(temporaryRepositoryConnection, permanentRepositoryConnection,
-                            randomContext, DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+                            randomContext, dataReferenceVerificationPolicy);
             
             permanentRepositoryConnection.commit();
             

@@ -84,8 +84,8 @@ public interface PoddArtifactManager
     boolean deleteArtifact(InferredOWLOntologyID artifactId) throws PoddException;
     
     /**
-     * Deletes the specified PODD object within an artifact. The artifact containing the 
-     * object should not be currently published.
+     * Deletes the specified PODD object within an artifact. The artifact containing the object
+     * should not be currently published.
      * 
      * @param artifactUri
      * @param versionUri
@@ -93,13 +93,13 @@ public interface PoddArtifactManager
      * @param cascade
      * @return Updated InferredOWLOntologyID of artifact after deletion
      * @throws PoddException
-     * @throws OWLException 
-     * @throws IOException 
-     * @throws RepositoryException 
+     * @throws OWLException
+     * @throws IOException
+     * @throws RepositoryException
      */
     InferredOWLOntologyID deleteObject(String artifactUri, String versionUri, String objectUri, boolean cascade)
-            throws PoddException, OpenRDFException, IOException, OWLException;
-
+        throws PoddException, OpenRDFException, IOException, OWLException;
+    
     /**
      * Exports the given artifact to a @{link Model}.
      * 
@@ -119,7 +119,7 @@ public interface PoddArtifactManager
      *             stream.
      */
     Model exportArtifact(InferredOWLOntologyID ontologyId, boolean includeInferred) throws OpenRDFException,
-    PoddException, IOException;
+        PoddException, IOException;
     
     /**
      * Exports the given artifact to the given output stream using an RDF format.
@@ -218,7 +218,6 @@ public interface PoddArtifactManager
      *             If the artifact is not managed.
      */
     InferredOWLOntologyID getArtifact(IRI artifactIRI, IRI versionIRI) throws UnmanagedArtifactIRIException;
-
     
     /**
      * Returns a {@link Set} containing the Object URIs of the given object's direct children.
@@ -233,7 +232,7 @@ public interface PoddArtifactManager
      * @throws OpenRDFException
      */
     Set<URI> getChildObjects(InferredOWLOntologyID ontologyID, URI objectUri) throws OpenRDFException;
-
+    
     /**
      * 
      * @return The {@link DataReferenceManager} used to create and fetch file references from
@@ -423,6 +422,10 @@ public interface PoddArtifactManager
     InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format) throws OpenRDFException,
         PoddException, IOException, OWLException;
     
+    InferredOWLOntologyID loadArtifact(InputStream inputStream, RDFFormat format,
+            DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
+        throws OpenRDFException, PoddException, IOException, OWLException;
+    
     /**
      * Sets the given OWLOntologyID to be published.
      * 
@@ -611,5 +614,5 @@ public interface PoddArtifactManager
     InferredOWLOntologyID updateSchemaImports(InferredOWLOntologyID artifactId,
             Set<OWLOntologyID> oldSchemaOntologyIds, Set<OWLOntologyID> newSchemaOntologyIds)
         throws UnmanagedSchemaException, OpenRDFException, PoddException, IOException, OWLException;
-
+    
 }

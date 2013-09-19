@@ -63,6 +63,8 @@ import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
 import org.semanticweb.owlapi.model.OWLException;
 
+import com.github.podd.api.DanglingObjectPolicy;
+import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.PoddArtifactManager;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
@@ -347,7 +349,9 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         {
             if(artifactManager != null)
             {
-                final InferredOWLOntologyID loadedArtifact = artifactManager.loadArtifact(inputStream, format);
+                final InferredOWLOntologyID loadedArtifact =
+                        artifactManager.loadArtifact(inputStream, format, DanglingObjectPolicy.REPORT,
+                                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
                 return loadedArtifact;
             }
             else
