@@ -492,18 +492,17 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
             format = RDFFormat.RDFXML;
         }
         
-        InputStream inputStream = null;
-        try
+        try (final InputStream inputStream =
+                new BufferedInputStream(Files.newInputStream(file, StandardOpenOption.READ));)
         {
-            inputStream = new BufferedInputStream(Files.newInputStream(file, StandardOpenOption.READ));
+            return this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, DanglingObjectPolicy.REPORT,
+                    DataReferenceVerificationPolicy.DO_NOT_VERIFY);
         }
         catch(final IOException e)
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "File IO error occurred", e);
         }
         
-        return this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, DanglingObjectPolicy.REPORT,
-                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
     }
     
 }
