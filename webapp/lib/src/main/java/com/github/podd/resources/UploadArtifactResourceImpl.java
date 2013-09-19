@@ -417,14 +417,15 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                     // FIXME: Strip everything up to the last . out of the filename so that
                     // the filename can be used for content type determination where
                     // possible.
-                    // Note: These are Java-7 APIs
-                    file = Files.createTempFile(this.tempDirectory, "ontologyupload-", name);
-                    
-                    contentType = fi.getContentType();
-                    props.put("Content-Type", fi.getContentType());
                     // InputStream uploadedFileInputStream = fi.getInputStream();
                     try
                     {
+                        // Note: These are Java-7 APIs
+                        contentType = fi.getContentType();
+                        props.put("Content-Type", fi.getContentType());
+                        
+                        file = Files.createTempFile(this.tempDirectory, "ontologyupload-", name);
+                        
                         fi.write(file.toFile());
                     }
                     catch(final IOException ioe)
@@ -490,7 +491,8 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         try (final InputStream inputStream =
-                new BufferedInputStream(Files.newInputStream(file, StandardOpenOption.READ));)
+                new BufferedInputStream(Files.newInputStream(file, StandardOpenOption.READ,
+                        StandardOpenOption.DELETE_ON_CLOSE));)
         {
             return this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, DanglingObjectPolicy.REPORT,
                     DataReferenceVerificationPolicy.DO_NOT_VERIFY);
