@@ -56,6 +56,8 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilRole;
+import com.github.podd.api.DanglingObjectPolicy;
+import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.api.file.DataReferenceConstants;
 import com.github.podd.client.api.PoddClient;
@@ -298,8 +300,7 @@ public class RestletPoddClientImpl implements PoddClient
     {
         this.log.info("cookies: {}", this.currentCookies);
         
-        final ClientResource resource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
         resource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
         
         resource.getCookies().addAll(this.currentCookies);
@@ -711,6 +712,15 @@ public class RestletPoddClientImpl implements PoddClient
     public InferredOWLOntologyID uploadNewArtifact(final InputStream input, final RDFFormat format)
         throws PoddClientException
     {
+        return uploadNewArtifact(input, format, DanglingObjectPolicy.REPORT,
+                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+    }
+    
+    @Override
+    public InferredOWLOntologyID uploadNewArtifact(final InputStream input, final RDFFormat format,
+            DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
+        throws PoddClientException
+    {
         final InputRepresentation rep = new InputRepresentation(input, MediaType.valueOf(format.getDefaultMIMEType()));
         
         final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
@@ -719,6 +729,14 @@ public class RestletPoddClientImpl implements PoddClient
         this.log.info("cookies: {}", this.currentCookies);
         
         resource.addQueryParameter("format", format.getDefaultMIMEType());
+        if(danglingObjectPolicy == DanglingObjectPolicy.FORCE_CLEAN)
+        {
+            resource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, "true");
+        }
+        if(dataReferenceVerificationPolicy == DataReferenceVerificationPolicy.VERIFY)
+        {
+            resource.addQueryParameter(PoddWebConstants.KEY_EDIT_VERIFY_FILE_REFERENCES, "true");
+        }
         
         // Request the results in Turtle to reduce the bandwidth
         final Representation post = resource.post(rep, MediaType.APPLICATION_RDF_TURTLE);

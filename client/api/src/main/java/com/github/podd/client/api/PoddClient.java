@@ -27,6 +27,8 @@ import org.openrdf.rio.RDFFormat;
 import org.semanticweb.owlapi.model.IRI;
 
 import com.github.ansell.restletutils.RestletUtilRole;
+import com.github.podd.api.DanglingObjectPolicy;
+import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.file.DataReference;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddUser;
@@ -316,4 +318,8 @@ public interface PoddClient
      *         IRI to determine if there have been changes to the ontology in future.
      */
     InferredOWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format) throws PoddClientException;
+    
+    InferredOWLOntologyID uploadNewArtifact(InputStream input, RDFFormat format,
+            DanglingObjectPolicy danglingObjectPolicy, DataReferenceVerificationPolicy dataReferenceVerificationPolicy)
+        throws PoddClientException;
 }
