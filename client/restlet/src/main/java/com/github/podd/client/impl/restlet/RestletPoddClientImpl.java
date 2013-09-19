@@ -24,8 +24,10 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +58,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.RestletUtilMediaType;
 import com.github.ansell.restletutils.RestletUtilRole;
+import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.file.DataReference;
@@ -97,7 +100,35 @@ public class RestletPoddClientImpl implements PoddClient
     public void addRole(final String userIdentifier, final RestletUtilRole role, final InferredOWLOntologyID artifact)
         throws PoddClientException
     {
-        throw new RuntimeException("TODO: Implement me");
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+        resource.getCookies().addAll(this.currentCookies);
+        resource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
+        
+        final Map<RestletUtilRole, Collection<URI>> mappings = new HashMap<>();
+        final Collection<URI> artifacts = Arrays.asList(artifact.getOntologyIRI().toOpenRDFURI());
+        mappings.put(role, artifacts);
+        
+        final Model model = new LinkedHashModel();
+        PoddRoles.dumpRoleMappingsUser(mappings, model);
+        
+        final Representation post = this.postRdf(resource, model);
+        
+        try
+        {
+            final Model parsedStatements = this.parseRdf(post);
+            
+            if(!parsedStatements.contains(null, SesameRealmConstants.OAS_USERIDENTIFIER,
+                    PoddRdfConstants.VF.createLiteral(userIdentifier)))
+            {
+                this.log.warn("Role edit response did not seem to contain the user identifier");
+            }
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Could not parse results due to an IOException", e);
+        }
     }
     
     @Override
@@ -121,25 +152,9 @@ public class RestletPoddClientImpl implements PoddClient
                 .getVersionIRI().toString());
         resource.addQueryParameter(DataReferenceConstants.KEY_OBJECT_URI, ref.getObjectIri().toString());
         
-        final Model rdf = ref.toRDF();
+        final Model model = ref.toRDF();
         
-        final StringWriter writer = new StringWriter();
-        
-        try
-        {
-            Rio.write(rdf, writer, RDFFormat.RDFJSON);
-        }
-        catch(final RDFHandlerException e)
-        {
-            throw new PoddClientException("Could not generate RDF from file reference", e);
-        }
-        
-        final Representation rep =
-                new ReaderRepresentation(new StringReader(writer.toString()), RestletUtilMediaType.APPLICATION_RDF_JSON);
-        
-        this.log.info("Attach file reference triples: {}", writer);
-        
-        final Representation post = resource.post(rep, RestletUtilMediaType.APPLICATION_RDF_JSON);
+        final Representation post = this.postRdf(resource, model);
         
         try
         {
@@ -681,6 +696,34 @@ public class RestletPoddClientImpl implements PoddClient
         {
             throw new PoddClientException("There was an error parsing the artifact", e);
         }
+    }
+    
+    /**
+     * @param resource
+     * @param rdf
+     * @return
+     * @throws PoddClientException
+     * @throws ResourceException
+     */
+    private Representation postRdf(final ClientResource resource, final Model rdf) throws PoddClientException,
+        ResourceException
+    {
+        final StringWriter writer = new StringWriter();
+        
+        try
+        {
+            Rio.write(rdf, writer, RDFFormat.RDFJSON);
+        }
+        catch(final RDFHandlerException e)
+        {
+            throw new PoddClientException("Could not generate request entity", e);
+        }
+        
+        final Representation rep =
+                new ReaderRepresentation(new StringReader(writer.toString()), RestletUtilMediaType.APPLICATION_RDF_JSON);
+        
+        final Representation post = resource.post(rep, RestletUtilMediaType.APPLICATION_RDF_JSON);
+        return post;
     }
     
     @Override
