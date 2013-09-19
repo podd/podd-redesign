@@ -362,7 +362,7 @@ public interface PoddRdfConstants
     public static final String PODD_SCIENCE = "http://purl.org/podd/ns/poddScience#";
     
     /** http://purl.org/podd/ns/poddScience#Project */
-    public static final Object PODD_SCIENCE_PROJECT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
+    public static final URI PODD_SCIENCE_PROJECT = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE,
             "Project");
     
     /** http://purl.org/podd/ns/poddBase#SPARQLDataRepository */
