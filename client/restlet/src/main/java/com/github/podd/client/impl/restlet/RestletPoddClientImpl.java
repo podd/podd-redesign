@@ -102,7 +102,7 @@ public class RestletPoddClientImpl implements PoddClient
     {
         this.log.info("cookies: {}", this.currentCookies);
         
-        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
         resource.getCookies().addAll(this.currentCookies);
         resource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
         
