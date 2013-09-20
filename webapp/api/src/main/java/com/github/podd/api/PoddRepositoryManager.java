@@ -22,6 +22,7 @@ package com.github.podd.api;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * Interface to manage the Sesame Repository used by PODD.
@@ -95,5 +96,13 @@ public interface PoddRepositoryManager
      * @param schemaManagementGraph
      */
     void setSchemaManagementGraph(URI schemaManagementGraph);
+    
+    /**
+     * Shutdown the repository manager, including any active repositories.
+     * 
+     * @throws RepositoryException
+     *             If there were issues shutting down the active repositories.
+     */
+    void shutDown() throws RepositoryException;
     
 }

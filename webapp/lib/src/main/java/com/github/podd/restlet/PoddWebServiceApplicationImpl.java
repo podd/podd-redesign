@@ -257,10 +257,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         try
         {
             // clear all resources and shut down PODD
-            if(this.getPoddRepositoryManager().getRepository() != null)
-            {
-                this.getPoddRepositoryManager().getRepository().shutDown();
-            }
+            this.getPoddRepositoryManager().shutDown();
         }
         catch(final OpenRDFException e)
         {

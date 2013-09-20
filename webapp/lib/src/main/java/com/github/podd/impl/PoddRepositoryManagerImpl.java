@@ -134,4 +134,13 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
         this.schemaGraph = schemaManagementGraph;
     }
     
+    @Override
+    public void shutDown() throws RepositoryException
+    {
+        if(this.repository != null)
+        {
+            this.repository.shutDown();
+        }
+    }
+    
 }
