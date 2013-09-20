@@ -360,7 +360,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         final Model resultModel = this.internalTestSearchRdf("e", searchTypes, requestMediaType, null);
         
         // verify:
-        Assert.assertEquals("Not the expected number of results", 204, resultModel.size());
+        Assert.assertEquals("Not the expected number of results", 205, resultModel.size());
         
         Assert.assertEquals(
                 "dcTerms not found",

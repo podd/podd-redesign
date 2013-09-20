@@ -75,11 +75,11 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         this.assertFreemarker(body);
         
         Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
-        Assert.assertTrue("Page missing first name", body.contains("Test Admin"));
+        Assert.assertTrue("Page missing first name", body.contains("Initial Admin"));
         Assert.assertTrue("Page missing last name", body.contains("User"));
-        Assert.assertTrue("Page missing organization", body.contains("UQ"));
+        Assert.assertTrue("Page missing organization", body.contains("Local Organisation"));
         Assert.assertTrue("Page missing home page", body.contains("http://www.example.com/testAdmin"));
-        Assert.assertTrue("Page missing orcid", body.contains("Orcid-Test-Admin"));
+        Assert.assertTrue("Page missing orcid", body.contains("Dummy-ORCID"));
     }
     
     /**

@@ -170,7 +170,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         final String body = results.getText();
         Assert.assertTrue(body.contains("Personal Details"));
         Assert.assertTrue(body.contains("User Name: "));
-        Assert.assertTrue(body.contains("test.admin.user@example.com"));
+        Assert.assertTrue(body.contains("initial.admin.user@example.com"));
         this.assertFreemarker(body);
     }
     

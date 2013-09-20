@@ -20,6 +20,7 @@ import info.aduna.iteration.Iterations;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -390,7 +391,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         throws ResourceException
     {
         List<FileItem> items;
-        Path file = null;
+        Path filePath = null;
         String contentType = null;
         
         // 1: Create a factory for disk-based file items
@@ -424,9 +425,10 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                         contentType = fi.getContentType();
                         props.put("Content-Type", fi.getContentType());
                         
-                        file = Files.createTempFile(this.tempDirectory, "ontologyupload-", name);
-                        
-                        fi.write(file.toFile());
+                        filePath = Files.createTempFile(this.tempDirectory, "ontologyupload-", name);
+                        File file = filePath.toFile();
+                        file.deleteOnExit();
+                        fi.write(file);
                     }
                     catch(final IOException ioe)
                     {
@@ -448,12 +450,12 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("props={}", props.toString());
         
-        if(file == null)
+        if(filePath == null)
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Did not submit a valid file and filename");
         }
         
-        this.log.info("filename={}", file.toAbsolutePath().toString());
+        this.log.info("filename={}", filePath.toAbsolutePath().toString());
         this.log.info("contentType={}", contentType);
         
         RDFFormat format = null;
@@ -462,7 +464,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         // Browsers attach this content type when they are not sure what the real type is
         if(MediaType.APPLICATION_OCTET_STREAM.getName().equals(contentType))
         {
-            format = Rio.getParserFormatForFileName(file.getFileName().toString());
+            format = Rio.getParserFormatForFileName(filePath.getFileName().toString());
             
             this.log.info("octet-stream contentType filename format={}", format);
         }
@@ -477,7 +479,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         // If the content type choices failed to resolve the type, then try the filename
         if(format == null)
         {
-            format = Rio.getParserFormatForFileName(file.getFileName().toString());
+            format = Rio.getParserFormatForFileName(filePath.getFileName().toString());
             
             this.log.info("non-content-type filename format={}", format);
         }
@@ -491,8 +493,7 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         try (final InputStream inputStream =
-                new BufferedInputStream(Files.newInputStream(file, StandardOpenOption.READ,
-                        StandardOpenOption.DELETE_ON_CLOSE));)
+                new BufferedInputStream(Files.newInputStream(filePath, StandardOpenOption.READ));)
         {
             return this.uploadFileAndLoadArtifactIntoPodd(inputStream, format, DanglingObjectPolicy.REPORT,
                     DataReferenceVerificationPolicy.DO_NOT_VERIFY);
