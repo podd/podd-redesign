@@ -1131,28 +1131,30 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             return results;
         }
         
-        final StringBuilder annotationQuery = new StringBuilder(1024);
-        
-        annotationQuery.append("CONSTRUCT { ");
-        annotationQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
-        annotationQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
-        annotationQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?annotationProperty . ");
-        annotationQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
-        
-        annotationQuery.append("} WHERE {");
-        annotationQuery.append(" ?annotationProperty <" + RDFS.RANGE.stringValue() + "> ?rangeClass . ");
-        annotationQuery.append("}");
-        final String annotationQueryString = annotationQuery.toString();
         /*
          * add statements for annotation properties RDFS:Label and RDFS:Comment
          */
         if(containsPropertyPolicy != MetadataPolicy.ONLY_CONTAINS)
         {
+            final StringBuilder annotationQuery = new StringBuilder(1024);
+            
+            annotationQuery.append("CONSTRUCT { ");
+            annotationQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
+            annotationQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+            annotationQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?annotationProperty . ");
+            annotationQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass . ");
+            
+            annotationQuery.append("} WHERE {");
+            annotationQuery.append(" ?annotationProperty <" + RDFS.RANGE.stringValue() + "> ?rangeClass . ");
+            annotationQuery.append("}");
+            final String annotationQueryString = annotationQuery.toString();
+            
+            final GraphQuery annotationGraphQuery =
+                    repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, annotationQueryString);
+            
             final URI[] commonAnnotationProperties = { RDFS.LABEL, RDFS.COMMENT };
             for(final URI annotationProperty : commonAnnotationProperties)
             {
-                final GraphQuery annotationGraphQuery =
-                        repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, annotationQueryString);
                 annotationGraphQuery.setBinding("objectType", objectType);
                 annotationGraphQuery.setBinding("annotationProperty", annotationProperty);
                 
