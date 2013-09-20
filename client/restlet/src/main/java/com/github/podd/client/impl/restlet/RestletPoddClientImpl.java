@@ -592,7 +592,8 @@ public class RestletPoddClientImpl implements PoddClient
             this.log.info("login result status: {}", resource.getStatus());
             if(rep != null)
             {
-                this.log.info("login result: {}", rep.getText());
+                // FIXME: Representation.getText may be implemented badly, so avoid calling it
+                // this.log.info("login result: {}", rep.getText());
             }
             else
             {
@@ -609,16 +610,10 @@ public class RestletPoddClientImpl implements PoddClient
             
             return !this.currentCookies.isEmpty();
         }
-        catch(final ResourceException e)
+        catch(final Throwable e)
         {
             this.currentCookies.clear();
             this.log.warn("Error with request", e);
-            throw new PoddClientException(e);
-        }
-        catch(final IOException e)
-        {
-            this.currentCookies.clear();
-            this.log.warn("Error with getting login result text for debugging", e);
             throw new PoddClientException(e);
         }
     }
@@ -653,7 +648,8 @@ public class RestletPoddClientImpl implements PoddClient
             
             if(rep != null)
             {
-                this.log.info("logout result: {}", rep.getText());
+                // FIXME: Representation.getText may be implemented badly, so avoid calling it
+                // this.log.info("logout result: {}", rep.getText());
             }
             else
             {
@@ -666,14 +662,9 @@ public class RestletPoddClientImpl implements PoddClient
             
             return true;
         }
-        catch(final ResourceException e)
+        catch(final Throwable e)
         {
             this.log.warn("Error with request", e);
-            throw new PoddClientException(e);
-        }
-        catch(final IOException e)
-        {
-            this.log.warn("Error with getting logout result text for debugging", e);
             throw new PoddClientException(e);
         }
     }

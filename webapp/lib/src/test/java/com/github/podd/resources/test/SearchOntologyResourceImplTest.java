@@ -205,9 +205,7 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: response
-        final String body = results.getText();
-        final Model resultModel =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 5);
+        final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 5);
         
         // verify: each URI has the expected label
         for(int i = 0; i < objectUris.length; i++)

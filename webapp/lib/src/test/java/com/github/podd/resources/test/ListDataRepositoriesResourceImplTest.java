@@ -51,7 +51,7 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         final Representation result =
                 RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final String body = result.getText();
+        final String body = getText(result);
         
         // System.out.println(body);
         
@@ -113,14 +113,12 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
         
-        final Representation result =
+        final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                         RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = result.getText();
-        
         // verify:
-        final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 3);
+        final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 3);
         
         // DebugUtils.printContents(model);
     }
@@ -175,14 +173,12 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
         
-        final Representation result =
+        final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = result.getText();
-        
         // verify:
-        final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 3);
+        final Model model = this.assertRdf(results, RDFFormat.RDFXML, 3);
         
         // DebugUtils.printContents(model);
     }

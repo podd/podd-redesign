@@ -18,6 +18,7 @@ package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
@@ -78,9 +79,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: response has correct identifier
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(new StringReader(getText(modifiedResults)), RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
@@ -134,9 +133,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: response has correct identifier
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
@@ -169,7 +166,7 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         // System.out.println(body);
         this.assertFreemarker(body);
         

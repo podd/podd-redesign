@@ -211,6 +211,12 @@ public class AbstractResourceImplTest
         return this.assertRdf(new InputStreamReader(inputStream), format, expectedStatements);
     }
     
+    protected Model assertRdf(final Representation representation, final RDFFormat format, final int expectedStatements)
+        throws RDFParseException, RDFHandlerException, IOException
+    {
+        return this.assertRdf(new StringReader(getText(representation)), format, expectedStatements);
+    }
+    
     /**
      * Utility method to verify that RDF documents can be parsed and the resulting number of
      * statements is as expected.
@@ -284,7 +290,7 @@ public class AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        return results.getText();
+        return getText(results);
     }
     
     /**
@@ -355,15 +361,7 @@ public class AbstractResourceImplTest
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        File folder = tempDirectory.newFolder("load-test-artifact-" + UUID.randomUUID().toString());
-        Path destination = folder.toPath().resolve("next.ttl");
-        Files.copy(results.getStream(), destination);
-        ByteArrayOutputStream result = new ByteArrayOutputStream(4096);
-        // verify: results (expecting the added artifact's ontology IRI)
-        Files.copy(destination, result);
-        
-        String body = new String(result.toByteArray(), StandardCharsets.UTF_8);
-        
+        String body = getText(results);
         // this.log.info(body);
         this.assertFreemarker(body);
         
@@ -371,6 +369,19 @@ public class AbstractResourceImplTest
         
         Assert.assertEquals("Should have got only 1 Ontology ID", 1, ontologyIDs.size());
         return ontologyIDs.iterator().next();
+    }
+    
+    protected String getText(Representation representation) throws IOException
+    {
+        File folder = tempDirectory.newFolder("temp-representation-" + UUID.randomUUID().toString());
+        Path destination = folder.toPath().resolve("next.dat");
+        Files.copy(representation.getStream(), destination);
+        ByteArrayOutputStream result = new ByteArrayOutputStream(4096);
+        // verify: results (expecting the added artifact's ontology IRI)
+        Files.copy(destination, result);
+        
+        String body = new String(result.toByteArray(), StandardCharsets.UTF_8);
+        return body;
     }
     
     /**
@@ -488,9 +499,7 @@ public class AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: response has 1 statement and identifier is correct
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(new StringReader(getText(results)), RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
@@ -537,9 +546,7 @@ public class AbstractResourceImplTest
         final Representation modifiedResults =
                 RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(new StringReader(getText(modifiedResults)), RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", userIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
     }

@@ -59,7 +59,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userListRolesClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         System.out.println(body);
         this.assertFreemarker(body);
         
@@ -77,8 +77,7 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userListlientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 16);
+        final Model resultsModel = this.assertRdf(results, format, 16);
         
         // verify:
         final Set<Resource> subjects =

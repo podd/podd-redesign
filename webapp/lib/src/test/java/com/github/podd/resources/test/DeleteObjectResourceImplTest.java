@@ -17,6 +17,7 @@
 package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
@@ -57,18 +58,15 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
                 .getOntologyIRI().toString());
         deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
                 .getVersionIRI().toString());
-        deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER,
-                objectToDelete);
+        deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectToDelete);
         deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_CASCADE, Boolean.toString(false));
-        
         
         Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
                         MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        
         // verify: response contains updated artifact's ID
-        final String updatedArtifactDetails = results.getText();
+        final String updatedArtifactDetails = getText(results);
         Assert.assertTrue("Artifact version has not been updated properly",
                 updatedArtifactDetails.contains("artifact:1:version:2"));
         
@@ -78,7 +76,6 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
         Assert.assertTrue("Object not deleted", retrievedArtifact.filter(objectToDeleteUri, null, null).isEmpty());
         Assert.assertTrue("Object not deleted", retrievedArtifact.filter(null, null, objectToDeleteUri).isEmpty());
     }
-    
     
     private Model getArtifact(final String artifactUri, final int expectedStatementCount) throws Exception
     {
@@ -92,8 +89,7 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
                         MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         final Model model =
-                this.assertRdf(new ByteArrayInputStream(getArtifactResult.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, expectedStatementCount);
+                this.assertRdf(new StringReader(getText(getArtifactResult)), RDFFormat.RDFXML, expectedStatementCount);
         
         return model;
     }

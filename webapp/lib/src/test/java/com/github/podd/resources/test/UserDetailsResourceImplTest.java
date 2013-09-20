@@ -146,7 +146,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         Assert.assertTrue(body.contains("User Name: "));
         Assert.assertTrue(body.contains("testuser@podd.com"));
         this.assertFreemarker(body);
@@ -167,7 +167,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         Assert.assertTrue(body.contains("Personal Details"));
         Assert.assertTrue(body.contains("User Name: "));
         Assert.assertTrue(body.contains("initial.admin.user@example.com"));
@@ -192,8 +192,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 11);
+        final Model resultsModel = this.assertRdf(results, format, 11);
         
         // DebugUtils.printContents(resultsModel);
         Assert.assertEquals("Not the expected identifier", "testAdminUser",
@@ -236,8 +235,7 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 12);
+        final Model resultsModel = this.assertRdf(results, format, 12);
         
         // verify:
         Assert.assertEquals("Not the expected User URI", testUserUri,

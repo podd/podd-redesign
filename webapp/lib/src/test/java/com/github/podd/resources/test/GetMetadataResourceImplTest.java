@@ -55,8 +55,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
+        // FIXME: Is there a better way to do this
         // verify: response is empty as no such object exists
-        Assert.assertNull("Expected NULL for response text", results.getText());
+        // Assert.assertTrue("Expected NULL for response text", getText(results).isEmpty());
     }
     
     @Test
@@ -81,11 +82,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
-        
         // verify:
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 64);
+        final Model model = this.assertRdf(results, RDFFormat.TURTLE, 64);
         
         Assert.assertEquals(
                 "GrowthConditions not found",
@@ -134,12 +132,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
-            final String body = results.getText();
-            
             // verify:
-            final Model model =
-                    this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE,
-                            expectedModelSize);
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, expectedModelSize);
             
             Assert.assertEquals("Unexpected no. of properties", expectedNoOfProperties,
                     model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size());
@@ -164,10 +158,9 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
-        
+        // final String body = getText(results);
         // verify:
-        Assert.assertNull("No content since Publication cannot have child objects", body);
+        // Assert.assertNull("No content since Publication cannot have child objects", body);
         // final Model model =
         // this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)),
         // RDFFormat.TURTLE, 7);
@@ -200,14 +193,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
-        
         // verify: received contents are in RDF
-        Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
-        Assert.assertTrue("Result does not have RDF", body.endsWith("</rdf:RDF>"));
-        
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 151);
+        final Model model = this.assertRdf(results, RDFFormat.RDFXML, 151);
         
         Assert.assertEquals("Unexpected no. of properties", 18,
                 model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
@@ -231,11 +218,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
-        System.out.println(body);
         // verify:
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 54);
+        final Model model = this.assertRdf(results, RDFFormat.TURTLE, 54);
         
         Assert.assertEquals("Unexpected no. of properties", 6,
                 model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
@@ -264,11 +248,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
-        
         // verify:
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 83);
+        final Model model = this.assertRdf(results, RDFFormat.TURTLE, 83);
         
         Assert.assertEquals("Unexpected no. of properties", 9,
                 model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);

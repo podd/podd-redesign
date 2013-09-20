@@ -58,10 +58,10 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify:
-        System.out.println("results:" + body);
+        // System.out.println("results:" + body);
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
         
@@ -91,10 +91,10 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify:
-        System.out.println("results:" + body);
+        // System.out.println("results:" + body);
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
         
@@ -124,12 +124,8 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                         RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
-        
         // verify:
-        System.out.println("results:" + body);
-        
-        this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFJSON, 0);
+        this.assertRdf(results, RDFFormat.RDFJSON, 0);
     }
     
     /**
@@ -154,12 +150,8 @@ public class ListArtifactsResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(listArtifactsClientResource, Method.GET, null,
                         RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
-        
         // verify:
-        System.out.println("results:" + body);
-        
-        this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFJSON, 10);
+        this.assertRdf(results, RDFFormat.RDFJSON, 10);
     }
     
 }

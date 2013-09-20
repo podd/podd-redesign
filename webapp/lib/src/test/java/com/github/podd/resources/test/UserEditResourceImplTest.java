@@ -18,6 +18,7 @@ package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.LinkedList;
@@ -70,7 +71,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         System.out.println(body);
         this.assertFreemarker(body);
         
@@ -102,8 +103,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final Model userInfoModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 11);
+        final Model userInfoModel = this.assertRdf(results, format, 11);
         // this.log.info("Retrieved [{}] details. ", testIdentifier);
         // DebugUtils.printContents(userInfoModel);
         
@@ -134,9 +134,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: response has correct identifier
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
@@ -149,9 +147,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 11);
+        final Model resultsModel = this.assertRdf(updatedResults, format, 11);
         
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -197,7 +193,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         // System.out.println(body);
         this.assertFreemarker(body);
         
@@ -240,8 +236,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final Model userInfoModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 16);
+        final Model userInfoModel = this.assertRdf(results, format, 16);
         // this.log.info("Retrieved [{}] details. ", testIdentifier);
         // DebugUtils.printContents(userInfoModel);
         
@@ -274,9 +269,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: response has correct identifier
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
@@ -289,9 +282,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 16);
+        final Model resultsModel = this.assertRdf(updatedResults, format, 16);
         
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
@@ -342,9 +333,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: response has correct identifier
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
@@ -439,8 +428,7 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final Model userInfoModel =
-                this.assertRdf(new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8)), format, 16);
+        final Model userInfoModel = this.assertRdf(results, format, 16);
         // this.log.info("Retrieved [{}] details. ", testIdentifier);
         // DebugUtils.printContents(userInfoModel);
         
@@ -459,11 +447,10 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 PoddRdfConstants.VF.createLiteral(modifiedLastName));
         
         // try to submit modified details to Edit User Service
-        final ClientResource userEditClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
         userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final StringWriter out = new StringWriter();
         Rio.write(userInfoModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
         

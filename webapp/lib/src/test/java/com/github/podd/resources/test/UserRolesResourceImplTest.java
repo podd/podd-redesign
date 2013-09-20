@@ -117,9 +117,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final Representation modifiedResults =
                 RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
@@ -131,9 +129,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final Representation updatedResults =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 43);
+        final Model resultsModel = this.assertRdf(updatedResults, format, 43);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
@@ -196,9 +192,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final Representation modifiedResults =
                 RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(modifiedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
@@ -210,9 +204,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final Representation updatedResults =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 31);
+        final Model resultsModel = this.assertRdf(updatedResults, format, 31);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
@@ -294,9 +286,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final Representation updatedResults =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 15);
+        final Model resultsModel = this.assertRdf(updatedResults, format, 15);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
@@ -380,9 +370,7 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final Representation updatedResults =
                 RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model resultsModel =
-                this.assertRdf(new ByteArrayInputStream(updatedResults.getText().getBytes(StandardCharsets.UTF_8)),
-                        format, 20);
+        final Model resultsModel = this.assertRdf(updatedResults, format, 20);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),

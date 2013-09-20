@@ -17,6 +17,7 @@
 package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
@@ -186,7 +187,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify:
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
@@ -218,7 +219,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify:
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
@@ -230,8 +231,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         
         this.assertFreemarker(body);
         
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 12);
+        final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFA, 12);
         
         // RDFa generates spurious triples, use at your own risk
         // Only rely on numbers from actual RDF serialisations
@@ -263,7 +263,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify: received contents are in RDF/JSON
         // Assert.assertTrue("Result does not have @prefix", body.contains("@prefix"));
@@ -271,8 +271,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         // verify: received contents have artifact's ontology and version IRIs
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
         
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFJSON, 29);
+        final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 29);
         
         Assert.assertEquals(6, model.subjects().size());
         Assert.assertEquals(15, model.predicates().size());
@@ -302,7 +301,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify: received contents are in RDF
         Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
@@ -311,8 +310,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         // verify: received contents have artifact URI
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
         
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 29);
+        final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 29);
         
         Assert.assertEquals(6, model.subjects().size());
         Assert.assertEquals(15, model.predicates().size());
@@ -342,7 +340,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText().trim();
+        final String body = getText(results).trim();
         
         // verify: received contents are in Turtle
         Assert.assertTrue("Turtle result did not have namespaces", body.contains("@prefix"));
@@ -351,8 +349,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         // verify: received contents have artifact's ontology and version IRIs
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
         
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.TURTLE, 29);
+        final Model model = this.assertRdf(new StringReader(body), RDFFormat.TURTLE, 29);
         
         Assert.assertEquals(6, model.subjects().size());
         Assert.assertEquals(15, model.predicates().size());
@@ -385,7 +382,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify:
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
@@ -417,8 +414,8 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
-        final String body = results.getText();
-
+        final String body = getText(results);
+        
         // verify:
         Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
@@ -442,7 +439,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         this.mapUserToRole("anotherUser", PoddRoles.PROJECT_ADMIN, artifactUri);
-
         
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -453,7 +449,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify:
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
@@ -478,7 +474,6 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         final String artifactUri = this.loadTestArtifact(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
         
         this.mapUserToRole("anotherUser", PoddRoles.PROJECT_OBSERVER, artifactUri);
-
         
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
@@ -489,7 +484,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify:
         Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
@@ -525,7 +520,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
                 RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                         MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
         
-        final String body = results.getText();
+        final String body = getText(results);
         
         // verify: received contents are in RDF
         Assert.assertTrue("Result does not have RDF", body.contains("<rdf:RDF"));
@@ -534,8 +529,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         // verify: received contents have artifact URI
         Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
         
-        final Model model =
-                this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFXML, 29);
+        final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 29);
         
         Assert.assertEquals(6, model.subjects().size());
         Assert.assertEquals(15, model.predicates().size());
@@ -565,7 +559,7 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
         sb.append("<body>");
         sb.append("</body>");
         sb.append("</html>");
-        this.assertRdf(new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)), RDFFormat.RDFA, 1);
+        this.assertRdf(new StringReader(sb.toString()), RDFFormat.RDFA, 1);
     }
     
 }

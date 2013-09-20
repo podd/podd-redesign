@@ -18,6 +18,7 @@ package com.github.podd.performance.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
@@ -131,8 +132,7 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // load into a Model and find statement count
-        final InputStream input = new ByteArrayInputStream(results.getText().getBytes(StandardCharsets.UTF_8));
-        final Model model = Rio.parse(input, "", RDFFormat.TURTLE);
+        final Model model = Rio.parse(new StringReader(getText(results)), "", RDFFormat.TURTLE);
         
         return model.size();
     }
@@ -156,7 +156,7 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
                         MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: results (expecting the added artifact's ontology IRI)
-        final String body = results.getText();
+        final String body = getText(results);
         Assert.assertTrue(body.contains("http://"));
         Assert.assertFalse(body.contains("html"));
         Assert.assertFalse(body.contains("\n"));
