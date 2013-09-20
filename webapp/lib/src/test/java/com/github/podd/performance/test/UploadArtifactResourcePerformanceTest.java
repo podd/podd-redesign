@@ -57,7 +57,7 @@ import com.github.podd.utils.PoddWebConstants;
 public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplTest
 {
     
-    @Parameters
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data()
     {
         final Object[][] data =
