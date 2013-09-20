@@ -66,17 +66,18 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testErrorUploadWithInconsistentArtifactRdf() throws Exception
     {
+        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
+        final RDFFormat responseFormat = RDFFormat.forMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES,
-                        MediaType.APPLICATION_RDF_XML);
-        
-        final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
-        final RDFFormat responseFormat = RDFFormat.forMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         try
         {
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_BAD_2_LEAD_INSTITUTES,
+                            MediaType.APPLICATION_RDF_XML);
+            
             RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input, mediaType,
                     Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
         }
@@ -110,6 +111,10 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals("Not the expected error source", "urn:temp:inconsistentArtifact:1",
                     model.filter(errorNode, PoddRdfConstants.ERR_SOURCE, null).objectString());
         }
+        finally
+        {
+            releaseClient(uploadArtifactClientResource);
+        }
     }
     
     /**
@@ -119,15 +124,16 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testErrorUploadWithNotInOwlDlProfileArtifactRdf() throws Exception
     {
-        final ClientResource uploadArtifactClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
-        
         final Representation input =
                 this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_BAD_NOT_OWL_DL,
                         MediaType.APPLICATION_RDF_XML);
         
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat responseFormat = RDFFormat.forMIMEType(mediaType.getName(), RDFFormat.RDFXML);
+        
+        final ClientResource uploadArtifactClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
+        
         try
         {
             RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input, mediaType,
@@ -166,6 +172,10 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                                     .createLiteral("ClassAssertion(owl:Individual <mailto:helen.daily@csiro.au>)"))
                             .size());
         }
+        finally
+        {
+            releaseClient(uploadArtifactClientResource);
+        }
     }
     
     /**
@@ -174,25 +184,29 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testErrorUploadWithoutAuthentication() throws Exception
     {
-        final ClientResource uploadArtifactResource =
+        final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
-        
-        final Representation input =
-                this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
-                        MediaType.APPLICATION_RDF_XML);
-        
-        final FormDataSet form = new FormDataSet();
-        form.setMultipart(true);
-        form.getEntries().add(new FormData("file", input));
         
         try
         {
-            uploadArtifactResource.post(form, MediaType.TEXT_HTML);
+            final Representation input =
+                    this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
+                            MediaType.APPLICATION_RDF_XML);
+            
+            final FormDataSet form = new FormDataSet();
+            form.setMultipart(true);
+            form.getEntries().add(new FormData("file", input));
+            
+            uploadArtifactClientResource.post(form, MediaType.TEXT_HTML);
             Assert.fail("Should have thrown a ResourceException with Status Code 401");
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(uploadArtifactClientResource);
         }
     }
     
@@ -205,11 +219,11 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final FormDataSet form = new FormDataSet();
-        form.setMultipart(true);
-        
         try
         {
+            final FormDataSet form = new FormDataSet();
+            form.setMultipart(true);
+            
             RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
                     MediaType.TEXT_HTML, Status.CLIENT_ERROR_BAD_REQUEST, this.testWithAdminPrivileges);
             Assert.fail("Should have thrown a ResourceException with Status Code 400");
@@ -217,6 +231,10 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         catch(final ResourceException e)
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(uploadArtifactClientResource);
         }
     }
     
@@ -230,15 +248,22 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        Assert.assertTrue(body.contains("Upload new artifact"));
-        Assert.assertTrue(body.contains("type=\"file\""));
-        
-        this.assertFreemarker(body);
+        try
+        {
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            Assert.assertTrue(body.contains("Upload new artifact"));
+            Assert.assertTrue(body.contains("type=\"file\""));
+            
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(getArtifactClientResource);
+        }
     }
     
     @Ignore("When this test is active, it seems to slow down other tests so far that they don't complete normally")
@@ -357,23 +382,29 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
-        
-        final Representation input =
-                this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
-                        MediaType.APPLICATION_RDF_XML);
-        
-        final FormDataSet form = new FormDataSet();
-        form.setMultipart(true);
-        form.getEntries().add(new FormData("file", input));
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // TODO: verify results once a proper success page is incorporated.
-        final String body = getText(results);
-        Assert.assertTrue(body.contains("Project successfully uploaded"));
-        this.assertFreemarker(body);
+        try
+        {
+            final Representation input =
+                    this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
+                            MediaType.APPLICATION_RDF_XML);
+            
+            final FormDataSet form = new FormDataSet();
+            form.setMultipart(true);
+            form.getEntries().add(new FormData("file", input));
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // TODO: verify results once a proper success page is incorporated.
+            final String body = getText(results);
+            Assert.assertTrue(body.contains("Project successfully uploaded"));
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(uploadArtifactClientResource);
+        }
     }
     
     /**
@@ -385,20 +416,26 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
-        
-        final Representation input =
-                this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
-                        MediaType.APPLICATION_RDF_XML);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: results (expecting the added artifact's ontology IRI)
-        final String body = results.getText();
-        Assert.assertTrue(body.contains("http://"));
-        Assert.assertFalse(body.contains("html"));
-        Assert.assertFalse(body.contains("\n"));
+        try
+        {
+            final Representation input =
+                    this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
+                            MediaType.APPLICATION_RDF_XML);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                            MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: results (expecting the added artifact's ontology IRI)
+            final String body = getText(results);
+            Assert.assertTrue(body.contains("http://"));
+            Assert.assertFalse(body.contains("html"));
+            Assert.assertFalse(body.contains("\n"));
+        }
+        finally
+        {
+            releaseClient(uploadArtifactClientResource);
+        }
     }
     
     /**
@@ -411,23 +448,30 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final Representation input =
-                this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
-                        MediaType.APPLICATION_RDF_XML);
-        
-        final FormDataSet form = new FormDataSet();
-        form.setMultipart(true);
-        form.getEntries().add(new FormData("file", input));
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
-                        MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: results (expecting the added artifact's ontology IRI)
-        final String body = results.getText();
-        Assert.assertTrue(body.contains("http://"));
-        Assert.assertFalse(body.contains("html"));
-        Assert.assertFalse(body.contains("\n"));
+        try
+        {
+            final Representation input =
+                    this.buildRepresentationFromResource("/test/artifacts/basicProject-1-internal-object.rdf",
+                            MediaType.APPLICATION_RDF_XML);
+            
+            final FormDataSet form = new FormDataSet();
+            form.setMultipart(true);
+            form.getEntries().add(new FormData("file", input));
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, form,
+                            MediaType.TEXT_PLAIN, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: results (expecting the added artifact's ontology IRI)
+            final String body = getText(results);
+            Assert.assertTrue(body.contains("http://"));
+            Assert.assertFalse(body.contains("html"));
+            Assert.assertFalse(body.contains("\n"));
+        }
+        finally
+        {
+            releaseClient(uploadArtifactClientResource);
+        }
     }
     
     /**
@@ -440,23 +484,31 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_TTL_1_INTERNAL_OBJECT,
-                        MediaType.APPLICATION_RDF_TURTLE);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: results (expecting the added artifact's ontology IRI)
-        final String body = results.getText();
-        
-        final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
-        
-        Assert.assertNotNull("No ontology IDs in response", ontologyIDs);
-        Assert.assertEquals("More than 1 ontology ID in response", 1, ontologyIDs.size());
-        Assert.assertTrue("Ontology ID not of expected format",
-                ontologyIDs.iterator().next().toString().contains("artifact:1:version:1"));
+        try
+        {
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_TTL_1_INTERNAL_OBJECT,
+                            MediaType.APPLICATION_RDF_TURTLE);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: results (expecting the added artifact's ontology IRI)
+            final String body = getText(results);
+            
+            final Collection<InferredOWLOntologyID> ontologyIDs =
+                    OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
+            
+            Assert.assertNotNull("No ontology IDs in response", ontologyIDs);
+            Assert.assertEquals("More than 1 ontology ID in response", 1, ontologyIDs.size());
+            Assert.assertTrue("Ontology ID not of expected format",
+                    ontologyIDs.iterator().next().toString().contains("artifact:1:version:1"));
+        }
+        finally
+        {
+            releaseClient(uploadArtifactClientResource);
+        }
     }
     
 }

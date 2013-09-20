@@ -65,22 +65,29 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     {
         final String testIdentifier = "testAdminUser";
         final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
-        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        System.out.println(body);
-        this.assertFreemarker(body);
-        
-        Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
-        Assert.assertTrue("Page missing first name", body.contains("Initial Admin"));
-        Assert.assertTrue("Page missing last name", body.contains("User"));
-        Assert.assertTrue("Page missing organization", body.contains("Local Organisation"));
-        Assert.assertTrue("Page missing home page", body.contains("http://www.example.com/testAdmin"));
-        Assert.assertTrue("Page missing orcid", body.contains("Dummy-ORCID"));
+        try
+        {
+            userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            System.out.println(body);
+            this.assertFreemarker(body);
+            
+            Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
+            Assert.assertTrue("Page missing first name", body.contains("Initial Admin"));
+            Assert.assertTrue("Page missing last name", body.contains("User"));
+            Assert.assertTrue("Page missing organization", body.contains("Local Organisation"));
+            Assert.assertTrue("Page missing home page", body.contains("http://www.example.com/testAdmin"));
+            Assert.assertTrue("Page missing orcid", body.contains("Dummy-ORCID"));
+        }
+        finally
+        {
+            releaseClient(userEditClientResource);
+        }
     }
     
     /**
@@ -99,67 +106,89 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
         userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        try
+        {
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model userInfoModel = this.assertRdf(results, format, 11);
+            // this.log.info("Retrieved [{}] details. ", testIdentifier);
+            // DebugUtils.printContents(userInfoModel);
+            
+            // prepare: modify existing User's details
+            final String modifiedFirstName = "Totally";
+            final String modifiedLastName = "Newman";
+            
+            final Resource userUri =
+                    userInfoModel.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).subjects().iterator().next();
+            
+            userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
+            userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
+            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
+                    PoddRdfConstants.VF.createLiteral(modifiedFirstName));
+            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
+                    PoddRdfConstants.VF.createLiteral(modifiedLastName));
+            // submit modified details to Edit User Service
+            final ClientResource userEditClientResource =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+            try
+            {
+                userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+                
+                final ByteArrayOutputStream out = new ByteArrayOutputStream();
+                Rio.write(userInfoModel, out, format);
+                final Representation input = new StringRepresentation(out.toString(), mediaType);
+                
+                final Representation modifiedResults =
+                        RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input,
+                                mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                
+                // verify: response has correct identifier
+                final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
+                Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                        model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+                
+                // verify: details have been correctly updated (by retrieving User details again)
+                final ClientResource userDetailsClientResource2 =
+                        new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+                try
+                {
+                    userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+                    
+                    final Representation updatedResults =
+                            RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null,
+                                    mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                    
+                    final Model resultsModel = this.assertRdf(updatedResults, format, 11);
+                    
+                    Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                            resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+                    Assert.assertEquals("Unexpected user URI", userUri.stringValue(),
+                            resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects()
+                                    .iterator().next().stringValue());
+                    Assert.assertEquals("First name was not modified", modifiedFirstName,
+                            resultsModel.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString());
+                    Assert.assertEquals("Last name was not modified", modifiedLastName,
+                            resultsModel.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString());
+                    Assert.assertEquals("Role count should not have changed", 1,
+                            resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
+                }
+                finally
+                {
+                    releaseClient(userDetailsClientResource2);
+                }
+            }
+            finally
+            {
+                releaseClient(userEditClientResource);
+            }
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
+        }
         
-        final Model userInfoModel = this.assertRdf(results, format, 11);
-        // this.log.info("Retrieved [{}] details. ", testIdentifier);
-        // DebugUtils.printContents(userInfoModel);
-        
-        // prepare: modify existing User's details
-        final String modifiedFirstName = "Totally";
-        final String modifiedLastName = "Newman";
-        
-        final Resource userUri =
-                userInfoModel.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).subjects().iterator().next();
-        
-        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
-        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(modifiedFirstName));
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
-                PoddRdfConstants.VF.createLiteral(modifiedLastName));
-        
-        // submit modified details to Edit User Service
-        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
-        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(userInfoModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
-        final Representation modifiedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response has correct identifier
-        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // verify: details have been correctly updated (by retrieving User details again)
-        final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation updatedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model resultsModel = this.assertRdf(updatedResults, format, 11);
-        
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Unexpected user URI", userUri.stringValue(),
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next()
-                        .stringValue());
-        Assert.assertEquals("First name was not modified", modifiedFirstName,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString());
-        Assert.assertEquals("Last name was not modified", modifiedLastName,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString());
-        Assert.assertEquals("Role count should not have changed", 1,
-                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
     }
     
     /**
@@ -187,26 +216,33 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
                 PoddUserStatus.ACTIVE);
         
         final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
-        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        // System.out.println(body);
-        this.assertFreemarker(body);
-        
-        Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
-        Assert.assertTrue("Page missing title", body.contains(testTitle));
-        Assert.assertTrue("Page missing first name", body.contains(testFirstName));
-        Assert.assertTrue("Page missing last name", body.contains(testLastName));
-        Assert.assertTrue("Page missing organization", body.contains(testOrganization));
-        Assert.assertTrue("Page missing phone", body.contains(testPhone));
-        Assert.assertTrue("Page missing position", body.contains(testPosition));
-        Assert.assertTrue("Page missing address", body.contains(testAddress));
-        Assert.assertTrue("Page missing home page", body.contains(testHomePage));
-        Assert.assertTrue("Page missing orcid", body.contains(testOrcid));
+        try
+        {
+            userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            // System.out.println(body);
+            this.assertFreemarker(body);
+            
+            Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
+            Assert.assertTrue("Page missing title", body.contains(testTitle));
+            Assert.assertTrue("Page missing first name", body.contains(testFirstName));
+            Assert.assertTrue("Page missing last name", body.contains(testLastName));
+            Assert.assertTrue("Page missing organization", body.contains(testOrganization));
+            Assert.assertTrue("Page missing phone", body.contains(testPhone));
+            Assert.assertTrue("Page missing position", body.contains(testPosition));
+            Assert.assertTrue("Page missing address", body.contains(testAddress));
+            Assert.assertTrue("Page missing home page", body.contains(testHomePage));
+            Assert.assertTrue("Page missing orcid", body.contains(testOrcid));
+        }
+        finally
+        {
+            releaseClient(userEditClientResource);
+        }
     }
     
     /**
@@ -230,73 +266,95 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         // prepare: retrieve Details of existing User
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model userInfoModel = this.assertRdf(results, format, 16);
-        // this.log.info("Retrieved [{}] details. ", testIdentifier);
-        // DebugUtils.printContents(userInfoModel);
-        
-        // prepare: modify existing User's details
-        final String modifiedFirstName = "Totally";
-        final String modifiedLastName = "Newman";
-        
-        final Resource userUri =
-                userInfoModel.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).subjects().iterator().next();
-        
-        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
-        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
-        userInfoModel.remove(userUri, PoddRdfConstants.PODD_USER_STATUS, null);
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(modifiedFirstName));
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
-                PoddRdfConstants.VF.createLiteral(modifiedLastName));
-        userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
-        
-        // submit modified details to Edit User Service
-        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
-        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(userInfoModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
-        final Representation modifiedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response has correct identifier
-        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // verify: details have been correctly updated (by retrieving User details again)
-        final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation updatedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model resultsModel = this.assertRdf(updatedResults, format, 16);
-        
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Unexpected user URI", userUri.stringValue(),
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next()
-                        .stringValue());
-        Assert.assertEquals("First name was not modified", modifiedFirstName,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString());
-        Assert.assertEquals("Last name was not modified", modifiedLastName,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString());
-        Assert.assertEquals("Role count should not have changed", 1,
-                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
-        Assert.assertEquals("Status was not modified", PoddUserStatus.INACTIVE.getURI(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+        try
+        {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model userInfoModel = this.assertRdf(results, format, 16);
+            // this.log.info("Retrieved [{}] details. ", testIdentifier);
+            // DebugUtils.printContents(userInfoModel);
+            
+            // prepare: modify existing User's details
+            final String modifiedFirstName = "Totally";
+            final String modifiedLastName = "Newman";
+            
+            final Resource userUri =
+                    userInfoModel.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).subjects().iterator().next();
+            
+            userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
+            userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
+            userInfoModel.remove(userUri, PoddRdfConstants.PODD_USER_STATUS, null);
+            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
+                    PoddRdfConstants.VF.createLiteral(modifiedFirstName));
+            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
+                    PoddRdfConstants.VF.createLiteral(modifiedLastName));
+            userInfoModel.add(userUri, PoddRdfConstants.PODD_USER_STATUS, PoddUserStatus.INACTIVE.getURI());
+            
+            // submit modified details to Edit User Service
+            final ClientResource userEditClientResource =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+            try
+            {
+                userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+                
+                final ByteArrayOutputStream out = new ByteArrayOutputStream();
+                Rio.write(userInfoModel, out, format);
+                final Representation input = new StringRepresentation(out.toString(), mediaType);
+                
+                final Representation modifiedResults =
+                        RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input,
+                                mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                
+                // verify: response has correct identifier
+                final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
+                Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                        model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+                
+                // verify: details have been correctly updated (by retrieving User details again)
+                final ClientResource userDetailsClientResource2 =
+                        new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+                try
+                {
+                    userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+                    
+                    final Representation updatedResults =
+                            RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null,
+                                    mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                    
+                    final Model resultsModel = this.assertRdf(updatedResults, format, 16);
+                    
+                    Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                            resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+                    Assert.assertEquals("Unexpected user URI", userUri.stringValue(),
+                            resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects()
+                                    .iterator().next().stringValue());
+                    Assert.assertEquals("First name was not modified", modifiedFirstName,
+                            resultsModel.filter(null, SesameRealmConstants.OAS_USERFIRSTNAME, null).objectString());
+                    Assert.assertEquals("Last name was not modified", modifiedLastName,
+                            resultsModel.filter(null, SesameRealmConstants.OAS_USERLASTNAME, null).objectString());
+                    Assert.assertEquals("Role count should not have changed", 1,
+                            resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects().size());
+                    Assert.assertEquals("Status was not modified", PoddUserStatus.INACTIVE.getURI(), resultsModel
+                            .filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                }
+                finally
+                {
+                    releaseClient(userDetailsClientResource2);
+                }
+            }
+            finally
+            {
+                releaseClient(userEditClientResource);
+            }
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
+        }
     }
     
     /**
@@ -322,35 +380,47 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
         final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
-        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(userInfoModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
-        final Representation modifiedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response has correct identifier
-        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // verify: request with old login details should still succeed
-        final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                    Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Rio.write(userInfoModel, out, format);
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            
+            final Representation modifiedResults =
+                    RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response has correct identifier
+            final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            
+            // verify: request with old login details should still succeed
+            final ClientResource userDetailsClientResource2 =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+            try
+            {
+                userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+                
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
+                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                
+            }
+            catch(final ResourceException e)
+            {
+                Assert.fail("Should have succeeded as password was not changed");
+            }
+            finally
+            {
+                releaseClient(userDetailsClientResource2);
+            }
         }
-        catch(final ResourceException e)
+        finally
         {
-            Assert.fail("Should have succeeded as password was not changed");
+            releaseClient(userEditClientResource);
         }
     }
     
@@ -362,13 +432,15 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     {
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         
+        final Representation input = new StringRepresentation("Should have user model in JSON", mediaType);
+        
         // submit modified details to Edit User Service
         final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
-        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, "noSuchUser");
         
-        final Representation input = new StringRepresentation("Should have user model in JSON", mediaType);
         try
         {
+            userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, "noSuchUser");
+            
             RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
                     Status.CLIENT_ERROR_BAD_REQUEST, this.testWithAdminPrivileges);
             Assert.fail("Should have thrown a ResourceException");
@@ -376,6 +448,10 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         catch(final ResourceException e)
         {
             Assert.assertEquals(e.getStatus(), Status.CLIENT_ERROR_BAD_REQUEST);
+        }
+        finally
+        {
+            releaseClient(userEditClientResource);
         }
     }
     
@@ -387,10 +463,10 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
     {
         final String testIdentifier = "testAdminUser";
         final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
-        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
         try
         {
+            userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
             RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.GET, null, MediaType.TEXT_HTML,
                     Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
             Assert.fail("Should have thrown a ResourceException");
@@ -398,6 +474,10 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         catch(final ResourceException e)
         {
             Assert.assertEquals("Expected UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(userEditClientResource);
         }
     }
     
@@ -422,47 +502,59 @@ public class UserEditResourceImplTest extends AbstractResourceImplTest
         // prepare: retrieve Details of existing User
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model userInfoModel = this.assertRdf(results, format, 16);
-        // this.log.info("Retrieved [{}] details. ", testIdentifier);
-        // DebugUtils.printContents(userInfoModel);
-        
-        // prepare: modify existing User's details
-        final String modifiedFirstName = "Totally";
-        final String modifiedLastName = "Newman";
-        
-        final Resource userUri =
-                userInfoModel.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).subjects().iterator().next();
-        
-        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
-        userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
-                PoddRdfConstants.VF.createLiteral(modifiedFirstName));
-        userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
-                PoddRdfConstants.VF.createLiteral(modifiedLastName));
-        
-        // try to submit modified details to Edit User Service
-        final ClientResource userEditClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
-        userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final StringWriter out = new StringWriter();
-        Rio.write(userInfoModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
-                    Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
-            Assert.fail("Should have thrown a ResourceException due to lack of authorization");
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model userInfoModel = this.assertRdf(results, format, 16);
+            // this.log.info("Retrieved [{}] details. ", testIdentifier);
+            // DebugUtils.printContents(userInfoModel);
+            
+            // prepare: modify existing User's details
+            final String modifiedFirstName = "Totally";
+            final String modifiedLastName = "Newman";
+            
+            final Resource userUri =
+                    userInfoModel.filter(null, SesameRealmConstants.OAS_USEREMAIL, null).subjects().iterator().next();
+            
+            userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERFIRSTNAME, null);
+            userInfoModel.remove(userUri, SesameRealmConstants.OAS_USERLASTNAME, null);
+            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERFIRSTNAME,
+                    PoddRdfConstants.VF.createLiteral(modifiedFirstName));
+            userInfoModel.add(userUri, SesameRealmConstants.OAS_USERLASTNAME,
+                    PoddRdfConstants.VF.createLiteral(modifiedLastName));
+            
+            final StringWriter out = new StringWriter();
+            Rio.write(userInfoModel, out, format);
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            
+            // try to submit modified details to Edit User Service
+            final ClientResource userEditClientResource =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT));
+            try
+            {
+                userEditClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+                
+                RestletTestUtils.doTestAuthenticatedRequest(userEditClientResource, Method.POST, input, mediaType,
+                        Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
+                Assert.fail("Should have thrown a ResourceException due to lack of authorization");
+            }
+            catch(final ResourceException e)
+            {
+                Assert.assertEquals("Should have been Unauthorized", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            }
+            finally
+            {
+                releaseClient(userEditClientResource);
+            }
         }
-        catch(final ResourceException e)
+        finally
         {
-            Assert.assertEquals("Should have been Unauthorized", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            releaseClient(userDetailsClientResource);
         }
     }
 }

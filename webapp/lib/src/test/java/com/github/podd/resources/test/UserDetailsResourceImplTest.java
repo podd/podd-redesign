@@ -64,16 +64,20 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, "noSuchUser");
-        
         try
         {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, "noSuchUser");
+            
             RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
                     MediaType.TEXT_HTML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_NOT_FOUND, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
         }
     }
     
@@ -85,11 +89,11 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
-                RestletTestUtils.TEST_ADMIN_USERNAME);
-        
         try
         {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
+                    RestletTestUtils.TEST_ADMIN_USERNAME);
+            
             RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
                     MediaType.TEXT_HTML, Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
             Assert.fail("Should have thrown a ResourceException with Status Code 401");
@@ -97,6 +101,10 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         catch(final ResourceException e)
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
         }
     }
     
@@ -108,17 +116,22 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
-                RestletTestUtils.TEST_ADMIN_USERNAME);
         
         try
         {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
+                    RestletTestUtils.TEST_ADMIN_USERNAME);
+            
             userDetailsClientResource.get(MediaType.TEXT_HTML);
             Assert.fail("Should have thrown a ResourceException with Status Code 401");
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
         }
     }
     
@@ -140,16 +153,23 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        Assert.assertTrue(body.contains("User Name: "));
-        Assert.assertTrue(body.contains("testuser@podd.com"));
-        this.assertFreemarker(body);
+        try
+        {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            Assert.assertTrue(body.contains("User Name: "));
+            Assert.assertTrue(body.contains("testuser@podd.com"));
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
+        }
     }
     
     /**
@@ -160,18 +180,25 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
-                RestletTestUtils.TEST_ADMIN_USERNAME);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        Assert.assertTrue(body.contains("Personal Details"));
-        Assert.assertTrue(body.contains("User Name: "));
-        Assert.assertTrue(body.contains("initial.admin.user@example.com"));
-        this.assertFreemarker(body);
+        try
+        {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
+                    RestletTestUtils.TEST_ADMIN_USERNAME);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            Assert.assertTrue(body.contains("Personal Details"));
+            Assert.assertTrue(body.contains("User Name: "));
+            Assert.assertTrue(body.contains("initial.admin.user@example.com"));
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
+        }
     }
     
     /**
@@ -185,28 +212,36 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
-                RestletTestUtils.TEST_ADMIN_USERNAME);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model resultsModel = this.assertRdf(results, format, 11);
-        
-        // DebugUtils.printContents(resultsModel);
-        Assert.assertEquals("Not the expected identifier", "testAdminUser",
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // verify: Roles are valid PoddRoles
-        final Set<Value> roleSet = resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects();
-        Assert.assertEquals("Not expected number of Roles", 1, roleSet.size());
-        final Iterator<Value> iterator = roleSet.iterator();
-        while(iterator.hasNext())
+        try
         {
-            final Value next = iterator.next();
-            final RestletUtilRole roleByUri = PoddRoles.getRoleByUri((URI)next);
-            Assert.assertNotNull("Role is not a PoddRole", roleByUri);
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER,
+                    RestletTestUtils.TEST_ADMIN_USERNAME);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model resultsModel = this.assertRdf(results, format, 11);
+            
+            // DebugUtils.printContents(resultsModel);
+            Assert.assertEquals("Not the expected identifier", "testAdminUser",
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            
+            // verify: Roles are valid PoddRoles
+            final Set<Value> roleSet =
+                    resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objects();
+            Assert.assertEquals("Not expected number of Roles", 1, roleSet.size());
+            final Iterator<Value> iterator = roleSet.iterator();
+            while(iterator.hasNext())
+            {
+                final Value next = iterator.next();
+                final RestletUtilRole roleByUri = PoddRoles.getRoleByUri((URI)next);
+                Assert.assertNotNull("Role is not a PoddRole", roleByUri);
+            }
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
         }
     }
     
@@ -229,22 +264,29 @@ public class UserDetailsResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model resultsModel = this.assertRdf(results, format, 12);
-        
-        // verify:
-        Assert.assertEquals("Not the expected User URI", testUserUri,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next()
-                        .stringValue());
-        Assert.assertEquals("Not the expected object URI", testObjectUri,
-                resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
-        Assert.assertEquals("Not the expected User Status", PoddUserStatus.ACTIVE.getURI(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+        try
+        {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model resultsModel = this.assertRdf(results, format, 12);
+            
+            // verify:
+            Assert.assertEquals("Not the expected User URI", testUserUri,
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator()
+                            .next().stringValue());
+            Assert.assertEquals("Not the expected object URI", testObjectUri,
+                    resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
+            Assert.assertEquals("Not the expected User Status", PoddUserStatus.ACTIVE.getURI(),
+                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
+        }
     }
     
 }

@@ -118,21 +118,25 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
         
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "Scan");
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
-                .toString());
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
-                "http://purl.org/podd/ns/poddScience#Platform");
-        
         // request without authentication
         try
         {
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "Scan");
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
+                    .toString());
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
+                    "http://purl.org/podd/ns/poddScience#Platform");
+            
             searchClientResource.get(MediaType.APPLICATION_RDF_XML);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(searchClientResource);
         }
     }
     
@@ -145,22 +149,26 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
         
-        // no search term!
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
-                .toString());
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
-                "http://purl.org/podd/ns/poddScience#Platform");
-        
         // there is no need to authenticate or have a test artifact as the search term is checked
         // for first
         try
         {
+            // no search term!
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
+                    .toString());
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
+                    "http://purl.org/podd/ns/poddScience#Platform");
+            
             searchClientResource.get(MediaType.APPLICATION_RDF_XML);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(searchClientResource);
         }
     }
     
@@ -172,50 +180,59 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact.getOntologyIRI()
-                .toString());
-        
-        // prepare: the test input
-        final String[] objectUris =
-                { "http://purl.org/podd/basic-1-20130206/object:2966",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
-                        "http://purl.org/podd/ns/poddScience#WildType_NotApplicable",
-                        "http://purl.org/podd/ns/poddPlant#DeltaTporometer-63",
-                        "http://purl.org/podd/ns/poddBase#DisplayType_LongText" };
-        
-        final String[] expectedLabels =
-                { "Project#2012-0006_ Cotton Leaf Morphology", "Demo genotype", "Squeekee material", "Not Applicable",
-                        "Delta-T porometer", null };
-        
-        final Model testModel = new LinkedHashModel();
-        for(final String s : objectUris)
+        try
         {
-            testModel.add(PoddRdfConstants.VF.createURI(s), RDFS.LABEL, PoddRdfConstants.VF.createLiteral("?blank"));
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, testArtifact
+                    .getOntologyIRI().toString());
+            
+            // prepare: the test input
+            final String[] objectUris =
+                    { "http://purl.org/podd/basic-1-20130206/object:2966",
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype",
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                            "http://purl.org/podd/ns/poddScience#WildType_NotApplicable",
+                            "http://purl.org/podd/ns/poddPlant#DeltaTporometer-63",
+                            "http://purl.org/podd/ns/poddBase#DisplayType_LongText" };
+            
+            final String[] expectedLabels =
+                    { "Project#2012-0006_ Cotton Leaf Morphology", "Demo genotype", "Squeekee material",
+                            "Not Applicable", "Delta-T porometer", null };
+            
+            final Model testModel = new LinkedHashModel();
+            for(final String s : objectUris)
+            {
+                testModel
+                        .add(PoddRdfConstants.VF.createURI(s), RDFS.LABEL, PoddRdfConstants.VF.createLiteral("?blank"));
+            }
+            
+            final RDFFormat inputFormat = RDFFormat.RDFXML;
+            final MediaType inputMediaType = MediaType.valueOf(inputFormat.getDefaultMIMEType());
+            
+            // build input representation
+            final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
+            Rio.write(testModel, output, inputFormat);
+            final Representation input = new StringRepresentation(output.toString(), inputMediaType);
+            
+            // invoke service
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.POST, input,
+                            inputMediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response
+            final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 5);
+            
+            // verify: each URI has the expected label
+            for(int i = 0; i < objectUris.length; i++)
+            {
+                final String objectString =
+                        resultModel.filter(PoddRdfConstants.VF.createURI(objectUris[i]), RDFS.LABEL, null)
+                                .objectString();
+                Assert.assertEquals("Not the expected label", expectedLabels[i], objectString);
+            }
         }
-        
-        final RDFFormat inputFormat = RDFFormat.RDFXML;
-        final MediaType inputMediaType = MediaType.valueOf(inputFormat.getDefaultMIMEType());
-        
-        // build input representation
-        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        Rio.write(testModel, output, inputFormat);
-        final Representation input = new StringRepresentation(output.toString(), inputMediaType);
-        
-        // invoke service
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.POST, input, inputMediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response
-        final Model resultModel = this.assertRdf(results, RDFFormat.RDFXML, 5);
-        
-        // verify: each URI has the expected label
-        for(int i = 0; i < objectUris.length; i++)
+        finally
         {
-            final String objectString =
-                    resultModel.filter(PoddRdfConstants.VF.createURI(objectUris[i]), RDFS.LABEL, null).objectString();
-            Assert.assertEquals("Not the expected label", expectedLabels[i], objectString);
+            releaseClient(searchClientResource);
         }
     }
     
