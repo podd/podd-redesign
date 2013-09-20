@@ -375,7 +375,21 @@ public class AbstractResourceImplTest
     protected String getText(Representation representation) throws IOException
     {
         StringWriter result = new StringWriter();
-        IOUtils.copy(representation.getStream(), result, StandardCharsets.UTF_8);
+        try
+        {
+            IOUtils.copy(representation.getStream(), result, StandardCharsets.UTF_8);
+        }
+        finally
+        {
+            try
+            {
+                representation.exhaust();
+            }
+            finally
+            {
+                representation.release();
+            }
+        }
         return result.toString();
     }
     
@@ -494,7 +508,7 @@ public class AbstractResourceImplTest
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
         
         // verify: response has 1 statement and identifier is correct
-        final Model model = this.assertRdf(new StringReader(getText(results)), RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(results, RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", testIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
         
@@ -541,7 +555,7 @@ public class AbstractResourceImplTest
         final Representation modifiedResults =
                 RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                         Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model model = this.assertRdf(new StringReader(getText(modifiedResults)), RDFFormat.RDFXML, 1);
+        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
         Assert.assertEquals("Unexpected user identifier", userIdentifier,
                 model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
     }
