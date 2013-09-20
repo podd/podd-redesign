@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
@@ -129,12 +130,12 @@ public class AbstractResourceImplTest
     {
         if(nextContext != null)
         {
-            nextContext.getParameters().add("maxThreads", "512");
-            nextContext.getParameters().add("minThreads", "100");
+            nextContext.getParameters().add("maxThreads", "256");
+            nextContext.getParameters().add("minThreads", "4");
             nextContext.getParameters().add("lowThreads", "145");
             nextContext.getParameters().add("maxQueued", "100");
             nextContext.getParameters().add("maxTotalConnections", "100");
-            // nextContext.getParameters().add("maxIoIdleTimeMs", "100");
+            // nextContext.getParameters().add("maxIoIdleTimeMs", "10000");
         }
     }
     
@@ -373,15 +374,9 @@ public class AbstractResourceImplTest
     
     protected String getText(Representation representation) throws IOException
     {
-        File folder = tempDirectory.newFolder("temp-representation-" + UUID.randomUUID().toString());
-        Path destination = folder.toPath().resolve("next.dat");
-        Files.copy(representation.getStream(), destination);
-        ByteArrayOutputStream result = new ByteArrayOutputStream(4096);
-        // verify: results (expecting the added artifact's ontology IRI)
-        Files.copy(destination, result);
-        
-        String body = new String(result.toByteArray(), StandardCharsets.UTF_8);
-        return body;
+        StringWriter result = new StringWriter();
+        IOUtils.copy(representation.getStream(), result, StandardCharsets.UTF_8);
+        return result.toString();
     }
     
     /**
@@ -567,9 +562,9 @@ public class AbstractResourceImplTest
         
         final Server httpServer =
                 new Server(this.component.getContext().createChildContext(), Protocol.HTTP, this.testPort);
+        AbstractResourceImplTest.setupThreading(httpServer.getContext());
         // Add a new HTTP server listening on the given TEST_PORT.
         this.component.getServers().add(httpServer);
-        AbstractResourceImplTest.setupThreading(httpServer.getContext());
         
         this.component.getClients().add(Protocol.CLAP);
         this.component.getClients().add(Protocol.HTTP);

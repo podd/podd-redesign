@@ -384,7 +384,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                     this.sesameManager.versionAndSchemaContexts(artifactID, connection,
                             this.repositoryManager.getSchemaManagementGraph());
             
-            Model model = null;
+            Model model;
             if(containsPropertyPolicy == MetadataPolicy.ONLY_CONTAINS)
             {
                 model = this.sesameManager.getObjectTypeContainsMetadata(objectType, connection, contexts);

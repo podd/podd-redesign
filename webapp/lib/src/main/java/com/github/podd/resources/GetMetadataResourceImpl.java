@@ -21,6 +21,8 @@ import java.io.IOException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
+import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
@@ -100,7 +102,7 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
         this.log.info("authenticated user: {}", user);
         
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        
+        final RDFFormat format = Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE);
         try
         {
             InferredOWLOntologyID artifactID = null;
@@ -110,8 +112,7 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
             }
             
             this.getPoddArtifactManager().exportObjectMetadata(PoddRdfConstants.VF.createURI(objectType), output,
-                    RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE),
-                    includeDoNotDisplayProperties, containsPropertyPolicy, artifactID);
+                    format, includeDoNotDisplayProperties, containsPropertyPolicy, artifactID);
         }
         catch(final UnmanagedArtifactIRIException e)
         {
@@ -122,7 +123,7 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not generate object metadata", e);
         }
         
-        return new ByteArrayRepresentation(output.toByteArray());
+        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(format.getDefaultMIMEType()));
     }
     
 }
