@@ -18,6 +18,7 @@ package com.github.podd.resources.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -354,11 +355,16 @@ public class AbstractResourceImplTest
         final Representation results =
                 RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
                         MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
+        File folder = tempDirectory.newFolder("load-test-artifact-" + UUID.randomUUID().toString());
+        Path destination = folder.toPath().resolve("next.ttl");
+        Files.copy(results.getStream(), destination);
+        ByteArrayOutputStream result = new ByteArrayOutputStream(4096);
         // verify: results (expecting the added artifact's ontology IRI)
-        final String body = results.getText();
+        Files.copy(destination, result);
         
-        this.log.info(body);
+        String body = new String(result.toByteArray(), StandardCharsets.UTF_8);
+        
+        // this.log.info(body);
         this.assertFreemarker(body);
         
         final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
