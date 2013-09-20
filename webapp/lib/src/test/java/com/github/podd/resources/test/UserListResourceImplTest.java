@@ -36,10 +36,10 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testErrorGetUsersNonAdminRdf() throws Exception
     {
-        final ClientResource userListlientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
+        final ClientResource userListClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userListlientResource, Method.GET, null,
+            RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
                     MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testNoAdminPrivileges);
             Assert.fail("Should've failed due to lack of authorization");
         }
@@ -47,22 +47,31 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         {
             Assert.assertEquals("", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
+        finally
+        {
+            releaseClient(userListClientResource);
+        }
     }
     
     @Test
     public void testGetUsersHtml() throws Exception
     {
-        final ClientResource userListRolesClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
+        final ClientResource userListClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
         
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userListRolesClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        System.out.println(body);
-        this.assertFreemarker(body);
-        
+        try
+        {
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            System.out.println(body);
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(userListClientResource);
+        }
     }
     
     @Test
@@ -71,32 +80,38 @@ public class UserListResourceImplTest extends AbstractResourceImplTest
         final MediaType mediaType = MediaType.APPLICATION_RDF_XML;
         final RDFFormat format = Rio.getWriterFormatForMIMEType(mediaType.getName(), RDFFormat.RDFXML);
         
-        final ClientResource userListlientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userListlientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model resultsModel = this.assertRdf(results, format, 16);
-        
-        // verify:
-        final Set<Resource> subjects =
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects();
-        Assert.assertEquals("Not the expected number of Users", 2, subjects.size());
-        
-        Assert.assertEquals(
-                "Missing testAdminUser",
-                1,
-                resultsModel
-                        .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                                PoddRdfConstants.VF.createLiteral("testAdminUser")).subjects().size());
-        
-        Assert.assertEquals(
-                "Missing anotherUser",
-                1,
-                resultsModel
-                        .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                                PoddRdfConstants.VF.createLiteral("anotherUser")).subjects().size());
+        final ClientResource userListClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_LIST));
+        try
+        {
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userListClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model resultsModel = this.assertRdf(results, format, 16);
+            
+            // verify:
+            final Set<Resource> subjects =
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects();
+            Assert.assertEquals("Not the expected number of Users", 2, subjects.size());
+            
+            Assert.assertEquals(
+                    "Missing testAdminUser",
+                    1,
+                    resultsModel
+                            .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
+                                    PoddRdfConstants.VF.createLiteral("testAdminUser")).subjects().size());
+            
+            Assert.assertEquals(
+                    "Missing anotherUser",
+                    1,
+                    resultsModel
+                            .filter(null, SesameRealmConstants.OAS_USERIDENTIFIER,
+                                    PoddRdfConstants.VF.createLiteral("anotherUser")).subjects().size());
+        }
+        finally
+        {
+            releaseClient(userListClientResource);
+        }
     }
     
 }

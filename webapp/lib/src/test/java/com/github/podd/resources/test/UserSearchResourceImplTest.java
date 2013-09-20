@@ -54,18 +54,24 @@ public class UserSearchResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userSearchClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_SEARCH));
-        
-        userSearchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "anoth");
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userSearchClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model resultsModel = this.assertRdf(results, format, 2);
-        
-        // verify:
-        Assert.assertEquals("Not the expected User", "Test User, CSIRO", resultsModel.filter(null, RDFS.LABEL, null)
-                .objectString());
+        try
+        {
+            userSearchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "anoth");
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userSearchClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model resultsModel = this.assertRdf(results, format, 2);
+            
+            // verify:
+            Assert.assertEquals("Not the expected User", "Test User, CSIRO", resultsModel
+                    .filter(null, RDFS.LABEL, null).objectString());
+        }
+        finally
+        {
+            releaseClient(userSearchClientResource);
+        }
     }
     
 }

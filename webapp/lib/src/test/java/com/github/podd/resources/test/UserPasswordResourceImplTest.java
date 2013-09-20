@@ -68,34 +68,46 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userPasswordClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD));
-        userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(userInfoModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
-        final Representation modifiedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response has correct identifier
-        final Model model = this.assertRdf(new StringReader(getText(modifiedResults)), RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // verify: request with old login details should fail
-        final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                    Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
-            Assert.fail("Should have thrown a ResourceException as password should now be invalid");
+            userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Rio.write(userInfoModel, out, format);
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            
+            final Representation modifiedResults =
+                    RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
+                            mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response has correct identifier
+            final Model model = this.assertRdf(new StringReader(getText(modifiedResults)), RDFFormat.RDFXML, 1);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            
+            // verify: request with old login details should fail
+            final ClientResource userDetailsClientResource2 =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+            userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            try
+            {
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
+                        Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
+                Assert.fail("Should have thrown a ResourceException as password should now be invalid");
+            }
+            catch(final ResourceException e)
+            {
+                Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED,
+                        e.getStatus());
+            }
+            finally
+            {
+                releaseClient(userDetailsClientResource2);
+            }
         }
-        catch(final ResourceException e)
+        finally
         {
-            Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            releaseClient(userPasswordClientResource);
         }
     }
     
@@ -122,35 +134,47 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userPasswordClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD));
-        userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(userInfoModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
-        final Representation modifiedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response has correct identifier
-        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // verify: request with old login details should fail
-        final ClientResource userDetailsClientResource2 =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
-                    Status.CLIENT_ERROR_UNAUTHORIZED, this.testWithAdminPrivileges);
-            Assert.fail("Should have thrown a ResourceException as password should now be invalid");
+            userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Rio.write(userInfoModel, out, format);
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            
+            final Representation modifiedResults =
+                    RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.POST, input,
+                            mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response has correct identifier
+            final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            
+            // verify: request with old login details should fail
+            final ClientResource userDetailsClientResource2 =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+            userDetailsClientResource2.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            try
+            {
+                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource2, Method.GET, null, mediaType,
+                        Status.CLIENT_ERROR_UNAUTHORIZED, this.testWithAdminPrivileges);
+                Assert.fail("Should have thrown a ResourceException as password should now be invalid");
+            }
+            catch(final ResourceException e)
+            {
+                Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED,
+                        e.getStatus());
+            }
+            finally
+            {
+                releaseClient(userDetailsClientResource2);
+            }
         }
-        catch(final ResourceException e)
+        finally
         {
-            Assert.assertEquals("Was expecting an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            releaseClient(userPasswordClientResource);
         }
     }
     
@@ -160,21 +184,28 @@ public class UserPasswordResourceImplTest extends AbstractResourceImplTest
         final String testIdentifier = "testAdminUser";
         final ClientResource userPasswordClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_EDIT_PWD));
-        userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        // System.out.println(body);
-        this.assertFreemarker(body);
-        
-        Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
-        Assert.assertTrue("Page missing old password", body.contains("Old Password"));
-        Assert.assertTrue("Page missing confirm password", body.contains("Confirm New Password"));
-        Assert.assertTrue("Page missing save button", body.contains("Save Password"));
-        Assert.assertTrue("Page missing cancel button", body.contains("Cancel"));
+        try
+        {
+            userPasswordClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userPasswordClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            // System.out.println(body);
+            this.assertFreemarker(body);
+            
+            Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
+            Assert.assertTrue("Page missing old password", body.contains("Old Password"));
+            Assert.assertTrue("Page missing confirm password", body.contains("Confirm New Password"));
+            Assert.assertTrue("Page missing save button", body.contains("Save Password"));
+            Assert.assertTrue("Page missing cancel button", body.contains("Cancel"));
+        }
+        finally
+        {
+            releaseClient(userPasswordClientResource);
+        }
     }
     
 }

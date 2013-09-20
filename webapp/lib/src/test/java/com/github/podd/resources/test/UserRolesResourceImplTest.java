@@ -110,39 +110,53 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         // submit modified details to User Roles Service
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
-        userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(newModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        final Representation modifiedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // verify: Test User Roles have been correctly updated
-        final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation updatedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model resultsModel = this.assertRdf(updatedResults, format, 43);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
-        
-        final Collection<Value> objects =
-                resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objects();
-        Assert.assertEquals("Incorrect no. of Project Roles", 7, objects.size());
-        
-        final Collection<Resource> subjects =
-                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI())
-                        .subjects();
-        Assert.assertEquals("Incorrect no. of Project Observer Roles", 4, subjects.size());
+        try
+        {
+            userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Rio.write(newModel, out, format);
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            final Representation modifiedResults =
+                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            
+            // verify: Test User Roles have been correctly updated
+            final ClientResource userDetailsClientResource =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+            try
+            {
+                userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+                
+                final Representation updatedResults =
+                        RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                                mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                final Model resultsModel = this.assertRdf(updatedResults, format, 43);
+                Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                        resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+                Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
+                        resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                
+                final Collection<Value> objects =
+                        resultsModel.filter(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objects();
+                Assert.assertEquals("Incorrect no. of Project Roles", 7, objects.size());
+                
+                final Collection<Resource> subjects =
+                        resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
+                                PoddRoles.PROJECT_OBSERVER.getURI()).subjects();
+                Assert.assertEquals("Incorrect no. of Project Observer Roles", 4, subjects.size());
+            }
+            finally
+            {
+                releaseClient(userDetailsClientResource);
+            }
+        }
+        finally
+        {
+            releaseClient(userRolesClientResource);
+        }
     }
     
     /**
@@ -184,40 +198,54 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         // submit details of Role to delete to User Roles Service
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
-        userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(newModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        final Representation modifiedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // verify: The Role has been correctly deleted
-        final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation updatedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model resultsModel = this.assertRdf(updatedResults, format, 31);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
-        
-        final Set<Resource> observerMappings =
-                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI())
-                        .subjects();
-        Assert.assertEquals("Expected only 1 Project_Observer mapping", 1, observerMappings.size());
-        
-        final Resource mapping = (Resource)observerMappings.toArray()[0];
-        Assert.assertEquals("Project_Observer Role is not for expected Project", testProject2Uri,
-                resultsModel.filter(mapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
+        try
+        {
+            userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Rio.write(newModel, out, format);
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            final Representation modifiedResults =
+                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            
+            // verify: The Role has been correctly deleted
+            final ClientResource userDetailsClientResource =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+            try
+            {
+                userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+                
+                final Representation updatedResults =
+                        RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                                mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                final Model resultsModel = this.assertRdf(updatedResults, format, 31);
+                Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                        resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+                Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
+                        resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                
+                final Set<Resource> observerMappings =
+                        resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
+                                PoddRoles.PROJECT_OBSERVER.getURI()).subjects();
+                Assert.assertEquals("Expected only 1 Project_Observer mapping", 1, observerMappings.size());
+                
+                final Resource mapping = (Resource)observerMappings.toArray()[0];
+                Assert.assertEquals("Project_Observer Role is not for expected Project", testProject2Uri, resultsModel
+                        .filter(mapping, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI());
+            }
+            finally
+            {
+                releaseClient(userDetailsClientResource);
+            }
+        }
+        finally
+        {
+            releaseClient(userRolesClientResource);
+        }
     }
     
     /**
@@ -261,47 +289,61 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         // submit modified details to User Roles Service
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
-        userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(newModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
         try
         {
-            RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                    Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
-            Assert.fail("Should have failed authorization");
+            userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Rio.write(newModel, out, format);
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            
+            try
+            {
+                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+                        Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
+                Assert.fail("Should have failed authorization");
+            }
+            catch(final ResourceException e)
+            {
+                Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            }
+            
+            // verify: No changes to mapped Roles
+            final ClientResource userDetailsClientResource =
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
+            try
+            {
+                userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+                
+                final Representation updatedResults =
+                        RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null,
+                                mediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                final Model resultsModel = this.assertRdf(updatedResults, format, 15);
+                Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                        resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+                Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
+                        resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+                
+                // verify: 1 Roles mapped
+                final Collection<Resource> roleMappings =
+                        resultsModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
+                Assert.assertEquals("Incorrect no. of Project Roles", 1, roleMappings.size());
+                
+                // verify: Project Creator Role still exists
+                final Collection<Resource> subjects =
+                        resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
+                                PoddRoles.PROJECT_CREATOR.getURI()).subjects();
+                Assert.assertEquals("Incorrect no. of Project Creator Roles", 1, subjects.size());
+            }
+            finally
+            {
+                releaseClient(userDetailsClientResource);
+            }
         }
-        catch(final ResourceException e)
+        finally
         {
-            Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+            releaseClient(userRolesClientResource);
         }
-        
-        // verify: No changes to mapped Roles
-        final ClientResource userDetailsClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation updatedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model resultsModel = this.assertRdf(updatedResults, format, 15);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
-        
-        // verify: 1 Roles mapped
-        final Collection<Resource> roleMappings =
-                resultsModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
-        Assert.assertEquals("Incorrect no. of Project Roles", 1, roleMappings.size());
-        
-        // verify: Project Creator Role still exists
-        final Collection<Resource> subjects =
-                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_CREATOR.getURI())
-                        .subjects();
-        Assert.assertEquals("Incorrect no. of Project Creator Roles", 1, subjects.size());
     }
     
     /**
@@ -342,17 +384,17 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         newModel.add(roleMapping2Uri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI());
         newModel.add(roleMapping2Uri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, testProject1Uri);
         
-        // submit details of Role to delete to User Roles Service
-        final ClientResource userRolesClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
-        userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(newModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
         
+        // submit details of Role to delete to User Roles Service
+        final ClientResource userRolesClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
         try
         {
+            userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
             RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
                     Status.CLIENT_ERROR_UNAUTHORIZED, this.testNoAdminPrivileges);
             Assert.fail("Should have failed authorization");
@@ -361,25 +403,36 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         {
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
+        finally
+        {
+            releaseClient(userRolesClientResource);
+        }
         
         // verify: No change to Roles
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation updatedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model resultsModel = this.assertRdf(updatedResults, format, 20);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
-        
-        final Set<Resource> observerMappings =
-                resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_OBSERVER.getURI())
-                        .subjects();
-        Assert.assertEquals("Project_Observer mappings have changed", 2, observerMappings.size());
+        try
+        {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation updatedResults =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            final Model resultsModel = this.assertRdf(updatedResults, format, 20);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            Assert.assertEquals("Status was not ACTIVE", PoddUserStatus.ACTIVE.getURI(),
+                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+            
+            final Set<Resource> observerMappings =
+                    resultsModel.filter(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
+                            PoddRoles.PROJECT_OBSERVER.getURI()).subjects();
+            Assert.assertEquals("Project_Observer mappings have changed", 2, observerMappings.size());
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
+        }
     }
     
     @Test
@@ -388,13 +441,20 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
         
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = results.getText();
-        System.out.println(body);
-        this.assertFreemarker(body);
+        try
+        {
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = results.getText();
+            System.out.println(body);
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(userRolesClientResource);
+        }
     }
     
     @Test
@@ -419,22 +479,29 @@ public class UserRolesResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
-        userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = results.getText();
-        System.out.println(body);
-        this.assertFreemarker(body);
-        
-        // Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
-        // Assert.assertTrue("Page missing old password", body.contains("Old Password"));
-        // Assert.assertTrue("Page missing confirm password",
-        // body.contains("Confirm New Password"));
-        // Assert.assertTrue("Page missing save button", body.contains("Save Password"));
-        // Assert.assertTrue("Page missing cancel button", body.contains("Cancel"));
+        try
+        {
+            userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = results.getText();
+            System.out.println(body);
+            this.assertFreemarker(body);
+            
+            // Assert.assertTrue("Page missing User identifier", body.contains(testIdentifier));
+            // Assert.assertTrue("Page missing old password", body.contains("Old Password"));
+            // Assert.assertTrue("Page missing confirm password",
+            // body.contains("Confirm New Password"));
+            // Assert.assertTrue("Page missing save button", body.contains("Save Password"));
+            // Assert.assertTrue("Page missing cancel button", body.contains("Cancel"));
+        }
+        finally
+        {
+            releaseClient(userRolesClientResource);
+        }
     }
     
 }
