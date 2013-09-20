@@ -41,13 +41,20 @@ public class IndexResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource indexClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_INDEX));
         
-        final Representation results =
-                PoddRestletTestUtils.doTestUnAuthenticatedRequest(indexClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK);
-        
-        final String body = getText(results);
-        Assert.assertTrue(body.contains("Welcome to PODD, please"));
-        this.assertFreemarker(body);
+        try
+        {
+            final Representation results =
+                    PoddRestletTestUtils.doTestUnAuthenticatedRequest(indexClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK);
+            
+            final String body = getText(results);
+            Assert.assertTrue(body.contains("Welcome to PODD, please"));
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(indexClientResource);
+        }
     }
     
 }

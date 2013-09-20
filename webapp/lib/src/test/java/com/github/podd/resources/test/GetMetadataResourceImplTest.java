@@ -45,19 +45,26 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     @Test
     public void testErrorGetWithInvalidObjectType() throws Exception
     {
+        final String objectType = PoddRdfConstants.PODD_SCIENCE + "NoSuchPoddConcept";
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
         
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "NoSuchPoddConcept";
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // FIXME: Is there a better way to do this
-        // verify: response is empty as no such object exists
-        // Assert.assertTrue("Expected NULL for response text", getText(results).isEmpty());
+        try
+        {
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // FIXME: Is there a better way to do this
+            // verify: response is empty as no such object exists
+            // Assert.assertTrue("Expected NULL for response text", getText(results).isEmpty());
+        }
+        finally
+        {
+            releaseClient(createObjectClientResource);
+        }
     }
     
     @Test
@@ -67,41 +74,49 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         final String artifactUri =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE)
                         .getOntologyIRI().toString();
+        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Investigation";
         
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
         
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Investigation";
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, "false");
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_METADATA_POLICY,
-                PoddWebConstants.METADATA_ONLY_CONTAINS);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify:
-        final Model model = this.assertRdf(results, RDFFormat.TURTLE, 64);
-        
-        Assert.assertEquals(
-                "GrowthConditions not found",
-                1,
-                model.filter(null, OWL.ALLVALUESFROM,
-                        PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "GrowthConditions")).subjects()
-                        .size());
-        
-        Assert.assertEquals(
-                "No label for FieldConditions",
-                1,
-                model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), RDFS.LABEL,
-                        null).objects().size());
-        
-        Assert.assertEquals("Unexpected no. of properties", 12,
-                model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size());
-        Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-                model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        try
+        {
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES,
+                    "false");
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_METADATA_POLICY,
+                    PoddWebConstants.METADATA_ONLY_CONTAINS);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify:
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 64);
+            
+            Assert.assertEquals(
+                    "GrowthConditions not found",
+                    1,
+                    model.filter(null, OWL.ALLVALUESFROM,
+                            PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "GrowthConditions")).subjects()
+                            .size());
+            
+            Assert.assertEquals(
+                    "No label for FieldConditions",
+                    1,
+                    model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
+                            RDFS.LABEL, null).objects().size());
+            
+            Assert.assertEquals("Unexpected no. of properties", 12,
+                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size());
+            Assert.assertEquals("Expected no Do-Not-Display properties", 0,
+                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        }
+        finally
+        {
+            releaseClient(createObjectClientResource);
+        }
     }
     
     @Test
@@ -122,6 +137,42 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
             final ClientResource createObjectClientResource =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
             
+            try
+            {
+                createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
+                createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES,
+                        "false");
+                createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_METADATA_POLICY,
+                        PoddWebConstants.METADATA_ONLY_CONTAINS);
+                
+                final Representation results =
+                        RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                                MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                
+                // verify:
+                final Model model = this.assertRdf(results, RDFFormat.TURTLE, expectedModelSize);
+                
+                Assert.assertEquals("Unexpected no. of properties", expectedNoOfProperties,
+                        model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size());
+                Assert.assertEquals("Expected no Do-Not-Display properties", expectedNoOfDnDProperties,
+                        model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+            }
+            finally
+            {
+                releaseClient(createObjectClientResource);
+            }
+        }
+    }
+    
+    @Test
+    public void testGetChildrenWithPublicationRdf() throws Exception
+    {
+        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Publication";
+        
+        final ClientResource createObjectClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
+        try
+        {
             createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
             createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES,
                     "false");
@@ -132,43 +183,22 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                     RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
+            // final String body = getText(results);
             // verify:
-            final Model model = this.assertRdf(results, RDFFormat.TURTLE, expectedModelSize);
-            
-            Assert.assertEquals("Unexpected no. of properties", expectedNoOfProperties,
-                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size());
-            Assert.assertEquals("Expected no Do-Not-Display properties", expectedNoOfDnDProperties,
-                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+            // Assert.assertNull("No content since Publication cannot have child objects", body);
+            // final Model model =
+            // this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)),
+            // RDFFormat.TURTLE, 7);
+            //
+            // Assert.assertEquals("Unexpected no. of properties", 1,
+            // model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+            // Assert.assertEquals("Expected no Do-Not-Display properties", 0,
+            // model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
-    }
-    
-    @Test
-    public void testGetChildrenWithPublicationRdf() throws Exception
-    {
-        final ClientResource createObjectClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
-        
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Publication";
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, "false");
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_METADATA_POLICY,
-                PoddWebConstants.METADATA_ONLY_CONTAINS);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // final String body = getText(results);
-        // verify:
-        // Assert.assertNull("No content since Publication cannot have child objects", body);
-        // final Model model =
-        // this.assertRdf(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)),
-        // RDFFormat.TURTLE, 7);
-        //
-        // Assert.assertEquals("Unexpected no. of properties", 1,
-        // model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
-        // Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-        // model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        finally
+        {
+            releaseClient(createObjectClientResource);
+        }
     }
     
     @Test
@@ -178,82 +208,104 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
         final String artifactUri =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE)
                         .getOntologyIRI().toString();
+        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Genotype";
         
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
         
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Genotype";
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, "true");
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_METADATA_POLICY,
-                PoddWebConstants.METADATA_ALL);
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: received contents are in RDF
-        final Model model = this.assertRdf(results, RDFFormat.RDFXML, 151);
-        
-        Assert.assertEquals("Unexpected no. of properties", 18,
-                model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
-        Assert.assertEquals("Expected no Do-Not-Display properties", 4,
-                model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        try
+        {
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
+            createObjectClientResource
+                    .addQueryParameter(PoddWebConstants.KEY_INCLUDE_DO_NOT_DISPLAY_PROPERTIES, "true");
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_METADATA_POLICY,
+                    PoddWebConstants.METADATA_ALL);
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: received contents are in RDF
+            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 151);
+            
+            Assert.assertEquals("Unexpected no. of properties", 18,
+                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+            Assert.assertEquals("Expected no Do-Not-Display properties", 4,
+                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        }
+        finally
+        {
+            releaseClient(createObjectClientResource);
+        }
     }
     
     @Test
     public void testGetWithInvestigationRdf() throws Exception
     {
+        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Investigation";
+        
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
-        
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Investigation";
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
-        
-        // include-do-not-display-properties defaults to false
-        // metadata-policy defaults to exclude sub-properties of poddBase:contains
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify:
-        final Model model = this.assertRdf(results, RDFFormat.TURTLE, 54);
-        
-        Assert.assertEquals("Unexpected no. of properties", 6,
-                model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
-        Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-                model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
-        Assert.assertEquals(
-                "Missing metadata about poddScience::refersToProcess",
-                5,
-                model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "refersToProcess"), null,
-                        null).size());
+        try
+        {
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
+            
+            // include-do-not-display-properties defaults to false
+            // metadata-policy defaults to exclude sub-properties of poddBase:contains
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify:
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 54);
+            
+            Assert.assertEquals("Unexpected no. of properties", 6,
+                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+            Assert.assertEquals("Expected no Do-Not-Display properties", 0,
+                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+            Assert.assertEquals(
+                    "Missing metadata about poddScience::refersToProcess",
+                    5,
+                    model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "refersToProcess"), null,
+                            null).size());
+        }
+        finally
+        {
+            releaseClient(createObjectClientResource);
+        }
     }
     
     @Test
     public void testGetWithProjectRdf() throws Exception
     {
+        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Project";
+        
         final ClientResource createObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_GET_METADATA));
-        
-        final String objectType = PoddRdfConstants.PODD_SCIENCE + "Project";
-        createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
-        
-        // include-do-not-display-properties defaults to false
-        // metadata-policy defaults to exclude sub-properties of poddBase:contains
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify:
-        final Model model = this.assertRdf(results, RDFFormat.TURTLE, 83);
-        
-        Assert.assertEquals("Unexpected no. of properties", 9,
-                model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
-        Assert.assertEquals("Expected no Do-Not-Display properties", 0,
-                model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        try
+        {
+            createObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_TYPE_IDENTIFIER, objectType);
+            
+            // include-do-not-display-properties defaults to false
+            // metadata-policy defaults to exclude sub-properties of poddBase:contains
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(createObjectClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify:
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 83);
+            
+            Assert.assertEquals("Unexpected no. of properties", 9,
+                    model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
+            Assert.assertEquals("Expected no Do-Not-Display properties", 0,
+                    model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
+        }
+        finally
+        {
+            releaseClient(createObjectClientResource);
+        }
     }
 }

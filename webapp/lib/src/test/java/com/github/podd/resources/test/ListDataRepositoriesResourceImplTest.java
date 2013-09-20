@@ -48,19 +48,26 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
         
-        final Representation result =
-                RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final String body = getText(result);
-        
-        // System.out.println(body);
-        
-        // verify:
-        this.assertFreemarker(body);
-        
-        Assert.assertFalse(body.contains("No data repositories currently available"));
-        
-        Assert.assertTrue(body.contains("alias_local_ssh"));
+        try
+        {
+            final Representation result =
+                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            final String body = getText(result);
+            
+            // System.out.println(body);
+            
+            // verify:
+            this.assertFreemarker(body);
+            
+            Assert.assertFalse(body.contains("No data repositories currently available"));
+            
+            Assert.assertTrue(body.contains("alias_local_ssh"));
+        }
+        finally
+        {
+            releaseClient(dataRepositoriesClientResource);
+        }
     }
     
     /**
@@ -82,6 +89,10 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
+        finally
+        {
+            releaseClient(dataRepositoriesClientResource);
+        }
     }
     
     /**
@@ -102,6 +113,10 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
+        finally
+        {
+            releaseClient(dataRepositoriesClientResource);
+        }
     }
     
     /**
@@ -113,14 +128,21 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
         
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                        RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify:
-        final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 3);
-        
-        // DebugUtils.printContents(model);
+        try
+        {
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify:
+            final Model model = this.assertRdf(results, RDFFormat.RDFJSON, 3);
+            
+            // DebugUtils.printContents(model);
+        }
+        finally
+        {
+            releaseClient(dataRepositoriesClientResource);
+        }
     }
     
     /**
@@ -142,6 +164,10 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
+        finally
+        {
+            releaseClient(dataRepositoriesClientResource);
+        }
     }
     
     /**
@@ -162,6 +188,10 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
+        finally
+        {
+            releaseClient(dataRepositoriesClientResource);
+        }
     }
     
     /**
@@ -173,14 +203,21 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         final ClientResource dataRepositoriesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_DATA_REPOSITORY_LIST));
         
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify:
-        final Model model = this.assertRdf(results, RDFFormat.RDFXML, 3);
-        
-        // DebugUtils.printContents(model);
+        try
+        {
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(dataRepositoriesClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify:
+            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 3);
+            
+            // DebugUtils.printContents(model);
+        }
+        finally
+        {
+            releaseClient(dataRepositoriesClientResource);
+        }
     }
     
     /**
@@ -202,6 +239,10 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
         }
+        finally
+        {
+            releaseClient(dataRepositoriesClientResource);
+        }
     }
     
     /**
@@ -221,6 +262,10 @@ public class ListDataRepositoriesResourceImplTest extends AbstractResourceImplTe
         catch(final ResourceException e)
         {
             Assert.assertEquals("Not the expected HTTP status code", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(dataRepositoriesClientResource);
         }
     }
     
