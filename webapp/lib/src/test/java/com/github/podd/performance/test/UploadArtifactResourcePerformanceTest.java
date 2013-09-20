@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.junit.ext.TimeoutWithStackTraces;
 import com.github.podd.resources.test.AbstractResourceImplTest;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -111,7 +112,7 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
         super();
         
         // increase test timeout
-        super.timeout = new Timeout(30000 * 1000);
+        super.timeout = new TimeoutWithStackTraces(30000 * 1000);
         
         this.filename = filename;
         this.mediaType = mediaType;

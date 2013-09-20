@@ -72,6 +72,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.junit.ext.TimeoutWithStackTraces;
 import com.github.podd.restlet.ApplicationUtils;
 import com.github.podd.restlet.PoddWebServiceApplication;
 import com.github.podd.restlet.PoddWebServiceApplicationImpl;
@@ -143,7 +144,7 @@ public class AbstractResourceImplTest
      * Timeout tests after 60 seconds.
      */
     @Rule
-    public Timeout timeout = new Timeout(60000);
+    public TimeoutWithStackTraces timeout = new TimeoutWithStackTraces(60000);
     
     /**
      * The set of ports that have been used in tests so far in this virtual machine.
