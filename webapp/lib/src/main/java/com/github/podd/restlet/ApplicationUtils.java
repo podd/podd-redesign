@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.ansell.restletutils.FixedRedirectCookieAuthenticator;
+import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.file.DataReferenceManager;
@@ -273,6 +274,8 @@ public class ApplicationUtils
     public static void setupApplication(final PoddWebServiceApplication application, final Context applicationContext)
         throws OpenRDFException
     {
+        final PropertyUtil props = application.getPropertyUtil();
+        
         ApplicationUtils.log.debug("application {}", application);
         ApplicationUtils.log.debug("applicationContext {}", applicationContext);
         
@@ -304,7 +307,7 @@ public class ApplicationUtils
         nextPurlRegistry.clear();
         final PoddPurlProcessorFactory nextPurlProcessorFactory = new UUIDPurlProcessorFactoryImpl();
         
-        final String purlPrefix = application.getPropertyUtil().get(PoddWebConstants.PROPERTY_PURL_PREFIX, null);
+        final String purlPrefix = props.get(PoddWebConstants.PROPERTY_PURL_PREFIX, null);
         ((UUIDPurlProcessorFactoryImpl)nextPurlProcessorFactory).setPrefix(purlPrefix);
         
         nextPurlRegistry.add(nextPurlProcessorFactory);
@@ -327,7 +330,7 @@ public class ApplicationUtils
         nextDataRepositoryManager.setOWLManager(nextOWLManager);
         try
         {
-            final Model aliasConfiguration = application.getAliasesConfiguration(application.getPropertyUtil());
+            final Model aliasConfiguration = application.getAliasesConfiguration(props);
             nextDataRepositoryManager.init(aliasConfiguration);
         }
         catch(PoddException | IOException e)
@@ -360,8 +363,7 @@ public class ApplicationUtils
         try
         {
             final String schemaManifest =
-                    application.getPropertyUtil().get(PoddRdfConstants.KEY_SCHEMAS,
-                            PoddRdfConstants.PATH_DEFAULT_SCHEMAS);
+                    props.get(PoddRdfConstants.KEY_SCHEMAS, PoddRdfConstants.PATH_DEFAULT_SCHEMAS);
             Model model = null;
             
             try (final InputStream schemaManifestStream = application.getClass().getResourceAsStream(schemaManifest);)
@@ -396,31 +398,49 @@ public class ApplicationUtils
             ApplicationUtils.log.error("Fatal Error!!! Could not load schema ontologies", e);
         }
         
-        // FIXME: Stub implementation in memory, based on the example restlet MemoryRealm class,
-        // need to create a realm implementation that backs onto a database for persistence
-        
         // OasMemoryRealm has extensions so that getClientInfo().getUser() will contain first name,
         // last name, and email address as necessary
-        // FIXME: Restlet MemoryRealm creates a DefaultVerifier class that is not compatible with
-        // DigestAuthenticator.setWrappedVerifier
         final PoddSesameRealmImpl nextRealm =
                 new PoddSesameRealmImpl(nextRepository, PoddRdfConstants.DEFAULT_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");
         
-        final URI testAdminUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testAdmin");
-        final PoddUser testAdminUser =
-                new PoddUser("testAdminUser", "testAdminPassword".toCharArray(), "Test Admin", "User",
-                        "test.admin.user@example.com", PoddUserStatus.ACTIVE, testAdminUserHomePage, "UQ",
-                        "Orcid-Test-Admin");
-        final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
-        nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
+        // Check if there is a current admin, and only add our test admin user if there is no admin
+        // in the system
+        boolean foundCurrentAdmin = false;
+        for(RestletUtilUser nextUser : nextRealm.getUsers())
+        {
+            if(nextRealm.findRoles(nextUser).contains(PoddRoles.ADMIN.getRole()))
+            {
+                foundCurrentAdmin = true;
+                break;
+            }
+        }
         
-        final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);
-        
-        ApplicationUtils.log.debug("testAdminUserRoles: {}, {}", testAdminUserRoles, testAdminUserRoles.size());
-        
+        if(!foundCurrentAdmin)
+        {
+            final URI testAdminUserHomePage = PoddRdfConstants.VF.createURI("http://www.example.com/testAdmin");
+            String username =
+                    props.get(PoddWebConstants.PROPERTY_INITIAL_ADMIN_USERNAME,
+                            PoddWebConstants.DEFAULT_INITIAL_ADMIN_USERNAME);
+            char[] password =
+                    props.get(PoddWebConstants.PROPERTY_INITIAL_ADMIN_PASSWORD,
+                            PoddWebConstants.DEFAULT_INITIAL_ADMIN_PASSWORD).toCharArray();
+            final PoddUser testAdminUser =
+                    new PoddUser(username, password, "Initial Admin", "User", "initial.admin.user@example.com",
+                            PoddUserStatus.ACTIVE, testAdminUserHomePage, "Local Organisation", null);
+            final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
+            nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
+            
+            final Set<Role> testAdminUserRoles = nextRealm.findRoles(testAdminUser);
+            
+            ApplicationUtils.log.debug("testAdminUserRoles: {}, {}", testAdminUserRoles, testAdminUserRoles.size());
+            
+            // FIXME: Should put the application in maintenance mode at this point (when that is
+            // supported), to require password/username change before opening up to other users
+            
+        }
         // final User findUser = nextRealm.findUser("testAdminUser");
         
         // ApplicationUtils.log.debug("findUser: {}", findUser);
@@ -439,7 +459,7 @@ public class ApplicationUtils
         
         // final Context authenticatorChildContext = applicationContext.createChildContext();
         final ChallengeAuthenticator newAuthenticator =
-                ApplicationUtils.getNewAuthenticator(nextRealm, applicationContext, application.getPropertyUtil());
+                ApplicationUtils.getNewAuthenticator(nextRealm, applicationContext, props);
         application.setAuthenticator(newAuthenticator);
         
         application.setRealm(nextRealm);

@@ -54,11 +54,13 @@ public class PoddCSIRORestletComponent extends Component
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     
-    private String resetKey;
-    
     static
     {
-        // add the ability to view java.util.logging messages using SLF4J
+        // Optionally remove existing handlers attached to j.u.l root logger
+        SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
+        
+        // add SLF4JBridgeHandler to j.u.l's root logger, should be done once during
+        // the initialization phase of your application
         SLF4JBridgeHandler.install();
     }
     

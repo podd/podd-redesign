@@ -231,6 +231,11 @@ public interface PoddWebConstants
     
     public static final String PROPERTY_PURL_PREFIX = "podd.purl.prefix";
     
+    public static final String PROPERTY_INITIAL_ADMIN_USERNAME = "podd.initialadmin.username";
+    public static final String PROPERTY_INITIAL_ADMIN_PASSWORD = "podd.initialadmin.password";
+    
+    public static final String DEFAULT_INITIAL_ADMIN_USERNAME = "testAdminUser";
+    public static final String DEFAULT_INITIAL_ADMIN_PASSWORD = "testAdminPassword";
     /**
      * Key used to select published artifacts. Defaults to true.
      */
