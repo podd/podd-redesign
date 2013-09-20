@@ -1201,13 +1201,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb2.append("}");
         String sb2String = sb2.toString();
         
+        final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
         for(final Value property : properties)
         {
             if(property instanceof URI)
             {
                 // - find property: type (e.g. object/datatype/annotation), label, display-type,
                 // weight
-                final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
                 graphQuery2.setBinding("propertyUri", property);
                 
                 this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}", sb2String, property);
@@ -1244,7 +1244,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                                             PoddRdfConstants.VF.createURI("http://www.w3.org/2002/07/owl#onClass"),
                                             null).objects();
                         }
-                        
                         for(final Value nextRangeType : nextRangeTypes)
                         {
                             if(nextRangeType instanceof URI)
