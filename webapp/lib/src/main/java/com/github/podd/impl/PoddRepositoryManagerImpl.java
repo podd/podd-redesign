@@ -63,7 +63,7 @@ public class PoddRepositoryManagerImpl implements PoddRepositoryManager
                 e1.printStackTrace();
             }
             
-            throw new RuntimeException("Could not initialise PoddRepositoryManager with an in-memory repository");
+            throw new RuntimeException("Could not initialise PoddRepositoryManager with an in-memory repository", e);
         }
     }
     
