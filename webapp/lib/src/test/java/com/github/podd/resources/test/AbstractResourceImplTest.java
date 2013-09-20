@@ -285,13 +285,20 @@ public class AbstractResourceImplTest
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        return getText(results);
+        try
+        {
+            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            return getText(results);
+        }
+        finally
+        {
+            releaseClient(getArtifactClientResource);
+        }
     }
     
     /**
@@ -357,19 +364,36 @@ public class AbstractResourceImplTest
         final ClientResource uploadArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_UPLOAD));
         
-        final Representation input = this.buildRepresentationFromResource(resourceName, mediaType);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        String body = getText(results);
-        // this.log.info(body);
-        this.assertFreemarker(body);
-        
-        final Collection<InferredOWLOntologyID> ontologyIDs = OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
-        
-        Assert.assertEquals("Should have got only 1 Ontology ID", 1, ontologyIDs.size());
-        return ontologyIDs.iterator().next();
+        try
+        {
+            final Representation input = this.buildRepresentationFromResource(resourceName, mediaType);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(uploadArtifactClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            String body = getText(results);
+            // this.log.info(body);
+            this.assertFreemarker(body);
+            
+            final Collection<InferredOWLOntologyID> ontologyIDs =
+                    OntologyUtils.stringToOntologyID(body, RDFFormat.TURTLE);
+            
+            Assert.assertEquals("Should have got only 1 Ontology ID", 1, ontologyIDs.size());
+            return ontologyIDs.iterator().next();
+        }
+        finally
+        {
+            releaseClient(uploadArtifactClientResource);
+        }
+    }
+    
+    protected void releaseClient(ClientResource clientResource) throws Exception
+    {
+        if(clientResource != null && clientResource.getNext() != null && clientResource.getNext() instanceof Client)
+        {
+            Client c = (Client)clientResource.getNext();
+            c.stop();
+        }
     }
     
     protected String getText(Representation representation) throws IOException
@@ -499,23 +523,30 @@ public class AbstractResourceImplTest
         
         final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
         
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(userInfoModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response has 1 statement and identifier is correct
-        final Model model = this.assertRdf(results, RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        
-        // return the unique URI assigned to this User
-        final Resource next =
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
-        return next.stringValue();
+        try
+        {
+            StringWriter out = new StringWriter();
+            Rio.write(userInfoModel, out, format);
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response has 1 statement and identifier is correct
+            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 1);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            
+            // return the unique URI assigned to this User
+            final Resource next =
+                    model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next();
+            return next.stringValue();
+        }
+        finally
+        {
+            releaseClient(userAddClientResource);
+        }
     }
     
     /**
@@ -548,16 +579,23 @@ public class AbstractResourceImplTest
         // submit modified details to User Roles Service
         final ClientResource userRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
-        userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(newModel, out, format);
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        final Representation modifiedResults =
-                RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", userIdentifier,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        try
+        {
+            userRolesClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Rio.write(newModel, out, format);
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            final Representation modifiedResults =
+                    RestletTestUtils.doTestAuthenticatedRequest(userRolesClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            final Model model = this.assertRdf(modifiedResults, RDFFormat.RDFXML, 1);
+            Assert.assertEquals("Unexpected user identifier", userIdentifier,
+                    model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        }
+        finally
+        {
+            releaseClient(userRolesClientResource);
+        }
     }
     
     /**

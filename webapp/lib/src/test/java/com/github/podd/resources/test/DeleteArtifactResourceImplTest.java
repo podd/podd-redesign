@@ -42,34 +42,44 @@ public class DeleteArtifactResourceImplTest extends AbstractResourceImplTest
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
-        
         final ClientResource deleteArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_DELETE));
         
-        deleteArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        deleteArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        
-        
-        RestletTestUtils.doTestAuthenticatedRequest(deleteArtifactClientResource, Method.DELETE, null,
-                MediaType.APPLICATION_RDF_XML, Status.SUCCESS_NO_CONTENT, this.testWithAdminPrivileges);        
+        try
+        {
+            deleteArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            deleteArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            
+            RestletTestUtils.doTestAuthenticatedRequest(deleteArtifactClientResource, Method.DELETE, null,
+                    MediaType.APPLICATION_RDF_XML, Status.SUCCESS_NO_CONTENT, this.testWithAdminPrivileges);
+        }
+        finally
+        {
+            releaseClient(deleteArtifactClientResource);
+        }
         
         // verify: try to retrieve deleted artifact
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
+        
         try
         {
+            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
             RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
             Assert.fail("Should have failed with a NOT_FOUND error");
         }
         catch(ResourceException e)
         {
-            Assert.assertNotNull(e);
+            // TODO: Test the exception
         }
-    }    
+        finally
+        {
+            releaseClient(getArtifactClientResource);
+        }
+    }
     
 }

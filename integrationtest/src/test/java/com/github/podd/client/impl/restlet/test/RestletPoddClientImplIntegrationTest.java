@@ -16,6 +16,7 @@
  */
 package com.github.podd.client.impl.restlet.test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -26,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
+import org.restlet.Client;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
 import com.github.podd.api.file.DataReference;
@@ -114,13 +117,44 @@ public class RestletPoddClientImplIntegrationTest extends AbstractPoddClientTest
     }
     
     @Override
-    protected void resetTestPoddServer()
+    protected void resetTestPoddServer() throws IOException
     {
         // Reset server after each test so that assertions are not dependent on the order of the
         // tests, which is unpredictable
         // HACK: This presumes that this reset service will exist and that it has this URL
-        final ClientResource resource = new ClientResource(this.getTestPoddServerUrl() + "/reset/r3set");
-        resource.get();
+        final ClientResource clientResource = new ClientResource(this.getTestPoddServerUrl() + "/reset/r3set");
+        try
+        {
+            Representation representation = clientResource.get();
+            try
+            {
+                representation.exhaust();
+            }
+            finally
+            {
+                representation.release();
+            }
+        }
+        finally
+        {
+            if(clientResource.getNext() != null && clientResource.getNext() instanceof Client)
+            {
+                Client c = (Client)clientResource.getNext();
+                try
+                {
+                    c.stop();
+                }
+                catch(IOException e)
+                {
+                    throw e;
+                }
+                catch(Exception e)
+                {
+                    throw new IOException(e);
+                }
+            }
+            
+        }
     }
     
     @Override

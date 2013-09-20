@@ -154,33 +154,40 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         final ClientResource fileRefAttachClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
         
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        // Query parameter Verification policy - NOT SUPPLIED - defaults to false
-        
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
-                        MediaType.APPLICATION_RDF_XML);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        
-        // verify: Inferred Ontology ID is received in RDF format
-        Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
-        Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
-        Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
-        Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
-        
-        // verify: new file reference has been added to the artifact
-        final String artifactBody =
-                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
-        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
-        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+        try
+        {
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            // Query parameter Verification policy - NOT SUPPLIED - defaults to false
+            
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                            MediaType.APPLICATION_RDF_XML);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            
+            // verify: Inferred Ontology ID is received in RDF format
+            Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
+            Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
+            Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+            Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+            
+            // verify: new file reference has been added to the artifact
+            final String artifactBody =
+                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
+            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
+            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+        }
+        finally
+        {
+            releaseClient(fileRefAttachClientResource);
+        }
     }
     
     /**
@@ -207,32 +214,43 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             final ClientResource fileRefAttachClientResource =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
             
-            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                    .getOntologyIRI().toString());
-            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                    .getVersionIRI().toString());
-            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
-                    Boolean.toString(true));
-            
-            final Representation input = new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_XML);
-            
-            final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-            
-            final String body = getText(results);
-            
-            // verify: Inferred Ontology ID is received in RDF format
-            Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
-            Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
-            Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
-            Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
-            
-            // verify: new file reference has been added to the artifact
-            final String artifactBody =
-                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
-            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
-            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+            try
+            {
+                fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                        .getOntologyIRI().toString());
+                fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER,
+                        artifactID.getVersionIRI().toString());
+                fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
+                        Boolean.toString(true));
+                
+                final Representation input =
+                        new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_XML);
+                
+                final Representation results =
+                        RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                                MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                
+                final String body = getText(results);
+                
+                // verify: Inferred Ontology ID is received in RDF format
+                Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
+                Assert.assertTrue("Artifact version has not been updated properly",
+                        body.contains("artifact:1:version:2"));
+                Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+                Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+                
+                // verify: new file reference has been added to the artifact
+                final String artifactBody =
+                        this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
+                Assert.assertTrue("New file ref not added to artifact",
+                        artifactBody.contains("Rice tree scan 003454-98"));
+                Assert.assertTrue("New file ref not added to artifact",
+                        artifactBody.contains("object-rice-scan-34343-a"));
+            }
+            finally
+            {
+                releaseClient(fileRefAttachClientResource);
+            }
         }
         finally
         {
@@ -253,32 +271,39 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         final ClientResource fileRefAttachClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
         
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        // Query parameter Verification policy - NOT SUPPLIED - defaults to false
-        
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT_TTL,
-                        MediaType.APPLICATION_RDF_TURTLE);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        
-        // verify: An updated Inferred Ontology ID is received
-        Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
-        Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
-        Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
-        
-        // verify: new file reference has been added to the artifact
-        final String artifactBody =
-                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
-        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
-        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+        try
+        {
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            // Query parameter Verification policy - NOT SUPPLIED - defaults to false
+            
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT_TTL,
+                            MediaType.APPLICATION_RDF_TURTLE);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            
+            // verify: An updated Inferred Ontology ID is received
+            Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
+            Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+            Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+            
+            // verify: new file reference has been added to the artifact
+            final String artifactBody =
+                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
+            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
+            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+        }
+        finally
+        {
+            releaseClient(fileRefAttachClientResource);
+        }
     }
     
     /**
@@ -305,32 +330,42 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             final ClientResource fileRefAttachClientResource =
                     new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
             
-            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                    .getOntologyIRI().toString());
-            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                    .getVersionIRI().toString());
-            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
-                    Boolean.toString(true));
-            
-            final Representation input =
-                    new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_TURTLE);
-            
-            final Representation results =
-                    RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
-                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-            
-            final String body = getText(results);
-            
-            // verify: Inferred Ontology ID is received in RDF format
-            Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
-            Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
-            Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
-            
-            // verify: new file reference has been added to the artifact
-            final String artifactBody =
-                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
-            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
-            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+            try
+            {
+                fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                        .getOntologyIRI().toString());
+                fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER,
+                        artifactID.getVersionIRI().toString());
+                fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
+                        Boolean.toString(true));
+                
+                final Representation input =
+                        new StringRepresentation(fileReferenceAsString, MediaType.APPLICATION_RDF_TURTLE);
+                
+                final Representation results =
+                        RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
+                                MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+                
+                final String body = getText(results);
+                
+                // verify: Inferred Ontology ID is received in RDF format
+                Assert.assertTrue("Artifact version has not been updated properly",
+                        body.contains("artifact:1:version:2"));
+                Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+                Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+                
+                // verify: new file reference has been added to the artifact
+                final String artifactBody =
+                        this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
+                Assert.assertTrue("New file ref not added to artifact",
+                        artifactBody.contains("Rice tree scan 003454-98"));
+                Assert.assertTrue("New file ref not added to artifact",
+                        artifactBody.contains("object-rice-scan-34343-a"));
+            }
+            finally
+            {
+                releaseClient(fileRefAttachClientResource);
+            }
         }
         finally
         {
@@ -351,21 +386,22 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
-        final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
-        
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
-        
         final Representation input =
                 this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
                         MediaType.APPLICATION_RDF_XML);
         
+        final ClientResource fileRefAttachClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+        
         try
         {
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
+                    Boolean.toString(true));
+            
             RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.testWithAdminPrivileges);
             Assert.fail("Should have thrown a ResourceException");
@@ -376,6 +412,10 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             final Representation responseEntity = fileRefAttachClientResource.getResponseEntity();
             Assert.assertTrue(getText(responseEntity).contains("File Reference validation resulted in failures"));
         }
+        finally
+        {
+            releaseClient(fileRefAttachClientResource);
+        }
     }
     
     @Test
@@ -384,26 +424,33 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         // prepare: dummy artifact details
         final String artifactUri = "urn:purl:dummy:artifact:uri:artifact:1";
         
-        final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
-        
-        // Query parameter Artifact ID - NOT SUPPLIED
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
-        
         this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
                 MediaType.APPLICATION_RDF_XML);
         
-        // there is no need to authenticate, have a test artifact or send RDF content as the
-        // artifact ID is checked for first
+        final ClientResource fileRefAttachClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+        
         try
         {
+            // Query parameter Artifact ID - NOT SUPPLIED
+            fileRefAttachClientResource
+                    .addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
+                    Boolean.toString(true));
+            
+            // there is no need to authenticate, have a test artifact or send RDF content as the
+            // artifact ID is checked for first
+            
             fileRefAttachClientResource.post(null, MediaType.TEXT_PLAIN);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(fileRefAttachClientResource);
         }
     }
     
@@ -416,26 +463,32 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         // prepare: dummy artifact details
         final String artifactUri = "urn:purl:dummy:artifact:uri:artifact:1";
         
-        final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
-        
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
-        
         final Representation input =
                 this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
                         MediaType.APPLICATION_RDF_XML);
         
+        final ClientResource fileRefAttachClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+        
         // invoke without authentication
         try
         {
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            fileRefAttachClientResource
+                    .addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
+                    Boolean.toString(true));
+            
             fileRefAttachClientResource.post(input, MediaType.APPLICATION_RDF_XML);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(fileRefAttachClientResource);
         }
     }
     
@@ -445,20 +498,21 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         // prepare: dummy artifact details
         final String artifactUri = "urn:purl:dummy:artifact:uri:artifact:1";
         
-        final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
-        
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        // Query parameter Version IRI - NOT SUPPLIED
-        fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY, Boolean.toString(true));
-        
         final Representation input =
                 this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
                         MediaType.APPLICATION_RDF_XML);
         
+        final ClientResource fileRefAttachClientResource =
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+        
         // authentication is required as version IRI is checked AFTER authentication
         try
         {
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            // Query parameter Version IRI - NOT SUPPLIED
+            fileRefAttachClientResource.addQueryParameter(PoddWebConstants.KEY_VERIFICATION_POLICY,
+                    Boolean.toString(true));
+            
             RestletTestUtils.doTestAuthenticatedRequest(fileRefAttachClientResource, Method.POST, input,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_BAD_REQUEST, this.testWithAdminPrivileges);
             Assert.fail("Should have thrown a ResourceException");
@@ -466,6 +520,10 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(fileRefAttachClientResource);
         }
     }
     

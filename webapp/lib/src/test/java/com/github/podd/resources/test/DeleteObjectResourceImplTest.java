@@ -54,27 +54,34 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
         final ClientResource deleteObjectClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_OBJECT_DELETE));
         
-        deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectToDelete);
-        deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_CASCADE, Boolean.toString(false));
-        
-        Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
-                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response contains updated artifact's ID
-        final String updatedArtifactDetails = getText(results);
-        Assert.assertTrue("Artifact version has not been updated properly",
-                updatedArtifactDetails.contains("artifact:1:version:2"));
-        
-        // verify: retrieve artifact and check deleted object's not present
-        final Model retrievedArtifact = this.getArtifact(artifactID.getOntologyIRI().toString(), 81);
-        final URI objectToDeleteUri = PoddRdfConstants.VF.createURI(objectToDelete);
-        Assert.assertTrue("Object not deleted", retrievedArtifact.filter(objectToDeleteUri, null, null).isEmpty());
-        Assert.assertTrue("Object not deleted", retrievedArtifact.filter(null, null, objectToDeleteUri).isEmpty());
+        try
+        {
+            deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectToDelete);
+            deleteObjectClientResource.addQueryParameter(PoddWebConstants.KEY_CASCADE, Boolean.toString(false));
+            
+            Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(deleteObjectClientResource, Method.DELETE, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response contains updated artifact's ID
+            final String updatedArtifactDetails = getText(results);
+            Assert.assertTrue("Artifact version has not been updated properly",
+                    updatedArtifactDetails.contains("artifact:1:version:2"));
+            
+            // verify: retrieve artifact and check deleted object's not present
+            final Model retrievedArtifact = this.getArtifact(artifactID.getOntologyIRI().toString(), 81);
+            final URI objectToDeleteUri = PoddRdfConstants.VF.createURI(objectToDelete);
+            Assert.assertTrue("Object not deleted", retrievedArtifact.filter(objectToDeleteUri, null, null).isEmpty());
+            Assert.assertTrue("Object not deleted", retrievedArtifact.filter(null, null, objectToDeleteUri).isEmpty());
+        }
+        finally
+        {
+            releaseClient(deleteObjectClientResource);
+        }
     }
     
     private Model getArtifact(final String artifactUri, final int expectedStatementCount) throws Exception
@@ -82,15 +89,21 @@ public class DeleteObjectResourceImplTest extends AbstractResourceImplTest
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation getArtifactResult =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model model =
-                this.assertRdf(new StringReader(getText(getArtifactResult)), RDFFormat.RDFXML, expectedStatementCount);
-        
-        return model;
+        try
+        {
+            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation getArtifactResult =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model model = this.assertRdf(getArtifactResult, RDFFormat.RDFXML, expectedStatementCount);
+            
+            return model;
+        }
+        finally
+        {
+            releaseClient(getArtifactClientResource);
+        }
     }
 }

@@ -46,6 +46,7 @@ import org.restlet.resource.ResourceException;
 
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.ansell.restletutils.test.RestletTestUtils;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUserStatus;
@@ -113,19 +114,26 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
         
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Rio.write(userInfoModel, out, format);
-        
-        final Representation input = new StringRepresentation(out.toString(), mediaType);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // verify: response has same correct identifier
-        final Model model = this.assertRdf(new StringReader(getText(results)), RDFFormat.RDFXML, 1);
-        Assert.assertEquals("Unexpected user identifier", testEmail,
-                model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        try
+        {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Rio.write(userInfoModel, out, format);
+            
+            final Representation input = new StringRepresentation(out.toString(), mediaType);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.POST, input, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // verify: response has same correct identifier
+            final Model model = this.assertRdf(new StringReader(getText(results)), RDFFormat.RDFXML, 1);
+            Assert.assertEquals("Unexpected user identifier", testEmail,
+                    model.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+        }
+        finally
+        {
+            releaseClient(userAddClientResource);
+        }
     }
     
     /**
@@ -136,17 +144,24 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
         
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        this.assertFreemarker(body);
-        
-        System.out.println(body);
-        
-        Assert.assertTrue("Page missing INACTIVE status", body.contains(PoddUserStatus.INACTIVE.getLabel()));
-        Assert.assertTrue("Page missing password field", body.contains("password"));
+        try
+        {
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userAddClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            this.assertFreemarker(body);
+            
+            System.out.println(body);
+            
+            Assert.assertTrue("Page missing INACTIVE status", body.contains(PoddUserStatus.INACTIVE.getLabel()));
+            Assert.assertTrue("Page missing password field", body.contains("password"));
+        }
+        finally
+        {
+            releaseClient(userAddClientResource);
+        }
     }
     
     @Test
@@ -169,22 +184,31 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
         
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
+        try
+        {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model resultsModel = this.assertRdf(new StringReader(getText(results)), format, 19);
+            
+            com.github.podd.utils.DebugUtils.printContents(resultsModel);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            Assert.assertEquals("Unexpected user URI", testUserUri,
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator()
+                            .next().stringValue());
+            Assert.assertEquals("Unexpected user Status", PoddUserStatus.ACTIVE.getURI(),
+                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
+        }
         
-        final Model resultsModel = this.assertRdf(new StringReader(getText(results)), format, 19);
-        
-        com.github.podd.utils.DebugUtils.printContents(resultsModel);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Unexpected user URI", testUserUri,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next()
-                        .stringValue());
-        Assert.assertEquals("Unexpected user Status", PoddUserStatus.ACTIVE.getURI(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
     }
     
     /**
@@ -206,30 +230,37 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model resultsModel = this.assertRdf(new StringReader(getText(results)), format, 8);
-        
-        com.github.podd.utils.DebugUtils.printContents(resultsModel);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Unexpected user URI", testUserUri,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next()
-                        .stringValue());
-        Assert.assertEquals("User Status was not set to INACTIVE by default", PoddUserStatus.INACTIVE.getURI(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
-        
-        // verify: Project Creator Role has been assigned by default
-        final Set<Resource> roleMappings =
-                resultsModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
-        Assert.assertEquals("No Role Mappings set", 1, roleMappings.size());
-        final Resource roleMappingUri = (Resource)roleMappings.toArray()[0];
-        Assert.assertEquals("Project_Creator Role not mapped", PoddRoles.PROJECT_CREATOR.getURI(),
-                resultsModel.filter(roleMappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI());
+        try
+        {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model resultsModel = this.assertRdf(results, format, 8);
+            
+            DebugUtils.printContents(resultsModel);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            Assert.assertEquals("Unexpected user URI", testUserUri,
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator()
+                            .next().stringValue());
+            Assert.assertEquals("User Status was not set to INACTIVE by default", PoddUserStatus.INACTIVE.getURI(),
+                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+            
+            // verify: Project Creator Role has been assigned by default
+            final Set<Resource> roleMappings =
+                    resultsModel.filter(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING).subjects();
+            Assert.assertEquals("No Role Mappings set", 1, roleMappings.size());
+            final Resource roleMappingUri = (Resource)roleMappings.toArray()[0];
+            Assert.assertEquals("Project_Creator Role not mapped", PoddRoles.PROJECT_CREATOR.getURI(), resultsModel
+                    .filter(roleMappingUri, SesameRealmConstants.OAS_ROLEMAPPEDROLE, null).objectURI());
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
+        }
     }
     
     @Test
@@ -251,22 +282,29 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         
         final ClientResource userDetailsClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_DETAILS));
-        userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final Model resultsModel = this.assertRdf(new StringReader(getText(results)), format, 12);
-        
-        com.github.podd.utils.DebugUtils.printContents(resultsModel);
-        Assert.assertEquals("Unexpected user identifier", testIdentifier,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
-        Assert.assertEquals("Unexpected user URI", testUserUri,
-                resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator().next()
-                        .stringValue());
-        Assert.assertEquals("User Status was not set to INACTIVE by default", PoddUserStatus.INACTIVE.getURI(),
-                resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+        try
+        {
+            userDetailsClientResource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, testIdentifier);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(userDetailsClientResource, Method.GET, null, mediaType,
+                            Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final Model resultsModel = this.assertRdf(results, format, 12);
+            
+            com.github.podd.utils.DebugUtils.printContents(resultsModel);
+            Assert.assertEquals("Unexpected user identifier", testIdentifier,
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).objectString());
+            Assert.assertEquals("Unexpected user URI", testUserUri,
+                    resultsModel.filter(null, SesameRealmConstants.OAS_USERIDENTIFIER, null).subjects().iterator()
+                            .next().stringValue());
+            Assert.assertEquals("User Status was not set to INACTIVE by default", PoddUserStatus.INACTIVE.getURI(),
+                    resultsModel.filter(null, PoddRdfConstants.PODD_USER_STATUS, null).objectURI());
+        }
+        finally
+        {
+            releaseClient(userDetailsClientResource);
+        }
     }
     
     @Test
@@ -304,12 +342,12 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         userInfoModel.add(tempUserUri, SesameRealmConstants.OAS_USEREMAIL,
                 PoddRdfConstants.VF.createLiteral(testIdentifier));
         
-        final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
-        
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(userInfoModel, out, format);
         
         final Representation input = new StringRepresentation(out.toString(), mediaType);
+        
+        final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
         
         try
         {
@@ -324,6 +362,10 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             final String body = getText(userAddClientResource.getResponseEntity());
             System.out.println(body);
             Assert.assertTrue("Expected cause is missing", body.contains("User already exists"));
+        }
+        finally
+        {
+            releaseClient(userAddClientResource);
         }
     }
     
@@ -344,6 +386,10 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         catch(final ResourceException e)
         {
             Assert.assertEquals("Expected an UNAUTHORIZED error", Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(userAddClientResource);
         }
     }
     
@@ -377,11 +423,11 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
         userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDUSER, tempUserUri);
         userInfoModel.add(authenticatedRoleMapping, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
         
-        final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
-        
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         Rio.write(userInfoModel, out, format);
         final Representation input = new StringRepresentation(out.toString(), mediaType);
+        
+        final ClientResource userAddClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ADD));
         
         try
         {
@@ -395,6 +441,10 @@ public class UserAddResourceImplTest extends AbstractResourceImplTest
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
             final String body = getText(userAddClientResource.getResponseEntity());
             Assert.assertTrue("Expected cause is missing", body.contains("User Email cannot be empty"));
+        }
+        finally
+        {
+            releaseClient(userAddClientResource);
         }
     }
     

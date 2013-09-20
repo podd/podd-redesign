@@ -125,16 +125,23 @@ public class UploadArtifactResourcePerformanceTest extends AbstractResourceImplT
         final ClientResource getArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_GET_BASE));
         
-        getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // load into a Model and find statement count
-        final Model model = Rio.parse(new StringReader(getText(results)), "", RDFFormat.TURTLE);
-        
-        return model.size();
+        try
+        {
+            getArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactClientResource, Method.GET, null,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            // load into a Model and find statement count
+            final Model model = Rio.parse(new StringReader(getText(results)), "", RDFFormat.TURTLE);
+            
+            return model.size();
+        }
+        finally
+        {
+            releaseClient(getArtifactClientResource);
+        }
     }
     
     /**

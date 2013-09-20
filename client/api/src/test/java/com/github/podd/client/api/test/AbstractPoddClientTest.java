@@ -137,8 +137,10 @@ public abstract class AbstractPoddClientTest
     /**
      * Resets the test PODD server if possible. If not possible it is not recommended to rely on
      * these tests for extensive verification.
+     * 
+     * @throws IOException
      */
-    protected abstract void resetTestPoddServer();
+    protected abstract void resetTestPoddServer() throws IOException;
     
     /**
      * @throws java.lang.Exception

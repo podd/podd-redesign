@@ -314,10 +314,7 @@ public class UploadArtifactResourceImplTest extends AbstractResourceImplTest
                                 }
                                 finally
                                 {
-                                    if(uploadArtifactClientResource != null)
-                                    {
-                                        uploadArtifactClientResource.release();
-                                    }
+                                    releaseClient(uploadArtifactClientResource);
                                 }
                             }
                             threadSuccessCount.incrementAndGet();

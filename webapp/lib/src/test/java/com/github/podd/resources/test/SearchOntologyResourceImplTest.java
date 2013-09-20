@@ -16,9 +16,8 @@
  */
 package com.github.podd.resources.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.StringReader;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,9 +26,7 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
-import org.openrdf.rio.helpers.StatementCollector;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
@@ -56,30 +53,32 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
     {
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
         
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, searchTerm);
-        if(artifactUri != null)
+        try
         {
-            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, searchTerm);
+            if(artifactUri != null)
+            {
+                searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            }
+            
+            for(final String searchType : searchTypes)
+            {
+                searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES, searchType);
+            }
+            
+            // invoke the search resource
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null,
+                            requestMediaType, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            RDFFormat format = Rio.getParserFormatForMIMEType(requestMediaType.getName(), RDFFormat.RDFXML);
+            // construct a Model out of the result
+            return Rio.parse(new StringReader(this.getText(results)), "", format);
         }
-        
-        for(final String searchType : searchTypes)
+        finally
         {
-            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES, searchType);
+            releaseClient(searchClientResource);
         }
-        
-        // invoke the search resource
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(searchClientResource, Method.GET, null, requestMediaType,
-                        Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        // construct a Model out of the result
-        final Model resultModel = new LinkedHashModel();
-        final RDFParser parser =
-                Rio.createParser(Rio.getWriterFormatForMIMEType(requestMediaType.getName(), RDFFormat.RDFXML));
-        parser.setRDFHandler(new StatementCollector(resultModel));
-        parser.parse(results.getStream(), "");
-        
-        return resultModel;
     }
     
     @Test
@@ -88,21 +87,25 @@ public class SearchOntologyResourceImplTest extends AbstractResourceImplTest
         // prepare:
         final ClientResource searchClientResource = new ClientResource(this.getUrl(PoddWebConstants.PATH_SEARCH));
         
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "Scan");
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, "http://no.such.artifact");
-        searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
-                "http://purl.org/podd/ns/poddScience#Platform");
-        
         // there is no need to authenticate or have a test artifact as the artifact ID is checked
         // for first
         try
         {
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCHTERM, "Scan");
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, "http://no.such.artifact");
+            searchClientResource.addQueryParameter(PoddWebConstants.KEY_SEARCH_TYPES,
+                    "http://purl.org/podd/ns/poddScience#Platform");
+            
             searchClientResource.get(MediaType.APPLICATION_RDF_XML);
             Assert.fail("Should have thrown a ResourceException");
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(searchClientResource);
         }
     }
     

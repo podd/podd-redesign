@@ -65,34 +65,42 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
-        // "force" query parameter is false by default
-        
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
-                        MediaType.APPLICATION_RDF_XML);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        
-        // verify: Inferred Ontology ID is received in RDF format
-        Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
-        Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
-        Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
-        Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
-        
-        // verify: publication46 has been added to the artifact
-        final String artifactBody =
-                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
-        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
-        Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+        try
+        {
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE,
+                    Boolean.toString(false));
+            // "force" query parameter is false by default
+            
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                            MediaType.APPLICATION_RDF_XML);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            
+            // verify: Inferred Ontology ID is received in RDF format
+            Assert.assertTrue("Response not in RDF format", body.contains("<rdf:RDF"));
+            Assert.assertTrue("Artifact version has not been updated properly", body.contains("artifact:1:version:2"));
+            Assert.assertTrue("Version IRI not in response", body.contains("versionIRI"));
+            Assert.assertTrue("Inferred version not in response", body.contains("inferredVersion"));
+            
+            // verify: publication46 has been added to the artifact
+            final String artifactBody =
+                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_XML);
+            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("Rice tree scan 003454-98"));
+            Assert.assertTrue("New file ref not added to artifact", artifactBody.contains("object-rice-scan-34343-a"));
+        }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
+        }
     }
     
     @Test
@@ -105,37 +113,45 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(false));
-        // "force" query parameter is false by default
-        
-        // edit Representation contains statements in Turtle format
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT,
-                        MediaType.APPLICATION_RDF_TURTLE);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String updatedArtifactDetails = getText(results);
-        
-        // verify: Inferred Ontology ID is NOT in RDF format
-        Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
-        Assert.assertTrue("Artifact version has not been updated properly",
-                updatedArtifactDetails.contains("artifact:1:version:2"));
-        Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
-        Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
-        
-        // verify: publication46 has been added to the artifact
-        final String artifactBody =
-                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
-        Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication46"));
-        // Assert.assertTrue("New publication not added to artifact",
-        // artifactBody.contains("http://dx.doi.org/10.1109/eScience.2013.44"));
+        try
+        {
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE,
+                    Boolean.toString(false));
+            // "force" query parameter is false by default
+            
+            // edit Representation contains statements in Turtle format
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_PUBLICATION_OBJECT,
+                            MediaType.APPLICATION_RDF_TURTLE);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String updatedArtifactDetails = getText(results);
+            
+            // verify: Inferred Ontology ID is NOT in RDF format
+            Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
+            Assert.assertTrue("Artifact version has not been updated properly",
+                    updatedArtifactDetails.contains("artifact:1:version:2"));
+            Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
+            Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
+            
+            // verify: publication46 has been added to the artifact
+            final String artifactBody =
+                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
+            Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication46"));
+            // Assert.assertTrue("New publication not added to artifact",
+            // artifactBody.contains("http://dx.doi.org/10.1109/eScience.2013.44"));
+        }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
+        }
     }
     
     @Test
@@ -148,41 +164,50 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(true));
-        
-        // edit Representation contains statements in Turtle format
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION,
-                        MediaType.APPLICATION_RDF_TURTLE);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String updatedArtifactDetails = getText(results);
-        
-        // verify: Inferred Ontology ID is NOT in RDF format
-        Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
-        Assert.assertTrue("Artifact version has not been updated properly",
-                updatedArtifactDetails.contains("artifact:1:version:2"));
-        Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
-        Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
-        
-        // verify: objects left dangling after edit have been removed from the artifact
-        final String artifactBody =
-                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
-        final String[] danglingObjects =
-                { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3",
-                        "http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A", };
-        for(final String deletedObject : danglingObjects)
+        try
         {
-            Assert.assertFalse("Dangling object still exists", artifactBody.contains(deletedObject));
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            editArtifactClientResource
+                    .addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(true));
+            
+            // edit Representation contains statements in Turtle format
+            final Representation input =
+                    this.buildRepresentationFromResource(
+                            TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION,
+                            MediaType.APPLICATION_RDF_TURTLE);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String updatedArtifactDetails = getText(results);
+            
+            // verify: Inferred Ontology ID is NOT in RDF format
+            Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
+            Assert.assertTrue("Artifact version has not been updated properly",
+                    updatedArtifactDetails.contains("artifact:1:version:2"));
+            Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
+            Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
+            
+            // verify: objects left dangling after edit have been removed from the artifact
+            final String artifactBody =
+                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
+            final String[] danglingObjects =
+                    { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial",
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_genotype_3",
+                            "http://purl.org/podd/basic-2-20130206/artifact:1#Sequence_A", };
+            for(final String deletedObject : danglingObjects)
+            {
+                Assert.assertFalse("Dangling object still exists", artifactBody.contains(deletedObject));
+            }
+        }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
         }
     }
     
@@ -196,64 +221,72 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(true));
-        
-        // prepare: add (temporary) object URIs that are being added
-        final String[] newObjects =
-                { "urn:temp:uuid:object-rice-scan-34343-a", "urn:temp:uuid:publication35",
-                        "urn:temp:uuid:publication46" };
-        for(final String objectUri : newObjects)
+        try
         {
-            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            editArtifactClientResource
+                    .addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(true));
+            
+            // prepare: add (temporary) object URIs that are being added
+            final String[] newObjects =
+                    { "urn:temp:uuid:object-rice-scan-34343-a", "urn:temp:uuid:publication35",
+                            "urn:temp:uuid:publication46" };
+            for(final String objectUri : newObjects)
+            {
+                editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
+            }
+            
+            // edit Representation contains statements in Turtle format
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_MULTIPLE_OBJECTS_TTL,
+                            MediaType.APPLICATION_RDF_TURTLE);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
+                            MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String updatedArtifactDetails = getText(results);
+            
+            // verify: Inferred Ontology ID is NOT in RDF format
+            Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
+            Assert.assertTrue("Artifact version has not been updated properly",
+                    updatedArtifactDetails.contains("artifact:1:version:2"));
+            Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
+            Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
+            
+            // verify: response contains the ontology ID
+            final Model model = Rio.parse(new StringReader(updatedArtifactDetails), "", RDFFormat.TURTLE);
+            final Collection<InferredOWLOntologyID> updatedOntologyID = OntologyUtils.modelToOntologyIDs(model);
+            Assert.assertEquals("Response did not contain an ontology ID", 1, updatedOntologyID.size());
+            
+            // verify: response contains object URIs and their PURLs
+            for(final String objectUri : newObjects)
+            {
+                final String purl =
+                        model.filter(PoddRdfConstants.VF.createURI(objectUri),
+                                PoddRdfConstants.PODD_REPLACED_TEMP_URI_WITH, null).objectString();
+                Assert.assertNotNull("Object URI's PURL not in response", purl);
+                Assert.assertTrue("PURL does not start as expected", purl.startsWith("http://example.org/purl/"));
+            }
+            
+            final String artifactBody =
+                    this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
+            // verify: publication46 has been added to the artifact
+            Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication46"));
+            // Assert.assertTrue("New publication not added to artifact",
+            // artifactBody.contains("http://dx.doi.org/10.1109/eScience.2013.44"));
+            
+            // verify: publication46 has been added to the artifact
+            Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication35"));
         }
-        
-        // edit Representation contains statements in Turtle format
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_MULTIPLE_OBJECTS_TTL,
-                        MediaType.APPLICATION_RDF_TURTLE);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
-                        MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String updatedArtifactDetails = getText(results);
-        
-        // verify: Inferred Ontology ID is NOT in RDF format
-        Assert.assertFalse("Response should not be in RDF format", updatedArtifactDetails.contains("<rdf:RDF"));
-        Assert.assertTrue("Artifact version has not been updated properly",
-                updatedArtifactDetails.contains("artifact:1:version:2"));
-        Assert.assertTrue("Version IRI not in response", updatedArtifactDetails.contains("versionIRI"));
-        Assert.assertTrue("Inferred version not in response", updatedArtifactDetails.contains("inferredVersion"));
-        
-        // verify: response contains the ontology ID
-        final Model model = Rio.parse(new StringReader(updatedArtifactDetails), "", RDFFormat.TURTLE);
-        final Collection<InferredOWLOntologyID> updatedOntologyID = OntologyUtils.modelToOntologyIDs(model);
-        Assert.assertEquals("Response did not contain an ontology ID", 1, updatedOntologyID.size());
-        
-        // verify: response contains object URIs and their PURLs
-        for(final String objectUri : newObjects)
+        finally
         {
-            final String purl =
-                    model.filter(PoddRdfConstants.VF.createURI(objectUri),
-                            PoddRdfConstants.PODD_REPLACED_TEMP_URI_WITH, null).objectString();
-            Assert.assertNotNull("Object URI's PURL not in response", purl);
-            Assert.assertTrue("PURL does not start as expected", purl.startsWith("http://example.org/purl/"));
+            releaseClient(editArtifactClientResource);
         }
-        
-        final String artifactBody =
-                this.getArtifactAsString(artifactID.getOntologyIRI().toString(), MediaType.APPLICATION_RDF_TURTLE);
-        // verify: publication46 has been added to the artifact
-        Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication46"));
-        // Assert.assertTrue("New publication not added to artifact",
-        // artifactBody.contains("http://dx.doi.org/10.1109/eScience.2013.44"));
-        
-        // verify: publication46 has been added to the artifact
-        Assert.assertTrue("New publication not added to artifact", artifactBody.contains("publication35"));
     }
     
     @Test
@@ -262,27 +295,28 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         // prepare: add an artifact
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        // prepare: set an INVALID artifact IRI
+        final String incorrectArtifactID = artifactID.getOntologyIRI().toString() + "_wrong";
         
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        // prepare: set an INVALID artifact IRI
-        final String incorrectArtifactID = artifactID.getOntologyIRI().toString() + "_wrong";
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, incorrectArtifactID);
-        
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(false));
-        
-        // create edit Representation
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
-                        MediaType.APPLICATION_RDF_XML);
-        
         try
         {
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, incorrectArtifactID);
+            
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            
+            editArtifactClientResource
+                    .addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(false));
+            
+            // create edit Representation
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                            MediaType.APPLICATION_RDF_XML);
+            
             RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_NOT_FOUND, this.testWithAdminPrivileges);
             Assert.fail("Should have failed due to incorrect artifact IRI");
@@ -299,6 +333,10 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             final String sourceOfError = model.filter(null, PoddRdfConstants.ERR_SOURCE, null).objectString();
             Assert.assertEquals("Err#source is not the incorrect artifact ID", incorrectArtifactID, sourceOfError);
         }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
+        }
     }
     
     @Test
@@ -307,28 +345,28 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         // prepare: add an artifact
         final InferredOWLOntologyID artifactID =
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
+        // prepare: set an INVALID version IRI
+        final String incorrectVersionIri = artifactID.getVersionIRI().toString() + ":nosuchversion";
         
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        
-        // prepare: set an INVALID version IRI
-        final String incorrectVersionIri = artifactID.getVersionIRI().toString() + ":nosuchversion";
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER,
-                incorrectVersionIri);
-        
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(false));
-        
-        // create edit Representation
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
-                        MediaType.APPLICATION_RDF_XML);
-        
         try
         {
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER,
+                    incorrectVersionIri);
+            
+            editArtifactClientResource
+                    .addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(false));
+            
+            // create edit Representation
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                            MediaType.APPLICATION_RDF_XML);
             RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                     MediaType.APPLICATION_RDF_XML, Status.CLIENT_ERROR_CONFLICT, this.testWithAdminPrivileges);
             Assert.fail("Should have failed due to incorrect version IRI");
@@ -344,6 +382,10 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
             
             final String sourceOfError = model.filter(null, PoddRdfConstants.ERR_SOURCE, null).objectString();
             Assert.assertEquals("Err#source is not the incorrect Version IRI", incorrectVersionIri, sourceOfError);
+        }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
         }
     }
     
@@ -363,6 +405,10 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         {
             Assert.assertEquals(Status.CLIENT_ERROR_BAD_REQUEST, e.getStatus());
         }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
+        }
     }
     
     @Test
@@ -374,21 +420,25 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
-        
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
-                        MediaType.APPLICATION_RDF_XML);
-        
         // invoke without authentication
         try
         {
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactUri);
+            
+            final Representation input =
+                    this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT,
+                            MediaType.APPLICATION_RDF_XML);
+            
             editArtifactClientResource.post(input, MediaType.APPLICATION_RDF_XML);
         }
         catch(final ResourceException e)
         {
             Assert.assertEquals(Status.CLIENT_ERROR_UNAUTHORIZED, e.getStatus());
+        }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
         }
     }
     
@@ -405,20 +455,22 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
-                .getOntologyIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
-                .getVersionIRI().toString());
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(false));
-        
-        // edit Representation contains statements in Turtle format
-        final Representation input =
-                this.buildRepresentationFromResource(TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION,
-                        MediaType.APPLICATION_RDF_TURTLE);
-        
         try
         {
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactID
+                    .getOntologyIRI().toString());
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, artifactID
+                    .getVersionIRI().toString());
+            editArtifactClientResource
+                    .addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_REPLACE, Boolean.toString(true));
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_EDIT_WITH_FORCE, Boolean.toString(false));
+            
+            // edit Representation contains statements in Turtle format
+            final Representation input =
+                    this.buildRepresentationFromResource(
+                            TestConstants.TEST_ARTIFACT_FRAGMENT_MODIFY_DEMO_INVESTIGATION,
+                            MediaType.APPLICATION_RDF_TURTLE);
+            
             RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.POST, input,
                     MediaType.APPLICATION_RDF_TURTLE, Status.SERVER_ERROR_INTERNAL, this.testWithAdminPrivileges);
             Assert.fail("Should have failed when dangling objects were identified");
@@ -427,6 +479,10 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         {
             Assert.assertEquals(Status.SERVER_ERROR_INTERNAL, e.getStatus());
             // the cause is not available to the client for verification
+        }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
         }
     }
     
@@ -444,18 +500,25 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        
-        // verify:
-        // System.out.println(body);
-        this.assertFreemarker(body);
+        try
+        {
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_OBJECT_IDENTIFIER, objectUri);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            
+            // verify:
+            // System.out.println(body);
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
+        }
     }
     
     /**
@@ -470,18 +533,25 @@ public class EditArtifactResourceImplTest extends AbstractResourceImplTest
         final ClientResource editArtifactClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_EDIT));
         
-        editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        // not requesting a specific object results in the Project being shown.
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        
-        // verify:
-        // System.out.println(body);
-        this.assertFreemarker(body);
+        try
+        {
+            editArtifactClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            // not requesting a specific object results in the Project being shown.
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(editArtifactClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            
+            // verify:
+            // System.out.println(body);
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(editArtifactClientResource);
+        }
     }
     
 }

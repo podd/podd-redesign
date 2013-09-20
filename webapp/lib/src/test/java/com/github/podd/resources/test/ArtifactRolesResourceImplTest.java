@@ -40,21 +40,27 @@ public class ArtifactRolesResourceImplTest extends AbstractResourceImplTest
         final ClientResource getArtifactRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_ROLES));
         
-        getArtifactRolesClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
-                        MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        
-        // verify:
-        System.out.println(body);
-        Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
-        Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-        
-        this.assertFreemarker(body);
-        
+        try
+        {
+            getArtifactRolesClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
+                            MediaType.TEXT_HTML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            
+            // verify:
+            System.out.println(body);
+            Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
+            Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
+            
+            this.assertFreemarker(body);
+        }
+        finally
+        {
+            releaseClient(getArtifactRolesClientResource);
+        }
     }
     
     @Test
@@ -66,34 +72,41 @@ public class ArtifactRolesResourceImplTest extends AbstractResourceImplTest
         final ClientResource getArtifactRolesClientResource =
                 new ClientResource(this.getUrl(PoddWebConstants.PATH_ARTIFACT_ROLES));
         
-        getArtifactRolesClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
-        
-        final Representation results =
-                RestletTestUtils.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
-                        RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
-        
-        final String body = getText(results);
-        
-        // verify:
-        System.out.println(body);
-        Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
-        Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
-        
-        this.assertFreemarker(body);
-        
-        final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 6);
-        
-        final Map<RestletUtilRole, Collection<String>> roles = PoddRoles.extractRoleMappingsArtifact(model);
-        
-        Assert.assertEquals(2, roles.size());
-        Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_ADMIN));
-        Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_ADMIN).size());
-        Assert.assertEquals(RestletTestUtils.TEST_ADMIN_USERNAME, roles.get(PoddRoles.PROJECT_ADMIN).iterator().next());
-        Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR));
-        Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
-        Assert.assertEquals(RestletTestUtils.TEST_ADMIN_USERNAME, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR)
-                .iterator().next());
-        
+        try
+        {
+            getArtifactRolesClientResource.addQueryParameter(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, artifactUri);
+            
+            final Representation results =
+                    RestletTestUtils.doTestAuthenticatedRequest(getArtifactRolesClientResource, Method.GET, null,
+                            RestletUtilMediaType.APPLICATION_RDF_JSON, Status.SUCCESS_OK, this.testWithAdminPrivileges);
+            
+            final String body = getText(results);
+            
+            // verify:
+            System.out.println(body);
+            Assert.assertTrue("Page does not identify Administrator", body.contains("Administrator"));
+            Assert.assertFalse("Page contained a 404 error", body.contains("ERROR: 404"));
+            
+            this.assertFreemarker(body);
+            
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 6);
+            
+            final Map<RestletUtilRole, Collection<String>> roles = PoddRoles.extractRoleMappingsArtifact(model);
+            
+            Assert.assertEquals(2, roles.size());
+            Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_ADMIN));
+            Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_ADMIN).size());
+            Assert.assertEquals(RestletTestUtils.TEST_ADMIN_USERNAME, roles.get(PoddRoles.PROJECT_ADMIN).iterator()
+                    .next());
+            Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR));
+            Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
+            Assert.assertEquals(RestletTestUtils.TEST_ADMIN_USERNAME,
+                    roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).iterator().next());
+        }
+        finally
+        {
+            releaseClient(getArtifactRolesClientResource);
+        }
     }
     
 }
