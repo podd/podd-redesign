@@ -429,7 +429,7 @@ public class ApplicationUtils
                             PoddWebConstants.DEFAULT_INITIAL_ADMIN_PASSWORD).toCharArray();
             final PoddUser testAdminUser =
                     new PoddUser(username, password, "Initial Admin", "User", "initial.admin.user@example.com",
-                            PoddUserStatus.ACTIVE, testAdminUserHomePage, "Local Organisation", null);
+                            PoddUserStatus.ACTIVE, testAdminUserHomePage, "Local Organisation", "Dummy-ORCID");
             final URI testAdminUserUri = nextRealm.addUser(testAdminUser);
             nextRealm.map(testAdminUser, PoddRoles.ADMIN.getRole());
             
