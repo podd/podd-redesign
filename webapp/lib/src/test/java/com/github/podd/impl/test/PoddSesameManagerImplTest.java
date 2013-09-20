@@ -27,6 +27,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.api.test.AbstractPoddSesameManagerTest;
 import com.github.podd.api.test.TestOntologyUtils;
@@ -34,6 +35,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddSesameManagerImpl;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * @author kutila
@@ -77,8 +79,13 @@ public class PoddSesameManagerImplTest extends AbstractPoddSesameManagerTest
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
         testPoddOWLManager.setOWLOntologyManager(manager);
         
+        // final OWLReasonerFactory reasonerFactory =
+        // OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
         final OWLReasonerFactory reasonerFactory =
-                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet");
+                OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(
+                        new PropertyUtil("podd").get(PoddWebConstants.PROPERTY_OWLAPI_REASONER,
+                                PoddWebConstants.DEFAULT_OWLAPI_REASONER));
+        
         Assert.assertNotNull("Null implementation of OWLReasonerFactory", reasonerFactory);
         testPoddOWLManager.setReasonerFactory(reasonerFactory);
         

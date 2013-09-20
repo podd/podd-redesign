@@ -38,6 +38,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyManagerFactoryRegistry;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactoryRegistry;
 
+import com.github.ansell.propertyutil.PropertyUtil;
 import com.github.podd.api.PoddOWLManager;
 import com.github.podd.api.PoddRepositoryManager;
 import com.github.podd.api.file.DataReference;
@@ -49,6 +50,7 @@ import com.github.podd.impl.PoddOWLManagerImpl;
 import com.github.podd.impl.PoddRepositoryManagerImpl;
 import com.github.podd.impl.file.PoddFileRepositoryManagerImpl;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.PoddWebConstants;
 
 /**
  * This concrete test class uses SSH File References and a test SSH file repository to run through
@@ -157,7 +159,10 @@ public class PoddFileRepositoryManagerImplTest extends AbstractPoddFileRepositor
         
         // create an OWL Manager
         final PoddOWLManager owlManager = new PoddOWLManagerImpl();
-        owlManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
+        // owlManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
+        owlManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(
+                new PropertyUtil("podd").get(PoddWebConstants.PROPERTY_OWLAPI_REASONER,
+                        PoddWebConstants.DEFAULT_OWLAPI_REASONER)));
         final OWLOntologyManager manager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         Assert.assertNotNull("Null implementation of OWLOntologymanager", manager);
         owlManager.setOWLOntologyManager(manager);

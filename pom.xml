@@ -78,6 +78,7 @@
 	</mailingLists>
 
 	<properties>
+		<hermit.version>1.3.8.2-ansell</hermit.version>
 		<junit.version>4.11</junit.version>
 		<mockito.version>1.9.5</mockito.version>
 		<podd-ontologies.version>1-SNAPSHOT</podd-ontologies.version>
@@ -301,6 +302,11 @@
 				<groupId>com.github.ansell.pellet</groupId>
 				<artifactId>pellet-explanation</artifactId>
 				<version>${pellet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.ansell.hermit</groupId>
+				<artifactId>HermiT</artifactId>
+				<version>${hermit.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>

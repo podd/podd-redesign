@@ -315,7 +315,9 @@ public class ApplicationUtils
         nextPurlManager.setPurlProcessorFactoryRegistry(nextPurlRegistry);
         
         final PoddOWLManager nextOWLManager = new PoddOWLManagerImpl();
-        nextOWLManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
+        // nextOWLManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory("Pellet"));
+        nextOWLManager.setReasonerFactory(OWLReasonerFactoryRegistry.getInstance().getReasonerFactory(
+                props.get(PoddWebConstants.PROPERTY_OWLAPI_REASONER, PoddWebConstants.DEFAULT_OWLAPI_REASONER)));
         final OWLOntologyManager nextOWLOntologyManager = OWLOntologyManagerFactoryRegistry.createOWLOntologyManager();
         if(nextOWLOntologyManager == null)
         {

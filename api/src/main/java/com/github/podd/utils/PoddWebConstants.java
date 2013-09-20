@@ -238,7 +238,7 @@ public interface PoddWebConstants
     public static final String DEFAULT_INITIAL_ADMIN_PASSWORD = "testAdminPassword";
     
     public static final String PROPERTY_OWLAPI_REASONER = "podd.owlreasoner";
-    public static final String DEFAULT_OWLAPI_REASONER = "Pellet";
+    public static final String DEFAULT_OWLAPI_REASONER = "HermiT";
     
     public static final String PROPERTY_SESAME_URL = "podd.sesamehttpurl";
     public static final String DEFAULT_SESAME_URL = "";
