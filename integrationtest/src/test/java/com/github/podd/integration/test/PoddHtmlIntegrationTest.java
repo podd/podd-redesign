@@ -842,7 +842,7 @@ public class PoddHtmlIntegrationTest extends AbstractPoddHtmlUnitIntegrationTest
         this.getWebTester().assertTextNotPresent("Login");
         
         // verify the correct user was logged in and their name now appears
-        this.getWebTester().assertTextPresent("Test Admin User");
+        this.getWebTester().assertTextPresent("Initial Admin User");
         
         // verify the Logout link is available
         this.getWebTester().assertTextPresent("Logout");
