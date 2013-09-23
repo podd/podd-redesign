@@ -137,7 +137,7 @@
 	    </div>
 
 	    <span><h3>PODD - Phenomics Ontology Driven Database</h3> 
-	    	<p class="errorMsg">Beta Version (Data is not persisted and will be lost on application restart.)</p>
+	    	<p class="errorMsg">Beta Version : Please file errors in our <a href="https://github.com/podd/podd-redesign/issues/new">issue tracker</a>.</p>
 	    </span>
 	</div>
 
