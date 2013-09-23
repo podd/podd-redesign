@@ -2510,7 +2510,7 @@ podd.submitUserEdit = function() {
 	var url = $('#url').val();
 	var orcid = $('#orcid').val();
 
-	var pathToSubmitTo = '/user/edit/' + userName;
+	var pathToSubmitTo = '/user/edit?userIdentifier=' + userName;
 	var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + "?userIdentifier=" + userName;
 
 	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
@@ -2641,7 +2641,7 @@ podd.submitUserPassword = function() {
 	var password = $('#password').val();
 	var oldPassword = $('#oldPassword').val();
 	
-	var pathToSubmitTo = '/user/editpwd/' + userName;
+	var pathToSubmitTo = '/user/editpwd?userIdentifier=' + userName;
 	
 	var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + "?userIdentifier=" + userName;
 	if (oldPassword != undefined && oldPassword !== ''){
