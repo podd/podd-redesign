@@ -727,7 +727,36 @@ public class RestletPoddClientImpl implements PoddClient
     public void removeRole(final String userIdentifier, final RestletUtilRole role, final InferredOWLOntologyID artifact)
         throws PoddClientException
     {
-        throw new RuntimeException("TODO: Implement me");
+        this.log.info("cookies: {}", this.currentCookies);
+        
+        final ClientResource resource = new ClientResource(this.getUrl(PoddWebConstants.PATH_USER_ROLES));
+        resource.getCookies().addAll(this.currentCookies);
+        resource.addQueryParameter(PoddWebConstants.KEY_USER_IDENTIFIER, userIdentifier);
+        resource.addQueryParameter(PoddWebConstants.KEY_DELETE, "true");
+        
+        final Map<RestletUtilRole, Collection<URI>> mappings = new HashMap<>();
+        final Collection<URI> artifacts = Arrays.asList(artifact.getOntologyIRI().toOpenRDFURI());
+        mappings.put(role, artifacts);
+        
+        final Model model = new LinkedHashModel();
+        PoddRoles.dumpRoleMappingsUser(mappings, model);
+        
+        final Representation post = this.postRdf(resource, model);
+        
+        try
+        {
+            final Model parsedStatements = this.parseRdf(post);
+            
+            if(!parsedStatements.contains(null, SesameRealmConstants.OAS_USERIDENTIFIER,
+                    PoddRdfConstants.VF.createLiteral(userIdentifier)))
+            {
+                this.log.warn("Role edit response did not seem to contain the user identifier");
+            }
+        }
+        catch(final IOException e)
+        {
+            throw new PoddClientException("Could not parse results due to an IOException", e);
+        }
     }
     
     /*
