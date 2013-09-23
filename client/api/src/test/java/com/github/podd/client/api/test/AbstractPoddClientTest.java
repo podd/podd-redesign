@@ -502,6 +502,92 @@ public abstract class AbstractPoddClientTest
     }
     
     /**
+     * Test method for
+     * {@link com.github.podd.client.api.PoddClient#removeRole(String, RestletUtilRole, InferredOWLOntologyID)}
+     * .
+     */
+    @Test
+    public final void testRemoveRolesArtifact() throws Exception
+    {
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        
+        final Map<RestletUtilRole, Collection<String>> roles = this.testClient.listRoles(newArtifact);
+        
+        Assert.assertEquals(2, roles.size());
+        Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_ADMIN));
+        Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_ADMIN).size());
+        Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, roles.get(PoddRoles.PROJECT_ADMIN).iterator()
+                .next());
+        Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR));
+        Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
+        Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR)
+                .iterator().next());
+        
+        this.testClient.removeRole(AbstractPoddClientTest.TEST_ADMIN_USER, PoddRoles.PROJECT_ADMIN, newArtifact);
+        
+        final Map<RestletUtilRole, Collection<String>> afterRoles = this.testClient.listRoles(newArtifact);
+        
+        Assert.assertEquals(1, afterRoles.size());
+        Assert.assertTrue(afterRoles.containsKey(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR));
+        Assert.assertEquals(1, afterRoles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
+        Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER,
+                afterRoles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).iterator().next());
+        
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.client.api.PoddClient#addRole(String, RestletUtilRole, InferredOWLOntologyID)}
+     * .
+     */
+    @Test
+    public final void testAddRolesArtifact() throws Exception
+    {
+        this.testClient.login(AbstractPoddClientTest.TEST_ADMIN_USER, AbstractPoddClientTest.TEST_ADMIN_PASSWORD);
+        
+        final InputStream input = this.getClass().getResourceAsStream("/test/artifacts/basicProject-1.rdf");
+        Assert.assertNotNull("Test resource missing", input);
+        
+        final InferredOWLOntologyID newArtifact = this.testClient.uploadNewArtifact(input, RDFFormat.RDFXML);
+        
+        final Map<RestletUtilRole, Collection<String>> roles = this.testClient.listRoles(newArtifact);
+        
+        Assert.assertEquals(2, roles.size());
+        Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_ADMIN));
+        Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_ADMIN).size());
+        Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, roles.get(PoddRoles.PROJECT_ADMIN).iterator()
+                .next());
+        Assert.assertTrue(roles.containsKey(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR));
+        Assert.assertEquals(1, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
+        Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, roles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR)
+                .iterator().next());
+        
+        this.testClient.addRole(TEST_ADMIN_USER, PoddRoles.PROJECT_OBSERVER, newArtifact);
+        
+        final Map<RestletUtilRole, Collection<String>> afterRoles = this.testClient.listRoles(newArtifact);
+        
+        Assert.assertEquals(3, afterRoles.size());
+        Assert.assertTrue(afterRoles.containsKey(PoddRoles.PROJECT_ADMIN));
+        Assert.assertEquals(1, afterRoles.get(PoddRoles.PROJECT_ADMIN).size());
+        Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, afterRoles.get(PoddRoles.PROJECT_ADMIN).iterator()
+                .next());
+        Assert.assertTrue(afterRoles.containsKey(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR));
+        Assert.assertEquals(1, afterRoles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).size());
+        Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER,
+                afterRoles.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR).iterator().next());
+        Assert.assertTrue(afterRoles.containsKey(PoddRoles.PROJECT_OBSERVER));
+        Assert.assertEquals(1, afterRoles.get(PoddRoles.PROJECT_OBSERVER).size());
+        Assert.assertEquals(AbstractPoddClientTest.TEST_ADMIN_USER, afterRoles.get(PoddRoles.PROJECT_OBSERVER)
+                .iterator().next());
+        
+    }
+    
+    /**
      * Test method for {@link com.github.podd.client.api.PoddClient#listRoles(String)} .
      */
     @Test
