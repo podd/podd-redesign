@@ -629,7 +629,7 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#attachFileReferences(URI, URI, InputStream, RDFFormat, DataReferenceVerificationPolicy)}
+     * {@link com.github.podd.api.PoddArtifactManager#attachDataReferences(URI, URI, InputStream, RDFFormat, DataReferenceVerificationPolicy)}
      * .
      */
     @Test
@@ -647,7 +647,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);
         
         final InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.attachFileReferences(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
+                this.testArtifactManager.attachDataReferences(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
                         .getVersionIRI().toOpenRDFURI(), editInputStream, RDFFormat.RDFXML,
                         DataReferenceVerificationPolicy.DO_NOT_VERIFY);
         

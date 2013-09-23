@@ -60,7 +60,7 @@ public interface PoddArtifactManager
     InferredOWLOntologyID attachFileReference(InferredOWLOntologyID artifactId, URI objectUri,
             DataReference dataReference) throws OpenRDFException, PoddException;
     
-    InferredOWLOntologyID attachFileReferences(URI artifactUri, URI versionUri, InputStream inputStream,
+    InferredOWLOntologyID attachDataReferences(URI artifactUri, URI versionUri, InputStream inputStream,
             RDFFormat format, DataReferenceVerificationPolicy dataReferenceVerificationPolicy) throws OpenRDFException,
         IOException, OWLException, PoddException;
     
