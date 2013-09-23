@@ -8,3 +8,10 @@
 	
 </div>  <!-- file_upload_div - Collapsible div -->
 
+<script type="text/javascript">
+	$(document).ready(function() {
+		podd.getDataRepositories(function(databank) {
+			podd.populateDataRepositoriesList(databank, $("dataRepositories"));
+		);
+	});
+</script>
