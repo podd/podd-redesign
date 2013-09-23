@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
@@ -528,7 +529,7 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
+     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValues(InferredOWLOntologyID, URI, Collection, RepositoryConnection)}
      * .
      */
     @Test
@@ -567,16 +568,19 @@ public abstract class AbstractPoddSesameManagerTest
         
         for(final URI[] element : testData)
         {
-            final URI cardinalityValue =
-                    this.testPoddSesameManager.getCardinalityValue(ontologyID, element[0], element[1],
+            Collection<URI> nextProperty = Arrays.asList(element[1]);
+            final Map<URI, URI> cardinalityValue =
+                    this.testPoddSesameManager.getCardinalityValues(ontologyID, element[0], nextProperty,
                             this.testRepositoryConnection);
-            Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue);
+            Assert.assertEquals("Could not find cardinality for: " + nextProperty, 1, cardinalityValue.size());
+            Assert.assertTrue("Did not find cardinality for: " + nextProperty, cardinalityValue.containsKey(element[1]));
+            Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue.get(element[1]));
         }
     }
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(URI, URI, boolean, RepositoryConnection, URI...)}
+     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValues(URI, Collection, boolean, RepositoryConnection, URI...)}
      * .
      */
     @Test
@@ -618,10 +622,13 @@ public abstract class AbstractPoddSesameManagerTest
         
         for(final URI[] element : testData)
         {
-            final URI cardinalityValue =
-                    this.testPoddSesameManager.getCardinalityValue(element[0], element[1], true,
+            Collection<URI> nextProperty = Arrays.asList(element[1]);
+            final Map<URI, URI> cardinalityValue =
+                    this.testPoddSesameManager.getCardinalityValues(element[0], nextProperty, true,
                             this.testRepositoryConnection, contexts.toArray(new URI[0]));
-            Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue);
+            Assert.assertEquals("Could not find cardinality for: " + nextProperty, 1, cardinalityValue.size());
+            Assert.assertTrue("Did not find cardinality for: " + nextProperty, cardinalityValue.containsKey(element[1]));
+            Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue.get(element[1]));
         }
     }
     

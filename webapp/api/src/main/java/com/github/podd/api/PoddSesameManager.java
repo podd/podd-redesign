@@ -21,6 +21,7 @@ package com.github.podd.api;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -152,7 +153,7 @@ public interface PoddSesameManager
      *            The artifact to which the object under consideration belongs
      * @param objectUri
      *            The object under consideration
-     * @param propertyUri
+     * @param propertyUris
      *            The property under consideration
      * @param repositoryConnection
      * @return a URI representing the cardinality value or NULL if no cardinality statements were
@@ -161,10 +162,10 @@ public interface PoddSesameManager
      * 
      * @since 03/05/2013
      */
-    URI getCardinalityValue(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
+    Map<URI, URI> getCardinalityValues(InferredOWLOntologyID artifactID, URI objectUri, Collection<URI> propertyUris,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
-    URI getCardinalityValue(URI objectUri, URI propertyUri, boolean findFromType,
+    Map<URI, URI> getCardinalityValues(URI objectUri, Collection<URI> propertyUris, boolean findFromType,
             RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     /**

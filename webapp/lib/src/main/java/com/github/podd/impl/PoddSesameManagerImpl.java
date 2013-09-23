@@ -25,8 +25,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
@@ -367,16 +369,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public URI getCardinalityValue(final InferredOWLOntologyID artifactID, final URI objectUri, final URI propertyUri,
-            final RepositoryConnection repositoryConnection) throws OpenRDFException
+    public Map<URI, URI> getCardinalityValues(final InferredOWLOntologyID artifactID, final URI objectUri,
+            final Collection<URI> propertyUris, final RepositoryConnection repositoryConnection)
+        throws OpenRDFException
     {
-        return this.getCardinalityValue(objectUri, propertyUri, false, repositoryConnection,
+        return this.getCardinalityValues(objectUri, propertyUris, false, repositoryConnection,
                 this.versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
     }
     
     @Override
-    public URI getCardinalityValue(final URI objectUri, final URI propertyUri, final boolean findFromType,
-            final RepositoryConnection repositoryConnection, final URI... contexts) throws OpenRDFException
+    public Map<URI, URI> getCardinalityValues(final URI objectUri, final Collection<URI> propertyUris,
+            final boolean findFromType, final RepositoryConnection repositoryConnection, final URI... contexts)
+        throws OpenRDFException
     {
         /*
          * Example of how a qualified cardinality statement appears in RDF triples
@@ -394,7 +398,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final StringBuilder sb = new StringBuilder(1024);
         
-        sb.append("SELECT ?qualifiedCardinality ?minQualifiedCardinality ?maxQualifiedCardinality ");
+        sb.append("SELECT ?propertyUri ?qualifiedCardinality ?minQualifiedCardinality ?maxQualifiedCardinality ");
         sb.append(" WHERE { ");
         
         if(!findFromType)
@@ -411,10 +415,24 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         sb.append(" } ");
         
-        this.log.debug("Created SPARQL {} with propertyUri {} and poddObject {}", sb, propertyUri, objectUri);
+        if(!propertyUris.isEmpty())
+        {
+            sb.append(" VALUES (?propertyUri) { ");
+            
+            for(URI nextProperty : propertyUris)
+            {
+                sb.append(" ( <");
+                sb.append(nextProperty.stringValue());
+                sb.append("> ) ");
+            }
+            sb.append(" } ");
+        }
+        
+        // this.log.debug("Created SPARQL {} with propertyUri {} and poddObject {}", sb,
+        // propertyUri, objectUri);
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        query.setBinding("propertyUri", propertyUri);
+        // query.setBinding("propertyUri", propertyUri);
         if(findFromType)
         {
             query.setBinding("somePoddConcept", objectUri);
@@ -426,45 +444,62 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final QueryResultCollector queryResults = this.executeSparqlQuery(query, contexts);
         
+        final ConcurrentMap<URI, URI> resultMap = new ConcurrentHashMap<URI, URI>();
+        
         for(final BindingSet next : queryResults.getBindingSets())
         {
-            final Value qualifiedCardinalityValue = next.getValue("qualifiedCardinality");
-            if(qualifiedCardinalityValue != null)
+            Value nextProperty = next.getValue("propertyUri");
+            if(nextProperty instanceof URI)
             {
-                return PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE;
-            }
-            
-            int minCardinality = -1;
-            int maxCardinality = -1;
-            
-            final Value minCardinalityValue = next.getValue("minQualifiedCardinality");
-            if(minCardinalityValue != null && minCardinalityValue instanceof LiteralImpl)
-            {
-                minCardinality = ((LiteralImpl)minCardinalityValue).intValue();
-            }
-            
-            final Value maxCardinalityValue = next.getValue("maxQualifiedCardinality");
-            if(maxCardinalityValue != null && maxCardinalityValue instanceof LiteralImpl)
-            {
-                maxCardinality = ((LiteralImpl)maxCardinalityValue).intValue();
-            }
-            
-            if(maxCardinality == 1 && minCardinality < 1)
-            {
-                return PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE;
-            }
-            else if(minCardinality == 1 && maxCardinality != 1)
-            {
-                return PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY;
+                URI nextPropertyURI = (URI)nextProperty;
+                URI nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY;
+                
+                final Value qualifiedCardinalityValue = next.getValue("qualifiedCardinality");
+                if(qualifiedCardinalityValue != null)
+                {
+                    nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE;
+                }
+                
+                int minCardinality = -1;
+                int maxCardinality = -1;
+                
+                final Value minCardinalityValue = next.getValue("minQualifiedCardinality");
+                if(minCardinalityValue != null && minCardinalityValue instanceof LiteralImpl)
+                {
+                    minCardinality = ((LiteralImpl)minCardinalityValue).intValue();
+                }
+                
+                final Value maxCardinalityValue = next.getValue("maxQualifiedCardinality");
+                if(maxCardinalityValue != null && maxCardinalityValue instanceof LiteralImpl)
+                {
+                    maxCardinality = ((LiteralImpl)maxCardinalityValue).intValue();
+                }
+                
+                if(maxCardinality == 1 && minCardinality < 1)
+                {
+                    nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_ONE;
+                }
+                else if(minCardinality == 1 && maxCardinality != 1)
+                {
+                    nextCardinality = PoddRdfConstants.PODD_BASE_CARDINALITY_ONE_OR_MANY;
+                }
+                
+                URI putIfAbsent = resultMap.putIfAbsent(nextPropertyURI, nextCardinality);
+                
+                if(putIfAbsent != null)
+                {
+                    log.warn(
+                            "Found duplicate cardinality constraints for {} : original constraint : {} ignored constraint {}",
+                            nextPropertyURI, putIfAbsent, nextCardinality);
+                }
             }
             else
-            // default rule
             {
-                return PoddRdfConstants.PODD_BASE_CARDINALITY_ZERO_OR_MANY;
+                log.warn("Property was not bound to a URI: {}", nextProperty);
             }
         }
         
-        return null;
+        return resultMap;
     }
     
     @Override
@@ -1170,11 +1205,19 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             annotationGraphQuery.setBinding("objectType", objectType);
             
             final Model annotationQueryResults = this.executeGraphQuery(annotationGraphQuery, contexts);
-                
+            
             results.addAll(annotationQueryResults);
             properties.addAll(annotationQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
         }
         
+        Set<URI> propertyUris = new LinkedHashSet<>();
+        for(final Value property : properties)
+        {
+            if(property instanceof URI)
+            {
+                propertyUris.add((URI)property);
+            }
+        }
         // -- for each property, get meta-data about it
         
         final StringBuilder sb2 = new StringBuilder(1024);
@@ -1208,61 +1251,86 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         
         sb2.append("}");
+        
+        if(!propertyUris.isEmpty())
+        {
+            sb2.append(" VALUES (?propertyUri) { ");
+            
+            for(URI nextProperty : propertyUris)
+            {
+                sb2.append(" ( <");
+                sb2.append(nextProperty.stringValue());
+                sb2.append("> ) ");
+            }
+            sb2.append(" } ");
+        }
+        
         String sb2String = sb2.toString();
         
         final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
-        for(final Value property : properties)
+        final Model queryResults2 = this.executeGraphQuery(graphQuery2, contexts);
+        results.addAll(queryResults2);
+        
+        // - add cardinality value
+        // TODO: Optimise the following so it takes a collection of properties and returns a
+        // map containing their cardinality values
+        final Map<URI, URI> cardinalityValues =
+                this.getCardinalityValues(objectType, propertyUris, true, repositoryConnection, contexts);
+        for(URI nextProperty : propertyUris)
         {
-            if(property instanceof URI)
+            URI cardinalityValue = null;
+            
+            if(cardinalityValues.containsKey(nextProperty))
             {
-                // - find property: type (e.g. object/datatype/annotation), label, display-type,
-                // weight
-                graphQuery2.setBinding("propertyUri", property);
-                
-                this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}", sb2String, property);
-                
-                final Model queryResults2 = this.executeGraphQuery(graphQuery2, contexts);
-                results.addAll(queryResults2);
-                
-                // - add cardinality value
-                final URI cardinalityValue =
-                        this.getCardinalityValue(objectType, (URI)property, true, repositoryConnection, contexts);
-                if(cardinalityValue != null)
+                cardinalityValue = cardinalityValues.get(nextProperty);
+            }
+            
+            if(cardinalityValue != null)
+            {
+                results.add((URI)nextProperty, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
+            }
+            else if(nextProperty.equals(RDFS.LABEL))
+            {
+                results.add((URI)nextProperty, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY,
+                        PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE);
+            }
+        }
+        
+        for(URI property : propertyUris)
+        {
+            // - find property: type (e.g. object/datatype/annotation), label, display-type,
+            // weight
+            // graphQuery2.setBinding("propertyUri", property);
+            
+            // this.log.debug("Created SPARQL {} \n   with propertyUri bound to {}", sb2String,
+            // property);
+            
+            // --- for 'drop-down' type properties, add all possible options into Model
+            if(results.contains((URI)property, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE,
+                    PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN))
+            {
+                for(final Resource nextRestriction : results.filter(null, OWL.ONPROPERTY, property).subjects())
                 {
-                    results.add((URI)property, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY, cardinalityValue);
-                }
-                else if(property.equals(RDFS.LABEL))
-                {
-                    results.add((URI)property, PoddRdfConstants.PODD_BASE_HAS_CARDINALITY,
-                            PoddRdfConstants.PODD_BASE_CARDINALITY_EXACTLY_ONE);
-                }
-                
-                // --- for 'drop-down' type properties, add all possible options into Model
-                if(results.contains((URI)property, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE,
-                        PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN))
-                {
-                    for(final Resource nextRestriction : results.filter(null, OWL.ONPROPERTY, property).subjects())
+                    Set<Value> nextRangeTypes = results.filter(nextRestriction, OWL.ALLVALUESFROM, null).objects();
+                    
+                    if(nextRangeTypes.isEmpty())
                     {
-                        Set<Value> nextRangeTypes = results.filter(nextRestriction, OWL.ALLVALUESFROM, null).objects();
-                        
-                        if(nextRangeTypes.isEmpty())
+                        // see if restriction exists with owl:onClass
+                        nextRangeTypes =
+                                results.filter(nextRestriction,
+                                        PoddRdfConstants.VF.createURI("http://www.w3.org/2002/07/owl#onClass"), null)
+                                        .objects();
+                    }
+                    // TODO: Optimise the following loop so it does not perform more than one
+                    // query, if possible
+                    for(final Value nextRangeType : nextRangeTypes)
+                    {
+                        if(nextRangeType instanceof URI)
                         {
-                            // see if restriction exists with owl:onClass
-                            nextRangeTypes =
-                                    results.filter(nextRestriction,
-                                            PoddRdfConstants.VF.createURI("http://www.w3.org/2002/07/owl#onClass"),
-                                            null).objects();
-                        }
-                        for(final Value nextRangeType : nextRangeTypes)
-                        {
-                            if(nextRangeType instanceof URI)
-                            {
-                                results.addAll(this.getInstancesOf((URI)nextRangeType, repositoryConnection, contexts));
-                            }
+                            results.addAll(this.getInstancesOf((URI)nextRangeType, repositoryConnection, contexts));
                         }
                     }
                 }
-                
             }
         }
         
