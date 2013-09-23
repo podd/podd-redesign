@@ -236,6 +236,16 @@ public interface PoddWebConstants
     
     public static final String DEFAULT_INITIAL_ADMIN_USERNAME = "testAdminUser";
     public static final String DEFAULT_INITIAL_ADMIN_PASSWORD = "testAdminPassword";
+<<<<<<< HEAD
+=======
+    
+    public static final String PROPERTY_OWLAPI_REASONER = "podd.owlreasoner";
+    public static final String DEFAULT_OWLAPI_REASONER = "HermiT";
+    
+    public static final String PROPERTY_SESAME_URL = "podd.sesamehttpurl";
+    public static final String DEFAULT_SESAME_URL = "";
+    
+>>>>>>> 01c2f46... add support for persistence
     /**
      * Key used to select published artifacts. Defaults to true.
      */
@@ -307,5 +317,5 @@ public interface PoddWebConstants
     public static final String KEY_SCHEMA_PATH = "schemaPath";
     
     public static final String PURL_ORG_PODD_NS = "http://purl.org/podd/ns/";
-    
+
 }

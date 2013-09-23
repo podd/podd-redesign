@@ -209,15 +209,14 @@ public class ApplicationUtils
         return result;
     }
     
-    public static Repository getNewRepository() throws RepositoryException
+    public static Repository getNewRepository(PropertyUtil props) throws RepositoryException
     {
-        // FIXME: Enable this before deploying
-        final String repositoryUrl = ""; // PropertyUtil.getProperty(OasProperties.PROPERTY_SESAME_URL,
-                                         // "");
+        final String repositoryUrl =
+                props.get(PoddWebConstants.PROPERTY_SESAME_URL, PoddWebConstants.DEFAULT_SESAME_URL);
         
         // if we weren't able to find a repository URL in the configuration, we setup an
         // in-memory store
-        if(repositoryUrl.trim().isEmpty())
+        if(repositoryUrl == null || repositoryUrl.trim().isEmpty())
         {
             final Repository repository = new SailRepository(new MemoryStore());
             
@@ -283,7 +282,7 @@ public class ApplicationUtils
         roles.clear();
         roles.addAll(PoddRoles.getRoles());
         
-        final Repository nextRepository = ApplicationUtils.getNewRepository();
+        final Repository nextRepository = ApplicationUtils.getNewRepository(props);
         
         application.setPoddRepositoryManager(new PoddRepositoryManagerImpl(nextRepository));
         application.getPoddRepositoryManager().setSchemaManagementGraph(PoddWebServiceApplicationImpl.SCHEMA_MGT_GRAPH);
