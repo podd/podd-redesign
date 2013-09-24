@@ -224,18 +224,22 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final StringBuilder graphQuery = new StringBuilder(1024);
         
         graphQuery.append("CONSTRUCT { ");
-        graphQuery.append(" ?subject <" + RDFS.LABEL.stringValue() + "> ?label . ");
+        graphQuery.append(" ?subject ");
+        graphQuery.append(RenderUtils.getSPARQLQueryString(RDFS.LABEL));
+        graphQuery.append(" ?label . ");
         
         graphQuery.append("} WHERE {");
-        graphQuery.append(" ?subject <" + RDFS.LABEL.stringValue() + "> ?label .  ");
+        graphQuery.append(" ?subject ");
+        graphQuery.append(RenderUtils.getSPARQLQueryString(RDFS.LABEL));
+        graphQuery.append(" ?label . ");
         graphQuery.append("}");
         
         graphQuery.append(" VALUES (?subject) { ");
         for(URI nextMissingLabelUri : missingLabelUris)
         {
-            graphQuery.append(" ( <");
-            graphQuery.append(nextMissingLabelUri.stringValue());
-            graphQuery.append("> ) ");
+            graphQuery.append(" ( ");
+            graphQuery.append(RenderUtils.getSPARQLQueryString(nextMissingLabelUri));
+            graphQuery.append(" ) ");
         }
         graphQuery.append(" } ");
         
@@ -439,9 +443,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             for(URI nextProperty : propertyUris)
             {
-                sb.append(" ( <");
-                sb.append(nextProperty.stringValue());
-                sb.append("> ) ");
+                sb.append(" ( ");
+                sb.append(RenderUtils.getSPARQLQueryString(nextProperty));
+                sb.append(" ) ");
             }
             sb.append(" } ");
         }
@@ -788,9 +792,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         for(URI nextRangeType : nextRangeTypes)
         {
-            instanceQuery.append(" ( <");
-            instanceQuery.append(nextRangeType.stringValue());
-            instanceQuery.append("> ) ");
+            instanceQuery.append(" ( ");
+            instanceQuery.append(RenderUtils.getSPARQLQueryString(nextRangeType));
+            instanceQuery.append(" ) ");
         }
         instanceQuery.append(" } ");
         
@@ -1244,9 +1248,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 
                 for(URI nextAnnotationPropertyURI : commonAnnotationProperties)
                 {
-                    annotationQuery.append(" ( <");
-                    annotationQuery.append(nextAnnotationPropertyURI.stringValue());
-                    annotationQuery.append("> ) ");
+                    annotationQuery.append(" ( ");
+                    annotationQuery.append(RenderUtils.getSPARQLQueryString(nextAnnotationPropertyURI));
+                    annotationQuery.append(" ) ");
                 }
                 annotationQuery.append(" } ");
             }
@@ -1311,9 +1315,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             
             for(URI nextProperty : propertyUris)
             {
-                sb2.append(" ( <");
-                sb2.append(nextProperty.stringValue());
-                sb2.append("> ) ");
+                sb2.append(" ( ");
+                sb2.append(RenderUtils.getSPARQLQueryString(nextProperty));
+                sb2.append(" ) ");
             }
             sb2.append(" } ");
         }
@@ -1460,26 +1464,26 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // 1: see if the given IRI exists as an ontology IRI
         final StringBuilder sb = new StringBuilder(1024);
         
-        sb.append("SELECT ?ontology ?version ?inferredVersion WHERE { ?ontology <");
-        sb.append(RDF.TYPE.stringValue());
-        sb.append("> <");
-        sb.append(OWL.ONTOLOGY.stringValue());
-        sb.append("> . ");
+        sb.append("SELECT ?ontology ?version ?inferredVersion WHERE { ?ontology ");
+        sb.append(RenderUtils.getSPARQLQueryString(RDF.TYPE));
+        sb.append(" ");
+        sb.append(RenderUtils.getSPARQLQueryString(OWL.ONTOLOGY));
+        sb.append(" . ");
         if(onlyCurrentVersions)
         {
-            sb.append(" ?ontology <");
-            sb.append(PoddRdfConstants.OMV_CURRENT_VERSION.stringValue());
-            sb.append("> ?version . ");
+            sb.append(" ?ontology ");
+            sb.append(RenderUtils.getSPARQLQueryString(PoddRdfConstants.OMV_CURRENT_VERSION));
+            sb.append(" ?version . ");
         }
         else
         {
-            sb.append(" ?ontology <");
-            sb.append(OWL.VERSIONIRI.stringValue());
-            sb.append("> ?version . ");
+            sb.append(" ?ontology ");
+            sb.append(RenderUtils.getSPARQLQueryString(OWL.VERSIONIRI));
+            sb.append(" ?version . ");
         }
-        sb.append("OPTIONAL{ ?version <");
-        sb.append(PoddRdfConstants.PODD_BASE_INFERRED_VERSION.stringValue());
-        sb.append("> ?inferredVersion . ");
+        sb.append("OPTIONAL{ ?version ");
+        sb.append(RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_BASE_INFERRED_VERSION));
+        sb.append(" ?inferredVersion . ");
         sb.append(" }");
         sb.append("}");
         
