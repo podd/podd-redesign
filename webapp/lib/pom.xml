@@ -231,6 +231,10 @@
 			<artifactId>semargl-sesame</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryrender</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<testResources>
