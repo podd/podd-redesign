@@ -138,7 +138,7 @@ public class RdfUtility
                 }
             }
         }
-        RdfUtility.log.info("{} unconnected node(s). {}", nodesToCheck.size(), nodesToCheck);
+        RdfUtility.log.debug("{} unconnected node(s). {}", nodesToCheck.size(), nodesToCheck);
         return nodesToCheck;
     }
     
