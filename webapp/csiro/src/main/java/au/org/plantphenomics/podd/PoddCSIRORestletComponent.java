@@ -52,8 +52,6 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class PoddCSIRORestletComponent extends Component
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     static
     {
         // Optionally remove existing handlers attached to j.u.l root logger
@@ -63,6 +61,8 @@ public class PoddCSIRORestletComponent extends Component
         // the initialization phase of your application
         SLF4JBridgeHandler.install();
     }
+    
+    private static final Logger log = LoggerFactory.getLogger(PoddCSIRORestletComponent.class);
     
     /**
      * 
