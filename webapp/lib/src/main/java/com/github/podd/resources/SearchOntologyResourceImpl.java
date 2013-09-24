@@ -58,7 +58,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
     @Get("rdf|rj|json|ttl")
     public Representation getRdf(final Variant variant) throws ResourceException
     {
-        this.log.info("searchRdf");
+        this.log.debug("searchRdf");
         
         final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
         
@@ -95,7 +95,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
             }
         }
         
-        this.log.info("requesting search ({}): {}, {}, {}", variant.getMediaType().getName(), searchTerm, artifactUri,
+        this.log.debug("requesting search ({}): {}, {}, {}", variant.getMediaType().getName(), searchTerm, artifactUri,
                 searchTypes);
         
         if(ontologyID == null)
@@ -109,7 +109,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         }
         
         final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
+        this.log.debug("authenticated user: {}", user);
         
         Model results = null;
         try
@@ -122,7 +122,7 @@ public class SearchOntologyResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Failed searching for Ontology Labels", e);
         }
-        this.log.info("Found {} matches for this search term", results.size());
+        this.log.debug("Found {} matches for this search term", results.size());
         
         final RDFFormat resultFormat =
                 Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);

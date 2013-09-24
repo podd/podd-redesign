@@ -75,14 +75,14 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
     @Post("rdf|rj|json|ttl")
     public Representation editUserRolesRdf(final Representation entity, final Variant variant) throws ResourceException
     {
-        this.log.info("editUserRolesRdf");
+        this.log.debug("editUserRolesRdf");
         
         final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
+        this.log.debug("authenticated user: {}", user);
         
         final String userIdentifier = this.getUserParameter();
         
-        this.log.info("editing Roles of user: {}", userIdentifier);
+        this.log.debug("editing Roles of user: {}", userIdentifier);
         
         // - validate User whose Roles are to be edited
         if(userIdentifier == null)
@@ -105,7 +105,7 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
         {
             isDelete = Boolean.valueOf(deleteQueryParam);
         }
-        this.log.info(" edit Roles is a 'delete' = {}", isDelete);
+        this.log.debug(" edit Roles is a 'delete' = {}", isDelete);
         
         Map<RestletUtilRole, Collection<URI>> rolesToEdit = null;
         
@@ -156,12 +156,12 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
                 if(isDelete)
                 {
                     nextRealm.unmap(poddUser, role.getRole(), mappedUri);
-                    this.log.info(" User [{}] unmapped from Role [{}]", poddUser.getIdentifier(), role.getName());
+                    this.log.debug(" User [{}] unmapped from Role [{}]", poddUser.getIdentifier(), role.getName());
                 }
                 else
                 {
                     nextRealm.map(poddUser, role.getRole(), mappedUri);
-                    this.log.info(" User [{}] mapped to Role [{}], [{}]", poddUser.getIdentifier(), role.getName(),
+                    this.log.debug(" User [{}] mapped to Role [{}], [{}]", poddUser.getIdentifier(), role.getName(),
                             mappedUri);
                 }
             }
@@ -191,13 +191,13 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
     @Get(":html")
     public Representation getRoleManagementPageHtml(final Variant variant) throws ResourceException
     {
-        this.log.info("getRoleManagementHtml");
+        this.log.debug("getRoleManagementHtml");
         
         final String requestedUserIdentifier = this.getUserParameter();
         PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
-        this.log.info("requesting role management for user: {}", requestedUserIdentifier);
+        this.log.debug("requesting role management for user: {}", requestedUserIdentifier);
         this.checkAuthentication(action);
         
         // completed checking authorization
@@ -240,13 +240,13 @@ public class UserRolesResourceImpl extends AbstractUserResourceImpl
     @Get(":rdf|rj|json|ttl")
     public Representation getRoleManagementRdf(final Variant variant) throws ResourceException
     {
-        this.log.info("getRoleManagementHtml");
+        this.log.debug("getRoleManagementHtml");
         
         final String requestedUserIdentifier = this.getUserParameter();
         PoddAction action =
                 this.getAction(requestedUserIdentifier, PoddAction.OTHER_USER_EDIT, PoddAction.CURRENT_USER_EDIT);
         
-        this.log.info("requesting role management for user: {}", requestedUserIdentifier);
+        this.log.debug("requesting role management for user: {}", requestedUserIdentifier);
         this.checkAuthentication(action);
         
         // completed checking authorization
