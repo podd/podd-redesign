@@ -63,7 +63,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get(":html")
     public Representation getArtifactHtml(final Representation entity) throws ResourceException
     {
-        this.log.info("getArtifactHtml");
+        this.log.debug("getArtifactHtml");
         
         final String artifactString = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
         
@@ -78,7 +78,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // optional parameter for inner objects
         final String objectToView = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
         
-        this.log.info("requesting get artifact (HTML): {}, {}, {}", artifactString, versionString, objectToView);
+        this.log.debug("requesting get artifact (HTML): {}, {}, {}", artifactString, versionString, objectToView);
         
         UnmanagedArtifactIRIException foundException = null;
         
@@ -143,7 +143,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // completed checking authorization
         
         final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
+        this.log.debug("authenticated user: {}", user);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "objectDetails.html.ftl");
@@ -170,7 +170,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // To fix this we need to check whether Accept is exactly "*/*" and response with HTML
         // variant instead of an RDF variant
         
-        this.log.info("getArtifactRdf");
+        this.log.debug("getArtifactRdf");
         
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
         
@@ -187,7 +187,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             final String versionString =
                     this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
             
-            this.log.info("requesting get artifact ({}): {}", variant.getMediaType().getName(), artifactString);
+            this.log.debug("requesting get artifact ({}): {}", variant.getMediaType().getName(), artifactString);
             
             // FIXME: The artifact may be published here
             this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_READ,
@@ -195,7 +195,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             // completed checking authorization
             
             final User user = this.getRequest().getClientInfo().getUser();
-            this.log.info("authenticated user: {}", user);
+            this.log.debug("authenticated user: {}", user);
             
             InferredOWLOntologyID ontologyID = null;
             if(versionString == null)
