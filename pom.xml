@@ -87,7 +87,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<restlet.version>2.1.1</restlet.version>
 		<restletutils.version>0.3-SNAPSHOT</restletutils.version>
-		<sesame.version>2.7.6</sesame.version>
+		<sesame.version>2.7.7</sesame.version>
 		<sesame-rio-extensions.version>0.4</sesame-rio-extensions.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<sshj.version>0.9.0</sshj.version>
@@ -450,6 +450,11 @@
 				<groupId>org.semarglproject</groupId>
 				<artifactId>semargl-sesame</artifactId>
 				<version>0.6.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-queryrender</artifactId>
+				<version>${sesame.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
