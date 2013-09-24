@@ -61,6 +61,7 @@
 		$("#btnSubmit").click(function(event) {
 			event.preventDefault();
 			podd.debug("Attempting to submit update query to server");
+			$("body").css("cursor", "wait");
 			podd.submitPoddObjectUpdate(podd.getCurrentArtifactIri(), podd.getCurrentVersionIri(), podd.getCurrentObjectUri(),  
 					podd.schemaDatabank, podd.artifactDatabank, podd.redirectToGetArtifact);
 			return false;
