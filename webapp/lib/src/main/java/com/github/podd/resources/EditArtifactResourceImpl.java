@@ -127,11 +127,11 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
             objectUris.add(PoddRdfConstants.VF.createURI(nextObjectURIString));
         }
         
-        this.log.info("requesting edit artifact ({}): {}, {} with isReplace {}", variant.getMediaType().getName(),
+        this.log.debug("requesting edit artifact ({}): {}, {} with isReplace {}", variant.getMediaType().getName(),
                 artifactUri, versionUri, updatePolicy);
         
         final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
+        this.log.debug("authenticated user: {}", user);
         
         // - get input stream with edited RDF content
         InputStream inputStream = null;
@@ -188,7 +188,7 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
     @Get("html")
     public Representation getEditArtifactHtml(final Representation entity) throws ResourceException
     {
-        this.log.info("getEditArtifactHtml");
+        this.log.debug("getEditArtifactHtml");
         
         // the artifact in which editing is requested
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
@@ -200,12 +200,12 @@ public class EditArtifactResourceImpl extends AbstractPoddResourceImpl
         // Podd object to be edited. NULL indicates top object is to be edited.
         final String objectToEdit = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
         
-        this.log.info("requesting to edit artifact (HTML): {}, {}", artifactUri, objectToEdit);
+        this.log.debug("requesting to edit artifact (HTML): {}, {}", artifactUri, objectToEdit);
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         
         final User user = this.getRequest().getClientInfo().getUser();
-        this.log.info("authenticated user: {}", user);
+        this.log.debug("authenticated user: {}", user);
         
         // validate artifact exists
         InferredOWLOntologyID ontologyID;
