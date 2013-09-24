@@ -912,13 +912,13 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             return;
         }
         
-        this.log.info("Handling File reference validation");
-        
-        final Set<DataReference> fileReferenceResults =
-                this.getFileReferenceManager().extractDataReferences(repositoryConnection, contexts);
-        
         if(DataReferenceVerificationPolicy.VERIFY.equals(policy))
         {
+            final Set<DataReference> fileReferenceResults =
+                    this.getFileReferenceManager().extractDataReferences(repositoryConnection, contexts);
+            
+            this.log.debug("Handling File reference validation");
+            
             try
             {
                 this.dataRepositoryManager.verifyDataReferences(fileReferenceResults);
@@ -943,7 +943,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             return Collections.emptySet();
         }
         
-        this.log.info("Handling Purl generation");
+        this.log.debug("Handling Purl generation");
         final Set<PoddPurlReference> purlResults =
                 this.getPurlManager().extractPurlReferences(repositoryConnection, context);
         
@@ -970,7 +970,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             if(!importedSchemaIRI.equals(schemaOntologyID.getVersionIRI()))
             {
                 // modify import to be a specific version of the schema
-                this.log.info("Updating import to version <{}>", schemaOntologyID.getVersionIRI());
+                this.log.debug("Updating import to version <{}>", schemaOntologyID.getVersionIRI());
                 tempRepositoryConnection.remove(ontologyIRI.toOpenRDFURI(), OWL.IMPORTS,
                         importedSchemaIRI.toOpenRDFURI(), tempContext);
                 tempRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.IMPORTS, schemaOntologyID.getVersionIRI()
