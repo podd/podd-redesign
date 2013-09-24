@@ -173,7 +173,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         sparqlQuery.setDataset(dataset);
         final Model results = new LinkedHashModel();
+        long before = System.currentTimeMillis();
         sparqlQuery.evaluate(new StatementCollector(results));
+        log.info("graph query took {}", Long.toString(System.currentTimeMillis() - before));
         
         return results;
     }
@@ -197,8 +199,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sparqlQuery.setDataset(dataset);
         
         final QueryResultCollector results = new QueryResultCollector();
+        long before = System.currentTimeMillis();
         QueryResults.report(sparqlQuery.evaluate(), results);
-        
+        log.info("tuple query took {}", Long.toString(System.currentTimeMillis() - before));
         return results;
     }
     
