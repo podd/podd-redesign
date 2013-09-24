@@ -1937,9 +1937,12 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         repositoryConnection.remove(topObjectIRI, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, ontologyID
                 .getVersionIRI().toOpenRDFURI());
         
+        repositoryConnection.remove(topObjectIRI, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null,
+                artifactManagementGraph);
+        
         // then insert the publication status as #Published
         repositoryConnection.add(topObjectIRI, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODD_BASE_PUBLISHED, ontologyID.getVersionIRI().toOpenRDFURI());
+                PoddRdfConstants.PODD_BASE_PUBLISHED, artifactManagementGraph);
         
         this.log.info("{} was set as Published", topObjectIRI);
     }
