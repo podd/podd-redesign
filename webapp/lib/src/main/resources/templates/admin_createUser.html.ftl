@@ -50,8 +50,14 @@
 	
 		$("#btnCancel").click(function(event) {
 			event.preventDefault();
-			podd.debug("TODO: implement cancellation");
+			window.location.href = podd.baseUrl + '/admin/user/list';
+			
 			return false;
+		});
+	
+		$("#btnClear").click(function(event) {
+			$(this).closest("form").find("input:text, input:password, input:file, select, textarea").val("");
+			$(this).closest("form").find('input:radio, input:checkbox').removeAttr('checked').removeAttr('selected');
 		});
 	
         podd.debug('### initialization complete ###');
