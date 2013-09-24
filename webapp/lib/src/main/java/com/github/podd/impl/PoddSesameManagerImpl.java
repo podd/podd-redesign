@@ -51,6 +51,7 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
+import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
@@ -1016,47 +1017,67 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         /*
          * Find any sub-classes of the above ranges and include them also
          */
-        final StringBuilder subRangeQuery = new StringBuilder(1024);
-        
-        subRangeQuery.append("CONSTRUCT { ");
-        subRangeQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
-        subRangeQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
-        subRangeQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
-        subRangeQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?subRange . ");
-        subRangeQuery.append(" ?subRange <" + RDFS.LABEL.stringValue() + "> ?subRangeLabel . ");
-        
-        subRangeQuery.append("} WHERE {");
-        
-        subRangeQuery.append(" ?subRange <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?rangeClass . ");
-        subRangeQuery.append(" OPTIONAL { ?subRange <" + RDFS.LABEL.stringValue() + "> ?subRangeLabel } . ");
-        
-        subRangeQuery.append("}");
-        final String subRangeQueryString = subRangeQuery.toString();
-        
-        final Model subModel = new LinkedHashModel();
-        for(final Value restriction : rdfsQueryResults.filter(null, RDF.TYPE, OWL.RESTRICTION).subjects())
+        if(rdfsQueryResults.contains(null, RDF.TYPE, OWL.RESTRICTION))
         {
+            final StringBuilder subRangeQuery = new StringBuilder(1024);
             
-            if(restriction instanceof Resource)
+            subRangeQuery.append("CONSTRUCT { ");
+            subRangeQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> _:x . ");
+            subRangeQuery.append(" _:x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+            subRangeQuery.append(" _:x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
+            subRangeQuery.append(" _:x <" + OWL.ALLVALUESFROM.stringValue() + "> ?subRange . ");
+            subRangeQuery.append(" ?subRange <" + RDFS.LABEL.stringValue() + "> ?subRangeLabel . ");
+            
+            subRangeQuery.append("} WHERE {");
+            
+            subRangeQuery.append(" ?subRange <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?rangeClass . ");
+            subRangeQuery.append(" OPTIONAL { ?subRange <" + RDFS.LABEL.stringValue() + "> ?subRangeLabel } . ");
+            
+            subRangeQuery.append("}");
+            subRangeQuery.append(" VALUES (?rangeClass ?propertyUri ?objectType) { ");
+            
+            for(final Value restriction : rdfsQueryResults.filter(null, RDF.TYPE, OWL.RESTRICTION).subjects())
             {
-                final Resource onProperty =
-                        rdfsQueryResults.filter((Resource)restriction, OWL.ONPROPERTY, null).objectResource();
-                final Resource onRange =
-                        rdfsQueryResults.filter((Resource)restriction, OWL.ALLVALUESFROM, null).objectResource();
-                
-                final GraphQuery subRangeGraphQuery =
-                        repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, subRangeQueryString);
-                subRangeGraphQuery.setBinding("rangeClass", onRange);
-                subRangeGraphQuery.setBinding("propertyUri", onProperty);
-                subRangeGraphQuery.setBinding("objectType", objectType);
-                
-                this.log.debug("Created SPARQL {} \n   with rangeClass bound to {}", subRangeQueryString, restriction);
-                
-                subModel.addAll(this.executeGraphQuery(subRangeGraphQuery, contexts));
+                if(restriction instanceof Resource)
+                {
+                    final Resource onProperty =
+                            rdfsQueryResults.filter((Resource)restriction, OWL.ONPROPERTY, null).objectResource();
+                    final Resource onRange =
+                            rdfsQueryResults.filter((Resource)restriction, OWL.ALLVALUESFROM, null).objectResource();
+                    
+                    if(onProperty instanceof URI && onRange instanceof URI)
+                    {
+                        subRangeQuery.append(" ( ");
+                        subRangeQuery.append(RenderUtils.getSPARQLQueryString(onRange));
+                        subRangeQuery.append(" ");
+                        subRangeQuery.append(RenderUtils.getSPARQLQueryString(onProperty));
+                        subRangeQuery.append(" ");
+                        subRangeQuery.append(RenderUtils.getSPARQLQueryString(objectType));
+                        subRangeQuery.append(" ) ");
+                    }
+                    else
+                    {
+                        // Add warning... If we need to support blank nodes here we will need to
+                        // switch to a different type of query, as SPARQL-1.1 VALUES doesn't support
+                        // blank nodes
+                        log.warn("FIXME: restriction pointed to a non-URI property or allvaluesfrom : {} {} {}",
+                                onProperty, onRange, objectType);
+                    }
+                }
             }
+            
+            subRangeQuery.append(" } ");
+            
+            final String subRangeQueryString = subRangeQuery.toString();
+            
+            final GraphQuery subRangeGraphQuery =
+                    repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, subRangeQueryString);
+            
+            // this.log.debug("Created SPARQL {} \n   with rangeClass bound to {}",
+            // subRangeQueryString, restriction);
+            
+            results.addAll(this.executeGraphQuery(subRangeGraphQuery, contexts));
         }
-        
-        results.addAll(subModel);
         
         return results;
     }
@@ -1304,8 +1325,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         results.addAll(queryResults2);
         
         // - add cardinality value
-        // TODO: Optimise the following so it takes a collection of properties and returns a
-        // map containing their cardinality values
         final Map<URI, URI> cardinalityValues =
                 this.getCardinalityValues(objectType, propertyUris, true, repositoryConnection, contexts);
         for(URI nextProperty : propertyUris)
