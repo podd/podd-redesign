@@ -236,7 +236,7 @@ public class ApplicationUtils
         }
         else
         {
-            final Repository repository = new HTTPRepository(repositoryUrl);
+            final Repository repository = new HTTPRepository(repositoryUrl.trim());
             
             try
             {
