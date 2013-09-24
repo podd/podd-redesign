@@ -420,7 +420,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final StringBuilder sb = new StringBuilder(1024);
         
-        sb.append("SELECT ?propertyUri ?qualifiedCardinality ?minQualifiedCardinality ?maxQualifiedCardinality ");
+        sb.append("SELECT DISTINCT ?propertyUri ?qualifiedCardinality ?minQualifiedCardinality ?maxQualifiedCardinality ");
         sb.append(" WHERE { ");
         
         if(!findFromType)
