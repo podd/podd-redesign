@@ -439,11 +439,11 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         if(!findFromType)
         {
-            sb.append(" ?poddObject <" + RDF.TYPE.stringValue() + "> ?somePoddConcept . ");
+            sb.append(" ?poddObject a ?somePoddConcept . ");
         }
         
         sb.append(" ?somePoddConcept <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
-        sb.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
+        sb.append(" ?x a <" + OWL.RESTRICTION.stringValue() + "> . ");
         sb.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
         sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#maxQualifiedCardinality> ?maxQualifiedCardinality } . ");
         sb.append(" OPTIONAL { ?x <http://www.w3.org/2002/07/owl#minQualifiedCardinality> ?minQualifiedCardinality } . ");
