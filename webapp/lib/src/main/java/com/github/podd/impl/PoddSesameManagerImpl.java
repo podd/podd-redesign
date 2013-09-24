@@ -205,6 +205,21 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     public Model fillMissingLabels(final Model inputModel, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
     {
+        Set<URI> missingLabelUris = new LinkedHashSet<>();
+        for(final Statement statement : inputModel)
+        {
+            if(statement.getSubject() instanceof URI
+                    && !inputModel.contains(statement.getSubject(), RDFS.LABEL, null, contexts))
+            {
+                missingLabelUris.add((URI)statement.getSubject());
+            }
+        }
+        
+        if(missingLabelUris.isEmpty())
+        {
+            return new LinkedHashModel();
+        }
+        
         final StringBuilder graphQuery = new StringBuilder(1024);
         
         graphQuery.append("CONSTRUCT { ");
@@ -213,20 +228,22 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         graphQuery.append("} WHERE {");
         graphQuery.append(" ?subject <" + RDFS.LABEL.stringValue() + "> ?label .  ");
         graphQuery.append("}");
+        
+        graphQuery.append(" VALUES (?subject) { ");
+        for(URI nextMissingLabelUri : missingLabelUris)
+        {
+            graphQuery.append(" ( <");
+            graphQuery.append(nextMissingLabelUri.stringValue());
+            graphQuery.append("> ) ");
+        }
+        graphQuery.append(" } ");
+        
         final GraphQuery rdfsGraphQuery =
                 repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, graphQuery.toString());
         
-        this.log.info("Created SPARQL {}.", graphQuery);
+        this.log.debug("Created SPARQL {}.", graphQuery);
         
-        final Model resultModel = new LinkedHashModel();
-        for(final Statement statement : inputModel)
-        {
-            rdfsGraphQuery.setBinding("subject", statement.getSubject());
-            
-            resultModel.addAll(this.executeGraphQuery(rdfsGraphQuery, contexts));
-            rdfsGraphQuery.clearBindings();
-        }
-        return resultModel;
+        return this.executeGraphQuery(rdfsGraphQuery, contexts);
     }
     
     @Override
