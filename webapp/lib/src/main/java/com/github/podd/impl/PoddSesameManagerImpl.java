@@ -744,9 +744,14 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         return results;
     }
     
-    private Model getInstancesOf(final URI nextRangeType, final RepositoryConnection repositoryConnection,
+    private Model getInstancesOf(final Collection<URI> nextRangeTypes, final RepositoryConnection repositoryConnection,
             final URI[] contexts) throws OpenRDFException
     {
+        if(nextRangeTypes.isEmpty())
+        {
+            return new LinkedHashModel();
+        }
+        
         /*
          * This query gets the instances and their RDFS:labels for that are of the given type.
          */
@@ -762,11 +767,22 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         instanceQuery.append("}");
         
+        instanceQuery.append(" VALUES (?rangeClass) { ");
+        
+        for(URI nextRangeType : nextRangeTypes)
+        {
+            instanceQuery.append(" ( <");
+            instanceQuery.append(nextRangeType.stringValue());
+            instanceQuery.append("> ) ");
+        }
+        instanceQuery.append(" } ");
+        
         final GraphQuery rdfsGraphQuery =
                 repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, instanceQuery.toString());
-        rdfsGraphQuery.setBinding("rangeClass", nextRangeType);
+        // rdfsGraphQuery.setBinding("rangeClass", nextRangeType);
         
-        this.log.debug("Created SPARQL {} \n   with nextRangeType bound to {}", instanceQuery, nextRangeType);
+        // this.log.debug("Created SPARQL {} \n   with nextRangeType bound to {}", instanceQuery,
+        // nextRangeType);
         
         return this.executeGraphQuery(rdfsGraphQuery, contexts);
     }
@@ -1296,6 +1312,8 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
         }
         
+        Collection<URI> nextRangeTypeURIs = new LinkedHashSet<>();
+        
         for(URI property : propertyUris)
         {
             // - find property: type (e.g. object/datatype/annotation), label, display-type,
@@ -1306,7 +1324,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // property);
             
             // --- for 'drop-down' type properties, add all possible options into Model
-            if(results.contains((URI)property, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE,
+            if(results.contains(property, PoddRdfConstants.PODD_BASE_DISPLAY_TYPE,
                     PoddRdfConstants.PODD_BASE_DISPLAY_TYPE_DROPDOWN))
             {
                 for(final Resource nextRestriction : results.filter(null, OWL.ONPROPERTY, property).subjects())
@@ -1316,23 +1334,24 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     if(nextRangeTypes.isEmpty())
                     {
                         // see if restriction exists with owl:onClass
+                        // TODO: Add OWL.ONCLASS to Sesame vocabulary
                         nextRangeTypes =
                                 results.filter(nextRestriction,
                                         PoddRdfConstants.VF.createURI("http://www.w3.org/2002/07/owl#onClass"), null)
                                         .objects();
                     }
-                    // TODO: Optimise the following loop so it does not perform more than one
-                    // query, if possible
                     for(final Value nextRangeType : nextRangeTypes)
                     {
                         if(nextRangeType instanceof URI)
                         {
-                            results.addAll(this.getInstancesOf((URI)nextRangeType, repositoryConnection, contexts));
+                            nextRangeTypeURIs.add((URI)nextRangeType);
                         }
                     }
                 }
             }
         }
+        
+        results.addAll(this.getInstancesOf(nextRangeTypeURIs, repositoryConnection, contexts));
         
         return results;
     }
