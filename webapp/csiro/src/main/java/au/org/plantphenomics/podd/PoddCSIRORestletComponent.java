@@ -54,6 +54,8 @@ public class PoddCSIRORestletComponent extends Component
 {
     static
     {
+        System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
+        
         // Optionally remove existing handlers attached to j.u.l root logger
         SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
         
