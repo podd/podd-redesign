@@ -1399,6 +1399,10 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                         {
                             nextRangeTypeURIs.add((URI)nextRangeType);
                         }
+                        else
+                        {
+                            log.warn("Restriction was on a class that did not have a URI: property={}", property);
+                        }
                     }
                 }
             }
