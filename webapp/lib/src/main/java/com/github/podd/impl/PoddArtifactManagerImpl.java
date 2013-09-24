@@ -868,23 +868,22 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     {
         final Set<URI> danglingObjects =
                 RdfUtility.findDisconnectedNodes(artifactID.toOpenRDFURI(), repositoryConnection, context);
-        this.log.info("Found {} dangling object(s). \n {}", danglingObjects.size(), danglingObjects);
         
-        if(danglingObjects.isEmpty())
+        if(!danglingObjects.isEmpty())
         {
-            return;
-        }
-        
-        if(policy.equals(DanglingObjectPolicy.REPORT))
-        {
-            throw new DisconnectedObjectException(danglingObjects, "Update leads to disconnected PODD objects");
-        }
-        else if(policy.equals(DanglingObjectPolicy.FORCE_CLEAN))
-        {
-            for(final URI danglingObject : danglingObjects)
+            if(policy.equals(DanglingObjectPolicy.REPORT))
             {
-                repositoryConnection.remove(danglingObject, null, null, context);
-                repositoryConnection.remove(null, null, (Value)danglingObject, context);
+                this.log.error("Found {} dangling object(s) (reporting). \n {}", danglingObjects.size(), danglingObjects);
+                throw new DisconnectedObjectException(danglingObjects, "Update leads to disconnected PODD objects");
+            }
+            else if(policy.equals(DanglingObjectPolicy.FORCE_CLEAN))
+            {
+                this.log.info("Found {} dangling object(s) (force cleaning). \n {}", danglingObjects.size(), danglingObjects);
+                for(final URI danglingObject : danglingObjects)
+                {
+                    repositoryConnection.remove(danglingObject, null, null, context);
+                    repositoryConnection.remove(null, null, (Value)danglingObject, context);
+                }
             }
         }
     }
