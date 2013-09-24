@@ -1915,7 +1915,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append(offset);
         
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
-        graphQuery.setBinding("searchTerm", ValueFactoryImpl.getInstance().createLiteral(searchTerm));
+        graphQuery.setBinding("searchTerm", PoddRdfConstants.VF.createLiteral(searchTerm));
         
         this.log.debug("Created SPARQL {} with searchTerm bound to '{}' ", sb, searchTerm);
         
