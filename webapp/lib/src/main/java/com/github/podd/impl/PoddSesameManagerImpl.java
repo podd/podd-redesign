@@ -528,10 +528,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         sb.append("SELECT DISTINCT ?childUri ");
         sb.append(" WHERE { ");
         sb.append(" ?poddObject ?propertyUri ?childUri . ");
-        
+        sb.append(" FILTER(isIRI(?childUri)) . ");
         sb.append(" ?propertyUri <" + RDFS.SUBPROPERTYOF.stringValue() + "> <" + PoddRdfConstants.PODD_BASE_CONTAINS
                 + "> . ");
-        
         sb.append(" } ");
         
         this.log.debug("Created SPARQL {} with poddObject bound to {}", sb, objectUri);
