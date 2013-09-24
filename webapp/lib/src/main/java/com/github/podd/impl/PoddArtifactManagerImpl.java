@@ -873,12 +873,14 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             if(policy.equals(DanglingObjectPolicy.REPORT))
             {
-                this.log.error("Found {} dangling object(s) (reporting). \n {}", danglingObjects.size(), danglingObjects);
+                this.log.error("Found {} dangling object(s) (reporting). \n {}", danglingObjects.size(),
+                        danglingObjects);
                 throw new DisconnectedObjectException(danglingObjects, "Update leads to disconnected PODD objects");
             }
             else if(policy.equals(DanglingObjectPolicy.FORCE_CLEAN))
             {
-                this.log.info("Found {} dangling object(s) (force cleaning). \n {}", danglingObjects.size(), danglingObjects);
+                this.log.info("Found {} dangling object(s) (force cleaning). \n {}", danglingObjects.size(),
+                        danglingObjects);
                 for(final URI danglingObject : danglingObjects)
                 {
                     repositoryConnection.remove(danglingObject, null, null, context);
@@ -1053,11 +1055,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
         {
             conn = this.repositoryManager.getRepository().getConnection();
             
-            if(this.getSesameManager().isPublished(ontologyId, conn,
-                    this.getRepositoryManager().getArtifactManagementGraph()))
-            {
-                return true;
-            }
+            return this.getSesameManager().isPublished(ontologyId, conn,
+                    this.getRepositoryManager().getArtifactManagementGraph());
         }
         finally
         {
@@ -1066,7 +1065,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 conn.close();
             }
         }
-        return false;
     }
     
     private List<InferredOWLOntologyID> listArtifacts(final boolean published, final boolean unpublished)
@@ -1174,6 +1172,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // Load the artifact RDF triples into a random context in the temp repository, which may
             // be shared between different uploads
             temporaryRepositoryConnection.add(inputStream, "", format, randomContext);
+            
+            // Remove any assertions that the user has made about publication status, as this
+            // information is a privileged operation that must be done through the designated API
+            // method
+            temporaryRepositoryConnection.remove((Resource)null, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
+                    (Resource)null, randomContext);
             
             this.handlePurls(temporaryRepositoryConnection, randomContext);
             
@@ -1426,11 +1430,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                         "Could not publish artifact as it was not the most current version.", ontologyId);
             }
             
-            this.getSesameManager().setPublished(currentVersion, repositoryConnection,
-                    this.getRepositoryManager().getArtifactManagementGraph());
-            
             final InferredOWLOntologyID published =
-                    this.getSesameManager().getCurrentArtifactVersion(ontologyIRI, repositoryConnection,
+                    this.getSesameManager().setPublished(true, currentVersion, repositoryConnection,
                             this.getRepositoryManager().getArtifactManagementGraph());
             
             repositoryConnection.commit();

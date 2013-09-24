@@ -30,6 +30,7 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -87,21 +88,28 @@ public abstract class AbstractPoddSesameManagerTest
      * {@link com.github.podd.api.PoddSesameManager#isPublished(OWLOntologyID, RepositoryConnection)}
      * 
      */
-    private boolean internalTestIsPublished(final String testResourcePath, final int expectedSize,
-            final URI contextCumVersionIRI, final URI managementGraph) throws Exception
+    private boolean internalTestIsPublished(final boolean isPublished, final String testResourcePath,
+            final int expectedSize, final URI contextCumVersionURI, final URI managementGraph) throws Exception
     {
         // prepare: load the ontology into the test repository
         final InputStream inputStream = this.getClass().getResourceAsStream(testResourcePath);
-        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, contextCumVersionIRI);
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, contextCumVersionURI);
         Assert.assertEquals("Not the expected number of statements in Repository", expectedSize,
-                this.testRepositoryConnection.size(contextCumVersionIRI));
+                this.testRepositoryConnection.size(contextCumVersionURI));
         
         // prepare: build an OWLOntologyID
         final IRI ontologyIRI =
-                this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, contextCumVersionIRI);
-        final OWLOntologyID ontologyID = new OWLOntologyID(ontologyIRI.toOpenRDFURI(), contextCumVersionIRI);
+                this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, contextCumVersionURI);
+        final InferredOWLOntologyID ontologyID =
+                new InferredOWLOntologyID(ontologyIRI, IRI.create(contextCumVersionURI),
+                        IRI.create("urn:not:actually:inferred"));
+        this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY, managementGraph);
+        this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, contextCumVersionURI,
+                managementGraph);
         
-        return this.testPoddSesameManager.isPublished(ontologyID, this.testRepositoryConnection, managementGraph);
+        InferredOWLOntologyID publishedOntologyID = this.testPoddSesameManager.setPublished(isPublished, ontologyID, testRepositoryConnection, managementGraph);
+        
+        return this.testPoddSesameManager.isPublished(publishedOntologyID, this.testRepositoryConnection, managementGraph);
     }
     
     /**
@@ -1845,11 +1853,9 @@ public abstract class AbstractPoddSesameManagerTest
     {
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         
-        final OWLOntologyID emptyOntologyID = new OWLOntologyID();
-        
         try
         {
-            this.testPoddSesameManager.isPublished(emptyOntologyID, this.testRepositoryConnection, context);
+            this.testPoddSesameManager.isPublished(null, this.testRepositoryConnection, context);
             Assert.fail("Should have thrown a NullPointerException");
         }
         catch(final NullPointerException e)
@@ -1894,7 +1900,7 @@ public abstract class AbstractPoddSesameManagerTest
         final String testResourcePath = TestConstants.TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED;
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:uuid:artifact:version:55");
         
-        final boolean isPublished = this.internalTestIsPublished(testResourcePath, 21, versionUri, context);
+        final boolean isPublished = this.internalTestIsPublished(true, testResourcePath, 21, versionUri, context);
         Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
     }
     
@@ -1912,7 +1918,7 @@ public abstract class AbstractPoddSesameManagerTest
         final String testResourcePath = TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1;
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:artifact:version:1");
         final boolean isPublished =
-                this.internalTestIsPublished(testResourcePath,
+                this.internalTestIsPublished(false, testResourcePath,
                         TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1_CONCRETE_TRIPLES, versionUri, context);
         Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
     }

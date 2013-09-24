@@ -1840,7 +1840,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public boolean isPublished(final OWLOntologyID ontologyID, final RepositoryConnection repositoryConnection,
+    public boolean isPublished(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection,
             final URI managementGraph) throws OpenRDFException
     {
         if(ontologyID == null || ontologyID.getOntologyIRI() == null || ontologyID.getVersionIRI() == null)
@@ -1861,21 +1861,34 @@ public class PoddSesameManagerImpl implements PoddSesameManager
          * 
          * }
          */
-        final String sparqlQuery =
-                "ASK { " + "?artifact <" + PoddRdfConstants.OWL_VERSION_IRI.stringValue() + "> "
-                        + ontologyID.getVersionIRI().toQuotedString() + " . " + "?artifact <"
-                        + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT.stringValue() + "> ?top ." + " ?top <"
-                        + PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS.stringValue() + "> <"
-                        + PoddRdfConstants.PODD_BASE_PUBLISHED.stringValue() + ">" + " }";
+        // final String sparqlQueryString =
+        // "?artifact <" + PoddRdfConstants.OWL_VERSION_IRI.stringValue() + "> "
+        // + ontologyID.getVersionIRI().toQuotedString() + " . " + "?artifact <"
+        // + PoddRdfConstants.PODD_BASE_HAS_TOP_OBJECT.stringValue() + "> ?top ." + " ?top <"
+        // + PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS.stringValue() + "> <"
+        // + PoddRdfConstants.PODD_BASE_PUBLISHED.stringValue() + ">" + " }";
+        
+        final StringBuilder sparqlQuery = new StringBuilder(1024);
+        sparqlQuery.append("ASK { ");
+        sparqlQuery.append(" ?artifact ").append(RenderUtils.getSPARQLQueryString(OWL.VERSIONIRI)).append(" ");
+        sparqlQuery.append(RenderUtils.getSPARQLQueryString(ontologyID.getVersionIRI().toOpenRDFURI()));
+        sparqlQuery.append(" . ");
+        sparqlQuery.append(" ?artifact ").append(
+                RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS));
+        sparqlQuery.append(" ");
+        sparqlQuery.append(RenderUtils.getSPARQLQueryString(PoddRdfConstants.PODD_BASE_PUBLISHED));
+        sparqlQuery.append(" . ");
+        sparqlQuery.append(" } ");
         
         this.log.debug("Generated SPARQL {}", sparqlQuery);
         
-        final BooleanQuery booleanQuery = repositoryConnection.prepareBooleanQuery(QueryLanguage.SPARQL, sparqlQuery);
+        final BooleanQuery booleanQuery =
+                repositoryConnection.prepareBooleanQuery(QueryLanguage.SPARQL, sparqlQuery.toString());
         
         // Create a dataset to specify the contexts
         final DatasetImpl dataset = new DatasetImpl();
-        dataset.addDefaultGraph(artifactGraphUri);
-        dataset.addNamedGraph(artifactGraphUri);
+        dataset.addDefaultGraph(managementGraph);
+        dataset.addNamedGraph(managementGraph);
         booleanQuery.setDataset(dataset);
         
         return booleanQuery.evaluate();
@@ -1925,26 +1938,64 @@ public class PoddSesameManagerImpl implements PoddSesameManager
     }
     
     @Override
-    public void setPublished(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection,
-            final URI artifactManagementGraph) throws OpenRDFException
+    public InferredOWLOntologyID setPublished(final boolean wantToPublish, final InferredOWLOntologyID ontologyID,
+            final RepositoryConnection repositoryConnection, final URI artifactManagementGraph) throws OpenRDFException
     {
-        final URI topObjectIRI = this.getTopObjectIRI(ontologyID, repositoryConnection);
+        boolean changeRequired = false;
         
-        // TODO: Manage the publication status in the artifact management graph if that is going to
-        // be easier
+        if(wantToPublish)
+        {
+           if(!repositoryConnection.hasStatement(ontologyID.getOntologyIRI().toOpenRDFURI(),
+                            PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_PUBLISHED,
+                            false, artifactManagementGraph))
+           {
+               changeRequired = true;
+           }
+        }
+        else
+        {
+            if(!repositoryConnection.hasStatement(ontologyID.getOntologyIRI().toOpenRDFURI(),
+                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_NOT_PUBLISHED,
+                    false, artifactManagementGraph))
+            {
+                changeRequired = true;
+            }
+        }
         
-        // remove previous value for publication status
-        repositoryConnection.remove(topObjectIRI, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, ontologyID
-                .getVersionIRI().toOpenRDFURI());
+        if(!changeRequired)
+        {
+            return ontologyID;
+        }
+        else if(wantToPublish)
+        {
+            // remove previous value for publication status
+            repositoryConnection.remove(ontologyID.getOntologyIRI().toOpenRDFURI(),
+                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, artifactManagementGraph);
+            
+            // then insert the publication status as #Published
+            repositoryConnection.add(ontologyID.getOntologyIRI().toOpenRDFURI(),
+                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_PUBLISHED,
+                    artifactManagementGraph);
+            
+            this.log.info("{} was set as Published", ontologyID.getOntologyIRI().toOpenRDFURI());
+        }
+        else
+        {
+            // remove previous value for publication status
+            repositoryConnection.remove(ontologyID.getOntologyIRI().toOpenRDFURI(),
+                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, artifactManagementGraph);
+            
+            this.updateManagedPoddArtifactVersion(ontologyID, true, repositoryConnection, artifactManagementGraph);
+            
+            // then insert the publication status as #NotPublished
+            repositoryConnection.add(ontologyID.getOntologyIRI().toOpenRDFURI(),
+                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_NOT_PUBLISHED,
+                    artifactManagementGraph);
+            
+            this.log.info("{} was set as Unpublished", ontologyID.getOntologyIRI().toOpenRDFURI());
+        }
         
-        repositoryConnection.remove(topObjectIRI, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null,
-                artifactManagementGraph);
-        
-        // then insert the publication status as #Published
-        repositoryConnection.add(topObjectIRI, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
-                PoddRdfConstants.PODD_BASE_PUBLISHED, artifactManagementGraph);
-        
-        this.log.info("{} was set as Published", topObjectIRI);
+        return ontologyID;
     }
     
     @Override
