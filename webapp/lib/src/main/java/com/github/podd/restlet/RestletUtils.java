@@ -104,11 +104,11 @@ public final class RestletUtils
         {
             dataModel.put("currentUserName", currentUser.getName());
             
-            RestletUtils.log.info("currentUser: {}", currentUser);
-            RestletUtils.log.info("currentUser.getFirstName: {}", currentUser.getFirstName());
-            RestletUtils.log.info("currentUser.getLastName: {}", currentUser.getLastName());
-            RestletUtils.log.info("currentUser.getName: {}", currentUser.getName());
-            RestletUtils.log.info("currentUser.getIdentifier: {}", currentUser.getIdentifier());
+            RestletUtils.log.debug("currentUser: {}", currentUser);
+            RestletUtils.log.trace("currentUser.getFirstName: {}", currentUser.getFirstName());
+            RestletUtils.log.trace("currentUser.getLastName: {}", currentUser.getLastName());
+            RestletUtils.log.trace("currentUser.getName: {}", currentUser.getName());
+            RestletUtils.log.trace("currentUser.getIdentifier: {}", currentUser.getIdentifier());
         }
         else
         {
