@@ -53,7 +53,6 @@ import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.helpers.StatementCollector;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
@@ -67,6 +66,7 @@ import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
 import com.github.podd.utils.PoddRdfConstants;
+import com.github.podd.utils.RdfUtility;
 
 /**
  * @author kutila
@@ -156,66 +156,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
     }
     
-    /**
-     * Helper method to execute a given SPARQL Graph query.
-     * 
-     * @param sparqlQuery
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    private Model executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts) throws OpenRDFException
-    {
-        final DatasetImpl dataset = new DatasetImpl();
-        for(final URI uri : contexts)
-        {
-            dataset.addDefaultGraph(uri);
-        }
-        sparqlQuery.setDataset(dataset);
-        final Model results = new LinkedHashModel();
-        long before = System.currentTimeMillis();
-        sparqlQuery.evaluate(new StatementCollector(results));
-        long total = System.currentTimeMillis() - before;
-        log.info("graph query took {}", Long.toString(total));
-        if(total > 30)
-        {
-            new Throwable().printStackTrace();
-        }
-        
-        return results;
-    }
-    
-    /**
-     * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
-     * 
-     * @param sparqlQuery
-     * @param contexts
-     * @return
-     * @throws OpenRDFException
-     */
-    private QueryResultCollector executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
-        throws OpenRDFException
-    {
-        final DatasetImpl dataset = new DatasetImpl();
-        for(final URI uri : contexts)
-        {
-            dataset.addDefaultGraph(uri);
-        }
-        sparqlQuery.setDataset(dataset);
-        
-        final QueryResultCollector results = new QueryResultCollector();
-        long before = System.currentTimeMillis();
-        QueryResults.report(sparqlQuery.evaluate(), results);
-        long total = System.currentTimeMillis() - before;
-        log.info("tuple query took {}", Long.toString(total));
-        if(total > 30)
-        {
-            new Throwable().printStackTrace();
-        }
-        
-        return results;
-    }
-    
     @Override
     public Model fillMissingLabels(final Model inputModel, final RepositoryConnection repositoryConnection,
             final URI... contexts) throws OpenRDFException
@@ -262,7 +202,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         this.log.debug("Created SPARQL {}.", graphQuery);
         
-        return this.executeGraphQuery(rdfsGraphQuery, contexts);
+        return RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
     }
     
     @Override
@@ -291,7 +231,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         this.log.debug("Generated SPARQL {} ", sb);
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        final QueryResultCollector queryResults = this.executeSparqlQuery(query, schemaManagementGraph);
+        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(query, schemaManagementGraph);
         
         for(final BindingSet nextResult : queryResults.getBindingSets())
         {
@@ -324,7 +264,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         this.log.debug("Generated SPARQL {} ", sb);
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        final QueryResultCollector queryResults = this.executeSparqlQuery(query, schemaManagementGraph);
+        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(query, schemaManagementGraph);
         
         for(final BindingSet nextResult : queryResults.getBindingSets())
         {
@@ -393,7 +333,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddProperty", propertyUri);
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery,
+                RdfUtility.executeSparqlQuery(tupleQuery,
                         this.versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
         
         for(final BindingSet binding : queryResults.getBindingSets())
@@ -478,7 +418,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             query.setBinding("poddObject", objectUri);
         }
         
-        final QueryResultCollector queryResults = this.executeSparqlQuery(query, contexts);
+        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(query, contexts);
         
         final ConcurrentMap<URI, URI> resultMap = new ConcurrentHashMap<URI, URI>();
         
@@ -556,7 +496,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddObject", objectUri);
-        final QueryResultCollector queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(tupleQuery, contexts);
         
         final Set<URI> resultSet = new HashSet<URI>();
         for(final BindingSet next : queryResults.getBindingSets())
@@ -819,7 +759,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         // this.log.debug("Created SPARQL {} \n   with nextRangeType bound to {}", instanceQuery,
         // nextRangeType);
         
-        return this.executeGraphQuery(rdfsGraphQuery, contexts);
+        return RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
     }
     
     @Override
@@ -848,7 +788,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final GraphQuery graphQuery = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb.toString());
         graphQuery.setBinding("poddObject", objectUri);
         
-        final Model queryResults = this.executeGraphQuery(graphQuery, contexts);
+        final Model queryResults = RdfUtility.executeGraphQuery(graphQuery, contexts);
         
         return queryResults;
     }
@@ -903,7 +843,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         graphQuery.setBinding("poddObject", objectUri);
         
         final Model queryResults =
-                this.executeGraphQuery(graphQuery,
+                RdfUtility.executeGraphQuery(graphQuery,
                         this.versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
         
         return queryResults;
@@ -940,7 +880,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery,
+                RdfUtility.executeSparqlQuery(tupleQuery,
                         this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
         
         String label = null;
@@ -1027,7 +967,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         this.log.debug("Created SPARQL {} \n   with objectType bound to {}", owlRestrictionQueryString, objectType);
         
-        final Model rdfsQueryResults = this.executeGraphQuery(rdfsGraphQuery, contexts);
+        final Model rdfsQueryResults = RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
         results.addAll(rdfsQueryResults);
         
         // this.log.info("{} Restrictions found", restrictions.size());
@@ -1094,7 +1034,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             // this.log.debug("Created SPARQL {} \n   with rangeClass bound to {}",
             // subRangeQueryString, restriction);
             
-            results.addAll(this.executeGraphQuery(subRangeGraphQuery, contexts));
+            results.addAll(RdfUtility.executeGraphQuery(subRangeGraphQuery, contexts));
         }
         
         return results;
@@ -1171,7 +1111,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         this.log.debug("Created SPARQL {} \n   with objectType bound to {}", owlRestrictionQueryString, objectType);
         
-        final Model restrictionQueryResults = this.executeGraphQuery(graphQuery, contexts);
+        final Model restrictionQueryResults = RdfUtility.executeGraphQuery(graphQuery, contexts);
         results.addAll(restrictionQueryResults);
         
         properties.addAll(restrictionQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
@@ -1223,7 +1163,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         this.log.debug("Created SPARQL {} \n   with objectType bound to {}", rdfsQueryString, objectType);
         
-        final Model rdfsQueryResults = this.executeGraphQuery(rdfsGraphQuery, contexts);
+        final Model rdfsQueryResults = RdfUtility.executeGraphQuery(rdfsGraphQuery, contexts);
         results.addAll(rdfsQueryResults);
         
         properties.addAll(rdfsQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
@@ -1275,7 +1215,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                     repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, annotationQueryString);
             annotationGraphQuery.setBinding("objectType", objectType);
             
-            final Model annotationQueryResults = this.executeGraphQuery(annotationGraphQuery, contexts);
+            final Model annotationQueryResults = RdfUtility.executeGraphQuery(annotationGraphQuery, contexts);
             
             results.addAll(annotationQueryResults);
             properties.addAll(annotationQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
@@ -1339,7 +1279,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         String sb2String = sb2.toString();
         
         final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
-        final Model queryResults2 = this.executeGraphQuery(graphQuery2, contexts);
+        final Model queryResults2 = RdfUtility.executeGraphQuery(graphQuery2, contexts);
         results.addAll(queryResults2);
         
         // - add cardinality value
@@ -1456,7 +1396,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(tupleQuery,
+                RdfUtility.executeSparqlQuery(tupleQuery,
                         this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
         
         final List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
@@ -1655,7 +1595,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         this.log.debug("Created SPARQL {} \n   with poddObject bound to {}", sb, objectUri);
         
-        return this.executeGraphQuery(graphQuery, contexts);
+        return RdfUtility.executeGraphQuery(graphQuery, contexts);
     }
     
     /*
@@ -1688,7 +1628,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         this.log.debug("Created SPARQL {} \n   with poddObject bound to {}", sb, objectUri);
         
-        return this.executeGraphQuery(graphQuery, contexts);
+        return RdfUtility.executeGraphQuery(graphQuery, contexts);
     }
     
     @Override
@@ -1760,7 +1700,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         query.setBinding("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
         
         final QueryResultCollector queryResults =
-                this.executeSparqlQuery(query, this.versionAndInferredContexts(ontologyID));
+                RdfUtility.executeSparqlQuery(query, this.versionAndInferredContexts(ontologyID));
         
         final List<URI> topObjectList = new ArrayList<URI>();
         
@@ -1823,7 +1763,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddObject", objectUri);
-        final QueryResultCollector queryResults = this.executeSparqlQuery(tupleQuery, contexts);
+        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(tupleQuery, contexts);
         // this.versionAndSchemaContexts(artifactID, repositoryConnection, c));
         
         final List<URI> resultList = new ArrayList<URI>();
@@ -1932,7 +1872,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         this.log.debug("Created SPARQL {} with searchTerm bound to '{}' ", sb, searchTerm);
         
-        final Model queryResults = this.executeGraphQuery(graphQuery, contexts);
+        final Model queryResults = RdfUtility.executeGraphQuery(graphQuery, contexts);
         
         return queryResults;
     }
@@ -1945,18 +1885,18 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         if(wantToPublish)
         {
-           if(!repositoryConnection.hasStatement(ontologyID.getOntologyIRI().toOpenRDFURI(),
-                            PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_PUBLISHED,
-                            false, artifactManagementGraph))
-           {
-               changeRequired = true;
-           }
+            if(!repositoryConnection.hasStatement(ontologyID.getOntologyIRI().toOpenRDFURI(),
+                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_PUBLISHED, false,
+                    artifactManagementGraph))
+            {
+                changeRequired = true;
+            }
         }
         else
         {
             if(!repositoryConnection.hasStatement(ontologyID.getOntologyIRI().toOpenRDFURI(),
-                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_NOT_PUBLISHED,
-                    false, artifactManagementGraph))
+                    PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, PoddRdfConstants.PODD_BASE_NOT_PUBLISHED, false,
+                    artifactManagementGraph))
             {
                 changeRequired = true;
             }

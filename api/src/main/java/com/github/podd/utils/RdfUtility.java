@@ -36,6 +36,11 @@ import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.QueryResults;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.impl.DatasetImpl;
+import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -296,6 +301,66 @@ public class RdfUtility
         {
             return false;
         }
+    }
+
+    /**
+     * Helper method to execute a given SPARQL Graph query.
+     * 
+     * @param sparqlQuery
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    public static Model executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts) throws OpenRDFException
+    {
+        final DatasetImpl dataset = new DatasetImpl();
+        for(final URI uri : contexts)
+        {
+            dataset.addDefaultGraph(uri);
+        }
+        sparqlQuery.setDataset(dataset);
+        final Model results = new LinkedHashModel();
+        long before = System.currentTimeMillis();
+        sparqlQuery.evaluate(new StatementCollector(results));
+        long total = System.currentTimeMillis() - before;
+        // log.info("graph query took {}", Long.toString(total));
+        if(total > 30)
+        {
+            new Throwable().printStackTrace();
+        }
+        
+        return results;
+    }
+
+    /**
+     * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
+     * 
+     * @param sparqlQuery
+     * @param contexts
+     * @return
+     * @throws OpenRDFException
+     */
+    public static QueryResultCollector executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
+        throws OpenRDFException
+    {
+        final DatasetImpl dataset = new DatasetImpl();
+        for(final URI uri : contexts)
+        {
+            dataset.addDefaultGraph(uri);
+        }
+        sparqlQuery.setDataset(dataset);
+        
+        final QueryResultCollector results = new QueryResultCollector();
+        long before = System.currentTimeMillis();
+        QueryResults.report(sparqlQuery.evaluate(), results);
+        long total = System.currentTimeMillis() - before;
+        // log.info("tuple query took {}", Long.toString(total));
+        if(total > 30)
+        {
+            new Throwable().printStackTrace();
+        }
+        
+        return results;
     }
     
 }
