@@ -27,19 +27,20 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.restlet.security.Role;
 
-import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
 import com.github.podd.restlet.PoddSesameRealm;
-import com.github.podd.restlet.PoddSesameRealmImpl;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
@@ -75,15 +76,15 @@ public class PoddSesameRealmTest
         // PoddRdfConstants.VF.createURI("urn:oas:user:" + userId + ":" +
         // UUID.randomUUID().toString());
         // testUser.setUri(testUserUri);
-        this.testRealm.addUser(testUser);
+        URI addUserUri = this.testRealm.addUser(testUser);
+        Assert.assertNotNull("Test user was not added correctly", addUserUri);
         return testUser;
     }
     
     /**
      * Wrapper to get statements from the Repository
      */
-    protected List<Statement> getStatementList(final URI subject, final URI predicate, final Value object)
-        throws Exception
+    protected Model getStatementList(final URI subject, final URI predicate, final Value object) throws Exception
     {
         RepositoryConnection conn = null;
         try
@@ -91,8 +92,8 @@ public class PoddSesameRealmTest
             conn = this.testRepository.getConnection();
             conn.begin();
             
-            return Iterations.asList(conn.getStatements(subject, predicate, object, true,
-                    PoddSesameRealmTest.userMgtContext));
+            return new LinkedHashModel(Iterations.asList(conn.getStatements(subject, predicate, object, true,
+                    PoddSesameRealmTest.userMgtContext)));
         }
         finally
         {
@@ -110,7 +111,7 @@ public class PoddSesameRealmTest
         this.testRepository = new SailRepository(new MemoryStore());
         this.testRepository.initialize();
         
-        this.testRealm = new PoddSesameRealmImpl(this.testRepository, PoddSesameRealmTest.userMgtContext);
+        this.testRealm = new PoddSesameRealm(this.testRepository, PoddSesameRealmTest.userMgtContext);
     }
     
     @After
@@ -130,12 +131,16 @@ public class PoddSesameRealmTest
     {
         final String testUserId1 = "john@example.com";
         final PoddUser testUser = this.addTestUser(testUserId1);
+        Assert.assertNotNull("Test user was null", testUser);
         
-        final RestletUtilUser retrievedUser = this.testRealm.findUser(testUserId1);
+        DebugUtils.printContents(this.getStatementList(null, null, null));
+        
+        final PoddUser retrievedUser = this.testRealm.findUser(testUserId1);
+        Assert.assertNotNull("Retrieved user was null", retrievedUser);
         Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
         Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
         
-        final PoddUser recvdPoddUser = (PoddUser)retrievedUser;
+        final PoddUser recvdPoddUser = retrievedUser;
         Assert.assertEquals("Returned user ORCID different to original", "SOME_ORCID_ID", recvdPoddUser.getOrcid());
         Assert.assertEquals("Returned user URI different to original", testUser.getHomePage(),
                 recvdPoddUser.getHomePage());
@@ -154,11 +159,11 @@ public class PoddSesameRealmTest
                         "Some Organization", "SOME_ORCID_ID");
         this.testRealm.addUser(testUser);
         
-        final RestletUtilUser retrievedUser = this.testRealm.findUser(testIdentifier);
+        final PoddUser retrievedUser = this.testRealm.findUser(testIdentifier);
         Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
         Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
         
-        final PoddUser recvdPoddUser = (PoddUser)retrievedUser;
+        final PoddUser recvdPoddUser = retrievedUser;
         Assert.assertEquals("Returned user has incorrect status", PoddUserStatus.INACTIVE,
                 recvdPoddUser.getUserStatus());
     }
@@ -168,16 +173,16 @@ public class PoddSesameRealmTest
     {
         final String testIdentifier = "xTest@example.com";
         final PoddUser testUser =
-                new PoddUser(testIdentifier, null, "First", "Last", testIdentifier,
-                        PoddUserStatus.INACTIVE, PoddRdfConstants.VF.createURI("http://example.org/" + testIdentifier),
-                        "Some Organization", "SOME_ORCID_ID");
+                new PoddUser(testIdentifier, null, "First", "Last", testIdentifier, PoddUserStatus.INACTIVE,
+                        PoddRdfConstants.VF.createURI("http://example.org/" + testIdentifier), "Some Organization",
+                        "SOME_ORCID_ID");
         this.testRealm.addUser(testUser);
         
-        final RestletUtilUser retrievedUser = this.testRealm.findUser(testIdentifier);
+        final PoddUser retrievedUser = this.testRealm.findUser(testIdentifier);
         Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
         Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
         
-        final PoddUser recvdPoddUser = (PoddUser)retrievedUser;
+        final PoddUser recvdPoddUser = retrievedUser;
         Assert.assertEquals("Returned user has incorrect status", PoddUserStatus.INACTIVE,
                 recvdPoddUser.getUserStatus());
     }
@@ -187,16 +192,16 @@ public class PoddSesameRealmTest
     {
         final String testIdentifier = "xTest@example.com";
         final PoddUser testUser =
-                new PoddUser(testIdentifier, null, "First", "Last", testIdentifier,
-                        PoddUserStatus.ACTIVE, PoddRdfConstants.VF.createURI("http://example.org/" + testIdentifier),
-                        "Some Organization", "SOME_ORCID_ID");
+                new PoddUser(testIdentifier, null, "First", "Last", testIdentifier, PoddUserStatus.ACTIVE,
+                        PoddRdfConstants.VF.createURI("http://example.org/" + testIdentifier), "Some Organization",
+                        "SOME_ORCID_ID");
         this.testRealm.addUser(testUser);
         
-        final RestletUtilUser retrievedUser = this.testRealm.findUser(testIdentifier);
+        final PoddUser retrievedUser = this.testRealm.findUser(testIdentifier);
         Assert.assertEquals("Returned user different to original", testUser, retrievedUser);
         Assert.assertTrue("Returned user is not a PoddUser", retrievedUser instanceof PoddUser);
         
-        final PoddUser recvdPoddUser = (PoddUser)retrievedUser;
+        final PoddUser recvdPoddUser = retrievedUser;
         Assert.assertEquals("Returned user has incorrect status", PoddUserStatus.INACTIVE,
                 recvdPoddUser.getUserStatus());
     }
@@ -422,13 +427,13 @@ public class PoddSesameRealmTest
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
         
         // -verify
-        final List<Statement> list1 =
+        final Model list1 =
                 this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
         Assert.assertFalse(list1.isEmpty());
         Assert.assertEquals(1, list1.size());
         
         // verify: a PROJECT_MEMBER role mapping exists
-        final List<Statement> list2 =
+        final Model list2 =
                 this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_MEMBER.getURI());
         Assert.assertFalse(list2.isEmpty());
         Assert.assertEquals(1, list2.size());
@@ -438,13 +443,13 @@ public class PoddSesameRealmTest
         this.testRealm.map(user2, PoddRoles.PROJECT_MEMBER.getRole(), object2URI);
         
         // verify: 2 PROJECT_MEMBER role mapping exists
-        final List<Statement> list3 =
+        final Model list3 =
                 this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_MEMBER.getURI());
         Assert.assertFalse(list3.isEmpty());
         Assert.assertEquals(2, list3.size());
         
         // verify: 2 RoleMappedObject statements exist in the repository
-        final List<Statement> list4 = this.getStatementList(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null);
+        final Model list4 = this.getStatementList(null, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null);
         Assert.assertFalse(list4.isEmpty());
         Assert.assertEquals(2, list4.size());
     }
@@ -566,13 +571,13 @@ public class PoddSesameRealmTest
         this.testRealm.map(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
         
         // -verify: ADMIN role mapping
-        final List<Statement> list1 =
+        final Model list1 =
                 this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
         Assert.assertFalse(list1.isEmpty());
         Assert.assertEquals(1, list1.size());
         
         // verify: PROJECT_MEMBER role mapping
-        final List<Statement> list2 =
+        final Model list2 =
                 this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_MEMBER.getURI());
         Assert.assertFalse(list2.isEmpty());
         Assert.assertEquals(1, list2.size());
@@ -581,12 +586,12 @@ public class PoddSesameRealmTest
         this.testRealm.unmap(user1, PoddRoles.PROJECT_MEMBER.getRole(), object1URI);
         
         // verify: no PROJECT_MEMBER role mapping exists
-        final List<Statement> list3 =
+        final Model list3 =
                 this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.PROJECT_MEMBER.getURI());
         Assert.assertTrue(list3.isEmpty());
         
         // verify: Admin Role Mapping exist in the repository
-        final List<Statement> list4 =
+        final Model list4 =
                 this.getStatementList(null, SesameRealmConstants.OAS_ROLEMAPPEDROLE, PoddRoles.ADMIN.getURI());
         Assert.assertFalse(list4.isEmpty());
         Assert.assertEquals(1, list4.size());
@@ -628,7 +633,7 @@ public class PoddSesameRealmTest
         // modify the existing User
         this.testRealm.updateUser(testUser2);
         
-        final PoddUser userFromRealm = (PoddUser)this.testRealm.findUser(testUserId);
+        final PoddUser userFromRealm = this.testRealm.findUser(testUserId);
         Assert.assertEquals("First name was not overwritten", testUser2FirstName, userFromRealm.getFirstName());
         Assert.assertEquals("Last name was not overwritten", testUser2LastName, userFromRealm.getLastName());
         Assert.assertEquals("Home Page was not overwritten", testUser2HomePage, userFromRealm.getHomePage());

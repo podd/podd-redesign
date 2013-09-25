@@ -302,7 +302,7 @@ public class RdfUtility
             return false;
         }
     }
-
+    
     /**
      * Helper method to execute a given SPARQL Graph query.
      * 
@@ -323,7 +323,7 @@ public class RdfUtility
         long before = System.currentTimeMillis();
         sparqlQuery.evaluate(new StatementCollector(results));
         long total = System.currentTimeMillis() - before;
-        // log.info("graph query took {}", Long.toString(total));
+        log.info("graph query took {}", Long.toString(total));
         if(total > 30)
         {
             new Throwable().printStackTrace();
@@ -331,7 +331,7 @@ public class RdfUtility
         
         return results;
     }
-
+    
     /**
      * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
      * 
@@ -340,7 +340,7 @@ public class RdfUtility
      * @return
      * @throws OpenRDFException
      */
-    public static QueryResultCollector executeSparqlQuery(final TupleQuery sparqlQuery, final URI... contexts)
+    public static QueryResultCollector executeTupleQuery(final TupleQuery sparqlQuery, final URI... contexts)
         throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
@@ -354,7 +354,7 @@ public class RdfUtility
         long before = System.currentTimeMillis();
         QueryResults.report(sparqlQuery.evaluate(), results);
         long total = System.currentTimeMillis() - before;
-        // log.info("tuple query took {}", Long.toString(total));
+        log.info("tuple query took {}", Long.toString(total));
         if(total > 30)
         {
             new Throwable().printStackTrace();

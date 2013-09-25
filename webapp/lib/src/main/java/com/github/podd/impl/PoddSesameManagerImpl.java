@@ -231,7 +231,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         this.log.debug("Generated SPARQL {} ", sb);
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(query, schemaManagementGraph);
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(query, schemaManagementGraph);
         
         for(final BindingSet nextResult : queryResults.getBindingSets())
         {
@@ -264,7 +264,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         this.log.debug("Generated SPARQL {} ", sb);
         
         final TupleQuery query = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
-        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(query, schemaManagementGraph);
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(query, schemaManagementGraph);
         
         for(final BindingSet nextResult : queryResults.getBindingSets())
         {
@@ -333,7 +333,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddProperty", propertyUri);
         final QueryResultCollector queryResults =
-                RdfUtility.executeSparqlQuery(tupleQuery,
+                RdfUtility.executeTupleQuery(tupleQuery,
                         this.versionAndInferredAndSchemaContexts(artifactID, repositoryConnection));
         
         for(final BindingSet binding : queryResults.getBindingSets())
@@ -418,7 +418,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             query.setBinding("poddObject", objectUri);
         }
         
-        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(query, contexts);
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(query, contexts);
         
         final ConcurrentMap<URI, URI> resultMap = new ConcurrentHashMap<URI, URI>();
         
@@ -496,7 +496,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddObject", objectUri);
-        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(tupleQuery, contexts);
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(tupleQuery, contexts);
         
         final Set<URI> resultSet = new HashSet<URI>();
         for(final BindingSet next : queryResults.getBindingSets())
@@ -880,7 +880,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                RdfUtility.executeSparqlQuery(tupleQuery,
+                RdfUtility.executeTupleQuery(tupleQuery,
                         this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
         
         String label = null;
@@ -1396,7 +1396,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("objectUri", objectUri);
         final QueryResultCollector queryResults =
-                RdfUtility.executeSparqlQuery(tupleQuery,
+                RdfUtility.executeTupleQuery(tupleQuery,
                         this.versionAndInferredAndSchemaContexts(ontologyID, repositoryConnection));
         
         final List<URI> results = new ArrayList<URI>(queryResults.getBindingSets().size());
@@ -1700,7 +1700,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         query.setBinding("artifactUri", ontologyID.getOntologyIRI().toOpenRDFURI());
         
         final QueryResultCollector queryResults =
-                RdfUtility.executeSparqlQuery(query, this.versionAndInferredContexts(ontologyID));
+                RdfUtility.executeTupleQuery(query, this.versionAndInferredContexts(ontologyID));
         
         final List<URI> topObjectList = new ArrayList<URI>();
         
@@ -1763,7 +1763,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         final TupleQuery tupleQuery = repositoryConnection.prepareTupleQuery(QueryLanguage.SPARQL, sb.toString());
         tupleQuery.setBinding("poddObject", objectUri);
-        final QueryResultCollector queryResults = RdfUtility.executeSparqlQuery(tupleQuery, contexts);
+        final QueryResultCollector queryResults = RdfUtility.executeTupleQuery(tupleQuery, contexts);
         // this.versionAndSchemaContexts(artifactID, repositoryConnection, c));
         
         final List<URI> resultList = new ArrayList<URI>();

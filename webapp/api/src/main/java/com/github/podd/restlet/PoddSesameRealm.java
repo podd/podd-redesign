@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.OpenRDFUtil;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
@@ -52,6 +53,7 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
+import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -79,12 +81,9 @@ import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
 import com.github.podd.utils.PoddUser;
 import com.github.podd.utils.PoddUserStatus;
+import com.github.podd.utils.RdfUtility;
 
-/**
- * Abstract class which customises RestletUtilSesameRealm.java to use PODDUsers and PoddRoles.
- * 
- */
-public abstract class PoddSesameRealm extends Realm
+public class PoddSesameRealm extends Realm
 {
     // ======================= begin inner classes ==========================
     
@@ -131,7 +130,7 @@ public abstract class PoddSesameRealm extends Realm
      * Verifier class based on the default security model. It looks up users in the mapped
      * organizations.
      * 
-     * NOTE: 2013/01/22 - this class is identical to the DefaultOasSesameRealmVerifier.java
+     * NOTE: 2013/01/22 - this class is identical to the DefaultPoddSesameRealmVerifier.java
      */
     private class DefaultPoddSesameRealmVerifier extends LocalVerifier
     {
@@ -390,6 +389,21 @@ public abstract class PoddSesameRealm extends Realm
     
     public final URI addUser(final PoddUser nextUser)
     {
+        return this.addUser(nextUser, true);
+    }
+    
+    protected URI addUser(final PoddUser nextUser, final boolean isNew)
+    {
+        final PoddUser oldUser = this.findUser(nextUser.getIdentifier());
+        if(isNew && oldUser != null)
+        {
+            throw new IllegalStateException("User already exists");
+        }
+        else if(!isNew && oldUser == null)
+        {
+            throw new IllegalStateException("Could not modify User (does not exist)");
+        }
+        
         URI nextUserUUID =
                 this.vf.createURI("urn:oas:user:", nextUser.getIdentifier() + ":" + UUID.randomUUID().toString());
         
@@ -454,60 +468,6 @@ public abstract class PoddSesameRealm extends Realm
                 conn.add(nextUserUUID, SesameRealmConstants.OAS_USEREMAIL, this.vf.createLiteral(nextUser.getEmail()),
                         this.getContexts());
             }
-            
-            conn.commit();
-        }
-        catch(final RepositoryException e)
-        {
-            this.log.error("Found repository exception while adding user", e);
-            try
-            {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Found unexpected exception while rolling back repository connection after exception");
-            }
-        }
-        finally
-        {
-            if(conn != null)
-            {
-                try
-                {
-                    conn.close();
-                }
-                catch(final RepositoryException e)
-                {
-                    this.log.error("Found unexpected repository exception", e);
-                }
-            }
-        }
-        
-        return nextUserUUID;
-    }
-    
-    protected URI addUser(final PoddUser nextUser, final boolean isNew)
-    {
-        final PoddUser oldUser = this.findUser(nextUser.getIdentifier());
-        if(isNew && oldUser != null)
-        {
-            throw new RuntimeException("User already exists");
-        }
-        else if(!isNew && oldUser == null)
-        {
-            throw new RuntimeException("Could not modify User (does not exist)");
-        }
-        
-        final URI nextUserUUID = this.addUser(nextUser);
-        
-        this.log.debug("adding PODD specific parameters");
-        
-        RepositoryConnection conn = null;
-        try
-        {
-            conn = this.getRepository().getConnection();
-            conn.begin();
             
             if(nextUser.getOrganization() != null)
             {
@@ -1510,28 +1470,24 @@ public abstract class PoddSesameRealm extends Realm
             
             final String query = this.buildSparqlQueryToFindUser(userIdentifier, false);
             
-            this.log.debug("findUser: query={}", query);
+            this.log.info("findUser: query={}", query);
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
             
-            try
+            if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
             {
-                if(queryResult.hasNext())
-                {
-                    final BindingSet bindingSet = queryResult.next();
-                    
-                    result = this.buildRestletUserFromSparqlResult(userIdentifier, bindingSet);
-                }
-                else
-                {
-                    this.log.info("Could not find user with identifier, returning null: {}", userIdentifier);
-                }
+                this.log.info("Could not find user with identifier, returning null: {}", userIdentifier);
             }
-            finally
+            else
             {
-                queryResult.close();
+                if(resultCollector.getBindingSets().size() > 1)
+                {
+                    this.log.warn("Found multiple users with the same identifier: {}", resultCollector.getBindingSets());
+                }
+                
+                result = this.buildRestletUserFromSparqlResult(userIdentifier, resultCollector.getBindingSets().get(0));
             }
             
         }
@@ -1544,6 +1500,10 @@ public abstract class PoddSesameRealm extends Realm
             throw new RuntimeException("Failure finding user in repository", e);
         }
         catch(final QueryEvaluationException e)
+        {
+            throw new RuntimeException("Failure finding user in repository", e);
+        }
+        catch(OpenRDFException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
@@ -2466,7 +2426,7 @@ public abstract class PoddSesameRealm extends Realm
         {
             // for security and usability we insist that a named graph is provided
             throw new IllegalArgumentException(
-                    "Cannot create an OasSesameRealm without specifying the contexts that are used to manage user data.");
+                    "Cannot create an PoddSesameRealm without specifying the contexts that are used to manage user data.");
         }
         this.userManagerContexts = contexts;
     }
