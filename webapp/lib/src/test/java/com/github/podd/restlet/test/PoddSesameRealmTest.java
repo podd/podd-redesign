@@ -625,7 +625,7 @@ public class PoddSesameRealmTest
             this.testRealm.addUser(testUser2);
             Assert.fail("Should have thrown an Exception as User identifier already exists");
         }
-        catch(final RuntimeException e)
+        catch(final IllegalStateException e)
         {
             Assert.assertTrue("Not the expected Exception", e.getMessage().contains("User already exists"));
         }

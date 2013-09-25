@@ -536,6 +536,21 @@ public class PoddSesameRealm extends Realm
             
             return nextUserUUID;
         }
+        catch(final IllegalStateException e)
+        {
+            if(conn != null)
+            {
+                try
+                {
+                    conn.rollback();
+                }
+                catch(final RepositoryException e1)
+                {
+                    this.log.error("Found unexpected exception while rolling back repository connection after exception");
+                }
+            }
+            throw e;
+        }
         catch(final OpenRDFException e)
         {
             this.log.error("Found repository exception while adding user", e);
