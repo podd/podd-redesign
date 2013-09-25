@@ -306,22 +306,22 @@ public class RdfUtility
     /**
      * Helper method to execute a given SPARQL Graph query.
      * 
-     * @param sparqlQuery
+     * @param graphQuery
      * @param contexts
      * @return
      * @throws OpenRDFException
      */
-    public static Model executeGraphQuery(final GraphQuery sparqlQuery, final URI... contexts) throws OpenRDFException
+    public static Model executeGraphQuery(final GraphQuery graphQuery, final URI... contexts) throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
         for(final URI uri : contexts)
         {
             dataset.addDefaultGraph(uri);
         }
-        sparqlQuery.setDataset(dataset);
+        graphQuery.setDataset(dataset);
         final Model results = new LinkedHashModel();
         long before = System.currentTimeMillis();
-        sparqlQuery.evaluate(new StatementCollector(results));
+        graphQuery.evaluate(new StatementCollector(results));
         long total = System.currentTimeMillis() - before;
         log.info("graph query took {}", Long.toString(total));
         if(total > 30)
@@ -335,12 +335,12 @@ public class RdfUtility
     /**
      * Helper method to execute a given SPARQL Tuple query, which may have had bindings attached.
      * 
-     * @param sparqlQuery
+     * @param tupleQuery
      * @param contexts
      * @return
      * @throws OpenRDFException
      */
-    public static QueryResultCollector executeTupleQuery(final TupleQuery sparqlQuery, final URI... contexts)
+    public static QueryResultCollector executeTupleQuery(final TupleQuery tupleQuery, final URI... contexts)
         throws OpenRDFException
     {
         final DatasetImpl dataset = new DatasetImpl();
@@ -348,11 +348,11 @@ public class RdfUtility
         {
             dataset.addDefaultGraph(uri);
         }
-        sparqlQuery.setDataset(dataset);
+        tupleQuery.setDataset(dataset);
         
         final QueryResultCollector results = new QueryResultCollector();
         long before = System.currentTimeMillis();
-        QueryResults.report(sparqlQuery.evaluate(), results);
+        QueryResults.report(tupleQuery.evaluate(), results);
         long total = System.currentTimeMillis() - before;
         log.info("tuple query took {}", Long.toString(total));
         if(total > 30)
