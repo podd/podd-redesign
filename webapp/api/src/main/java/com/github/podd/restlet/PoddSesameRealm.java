@@ -356,7 +356,7 @@ public class PoddSesameRealm extends Realm
             
             conn.commit();
         }
-        catch(final RepositoryException e)
+        catch(final OpenRDFException e)
         {
             this.log.error("Found exception while storing root group", e);
             if(conn != null)
@@ -370,6 +370,7 @@ public class PoddSesameRealm extends Realm
                     this.log.error("Found exception while trying to roll back connection", e1);
                 }
             }
+            throw new RuntimeException("Found exception while storing root group", e);
         }
         finally
         {
@@ -394,33 +395,34 @@ public class PoddSesameRealm extends Realm
     
     protected URI addUser(final PoddUser nextUser, final boolean isNew)
     {
-        final PoddUser oldUser = this.findUser(nextUser.getIdentifier());
-        if(isNew && oldUser != null)
-        {
-            throw new IllegalStateException("User already exists");
-        }
-        else if(!isNew && oldUser == null)
-        {
-            throw new IllegalStateException("Could not modify User (does not exist)");
-        }
-        
-        URI nextUserUUID;
-        
-        if(oldUser != null)
-        {
-            nextUserUUID = oldUser.getUri();
-        }
-        else
-        {
-            nextUserUUID =
-                    this.vf.createURI("urn:oas:user:", nextUser.getIdentifier() + ":" + UUID.randomUUID().toString());
-        }
-        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repository.getConnection();
             conn.begin();
+            
+            final PoddUser oldUser = this.findUser(nextUser.getIdentifier(), conn);
+            if(isNew && oldUser != null)
+            {
+                throw new IllegalStateException("User already exists");
+            }
+            else if(!isNew && oldUser == null)
+            {
+                throw new IllegalStateException("Could not modify User (does not exist)");
+            }
+            
+            URI nextUserUUID;
+            
+            if(oldUser != null)
+            {
+                nextUserUUID = oldUser.getUri();
+            }
+            else
+            {
+                nextUserUUID =
+                        this.vf.createURI("urn:oas:user:", nextUser.getIdentifier() + ":"
+                                + UUID.randomUUID().toString());
+            }
             
             // FIXME: Optimise the following to require less queries
             final List<Statement> userIdentifierStatements =
@@ -527,8 +529,10 @@ public class PoddSesameRealm extends Realm
             conn.add(nextUserUUID, PoddRdfConstants.PODD_USER_STATUS, status.getURI(), this.getContexts());
             
             conn.commit();
+            
+            return nextUserUUID;
         }
-        catch(final RepositoryException e)
+        catch(final OpenRDFException e)
         {
             this.log.error("Found repository exception while adding user", e);
             if(conn != null)
@@ -542,6 +546,7 @@ public class PoddSesameRealm extends Realm
                     this.log.error("Found unexpected exception while rolling back repository connection after exception");
                 }
             }
+            throw new RuntimeException("Found repository exception while adding user", e);
         }
         finally
         {
@@ -558,7 +563,6 @@ public class PoddSesameRealm extends Realm
             }
         }
         
-        return nextUserUUID;
     }
     
     protected Entry<Role, URI> buildMapEntryFromSparqlResult(final BindingSet bindingSet)
@@ -1266,20 +1270,20 @@ public class PoddSesameRealm extends Realm
     
     public URI deleteUser(final User nextUser)
     {
-        URI nextUserUUID = null;
-        
-        final PoddUser findUser = this.findUser(nextUser.getIdentifier());
-        
-        if(findUser == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No such user found");
-        }
-        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repository.getConnection();
             conn.begin();
+            
+            URI nextUserUUID = null;
+            
+            final PoddUser findUser = this.findUser(nextUser.getIdentifier(), conn);
+            
+            if(findUser == null)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "No such user found");
+            }
             
             final List<Statement> userIdentifierStatements =
                     Iterations.asList(conn.getStatements(null, SesameRealmConstants.OAS_USERIDENTIFIER,
@@ -1307,8 +1311,10 @@ public class PoddSesameRealm extends Realm
             }
             
             conn.commit();
+            
+            return nextUserUUID;
         }
-        catch(final RepositoryException e)
+        catch(final OpenRDFException e)
         {
             this.log.error("Found repository exception while adding user", e);
             try
@@ -1319,6 +1325,7 @@ public class PoddSesameRealm extends Realm
             {
                 this.log.error("Found unexpected exception while rolling back repository connection after exception");
             }
+            throw new RuntimeException("Found repository exception while adding user", e);
         }
         finally
         {
@@ -1334,8 +1341,6 @@ public class PoddSesameRealm extends Realm
                 }
             }
         }
-        
-        return nextUserUUID;
     }
     
     /**
@@ -1659,7 +1664,7 @@ public class PoddSesameRealm extends Realm
                                     final String nextUserIdentifier =
                                             ((Literal)nextRoleMappingStatement.getObject()).stringValue();
                                     
-                                    final PoddUser nextUser = this.findUser(nextUserIdentifier);
+                                    final PoddUser nextUser = this.findUser(nextUserIdentifier, conn);
                                     
                                     if(nextUser != null)
                                     {
@@ -1713,9 +1718,10 @@ public class PoddSesameRealm extends Realm
                 typeStatements.close();
             }
         }
-        catch(final RepositoryException e)
+        catch(final OpenRDFException e)
         {
             this.log.error("Found exception while retrieving role mappings", e);
+            throw new RuntimeException("Found exception while retrieving role mappings", e);
         }
         finally
         {
@@ -2478,10 +2484,10 @@ public class PoddSesameRealm extends Realm
      * 
      * @param nextGroup
      * @param isRootGroup
-     * @throws RepositoryException
+     * @throws OpenRDFException
      */
     private void storeGroup(final Group nextGroup, final RepositoryConnection conn, final boolean isRootGroup)
-        throws RepositoryException
+        throws OpenRDFException
     {
         if(conn.hasStatement(null, SesameRealmConstants.OAS_GROUPNAME, this.vf.createLiteral(nextGroup.getName()),
                 true, this.getContexts()))
@@ -2515,7 +2521,7 @@ public class PoddSesameRealm extends Realm
         // only store users who cannot be found based on their identifier
         for(final User nextUser : nextGroup.getMemberUsers())
         {
-            if(this.findUser(nextUser.getIdentifier()) == null)
+            if(this.findUser(nextUser.getIdentifier(), conn) == null)
             {
                 final URI nextUserUri = this.addUser((PoddUser)nextUser);
             }
