@@ -162,7 +162,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    @Get(":rdf|rj|ttl")
+    @Get(":rdf|rj|json|ttl")
     public Representation getArtifactRdf(final Representation entity, final Variant variant) throws ResourceException
     {
         // FIXME: Some Firefox requests get sent with Accept: */*, and Restlet chooses this method
@@ -217,7 +217,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             this.getPoddApplication()
                     .getPoddArtifactManager()
                     .exportArtifact(ontologyID, stream,
-                            RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.TURTLE), includeInferred);
+                            RDFFormat.forMIMEType(variant.getMediaType().getName(), RDFFormat.RDFJSON), includeInferred);
         }
         catch(final UnmanagedArtifactIRIException e)
         {
