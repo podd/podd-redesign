@@ -608,22 +608,6 @@ public class PoddSesameRealm extends Realm
         
     }
     
-    protected Entry<Role, URI> buildMapEntryFromSparqlResult(final BindingSet bindingSet)
-    {
-        final URI roleUri = (URI)bindingSet.getValue(PoddSesameRealm.PARAM_ROLE);
-        final Role role = PoddRoles.getRoleByUri(roleUri).getRole();
-        
-        URI objectUri = null;
-        if(bindingSet.getValue(PoddSesameRealm.PARAM_OBJECT_URI) != null)
-        {
-            objectUri = (URI)bindingSet.getValue(PoddSesameRealm.PARAM_OBJECT_URI);
-        }
-        
-        this.log.debug("Building map entry: {}, <{}>", role.getName(), objectUri);
-        
-        return new AbstractMap.SimpleEntry<Role, URI>(role, objectUri);
-    }
-    
     protected PoddUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
     {
         this.log.debug("Building PoddUser from SPARQL results");
@@ -1558,22 +1542,11 @@ public class PoddSesameRealm extends Realm
     {
         final Set<Role> result = new HashSet<Role>();
         
-        for(final RoleMapping mapping : this.getRoleMappings(conn))
+        Collection<Entry<Role, URI>> mappings = getRolesWithObjectMappings(user);
+        
+        for(Entry<Role, URI> nextMapping : mappings)
         {
-            final Object source = mapping.getSource();
-            
-            if((user != null) && user.equals(source))
-            {
-                final RestletUtilRole standardRole = this.getRoleByName(mapping.getTarget().getName());
-                if(standardRole != null)
-                {
-                    result.add(standardRole.getRole());
-                }
-                else
-                {
-                    result.add(mapping.getTarget());
-                }
-            }
+            result.add(nextMapping.getKey());
         }
         
         return result;
@@ -1977,7 +1950,18 @@ public class PoddSesameRealm extends Realm
             
             for(BindingSet bindingSet : resultCollector.getBindingSets())
             {
-                final Entry<Role, URI> roleEntry = this.buildMapEntryFromSparqlResult(bindingSet);
+                final URI roleUri = (URI)bindingSet.getValue(PoddSesameRealm.PARAM_ROLE);
+                final Role role = PoddRoles.getRoleByUri(roleUri).getRole();
+                
+                URI objectUri = null;
+                if(bindingSet.getValue(PoddSesameRealm.PARAM_OBJECT_URI) != null)
+                {
+                    objectUri = (URI)bindingSet.getValue(PoddSesameRealm.PARAM_OBJECT_URI);
+                }
+                
+                this.log.debug("Building map entry: {}, <{}>", role.getName(), objectUri);
+                
+                final Entry<Role, URI> roleEntry = new AbstractMap.SimpleEntry<Role, URI>(role, objectUri);
                 // roleMap.put(roleEntry.getKey(), roleEntry.getValue());
                 roleCollection.add(roleEntry);
             }
