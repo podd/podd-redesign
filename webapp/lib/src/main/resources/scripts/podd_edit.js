@@ -1292,7 +1292,10 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDataban
     $.ajax({
         url : requestUrl,
         type : 'GET',
-        // dataType : 'application/rdf+xml', // what is expected back
+        dataType : 'json',
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
         success : function(resultData, status, xhr) {
             if (cleanArtifactDatabank) {
                 podd.deleteAllTriples(nextArtifactDatabank);
