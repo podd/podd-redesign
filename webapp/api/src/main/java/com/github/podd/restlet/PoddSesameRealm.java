@@ -101,31 +101,55 @@ public class PoddSesameRealm extends Realm
         @Override
         public void enrole(final ClientInfo clientInfo)
         {
-            // casting is safe here as buildRestletUserFromSparqlResult() creates a PoddUser
-            final PoddUser user = PoddSesameRealm.this.findUser(clientInfo.getUser().getIdentifier());
-            
-            if(user != null)
+            RepositoryConnection conn = null;
+            try
             {
-                // Add roles specific to this user
-                final Set<Role> userRoles = PoddSesameRealm.this.findRoles(user);
+                conn = PoddSesameRealm.this.repository.getConnection();
+                final PoddUser user = PoddSesameRealm.this.findUser(clientInfo.getUser().getIdentifier(), conn);
                 
-                for(final Role role : userRoles)
+                if(user != null)
                 {
-                    clientInfo.getRoles().add(role);
+                    // Add roles specific to this user
+                    final Set<Role> userRoles = PoddSesameRealm.this.findRoles(user, conn);
+                    
+                    for(final Role role : userRoles)
+                    {
+                        clientInfo.getRoles().add(role);
+                    }
+                    
+                    // FIXME: When we support groups, reenable this section
+                    // Find all the inherited groups of this user
+                    // final Set<Group> userGroups = PoddSesameRealm.this.findGroups(user);
+                    
+                    // Add roles common to group members
+                    // final Set<Role> groupRoles = PoddSesameRealm.this.findRoles(userGroups);
+                    
+                    // for(final Role role : groupRoles)
+                    // {
+                    // clientInfo.getRoles().add(role);
+                    // }
                 }
-                
-                // FIXME: When we support groups, reenable this section
-                // Find all the inherited groups of this user
-                // final Set<Group> userGroups = PoddSesameRealm.this.findGroups(user);
-                
-                // Add roles common to group members
-                // final Set<Role> groupRoles = PoddSesameRealm.this.findRoles(userGroups);
-                
-                // for(final Role role : groupRoles)
-                // {
-                // clientInfo.getRoles().add(role);
-                // }
             }
+            catch(final OpenRDFException e)
+            {
+                PoddSesameRealm.this.log.error("Found exception while finding roles for user", e);
+                throw new RuntimeException("Found exception while finding roles for user", e);
+            }
+            finally
+            {
+                if(conn != null)
+                {
+                    try
+                    {
+                        conn.close();
+                    }
+                    catch(final RepositoryException e)
+                    {
+                        PoddSesameRealm.this.log.error("Found exception closing repository connection", e);
+                    }
+                }
+            }
+            
         }
     }
     
@@ -1411,13 +1435,36 @@ public class PoddSesameRealm extends Realm
     {
         final Set<Role> result = new HashSet<Role>();
         
-        for(final RoleMapping mapping : this.getRoleMappings())
+        RepositoryConnection conn = null;
+        try
         {
-            final Object source = mapping.getSource();
-            
-            if((userGroup != null) && userGroup.equals(source))
+            conn = this.repository.getConnection();
+            for(final RoleMapping mapping : this.getRoleMappings(conn))
             {
-                result.add(mapping.getTarget());
+                final Object source = mapping.getSource();
+                
+                if((userGroup != null) && userGroup.equals(source))
+                {
+                    result.add(mapping.getTarget());
+                }
+            }
+        }
+        catch(final OpenRDFException e)
+        {
+            throw new RuntimeException("Failure finding roles for group in repository", e);
+        }
+        finally
+        {
+            try
+            {
+                if(conn != null)
+                {
+                    conn.close();
+                }
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Failure to close connection", e);
             }
         }
         
@@ -1439,7 +1486,7 @@ public class PoddSesameRealm extends Realm
         try
         {
             conn = this.repository.getConnection();
-            for(final RoleMapping mapping : this.getRoleMappings())
+            for(final RoleMapping mapping : this.getRoleMappings(conn))
             {
                 final Object source = mapping.getSource();
                 
@@ -1480,29 +1527,11 @@ public class PoddSesameRealm extends Realm
      */
     public Set<Role> findRoles(final User user)
     {
-        final Set<Role> result = new HashSet<Role>();
-        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repository.getConnection();
-            for(final RoleMapping mapping : this.getRoleMappings(conn))
-            {
-                final Object source = mapping.getSource();
-                
-                if((user != null) && user.equals(source))
-                {
-                    final RestletUtilRole standardRole = this.getRoleByName(mapping.getTarget().getName());
-                    if(standardRole != null)
-                    {
-                        result.add(standardRole.getRole());
-                    }
-                    else
-                    {
-                        result.add(mapping.getTarget());
-                    }
-                }
-            }
+            return findRoles(user, conn);
         }
         catch(final OpenRDFException e)
         {
@@ -1520,6 +1549,30 @@ public class PoddSesameRealm extends Realm
             catch(final RepositoryException e)
             {
                 this.log.error("Failure to close connection", e);
+            }
+        }
+        
+    }
+    
+    protected Set<Role> findRoles(final User user, final RepositoryConnection conn) throws OpenRDFException
+    {
+        final Set<Role> result = new HashSet<Role>();
+        
+        for(final RoleMapping mapping : this.getRoleMappings(conn))
+        {
+            final Object source = mapping.getSource();
+            
+            if((user != null) && user.equals(source))
+            {
+                final RestletUtilRole standardRole = this.getRoleByName(mapping.getTarget().getName());
+                if(standardRole != null)
+                {
+                    result.add(standardRole.getRole());
+                }
+                else
+                {
+                    result.add(mapping.getTarget());
+                }
             }
         }
         
