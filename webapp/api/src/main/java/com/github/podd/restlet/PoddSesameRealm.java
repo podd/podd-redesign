@@ -1508,7 +1508,7 @@ public class PoddSesameRealm extends Realm
         
         final String query = this.buildSparqlQueryToFindUser(userIdentifier, false);
         
-        this.log.info("findUser: query={}", query);
+        this.log.debug("findUser: query={}", query);
         
         final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
         
