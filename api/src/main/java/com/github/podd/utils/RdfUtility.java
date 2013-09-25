@@ -323,8 +323,12 @@ public class RdfUtility
         long before = System.currentTimeMillis();
         graphQuery.evaluate(new StatementCollector(results));
         long total = System.currentTimeMillis() - before;
-        log.info("graph query took {}", Long.toString(total));
-        if(total > 30)
+        log.debug("graph query took {}", Long.toString(total));
+        if(total > 50 && log.isDebugEnabled())
+        {
+            new Throwable().printStackTrace();
+        }
+        else if(total > 30 && log.isTraceEnabled())
         {
             new Throwable().printStackTrace();
         }
@@ -354,8 +358,12 @@ public class RdfUtility
         long before = System.currentTimeMillis();
         QueryResults.report(tupleQuery.evaluate(), results);
         long total = System.currentTimeMillis() - before;
-        log.info("tuple query took {}", Long.toString(total));
-        if(total > 30)
+        log.debug("tuple query took {}", Long.toString(total));
+        if(total > 50 && log.isDebugEnabled())
+        {
+            new Throwable().printStackTrace();
+        }
+        else if(total > 30 && log.isTraceEnabled())
         {
             new Throwable().printStackTrace();
         }
