@@ -107,9 +107,12 @@ public abstract class AbstractPoddSesameManagerTest
         this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, contextCumVersionURI,
                 managementGraph);
         
-        InferredOWLOntologyID publishedOntologyID = this.testPoddSesameManager.setPublished(isPublished, ontologyID, testRepositoryConnection, managementGraph);
+        InferredOWLOntologyID publishedOntologyID =
+                this.testPoddSesameManager.setPublished(isPublished, ontologyID, testRepositoryConnection,
+                        managementGraph);
         
-        return this.testPoddSesameManager.isPublished(publishedOntologyID, this.testRepositoryConnection, managementGraph);
+        return this.testPoddSesameManager.isPublished(publishedOntologyID, this.testRepositoryConnection,
+                managementGraph);
     }
     
     /**
@@ -1232,7 +1235,8 @@ public abstract class AbstractPoddSesameManagerTest
             
             if(expectedTripleCount != model.size())
             {
-                DebugUtils.printContents(model);
+                // DebugUtils.printContents(model);
+                Rio.write(model, System.out, RDFFormat.NQUADS);
             }
             
             // verify:

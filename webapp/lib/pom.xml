@@ -235,6 +235,11 @@
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-queryrender</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-nquads</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<testResources>
