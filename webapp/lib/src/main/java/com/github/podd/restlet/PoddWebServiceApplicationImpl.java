@@ -548,13 +548,10 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         }
         else
         {
-            final RestletUtilUser findUser = this.getRealm().findUser(user.getIdentifier());
-            if(findUser != null && findUser instanceof PoddUser)
+            final PoddUser findUser = this.getRealm().findUser(user.getIdentifier());
+            if(findUser.getUserStatus() == PoddUserStatus.ACTIVE)
             {
-                if(((PoddUser)findUser).getUserStatus() == PoddUserStatus.ACTIVE)
-                {
-                    return false;
-                }
+                return false;
             }
         }
         return true;
