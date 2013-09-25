@@ -940,7 +940,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         owlRestrictionQuery.append("} WHERE {");
         
+        // TODO: The following seems to pick up restrictions that are put onto other types
         owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        // owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
         owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
         owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
         owlRestrictionQuery.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
@@ -1073,7 +1075,9 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         
         owlRestrictionQuery.append("} WHERE {");
         
+        // TODO: The following seems to pick up restrictions that are put onto other types
         owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + ">+ ?x . ");
+        // owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
         owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
         owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
         owlRestrictionQuery.append(" OPTIONAL { ?x <" + OWL.ALLVALUESFROM.stringValue() + "> ?rangeClass } . ");
