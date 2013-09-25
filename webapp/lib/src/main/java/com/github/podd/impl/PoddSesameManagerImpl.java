@@ -462,7 +462,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 
                 URI putIfAbsent = resultMap.putIfAbsent(nextPropertyURI, nextCardinality);
                 
-                if(putIfAbsent != null && !nextPropertyURI.equals(putIfAbsent))
+                if(putIfAbsent != null && !nextCardinality.equals(putIfAbsent))
                 {
                     log.warn(
                             "Found duplicate cardinality constraints for {} : original constraint : {} ignored constraint {}",
