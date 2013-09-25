@@ -236,6 +236,9 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
                 nextRealm.getRolesForObjectAlternate(null, PoddRdfConstants.VF.createURI(artifactUri));
         
         final Collection<String> keySet = participantMap.keySet();
+        
+        Map<String, PoddUser> usersMapByIdentifier = nextRealm.getUsersMapByIdentifier();
+        
         for(final String userIdentifier : keySet)
         {
             final Collection<Role> rolesOfUser = participantMap.get(userIdentifier);
@@ -253,7 +256,7 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
                         nextRoles = putIfAbsent;
                     }
                     
-                    final PoddUser tempUser = (PoddUser)nextRealm.findUser(userIdentifier);
+                    final PoddUser tempUser = usersMapByIdentifier.get(userIdentifier);
                     final PoddUser userToReturn =
                             new PoddUser(tempUser.getIdentifier(), null, tempUser.getFirstName(),
                                     tempUser.getLastName(), null, tempUser.getUserStatus(), null,
