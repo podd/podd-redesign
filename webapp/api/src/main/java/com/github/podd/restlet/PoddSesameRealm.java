@@ -1435,13 +1435,36 @@ public class PoddSesameRealm extends Realm
     {
         final Set<Role> result = new HashSet<Role>();
         
-        for(final RoleMapping mapping : this.getRoleMappings())
+        RepositoryConnection conn = null;
+        try
         {
-            final Object source = mapping.getSource();
-            
-            if((userGroups != null) && userGroups.contains(source))
+            conn = this.repository.getConnection();
+            for(final RoleMapping mapping : this.getRoleMappings())
             {
-                result.add(mapping.getTarget());
+                final Object source = mapping.getSource();
+                
+                if((userGroups != null) && userGroups.contains(source))
+                {
+                    result.add(mapping.getTarget());
+                }
+            }
+        }
+        catch(final OpenRDFException e)
+        {
+            throw new RuntimeException("Failure finding roles for groups in repository", e);
+        }
+        finally
+        {
+            try
+            {
+                if(conn != null)
+                {
+                    conn.close();
+                }
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Failure to close connection", e);
             }
         }
         
@@ -1459,22 +1482,44 @@ public class PoddSesameRealm extends Realm
     {
         final Set<Role> result = new HashSet<Role>();
         
-        for(final RoleMapping mapping : this.getRoleMappings())
+        RepositoryConnection conn = null;
+        try
         {
-            final Object source = mapping.getSource();
-            
-            if((user != null) && user.equals(source))
+            conn = this.repository.getConnection();
+            for(final RoleMapping mapping : this.getRoleMappings(conn))
             {
-                // TODO: Fix this hardcoding when Restlet implements equals for Role objects again
-                final RestletUtilRole standardRole = this.getRoleByName(mapping.getTarget().getName());
-                if(standardRole != null)
+                final Object source = mapping.getSource();
+                
+                if((user != null) && user.equals(source))
                 {
-                    result.add(standardRole.getRole());
+                    final RestletUtilRole standardRole = this.getRoleByName(mapping.getTarget().getName());
+                    if(standardRole != null)
+                    {
+                        result.add(standardRole.getRole());
+                    }
+                    else
+                    {
+                        result.add(mapping.getTarget());
+                    }
                 }
-                else
+            }
+        }
+        catch(final OpenRDFException e)
+        {
+            throw new RuntimeException("Failure finding roles for user in repository", e);
+        }
+        finally
+        {
+            try
+            {
+                if(conn != null)
                 {
-                    result.add(mapping.getTarget());
+                    conn.close();
                 }
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Failure to close connection", e);
             }
         }
         
@@ -1582,162 +1627,11 @@ public class PoddSesameRealm extends Realm
     
     private List<RoleMapping> getRoleMappings()
     {
-        final List<RoleMapping> results = new ArrayList<RoleMapping>();
-        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repository.getConnection();
-            
-            final RepositoryResult<Statement> typeStatements =
-                    conn.getStatements(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, true, this.getContexts());
-            
-            this.getUsersMapByIdentifier(conn);
-            
-            try
-            {
-                // We iterate through this gradually to reduce the load as the size of this
-                // collection will grow with users
-                while(typeStatements.hasNext())
-                {
-                    final Statement next = typeStatements.next();
-                    
-                    if(next.getSubject() instanceof URI)
-                    {
-                        final URI nextRoleMappingUri = (URI)next.getSubject();
-                        
-                        final RoleMapping nextRoleMapping = new RoleMapping();
-                        
-                        // dump all of these statements into a list as the size will be relatively
-                        // constant and small for all scenarios
-                        final List<Statement> nextRoleMappingStatements =
-                                Iterations.asList(conn.getStatements(nextRoleMappingUri, null, null, true,
-                                        this.getContexts()));
-                        
-                        for(final Statement nextRoleMappingStatement : nextRoleMappingStatements)
-                        {
-                            if(nextRoleMappingStatement.getPredicate().equals(SesameRealmConstants.OAS_ROLEMAPPEDROLE))
-                            {
-                                if(nextRoleMappingStatement.getObject() instanceof URI)
-                                {
-                                    // XXX: When Restlet allows custom .equals for Role, switch to
-                                    // avoid only using
-                                    // StandardOASRoles here, until then we have no easy way of
-                                    // matching roles out of the
-                                    // repository to objects
-                                    
-                                    final RestletUtilRole nextStandardRole =
-                                            this.getRoleByUri((URI)nextRoleMappingStatement.getObject());
-                                    
-                                    if(nextStandardRole == null)
-                                    {
-                                        this.log.warn(
-                                                "Failed to find an in-memory role for the given role mapped role: {}",
-                                                nextRoleMappingStatement);
-                                    }
-                                    else
-                                    {
-                                        nextRoleMapping.setTarget(nextStandardRole.getRole());
-                                    }
-                                }
-                                else
-                                {
-                                    this.log.warn("Found a non-URI as the target for a role mapped role statement: {}",
-                                            nextRoleMappingStatement);
-                                }
-                            }
-                            else if(nextRoleMappingStatement.getPredicate().equals(
-                                    SesameRealmConstants.OAS_ROLEMAPPEDGROUP))
-                            {
-                                if(nextRoleMappingStatement.getObject() instanceof Literal)
-                                {
-                                    final String nextGroupName =
-                                            ((Literal)nextRoleMappingStatement.getObject()).stringValue();
-                                    
-                                    // TODO: Support nested groups here
-                                    
-                                    final List<Group> rootGroups = this.getRootGroups();
-                                    
-                                    for(final Group nextRootGroup : rootGroups)
-                                    {
-                                        if(nextRootGroup.getName().equals(nextGroupName))
-                                        {
-                                            nextRoleMapping.setSource(nextRootGroup);
-                                        }
-                                        else
-                                        {
-                                            // TODO: need to check further for nested groups
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    this.log.warn(
-                                            "Found a non-Literal as the target for a role mapped group statement: {}",
-                                            nextRoleMappingStatement);
-                                }
-                            }
-                            else if(nextRoleMappingStatement.getPredicate().equals(
-                                    SesameRealmConstants.OAS_ROLEMAPPEDUSER))
-                            {
-                                if(nextRoleMappingStatement.getObject() instanceof Literal)
-                                {
-                                    final String nextUserIdentifier =
-                                            ((Literal)nextRoleMappingStatement.getObject()).stringValue();
-                                    
-                                    final PoddUser nextUser = this.findUser(nextUserIdentifier, conn);
-                                    
-                                    if(nextUser != null)
-                                    {
-                                        nextRoleMapping.setSource(nextUser);
-                                    }
-                                    else
-                                    {
-                                        this.log.info(
-                                                "Failed to find a role mapped user internally for the given user identifier: {}",
-                                                nextRoleMappingStatement);
-                                    }
-                                }
-                                else
-                                {
-                                    this.log.warn(
-                                            "Found a non-Literal as the target for a role mapped group statement: {}",
-                                            nextRoleMappingStatement);
-                                }
-                            }
-                            else if(nextRoleMappingStatement.getPredicate().equals(RDF.TYPE))
-                            {
-                                this.log.trace("Found rdf:type statement for role mapping: {}",
-                                        nextRoleMappingStatement);
-                            }
-                            else
-                            {
-                                this.log.debug("Found unknown statement for role mapping: {}", nextRoleMappingStatement);
-                            }
-                        }
-                        
-                        // verify that the source and target were both setup before adding this
-                        // mapping to results
-                        if(nextRoleMapping.getSource() != null && nextRoleMapping.getTarget() != null)
-                        {
-                            results.add(nextRoleMapping);
-                        }
-                        else
-                        {
-                            this.log.info("Not adding incomplete role mapping to results: uri={}, partialMapping={}",
-                                    nextRoleMappingUri, nextRoleMapping);
-                        }
-                    }
-                    else
-                    {
-                        this.log.info("Found non-URI for role mapping, ignoring this role mapping: {}", next);
-                    }
-                }
-            }
-            finally
-            {
-                typeStatements.close();
-            }
+            return getRoleMappings(conn);
         }
         catch(final OpenRDFException e)
         {
@@ -1759,6 +1653,153 @@ public class PoddSesameRealm extends Realm
             }
         }
         
+    }
+    
+    private List<RoleMapping> getRoleMappings(RepositoryConnection conn) throws OpenRDFException
+    {
+        final List<RoleMapping> results = new ArrayList<RoleMapping>();
+        
+        Map<String, PoddUser> usersMapByIdentifier = this.getUsersMapByIdentifier(conn);
+        
+        final RepositoryResult<Statement> typeStatements =
+                conn.getStatements(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, true, this.getContexts());
+        
+        try
+        {
+            // We iterate through this gradually to reduce the load as the size of this
+            // collection will grow with users
+            while(typeStatements.hasNext())
+            {
+                final Statement next = typeStatements.next();
+                
+                if(next.getSubject() instanceof URI)
+                {
+                    final URI nextRoleMappingUri = (URI)next.getSubject();
+                    
+                    final RoleMapping nextRoleMapping = new RoleMapping();
+                    
+                    // dump all of these statements into a list as the size will be relatively
+                    // constant and small for all scenarios
+                    final List<Statement> nextRoleMappingStatements =
+                            Iterations.asList(conn.getStatements(nextRoleMappingUri, null, null, true,
+                                    this.getContexts()));
+                    
+                    for(final Statement nextRoleMappingStatement : nextRoleMappingStatements)
+                    {
+                        if(nextRoleMappingStatement.getPredicate().equals(SesameRealmConstants.OAS_ROLEMAPPEDROLE))
+                        {
+                            if(nextRoleMappingStatement.getObject() instanceof URI)
+                            {
+                                final RestletUtilRole nextStandardRole =
+                                        this.getRoleByUri((URI)nextRoleMappingStatement.getObject());
+                                
+                                if(nextStandardRole == null)
+                                {
+                                    this.log.warn(
+                                            "Failed to find an in-memory role for the given role mapped role: {}",
+                                            nextRoleMappingStatement);
+                                }
+                                else
+                                {
+                                    nextRoleMapping.setTarget(nextStandardRole.getRole());
+                                }
+                            }
+                            else
+                            {
+                                this.log.warn("Found a non-URI as the target for a role mapped role statement: {}",
+                                        nextRoleMappingStatement);
+                            }
+                        }
+                        else if(nextRoleMappingStatement.getPredicate()
+                                .equals(SesameRealmConstants.OAS_ROLEMAPPEDGROUP))
+                        {
+                            if(nextRoleMappingStatement.getObject() instanceof Literal)
+                            {
+                                final String nextGroupName =
+                                        ((Literal)nextRoleMappingStatement.getObject()).stringValue();
+                                
+                                // TODO: Support nested groups here
+                                
+                                final List<Group> rootGroups = this.getRootGroups();
+                                
+                                for(final Group nextRootGroup : rootGroups)
+                                {
+                                    if(nextRootGroup.getName().equals(nextGroupName))
+                                    {
+                                        nextRoleMapping.setSource(nextRootGroup);
+                                    }
+                                    else
+                                    {
+                                        // TODO: need to check further for nested groups
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                this.log.warn(
+                                        "Found a non-Literal as the target for a role mapped group statement: {}",
+                                        nextRoleMappingStatement);
+                            }
+                        }
+                        else if(nextRoleMappingStatement.getPredicate().equals(SesameRealmConstants.OAS_ROLEMAPPEDUSER))
+                        {
+                            if(nextRoleMappingStatement.getObject() instanceof Literal)
+                            {
+                                final String nextUserIdentifier =
+                                        ((Literal)nextRoleMappingStatement.getObject()).stringValue();
+                                
+                                final PoddUser nextUser = usersMapByIdentifier.get(nextUserIdentifier);
+                                
+                                if(nextUser != null)
+                                {
+                                    nextRoleMapping.setSource(nextUser);
+                                }
+                                else
+                                {
+                                    this.log.info(
+                                            "Failed to find a role mapped user internally for the given user identifier: {}",
+                                            nextRoleMappingStatement);
+                                }
+                            }
+                            else
+                            {
+                                this.log.warn(
+                                        "Found a non-Literal as the target for a role mapped group statement: {}",
+                                        nextRoleMappingStatement);
+                            }
+                        }
+                        else if(nextRoleMappingStatement.getPredicate().equals(RDF.TYPE))
+                        {
+                            this.log.trace("Found rdf:type statement for role mapping: {}", nextRoleMappingStatement);
+                        }
+                        else
+                        {
+                            this.log.debug("Found unknown statement for role mapping: {}", nextRoleMappingStatement);
+                        }
+                    }
+                    
+                    // verify that the source and target were both setup before adding this
+                    // mapping to results
+                    if(nextRoleMapping.getSource() != null && nextRoleMapping.getTarget() != null)
+                    {
+                        results.add(nextRoleMapping);
+                    }
+                    else
+                    {
+                        this.log.info("Not adding incomplete role mapping to results: uri={}, partialMapping={}",
+                                nextRoleMappingUri, nextRoleMapping);
+                    }
+                }
+                else
+                {
+                    this.log.info("Found non-URI for role mapping, ignoring this role mapping: {}", next);
+                }
+            }
+        }
+        finally
+        {
+            typeStatements.close();
+        }
         return results;
     }
     
