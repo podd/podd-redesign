@@ -69,7 +69,6 @@
 		<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
-			<version>2.3.19</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.sshd</groupId>
@@ -95,6 +94,10 @@
 			<artifactId>restlet-utils</artifactId>
 			<scope>test</scope>
 			<type>test-jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-api</artifactId>
 		</dependency>
 	</dependencies>
 </project>
