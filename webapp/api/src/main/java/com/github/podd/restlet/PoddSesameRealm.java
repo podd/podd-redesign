@@ -50,6 +50,7 @@ import org.openrdf.query.Dataset;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.QueryResultHandlerException;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
@@ -71,7 +72,9 @@ import org.restlet.security.Group;
 import org.restlet.security.LocalVerifier;
 import org.restlet.security.Realm;
 import org.restlet.security.Role;
+import org.restlet.security.SecretVerifier;
 import org.restlet.security.User;
+import org.restlet.security.Verifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,9 +177,10 @@ public class PoddSesameRealm extends Realm
          * password in the database.
          */
         @Override
-        public int verify(String identifier, char[] secret)
+        public int verify(final String identifier, final char[] secret)
         {
-            return compare(secret, getLocalSecret(identifier)) ? RESULT_VALID : RESULT_INVALID;
+            return SecretVerifier.compare(secret, this.getLocalSecret(identifier)) ? Verifier.RESULT_VALID
+                    : Verifier.RESULT_INVALID;
         }
     }
     
@@ -1480,9 +1484,9 @@ public class PoddSesameRealm extends Realm
         try
         {
             conn = this.repository.getConnection();
-            return findUser(userIdentifier, conn);
+            return this.findUser(userIdentifier, conn);
         }
-        catch(OpenRDFException e)
+        catch(final OpenRDFException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
@@ -1512,7 +1516,7 @@ public class PoddSesameRealm extends Realm
         
         final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
         
-        QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
+        final QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
         
         if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
         {
@@ -1572,6 +1576,8 @@ public class PoddSesameRealm extends Realm
             
             final RepositoryResult<Statement> typeStatements =
                     conn.getStatements(null, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING, true, this.getContexts());
+            
+            this.getUsersMapByIdentifier(conn);
             
             try
             {
@@ -1758,61 +1764,13 @@ public class PoddSesameRealm extends Realm
     
     public Map<String, Collection<Role>> getRolesForObjectAlternate(final String userIdentifier, final URI objectUri)
     {
-        final ConcurrentMap<String, Collection<Role>> roleCollection =
-                new ConcurrentHashMap<String, Collection<Role>>();
-        
         RepositoryConnection conn = null;
         try
         {
             conn = this.getRepository().getConnection();
-            
-            final String query = this.buildSparqlQueryForObjectRoles(userIdentifier, objectUri);
-            
-            if(this.log.isDebugEnabled())
-            {
-                this.log.debug("getCommonRolesForObjects: query={}", query);
-            }
-            
-            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
-            
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
-            
-            try
-            {
-                if(!queryResult.hasNext())
-                {
-                    this.log.warn("Could not find role with mappings for user: {}", userIdentifier);
-                }
-                
-                while(queryResult.hasNext())
-                {
-                    final BindingSet bindingSet = queryResult.next();
-                    
-                    final Role role = this.buildRoleFromSparqlResult(bindingSet);
-                    
-                    if(!bindingSet.hasBinding(PoddSesameRealm.PARAM_USER_IDENTIFIER))
-                    {
-                        throw new RuntimeException("Query did not bind a user to the role : " + bindingSet.toString());
-                    }
-                    
-                    Collection<Role> nextRoles = new HashSet<Role>();
-                    final Collection<Role> putIfAbsent =
-                            roleCollection.putIfAbsent(bindingSet.getBinding(PoddSesameRealm.PARAM_USER_IDENTIFIER)
-                                    .getValue().stringValue(), nextRoles);
-                    if(putIfAbsent != null)
-                    {
-                        nextRoles = putIfAbsent;
-                    }
-                    nextRoles.add(role);
-                }
-            }
-            finally
-            {
-                queryResult.close();
-            }
-            
+            return getRolesForObjectAlternate(userIdentifier, objectUri, conn);
         }
-        catch(final RepositoryException | MalformedQueryException | QueryEvaluationException e)
+        catch(final OpenRDFException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
@@ -1829,6 +1787,49 @@ public class PoddSesameRealm extends Realm
                     this.log.error("Failure to close connection", e);
                 }
             }
+        }
+    }
+    
+    public Map<String, Collection<Role>> getRolesForObjectAlternate(final String userIdentifier, final URI objectUri,
+            final RepositoryConnection conn) throws OpenRDFException
+    {
+        final ConcurrentMap<String, Collection<Role>> roleCollection =
+                new ConcurrentHashMap<String, Collection<Role>>();
+        
+        final String query = this.buildSparqlQueryForObjectRoles(userIdentifier, objectUri);
+        
+        if(this.log.isDebugEnabled())
+        {
+            this.log.debug("getCommonRolesForObjects: query={}", query);
+        }
+        
+        final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+        
+        QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
+        
+        if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
+        {
+            this.log.warn("Could not find role with mappings for user: {}", userIdentifier);
+        }
+        
+        for(BindingSet bindingSet : resultCollector.getBindingSets())
+        {
+            final Role role = this.buildRoleFromSparqlResult(bindingSet);
+            
+            if(!bindingSet.hasBinding(PoddSesameRealm.PARAM_USER_IDENTIFIER))
+            {
+                throw new RuntimeException("Query did not bind a user to the role : " + bindingSet.toString());
+            }
+            
+            Collection<Role> nextRoles = new HashSet<Role>();
+            final Collection<Role> putIfAbsent =
+                    roleCollection.putIfAbsent(bindingSet.getBinding(PoddSesameRealm.PARAM_USER_IDENTIFIER).getValue()
+                            .stringValue(), nextRoles);
+            if(putIfAbsent != null)
+            {
+                nextRoles = putIfAbsent;
+            }
+            nextRoles.add(role);
         }
         
         return roleCollection;
@@ -1858,29 +1859,22 @@ public class PoddSesameRealm extends Realm
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
             
-            try
+            if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
             {
-                if(!queryResult.hasNext())
-                {
-                    this.log.warn("Could not find role with mappings for user: {}", user.getIdentifier());
-                }
-                
-                while(queryResult.hasNext())
-                {
-                    final Entry<Role, URI> roleEntry = this.buildMapEntryFromSparqlResult(queryResult.next());
-                    // roleMap.put(roleEntry.getKey(), roleEntry.getValue());
-                    roleCollection.add(roleEntry);
-                }
+                this.log.warn("Could not find role with mappings for user: {}", user);
             }
-            finally
+            
+            for(BindingSet bindingSet : resultCollector.getBindingSets())
             {
-                queryResult.close();
+                final Entry<Role, URI> roleEntry = this.buildMapEntryFromSparqlResult(bindingSet);
+                // roleMap.put(roleEntry.getKey(), roleEntry.getValue());
+                roleCollection.add(roleEntry);
             }
             
         }
-        catch(final RepositoryException | MalformedQueryException | QueryEvaluationException e)
+        catch(final OpenRDFException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
@@ -2019,33 +2013,16 @@ public class PoddSesameRealm extends Realm
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
             
-            try
+            for(BindingSet bindingSet : resultCollector.getBindingSets())
             {
-                while(queryResult.hasNext())
-                {
-                    final BindingSet bindingSet = queryResult.next();
-                    final Binding binding = bindingSet.getBinding("userIdentifier");
-                    
-                    result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
-                }
-            }
-            finally
-            {
-                queryResult.close();
+                final Binding binding = bindingSet.getBinding("userIdentifier");
+                result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
             }
             
         }
-        catch(final RepositoryException e)
-        {
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final MalformedQueryException e)
-        {
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final QueryEvaluationException e)
+        catch(final OpenRDFException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
@@ -2124,46 +2101,14 @@ public class PoddSesameRealm extends Realm
      */
     public List<PoddUser> getUsers()
     {
-        final List<PoddUser> result = new ArrayList<PoddUser>();
-        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repository.getConnection();
             
-            final String query = this.buildSparqlQueryToFindUser(null, true);
-            
-            this.log.debug("findUser: query={}", query);
-            
-            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
-            
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
-            
-            try
-            {
-                while(queryResult.hasNext())
-                {
-                    final BindingSet bindingSet = queryResult.next();
-                    final Binding binding = bindingSet.getBinding("userIdentifier");
-                    
-                    result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
-                }
-            }
-            finally
-            {
-                queryResult.close();
-            }
-            
+            return this.getUsers(conn);
         }
-        catch(final RepositoryException e)
-        {
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final MalformedQueryException e)
-        {
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final QueryEvaluationException e)
+        catch(final OpenRDFException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
@@ -2179,14 +2124,112 @@ public class PoddSesameRealm extends Realm
             }
         }
         
+    }
+    
+    protected List<PoddUser> getUsers(final RepositoryConnection conn) throws OpenRDFException
+    {
+        final List<PoddUser> result = new ArrayList<PoddUser>();
+        
+        final String query = this.buildSparqlQueryToFindUser(null, true);
+        
+        this.log.debug("findUser: query={}", query);
+        
+        final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+        
+        final QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
+        
+        for(final BindingSet bindingSet : resultCollector.getBindingSets())
+        {
+            final Binding binding = bindingSet.getBinding("userIdentifier");
+            
+            result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
+        }
+        
         return Collections.unmodifiableList(result);
     }
     
-    public Map<String, PoddUser> getUsersMapByIdentifier()
+    /**
+     * Helper method to find PODD Users who are assigned the 'roles of interest' for the given
+     * artifact.
+     * 
+     * For security purposes, the returned Users only have their Identifier, First name, Last name,
+     * Status and Organization filled.
+     * 
+     * @param rolesOfInterest
+     * @param artifactUri
+     * @return
+     */
+    public Map<RestletUtilRole, Collection<PoddUser>> getUsersForRole(
+            final Collection<RestletUtilRole> rolesOfInterest, final URI artifactUri)
+    {
+        final ConcurrentMap<RestletUtilRole, Collection<PoddUser>> userList = new ConcurrentHashMap<>();
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repository.getConnection();
+            
+            // final PoddSesameRealm nextRealm =
+            // ((PoddWebServiceApplication)this.getApplication()).getRealm();
+            final Map<String, Collection<Role>> participantMap =
+                    this.getRolesForObjectAlternate(null, artifactUri, conn);
+            
+            final Collection<String> keySet = participantMap.keySet();
+            
+            Map<String, PoddUser> usersMapByIdentifier = this.getUsersMapByIdentifier(conn);
+            
+            for(final String userIdentifier : keySet)
+            {
+                final Collection<Role> rolesOfUser = participantMap.get(userIdentifier);
+                
+                for(final RestletUtilRole roleOfInterest : rolesOfInterest)
+                {
+                    if(rolesOfUser.contains(roleOfInterest.getRole()))
+                    {
+                        this.log.info("User {} has Role {} ", userIdentifier, roleOfInterest.getName());
+                        
+                        Collection<PoddUser> nextRoles = new ArrayList<PoddUser>();
+                        final Collection<PoddUser> putIfAbsent = userList.putIfAbsent(roleOfInterest, nextRoles);
+                        if(putIfAbsent != null)
+                        {
+                            nextRoles = putIfAbsent;
+                        }
+                        
+                        final PoddUser tempUser = usersMapByIdentifier.get(userIdentifier);
+                        final PoddUser userToReturn =
+                                new PoddUser(tempUser.getIdentifier(), null, tempUser.getFirstName(),
+                                        tempUser.getLastName(), null, tempUser.getUserStatus(), null,
+                                        tempUser.getOrganization(), null);
+                        
+                        nextRoles.add(userToReturn);
+                    }
+                }
+            }
+        }
+        catch(final OpenRDFException e)
+        {
+            throw new RuntimeException("Failure getting users for roles in repository", e);
+        }
+        finally
+        {
+            try
+            {
+                conn.close();
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Failure to close connection", e);
+            }
+        }
+        
+        return userList;
+    }
+    
+    public Map<String, PoddUser> getUsersMapByIdentifier(final RepositoryConnection conn) throws OpenRDFException
     {
         final ConcurrentMap<String, PoddUser> result = new ConcurrentHashMap<String, PoddUser>();
         
-        for(final PoddUser nextUser : this.getUsers())
+        for(final PoddUser nextUser : this.getUsers(conn))
         {
             final PoddUser putIfAbsent = result.putIfAbsent(nextUser.getIdentifier(), nextUser);
             
@@ -2199,11 +2242,11 @@ public class PoddSesameRealm extends Realm
         return result;
     }
     
-    public Map<URI, PoddUser> getUsersMapByURI()
+    public Map<URI, PoddUser> getUsersMapByURI(final RepositoryConnection conn) throws OpenRDFException
     {
         final ConcurrentMap<URI, PoddUser> result = new ConcurrentHashMap<URI, PoddUser>();
         
-        for(final PoddUser nextUser : this.getUsers())
+        for(final PoddUser nextUser : this.getUsers(conn))
         {
             final PoddUser putIfAbsent = result.putIfAbsent(nextUser.getUri(), nextUser);
             
@@ -2395,24 +2438,16 @@ public class PoddSesameRealm extends Realm
             }
             tupleQuery.setBinding(PoddSesameRealm.PARAM_SEARCH_TERM, PoddRdfConstants.VF.createLiteral(searchTerm));
             
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            final QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
             
-            try
+            for(final BindingSet bindingSet : resultCollector.getBindingSets())
             {
-                while(queryResult.hasNext())
-                {
-                    final BindingSet bindingSet = queryResult.next();
-                    final Binding binding = bindingSet.getBinding("userIdentifier");
-                    
-                    result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
-                }
-            }
-            finally
-            {
-                queryResult.close();
+                final Binding binding = bindingSet.getBinding("userIdentifier");
+                
+                result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
             }
         }
-        catch(final RepositoryException | MalformedQueryException | QueryEvaluationException e)
+        catch(final OpenRDFException e)
         {
             throw new RuntimeException("Failure searching users in repository", e);
         }
@@ -2587,7 +2622,6 @@ public class PoddSesameRealm extends Realm
             query.append("   ?roleMappingUri <" + mappingUri + "> ?identifier . ");
             query.append("   ?roleMappingUri <" + SesameRealmConstants.OAS_ROLEMAPPEDROLE + "> ?roleUri . ");
             query.append("   FILTER(str(?identifier) = \"" + NTriplesUtil.escapeString(identifier) + "\") ");
-            query.append("   FILTER(?roleUri = <" + oasRole.getURI() + "> ) ");
             query.append(" } ");
             
             if(this.log.isDebugEnabled())
@@ -2596,72 +2630,38 @@ public class PoddSesameRealm extends Realm
             }
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
-            tupleQuery.setDataset(this.getSesameDataset());
+            tupleQuery.setBinding("roleUri", oasRole.getURI());
             
-            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            final QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
             
-            try
+            if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
             {
-                if(!queryResult.hasNext())
-                {
-                    this.log.info("Could not find any role mappings to remove for this role: {} and this target: {}",
-                            role, identifier);
-                }
-                
-                while(queryResult.hasNext())
-                {
-                    final BindingSet bindingSet = queryResult.next();
-                    
-                    if(queryResult.hasNext())
-                    {
-                        this.log.warn(
-                                "Found duplicate roleMapping, will remove all mappings for this role: {} and this target: {}",
-                                role, identifier);
-                    }
-                    
-                    final Value roleMappingUri = bindingSet.getValue("roleMappingUri");
-                    
-                    if(roleMappingUri instanceof Resource)
-                    {
-                        conn.remove((Resource)roleMappingUri, null, null, this.getContexts());
-                    }
-                    else
-                    {
-                        this.log.warn("This should not happen while RDF only allows URIs and blank nodes in the subject position of triples");
-                    }
-                }
+                this.log.info("Could not find any role mappings to remove for this role: {} and this target: {}", role,
+                        identifier);
             }
-            finally
+            else if(resultCollector.getBindingSets().size() > 1)
             {
-                queryResult.close();
+                this.log.warn(
+                        "Found duplicate roleMapping, will remove all mappings for this role: {} and this target: {}",
+                        role, identifier);
+            }
+            
+            for(final BindingSet bindingSet : resultCollector.getBindingSets())
+            {
+                final Value roleMappingUri = bindingSet.getValue("roleMappingUri");
+                
+                if(roleMappingUri instanceof Resource)
+                {
+                    conn.remove((Resource)roleMappingUri, null, null, this.getContexts());
+                }
+                else
+                {
+                    this.log.warn("This should not happen while RDF only allows URIs and blank nodes in the subject position of triples");
+                }
             }
             conn.commit();
         }
-        catch(final RepositoryException e)
-        {
-            try
-            {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Repository Exception while rolling back connection");
-            }
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final MalformedQueryException e)
-        {
-            try
-            {
-                conn.rollback();
-            }
-            catch(final RepositoryException e1)
-            {
-                this.log.error("Repository Exception while rolling back connection");
-            }
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final QueryEvaluationException e)
+        catch(final OpenRDFException e)
         {
             try
             {
@@ -2720,8 +2720,6 @@ public class PoddSesameRealm extends Realm
                 query.append("   ?roleMappingUri <" + PoddRdfConstants.PODD_ROLEMAPPEDOBJECT + "> ?object . ");
                 query.append("   FILTER(str(?identifier) = \"" + NTriplesUtil.escapeString(user.getIdentifier())
                         + "\") ");
-                query.append("   FILTER(?role = <" + oasRole.getURI() + "> ) ");
-                query.append("   FILTER(?object = <" + optionalObjectUri + "> ) ");
                 query.append(" } ");
                 
                 final String queryString = query.toString();
@@ -2729,73 +2727,41 @@ public class PoddSesameRealm extends Realm
                 this.log.debug("findUser: query={}", queryString);
                 
                 final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-                tupleQuery.setDataset(this.getSesameDataset());
+                tupleQuery.setBinding("role", oasRole.getURI());
+                tupleQuery.setBinding("object", optionalObjectUri);
+                final QueryResultCollector resultCollector =
+                        RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
                 
-                final TupleQueryResult queryResult = tupleQuery.evaluate();
-                
-                try
+                if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
                 {
-                    if(!queryResult.hasNext())
-                    {
-                        this.log.info(
-                                "Could not find any role mappings to remove for this role: {}, object <{}>, and this target: {}",
-                                role, optionalObjectUri, user.getIdentifier());
-                    }
-                    
-                    while(queryResult.hasNext())
-                    {
-                        final BindingSet bindingSet = queryResult.next();
-                        
-                        if(queryResult.hasNext())
-                        {
-                            this.log.warn(
-                                    "Found duplicate roleMapping, will remove all mappings for this role: {}, object <{}>, and this target: {}",
-                                    role, optionalObjectUri, user.getIdentifier());
-                        }
-                        
-                        final Value roleMappingUri = bindingSet.getValue("roleMappingUri");
-                        
-                        if(roleMappingUri instanceof Resource)
-                        {
-                            conn.remove((Resource)roleMappingUri, null, null, this.getContexts());
-                        }
-                        else
-                        {
-                            this.log.warn("This should not happen while RDF only allows URIs and blank nodes in the subject position of triples");
-                        }
-                    }
+                    this.log.info(
+                            "Could not find any role mappings to remove for this role: {}, object <{}>, and this target: {}",
+                            role, optionalObjectUri, user.getIdentifier());
                 }
-                finally
+                else if(resultCollector.getBindingSets().size() > 1)
                 {
-                    queryResult.close();
+                    this.log.warn(
+                            "Found duplicate roleMapping, will remove all mappings for this role: {}, object <{}>, and this target: {}",
+                            role, optionalObjectUri, user.getIdentifier());
+                }
+                
+                for(final BindingSet bindingSet : resultCollector.getBindingSets())
+                {
+                    
+                    final Value roleMappingUri = bindingSet.getValue("roleMappingUri");
+                    
+                    if(roleMappingUri instanceof Resource)
+                    {
+                        conn.remove((Resource)roleMappingUri, null, null, this.getContexts());
+                    }
+                    else
+                    {
+                        this.log.warn("This should not happen while RDF only allows URIs and blank nodes in the subject position of triples");
+                    }
                 }
                 conn.commit();
             }
-            catch(final RepositoryException e)
-            {
-                try
-                {
-                    conn.rollback();
-                }
-                catch(final RepositoryException e1)
-                {
-                    this.log.error("Repository Exception while rolling back connection");
-                }
-                throw new RuntimeException("Failure finding user in repository", e);
-            }
-            catch(final MalformedQueryException e)
-            {
-                try
-                {
-                    conn.rollback();
-                }
-                catch(final RepositoryException e1)
-                {
-                    this.log.error("Repository Exception while rolling back connection");
-                }
-                throw new RuntimeException("Failure finding user in repository", e);
-            }
-            catch(final QueryEvaluationException e)
+            catch(final OpenRDFException e)
             {
                 try
                 {
