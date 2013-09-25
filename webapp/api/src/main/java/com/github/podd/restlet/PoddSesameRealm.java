@@ -1471,47 +1471,11 @@ public class PoddSesameRealm extends Realm
             throw new NullPointerException("User identifier was null");
         }
         
-        PoddUser result = null;
-        
         RepositoryConnection conn = null;
         try
         {
             conn = this.repository.getConnection();
-            
-            final String query = this.buildSparqlQueryToFindUser(userIdentifier, false);
-            
-            this.log.info("findUser: query={}", query);
-            
-            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
-            
-            QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
-            
-            if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
-            {
-                this.log.info("Could not find user with identifier, returning null: {}", userIdentifier);
-            }
-            else
-            {
-                if(resultCollector.getBindingSets().size() > 1)
-                {
-                    this.log.warn("Found multiple users with the same identifier: {}", resultCollector.getBindingSets());
-                }
-                
-                result = this.buildRestletUserFromSparqlResult(userIdentifier, resultCollector.getBindingSets().get(0));
-            }
-            
-        }
-        catch(final RepositoryException e)
-        {
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final MalformedQueryException e)
-        {
-            throw new RuntimeException("Failure finding user in repository", e);
-        }
-        catch(final QueryEvaluationException e)
-        {
-            throw new RuntimeException("Failure finding user in repository", e);
+            return findUser(userIdentifier, conn);
         }
         catch(OpenRDFException e)
         {
@@ -1521,12 +1485,42 @@ public class PoddSesameRealm extends Realm
         {
             try
             {
-                conn.close();
+                if(conn != null)
+                {
+                    conn.close();
+                }
             }
             catch(final RepositoryException e)
             {
                 this.log.error("Failure to close connection", e);
             }
+        }
+    }
+    
+    protected PoddUser findUser(final String userIdentifier, final RepositoryConnection conn) throws OpenRDFException
+    {
+        PoddUser result = null;
+        
+        final String query = this.buildSparqlQueryToFindUser(userIdentifier, false);
+        
+        this.log.info("findUser: query={}", query);
+        
+        final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+        
+        QueryResultCollector resultCollector = RdfUtility.executeTupleQuery(tupleQuery, this.getContexts());
+        
+        if(!resultCollector.getHandledTuple() || resultCollector.getBindingSets().isEmpty())
+        {
+            this.log.info("Could not find user with identifier, returning null: {}", userIdentifier);
+        }
+        else
+        {
+            if(resultCollector.getBindingSets().size() > 1)
+            {
+                this.log.warn("Found multiple users with the same identifier: {}", resultCollector.getBindingSets());
+            }
+            
+            result = this.buildRestletUserFromSparqlResult(userIdentifier, resultCollector.getBindingSets().get(0));
         }
         
         return result;
