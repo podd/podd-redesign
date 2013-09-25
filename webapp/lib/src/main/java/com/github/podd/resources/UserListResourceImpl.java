@@ -64,13 +64,8 @@ public class UserListResourceImpl extends AbstractUserResourceImpl
         dataModel.put("pageTitle", "List Users");
         
         final PoddSesameRealm realm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final List<RestletUtilUser> users = realm.getUsers();
-        final List<PoddUser> poddUsers = new ArrayList<PoddUser>();
-        for(final RestletUtilUser restletUtilUser : users)
-        {
-            poddUsers.add((PoddUser)restletUtilUser);
-        }
-        dataModel.put("userObjectList", poddUsers);
+        final List<PoddUser> users = realm.getUsers();
+        dataModel.put("userObjectList", users);
         
         dataModel.put("statusList", PoddUserStatus.values());
         dataModel.put("roleObjectList", PoddRoles.values());
@@ -122,13 +117,11 @@ public class UserListResourceImpl extends AbstractUserResourceImpl
      * @param users
      * @return
      */
-    private Model userListToModel(final List<RestletUtilUser> users)
+    private Model userListToModel(final List<PoddUser> users)
     {
         final Model model = new LinkedHashModel();
-        for(final RestletUtilUser u : users)
+        for(final PoddUser user : users)
         {
-            final PoddUser user = (PoddUser)u;
-            
             user.toModel(model, false);
         }
         

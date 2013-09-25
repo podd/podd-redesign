@@ -399,7 +399,7 @@ public class ApplicationUtils
         
         // OasMemoryRealm has extensions so that getClientInfo().getUser() will contain first name,
         // last name, and email address as necessary
-        final PoddSesameRealmImpl nextRealm =
+        final PoddSesameRealm nextRealm =
                 new PoddSesameRealmImpl(nextRepository, PoddRdfConstants.DEFAULT_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable

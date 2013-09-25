@@ -623,19 +623,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     }
     
     @Override
-    public void setRealm(final RestletUtilSesameRealm nextRealm)
-    {
-        if(nextRealm instanceof PoddSesameRealm)
-        {
-            this.realm = (PoddSesameRealmImpl)nextRealm;
-        }
-        else
-        {
-            throw new IllegalArgumentException("We only know how to handle PoddSesameRealm");
-        }
-    }
-    
-    @Override
     public void setTemplateConfiguration(final Configuration nextFreemarkerConfiguration)
     {
         this.freemarkerConfiguration = nextFreemarkerConfiguration;

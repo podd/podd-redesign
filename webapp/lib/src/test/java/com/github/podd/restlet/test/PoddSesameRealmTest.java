@@ -38,6 +38,7 @@ import org.restlet.security.Role;
 
 import com.github.ansell.restletutils.RestletUtilUser;
 import com.github.ansell.restletutils.SesameRealmConstants;
+import com.github.podd.restlet.PoddSesameRealm;
 import com.github.podd.restlet.PoddSesameRealmImpl;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddRoles;
@@ -53,7 +54,7 @@ public class PoddSesameRealmTest
     private static final URI userMgtContext = PoddRdfConstants.VF.createURI("urn:context:usermanagement:graph");
     
     private Repository testRepository;
-    private PoddSesameRealmImpl testRealm;
+    private PoddSesameRealm testRealm;
     
     /**
      * Helper method to create a test User and add it to the SesameRealm.
@@ -396,7 +397,7 @@ public class PoddSesameRealmTest
         this.testRealm.map(user2, PoddRoles.PROJECT_OBSERVER.getRole(), object2URI);
         
         // - get User List
-        final List<RestletUtilUser> users = this.testRealm.getUsers();
+        final List<PoddUser> users = this.testRealm.getUsers();
         Assert.assertNotNull("NULL returned for user list", users);
         Assert.assertEquals("Incorrect number of Users in list", 2, users.size());
         Assert.assertTrue("User list did not contain user1", users.contains(user1));
