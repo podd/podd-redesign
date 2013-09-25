@@ -404,8 +404,17 @@ public class PoddSesameRealm extends Realm
             throw new IllegalStateException("Could not modify User (does not exist)");
         }
         
-        URI nextUserUUID =
-                this.vf.createURI("urn:oas:user:", nextUser.getIdentifier() + ":" + UUID.randomUUID().toString());
+        URI nextUserUUID;
+        
+        if(oldUser != null)
+        {
+            nextUserUUID = oldUser.getUri();
+        }
+        else
+        {
+            nextUserUUID =
+                    this.vf.createURI("urn:oas:user:", nextUser.getIdentifier() + ":" + UUID.randomUUID().toString());
+        }
         
         RepositoryConnection conn = null;
         try
@@ -413,11 +422,11 @@ public class PoddSesameRealm extends Realm
             conn = this.repository.getConnection();
             conn.begin();
             
+            // FIXME: Optimise the following to require less queries
             final List<Statement> userIdentifierStatements =
                     Iterations.asList(conn.getStatements(null, SesameRealmConstants.OAS_USERIDENTIFIER,
                             this.vf.createLiteral(nextUser.getIdentifier()), true, this.getContexts()));
             
-            // FIXME: Is it safe to overwrite old users like this...
             if(!userIdentifierStatements.isEmpty())
             {
                 for(final Statement nextUserIdentifierStatement : userIdentifierStatements)
@@ -1166,7 +1175,7 @@ public class PoddSesameRealm extends Realm
         return query.toString();
     }
     
-    private Group createGroupForStatements(final List<Statement> nextGroupStatements)
+    private Group createGroupForStatements(final Iterable<Statement> nextGroupStatements)
     {
         final Group nextGroup = new Group();
         
@@ -1208,8 +1217,9 @@ public class PoddSesameRealm extends Realm
         try
         {
             // get the statements for the nextGroupUri
-            final List<Statement> nextRootGroupStatements =
-                    Iterations.asList(conn.getStatements(nextGroupUri, null, null, true, this.getContexts()));
+            final Model nextRootGroupStatements =
+                    new LinkedHashModel(Iterations.asList(conn.getStatements(nextGroupUri, null, null, true,
+                            this.getContexts())));
             // create the group
             final Group newGroup = this.createGroupForStatements(nextRootGroupStatements);
             
