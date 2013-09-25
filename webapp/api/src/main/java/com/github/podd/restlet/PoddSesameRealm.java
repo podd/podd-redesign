@@ -138,7 +138,6 @@ public abstract class PoddSesameRealm extends Realm
         @Override
         protected User createUser(final String identifier, final Request request, final Response response)
         {
-            // casting is safe here as buildRestletUserFromSparqlResult() creates a PoddUser
             final PoddUser checkUser = PoddSesameRealm.this.findUser(identifier);
             
             if(checkUser == null)
@@ -168,6 +167,17 @@ public abstract class PoddSesameRealm extends Realm
             }
             
             return result;
+        }
+        
+        /**
+         * FIXME: Replace this with an implementation that hashes the given secret and compares the
+         * hash value rather than comparing the secret directly, so we don't need to store the
+         * password in the database.
+         */
+        @Override
+        public int verify(String identifier, char[] secret)
+        {
+            return compare(secret, getLocalSecret(identifier)) ? RESULT_VALID : RESULT_INVALID;
         }
     }
     
