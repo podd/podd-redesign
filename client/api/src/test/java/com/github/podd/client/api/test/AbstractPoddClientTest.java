@@ -70,7 +70,7 @@ public abstract class AbstractPoddClientTest
     
     private PoddClient testClient;
     
-    private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 26;
+    private static final int BASIC_PROJECT_1_EXPECTED_CONCRETE_TRIPLES = 24;
     
     /**
      * Instruct the implementors of this test to attempt to deploy a file reference that has the
@@ -239,7 +239,7 @@ public abstract class AbstractPoddClientTest
             final ByteArrayOutputStream afterOutputStream = new ByteArrayOutputStream(8096);
             this.testClient.downloadArtifact(newArtifact, afterOutputStream, RDFFormat.RDFJSON);
             final Model afterParseRdf =
-                    this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON, 34);
+                    this.parseRdf(new ByteArrayInputStream(afterOutputStream.toByteArray()), RDFFormat.RDFJSON, 32);
             
             final Model afterTopObject =
                     afterParseRdf.filter(newArtifact.getOntologyIRI().toOpenRDFURI(),
