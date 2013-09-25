@@ -56,7 +56,11 @@
 				
 	    // Get Metadata and invoke the callback function which will continue to update the interface
 	    podd.getObjectTypeMetadata(podd.artifactIri, podd.objectTypeUri, podd.callbackFromGetMetadata, podd.schemaDatabank, podd.artifactDatabank);
-	
+		
+		// Cache the data repositories list
+	    podd.dataRepositoriesDatabank = podd.newDatabank();
+		podd.getDataRepositories(podd.dataRepositoriesDatabank);
+		
 		// Add form submission handler
 		$("#btnSubmit").click(function(event) {
 			event.preventDefault();

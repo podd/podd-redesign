@@ -465,12 +465,20 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
     @Override
     public InferredOWLOntologyID getArtifact(final IRI artifactIRI) throws UnmanagedArtifactIRIException
     {
-        return this.getArtifact(artifactIRI, null);
+        try
+        {
+            return this.getArtifact(artifactIRI, null);
+        }
+        catch(UnmanagedArtifactVersionException e)
+        {
+            log.error("Null artifact version not recognised, this should not happen");
+            return null;
+        }
     }
     
     @Override
     public InferredOWLOntologyID getArtifact(final IRI artifactIRI, final IRI versionIRI)
-        throws UnmanagedArtifactIRIException
+        throws UnmanagedArtifactIRIException, UnmanagedArtifactVersionException
     {
         RepositoryConnection repositoryConnection = null;
         
@@ -498,9 +506,9 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             {
                 // If the result that was returned contained a different artifact IRI then throw an
                 // exception early instead of returning inconsistent results
-                if(!result.getOntologyIRI().equals(artifactIRI) && !result.getVersionIRI().equals(artifactIRI))
+                if(versionIRI != null && !result.getVersionIRI().equals(versionIRI))
                 {
-                    throw new UnmanagedArtifactIRIException(artifactIRI,
+                    throw new UnmanagedArtifactVersionException(artifactIRI, result.getVersionIRI(), versionIRI,
                             "Artifact IRI and Version IRI combination did not match");
                 }
             }

@@ -19,6 +19,7 @@ var DISPLAY_ShortText = 'http://purl.org/podd/ns/poddBase#DisplayType_ShortText'
 var DISPLAY_CheckBox = 'http://purl.org/podd/ns/poddBase#DisplayType_CheckBox';
 var DISPLAY_DropDown = 'http://purl.org/podd/ns/poddBase#DisplayType_DropDownList'
 var DISPLAY_AutoComplete = 'http://purl.org/podd/ns/poddBase#DisplayType_AutoComplete';
+var DISPLAY_DataReference = 'http://purl.org/podd/ns/poddBase#DisplayType_DataReference';
 
 var OBJECT_PROPERTY = 'http://www.w3.org/2002/07/owl#ObjectProperty';
 var DATATYPE_PROPERTY = 'http://www.w3.org/2002/07/owl#DatatypeProperty';
@@ -271,6 +272,61 @@ podd.addEnterKeyHandler = function(textField) {
         }
     });
 
+};
+
+/**
+ * Creates a list of data repositories using the output from the
+ * "datarepositories/list" service
+ */
+podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentValue, isNew) {
+    var select = $('<select>', {
+        name : 'name_datarepository_select',
+    });
+
+    var defaultOption = $('<option>', {
+        value : '',
+        text : 'Please Select'
+    });
+    select.append(defaultOption);
+
+    var myQuery = $.rdf({
+        databank : nextDatabank
+    })
+    // Find the class
+    .where('?pRepository rdf:type ?pClass')
+    //
+    .where('?pRepository poddBase:hasAlias ?pAlias').optional('?pRepository rdfs:label ?pLabel');
+    var bindings = myQuery.select();
+
+    if (bindings.length === 0) {
+        podd.debug('Did not find any data repositories');
+    }
+    
+    $.each(bindings, function(index, value) {
+
+        var optionValue = value.pAlias.value;
+
+        var optionDisplayValue = value.pAlias.value;
+        if (typeof value.pLabel != 'undefined') {
+            optionDisplayValue = value.pLabel.value + " (" + value.pAlias.value + ")";
+        }
+
+        var selectedVal = false;
+        if (value.pAlias.value == currentValue) {
+            podd.debug('SELECTED option = ' + optionValue);
+            selectedVal = true;
+        }
+
+        var option = $('<option>', {
+            value : optionValue,
+            text : optionDisplayValue,
+            // TODO: Does the following need to be "selected: selected"?
+            selected : selectedVal
+        });
+
+        select.append(option);
+    });
+    return select;
 };
 
 /**
@@ -1011,6 +1067,11 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
                         + " (" + aValue.displayValue + ")");
 
             }
+            else if (nextField.displayType == DISPLAY_DataReference) {
+                var list = podd.createDataRepositoriesList(podd.dataRepositoriesDatabank, nextField.propertyUri,
+                        aValue.displayValue);
+                li2.append(list);
+            }
             else { // default
                 podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " ("
                         + aValue.displayValue + ")");
@@ -1426,7 +1487,7 @@ podd.getCurrentVersionIri = function() {
  * List Data Repositories web service in RDF and sends the resulting data to the
  * callback.
  */
-podd.getDataRepositories = function(successCallback) {
+podd.getDataRepositories = function(dataRepositoriesDatabank, successCallback) {
     var requestUrl = podd.baseUrl + '/datarepositories/list';
 
     $.ajax({
@@ -1437,12 +1498,17 @@ podd.getDataRepositories = function(successCallback) {
             podd.debug('[getDataRepositories] ### SUCCESS ### ');
             podd.debug(resultData);
 
-            var dataRepositoresDatabank = podd.newDatabank();
+            if (typeof dataRepositoriesDatabank == "undefined") {
+                dataRepositoresDatabank = podd.newDatabank();
+            }
+
             dataRepositoriesDatabank.load(resultData);
 
             podd.debug('[getDataRepositories] Data Repositories Databank size = ' + dataRepositoriesDatabank.size());
 
-            successCallback(dataRepositoriesDatabank);
+            if (typeof successCallback == "function") {
+                successCallback(dataRepositoriesDatabank);
+            }
         },
         error : function(xhr, status, error) {
             podd.debug('[getDataRepositories] $$$ ERROR $$$ ' + error);

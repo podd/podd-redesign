@@ -10,8 +10,10 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		
+			
 		podd.getDataRepositories(function(databank) {
-			podd.populateDataRepositoriesList(databank, $("dataRepositories"));
+			$("attach_dataReference").append(podd.populateDataRepositoriesList(databank));
 		);
 	});
 </script>

@@ -38,6 +38,7 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.security.User;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,8 @@ import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.OntologyNotInProfileException;
 import com.github.podd.exception.PoddException;
+import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
@@ -83,6 +86,23 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
         }
         
+        InferredOWLOntologyID artifact;
+        
+        try
+        {
+            artifact = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri), IRI.create(versionUri));
+        }
+        catch(UnmanagedArtifactIRIException e)
+        {
+            this.log.error("Artifact IRI not recognised");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not recognised");
+        }
+        catch(UnmanagedArtifactVersionException e)
+        {
+            this.log.error("Artifact Version IRI not recognised");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not recognised");
+        }
+        
         this.log.info("attachFileRefHtml");
         final User user = this.getRequest().getClientInfo().getUser();
         
@@ -91,6 +111,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "attachdatareference.html.ftl");
         dataModel.put("pageTitle", "TODO: Attach Data Reference");
+        dataModel.put("artifact", artifact);
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page

@@ -41,6 +41,7 @@ import org.semanticweb.owlapi.model.IRI;
 
 import com.github.podd.exception.PoddException;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
+import com.github.podd.exception.UnmanagedArtifactVersionException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.FreemarkerUtil;
@@ -101,7 +102,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
                 }
             }
         }
-        catch(final UnmanagedArtifactIRIException e)
+        catch(final UnmanagedArtifactIRIException | UnmanagedArtifactVersionException e)
         {
             if(this.getRequest().getClientInfo().isAuthenticated())
             {
@@ -322,7 +323,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             dataModel.put("canEditObject", false);
             dataModel.put("canAddChildren", false);
         }
-
+        
         if(!isPublished
                 && this.checkAuthentication(PoddAction.PROJECT_ROLE_EDIT, ontologyID.getOntologyIRI().toOpenRDFURI(),
                         false))
@@ -331,12 +332,12 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         }
         
         if(!isPublished
-                && this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, ontologyID.getOntologyIRI().toOpenRDFURI(),
-                        false))
+                && this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_DELETE, ontologyID.getOntologyIRI()
+                        .toOpenRDFURI(), false))
         {
             dataModel.put("canDeleteProject", true);
         }
-
+        
         dataModel.put("selectedObjectCount", 0);
         dataModel.put("childHierarchyList", Collections.emptyList());
         

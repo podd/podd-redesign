@@ -216,8 +216,11 @@ public interface PoddArtifactManager
      *         if it was not found.
      * @throws UnmanagedArtifactIRIException
      *             If the artifact is not managed.
+     * @throws UnmanagedArtifactVersionException
+     *             If the artifact is managed, but the version was not recognised.
      */
-    InferredOWLOntologyID getArtifact(IRI artifactIRI, IRI versionIRI) throws UnmanagedArtifactIRIException;
+    InferredOWLOntologyID getArtifact(IRI artifactIRI, IRI versionIRI) throws UnmanagedArtifactIRIException,
+        UnmanagedArtifactVersionException;
     
     /**
      * Returns a {@link Set} containing the Object URIs of the given object's direct children.
