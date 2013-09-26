@@ -86,7 +86,8 @@ public class GetMetadataResourceImpl extends AbstractPoddResourceImpl
             }
         }
         
-        this.log.info("@Get Metadata: {} ({})", objectType, variant.getMediaType().getName());
+        this.log.info("@Get Metadata: {}, {}, {}, {} ({})", objectType, containsPropertyPolicy,
+                includeDoNotDisplayProperties, artifactUri, variant.getMediaType().getName());
         
         if(artifactUri == null)
         {
