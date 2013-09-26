@@ -548,13 +548,10 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         }
         else
         {
-            final RestletUtilUser findUser = this.getRealm().findUser(user.getIdentifier());
-            if(findUser != null && findUser instanceof PoddUser)
+            final PoddUser findUser = this.getRealm().findUser(user.getIdentifier());
+            if(findUser.getUserStatus() == PoddUserStatus.ACTIVE)
             {
-                if(((PoddUser)findUser).getUserStatus() == PoddUserStatus.ACTIVE)
-                {
-                    return false;
-                }
+                return false;
             }
         }
         return true;
@@ -620,19 +617,6 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
     public void setRealm(final PoddSesameRealm realm)
     {
         this.realm = realm;
-    }
-    
-    @Override
-    public void setRealm(final RestletUtilSesameRealm nextRealm)
-    {
-        if(nextRealm instanceof PoddSesameRealm)
-        {
-            this.realm = (PoddSesameRealmImpl)nextRealm;
-        }
-        else
-        {
-            throw new IllegalArgumentException("We only know how to handle PoddSesameRealm");
-        }
     }
     
     @Override

@@ -306,11 +306,11 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             // verify: received contents have artifact's ontology and version IRIs
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
             
-            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 29);
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFJSON, 28);
             
             Assert.assertEquals(6, model.subjects().size());
-            Assert.assertEquals(15, model.predicates().size());
-            Assert.assertEquals(24, model.objects().size());
+            Assert.assertEquals(14, model.predicates().size());
+            Assert.assertEquals(23, model.objects().size());
             
             if(this.log.isDebugEnabled())
             {
@@ -352,11 +352,11 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             // verify: received contents have artifact URI
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
             
-            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 29);
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 28);
             
             Assert.assertEquals(6, model.subjects().size());
-            Assert.assertEquals(15, model.predicates().size());
-            Assert.assertEquals(24, model.objects().size());
+            Assert.assertEquals(14, model.predicates().size());
+            Assert.assertEquals(23, model.objects().size());
             
             if(this.log.isDebugEnabled())
             {
@@ -398,11 +398,11 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             // verify: received contents have artifact's ontology and version IRIs
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
             
-            final Model model = this.assertRdf(new StringReader(body), RDFFormat.TURTLE, 29);
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.TURTLE, 28);
             
             Assert.assertEquals(6, model.subjects().size());
-            Assert.assertEquals(15, model.predicates().size());
-            Assert.assertEquals(24, model.objects().size());
+            Assert.assertEquals(14, model.predicates().size());
+            Assert.assertEquals(23, model.objects().size());
             
             if(this.log.isDebugEnabled())
             {
@@ -613,11 +613,11 @@ public class GetArtifactResourceImplTest extends AbstractResourceImplTest
             // verify: received contents have artifact URI
             Assert.assertTrue("Result does not contain artifact URI", body.contains(artifactUri));
             
-            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 29);
+            final Model model = this.assertRdf(new StringReader(body), RDFFormat.RDFXML, 28);
             
             Assert.assertEquals(6, model.subjects().size());
-            Assert.assertEquals(15, model.predicates().size());
-            Assert.assertEquals(24, model.objects().size());
+            Assert.assertEquals(14, model.predicates().size());
+            Assert.assertEquals(23, model.objects().size());
             
             if(this.log.isDebugEnabled())
             {

@@ -128,7 +128,7 @@ public class UserAddResourceImpl extends AbstractUserResourceImpl
                 final URI mappedObject =
                         newUserModel.filter(mappingUri, PoddRdfConstants.PODD_ROLEMAPPEDOBJECT, null).objectURI();
                 
-                this.log.info("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
+                this.log.debug("Mapping <{}> to Role <{}> with Optional Object <{}>", newUser.getIdentifier(),
                         role.getName(), mappedObject);
                 if(mappedObject != null)
                 {

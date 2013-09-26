@@ -127,7 +127,8 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         {
             connection = this.repositoryManager.getRepository().getConnection();
             
-            RepositoryResult<Statement> statements = connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
+            RepositoryResult<Statement> statements =
+                    connection.getStatements(null, null, null, includeInferred, contexts.toArray(new Resource[] {}));
             Model model = new LinkedHashModel(Iterations.asList(statements));
             RepositoryResult<Namespace> namespaces = connection.getNamespaces();
             for(Namespace nextNs : Iterations.asSet(namespaces))
@@ -437,7 +438,7 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
                 }
             }
         }
-        this.log.info("adding import for {} at {}", nextVersionUri, maxIndex);
+        this.log.debug("adding import for {} at {}", nextVersionUri, maxIndex);
         // TODO: FIXME: This will not allow for multiple versions of a single schema
         // ontology at the same time
         importOrder.add(maxIndex, nextVersionUri);
@@ -544,22 +545,26 @@ public class PoddSchemaManagerImpl implements PoddSchemaManager
         
         final List<URI> importOrder = new ArrayList<>(schemaOntologyUris.size());
         
+        // Find current version for each schema ontology
         for(final URI nextSchemaOntologyUri : schemaOntologyUris)
         {
             this.mapCurrentVersion(model, currentVersionsMap, nextSchemaOntologyUri);
         }
         
+        // Find all versions for each schema ontology
         for(final URI nextSchemaOntologyUri : schemaOntologyUris)
         {
             this.mapAllVersions(model, currentVersionsMap, allVersionsMap, nextSchemaOntologyUri);
         }
         
+        // Map the actual schema ontologies to the correct order, based on current versions and all
+        // versions with the imports taken into account
         for(final URI nextVersionUri : schemaVersionUris)
         {
             this.mapAndSortImports(model, currentVersionsMap, allVersionsMap, importsMap, importOrder, nextVersionUri);
         }
         
-        this.log.info("importOrder: {}", importOrder);
+        this.log.debug("importOrder: {}", importOrder);
         
         this.uploadSchemaOntologiesInOrder(model, importOrder);
     }

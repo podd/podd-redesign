@@ -15,7 +15,9 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.Rio;
 import org.restlet.data.MediaType;
@@ -104,7 +106,9 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             nextRoles.addAll(Arrays.asList(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR, PoddRoles.PROJECT_ADMIN,
                     PoddRoles.PROJECT_MEMBER, PoddRoles.PROJECT_OBSERVER));
             
-            final Map<RestletUtilRole, Collection<PoddUser>> roleUserMap = this.getUsersForRole(nextRoles, artifactUri);
+            final Map<RestletUtilRole, Collection<PoddUser>> roleUserMap =
+                    ((PoddWebServiceApplication)this.getApplication()).getRealm().getUsersForRole(nextRoles,
+                            ontologyID.getOntologyIRI().toOpenRDFURI());
             
             // - add PI user label and identifier
             final Collection<PoddUser> piList = roleUserMap.get(PoddRoles.PROJECT_PRINCIPAL_INVESTIGATOR);
@@ -173,7 +177,8 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
                 PoddRoles.PROJECT_MEMBER, PoddRoles.PROJECT_OBSERVER));
         
         final Map<RestletUtilRole, Collection<PoddUser>> roleUserMap =
-                this.getUsersForRole(nextRoles, ontologyID.getOntologyIRI().toString());
+                ((PoddWebServiceApplication)this.getApplication()).getRealm().getUsersForRole(nextRoles,
+                        ontologyID.getOntologyIRI().toOpenRDFURI());
         final Map<RestletUtilRole, Collection<String>> mappings = this.translateMap(roleUserMap);
         
         final Model model = new LinkedHashModel();
@@ -213,58 +218,6 @@ public class ArtifactRolesResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
         }
         return topObjectLabels.get(0);
-    }
-    
-    /**
-     * Helper method to find PODD Users who are assigned the 'roles of interest' for the given
-     * artifact.
-     * 
-     * For security purposes, the returned Users only have their Identifier, First name, Last name,
-     * Status and Organization filled.
-     * 
-     * @param rolesOfInterest
-     * @param artifactUri
-     * @return
-     */
-    private Map<RestletUtilRole, Collection<PoddUser>> getUsersForRole(
-            final Collection<RestletUtilRole> rolesOfInterest, final String artifactUri)
-    {
-        final ConcurrentMap<RestletUtilRole, Collection<PoddUser>> userList = new ConcurrentHashMap<>();
-        
-        final PoddSesameRealm nextRealm = ((PoddWebServiceApplication)this.getApplication()).getRealm();
-        final Map<String, Collection<Role>> participantMap =
-                nextRealm.getRolesForObjectAlternate(null, PoddRdfConstants.VF.createURI(artifactUri));
-        
-        final Collection<String> keySet = participantMap.keySet();
-        for(final String userIdentifier : keySet)
-        {
-            final Collection<Role> rolesOfUser = participantMap.get(userIdentifier);
-            
-            for(final RestletUtilRole roleOfInterest : rolesOfInterest)
-            {
-                if(rolesOfUser.contains(roleOfInterest.getRole()))
-                {
-                    this.log.info("User {} has Role {} ", userIdentifier, roleOfInterest.getName());
-                    
-                    Collection<PoddUser> nextRoles = new ArrayList<PoddUser>();
-                    final Collection<PoddUser> putIfAbsent = userList.putIfAbsent(roleOfInterest, nextRoles);
-                    if(putIfAbsent != null)
-                    {
-                        nextRoles = putIfAbsent;
-                    }
-                    
-                    final PoddUser tempUser = (PoddUser)nextRealm.findUser(userIdentifier);
-                    final PoddUser userToReturn =
-                            new PoddUser(tempUser.getIdentifier(), null, tempUser.getFirstName(),
-                                    tempUser.getLastName(), null, tempUser.getUserStatus(), null,
-                                    tempUser.getOrganization(), null);
-                    
-                    nextRoles.add(userToReturn);
-                }
-            }
-        }
-        
-        return userList;
     }
     
     private Map<RestletUtilRole, Collection<String>> translateMap(final Map<RestletUtilRole, Collection<PoddUser>> input)

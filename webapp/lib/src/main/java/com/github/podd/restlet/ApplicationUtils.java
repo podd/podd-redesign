@@ -236,7 +236,7 @@ public class ApplicationUtils
         }
         else
         {
-            final Repository repository = new HTTPRepository(repositoryUrl);
+            final Repository repository = new HTTPRepository(repositoryUrl.trim());
             
             try
             {
@@ -399,8 +399,8 @@ public class ApplicationUtils
         
         // OasMemoryRealm has extensions so that getClientInfo().getUser() will contain first name,
         // last name, and email address as necessary
-        final PoddSesameRealmImpl nextRealm =
-                new PoddSesameRealmImpl(nextRepository, PoddRdfConstants.DEFAULT_USER_MANAGEMENT_GRAPH);
+        final PoddSesameRealm nextRealm =
+                new PoddSesameRealm(nextRepository, PoddRdfConstants.DEFAULT_USER_MANAGEMENT_GRAPH);
         
         // FIXME: Make this configurable
         nextRealm.setName("PODDRealm");

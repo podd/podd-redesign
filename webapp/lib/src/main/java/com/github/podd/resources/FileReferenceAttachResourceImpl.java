@@ -75,17 +75,22 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         
+        // check mandatory parameter: artifact version IRI
+        final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
+        if(versionUri == null)
+        {
+            this.log.error("Artifact Version IRI not submitted");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
+        }
+        
         this.log.info("attachFileRefHtml");
         final User user = this.getRequest().getClientInfo().getUser();
         
         this.log.info("authenticated user: {}", user);
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
-        dataModel.put("contentTemplate", "index.html.ftl");
-        dataModel.put("pageTitle", "TODO: Attach File Reference");
-        
-        final Map<String, Object> artifactDataMap = this.getRequestedArtifact();
-        dataModel.put("requestedArtifact", artifactDataMap);
+        dataModel.put("contentTemplate", "attachdatareference.html.ftl");
+        dataModel.put("pageTitle", "TODO: Attach Data Reference");
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page
@@ -93,7 +98,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
                 MediaType.TEXT_HTML, this.getPoddApplication().getTemplateConfiguration());
     }
     
-    @Post("rdf|rj|ttl")
+    @Post(":rdf|rj|ttl")
     public Representation attachFileReferenceRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
@@ -123,6 +128,42 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             verificationPolicy = DataReferenceVerificationPolicy.VERIFY;
         }
         
+        this.log.info("@Post attachFileReference ({})", entity.getMediaType().getName());
+        
+        InferredOWLOntologyID artifactMap = attachDataReference(entity, artifactUri, versionUri, verificationPolicy);
+        
+        // prepare output: Artifact ID, object URI, file reference URI
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
+        
+        final RDFWriter writer =
+                Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
+                        output);
+        try
+        {
+            writer.startRDF();
+            OntologyUtils.ontologyIDsToHandler(Arrays.asList(artifactMap), writer);
+            writer.endRDF();
+        }
+        catch(final RDFHandlerException e)
+        {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
+        }
+        
+        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
+                .getDefaultMIMEType()));
+    }
+    
+    /**
+     * @param entity
+     * @param artifactUri
+     * @param versionUri
+     * @param verificationPolicy
+     * @return
+     * @throws ResourceException
+     */
+    private InferredOWLOntologyID attachDataReference(final Representation entity, final String artifactUri,
+            final String versionUri, DataReferenceVerificationPolicy verificationPolicy) throws ResourceException
+    {
         // get input stream containing RDF statements
         InputStream inputStream = null;
         try
@@ -133,16 +174,13 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "There was a problem with the input", e);
         }
-        final RDFFormat inputFormat =
-                Rio.getParserFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML);
-        
-        this.log.info("@Post attachFileReference ({})", variant.getMediaType().getName());
+        final RDFFormat inputFormat = Rio.getParserFormatForMIMEType(entity.getMediaType().getName(), RDFFormat.RDFXML);
         
         InferredOWLOntologyID artifactMap = null;
         try
         {
             artifactMap =
-                    this.getPoddArtifactManager().attachFileReferences(
+                    this.getPoddArtifactManager().attachDataReferences(
                             ValueFactoryImpl.getInstance().createURI(artifactUri),
                             ValueFactoryImpl.getInstance().createURI(versionUri), inputStream, inputFormat,
                             verificationPolicy);
@@ -166,39 +204,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         }
         
         this.log.info("Successfully attached file reference to artifact {}", artifactMap);
-        
-        // prepare output: Artifact ID, object URI, file reference URI
-        final ByteArrayOutputStream output = new ByteArrayOutputStream(8096);
-        
-        final RDFWriter writer =
-                Rio.createWriter(Rio.getWriterFormatForMIMEType(variant.getMediaType().getName(), RDFFormat.RDFXML),
-                        output);
-        try
-        {
-            writer.startRDF();
-            OntologyUtils.ontologyIDsToHandler(Arrays.asList(artifactMap), writer);
-            writer.endRDF();
-        }
-        catch(final RDFHandlerException e)
-        {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Could not create response");
-        }
-        
-        return new ByteArrayRepresentation(output.toByteArray(), MediaType.valueOf(writer.getRDFFormat()
-                .getDefaultMIMEType()));
-    }
-    
-    // FIXME: populating dummy info for test
-    private Map<String, Object> getRequestedArtifact()
-    {
-        final Map<String, Object> testArtifactMap = new HashMap<String, Object>();
-        testArtifactMap.put("TODO: ", "Implement FileReferenceAttachResourceImpl");
-        
-        final Map<String, String> roleMap = new HashMap<String, String>();
-        roleMap.put("description", "A dummy user account for testing");
-        testArtifactMap.put("repositoryRole", roleMap);
-        
-        return testArtifactMap;
+        return artifactMap;
     }
     
 }
