@@ -49,6 +49,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -1032,6 +1033,47 @@ public abstract class AbstractPoddArtifactManagerTest
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES, model.size());
     }
     
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, MetadataPolicy, InferredOWLOntologyID)}
+     * .
+     * 
+     * Test to expose issue #96. poddScience:ProjectPlan only has the two default properties of
+     * title and description. Issue also affected 'Process' and 'Protocol'.
+     */
+    @Test
+    public final void testExportObjectMetadataForProjectPlan() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        
+        final URI objectType = PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process");
+        
+        this.testArtifactManager.exportObjectMetadata(objectType, output, RDFFormat.TURTLE,
+                false, MetadataPolicy.EXCLUDE_CONTAINS, null);
+        
+        // parse output into a Model
+        final ByteArrayInputStream bin = new ByteArrayInputStream(output.toByteArray());
+        final RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE);
+        final Model model = new LinkedHashModel();
+        rdfParser.setRDFHandler(new StatementCollector(model));
+        rdfParser.parse(bin, "");
+
+        // verify:
+        Assert.assertEquals("Not the expected number of statements", 18, model.size());
+        Assert.assertTrue("Missing statement: 'Process a OWL:Class'", model.contains(objectType, RDF.TYPE, OWL.CLASS));
+        Assert.assertTrue("No label for rdfs:label", model.contains(RDFS.LABEL, RDFS.LABEL, null));
+        Assert.assertTrue("No label for rdfs:comment", model.contains(RDFS.COMMENT, RDFS.LABEL, null));
+    }
+
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, MetadataPolicy, InferredOWLOntologyID)}
