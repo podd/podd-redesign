@@ -2917,6 +2917,17 @@ podd.updateErrorTable = function(column1, column2) {
  * properties without labels should have them added.
  */
 podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
+	
+    // check objectType is an owl:Class and print a warning otherwise
+    var classQuery = $.rdf({
+        databank : nextSchemaDatabank
+    })
+    .where('<' + objectType + '> rdf:type owl:Class');
+    var classBindings = classQuery.select();
+    if (classBindings.length == 0) {
+    	podd.debug('WARNING: <' + objectType + '> is NOT an owl:Class');
+    }
+	
     // retrieve weighted property list
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
