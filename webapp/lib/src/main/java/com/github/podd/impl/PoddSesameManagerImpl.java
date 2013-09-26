@@ -53,6 +53,7 @@ import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.resultio.helpers.QueryResultCollector;
 import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryResult;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ import com.github.podd.api.MetadataPolicy;
 import com.github.podd.api.PoddSesameManager;
 import com.github.podd.exception.UnmanagedArtifactIRIException;
 import com.github.podd.exception.UnmanagedSchemaIRIException;
+import com.github.podd.utils.DebugUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddObjectLabelImpl;
@@ -1053,6 +1055,19 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             return results;
         }
         
+        // - check if the objectType is known at all (i.e. exists somewhere in the graphs)
+        final boolean objectTypeExists =
+                repositoryConnection.getStatements(objectType, null, null, false, contexts).hasNext()
+                        || repositoryConnection.getStatements(null, null, objectType, false, contexts).hasNext();
+        if(!objectTypeExists)
+        {
+            this.log.info("Object type <{}> does not exist", objectType);
+            return results;
+        }        
+        
+        // - identify it as an owl:Class
+        results.add(objectType, RDF.TYPE, OWL.CLASS);
+        
         // - find all Properties and their ranges
         
         final Set<Value> properties = new HashSet<Value>();
@@ -1064,8 +1079,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         final StringBuilder owlRestrictionQuery = new StringBuilder(1024);
         
         owlRestrictionQuery.append("CONSTRUCT { ");
-        owlRestrictionQuery
-                .append(" ?objectType <" + RDF.TYPE.stringValue() + "> <" + OWL.CLASS.stringValue() + "> . ");
         owlRestrictionQuery.append(" ?objectType <" + RDFS.SUBCLASSOF.stringValue() + "> ?x . ");
         owlRestrictionQuery.append(" ?x <" + RDF.TYPE.stringValue() + "> <" + OWL.RESTRICTION.stringValue() + "> . ");
         owlRestrictionQuery.append(" ?x <" + OWL.ONPROPERTY.stringValue() + "> ?propertyUri . ");
@@ -1173,15 +1186,6 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         properties.addAll(rdfsQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
         
         /*
-         * If no properties could be found so far, return the empty Model. Continuing further
-         * results in erroneously adding statements about RDFS:Label and RDFS:Comment.
-         */
-        if(properties.isEmpty())
-        {
-            return results;
-        }
-        
-        /*
          * add statements for annotation properties RDFS:Label and RDFS:Comment
          */
         if(containsPropertyPolicy != MetadataPolicy.ONLY_CONTAINS)
@@ -1224,7 +1228,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             results.addAll(annotationQueryResults);
             properties.addAll(annotationQueryResults.filter(null, OWL.ONPROPERTY, null).objects());
         }
-        
+
         Set<URI> propertyUris = new LinkedHashSet<>();
         for(final Value property : properties)
         {
@@ -1234,41 +1238,41 @@ public class PoddSesameManagerImpl implements PoddSesameManager
             }
         }
         // -- for each property, get meta-data about it
-        
-        final StringBuilder sb2 = new StringBuilder(1024);
-        
-        sb2.append("CONSTRUCT { ");
-        sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
-        sb2.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
-        sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
-                + "> ?propertyDisplayType . ");
-        sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight . ");
-        
-        sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                + "> ?propertyDoNotDisplay . ");
-        
-        sb2.append("} WHERE {");
-        
-        sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
-        
-        sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
-                + "> ?propertyDisplayType . }  ");
-        
-        sb2.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . } ");
-        
-        sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue()
-                + "> ?propertyWeight . } ");
-        
-        if(includeDoNotDisplayProperties)
-        {
-            sb2.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
-                    + "> ?propertyDoNotDisplay . } ");
-        }
-        
-        sb2.append("}");
-        
         if(!propertyUris.isEmpty())
         {
+            
+            final StringBuilder sb2 = new StringBuilder(1024);
+            
+            sb2.append("CONSTRUCT { ");
+            sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+            sb2.append(" ?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . ");
+            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
+                    + "> ?propertyDisplayType . ");
+            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue() + "> ?propertyWeight . ");
+            
+            sb2.append(" ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                    + "> ?propertyDoNotDisplay . ");
+            
+            sb2.append("} WHERE {");
+            
+            sb2.append(" ?propertyUri <" + RDF.TYPE.stringValue() + "> ?propertyType . ");
+            
+            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_DISPLAY_TYPE.stringValue()
+                    + "> ?propertyDisplayType . }  ");
+            
+            sb2.append(" OPTIONAL {?propertyUri <" + RDFS.LABEL.stringValue() + "> ?propertyLabel . } ");
+            
+            sb2.append(" OPTIONAL {?propertyUri <" + PoddRdfConstants.PODD_BASE_WEIGHT.stringValue()
+                    + "> ?propertyWeight . } ");
+            
+            if(includeDoNotDisplayProperties)
+            {
+                sb2.append(" OPTIONAL { ?propertyUri <" + PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY.stringValue()
+                        + "> ?propertyDoNotDisplay . } ");
+            }
+            
+            sb2.append("}");
+            
             sb2.append(" VALUES (?propertyUri) { ");
             
             for(URI nextProperty : propertyUris)
@@ -1278,13 +1282,13 @@ public class PoddSesameManagerImpl implements PoddSesameManager
                 sb2.append(" ) ");
             }
             sb2.append(" } ");
+            
+            String sb2String = sb2.toString();
+            
+            final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
+            final Model queryResults2 = RdfUtility.executeGraphQuery(graphQuery2, contexts);
+            results.addAll(queryResults2);
         }
-        
-        String sb2String = sb2.toString();
-        
-        final GraphQuery graphQuery2 = repositoryConnection.prepareGraphQuery(QueryLanguage.SPARQL, sb2String);
-        final Model queryResults2 = RdfUtility.executeGraphQuery(graphQuery2, contexts);
-        results.addAll(queryResults2);
         
         // - add cardinality value
         final Map<URI, URI> cardinalityValues =
@@ -1353,7 +1357,7 @@ public class PoddSesameManagerImpl implements PoddSesameManager
         }
         
         results.addAll(this.getInstancesOf(nextRangeTypeURIs, repositoryConnection, contexts));
-        
+
         return results;
     }
     

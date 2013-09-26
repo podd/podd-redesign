@@ -1199,7 +1199,7 @@ public abstract class AbstractPoddSesameManagerTest
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), true,
                                 MetadataPolicy.INCLUDE_ALL, 115, 14, 4 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 0, -1, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 1, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
                                 MetadataPolicy.INCLUDE_ALL, 61, 7, 0 },

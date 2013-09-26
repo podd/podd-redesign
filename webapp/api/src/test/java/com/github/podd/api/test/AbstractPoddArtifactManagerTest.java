@@ -311,12 +311,23 @@ public abstract class AbstractPoddArtifactManagerTest
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
                                 MetadataPolicy.ONLY_CONTAINS, 12, 2, 0 },
                         
+                        // to expose issue #96 - add child Process has no fields
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
+                                MetadataPolicy.INCLUDE_ALL, 26, 4, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), true,
+                                MetadataPolicy.INCLUDE_ALL, 59, 9, 4 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
+                                MetadataPolicy.ONLY_CONTAINS, 6, 1, 0 },
+                        { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
+                                MetadataPolicy.EXCLUDE_CONTAINS, 18, 3, 0 },
+                                
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
                                 MetadataPolicy.INCLUDE_ALL, 77, 10, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
                                 MetadataPolicy.INCLUDE_ALL, 110, 15, 4 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 12, 2, 0 }, };
+                                MetadataPolicy.ONLY_CONTAINS, 12, 2, 0 }, 
+                                };
         
         for(final Object[] element : testData)
         {
