@@ -135,13 +135,6 @@ public abstract class PoddWebServiceApplication extends Application
     public abstract void setRealm(PoddSesameRealm realm);
     
     /**
-     * Sets the realm which is used to manage users and roles.
-     * 
-     * @param nextRealm
-     */
-    public abstract void setRealm(RestletUtilSesameRealm nextRealm);
-    
-    /**
      * Set a new Freemarker Template Configuration for this application.
      * 
      * @param nextFreemarkerConfiguration

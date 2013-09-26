@@ -21,6 +21,7 @@ package com.github.podd.api;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.openrdf.OpenRDFException;
@@ -107,10 +108,10 @@ public interface PoddSesameManager
      */
     Set<InferredOWLOntologyID> getAllCurrentSchemaOntologyVersions(RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
-
+    
     /**
-     * Gets all schema ontologies configured in this PODD server. This includes current as well as previous
-     * versions of ontologies.
+     * Gets all schema ontologies configured in this PODD server. This includes current as well as
+     * previous versions of ontologies.
      * 
      * @param repositoryConnection
      * @param schemaManagementGraph
@@ -152,7 +153,7 @@ public interface PoddSesameManager
      *            The artifact to which the object under consideration belongs
      * @param objectUri
      *            The object under consideration
-     * @param propertyUri
+     * @param propertyUris
      *            The property under consideration
      * @param repositoryConnection
      * @return a URI representing the cardinality value or NULL if no cardinality statements were
@@ -161,10 +162,10 @@ public interface PoddSesameManager
      * 
      * @since 03/05/2013
      */
-    URI getCardinalityValue(InferredOWLOntologyID artifactID, URI objectUri, URI propertyUri,
+    Map<URI, URI> getCardinalityValues(InferredOWLOntologyID artifactID, URI objectUri, Collection<URI> propertyUris,
             RepositoryConnection repositoryConnection) throws OpenRDFException;
     
-    URI getCardinalityValue(URI objectUri, URI propertyUri, boolean findFromType,
+    Map<URI, URI> getCardinalityValues(URI objectUri, Collection<URI> propertyUris, boolean findFromType,
             RepositoryConnection repositoryConnection, URI... contexts) throws OpenRDFException;
     
     /**
@@ -187,7 +188,7 @@ public interface PoddSesameManager
     InferredOWLOntologyID getCurrentArtifactVersion(final IRI ontologyIRI,
             final RepositoryConnection repositoryConnection, final URI managementGraph) throws OpenRDFException,
         UnmanagedArtifactIRIException;
-
+    
     /**
      * Returns a {@link Set} containing the Object URIs of the given object's children. An empty Set
      * is returned if the given object does not have any children.
@@ -200,7 +201,7 @@ public interface PoddSesameManager
      * @throws OpenRDFException
      */
     Set<URI> getChildObjects(URI objectUri, RepositoryConnection conn, URI... contexts) throws OpenRDFException;
-
+    
     /**
      * Returns current version details of an ontology which has the given IRI as the Ontology IRI or
      * Version IRI.
@@ -449,7 +450,7 @@ public interface PoddSesameManager
      * @return
      * @throws OpenRDFException
      */
-    boolean isPublished(OWLOntologyID ontologyID, RepositoryConnection repositoryConnection, final URI context)
+    boolean isPublished(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection, final URI context)
         throws OpenRDFException;
     
     /**
@@ -473,17 +474,22 @@ public interface PoddSesameManager
      * Sets the given Ontology IRI to be published. This restricts the ability to publish the
      * ontology again.
      * 
+     * @param isPublished
+     *            True to set the artifact as published, and false to set as unpublished.
      * @param ontologyID
      *            The {@link InferredOWLOntologyID} identifying the ontology that needs to be
      *            published
      * @param repositoryConnection
      * @param artifactManagementGraph
+     *            The management graph containing metadata about the artifact.
+     * @return The new {@link InferredOWLOntologyID} for the resulting artifact.
      * @throws OpenRDFException
      * @throws UnmanagedArtifactIRIException
      *             If this is not a managed ontology
      */
-    void setPublished(final InferredOWLOntologyID ontologyID, final RepositoryConnection repositoryConnection,
-            final URI artifactManagementGraph) throws OpenRDFException, UnmanagedArtifactIRIException;
+    InferredOWLOntologyID setPublished(boolean isPublished, InferredOWLOntologyID ontologyID,
+            RepositoryConnection repositoryConnection, URI artifactManagementGraph) throws OpenRDFException,
+        UnmanagedArtifactIRIException;
     
     /**
      * This method adds information to the Schema Ontology management graph, and updates the links
@@ -529,5 +535,5 @@ public interface PoddSesameManager
     
     URI[] versionAndSchemaContexts(InferredOWLOntologyID ontologyID, RepositoryConnection repositoryConnection,
             URI schemaManagementGraph) throws OpenRDFException;
-
+    
 }

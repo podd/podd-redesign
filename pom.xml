@@ -87,7 +87,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<restlet.version>2.1.1</restlet.version>
 		<restletutils.version>0.3-SNAPSHOT</restletutils.version>
-		<sesame.version>2.7.6</sesame.version>
+		<sesame.version>2.7.7</sesame.version>
 		<sesame-rio-extensions.version>0.4</sesame-rio-extensions.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<sshj.version>0.9.0</sshj.version>
@@ -344,6 +344,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.restlet.jee</groupId>
+				<artifactId>org.restlet.ext.slf4j</artifactId>
+				<version>${restlet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.restlet.jee</groupId>
 				<artifactId>org.restlet.ext.freemarker</artifactId>
 				<version>${restlet.version}</version>
 			</dependency>
@@ -450,6 +455,26 @@
 				<groupId>org.semarglproject</groupId>
 				<artifactId>semargl-sesame</artifactId>
 				<version>0.6.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-queryrender</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.freemarker</groupId>
+				<artifactId>freemarker</artifactId>
+				<version>2.3.19</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-queryresultio-api</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-rio-nquads</artifactId>
+				<version>${sesame.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

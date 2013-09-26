@@ -95,11 +95,11 @@ public class DeleteObjectResourceImpl extends AbstractPoddResourceImpl
             
             this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
             
-            this.log.info("requesting delete object: {}, {}, {} with cascade {}", artifactUri, versionUri, objectUri,
+            this.log.debug("requesting delete object: {}, {}, {} with cascade {}", artifactUri, versionUri, objectUri,
                     cascade);
             
             final User user = this.getRequest().getClientInfo().getUser();
-            this.log.info("authenticated user: {}", user);
+            this.log.debug("authenticated user: {}", user);
             
             final InferredOWLOntologyID updatedOntologyID =
                     this.getPoddArtifactManager().deleteObject(artifactUri, versionUri, objectUri, cascade);

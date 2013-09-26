@@ -52,10 +52,10 @@ import com.github.podd.utils.PoddWebConstants;
  */
 public class PoddCSIRORestletComponent extends Component
 {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
     static
     {
+        System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
+        
         // Optionally remove existing handlers attached to j.u.l root logger
         SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
         
@@ -63,6 +63,8 @@ public class PoddCSIRORestletComponent extends Component
         // the initialization phase of your application
         SLF4JBridgeHandler.install();
     }
+    
+    private static final Logger log = LoggerFactory.getLogger(PoddCSIRORestletComponent.class);
     
     /**
      * 

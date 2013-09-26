@@ -49,7 +49,7 @@ public class GetSchemaResourceImpl extends AbstractPoddResourceImpl
     @Get(":rdf|rj|json|ttl")
     public Representation getSchemaRdf(final Variant variant) throws ResourceException
     {
-        this.log.info("getSchemaRdf");
+        this.log.debug("getSchemaRdf");
         
         try
         {
@@ -74,7 +74,7 @@ public class GetSchemaResourceImpl extends AbstractPoddResourceImpl
                 }
             }
             
-            this.log.info("requesting get schema ({}): {} {} {}", variant.getMediaType().getName(), schemaString,
+            this.log.debug("requesting get schema ({}): {} {} {}", variant.getMediaType().getName(), schemaString,
                     versionString, schemaPath);
             
             // TODO: Is authentication required for resolving schemas?
@@ -83,7 +83,7 @@ public class GetSchemaResourceImpl extends AbstractPoddResourceImpl
             // completed checking authorization
             
             // final User user = this.getRequest().getClientInfo().getUser();
-            // this.log.info("authenticated user: {}", user);
+            // this.log.debug("authenticated user: {}", user);
             
             InferredOWLOntologyID ontologyID = null;
             

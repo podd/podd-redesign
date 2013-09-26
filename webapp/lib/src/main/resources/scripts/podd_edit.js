@@ -39,6 +39,9 @@ var DUMMY_Datetime = '1970-01-01T00:00:00';
 
 var PROPERTY_HAS_PI = 'http://purl.org/podd/ns/poddBase#hasPrincipalInvestigator';
 
+var TYPE_DATA_REPOSITORY = 'http://purl.org/podd/ns/dataRepository#DataRepository';
+var TYPE_SSH_DATA_REPOSITORY = 'http://purl.org/podd/ns/dataRepository#SSHFileRepository';
+
 // --------------------------------
 
 /**
@@ -70,20 +73,21 @@ podd.addAutoCompleteHandler = function(
 /* object */artifactUri,
 /* boolean */isUserSearch) {
 
-	autoComplete.autocomplete({
+    autoComplete.autocomplete({
         delay : 500, // milliseconds
         minLength : 2, // min length to trigger
-        
+
         source : function(request, callbackFunction) {
-        	if (isUserSearch == true) {
-        		podd.debug('Search for User: ' + request.term);
-        		podd.searchUserService(request, callbackFunction);
-        	} else {
-        		podd.debug('Search for Resource: ' + request.term);
-	            request.searchTypes = searchTypes;
-	            request.artifactUri = artifactUri;
-	            podd.searchOntologyService(request, callbackFunction);
-        	}
+            if (isUserSearch == true) {
+                podd.debug('Search for User: ' + request.term);
+                podd.searchUserService(request, callbackFunction);
+            }
+            else {
+                podd.debug('Search for Resource: ' + request.term);
+                request.searchTypes = searchTypes;
+                request.artifactUri = artifactUri;
+                podd.searchOntologyService(request, callbackFunction);
+            }
         },
 
         focus : function(event, ui) {
@@ -95,12 +99,12 @@ podd.addAutoCompleteHandler = function(
         select : function(event, ui) {
             podd.debug('Option selected "' + ui.item.label + '" with value "' + ui.item.value + '".');
             $(this).val(ui.item.label);
-			hiddenValueElement.val(ui.item.value);
+            hiddenValueElement.val(ui.item.value);
             return false;
         },
 
         blur : function(event, ui) {
-        	podd.debug('***ERROR*** - autocomplete blur event should be handled by textFieldBlurHandler');
+            podd.debug('***ERROR*** - autocomplete blur event should be handled by textFieldBlurHandler');
         }
     });
 };
@@ -117,62 +121,63 @@ podd.addAutoCompleteHandler = function(
  * @param hiddenRelationsip
  *            Hidden input where the selected child relationship is set
  */
-podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType,
-		hiddenRelationship) {
+podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType, hiddenRelationship) {
 
-	dropDown.change(function(event) {
-		var option = $('option:selected', this);
+    dropDown.change(function(event) {
+        var option = $('option:selected', this);
 
-		if (typeof option !== 'undefined') {
-			var propertyUri = '' + option.val();
-			var targetObjectType = '' + option.attr('targetobject');
+        if (typeof option !== 'undefined') {
+            var propertyUri = '' + option.val();
+            var targetObjectType = '' + option.attr('targetobject');
 
-			podd.debug('Selected ' + targetObjectType + ' and ' + propertyUri);
+            podd.debug('Selected ' + targetObjectType + ' and ' + propertyUri);
 
-			hiddenRelationship.val(propertyUri);
-			hiddenChildType.val(targetObjectType);
-		} else {
-			podd.debug('option was undefined');
-		}
-	});
+            hiddenRelationship.val(propertyUri);
+            hiddenChildType.val(targetObjectType);
+        }
+        else {
+            podd.debug('option was undefined');
+        }
+    });
 
-	theLink.click(function(event) {
-		
-		$('#dialog').dialog('close');
-		
-		var propertyUri = hiddenRelationship.val();
-		var targetObjectType = hiddenChildType.val();
-		podd.debug('Clicked ' + $(this).attr('name') + ' Relationship = '
-				+ propertyUri + ' and object type = ' + targetObjectType);
+    theLink.click(function(event) {
 
-		var errors = [];
-		if (typeof propertyUri === 'undefined' || propertyUri.length === 0) {
-			errors.push('<p>A Parent-Child relationship should be selected</p>');
-		}
-		if (typeof targetObjectType === 'undefined'
-				|| targetObjectType.length === 0) {
-			errors.push('<p>A child type should be selected</p>');
-		}
+        $('#dialog').dialog('close');
 
-		if (errors.length > 0) {
-			$.each(errors, function(index, value) {
-				podd.updateErrorMessageList(value);
-			});
-		} else {
-			var requestUrl = podd.baseUrl + '/artifact/addobject' +
-			// artifact
-			'?artifacturi=' + podd.uriEncode(podd.getCurrentArtifactIri()) +
-			// parent object
-			'&parenturi=' + podd.uriEncode(podd.getCurrentObjectUri()) +
-			// type of child object
-			'&objecttypeuri=' + podd.uriEncode(targetObjectType) +
-			// relationship to child object
-			'&parentpredicateuri=' + podd.uriEncode(propertyUri);
+        var propertyUri = hiddenRelationship.val();
+        var targetObjectType = hiddenChildType.val();
+        podd.debug('Clicked ' + $(this).attr('name') + ' Relationship = ' + propertyUri + ' and object type = '
+                + targetObjectType);
 
-			// TODO: turn this into an AJAX call which listens for errors and then redirect
-			window.location.href = requestUrl;
-		}
-	});
+        var errors = [];
+        if (typeof propertyUri === 'undefined' || propertyUri.length === 0) {
+            errors.push('<p>A Parent-Child relationship should be selected</p>');
+        }
+        if (typeof targetObjectType === 'undefined' || targetObjectType.length === 0) {
+            errors.push('<p>A child type should be selected</p>');
+        }
+
+        if (errors.length > 0) {
+            $.each(errors, function(index, value) {
+                podd.updateErrorMessageList(value);
+            });
+        }
+        else {
+            var requestUrl = podd.baseUrl + '/artifact/addobject' +
+            // artifact
+            '?artifacturi=' + podd.uriEncode(podd.getCurrentArtifactIri()) +
+            // parent object
+            '&parenturi=' + podd.uriEncode(podd.getCurrentObjectUri()) +
+            // type of child object
+            '&objecttypeuri=' + podd.uriEncode(targetObjectType) +
+            // relationship to child object
+            '&parentpredicateuri=' + podd.uriEncode(propertyUri);
+
+            // TODO: turn this into an AJAX call which listens for errors and
+            // then redirect
+            window.location.href = requestUrl;
+        }
+    });
 };
 
 /**
@@ -200,41 +205,42 @@ podd.addChildObjectHandler = function(theLink, dropDown, hiddenChildType,
  * </ul>
  */
 podd.addCloneHandler = function(input, params) {
-	// create local variables for parameters
-	var parentList = params.parentList;
-	var link = params.link;
-	var nextField = params.nextField;
-	var nextArtifactDatabank = params.artifactDatabank;
-	var hiddenValueElement = params.hiddenValueElement;
-	var isAutoComplete = params.isAutoComplete;
-	var searchTypes = params.searchTypes;
-	var artifactUri = params.artifactUri;
-	var isNew = params.isNew;
-	
-	// get on with adding the handler
+    // create local variables for parameters
+    var parentList = params.parentList;
+    var link = params.link;
+    var nextField = params.nextField;
+    var nextArtifactDatabank = params.artifactDatabank;
+    var hiddenValueElement = params.hiddenValueElement;
+    var isAutoComplete = params.isAutoComplete;
+    var searchTypes = params.searchTypes;
+    var artifactUri = params.artifactUri;
+    var isNew = params.isNew;
+
+    // get on with adding the handler
     if (typeof link !== 'undefined') {
-    	
+
         link.click(function() {
-        	podd.debug('Clicked (+) button to Clone');
+            podd.debug('Clicked (+) button to Clone');
             var clonedField = input.clone(false);
 
             // make value empty
             clonedField.val('');
             if (typeof hiddenValueElement !== 'undefined') {
-            	hiddenValueElement.val('');
+                hiddenValueElement.val('');
             }
-            
-            podd.addTextFieldBlurHandler(clonedField, hiddenValueElement, nextField.propertyUri, undefined, nextField.propertyType, 
-                    nextArtifactDatabank, true);
-            
+
+            podd.addTextFieldBlurHandler(clonedField, hiddenValueElement, nextField.propertyUri, undefined,
+                    nextField.propertyType, nextArtifactDatabank, true);
+
             if (nextField.displayType === DISPLAY_ShortText) {
-            	podd.addEnterKeyHandler(clonedField);
+                podd.addEnterKeyHandler(clonedField);
             }
-            
+
             if (isAutoComplete) {
-    			podd.addAutoCompleteHandler(clonedField, hiddenValueElement, nextArtifactDatabank, searchTypes, artifactUri, false);
+                podd.addAutoCompleteHandler(clonedField, hiddenValueElement, nextArtifactDatabank, searchTypes,
+                        artifactUri, false);
             }
-            
+
             var li = $("<li>");
             li.append(clonedField);
             parentList.append(li);
@@ -243,30 +249,28 @@ podd.addCloneHandler = function(input, params) {
 };
 
 /**
- * FIXME - when Enter is pressed to select an item from a browser cached list of values
- * submit should not be invoked.
+ * FIXME - when Enter is pressed to select an item from a browser cached list of
+ * values submit should not be invoked.
  * 
  */
 podd.addEnterKeyHandler = function(textField) {
-	
+
     textField.keydown(function(event) {
-    	
-		var code = event.keyCode || event.which; 
-		if (code  === 13) {               
-			event.preventDefault();
-/*			
-			podd.debug('Enter pressed! event type=' + event.type);
-			
-			podd.debug('1. invoke blur()');
-			$(this).blur();
-			
-			podd.debug('2 invoke submit()');
-			$("#editObjectForm").submit();
-*/			
-		   	return false;
-		}
+
+        var code = event.keyCode || event.which;
+        if (code === 13) {
+            event.preventDefault();
+            /*
+             * podd.debug('Enter pressed! event type=' + event.type);
+             * 
+             * podd.debug('1. invoke blur()'); $(this).blur();
+             * 
+             * podd.debug('2 invoke submit()'); $("#editObjectForm").submit();
+             */
+            return false;
+        }
     });
-    
+
 };
 
 /**
@@ -292,13 +296,13 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextFieldValue, n
     });
 
     select.attr('datatype', nextField.propertyRange);
-    
+
     var defaultOption = $('<option>', {
         value : '',
         text : 'Please Select'
     });
     select.append(defaultOption);
-    
+
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
     })
@@ -327,7 +331,7 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextFieldValue, n
         .optional('?pValue rdfs:label ?pDisplayValue');
         bindings = myQuery.select();
     }
-    
+
     $.each(bindings, function(index, value) {
 
         var optionValue = value.pValue.value;
@@ -359,11 +363,13 @@ podd.addFieldDropDownListNonAutoComplete = function(nextField, nextFieldValue, n
  * Construct an HTML input field using the given values.
  * 
  * @param nextField
- * 			{object} Contains metadata to create the Input field
+ *            {object} Contains metadata to create the Input field
  * @param nextFieldValue
- * 			{object} Contains a pre-existing value which should be displayed in the Input field
+ *            {object} Contains a pre-existing value which should be displayed
+ *            in the Input field
  * @param inputType
- * 			{string} The type of Input field (e.g. 'text', 'checkbox', 'hidden')
+ *            {string} The type of Input field (e.g. 'text', 'checkbox',
+ *            'hidden')
  */
 podd.addFieldInputText = function(nextField, nextFieldValue, inputType) {
 
@@ -380,12 +386,13 @@ podd.addFieldInputText = function(nextField, nextFieldValue, inputType) {
 
     if (inputType === 'checkbox' || inputType === 'hidden') {
         input.val(nextFieldValue.valueUri);
-    } else {
-    	input.val(nextFieldValue.displayValue);
+    }
+    else {
+        input.val(nextFieldValue.displayValue);
     }
 
     input.attr('datatype', nextField.propertyRange);
-    
+
     return input;
 };
 
@@ -393,13 +400,14 @@ podd.addFieldInputText = function(nextField, nextFieldValue, inputType) {
  * Construct an HTML TextArea element using the given values.
  * 
  * @param nextField
- * 			{object} Contains metadata to create the Input field
+ *            {object} Contains metadata to create the Input field
  * @param nextFieldValue
- * 			{object} Contains a pre-existing value which should be displayed in the TextArea field
+ *            {object} Contains a pre-existing value which should be displayed
+ *            in the TextArea field
  * @param noOfColumns
- * 			{number} Columns in the TextArea
+ *            {number} Columns in the TextArea
  * @param noOfRows
- * 			{number} Rows in the TextArea
+ *            {number} Rows in the TextArea
  */
 podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRows) {
 
@@ -419,55 +427,55 @@ podd.addFieldTextArea = function(nextField, nextFieldValue, noOfColumns, noOfRow
  * TODO
  */
 podd.addElementToList = function(list, roleUri, userLabel, userIdentifier) {
-	podd.debug('[addElementToList] add item: ' + userIdentifier + ' to Role ' + roleUri);
+    podd.debug('[addElementToList] add item: ' + userIdentifier + ' to Role ' + roleUri);
 
-	var deleteLink = $('<a>', {
-		name : roleUri,
-		text : 'delete',
-		href : '',
-		class : 'deleteLinkStatic'
-	});
-	podd.addListItemDeleteHandler(deleteLink);
+    var deleteLink = $('<a>', {
+        name : roleUri,
+        text : 'delete',
+        href : '',
+        class : 'deleteLinkStatic'
+    });
+    podd.addListItemDeleteHandler(deleteLink);
 
-	var span = $('<span>', {
-		text : userLabel + ' ',
-		value : userIdentifier,
-	});
+    var span = $('<span>', {
+        text : userLabel + ' ',
+        value : userIdentifier,
+    });
 
-	span.append(deleteLink);
+    span.append(deleteLink);
 
-	var li = $('<li>');
-	li.append(span);
-	list.append(li);
+    var li = $('<li>');
+    li.append(span);
+    list.append(li);
 
-	podd.debug('[addElementToList] completed');
+    podd.debug('[addElementToList] completed');
 };
 
 /**
  * TODO
  */
 podd.addListItemDeleteHandler = function(deleteLink) {
-	
-	deleteLink.click(function(event) {
-     	var userIdentifier = $(this).closest('span').attr('value');
-     	var roleUri = $(this).attr('name');
-		
-    	podd.debug('Remove: ' + userIdentifier + ' from Role <' + roleUri + '> for project ' + podd.artifactIri);
-    	
-    	podd.submitUserRoleDelete(userIdentifier, roleUri, podd.artifactIri);
-     	
-    	// remove User from list
-    	var array = podd.roledata[roleUri];
-    	array.splice( $.inArray(userIdentifier, array), 1 );
-    	
-     	var liToRemove = $(this).closest('li');
-		podd.debug('Going to remove ' + liToRemove);	     	
-     	liToRemove.fadeOut(400, function(){
-     		liToRemove.remove();
-    	});
-     	
-    	return false;
-	} );
+
+    deleteLink.click(function(event) {
+        var userIdentifier = $(this).closest('span').attr('value');
+        var roleUri = $(this).attr('name');
+
+        podd.debug('Remove: ' + userIdentifier + ' from Role <' + roleUri + '> for project ' + podd.artifactIri);
+
+        podd.submitUserRoleDelete(userIdentifier, roleUri, podd.artifactIri);
+
+        // remove User from list
+        var array = podd.roledata[roleUri];
+        array.splice($.inArray(userIdentifier, array), 1);
+
+        var liToRemove = $(this).closest('li');
+        podd.debug('Going to remove ' + liToRemove);
+        liToRemove.fadeOut(400, function() {
+            liToRemove.remove();
+        });
+
+        return false;
+    });
 };
 
 /**
@@ -490,35 +498,36 @@ podd.addListItemDeleteHandler = function(deleteLink) {
  *            {string} Previous Principal Investigator's User Identifier
  */
 podd.addPiBlurHandler = function(input, hiddenValueElement, artifactIri, roleUri, originalIdentifier) {
-	
+
     input.blur(function(event) {
-    	var newUserLabel = $(this).val();
+        var newUserLabel = $(this).val();
         var newUserIdentifier = '' + $(this).val();
         if (typeof hiddenValueElement !== undefined && newUserIdentifier !== '') {
-        	newUserIdentifier = hiddenValueElement.val();
+            newUserIdentifier = hiddenValueElement.val();
         }
-        
-        if (originalIdentifier !== newUserIdentifier  && newUserIdentifier !== '') {
-        	podd.debug("[blur] triggered with new value: " + newUserIdentifier + " was " + originalIdentifier);
-        	
-        	// - remove previous PI
-        	if (originalIdentifier !== '') {
-        		podd.submitUserRoleDelete(originalIdentifier, roleUri, artifactIri);
-        	}
-        	
-        	// - add new PI
+
+        if (originalIdentifier !== newUserIdentifier && newUserIdentifier !== '') {
+            podd.debug("[blur] triggered with new value: " + newUserIdentifier + " was " + originalIdentifier);
+
+            // - remove previous PI
+            if (originalIdentifier !== '') {
+                podd.submitUserRoleDelete(originalIdentifier, roleUri, artifactIri);
+            }
+
+            // - add new PI
             podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
-            
+
             // - update content of hidden Input and label
-    		$('#pi_label_div span').text(newUserLabel + ' ');
+            $('#pi_label_div span').text(newUserLabel + ' ');
             hiddenValueElement.val(newUserIdentifier);
-        	
-        } else {
-        	podd.debug("[blur] no change in value: was " + originalIdentifier + ", is " + newUserIdentifier);
+
+        }
+        else {
+            podd.debug("[blur] no change in value: was " + originalIdentifier + ", is " + newUserIdentifier);
         }
         // hide Input and show Label DIV
-		$('#pi_input_div').hide();
-		$('#pi_label_div').show();
+        $('#pi_input_div').hide();
+        $('#pi_label_div').show();
     });
 };
 
@@ -530,7 +539,7 @@ podd.addPiBlurHandler = function(input, hiddenValueElement, artifactIri, roleUri
  * @param hiddenValueElement
  *            {object} Hidden Input field associated with the blurred field
  * @param list
- * 			  {object} List to be updated with participant details
+ *            {object} List to be updated with participant details
  * @param artifactIri
  *            {string} Artifact whose Roles are being managed
  * @param roleUri
@@ -540,27 +549,29 @@ podd.addPiBlurHandler = function(input, hiddenValueElement, artifactIri, roleUri
  * 
  */
 podd.addProjectRoleBlurHandler = function(input, hiddenValueElement, list, artifactIri, roleUri) {
-	
+
     input.blur(function(event) {
         var newUserIdentifier = hiddenValueElement.val();
-        
+
         if (typeof newUserIdentifier !== undefined && newUserIdentifier !== '') {
-        	podd.debug("[blur] triggered with new value: " + newUserIdentifier);
-        	
-        	if ($.inArray(newUserIdentifier, podd.roledata[roleUri]) < 0) {
-        		
-	        	// - add new Role user
-	            podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
-	            
-	            podd.addElementToList(list, roleUri, $(this).val(), newUserIdentifier);
-	            podd.roledata[roleUri].push(newUserIdentifier);
-        	} else {
-        		podd.debug(newUserIdentifier + ' already exists in list of ' + roleUri);
-        	}
-        } else {
-        	podd.debug("[blur] value is empty:  " + newUserIdentifier);
+            podd.debug("[blur] triggered with new value: " + newUserIdentifier);
+
+            if ($.inArray(newUserIdentifier, podd.roledata[roleUri]) < 0) {
+
+                // - add new Role user
+                podd.submitUserRoleAdd(newUserIdentifier, roleUri, artifactIri);
+
+                podd.addElementToList(list, roleUri, $(this).val(), newUserIdentifier);
+                podd.roledata[roleUri].push(newUserIdentifier);
+            }
+            else {
+                podd.debug(newUserIdentifier + ' already exists in list of ' + roleUri);
+            }
         }
-        
+        else {
+            podd.debug("[blur] value is empty:  " + newUserIdentifier);
+        }
+
         // clear the input fields
         $(this).val("");
         hiddenValueElement.val("");
@@ -579,45 +590,46 @@ podd.addProjectRoleBlurHandler = function(input, hiddenValueElement, list, artif
  */
 podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
 
-	theLink.click(function(event) {
-		$('#add_role_dialog').dialog('close');
+    theLink.click(function(event) {
+        $('#add_role_dialog').dialog('close');
 
-		var option = $('option:selected', dropDown);
-		if (typeof option !== 'undefined' && option.val() !== '') {
-			var roleUri = option.val();
-			var roleName = option.text();
-			
-			podd.debug('Selected Role: ' + roleUri);
-			
-			podd.submitUserRoleAdd(podd.userName, roleUri, undefined);
-			
-		    var deleteLink = $('<a>', {
-		        name : 'name_delete_role',
-		        text : 'delete', 
-		        class : 'deleteLink',
-		        click : function(event) {
-					     	var tr = $(this).closest('tr');
-					     	podd.showDeleteRoleConfirmDialog(podd.userName, tr);
-				        	return false;
-		        		} 
-		    });
-			
-		    var span = $('<span>', {
-		    	class : 'role_span',
-		    	text : roleName,
-		        value : roleUri,
-		    });
-		    
-			var tr = $('<tr>');
-			tr.append($('<td></td>').append(span));
-			tr.append('<td>Repository wide role</td>');
-			tr.append($('<td></td>').append(deleteLink));
-			$('#roleTable > tbody:last').append(tr);
-			
-		} else {
-			podd.debug('option was undefined');
-		}
-	});
+        var option = $('option:selected', dropDown);
+        if (typeof option !== 'undefined' && option.val() !== '') {
+            var roleUri = option.val();
+            var roleName = option.text();
+
+            podd.debug('Selected Role: ' + roleUri);
+
+            podd.submitUserRoleAdd(podd.userName, roleUri, undefined);
+
+            var deleteLink = $('<a>', {
+                name : 'name_delete_role',
+                text : 'delete',
+                class : 'deleteLink',
+                click : function(event) {
+                    var tr = $(this).closest('tr');
+                    podd.showDeleteRoleConfirmDialog(podd.userName, tr);
+                    return false;
+                }
+            });
+
+            var span = $('<span>', {
+                class : 'role_span',
+                text : roleName,
+                value : roleUri,
+            });
+
+            var tr = $('<tr>');
+            tr.append($('<td></td>').append(span));
+            tr.append('<td>Repository wide role</td>');
+            tr.append($('<td></td>').append(deleteLink));
+            $('#roleTable > tbody:last').append(tr);
+
+        }
+        else {
+            podd.debug('option was undefined');
+        }
+    });
 };
 
 /**
@@ -627,23 +639,24 @@ podd.addRoleDialogContinueHandler = function(theLink, dropDown) {
  * @param textField
  *            reference to the text field that has been 'blurred'
  * @param hiddenValueElement
- * 			  TODO
+ *            TODO
  * @param propertyUri
  *            property/predicate representing this field
  * @param originalValue
- *            the original value that is recorded against this field. can be 'undefined'
+ *            the original value that is recorded against this field. can be
+ *            'undefined'
  * @param propertyType
- * 			  TODO
+ *            TODO
  * @param nextArtifactDatabank
  *            {databank} databank containing artifact triples
  * @param isNew
- *            {boolean} boolean indicating whether this field did not previously have a
- *            value
+ *            {boolean} boolean indicating whether this field did not previously
+ *            have a value
  * 
  */
 podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyUri, originalValue, propertyType,
-		nextArtifactDatabank, isNew) {
-	
+        nextArtifactDatabank, isNew) {
+
     var nextOriginalValue = '' + originalValue;
 
     textField.blur(function(event) {
@@ -655,12 +668,12 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
         var changesets = [];
 
         if (typeof hiddenValueElement !== 'undefined' && newValue !== '') {
-        	newValue = hiddenValueElement.val();
-        	podd.debug('[blur] hidden field found with value: ' + newValue);
+            newValue = hiddenValueElement.val();
+            podd.debug('[blur] hidden field found with value: ' + newValue);
         }
 
         var propertyDatatype = $(this).attr('datatype');
-        
+
         if (newValue !== nextOriginalValue) {
             var nextChangeset = {};
             nextChangeset.isNew = isNew;
@@ -670,23 +683,27 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
 
             // add old triple ONLY if there originally was a value
             if (nextOriginalValue !== 'undefined') {
-            	podd.vTableRemovePropertyValue(propertyUri, nextOriginalValue);
-		    	/*
-				 * Due to rdf deduplication, the databank will never have more than one triple to represent
-				 * this property-value. Therefore, mark this triple for removal only if there are no other
-				 * occurrences of this value in the vTable.
-				 */
-            	if (podd.vTablePropertyContainsValue(propertyUri, nextOriginalValue) === false) {
-                	nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType, propertyDatatype));
-            	}
+                podd.vTableRemovePropertyValue(propertyUri, nextOriginalValue);
+                /*
+                 * Due to rdf deduplication, the databank will never have more
+                 * than one triple to represent this property-value. Therefore,
+                 * mark this triple for removal only if there are no other
+                 * occurrences of this value in the vTable.
+                 */
+                if (podd.vTablePropertyContainsValue(propertyUri, nextOriginalValue) === false) {
+                    nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue,
+                            propertyType, propertyDatatype));
+                }
             }
 
-            // add a new triple ONLY if the value is non-empty. enables deleting of previous entries. 
+            // add a new triple ONLY if the value is non-empty. enables deleting
+            // of previous entries.
             if (newValue !== '') {
-            	podd.vTableAddPropertyValue(propertyUri, newValue);
-            	nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
+                podd.vTableAddPropertyValue(propertyUri, newValue);
+                nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyType,
+                        propertyDatatype));
             }
-            
+
             changesets.push(nextChangeset);
 
             podd.debug('Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue
@@ -699,7 +716,8 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
             $(this).unbind("blur");
             // NOTE: isNew is always false after the first time through this
             // method with a non-empty/non-default value
-            podd.addTextFieldBlurHandler(textField, hiddenValueElement, propertyUri, newValue, propertyType, nextArtifactDatabank, false);
+            podd.addTextFieldBlurHandler(textField, hiddenValueElement, propertyUri, newValue, propertyType,
+                    nextArtifactDatabank, false);
         }
         else {
             podd.debug("No change on blur for value for property=" + propertyUri + " original=" + nextOriginalValue
@@ -708,7 +726,7 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
         // NOTE: Cannot call update to the server after each edit, as some
         // fields may have incomplete/invalid values at this point.
     });
-    
+
 };
 
 /**
@@ -724,32 +742,31 @@ podd.addTextFieldBlurHandler = function(textField, hiddenValueElement, propertyU
  *            Specifies the datatype of the object
  * @return The constructed triple
  */
-podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType,
-		objectDatatype) {
+podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType, objectDatatype) {
 
-	podd.debug('buildTriple(' + subjectUri + ', ' + propertyUri + ', '
-			+ objectValue + ' [' + objectDatatype + ']');
+    podd.debug('buildTriple(' + subjectUri + ', ' + propertyUri + ', ' + objectValue + ' [' + objectDatatype + ']');
 
-	var objectPart;
+    var objectPart;
 
-	if (typeof objectDatatype !== 'undefined') {
+    if (typeof objectDatatype !== 'undefined') {
 
-		// figure out if the object is a Resource or a Literal
-		if (typeof propertyType !== 'undefined'
-				&& propertyType.toString() === OBJECT_PROPERTY) {
+        // figure out if the object is a Resource or a Literal
+        if (typeof propertyType !== 'undefined' && propertyType.toString() === OBJECT_PROPERTY) {
 
-			objectPart = $.rdf.resource('<' + objectValue + '>');
-		} else {
+            objectPart = $.rdf.resource('<' + objectValue + '>');
+        }
+        else {
 
-			objectPart = $.rdf.literal(objectValue, {
-				datatype : objectDatatype
-			});
-		}
-	} else {
-		objectPart = $.rdf.literal(objectValue);
-	}
+            objectPart = $.rdf.literal(objectValue, {
+                datatype : objectDatatype
+            });
+        }
+    }
+    else {
+        objectPart = $.rdf.literal(objectValue);
+    }
 
-	return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectPart);
+    return $.rdf.triple(subjectUri, $.rdf.resource(propertyUri), objectPart);
 };
 
 /**
@@ -770,17 +787,20 @@ podd.buildTriple = function(subjectUri, propertyUri, objectValue, propertyType,
  *            {databank} Databank where artifact's triples are stored.
  */
 podd.callbackFromGetMetadata = function(artifactUri, objectType, nextSchemaDatabank, nextArtifactDatabank) {
-	
-	podd.debug('[callbackFromGetMetadata] objectType=<' +objectType + '>, artifactUri=<' + artifactUri + '>');
-	
-	// TODO: are these two conditions sufficient to ensure it is a new artifact?
-	if (typeof artifactUri !== 'undefined' && artifactUri !== 'undefined') {
-		podd.debug('[callbackFromGetMetadata] artifact exists. retrieve it before update interface.');
-		podd.getArtifact(artifactUri, nextSchemaDatabank, nextArtifactDatabank, false, podd.updateInterface, objectType);
-	} else {
-		podd.debug('[callbackFromGetMetadata] new artifact. invoke update interface');
-		podd.updateInterface(objectType, nextSchemaDatabank, nextArtifactDatabank);
-	}
+
+    podd.debug('[callbackFromGetMetadata] objectType=<' + objectType + '>, artifactUri=<' + artifactUri + '>');
+
+    // TODO: are these two conditions sufficient to ensure it is a new artifact?
+    if (typeof artifactUri !== 'undefined' && artifactUri !== 'undefined') {
+        podd.debug('[callbackFromGetMetadata] artifact exists. retrieve it before update interface.');
+        podd
+                .getArtifact(artifactUri, nextSchemaDatabank, nextArtifactDatabank, false, podd.updateInterface,
+                        objectType);
+    }
+    else {
+        podd.debug('[callbackFromGetMetadata] new artifact. invoke update interface');
+        podd.updateInterface(objectType, nextSchemaDatabank, nextArtifactDatabank);
+    }
 };
 
 /**
@@ -800,11 +820,11 @@ podd.callbackFromGetMetadata = function(artifactUri, objectType, nextSchemaDatab
  * @return a list item (i.e. &lt;li&gt;) containing the HTML field
  */
 podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatabank, isNew) {
-	// podd.debug('[' + nextField.weight + '] <' + nextField.propertyUri
-	// + '> "' + nextField.propertyLabel + '" <' +
-	// nextField.displayType + '> <' + nextField.cardinality + '>');
+    // podd.debug('[' + nextField.weight + '] <' + nextField.propertyUri
+    // + '> "' + nextField.propertyLabel + '" <' +
+    // nextField.displayType + '> <' + nextField.cardinality + '>');
 
-	// <li> element to which the whole field is to be attached
+    // <li> element to which the whole field is to be attached
     var li = $("<li>");
 
     // field name
@@ -846,157 +866,160 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
     // a list which will be useful if this field supports multi-values;
     var subList = $('<ul>');
 
-
     if (typeof nextField.valuesArray !== 'undefined' && nextField.valuesArray.length > 0) {
-    	
-    	$.each(nextField.valuesArray, function(index, aValue) {
-    		
-    		// store this value for validating modifications
-    		if (typeof aValue.valueUri !== 'undefined') {
-    			podd.vTableAddPropertyValue(nextField.propertyUri, aValue.valueUri);
-    		} else {
-    			podd.vTableAddPropertyValue(nextField.propertyUri, aValue.displayValue);
-    		}
-    		
-    	    var li2 = $("<li>");
-		    		
-		    if (nextField.displayType == DISPLAY_LongText) {
-		        var input = podd.addFieldTextArea(nextField, aValue, 30, 2);
-		        
-		        // TODO: refactor so that there is one addHandler() inside which
-				// blur handler is invoked for both the original and the cloned fields
-				podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue,
-						nextField.propertyType, nextArtifactDatabank, isNew);
-		        
-		        if (index === 0) {
-		        	//clone handler should only be added once
-		        	var parameterObject = {};
-		        	parameterObject.parentList = subList;
-		        	parameterObject.link = link;
-		        	parameterObject.nextField = nextField;
-		        	parameterObject.artifactDatabank = nextArtifactDatabank;
-		        	podd.addCloneHandler(input, parameterObject);
-		        }
-		        
-		        li2.append(input);
-		    }
-		    else if (nextField.displayType == DISPLAY_ShortText) {
-		        var input = podd.addFieldInputText(nextField, aValue, 'text');
-		
-		        // TODO: add support for date/time types other than xsd:date
-		        if (typeof nextField.propertyRange !== 'undefined' &&
-		        		nextField.propertyRange.toString() === 'http://www.w3.org/2001/XMLSchema#date') {
-		
-		        	// prevent user bypassing the datepicker widget and typing values in
-		        	input.attr('readonly', 'readonly');
-		        	input.attr('style', 'background:white');
-		        	
-		        	input.datepicker({
-		        			dateFormat : "yy-mm-dd",
-		        			changeYear : true,
-		        			yearRange : "-5:+10",
-		        			onSelect : function() {
-		        				// blur handler does not work with datepicker as the blur event gets fired before
-		        				// the selected value is set.
-		        		        podd.handleDatePickerFieldChange(input, nextField.propertyUri, aValue.displayValue,
-									nextField.propertyType, nextArtifactDatabank, isNew);
-		        			} 
-		        		});
-		        } else {
-				    podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue,
-				    	nextField.propertyType, nextArtifactDatabank, isNew);
-				    podd.addEnterKeyHandler(input);
-		        }
-		
-		        if (index === 0) {
-		        	//clone handler should only be added once
-		        	var parameterObject = {};
-		        	parameterObject.parentList = subList;
-		        	parameterObject.link = link;
-		        	parameterObject.nextField = nextField;
-		        	parameterObject.artifactDatabank = nextArtifactDatabank;
-		        	podd.addCloneHandler(input, parameterObject);
-		        }
-		        
-		        li2.append(input);
-		    }
-		    else if (nextField.displayType == DISPLAY_DropDown) {
-		        var input = podd.addFieldDropDownListNonAutoComplete(nextField, aValue, nextSchemaDatabank);
-		        podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.valueUri, 
-		        		nextField.propertyType, nextArtifactDatabank, isNew);
-		        
-		        if (index === 0) {
-		        	//clone handler should only be added once
-		        	var parameterObject = {};
-		        	parameterObject.parentList = subList;
-		        	parameterObject.link = link;
-		        	parameterObject.nextField = nextField;
-		        	parameterObject.artifactDatabank = nextArtifactDatabank;
-		        	podd.addCloneHandler(input, parameterObject);
-		        }
-		        
-		        li2.append(input);
-		    }
-		    else if (nextField.displayType == DISPLAY_AutoComplete) {
-		
-				// - set search Types
-				var searchTypes = [ ];
-				if (typeof nextField.propertyRange != 'undefined'
-						&& nextField.propertyRange != 'Not Found') {
-					searchTypes.push(nextField.propertyRange);
-				} else {
-					podd.debug('WARNING: Could not find search types for property: ' + nextField.propertyUri);
-					searchTypes.push(OWL_NAMED_INDIVIDUAL); // attempt to limit the damage
-				}
-		
-				// - set artifact URI
-				var artifactUri;
-				if (typeof podd.artifactIri != 'undefined'
-						&& podd.artifactIri != 'undefined') {
-					artifactUri = podd.artifactIri;
-				}
-		
-				var input = podd.addFieldInputText(nextField, aValue, 'text');
-				var hiddenValueElement = podd.addFieldInputText(nextField, aValue, 'hidden');
-				podd.addAutoCompleteHandler(input, hiddenValueElement,
-						nextArtifactDatabank, searchTypes, artifactUri, false);
-				podd.addTextFieldBlurHandler(input, hiddenValueElement, nextField.propertyUri,
-						aValue.valueUri, nextField.propertyType,
-						nextArtifactDatabank, isNew);
 
-		        if (index === 0) {
-		        	//clone handler should only be added once
-		        	var parameterObject = {};
-		        	parameterObject.parentList = subList;
-		        	parameterObject.link = link;
-		        	parameterObject.nextField = nextField;
-		        	parameterObject.artifactDatabank = nextArtifactDatabank;
-		        	parameterObject.isAutoComplete = true;
-		        	parameterObject.hiddenValueElement = hiddenValueElement;
-		        	parameterObject.searchTypes = searchTypes;
-		        	parameterObject.artifactUri = artifactUri;
-		        	parameterObject.isNew = isNew;
-		        	
-		        	podd.addCloneHandler(input, parameterObject);
-		        }
-				
-				li2.append(input);
-				li2.append(hiddenValueElement);
-		    }
-		    else if (nextField.displayType == DISPLAY_CheckBox) {
-		    	podd.updateErrorMessageList("TODO: Support DISPLAY_Checkbox for property : " + nextField.propertyUri + " (" 
-		    			+ aValue.displayValue + ")");		        
-		        
-		    }
-		    else { // default
-		        podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " (" + aValue.displayValue
-		                + ")");
-		    }
-		    subList.append(li2);
-		
-    	}); //end $.each()
+        $.each(nextField.valuesArray, function(index, aValue) {
+
+            // store this value for validating modifications
+            if (typeof aValue.valueUri !== 'undefined') {
+                podd.vTableAddPropertyValue(nextField.propertyUri, aValue.valueUri);
+            }
+            else {
+                podd.vTableAddPropertyValue(nextField.propertyUri, aValue.displayValue);
+            }
+
+            var li2 = $("<li>");
+
+            if (nextField.displayType == DISPLAY_LongText) {
+                var input = podd.addFieldTextArea(nextField, aValue, 30, 2);
+
+                // TODO: refactor so that there is one addHandler() inside which
+                // blur handler is invoked for both the original and the cloned
+                // fields
+                podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue,
+                        nextField.propertyType, nextArtifactDatabank, isNew);
+
+                if (index === 0) {
+                    // clone handler should only be added once
+                    var parameterObject = {};
+                    parameterObject.parentList = subList;
+                    parameterObject.link = link;
+                    parameterObject.nextField = nextField;
+                    parameterObject.artifactDatabank = nextArtifactDatabank;
+                    podd.addCloneHandler(input, parameterObject);
+                }
+
+                li2.append(input);
+            }
+            else if (nextField.displayType == DISPLAY_ShortText) {
+                var input = podd.addFieldInputText(nextField, aValue, 'text');
+
+                // TODO: add support for date/time types other than xsd:date
+                if (typeof nextField.propertyRange !== 'undefined'
+                        && nextField.propertyRange.toString() === 'http://www.w3.org/2001/XMLSchema#date') {
+
+                    // prevent user bypassing the datepicker widget and typing
+                    // values in
+                    input.attr('readonly', 'readonly');
+                    input.attr('style', 'background:white');
+
+                    input.datepicker({
+                        dateFormat : "yy-mm-dd",
+                        changeYear : true,
+                        yearRange : "-5:+10",
+                        onSelect : function() {
+                            // blur handler does not work with datepicker as the
+                            // blur event gets fired before
+                            // the selected value is set.
+                            podd.handleDatePickerFieldChange(input, nextField.propertyUri, aValue.displayValue,
+                                    nextField.propertyType, nextArtifactDatabank, isNew);
+                        }
+                    });
+                }
+                else {
+                    podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.displayValue,
+                            nextField.propertyType, nextArtifactDatabank, isNew);
+                    podd.addEnterKeyHandler(input);
+                }
+
+                if (index === 0) {
+                    // clone handler should only be added once
+                    var parameterObject = {};
+                    parameterObject.parentList = subList;
+                    parameterObject.link = link;
+                    parameterObject.nextField = nextField;
+                    parameterObject.artifactDatabank = nextArtifactDatabank;
+                    podd.addCloneHandler(input, parameterObject);
+                }
+
+                li2.append(input);
+            }
+            else if (nextField.displayType == DISPLAY_DropDown) {
+                var input = podd.addFieldDropDownListNonAutoComplete(nextField, aValue, nextSchemaDatabank);
+                podd.addTextFieldBlurHandler(input, undefined, nextField.propertyUri, aValue.valueUri,
+                        nextField.propertyType, nextArtifactDatabank, isNew);
+
+                if (index === 0) {
+                    // clone handler should only be added once
+                    var parameterObject = {};
+                    parameterObject.parentList = subList;
+                    parameterObject.link = link;
+                    parameterObject.nextField = nextField;
+                    parameterObject.artifactDatabank = nextArtifactDatabank;
+                    podd.addCloneHandler(input, parameterObject);
+                }
+
+                li2.append(input);
+            }
+            else if (nextField.displayType == DISPLAY_AutoComplete) {
+
+                // - set search Types
+                var searchTypes = [];
+                if (typeof nextField.propertyRange != 'undefined' && nextField.propertyRange != 'Not Found') {
+                    searchTypes.push(nextField.propertyRange);
+                }
+                else {
+                    podd.debug('WARNING: Could not find search types for property: ' + nextField.propertyUri);
+                    searchTypes.push(OWL_NAMED_INDIVIDUAL); // attempt to limit
+                    // the damage
+                }
+
+                // - set artifact URI
+                var artifactUri;
+                if (typeof podd.artifactIri != 'undefined' && podd.artifactIri != 'undefined') {
+                    artifactUri = podd.artifactIri;
+                }
+
+                var input = podd.addFieldInputText(nextField, aValue, 'text');
+                var hiddenValueElement = podd.addFieldInputText(nextField, aValue, 'hidden');
+                podd.addAutoCompleteHandler(input, hiddenValueElement, nextArtifactDatabank, searchTypes, artifactUri,
+                        false);
+                podd.addTextFieldBlurHandler(input, hiddenValueElement, nextField.propertyUri, aValue.valueUri,
+                        nextField.propertyType, nextArtifactDatabank, isNew);
+
+                if (index === 0) {
+                    // clone handler should only be added once
+                    var parameterObject = {};
+                    parameterObject.parentList = subList;
+                    parameterObject.link = link;
+                    parameterObject.nextField = nextField;
+                    parameterObject.artifactDatabank = nextArtifactDatabank;
+                    parameterObject.isAutoComplete = true;
+                    parameterObject.hiddenValueElement = hiddenValueElement;
+                    parameterObject.searchTypes = searchTypes;
+                    parameterObject.artifactUri = artifactUri;
+                    parameterObject.isNew = isNew;
+
+                    podd.addCloneHandler(input, parameterObject);
+                }
+
+                li2.append(input);
+                li2.append(hiddenValueElement);
+            }
+            else if (nextField.displayType == DISPLAY_CheckBox) {
+                podd.updateErrorMessageList("TODO: Support DISPLAY_Checkbox for property : " + nextField.propertyUri
+                        + " (" + aValue.displayValue + ")");
+
+            }
+            else { // default
+                podd.updateErrorMessageList("TODO: Support property : " + nextField.propertyUri + " ("
+                        + aValue.displayValue + ")");
+            }
+            subList.append(li2);
+
+        }); // end $.each()
     }
-    
+
     li.append(subList);
     return li;
 };
@@ -1024,7 +1047,7 @@ podd.debugPrintDatabank = function(databank, message) {
  * Removes all triples in the given databank.
  */
 podd.deleteAllTriples = function(nextDatabank) {
-	var size = nextDatabank.size();
+    var size = nextDatabank.size();
     $.rdf({
         databank : nextDatabank
     }).where('?subject ?property ?object').sources().each(function(index, tripleArray) {
@@ -1055,65 +1078,62 @@ podd.deleteTriples = function(nextDatabank, subject, property) {
  *            {string} The error Model as a JSON string
  */
 podd.displayDetailedErrors = function(errorModelAsJson) {
-	var errorDetailsCount = 0;
+    var errorDetailsCount = 0;
 
     var nextDatabank = podd.newDatabank();
-    nextDatabank.load(errorModelAsJson, {format: 'application/json'});
+    nextDatabank.load(errorModelAsJson, {
+        format : 'application/json'
+    });
 
-	// Display top level error details
-	var queryDetails = $.rdf({
-    	databank : nextDatabank
-	})
-	.where('?x rdf:type <http://purl.org/podd/ns/err#TopError> ')
-	.optional('?x rdfs:comment ?description')
-	.optional('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
-	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
-	;
-	var bindings1 = queryDetails.select();
+    // Display top level error details
+    var queryDetails = $.rdf({
+        databank : nextDatabank
+    }).where('?x rdf:type <http://purl.org/podd/ns/err#TopError> ').optional('?x rdfs:comment ?description').optional(
+            '?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass').optional(
+            '?x <http://purl.org/podd/ns/err#source> ?source');
+    var bindings1 = queryDetails.select();
 
-	$.each(bindings1, function(index, binding) {
-		if (typeof binding.source !== 'undefined') {
-			var source = '<PRE>' + binding.source.value + '</PRE>';
-			podd.updateErrorTable('Source of Error: ', source);
-		}
-		
-		if (typeof binding.exceptionClass !== 'undefined') {
-			var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
-			podd.updateErrorTable('Exception Class: ', exceptionClass);
-		}
-		
-		if (typeof binding.description !== 'undefined') {
-			var description = '<PRE>' + binding.description.value + '</PRE>';
-			podd.updateErrorTable('Description: ', description);
-		}
-		
-		errorDetailsCount = errorDetailsCount + 1;
-	});
-	
-	// Display any sub-details		
-	var querySub = $.rdf({
-    	databank : nextDatabank
-	})
-	.where('?top <http://purl.org/podd/ns/err#contains> ?x')
-	.where('?x rdf:type <http://purl.org/podd/ns/err#Error> ')
-	.where('?x rdfs:comment ?details')
-	.where('?x <http://purl.org/podd/ns/err#source> ?source')
-	;
-	var bindings2 = querySub.select();
+    $.each(bindings1, function(index, binding) {
+        if (typeof binding.source !== 'undefined') {
+            var source = '<PRE>' + binding.source.value + '</PRE>';
+            podd.updateErrorTable('Source of Error: ', source);
+        }
 
-	$.each(bindings2, function(index, binding) {
-		var details = '<PRE>' + binding.details.value + '</PRE>';
-		var source = '<PRE>' + binding.source.value + '</PRE>';
-		
-		podd.updateErrorTable(' Secondary Source: ', source);
-		podd.updateErrorTable(' Secondary Details: ', details);
-		
-		errorDetailsCount = errorDetailsCount + 1;
-	});
+        if (typeof binding.exceptionClass !== 'undefined') {
+            var exceptionClass = '<PRE>' + binding.exceptionclass.value + '</PRE>';
+            podd.updateErrorTable('Exception Class: ', exceptionClass);
+        }
 
-	if (errorDetailsCount == 0) {
-		podd.updateErrorTable('No error details available');
-	};
+        if (typeof binding.description !== 'undefined') {
+            var description = '<PRE>' + binding.description.value + '</PRE>';
+            podd.updateErrorTable('Description: ', description);
+        }
+
+        errorDetailsCount = errorDetailsCount + 1;
+    });
+
+    // Display any sub-details
+    var querySub = $.rdf({
+        databank : nextDatabank
+    }).where('?top <http://purl.org/podd/ns/err#contains> ?x')
+            .where('?x rdf:type <http://purl.org/podd/ns/err#Error> ').where('?x rdfs:comment ?details').where(
+                    '?x <http://purl.org/podd/ns/err#source> ?source');
+    var bindings2 = querySub.select();
+
+    $.each(bindings2, function(index, binding) {
+        var details = '<PRE>' + binding.details.value + '</PRE>';
+        var source = '<PRE>' + binding.source.value + '</PRE>';
+
+        podd.updateErrorTable(' Secondary Source: ', source);
+        podd.updateErrorTable(' Secondary Details: ', details);
+
+        errorDetailsCount = errorDetailsCount + 1;
+    });
+
+    if (errorDetailsCount == 0) {
+        podd.updateErrorTable('No error details available');
+    }
+    ;
 };
 
 /**
@@ -1128,86 +1148,81 @@ podd.displayDetailedErrors = function(errorModelAsJson) {
  */
 podd.displaySummaryErrorMessage = function(errorModelAsJson) {
 
-//	if (typeof errorModelAsJson === 'string') {
-//		podd.debug('[displayErrorMsgTable] input is a string');
-//	}
-//	podd.debug('[displayErrorMsgTable] Error model =' + errorModelAsJson);
-	
-	var errorDetailsCount = 0;
+    // if (typeof errorModelAsJson === 'string') {
+    // podd.debug('[displayErrorMsgTable] input is a string');
+    // }
+    // podd.debug('[displayErrorMsgTable] Error model =' + errorModelAsJson);
+
+    var errorDetailsCount = 0;
 
     var nextDatabank = podd.newDatabank();
-    nextDatabank.load(errorModelAsJson, {format: 'application/json'});
+    nextDatabank.load(errorModelAsJson, {
+        format : 'application/json'
+    });
 
     podd.debug('[displayErrorMsgTable] error databank size = ' + nextDatabank.size());
 
-	var query = $.rdf({
-    	databank : nextDatabank
-	})
-	.where('?s ?p ?o');
-	var allBindings = query.select();
-	$.each(allBindings, function(index, next) {
-		podd.debug('   > ' + next.s.value + ' : ' + next.p.value + ' : ' + next.o.value);
-	});
-    
+    var query = $.rdf({
+        databank : nextDatabank
+    }).where('?s ?p ?o');
+    var allBindings = query.select();
+    $.each(allBindings, function(index, next) {
+        podd.debug('   > ' + next.s.value + ' : ' + next.p.value + ' : ' + next.o.value);
+    });
+
     var message = '';
-    
-	// construct error message
-	var queryDetails = $.rdf({
-    	databank : nextDatabank
-	})
-	.where('?x rdf:type <http://purl.org/podd/ns/err#TopError> ')
-	.optional('?x rdfs:comment ?description')
-	.optional('?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass')
-	.optional('?x <http://purl.org/podd/ns/err#source> ?source')
-	;
-	var bindings1 = queryDetails.select();
 
-	$.each(bindings1, function(index, binding) {
-		
-		if (typeof binding.exceptionClass !== 'undefined') {
-			var exceptionClass = '<b>' + binding.exceptionclass.value + '</b>';
-			message = exceptionClass + ' ';
-		}
-		
-		if (typeof binding.description !== 'undefined') {
-			message = message + binding.description.value;
-		}
+    // construct error message
+    var queryDetails = $.rdf({
+        databank : nextDatabank
+    }).where('?x rdf:type <http://purl.org/podd/ns/err#TopError> ').optional('?x rdfs:comment ?description').optional(
+            '?x <http://purl.org/podd/ns/err#exceptionClass> ?exceptionclass').optional(
+            '?x <http://purl.org/podd/ns/err#source> ?source');
+    var bindings1 = queryDetails.select();
 
-		if (typeof binding.source !== 'undefined') {
-			message = message + '(Source of error: ' +binding.source.value + ')';
-		}
-		
-		errorDetailsCount = errorDetailsCount + 1;
-	});
-	podd.updateErrorMessageList(message);
+    $.each(bindings1, function(index, binding) {
 
-	
-	// add more details to error message
-	// NOTE: this could lead to too many error messages if there are several causes
-	var queryDetails2 = $.rdf({
-    	databank : nextDatabank
-	})
-	.where('?top <http://purl.org/podd/ns/err#contains> ?cause')
-	.where('?cause rdf:type <http://purl.org/podd/ns/err#Error> ')
-	.where('?cause rdfs:label ?causelabel ')
-	;
+        if (typeof binding.exceptionClass !== 'undefined') {
+            var exceptionClass = '<b>' + binding.exceptionclass.value + '</b>';
+            message = exceptionClass + ' ';
+        }
 
-	var bindings2 = queryDetails2.select();
+        if (typeof binding.description !== 'undefined') {
+            message = message + binding.description.value;
+        }
 
-	$.each(bindings2, function(index, binding) {
-		if (typeof binding.causelabel !== 'undefined' && binding.causelabel.value.length < 255) {
-			podd.updateErrorMessageList('<PRE>' + binding.causelabel.value + '</PRE>');
-		}
-		errorDetailsCount = errorDetailsCount + 1;
-	});
-	
-	if (errorDetailsCount == 0) {
-		podd.updateErrorMessageList('No error details available');
-	};
-	
+        if (typeof binding.source !== 'undefined') {
+            message = message + '(Source of error: ' + binding.source.value + ')';
+        }
+
+        errorDetailsCount = errorDetailsCount + 1;
+    });
+    podd.updateErrorMessageList(message);
+
+    // add more details to error message
+    // NOTE: this could lead to too many error messages if there are several
+    // causes
+    var queryDetails2 = $.rdf({
+        databank : nextDatabank
+    }).where('?top <http://purl.org/podd/ns/err#contains> ?cause').where(
+            '?cause rdf:type <http://purl.org/podd/ns/err#Error> ').where('?cause rdfs:label ?causelabel ');
+
+    var bindings2 = queryDetails2.select();
+
+    $.each(bindings2, function(index, binding) {
+        if (typeof binding.causelabel !== 'undefined' && binding.causelabel.value.length < 255) {
+            podd.updateErrorMessageList('<PRE>' + binding.causelabel.value + '</PRE>');
+        }
+        errorDetailsCount = errorDetailsCount + 1;
+    });
+
+    if (errorDetailsCount == 0) {
+        podd.updateErrorMessageList('No error details available');
+    }
+    ;
+
     podd.debug('[displayErrorMsgTable] errorDetails count = ' + errorDetailsCount);
 };
-
 
 /**
  * @memberOf podd
@@ -1215,11 +1230,12 @@ podd.displaySummaryErrorMessage = function(errorModelAsJson) {
  * Clean all the error messages
  */
 podd.emptyErrorMessages = function() {
-	$("#errorMsgList").empty();
+    $("#errorMsgList").empty();
 };
 
 /**
- * Search the given databank for the label (i.e. rdfs:label) of the given object.
+ * Search the given databank for the label (i.e. rdfs:label) of the given
+ * object.
  * 
  * @param nextDatabank
  *            {databank} Databank to search for label
@@ -1229,7 +1245,7 @@ podd.emptyErrorMessages = function() {
  */
 podd.findLabel = function(nextDatabank, objectUri) {
 
-	var result;
+    var result;
 
     var labelQuery = $.rdf({
         databank : nextDatabank
@@ -1238,11 +1254,11 @@ podd.findLabel = function(nextDatabank, objectUri) {
     var labelBindings = labelQuery.select();
 
     $.each(labelBindings, function(index, nextBinding) {
-    	result = nextBinding.uLabel.value;
-    	return false;
+        result = nextBinding.uLabel.value;
+        return false;
     });
-    
-	podd.debug('Label for <' + objectUri + '> is: ' + result);
+
+    podd.debug('Label for <' + objectUri + '> is: ' + result);
     return result;
 };
 
@@ -1268,20 +1284,22 @@ podd.findLabel = function(nextDatabank, objectUri) {
  * @param callbackParam
  *            The 4th parameter of the callback method. Could be undefined.
  */
-podd.getArtifact = function(artifactUri, nextSchemaDatabank,
-		nextArtifactDatabank, cleanArtifactDatabank,
-		updateDisplayCallbackFunction, callbackParam) {
+podd.getArtifact = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, cleanArtifactDatabank,
+        updateDisplayCallbackFunction, callbackParam) {
     var requestUrl = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(artifactUri);
 
     podd.debug('[getArtifact] Request to: ' + requestUrl);
     $.ajax({
         url : requestUrl,
         type : 'GET',
-        // dataType : 'application/rdf+xml', // what is expected back
+        dataType : 'json',
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
         success : function(resultData, status, xhr) {
-        	if (cleanArtifactDatabank) {
-        		podd.deleteAllTriples(nextArtifactDatabank);
-        	}
+            if (cleanArtifactDatabank) {
+                podd.deleteAllTriples(nextArtifactDatabank);
+            }
             nextArtifactDatabank.load(resultData);
             podd.debug('[getArtifact] ### SUCCESS ### loaded databank with size ' + nextArtifactDatabank.size());
 
@@ -1290,7 +1308,8 @@ podd.getArtifact = function(artifactUri, nextSchemaDatabank,
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
 
-            podd.loadMissingArtifactLabels(artifactUri, nextSchemaDatabank, nextArtifactDatabank, updateDisplayCallbackFunction, callbackParam);
+            podd.loadMissingArtifactLabels(artifactUri, nextSchemaDatabank, nextArtifactDatabank,
+                    updateDisplayCallbackFunction, callbackParam);
         },
         error : function(xhr, status, error) {
             podd.debug(status + '[getArtifact] $$$ ERROR $$$ ' + error);
@@ -1323,7 +1342,7 @@ podd.getCreateChildMetadata = function(artifactUri, objectType, successCallback)
         url : requestUrl,
         type : 'GET',
         data : {
-        	artifacturi : artifactUri,
+            artifacturi : artifactUri,
             objecttypeuri : objectType,
             includedndprops : false,
             metadatapolicy : 'containsonly'
@@ -1331,10 +1350,10 @@ podd.getCreateChildMetadata = function(artifactUri, objectType, successCallback)
         dataType : 'json', // what is expected back
         success : function(resultData, status, xhr) {
             podd.debug('[getCreateChildMetadata] ### SUCCESS ### ');
-			podd.debug(resultData);
+            podd.debug(resultData);
 
-		    var nextSchemaDatabank = podd.newDatabank();
-			
+            var nextSchemaDatabank = podd.newDatabank();
+
             nextSchemaDatabank.load(resultData);
 
             successCallback(objectType, nextSchemaDatabank);
@@ -1399,9 +1418,39 @@ podd.getCurrentObjectUri = function() {
  * @return the Version IRI or 'undefined' if it is not defined.
  */
 podd.getCurrentVersionIri = function() {
-	return podd.versionIri;
+    return podd.versionIri;
 };
 
+/**
+ * Asynchronously requests the current data repository metadata from the PODD
+ * List Data Repositories web service in RDF and sends the resulting data to the
+ * callback.
+ */
+podd.getDataRepositories = function(successCallback) {
+    var requestUrl = podd.baseUrl + '/datarepositories/list';
+
+    $.ajax({
+        url : requestUrl,
+        type : 'GET',
+        dataType : 'json', // what is expected back
+        success : function(resultData, status, xhr) {
+            podd.debug('[getDataRepositories] ### SUCCESS ### ');
+            podd.debug(resultData);
+
+            var dataRepositoresDatabank = podd.newDatabank();
+            dataRepositoriesDatabank.load(resultData);
+
+            podd.debug('[getDataRepositories] Data Repositories Databank size = ' + dataRepositoriesDatabank.size());
+
+            successCallback(dataRepositoriesDatabank);
+        },
+        error : function(xhr, status, error) {
+            podd.debug('[getDataRepositories] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
+            podd.displaySummaryErrorMessage(xhr.responseText);
+        }
+    });
+};
 
 /**
  * Retrieve metadata to render the fields to add a new object of the given type.
@@ -1420,7 +1469,7 @@ podd.getCurrentVersionIri = function() {
  * @memberOf podd
  */
 podd.getObjectTypeMetadata = function(artifactUri, objectType, successCallback, nextSchemaDatabank,
-		nextArtifactDatabank) {
+        nextArtifactDatabank) {
 
     var requestUrl = podd.baseUrl + '/metadata';
 
@@ -1435,7 +1484,7 @@ podd.getObjectTypeMetadata = function(artifactUri, objectType, successCallback, 
         dataType : 'json', // what is expected back
         success : function(resultData, status, xhr) {
             podd.debug('[getObjectTypeMetadata] ### SUCCESS ### ');
-			podd.debug(resultData);
+            podd.debug(resultData);
 
             nextSchemaDatabank.load(resultData);
 
@@ -1468,14 +1517,13 @@ podd.getOntologyID = function(nextDatabank) {
     var bindings = myQuery.select();
 
     var nodeChildren = [];
-    $.each(bindings,
-            function(index, value) {
-                var nextChild = {};
-                nextChild.artifactIri = value.artifactIri.value;
-                nextChild.versionIri = value.versionIri.value;
+    $.each(bindings, function(index, value) {
+        var nextChild = {};
+        nextChild.artifactIri = value.artifactIri.value;
+        nextChild.versionIri = value.versionIri.value;
 
-                nodeChildren.push(nextChild);
-            });
+        nodeChildren.push(nextChild);
+    });
 
     if (nodeChildren.length > 1) {
         podd.debug('[getVersion] ERROR - More than 1 version IRI statement found!!!');
@@ -1506,8 +1554,7 @@ podd.getParentAndObjectUri = function(nextDatabank) {
     if (typeof podd.parentUri === 'undefined' && podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
         var myQuery = $.rdf({
             databank : nextDatabank
-        })
-        .where('?artifactIri poddBase:artifactHasTopObject ?topObject');
+        }).where('?artifactIri poddBase:artifactHasTopObject ?topObject');
         var innerBindings = myQuery.select();
         // TODO: validate only 1 binding exists
         $.each(innerBindings, function(index, value) {
@@ -1515,7 +1562,8 @@ podd.getParentAndObjectUri = function(nextDatabank) {
             nextChild.objectUri = value.topObject.value;
         });
 
-    } else {
+    }
+    else {
         // NOTE: The results must contain only one triple linking
         // the known parent URI to the current object for this to
         // work.
@@ -1526,7 +1574,7 @@ podd.getParentAndObjectUri = function(nextDatabank) {
         .where('<' + podd.parentUri + '> ?property ?currentObject')
         //
         .where('?currentObject rdf:type <' + podd.objectTypeUri + '> ');
-        
+
         var innerBindings = myQuery.select();
 
         $.each(innerBindings, function(index, value) {
@@ -1571,8 +1619,8 @@ podd.getProjectTitle = function(nextDatabank) {
  * 
  * @param textField
  *            {object} reference to the text field that has been 'blurred'
- * @param propertyUri 
- * 			  property/predicate representing this field
+ * @param propertyUri
+ *            property/predicate representing this field
  * @param originalValue
  *            the original value that is recorded against this field. can be
  *            'undefined'
@@ -1583,57 +1631,60 @@ podd.getProjectTitle = function(nextDatabank) {
  *            have a value
  */
 podd.handleDatePickerFieldChange = function(textField, propertyUri, originalValue, propertyType, nextArtifactDatabank,
-		isNew) {
+        isNew) {
 
-	var nextOriginalValue = '' + originalValue;
+    var nextOriginalValue = '' + originalValue;
 
-	var newValue = '' + textField.val();
-	podd.debug("[dateField] triggered with new value: " + newValue);
+    var newValue = '' + textField.val();
+    podd.debug("[dateField] triggered with new value: " + newValue);
 
-	var objectUri = podd.getCurrentObjectUri();
+    var objectUri = podd.getCurrentObjectUri();
 
-	var changesets = [];
+    var changesets = [];
 
-	var propertyDatatype = textField.attr('datatype');
+    var propertyDatatype = textField.attr('datatype');
 
-	if (newValue !== nextOriginalValue) {
-		var nextChangeset = {};
-		nextChangeset.isNew = isNew;
-		nextChangeset.objectUri = objectUri;
-		nextChangeset.newTriples = [];
-		nextChangeset.oldTriples = [];
+    if (newValue !== nextOriginalValue) {
+        var nextChangeset = {};
+        nextChangeset.isNew = isNew;
+        nextChangeset.objectUri = objectUri;
+        nextChangeset.newTriples = [];
+        nextChangeset.oldTriples = [];
 
-		// add old triple ONLY if there originally was a value
-		if (nextOriginalValue !== 'undefined') {
-        	podd.vTableRemovePropertyValue(propertyUri, nextOriginalValue);
-	    	/*
-			 * Due to rdf deduplication, the databank will never have more than one triple to represent
-			 * this property-value. Therefore, mark this triple for removal only if there are no other
-			 * occurrences of this value in the vTable.
-			 */
-        	if (podd.vTablePropertyContainsValue(propertyUri, nextOriginalValue) === false) {
-				nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType,
-						propertyDatatype));
-        	}
-		}
-		
-        // add a new triple ONLY if the value is non-empty. enables deleting of previous entries. 
-		if (newValue !== '') {
-        	podd.vTableAddPropertyValue(propertyUri, newValue);
-			nextChangeset.newTriples.push(podd
-					.buildTriple(objectUri, propertyUri, newValue, propertyType, propertyDatatype));
-		}
-		
-		changesets.push(nextChangeset);
+        // add old triple ONLY if there originally was a value
+        if (nextOriginalValue !== 'undefined') {
+            podd.vTableRemovePropertyValue(propertyUri, nextOriginalValue);
+            /*
+             * Due to rdf deduplication, the databank will never have more than
+             * one triple to represent this property-value. Therefore, mark this
+             * triple for removal only if there are no other occurrences of this
+             * value in the vTable.
+             */
+            if (podd.vTablePropertyContainsValue(propertyUri, nextOriginalValue) === false) {
+                nextChangeset.oldTriples.push(podd.buildTriple(objectUri, propertyUri, nextOriginalValue, propertyType,
+                        propertyDatatype));
+            }
+        }
 
-		podd.debug('[dateField] Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue + ' (isNew='
-				+ isNew + ')');
+        // add a new triple ONLY if the value is non-empty. enables deleting of
+        // previous entries.
+        if (newValue !== '') {
+            podd.vTableAddPropertyValue(propertyUri, newValue);
+            nextChangeset.newTriples.push(podd.buildTriple(objectUri, propertyUri, newValue, propertyType,
+                    propertyDatatype));
+        }
 
-		podd.updateDatabank(changesets, nextArtifactDatabank);
-	} else {
-		podd.debug("[dateField] No change of value for property=" + propertyUri + " original=" + nextOriginalValue
-				+ " newValue=" + newValue);
-	}
+        changesets.push(nextChangeset);
+
+        podd.debug('[dateField] Update property : ' + propertyUri + ' from ' + nextOriginalValue + ' to ' + newValue
+                + ' (isNew=' + isNew + ')');
+
+        podd.updateDatabank(changesets, nextArtifactDatabank);
+    }
+    else {
+        podd.debug("[dateField] No change of value for property=" + propertyUri + " original=" + nextOriginalValue
+                + " newValue=" + newValue);
+    }
 };
 
 /**
@@ -1644,14 +1695,13 @@ podd.handleDatePickerFieldChange = function(textField, propertyUri, originalValu
  * 
  */
 podd.initialiseNewObject = function(nextDatabank, artifactUri, objectUri, parentUri, parentPredicateUri) {
-	
-	podd.debug('Trying to build triple out of: ' + parentUri + ' ' + parentPredicateUri + ' and ' + objectUri);
+
+    podd.debug('Trying to build triple out of: ' + parentUri + ' ' + parentPredicateUri + ' and ' + objectUri);
 
     nextDatabank.add('<' + parentUri + '> <' + parentPredicateUri + '> ' + objectUri);
-    
-	// add createdAt statement with default value
-	nextDatabank.add(podd.buildTriple(objectUri, PODD_CREATED_AT,
-			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
+
+    // add createdAt statement with default value
+    nextDatabank.add(podd.buildTriple(objectUri, PODD_CREATED_AT, DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
 };
 
 /**
@@ -1674,10 +1724,9 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddBase/1>');
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddScience/1>');
     nextDatabank.add(artifactUri + ' owl:imports <http://purl.org/podd/ns/version/poddPlant/1>');
-    
+
     // add createdAt statement with default value
-	nextDatabank.add(podd.buildTriple(objectUri, PODD_CREATED_AT,
-			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
+    nextDatabank.add(podd.buildTriple(objectUri, PODD_CREATED_AT, DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
 };
 
 /**
@@ -1691,26 +1740,29 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
  * @return {boolean} Indicating whether the artifact is valid or not
  */
 podd.isValidArtifact = function(nextDatabank) {
-	var valid = true;
-	
-	$.each(podd.cardinalityList, function(index, value) {
-		
-		if (typeof value.cardinality !== 'undefined' && (value.cardinality.toString() === CARD_ExactlyOne 
-				|| value.cardinality.toString() === CARD_OneOrMany)) {
-			
-			 var myQuery = $.rdf({
-			        databank : nextDatabank
-			    }).where('?someObject <' +value.propertyUri + '> ?someValue');
-		    var bindings = myQuery.select();
-		    if (bindings.length === 0) {
-				podd.updateErrorMessageList('Mandatory property ' + value.propertyLabel + ' is empty.');
+    var valid = true;
 
-				//TODO: display error next to the erroneous
-				valid = false;
-		    }
-		}
-	});
-	return valid;
+    $
+            .each(
+                    podd.cardinalityList,
+                    function(index, value) {
+
+                        if (typeof value.cardinality !== 'undefined'
+                                && (value.cardinality.toString() === CARD_ExactlyOne || value.cardinality.toString() === CARD_OneOrMany)) {
+
+                            var myQuery = $.rdf({
+                                databank : nextDatabank
+                            }).where('?someObject <' + value.propertyUri + '> ?someValue');
+                            var bindings = myQuery.select();
+                            if (bindings.length === 0) {
+                                podd.updateErrorMessageList('Mandatory property ' + value.propertyLabel + ' is empty.');
+
+                                // TODO: display error next to the erroneous
+                                valid = false;
+                            }
+                        }
+                    });
+    return valid;
 };
 
 /**
@@ -1718,8 +1770,8 @@ podd.isValidArtifact = function(nextDatabank) {
  * 
  * This method identifies object URIs in the artifact databank that do not have
  * labels, retrieves them from the PODD service and stores them in the schema
- * databank (labels are stored in the schma databank as they are not
- * part of the artifact).
+ * databank (labels are stored in the schma databank as they are not part of the
+ * artifact).
  * 
  * @param artifactUri -
  *            {string} URI for the current artifact
@@ -1732,63 +1784,65 @@ podd.isValidArtifact = function(nextDatabank) {
  * @param callbackParam -
  *            {object} Parameter to be used when invoking the callback
  */
-podd.loadMissingArtifactLabels = function(artifactUri, nextSchemaDatabank,
-		nextArtifactDatabank, callbackFunction, callbackParam) {
+podd.loadMissingArtifactLabels = function(artifactUri, nextSchemaDatabank, nextArtifactDatabank, callbackFunction,
+        callbackParam) {
     podd.debug('[loadArtifactLabels] started')
-    
+
     // go through artifact databank and identify URIs without labels
     var uriList = [];
     var tempDatabank = podd.newDatabank();
-    
+
     var myQuery = $.rdf({
         databank : nextArtifactDatabank
     })
-    //for all statements
+    // for all statements
     .where('?subject ?predicate ?object')
-    //optionally, if object has a label
-    .optional('?object <http://www.w3.org/2000/01/rdf-schema#label> ?objectLabel')
-    ;
+    // optionally, if object has a label
+    .optional('?object <http://www.w3.org/2000/01/rdf-schema#label> ?objectLabel');
     var bindings = myQuery.select();
 
     $.each(bindings, function(index, value) {
         if (value.object.type === 'uri' && value.objectLabel === undefined) {
-            //podd.debug('[loadArtifactLabels] missing label for = ' + value.object.value)
+            // podd.debug('[loadArtifactLabels] missing label for = ' +
+            // value.object.value)
             uriList.push(value.object.value);
             tempDatabank.add('<' + value.object.value + '> <http://www.w3.org/2000/01/rdf-schema#label> "?blank"');
         }
     });
-    
+
     // retrieve labels for these and populate the schemadatabank with them
     var triplesToSendInJson = $.toJSON(tempDatabank.dump({
         format : 'application/json'
-    }));    
-    var requestUrl = podd.baseUrl + '/search?artifacturi=' + podd.uriEncode(artifactUri); 
-    
+    }));
+    var requestUrl = podd.baseUrl + '/search?artifacturi=' + podd.uriEncode(artifactUri);
+
     $.ajax({
         url : requestUrl,
         type : 'POST',
-        
+
         data : {
             artifacturi : artifactUri
         },
         data : triplesToSendInJson,
-        
+
         contentType : 'application/rdf+json', // what we're sending
         beforeSend : function(xhr) {
             xhr.setRequestHeader("Accept", "application/rdf+json");
         },
         success : function(resultData, status, xhr) {
             // add the results to schemadatabank
-        	//podd.debug('[getUriLabel] response is = ' + resultData.toString());
-        	var sizeBefore = nextSchemaDatabank.size();
+            // podd.debug('[getUriLabel] response is = ' +
+            // resultData.toString());
+            var sizeBefore = nextSchemaDatabank.size();
             nextSchemaDatabank.load(resultData);
-            podd.debug('[loadArtifactLabels] ### SUCCESS ### databank size changed from ' + sizeBefore + ' to ' + nextSchemaDatabank.size());
-            
+            podd.debug('[loadArtifactLabels] ### SUCCESS ### databank size changed from ' + sizeBefore + ' to '
+                    + nextSchemaDatabank.size());
+
             // callback
             // The following may update the interface, redirect the user to
             // another page, or so anything it likes really
-        	podd.debug('[loadArtifactLabels] invoke callback with 4 parameters')
-        	callbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank, callbackParam);
+            podd.debug('[loadArtifactLabels] invoke callback with 4 parameters')
+            callbackFunction(podd.objectTypeUri, nextSchemaDatabank, nextArtifactDatabank, callbackParam);
         },
         error : function(xhr, status, error) {
             podd.debug(status + '[loadArtifactLabels] $$$ ERROR $$$ ' + error);
@@ -1810,6 +1864,7 @@ podd.newDatabank = function() {
     // nextDatabank.base("http://www.example.org/")
     nextDatabank.prefix("dcterms", "http://purl.org/dc/terms/");
     nextDatabank.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#');
+    nextDatabank.prefix('poddDataRepositories', 'http://purl.org/podd/ns/dataRepository#');
     nextDatabank.prefix('poddUser', 'http://purl.org/podd/ns/poddUser#');
     nextDatabank.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
     nextDatabank.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#');
@@ -1844,10 +1899,11 @@ podd.parseSearchResults = function(/* string */searchURL, /* rdf/json */data) {
     $.each(bindings, function(index, value) {
         var nextChild = {};
         nextChild.label = value.pLabel.value;
-        
+
         if (value.pIdentifier !== undefined && value.pIdentifier !== 'undefined') {
-        	nextChild.value = value.pIdentifier.value;
-        } else {
+            nextChild.value = value.pIdentifier.value;
+        }
+        else {
             nextChild.value = value.pUri.value;
         }
 
@@ -1867,23 +1923,23 @@ podd.parseSearchResults = function(/* string */searchURL, /* rdf/json */data) {
  */
 podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifactDatabank) {
 
-	if (typeof podd.artifactIri === 'undefined' || podd.artifactIri === 'undefined'
-		|| podd.artifactIri.toString().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
-		
-		window.location.href = podd.baseUrl + '/artifacts';
-		return;
-	}
-	
-	var redirectUri = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(podd.artifactIri);
-	
-	//TODO: podd.objectUri should be set before this redirect is called
-	if (typeof podd.objectUri !== 'undefined' && podd.objectUri !== 'undefined'
-			&& podd.objectUri.lastIndexOf('<urn:temp:uuid:', 0) !== 0) {
+    if (typeof podd.artifactIri === 'undefined' || podd.artifactIri === 'undefined'
+            || podd.artifactIri.toString().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
 
-		podd.debug('[Redirect] to object: ' + podd.objectUri);
-		redirectUri = redirectUri + '&objecturi=' + encodeURIComponent(podd.objectUri);
-	}
-	window.location.href = redirectUri;
+        window.location.href = podd.baseUrl + '/artifacts';
+        return;
+    }
+
+    var redirectUri = podd.baseUrl + '/artifact/base?artifacturi=' + encodeURIComponent(podd.artifactIri);
+
+    // TODO: podd.objectUri should be set before this redirect is called
+    if (typeof podd.objectUri !== 'undefined' && podd.objectUri !== 'undefined'
+            && podd.objectUri.lastIndexOf('<urn:temp:uuid:', 0) !== 0) {
+
+        podd.debug('[Redirect] to object: ' + podd.objectUri);
+        redirectUri = redirectUri + '&objecturi=' + encodeURIComponent(podd.objectUri);
+    }
+    window.location.href = redirectUri;
 };
 
 /**
@@ -1896,12 +1952,11 @@ podd.redirectToGetArtifact = function(objectType, nextSchemaDatabank, nextArtifa
  *            Contains statements of current object
  */
 podd.resetLastModifiedAt = function(objectUri, nextDatabank) {
-	// delete lastModified statement if it exists
-	podd.deleteTriples(nextDatabank, objectUri, PODD_LAST_MODIFIED);
+    // delete lastModified statement if it exists
+    podd.deleteTriples(nextDatabank, objectUri, PODD_LAST_MODIFIED);
 
-	// add lastModified statement with dummy value
-	nextDatabank.add(podd.buildTriple(objectUri, PODD_LAST_MODIFIED,
-			DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
+    // add lastModified statement with dummy value
+    nextDatabank.add(podd.buildTriple(objectUri, PODD_LAST_MODIFIED, DUMMY_Datetime, DATATYPE_PROPERTY, XSD_DATETIME));
 };
 
 /**
@@ -1942,15 +1997,15 @@ podd.searchOntologyService = function(
         },
         error : function(xhr, status, error) {
             podd.debug(status + '[searchOntologyService] $$$ ERROR $$$ ' + error);
-            
+
             podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
 };
 
 /**
- * Call Search User Resource Service using AJAX, convert the RDF response to
- * a JSON array and invoke the specified callback function.
+ * Call Search User Resource Service using AJAX, convert the RDF response to a
+ * JSON array and invoke the specified callback function.
  * 
  * @param request
  *            {object} Contains the 'search term'
@@ -1980,7 +2035,7 @@ podd.searchUserService = function(request, callbackFunction) {
         },
         error : function(xhr, status, error) {
             podd.debug(status + '[searchUserService] $$$ ERROR $$$ ' + error);
-            
+
             podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
@@ -2008,12 +2063,12 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
         targetobject : ''
     });
     select.append(defaultOption);
-    
+
     var myQuery = $.rdf({
         databank : nextSchemaDatabank
     })
     // Find all possible child object details for this object type
-    .where('<' +objectType + '> rdfs:subClassOf ?myRestriction')
+    .where('<' + objectType + '> rdfs:subClassOf ?myRestriction')
     //
     .where('?myRestriction a owl:Restriction')
     //
@@ -2023,23 +2078,22 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
     //
     .where('?childRelationship rdfs:label ?relationshipLabel')
     //
-    .where('?childType rdfs:label ?childTypeLabel')
-    ;
+    .where('?childType rdfs:label ?childTypeLabel');
     var bindings = myQuery.select();
 
     var bindingsList = [];
-    
+
     $.each(bindings, function(index, value) {
         var nextChild = {};
         nextChild.weight;
         nextChild.propertyUri = value.childRelationship.value;
         nextChild.propertyLabel = value.relationshipLabel.value;
         nextChild.objectType = value.childType.value;
-    	nextChild.objectLabel = value.childTypeLabel.value;
-    	
-        podd.debug('[showAddChildDialog] child relationship: <' + nextChild.propertyUri + '> "' 
-        		+ nextChild.propertyLabel + '"  and child type: ' + nextChild.objectType);
-        
+        nextChild.objectLabel = value.childTypeLabel.value;
+
+        podd.debug('[showAddChildDialog] child relationship: <' + nextChild.propertyUri + '> "'
+                + nextChild.propertyLabel + '"  and child type: ' + nextChild.objectType);
+
         bindingsList.push(nextChild);
     });
 
@@ -2047,40 +2101,41 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
     bindingsList.sort(function(a, b) {
         var aID = a.weight;
         var bID = b.weight;
-        
+
         if (aID == bID) {
-        	// on equal weights sort by property label
-        	return (a.propertyLabel > b.propertyLabel) ? 1: -1;
-        } else {
-        	return (aID - bID);
+            // on equal weights sort by property label
+            return (a.propertyLabel > b.propertyLabel) ? 1 : -1;
+        }
+        else {
+            return (aID - bID);
         }
     });
-    
+
     $.each(bindingsList, function(index, nextChild) {
-        var text = nextChild.objectLabel + ' (' + nextChild.propertyLabel + ')'; 
-        
+        var text = nextChild.objectLabel + ' (' + nextChild.propertyLabel + ')';
+
         var option = $('<option>', {
             value : nextChild.propertyUri,
             text : text,
             targetobject : nextChild.objectType
         });
-        
+
         select.append(option);
     });
-    
+
     var hiddenChildType = $('<input>', {
-    	name : 'name_child_type',
-    	type : 'hidden'
+        name : 'name_child_type',
+        type : 'hidden'
     });
-    
+
     var hiddenRelationship = $('<input>', {
-    	name : 'name_child_relationship',
-    	type : 'hidden'
+        name : 'name_child_relationship',
+        type : 'hidden'
     });
-    
+
     var continueLink = $('<a>', {
         name : 'name_add_object_link',
-        text : 'Continue', 
+        text : 'Continue',
         class : 'button'
     });
 
@@ -2089,25 +2144,25 @@ podd.showAddChildDialog = function(objectType, nextSchemaDatabank) {
     });
 
     podd.addChildObjectHandler(continueLink, select, hiddenChildType, hiddenRelationship);
-   
+
     div.append('<p>Select Type of Child</p>')
     div.append(select);
     div.append('<br><br>');
     div.append(continueLink);
     div.append(hiddenChildType);
     div.append(hiddenRelationship);
-    
-	var dialog = $("#dialog").dialog({
-		autoOpen : false,
-		modal: true,
-	    dialogClass: "dialog_class",
-	    close: function () {
-    		div.remove();
-  		}  
-	});
-	dialog.append(div);
-	dialog.dialog("open");
-    
+
+    var dialog = $("#dialog").dialog({
+        autoOpen : false,
+        modal : true,
+        dialogClass : "dialog_class",
+        close : function() {
+            div.remove();
+        }
+    });
+    dialog.append(div);
+    dialog.dialog("open");
+
     podd.debug('[showAddChildDialog] finished');
 };
 
@@ -2130,38 +2185,38 @@ podd.showAddRoleDialog = function() {
             value : nextChild.uri,
             text : nextChild.name,
         });
-        
+
         select.append(option);
     });
-    
+
     var continueLink = $('<a>', {
         name : 'name_add_role_link',
-        text : 'Continue', 
+        text : 'Continue',
         class : 'button'
     });
-    
+
     var div = $('<div>', {
         name : 'add_role',
     });
 
     podd.addRoleDialogContinueHandler(continueLink, select);
-   
+
     div.append('<p>Select Role</p>')
     div.append(select);
     div.append('<br><br>');
     div.append(continueLink);
-    
-	var dialog = $("#add_role_dialog").dialog({
-		autoOpen : false,
-		modal: true,
-	    dialogClass: "dialog_class",
-	    close: function () {
-    		div.remove();
-  		}  
-	});
-	dialog.append(div);
-	dialog.dialog("open");
-    
+
+    var dialog = $("#add_role_dialog").dialog({
+        autoOpen : false,
+        modal : true,
+        dialogClass : "dialog_class",
+        close : function() {
+            div.remove();
+        }
+    });
+    dialog.append(div);
+    dialog.dialog("open");
+
     podd.debug('[showAddRole] finished');
 };
 
@@ -2181,61 +2236,61 @@ podd.showAddRoleDialog = function() {
  * @param childCount
  *            {int} The number of child objects that the object to delete has
  * @param redirectUrl
- * 			  {string} URL to redirect to upon successful completion
+ *            {string} URL to redirect to upon successful completion
  */
 podd.showDeleteObjectConfirmDialog = function(artifactUri, versionUri, objectUri, objectName, childCount, redirectUrl) {
     podd.debug('[showDeleteObjectConfirmDialog] started');
-	
+
     var cascade = false;
     var confirmationMessage = 'Delete Object "' + objectName + '"';
     if (childCount > 0) {
-    	confirmationMessage += ' and its child objects';
-    	cascade = true;
+        confirmationMessage += ' and its child objects';
+        cascade = true;
     }
     confirmationMessage += '?'
-    
+
     var confirmLink = $('<a>', {
         name : 'name_delete_object_link',
-        text : 'Confirm', 
+        text : 'Confirm',
         class : 'button',
-        click : function(){
-        	podd.debug('Clicked Confirmation Link');
-        	$('#delete_object_dialog').dialog('close');
-        	
-         	podd.submitDeleteObject(artifactUri, versionUri, objectUri, cascade, redirectUrl);
+        click : function() {
+            podd.debug('Clicked Confirmation Link');
+            $('#delete_object_dialog').dialog('close');
+
+            podd.submitDeleteObject(artifactUri, versionUri, objectUri, cascade, redirectUrl);
         }
     });
-    
+
     var cancelLink = $('<a>', {
         name : 'name_cancel_delete_object_link',
-        text : 'Cancel', 
+        text : 'Cancel',
         class : 'button',
-        click : function(){
-        	$('#delete_object_dialog').dialog('close');
+        click : function() {
+            $('#delete_object_dialog').dialog('close');
         }
     });
-    
+
     var div = $('<div/>', {
-    	id : 'buttonwrapper',
+        id : 'buttonwrapper',
         name : 'delete_object'
     });
-    
+
     div.append('<p>' + confirmationMessage + '</p>')
     div.append('<br><br>');
     div.append(confirmLink);
     div.append(cancelLink);
-    
-	var dialog = $("#delete_object_dialog").dialog({
-		autoOpen : false,
-		modal: true,
-	    dialogClass: "dialog_class",
-	    close: function () {
-    		div.remove();
-  		}  
-	});
-	dialog.append(div);
-	dialog.dialog("open");
-    
+
+    var dialog = $("#delete_object_dialog").dialog({
+        autoOpen : false,
+        modal : true,
+        dialogClass : "dialog_class",
+        close : function() {
+            div.remove();
+        }
+    });
+    dialog.append(div);
+    dialog.dialog("open");
+
     podd.debug('[showDeleteObjectConfirmDialog] finished');
 };
 
@@ -2243,60 +2298,59 @@ podd.showDeleteObjectConfirmDialog = function(artifactUri, versionUri, objectUri
  * Display a Dialog asking for confirmation of deleting a PODD User's Role.
  */
 podd.showDeleteRoleConfirmDialog = function(userName, rowToDelete) {
-	
-	var roleUri = $('.role_span', rowToDelete).attr('value');
-	var roleName = $('.role_span', rowToDelete).text();
-	
+
+    var roleUri = $('.role_span', rowToDelete).attr('value');
+    var roleName = $('.role_span', rowToDelete).text();
+
     var confirmationMessage = 'Delete Role "' + roleName + '"?';
-    
+
     var confirmLink = $('<a>', {
         name : 'name_delete_role_link',
-        text : 'Confirm', 
+        text : 'Confirm',
         class : 'button',
-        click : function(){
-        	podd.debug('Clicked Confirmation Link');
-        	$('#delete_role_dialog').dialog('close');
-        	
-         	podd.submitUserRoleDelete(userName, roleUri);
-         	rowToDelete.fadeOut(400, function(){
-         		rowToDelete.remove();
-        	});
+        click : function() {
+            podd.debug('Clicked Confirmation Link');
+            $('#delete_role_dialog').dialog('close');
+
+            podd.submitUserRoleDelete(userName, roleUri);
+            rowToDelete.fadeOut(400, function() {
+                rowToDelete.remove();
+            });
         }
     });
-    
+
     var cancelLink = $('<a>', {
         name : 'name_cancel_delete_role_link',
-        text : 'Cancel', 
+        text : 'Cancel',
         class : 'button',
-        click : function(){
-        	$('#delete_role_dialog').dialog('close');
+        click : function() {
+            $('#delete_role_dialog').dialog('close');
         }
     });
-    
+
     var div = $('<div/>', {
-    	id : 'buttonwrapper',
+        id : 'buttonwrapper',
         name : 'delete_role'
     });
-    
+
     div.append('<p>' + confirmationMessage + '</p>')
     div.append('<br><br>');
     div.append(confirmLink);
     div.append(cancelLink);
-    
-	var dialog = $("#delete_role_dialog").dialog({
-		autoOpen : false,
-		modal: true,
-	    dialogClass: "dialog_class",
-	    close: function () {
-    		div.remove();
-  		}  
-	});
-	dialog.append(div);
-	dialog.dialog("open");
-    
+
+    var dialog = $("#delete_role_dialog").dialog({
+        autoOpen : false,
+        modal : true,
+        dialogClass : "dialog_class",
+        close : function() {
+            div.remove();
+        }
+    });
+    dialog.append(div);
+    dialog.dialog("open");
+
     podd.debug('[showDeleteRoleConfirmDialog] finished');
 };
-
 
 /**
  * Invoke the Edit Artifact Service to update the artifact with changed object
@@ -2314,15 +2368,15 @@ podd.submitPoddObjectUpdate = function(
 /* object */nextArtifactDatabank,
 /* function */updateCallback) {
 
-	podd.resetLastModifiedAt(objectUri, nextArtifactDatabank);
-	
-	podd.emptyErrorMessages();
+    podd.resetLastModifiedAt(objectUri, nextArtifactDatabank);
 
-	if (!podd.isValidArtifact(nextArtifactDatabank)) {
-		podd.debug('[updatePoddObject] Invalid artifact. Aborting submit.');
-		return; // cannot continue submission
-	}
-	
+    podd.emptyErrorMessages();
+
+    if (!podd.isValidArtifact(nextArtifactDatabank)) {
+        podd.debug('[updatePoddObject] Invalid artifact. Aborting submit.');
+        return; // cannot continue submission
+    }
+
     var requestUrl;
 
     var modifiedTriples = $.toJSON(nextArtifactDatabank.dump({
@@ -2340,8 +2394,8 @@ podd.submitPoddObjectUpdate = function(
         requestUrl = podd.baseUrl + '/artifact/new';
     }
     else {
-    	requestUrl = podd.baseUrl + '/artifact/edit'
-    	// FIXME: Why is the parameter isForce hardcoded to true?
+        requestUrl = podd.baseUrl + '/artifact/edit'
+        // FIXME: Why is the parameter isForce hardcoded to true?
         requestUrl = requestUrl + '?artifacturi=' + podd.uriEncode(artifactIri) + '&isforce=true';
         if (typeof versionIri !== "undefined") {
             podd.debug(' of artifact (' + versionIri + ').');
@@ -2367,7 +2421,8 @@ podd.submitPoddObjectUpdate = function(
         success : function(resultData, status, xhr) {
             podd.debug('[updatePoddObject] ### SUCCESS ### ' + resultData);
             // podd.debug('[updatePoddObject] ' + xhr.responseText);
-            // var message = '<div>Successfully edited artifact.<pre>' + xhr.responseText + '</pre></div>';
+            // var message = '<div>Successfully edited artifact.<pre>' +
+            // xhr.responseText + '</pre></div>';
             // podd.debug(message);
 
             // The results of an update query are minimal
@@ -2377,21 +2432,22 @@ podd.submitPoddObjectUpdate = function(
             // Reset the artifact and version URIs based on what came back
             podd.artifactIri = artifactId[0].artifactIri;
             podd.versionIri = artifactId[0].versionIri;
-            
+
             podd.updateObjectUriWithPurl(tempDatabank);
             // Do we need to worry about parent URI?
-            
+
             // After the update is complete we try to fetch the complete content
             // before calling updateCallback again, to make sure that all of the
             // temporary URIs in nextArtifactDatabank are replaced with their
             // PURL versions
             var emptyParam;
-            podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, true, updateCallback, emptyParam);
+            podd.getArtifact(podd.artifactIri, nextSchemaDatabank, nextArtifactDatabank, true, updateCallback,
+                    emptyParam);
         },
         error : function(xhr, status, error) {
             podd.debug('[updatePoddObject] $$$ ERROR $$$ ' + error);
             podd.debug(xhr.statusText);
-            
+
             podd.displaySummaryErrorMessage(xhr.responseText);
         }
     });
@@ -2416,40 +2472,40 @@ podd.submitPoddObjectUpdate = function(
  */
 podd.submitDeleteObject = function(artifactUri, versionUri, objectUri, cascade, redirectUrl) {
 
-	podd.debug("[submitDeleteObject] started");
+    podd.debug("[submitDeleteObject] started");
 
-	podd.debug('objectUri = ' + objectUri);
-	podd.debug('redirect  = ' + redirectUrl);
-	
-	var requestUrl = podd.baseUrl + '/artifact/deleteobject?artifacturi=' + encodeURIComponent(artifactUri)
-			+ '&versionuri=' + encodeURIComponent(versionUri) + '&objecturi=' + encodeURIComponent(objectUri)
-			+ '&iscascade=' + cascade;
+    podd.debug('objectUri = ' + objectUri);
+    podd.debug('redirect  = ' + redirectUrl);
 
-	if (typeof objectUri == undefined || objectUri === 'undefined') {
-		podd.debug('Deleting an Artifact: ' + artifactUri);
-		requestUrl = podd.baseUrl + '/artifact/delete?artifacturi=' + encodeURIComponent(artifactUri) 
-			+ '&versionuri=' + encodeURIComponent(versionUri);
-	}
-	
-	$.ajax({
-		url : requestUrl,
-		type : 'DELETE',
-		contentType : 'application/rdf+json', // what we're sending
-		beforeSend : function(xhr) {
-			xhr.setRequestHeader("Accept", "application/rdf+json");
-		},
-		success : function(resultData, status, xhr) {
-			podd.debug('[submitDeleteObject] ### SUCCESS ### ' + resultData);
-			window.location.href = redirectUrl;
-			
-		},
-		error : function(xhr, status, error) {
-			podd.debug('[submitDeleteObject] $$$ ERROR $$$ ' + error);
-			podd.debug(xhr.statusText);
+    var requestUrl = podd.baseUrl + '/artifact/deleteobject?artifacturi=' + encodeURIComponent(artifactUri)
+            + '&versionuri=' + encodeURIComponent(versionUri) + '&objecturi=' + encodeURIComponent(objectUri)
+            + '&iscascade=' + cascade;
 
-			podd.displaySummaryErrorMessage(xhr.responseText);
-		}
-	});
+    if (typeof objectUri == undefined || objectUri === 'undefined') {
+        podd.debug('Deleting an Artifact: ' + artifactUri);
+        requestUrl = podd.baseUrl + '/artifact/delete?artifacturi=' + encodeURIComponent(artifactUri) + '&versionuri='
+                + encodeURIComponent(versionUri);
+    }
+
+    $.ajax({
+        url : requestUrl,
+        type : 'DELETE',
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
+        success : function(resultData, status, xhr) {
+            podd.debug('[submitDeleteObject] ### SUCCESS ### ' + resultData);
+            window.location.href = redirectUrl;
+
+        },
+        error : function(xhr, status, error) {
+            podd.debug('[submitDeleteObject] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
+
+            podd.displaySummaryErrorMessage(xhr.responseText);
+        }
+    });
 };
 
 /**
@@ -2459,62 +2515,62 @@ podd.submitDeleteObject = function(artifactUri, versionUri, objectUri, cascade, 
  * bound to the element IDs used in admin_createUser.html
  */
 podd.submitUserCreate = function() {
-	podd.debug("[submitUserCreate] adding a new user...");
-	
-	var userName = $('#userName').val();
-	var email = $('#email').val();
-	var password = $('#password').val();
-	var status = $('input:radio[name=status]:checked').val();
-	var title = $('#title').val();
-	var firstName = $('#firstName').val();
-	var lastName = $('#lastName').val();
-	var organisation = $('#organisation').val();
-	var position = $('#position').val();
-	var phone = $('#phone').val();
-	var address = $('#address').val();
-	var url = $('#url').val();
-	var orcid = $('#orcid').val();
+    podd.debug("[submitUserCreate] adding a new user...");
 
-	var pathToSubmitTo = '/admin/user/add';
-	var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + "?userIdentifier=" + userName;
+    var userName = $('#userName').val();
+    var email = $('#email').val();
+    var password = $('#password').val();
+    var status = $('input:radio[name=status]:checked').val();
+    var title = $('#title').val();
+    var firstName = $('#firstName').val();
+    var lastName = $('#lastName').val();
+    var organisation = $('#organisation').val();
+    var position = $('#position').val();
+    var phone = $('#phone').val();
+    var address = $('#address').val();
+    var url = $('#url').val();
+    var orcid = $('#orcid').val();
 
-	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
-			phone, address, url, orcid, undefined, redirectUrl);
+    var pathToSubmitTo = '/admin/user/add';
+    var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + "?userIdentifier=" + userName;
+
+    podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation,
+            position, phone, address, url, orcid, undefined, redirectUrl);
 };
 
 /**
  * @memberOf podd
  * 
- * Submit the "Edit User" form to update a PoddUser's details.
- * This method is closely bound to the element IDs used in editUser.html
+ * Submit the "Edit User" form to update a PoddUser's details. This method is
+ * closely bound to the element IDs used in editUser.html
  */
 podd.submitUserEdit = function() {
-	podd.debug("[submitUserEdit] updating user details...");
-	
-	var userName = $('#userName').val();
-	var email = $('#email').val();
-	var password = $('#password').val();
-	
-	var status = $('input:radio[name=status]:checked').val();
-	if (typeof status == 'undefined' || status == 'undefined') {
-		status = $('#status').val();
-	}
-	
-	var title = $('#title').val();
-	var firstName = $('#firstName').val();
-	var lastName = $('#lastName').val();
-	var organisation = $('#organisation').val();
-	var position = $('#position').val();
-	var phone = $('#phone').val();
-	var address = $('#address').val();
-	var url = $('#url').val();
-	var orcid = $('#orcid').val();
+    podd.debug("[submitUserEdit] updating user details...");
 
-	var pathToSubmitTo = '/user/edit?userIdentifier=' + userName;
-	var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + "?userIdentifier=" + userName;
+    var userName = $('#userName').val();
+    var email = $('#email').val();
+    var password = $('#password').val();
 
-	podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation, position,
-			phone, address, url, orcid, undefined, redirectUrl);
+    var status = $('input:radio[name=status]:checked').val();
+    if (typeof status == 'undefined' || status == 'undefined') {
+        status = $('#status').val();
+    }
+
+    var title = $('#title').val();
+    var firstName = $('#firstName').val();
+    var lastName = $('#lastName').val();
+    var organisation = $('#organisation').val();
+    var position = $('#position').val();
+    var phone = $('#phone').val();
+    var address = $('#address').val();
+    var url = $('#url').val();
+    var orcid = $('#orcid').val();
+
+    var pathToSubmitTo = '/user/edit?userIdentifier=' + userName;
+    var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + "?userIdentifier=" + userName;
+
+    podd.submitUserData(pathToSubmitTo, userName, email, password, status, title, firstName, lastName, organisation,
+            position, phone, address, url, orcid, undefined, redirectUrl);
 };
 
 /**
@@ -2542,115 +2598,128 @@ podd.submitUserEdit = function() {
  * @param orcid
  * @param oldPassword
  * @param redirectUrl
- * 			  {string} The URL to redirect after successful completion
+ *            {string} The URL to redirect after successful completion
  */
-podd.submitUserData = function(submitPath, userName, email, password, status, title, firstName, lastName,
-		organisation, position, phone, address, homePage, orcid, oldPassword, redirectUrl) {
-	  
-	  var databank = podd.newDatabank();
-	  var tempUser = '<urn:temp:user>';
-	  
-	  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userIdentifier>', userName, DATATYPE_PROPERTY, XSD_STRING));
-	  
-	  if (typeof email !== 'undefined' && email !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userEmail>', email, DATATYPE_PROPERTY, XSD_STRING));
-	  }
-	  
-	  if (typeof firstName !== 'undefined' && firstName !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userFirstName>', firstName, DATATYPE_PROPERTY, XSD_STRING));
-	  }
-	  
-	  if (typeof lastName !== 'undefined' && lastName !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userLastName>', lastName, DATATYPE_PROPERTY, XSD_STRING));
-	  }
-	  
-	  if (typeof organisation !== 'undefined' && organisation !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#organization>', organisation, DATATYPE_PROPERTY, XSD_STRING));
-	  }
-	  
-	  if (typeof phone !== 'undefined' && phone !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#phone>', phone, DATATYPE_PROPERTY, XSD_STRING));
-	  }
-	  
-	  if (typeof address !== 'undefined' && address !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#address>', address, DATATYPE_PROPERTY, XSD_STRING));
-	  }
+podd.submitUserData = function(submitPath, userName, email, password, status, title, firstName, lastName, organisation,
+        position, phone, address, homePage, orcid, oldPassword, redirectUrl) {
 
-	  if (typeof password !== 'undefined' && password !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userSecret>', password, DATATYPE_PROPERTY, XSD_STRING));
-	  }
-	  
-	  if (typeof status !== 'undefined' && status !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#status>', status, OBJECT_PROPERTY, 'URI'));
-	  }
-	  if (typeof title !== 'undefined' && title !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#title>', title, DATATYPE_PROPERTY, XSD_STRING));
-	  }
-	  if (typeof homePage !== 'undefined' && homePage !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#homepage>', homePage, OBJECT_PROPERTY, 'URI'));
-	  }
-	  if (typeof position !== 'undefined' && position !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#position>', position, DATATYPE_PROPERTY, XSD_STRING));
-	  }
-	  if (typeof orcid !== 'undefined' && orcid !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#orcid>', orcid, DATATYPE_PROPERTY, XSD_STRING));
-	  }
-	  
-	  // only when current user is changing his/her password
-	  if (typeof oldPassword !== 'undefined' && oldPassword !== '') {
-		  databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#oldSecret>', oldPassword, DATATYPE_PROPERTY, XSD_STRING));
-	  }
+    var databank = podd.newDatabank();
+    var tempUser = '<urn:temp:user>';
 
-	  var modifiedTriples = $.toJSON(databank.dump({
-		format : 'application/json'
-	  }));
-	  podd.debug("As JSON: " + modifiedTriples);
-	  
-	  var requestUrl = podd.baseUrl + submitPath;
-	  
-	  $.ajax({
-	        url : requestUrl,
-	        type : 'POST',
-	        data : modifiedTriples,
-	        contentType : 'application/rdf+json', // what we're sending
-	        beforeSend : function(xhr) {
-	            xhr.setRequestHeader("Accept", "application/rdf+json");
-	        },
-	        success : function(resultData, status, xhr) {
-	            podd.debug('[submitUserData] ### SUCCESS ### ' + resultData);
-	        	window.location.href = redirectUrl;
-	        },
-	        error : function(xhr, status, error) {
-	            podd.debug('[submitUserData] $$$ ERROR $$$ ' + error);
-	            podd.debug(xhr.statusText);
-	            
-	            podd.displaySummaryErrorMessage(xhr.responseText);
-	        }
-	    });	  
+    databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userIdentifier>', userName, DATATYPE_PROPERTY,
+            XSD_STRING));
+
+    if (typeof email !== 'undefined' && email !== '') {
+        databank.add(podd
+                .buildTriple(tempUser, '<http://purl.org/oas/userEmail>', email, DATATYPE_PROPERTY, XSD_STRING));
+    }
+
+    if (typeof firstName !== 'undefined' && firstName !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userFirstName>', firstName, DATATYPE_PROPERTY,
+                XSD_STRING));
+    }
+
+    if (typeof lastName !== 'undefined' && lastName !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userLastName>', lastName, DATATYPE_PROPERTY,
+                XSD_STRING));
+    }
+
+    if (typeof organisation !== 'undefined' && organisation !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#organization>', organisation,
+                DATATYPE_PROPERTY, XSD_STRING));
+    }
+
+    if (typeof phone !== 'undefined' && phone !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#phone>', phone, DATATYPE_PROPERTY,
+                XSD_STRING));
+    }
+
+    if (typeof address !== 'undefined' && address !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#address>', address,
+                DATATYPE_PROPERTY, XSD_STRING));
+    }
+
+    if (typeof password !== 'undefined' && password !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/oas/userSecret>', password, DATATYPE_PROPERTY,
+                XSD_STRING));
+    }
+
+    if (typeof status !== 'undefined' && status !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#status>', status, OBJECT_PROPERTY,
+                'URI'));
+    }
+    if (typeof title !== 'undefined' && title !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#title>', title, DATATYPE_PROPERTY,
+                XSD_STRING));
+    }
+    if (typeof homePage !== 'undefined' && homePage !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#homepage>', homePage,
+                OBJECT_PROPERTY, 'URI'));
+    }
+    if (typeof position !== 'undefined' && position !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#position>', position,
+                DATATYPE_PROPERTY, XSD_STRING));
+    }
+    if (typeof orcid !== 'undefined' && orcid !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#orcid>', orcid, DATATYPE_PROPERTY,
+                XSD_STRING));
+    }
+
+    // only when current user is changing his/her password
+    if (typeof oldPassword !== 'undefined' && oldPassword !== '') {
+        databank.add(podd.buildTriple(tempUser, '<http://purl.org/podd/ns/poddUser#oldSecret>', oldPassword,
+                DATATYPE_PROPERTY, XSD_STRING));
+    }
+
+    var modifiedTriples = $.toJSON(databank.dump({
+        format : 'application/json'
+    }));
+    podd.debug("As JSON: " + modifiedTriples);
+
+    var requestUrl = podd.baseUrl + submitPath;
+
+    $.ajax({
+        url : requestUrl,
+        type : 'POST',
+        data : modifiedTriples,
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
+        success : function(resultData, status, xhr) {
+            podd.debug('[submitUserData] ### SUCCESS ### ' + resultData);
+            window.location.href = redirectUrl;
+        },
+        error : function(xhr, status, error) {
+            podd.debug('[submitUserData] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
+
+            podd.displaySummaryErrorMessage(xhr.responseText);
+        }
+    });
 };
 
 /**
  * @memberOf podd
- *
+ * 
  * Submit Change Password form.
  * 
  */
 podd.submitUserPassword = function() {
 
-	var userName = $('#userName').val();
-	var password = $('#password').val();
-	var oldPassword = $('#oldPassword').val();
-	
-	var pathToSubmitTo = '/user/editpwd?userIdentifier=' + userName;
-	
-	var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + "?userIdentifier=" + userName;
-	if (oldPassword != undefined && oldPassword !== ''){
-		redirectUrl = podd.baseUrl + '/loginpage';
-	}
-		
-	
-	podd.submitUserData(pathToSubmitTo, userName, undefined, password, undefined, undefined, undefined, undefined, undefined, undefined,
-			undefined, undefined, undefined, undefined, oldPassword, redirectUrl);
+    var userName = $('#userName').val();
+    var password = $('#password').val();
+    var oldPassword = $('#oldPassword').val();
+
+    var pathToSubmitTo = '/user/editpwd?userIdentifier=' + userName;
+
+    var redirectUrl = podd.baseUrl + PATH_USER_DETAILS + "?userIdentifier=" + userName;
+    if (oldPassword != undefined && oldPassword !== '') {
+        redirectUrl = podd.baseUrl + '/loginpage';
+    }
+
+    podd.submitUserData(pathToSubmitTo, userName, undefined, password, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined, undefined, oldPassword, redirectUrl);
 };
 
 /**
@@ -2663,57 +2732,57 @@ podd.submitUserPassword = function() {
  * @param roleUri
  *            {string} URI of Role to be deleted
  * @param objectUri
- * 			  {string} Optional URI mapping for the Role to be deleted
+ *            {string} Optional URI mapping for the Role to be deleted
  */
 podd.submitUserRoleDelete = function(userName, roleUri, objectUri) {
 
-	podd.debug('[submitUserRoleDelete] ' + userName);
-	var pathToSubmitTo = PATH_USER_ROLES + '?useridentifier=' + userName + '&delete=true';
+    podd.debug('[submitUserRoleDelete] ' + userName);
+    var pathToSubmitTo = PATH_USER_ROLES + '?useridentifier=' + userName + '&delete=true';
 
-	var roleDatabank = podd.newDatabank();
+    var roleDatabank = podd.newDatabank();
 
-	if (roleUri !== undefined) {
-		podd.debug('[submitUserRoleDelete] role = ' + roleUri);
+    if (roleUri !== undefined) {
+        podd.debug('[submitUserRoleDelete] role = ' + roleUri);
 
-		var mappingUri = $.rdf.blank('_:mapping34');
+        var mappingUri = $.rdf.blank('_:mapping34');
 
-		roleDatabank.add(podd.buildTriple(mappingUri, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
-				'http://purl.org/oas/RoleMapping', OBJECT_PROPERTY, 'URI'));
-		roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/oas/roleMappedRole>', roleUri, OBJECT_PROPERTY,
-				'URI'));
-		if (typeof objectUri !== undefined && objectUri !== '') {
-			roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/oas/roleMappedObject>', objectUri, OBJECT_PROPERTY,
-			'URI'));
-		}
-		
-	}
+        roleDatabank.add(podd.buildTriple(mappingUri, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                'http://purl.org/oas/RoleMapping', OBJECT_PROPERTY, 'URI'));
+        roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/oas/roleMappedRole>', roleUri, OBJECT_PROPERTY,
+                'URI'));
+        if (typeof objectUri !== undefined && objectUri !== '') {
+            roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/oas/roleMappedObject>', objectUri,
+                    OBJECT_PROPERTY, 'URI'));
+        }
 
-	// ajax POST
-	var modifiedTriples = $.toJSON(roleDatabank.dump({
-		format : 'application/json'
-	}));
-	podd.debug("As JSON: " + modifiedTriples);
+    }
 
-	var requestUrl = podd.baseUrl + pathToSubmitTo;
+    // ajax POST
+    var modifiedTriples = $.toJSON(roleDatabank.dump({
+        format : 'application/json'
+    }));
+    podd.debug("As JSON: " + modifiedTriples);
 
-	$.ajax({
-		url : requestUrl,
-		type : 'POST',
-		data : modifiedTriples,
-		contentType : 'application/rdf+json', // what we're sending
-		beforeSend : function(xhr) {
-			xhr.setRequestHeader("Accept", "application/rdf+json");
-		},
-		success : function(resultData, status, xhr) {
-			podd.debug('[submitUserRoleDelete] ### SUCCESS ### ' + resultData);
-		},
-		error : function(xhr, status, error) {
-			podd.debug('[submitUserRoleDelete] $$$ ERROR $$$ ' + error);
-			podd.debug(xhr.statusText);
+    var requestUrl = podd.baseUrl + pathToSubmitTo;
 
-			podd.displaySummaryErrorMessage(xhr.responseText);
-		}
-	});
+    $.ajax({
+        url : requestUrl,
+        type : 'POST',
+        data : modifiedTriples,
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
+        success : function(resultData, status, xhr) {
+            podd.debug('[submitUserRoleDelete] ### SUCCESS ### ' + resultData);
+        },
+        error : function(xhr, status, error) {
+            podd.debug('[submitUserRoleDelete] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
+
+            podd.displaySummaryErrorMessage(xhr.responseText);
+        }
+    });
 };
 
 /**
@@ -2728,48 +2797,51 @@ podd.submitUserRoleDelete = function(userName, roleUri, objectUri) {
  *            {string} The Role to be added
  */
 podd.submitUserRoleAdd = function(userName, roleUri, roleMappedObject) {
-	
-	podd.debug('[submitUserRoles] ' + userName);
-	var pathToSubmitTo = PATH_USER_ROLES + '?useridentifier=' + userName;
 
-	var roleDatabank = podd.newDatabank(); 
-	
+    podd.debug('[submitUserRoles] ' + userName);
+    var pathToSubmitTo = PATH_USER_ROLES + '?useridentifier=' + userName;
+
+    var roleDatabank = podd.newDatabank();
+
     podd.debug('[submitUserRoles] role = ' + roleUri);
-	    
+
     var mappingUri = $.rdf.blank('_:mapping45');
-	    
-	roleDatabank.add(podd.buildTriple(mappingUri, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>', 'http://purl.org/oas/RoleMapping', OBJECT_PROPERTY, 'URI'));
-	roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/oas/roleMappedRole>', roleUri, OBJECT_PROPERTY, 'URI'));
+
+    roleDatabank.add(podd.buildTriple(mappingUri, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+            'http://purl.org/oas/RoleMapping', OBJECT_PROPERTY, 'URI'));
+    roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/oas/roleMappedRole>', roleUri, OBJECT_PROPERTY,
+            'URI'));
     if (roleMappedObject != undefined) {
-    	roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/podd/ns/poddUser#roleMappedObject>', roleMappedObject, OBJECT_PROPERTY, 'URI'));
+        roleDatabank.add(podd.buildTriple(mappingUri, '<http://purl.org/podd/ns/poddUser#roleMappedObject>',
+                roleMappedObject, OBJECT_PROPERTY, 'URI'));
     }
-	
-	//ajax POST
-	var modifiedTriples = $.toJSON(roleDatabank.dump({
-		format : 'application/json'
-	}));
-	podd.debug("As JSON: " + modifiedTriples);
-	  
-	var requestUrl = podd.baseUrl + pathToSubmitTo;
-	  
-	$.ajax({
-	        url : requestUrl,
-	        type : 'POST',
-	        data : modifiedTriples,
-	        contentType : 'application/rdf+json', // what we're sending
-	        beforeSend : function(xhr) {
-	            xhr.setRequestHeader("Accept", "application/rdf+json");
-	        },
-	        success : function(resultData, status, xhr) {
-	            podd.debug('[submitUserRoles] ### SUCCESS ### ' + resultData);
-	        },
-	        error : function(xhr, status, error) {
-	            podd.debug('[submitUserRoles] $$$ ERROR $$$ ' + error);
-	            podd.debug(xhr.statusText);
-	            
-	            podd.displaySummaryErrorMessage(xhr.responseText);
-	        }
-	});	  
+
+    // ajax POST
+    var modifiedTriples = $.toJSON(roleDatabank.dump({
+        format : 'application/json'
+    }));
+    podd.debug("As JSON: " + modifiedTriples);
+
+    var requestUrl = podd.baseUrl + pathToSubmitTo;
+
+    $.ajax({
+        url : requestUrl,
+        type : 'POST',
+        data : modifiedTriples,
+        contentType : 'application/rdf+json', // what we're sending
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("Accept", "application/rdf+json");
+        },
+        success : function(resultData, status, xhr) {
+            podd.debug('[submitUserRoles] ### SUCCESS ### ' + resultData);
+        },
+        error : function(xhr, status, error) {
+            podd.debug('[submitUserRoles] $$$ ERROR $$$ ' + error);
+            podd.debug(xhr.statusText);
+
+            podd.displaySummaryErrorMessage(xhr.responseText);
+        }
+    });
 };
 
 /**
@@ -2817,23 +2889,23 @@ podd.updateErrorMessageList = function(theMessage) {
  * Add a new row to Error Table.
  * 
  * @param column1
- * 			{string} Value for first column
+ *            {string} Value for first column
  * @param column2
- * 			{string} Value for second column
+ *            {string} Value for second column
  * 
  */
 podd.updateErrorTable = function(column1, column2) {
-	var td1 = $('<td>');
-	td1.html(column1);
-	
-	var td2 = $('<td>');
-	td2.html(column2);
-	
-	var tr = $('<tr>');
-	tr.append(td1);
-	tr.append(td2);
-	
-	$("#errorTable").append(tr);
+    var td1 = $('<td>');
+    td1.html(column1);
+
+    var td2 = $('<td>');
+    td2.html(column2);
+
+    var tr = $('<tr>');
+    tr.append(td1);
+    tr.append(td2);
+
+    $("#errorTable").append(tr);
 };
 
 /**
@@ -2916,39 +2988,43 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
 
         // set Range of the property
         if (typeof nextBinding.allValuesClass !== 'undefined') {
-    		nextChild.propertyRange = nextBinding.allValuesClass.value;
-    	} else if (typeof nextBinding.rangeClass !== 'undefined') {
-    		nextChild.propertyRange = nextBinding.rangeClass.value;
-    	} else if (typeof nextBinding.onClass !== 'undefined') {
-    		nextChild.propertyRange = nextBinding.onClass.value;
-    	} else {
-    		nextChild.propertyRange = 'Not Found';
-    	}
-        
+            nextChild.propertyRange = nextBinding.allValuesClass.value;
+        }
+        else if (typeof nextBinding.rangeClass !== 'undefined') {
+            nextChild.propertyRange = nextBinding.rangeClass.value;
+        }
+        else if (typeof nextBinding.onClass !== 'undefined') {
+            nextChild.propertyRange = nextBinding.onClass.value;
+        }
+        else {
+            nextChild.propertyRange = 'Not Found';
+        }
+
         if (typeof nextBinding.propertyType != 'undefined') {
             nextChild.propertyType = nextBinding.propertyType.value;
         }
 
-        
-        // Avoid duplicates, which are occurring due to multiple ways of specifying ranges/etc., in OWL
-        if($.inArray(nextChild.propertyUri, propertyUris) === -1)
-       	{
+        // Avoid duplicates, which are occurring due to multiple ways of
+        // specifying ranges/etc., in OWL
+        if ($.inArray(nextChild.propertyUri, propertyUris) === -1) {
             propertyUris.push(nextChild.propertyUri);
             propertyList.push(nextChild);
-//                podd.debug("[" + nextChild.weight + "] propertyUri=<" + nextChild.propertyUri + "> label=\""
-//                        + nextChild.propertyLabel + "\" displayType=<" + nextChild.displayType + "> card=<"
-//                        + nextChild.cardinality + ">");
-            
-            //add cardinalities for use in validation at submit time. could be undefined
+            // podd.debug("[" + nextChild.weight + "] propertyUri=<" +
+            // nextChild.propertyUri + "> label=\""
+            // + nextChild.propertyLabel + "\" displayType=<" +
+            // nextChild.displayType + "> card=<"
+            // + nextChild.cardinality + ">");
+
+            // add cardinalities for use in validation at submit time. could be
+            // undefined
             var entry = {};
             entry.cardinality = nextChild.cardinality;
             entry.propertyUri = nextChild.propertyUri;
             entry.propertyLabel = nextChild.propertyLabel;
             podd.cardinalityList.push(entry);
-       	}
-        else
-        {
-            podd.debug("Duplicate property found: "+nextChild.propertyUri);
+        }
+        else {
+            podd.debug("Duplicate property found: " + nextChild.propertyUri);
         }
     });
 
@@ -2956,15 +3032,16 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
     propertyList.sort(function(a, b) {
         var aID = a.weight;
         var bID = b.weight;
-        
+
         if (aID == bID) {
-        	// on equal weights sort by property label
-        	return (a.propertyLabel > b.propertyLabel) ? 1: -1;
-        } else {
-        	return (aID - bID);
+            // on equal weights sort by property label
+            return (a.propertyLabel > b.propertyLabel) ? 1 : -1;
+        }
+        else {
+            return (aID - bID);
         }
     });
-    
+
     // Reset the details list
     $(DETAILS_LIST_Selector).empty();
 
@@ -2980,13 +3057,15 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
 
         var nextArtifactBindings = nextArtifactQuery.select();
 
-		// If there are values for the property in the artifact databank, add them as an
-        // array so that they can be displayed instead of showing a single new empty field
+        // If there are values for the property in the artifact databank, add
+        // them as an
+        // array so that they can be displayed instead of showing a single new
+        // empty field
         if (nextArtifactBindings.length > 0) {
-        	
-        	var valuesArray = [];
+
+            var valuesArray = [];
             $.each(nextArtifactBindings, function(nextArtifactIndex, nextArtifactValue) {
-            	var oneValue = {};
+                var oneValue = {};
                 // found existing value for property
                 oneValue.displayValue = nextArtifactValue.propertyValue.value;
                 podd.debug("Property <" + value.propertyUri + "> has value: " + oneValue.displayValue);
@@ -2994,40 +3073,42 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
                 // for URIs populate the valueUri property with the value so we
                 // have the option to put a human readable label in displayValue
                 if (nextArtifactValue.propertyValue.type === 'uri') {
-                	oneValue.valueUri = nextArtifactValue.propertyValue.value;
+                    oneValue.valueUri = nextArtifactValue.propertyValue.value;
 
-                	// look for label in schema databank
-                	var displayLabel = podd.findLabel(nextSchemaDatabank, oneValue.valueUri);
+                    // look for label in schema databank
+                    var displayLabel = podd.findLabel(nextSchemaDatabank, oneValue.valueUri);
 
-                	// look for label in artifact databank
-                	if (typeof displayLabel === 'undefined' || displayLabel === 'undefined') {
-                		displayLabel = podd.findLabel(nextArtifactDatabank, oneValue.valueUri);
-                	}
-                	
-                	if (typeof displayLabel !== 'undefined' && displayLabel !== 'undefined') {
-                		oneValue.displayValue = displayLabel;
-                	}                	
+                    // look for label in artifact databank
+                    if (typeof displayLabel === 'undefined' || displayLabel === 'undefined') {
+                        displayLabel = podd.findLabel(nextArtifactDatabank, oneValue.valueUri);
+                    }
+
+                    if (typeof displayLabel !== 'undefined' && displayLabel !== 'undefined') {
+                        oneValue.displayValue = displayLabel;
+                    }
                 }
                 valuesArray.push(oneValue);
-                
-            });
-            
-            value.valuesArray = valuesArray;
-            podd.debug('Property <' + value.propertyUri + '> has ' + valuesArray.length + ' values' );
 
-            $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
+            });
+
+            value.valuesArray = valuesArray;
+            podd.debug('Property <' + value.propertyUri + '> has ' + valuesArray.length + ' values');
+
+            $(DETAILS_LIST_Selector).append(
+                    podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, false));
         }
         else {
             podd.debug("Property <" + value.propertyUri + "> has NO value");
 
             var oneValue = {};
-            oneValue.displayValue; //undefined to indicate there is NO value
+            oneValue.displayValue; // undefined to indicate there is NO value
             oneValue.valueUri = '';
 
             value.valuesArray = [];
             value.valuesArray.push(oneValue);
-            
-            $(DETAILS_LIST_Selector).append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
+
+            $(DETAILS_LIST_Selector)
+                    .append(podd.createEditField(value, nextSchemaDatabank, nextArtifactDatabank, true));
         }
     });
 };
@@ -3040,18 +3121,18 @@ podd.updateInterface = function(objectType, nextSchemaDatabank, nextArtifactData
  *            A databank which may contain temporary URI to PURL mappings
  */
 podd.updateObjectUriWithPurl = function(nextDatabank) {
-	
-	if (podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
-		var myQuery = $.rdf({
-			databank : nextDatabank
-		}).where(podd.getCurrentObjectUri()	+ ' poddBase:replacedTempUriWith ?purl');
-		
-		var bindings = myQuery.select();
-		$.each(bindings, function(index, value) {
-			podd.objectUri = value.purl.value.toString();
-			podd.debug('[updateObjectUri] podd.objectUri set to: ' + value.purl.value);
-		});
-	}
+
+    if (podd.getCurrentObjectUri().lastIndexOf('<urn:temp:uuid:', 0) === 0) {
+        var myQuery = $.rdf({
+            databank : nextDatabank
+        }).where(podd.getCurrentObjectUri() + ' poddBase:replacedTempUriWith ?purl');
+
+        var bindings = myQuery.select();
+        $.each(bindings, function(index, value) {
+            podd.objectUri = value.purl.value.toString();
+            podd.debug('[updateObjectUri] podd.objectUri set to: ' + value.purl.value);
+        });
+    }
 };
 
 /**
@@ -3061,21 +3142,20 @@ podd.updateObjectUriWithPurl = function(nextDatabank) {
  */
 podd.uriEncode = function(input) {
 
-	if (typeof input === 'undefined') {
-		return input;
-	}
+    if (typeof input === 'undefined') {
+        return input;
+    }
 
-	var trimmedInput = $.trim(input);
+    var trimmedInput = $.trim(input);
 
-	var len = trimmedInput.length;
+    var len = trimmedInput.length;
 
-	if ((len > 2) && (trimmedInput.substring(0, 1) === '<')
-			&& (trimmedInput.substring(len - 1, len) === '>')) {
+    if ((len > 2) && (trimmedInput.substring(0, 1) === '<') && (trimmedInput.substring(len - 1, len) === '>')) {
 
-		trimmedInput = trimmedInput.substring(1, len - 1);
-	}
+        trimmedInput = trimmedInput.substring(1, len - 1);
+    }
 
-	return encodeURIComponent(trimmedInput);
+    return encodeURIComponent(trimmedInput);
 };
 
 /**
@@ -3084,29 +3164,29 @@ podd.uriEncode = function(input) {
  * Add the given value to the vTable under the given property.
  * 
  * @param propertyUri
- * 			{string} A property of the artifact
+ *            {string} A property of the artifact
  * @param value
- * 			{string} A value assigned to this property
+ *            {string} A value assigned to this property
  */
 podd.vTableAddPropertyValue = function(propertyUri, value) {
-	
-	podd.debug('[addPropertyValue] add [' + propertyUri + ', ' + value + ']');
-	
-	if (typeof propertyUri === 'undefined') {
-		return;
-	}
-	
-	if (typeof podd.valuesTable === 'undefined') {
-		podd.valuesTable = {};
-	}
-	
-	if (typeof podd.valuesTable[propertyUri] === 'undefined') {
-		podd.valuesTable[propertyUri] = [];
-	}
-	
-	if (typeof value !== 'undefined' && value !== '') {
-		podd.valuesTable[propertyUri].push(value.toString());
-	}
+
+    podd.debug('[addPropertyValue] add [' + propertyUri + ', ' + value + ']');
+
+    if (typeof propertyUri === 'undefined') {
+        return;
+    }
+
+    if (typeof podd.valuesTable === 'undefined') {
+        podd.valuesTable = {};
+    }
+
+    if (typeof podd.valuesTable[propertyUri] === 'undefined') {
+        podd.valuesTable[propertyUri] = [];
+    }
+
+    if (typeof value !== 'undefined' && value !== '') {
+        podd.valuesTable[propertyUri].push(value.toString());
+    }
 };
 
 /**
@@ -3115,27 +3195,28 @@ podd.vTableAddPropertyValue = function(propertyUri, value) {
  * Checks if vTable contains the given value for the given property.
  * 
  * @param propertyUri
- * 			{string} A property of the artifact
+ *            {string} A property of the artifact
  * @param value
- * 			{string} A value assigned to this property
+ *            {string} A value assigned to this property
  * @return true if the value is present, false otherwise
  */
 podd.vTablePropertyContainsValue = function(propertyUri, value) {
-	
-	var result = false;
-	if (typeof podd.valuesTable !== 'undefined' && typeof podd.valuesTable[propertyUri] !== 'undefined') {
-		result = ($.inArray(value, podd.valuesTable[propertyUri]) > -1);
-	}
-	
-	podd.debug('[propertyContainsValue] contains [' + propertyUri + ', ' + value + '] result =' + result);
-	return result;
+
+    var result = false;
+    if (typeof podd.valuesTable !== 'undefined' && typeof podd.valuesTable[propertyUri] !== 'undefined') {
+        result = ($.inArray(value, podd.valuesTable[propertyUri]) > -1);
+    }
+
+    podd.debug('[propertyContainsValue] contains [' + propertyUri + ', ' + value + '] result =' + result);
+    return result;
 };
 
 /**
  * @memberOf podd
  * 
  * Remove from the vTable, the given value if it is found listed under the given
- * property. If the value exists more than once, only the first instance is removed.
+ * property. If the value exists more than once, only the first instance is
+ * removed.
  * 
  * @param propertyUri
  *            {string} A property of the artifact
@@ -3144,20 +3225,20 @@ podd.vTablePropertyContainsValue = function(propertyUri, value) {
  */
 podd.vTableRemovePropertyValue = function(propertyUri, value) {
 
-	podd.debug('[removePropertyValue] remove [' + propertyUri + ', ' + value + ']');
-	
-	if (typeof podd.valuesTable === 'undefined' || typeof podd.valuesTable[propertyUri] === 'undefined') {
-		//nothing to remove
-		return;
-	}
-	
-	var theArray = podd.valuesTable[propertyUri];
-	//podd.debug('[removePropertyValue] before = ' + theArray);
-	var pos = $.inArray(value, theArray);
-	if (pos > -1) {
-		theArray.splice( pos ,1 );	
-		//podd.debug('[removePropertyValue] after = ' + theArray);
-	}
-	
-	podd.valuesTable[propertyUri] = theArray;
+    podd.debug('[removePropertyValue] remove [' + propertyUri + ', ' + value + ']');
+
+    if (typeof podd.valuesTable === 'undefined' || typeof podd.valuesTable[propertyUri] === 'undefined') {
+        // nothing to remove
+        return;
+    }
+
+    var theArray = podd.valuesTable[propertyUri];
+    // podd.debug('[removePropertyValue] before = ' + theArray);
+    var pos = $.inArray(value, theArray);
+    if (pos > -1) {
+        theArray.splice(pos, 1);
+        // podd.debug('[removePropertyValue] after = ' + theArray);
+    }
+
+    podd.valuesTable[propertyUri] = theArray;
 };

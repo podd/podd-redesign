@@ -24,11 +24,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -86,21 +88,31 @@ public abstract class AbstractPoddSesameManagerTest
      * {@link com.github.podd.api.PoddSesameManager#isPublished(OWLOntologyID, RepositoryConnection)}
      * 
      */
-    private boolean internalTestIsPublished(final String testResourcePath, final int expectedSize,
-            final URI contextCumVersionIRI, final URI managementGraph) throws Exception
+    private boolean internalTestIsPublished(final boolean isPublished, final String testResourcePath,
+            final int expectedSize, final URI contextCumVersionURI, final URI managementGraph) throws Exception
     {
         // prepare: load the ontology into the test repository
         final InputStream inputStream = this.getClass().getResourceAsStream(testResourcePath);
-        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, contextCumVersionIRI);
+        this.testRepositoryConnection.add(inputStream, "", RDFFormat.RDFXML, contextCumVersionURI);
         Assert.assertEquals("Not the expected number of statements in Repository", expectedSize,
-                this.testRepositoryConnection.size(contextCumVersionIRI));
+                this.testRepositoryConnection.size(contextCumVersionURI));
         
         // prepare: build an OWLOntologyID
         final IRI ontologyIRI =
-                this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, contextCumVersionIRI);
-        final OWLOntologyID ontologyID = new OWLOntologyID(ontologyIRI.toOpenRDFURI(), contextCumVersionIRI);
+                this.testPoddSesameManager.getOntologyIRI(this.testRepositoryConnection, contextCumVersionURI);
+        final InferredOWLOntologyID ontologyID =
+                new InferredOWLOntologyID(ontologyIRI, IRI.create(contextCumVersionURI),
+                        IRI.create("urn:not:actually:inferred"));
+        this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), RDF.TYPE, OWL.ONTOLOGY, managementGraph);
+        this.testRepositoryConnection.add(ontologyIRI.toOpenRDFURI(), OWL.VERSIONIRI, contextCumVersionURI,
+                managementGraph);
         
-        return this.testPoddSesameManager.isPublished(ontologyID, this.testRepositoryConnection, managementGraph);
+        InferredOWLOntologyID publishedOntologyID =
+                this.testPoddSesameManager.setPublished(isPublished, ontologyID, testRepositoryConnection,
+                        managementGraph);
+        
+        return this.testPoddSesameManager.isPublished(publishedOntologyID, this.testRepositoryConnection,
+                managementGraph);
     }
     
     /**
@@ -528,7 +540,7 @@ public abstract class AbstractPoddSesameManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(InferredOWLOntologyID, URI, URI, RepositoryConnection)}
+     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValues(InferredOWLOntologyID, URI, Collection, RepositoryConnection)}
      * .
      */
     @Test
@@ -567,16 +579,19 @@ public abstract class AbstractPoddSesameManagerTest
         
         for(final URI[] element : testData)
         {
-            final URI cardinalityValue =
-                    this.testPoddSesameManager.getCardinalityValue(ontologyID, element[0], element[1],
+            Collection<URI> nextProperty = Arrays.asList(element[1]);
+            final Map<URI, URI> cardinalityValue =
+                    this.testPoddSesameManager.getCardinalityValues(ontologyID, element[0], nextProperty,
                             this.testRepositoryConnection);
-            Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue);
+            Assert.assertEquals("Could not find cardinality for: " + nextProperty, 1, cardinalityValue.size());
+            Assert.assertTrue("Did not find cardinality for: " + nextProperty, cardinalityValue.containsKey(element[1]));
+            Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue.get(element[1]));
         }
     }
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValue(URI, URI, boolean, RepositoryConnection, URI...)}
+     * {@link com.github.podd.api.PoddSesameManager#getCardinalityValues(URI, Collection, boolean, RepositoryConnection, URI...)}
      * .
      */
     @Test
@@ -618,10 +633,13 @@ public abstract class AbstractPoddSesameManagerTest
         
         for(final URI[] element : testData)
         {
-            final URI cardinalityValue =
-                    this.testPoddSesameManager.getCardinalityValue(element[0], element[1], true,
+            Collection<URI> nextProperty = Arrays.asList(element[1]);
+            final Map<URI, URI> cardinalityValue =
+                    this.testPoddSesameManager.getCardinalityValues(element[0], nextProperty, true,
                             this.testRepositoryConnection, contexts.toArray(new URI[0]));
-            Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue);
+            Assert.assertEquals("Could not find cardinality for: " + nextProperty, 1, cardinalityValue.size());
+            Assert.assertTrue("Did not find cardinality for: " + nextProperty, cardinalityValue.containsKey(element[1]));
+            Assert.assertEquals("Not the expected cardinality value", element[2], cardinalityValue.get(element[1]));
         }
     }
     
@@ -1217,7 +1235,8 @@ public abstract class AbstractPoddSesameManagerTest
             
             if(expectedTripleCount != model.size())
             {
-                DebugUtils.printContents(model);
+                // DebugUtils.printContents(model);
+                Rio.write(model, System.out, RDFFormat.NQUADS);
             }
             
             // verify:
@@ -1838,11 +1857,9 @@ public abstract class AbstractPoddSesameManagerTest
     {
         final URI context = ValueFactoryImpl.getInstance().createURI("urn:testcontext");
         
-        final OWLOntologyID emptyOntologyID = new OWLOntologyID();
-        
         try
         {
-            this.testPoddSesameManager.isPublished(emptyOntologyID, this.testRepositoryConnection, context);
+            this.testPoddSesameManager.isPublished(null, this.testRepositoryConnection, context);
             Assert.fail("Should have thrown a NullPointerException");
         }
         catch(final NullPointerException e)
@@ -1887,7 +1904,7 @@ public abstract class AbstractPoddSesameManagerTest
         final String testResourcePath = TestConstants.TEST_ARTIFACT_BASIC_PROJECT_PUBLISHED;
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:uuid:artifact:version:55");
         
-        final boolean isPublished = this.internalTestIsPublished(testResourcePath, 21, versionUri, context);
+        final boolean isPublished = this.internalTestIsPublished(true, testResourcePath, 21, versionUri, context);
         Assert.assertEquals("Did not identify artifact as Published", true, isPublished);
     }
     
@@ -1905,7 +1922,7 @@ public abstract class AbstractPoddSesameManagerTest
         final String testResourcePath = TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1;
         final URI versionUri = ValueFactoryImpl.getInstance().createURI("urn:temp:artifact:version:1");
         final boolean isPublished =
-                this.internalTestIsPublished(testResourcePath,
+                this.internalTestIsPublished(false, testResourcePath,
                         TestConstants.TEST_ARTIFACT_BASIC_PROJECT_1_CONCRETE_TRIPLES, versionUri, context);
         Assert.assertEquals("Did not identify artifact as Not Published", false, isPublished);
     }

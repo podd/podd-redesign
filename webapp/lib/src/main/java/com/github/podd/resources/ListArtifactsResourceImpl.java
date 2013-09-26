@@ -96,12 +96,12 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         
         if(published)
         {
-            this.log.info("Including published artifacts");
+            this.log.debug("Including published artifacts");
         }
         
         if(unpublished)
         {
-            this.log.info("Including unpublished artifacts");
+            this.log.debug("Including unpublished artifacts");
         }
         
         if(!published && !unpublished)
@@ -135,9 +135,9 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
             
             if(unpublished && this.checkAuthentication(PoddAction.UNPUBLISHED_ARTIFACT_LIST, null, false))
             {
-                this.log.info("About to check for authentication to look at unpublished artifacts");
-                this.log.info("Is authenticated: {}", this.getRequest().getClientInfo().isAuthenticated());
-                this.log.info("Current user: {}", this.getRequest().getClientInfo().getUser());
+                this.log.debug("About to check for authentication to look at unpublished artifacts");
+                this.log.debug("Is authenticated: {}", this.getRequest().getClientInfo().isAuthenticated());
+                this.log.debug("Current user: {}", this.getRequest().getClientInfo().getUser());
                 
                 final List<InferredOWLOntologyID> unpublishedResults = new ArrayList<InferredOWLOntologyID>();
                 
@@ -178,7 +178,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
     @Get(":html")
     public Representation getListArtifactsPage(final Representation entity) throws ResourceException
     {
-        this.log.info("@Get listArtifacts Page");
+        this.log.debug("@Get listArtifacts Page");
         
         final Map<String, List<InferredOWLOntologyID>> artifactsInternal = this.getArtifactsInternal();
         
@@ -190,17 +190,16 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("canFilter", Boolean.FALSE);
         dataModel.put("hasFilter", Boolean.FALSE);
         
-        
-        if (this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null, false))
+        if(this.checkAuthentication(PoddAction.ARTIFACT_CREATE, null, false))
         {
-            dataModel.put("userCanCreate", Boolean.TRUE);    
+            dataModel.put("userCanCreate", Boolean.TRUE);
         }
         else
         {
             dataModel.put("userCanCreate", Boolean.FALSE);
         }
         
-        this.log.info("artifacts: {}", artifactsInternal);
+        this.log.trace("artifacts: {}", artifactsInternal);
         
         for(final String nextKey : artifactsInternal.keySet())
         {
@@ -261,7 +260,7 @@ public class ListArtifactsResourceImpl extends AbstractPoddResourceImpl
                     "Could not generate RDF output due to an exception in the writer", e);
         }
         
-        this.log.info(new String(out.toByteArray(), StandardCharsets.UTF_8));
+        // this.log.info(new String(out.toByteArray(), StandardCharsets.UTF_8));
         
         final ByteArrayRepresentation result = new ByteArrayRepresentation(out.toByteArray(), resultMediaType);
         

@@ -629,7 +629,7 @@ public abstract class AbstractPoddArtifactManagerTest
     
     /**
      * Test method for
-     * {@link com.github.podd.api.PoddArtifactManager#attachFileReferences(URI, URI, InputStream, RDFFormat, DataReferenceVerificationPolicy)}
+     * {@link com.github.podd.api.PoddArtifactManager#attachDataReferences(URI, URI, InputStream, RDFFormat, DataReferenceVerificationPolicy)}
      * .
      */
     @Test
@@ -647,7 +647,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_FRAGMENT_NEW_FILE_REF_OBJECT);
         
         final InferredOWLOntologyID updatedArtifact =
-                this.testArtifactManager.attachFileReferences(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
+                this.testArtifactManager.attachDataReferences(artifactId.getOntologyIRI().toOpenRDFURI(), artifactId
                         .getVersionIRI().toOpenRDFURI(), editInputStream, RDFFormat.RDFXML,
                         DataReferenceVerificationPolicy.DO_NOT_VERIFY);
         
@@ -699,7 +699,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-
+        
         final String mimeType = "application/rdf+xml";
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
@@ -709,7 +709,7 @@ public abstract class AbstractPoddArtifactManagerTest
         resultArtifactId = this.testArtifactManager.publishArtifact(resultArtifactId);
         
         // verify:
-        this.verifyLoadedArtifact(resultArtifactId, 7,
+        this.verifyLoadedArtifact(resultArtifactId, 8,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, true);
         
@@ -725,7 +725,7 @@ public abstract class AbstractPoddArtifactManagerTest
                     resultArtifactId.getOntologyIRI(), e.getArtifact().getOntologyIRI());
         }
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
@@ -740,7 +740,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-
+        
         final String mimeType = "application/rdf+xml";
         final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
         
@@ -750,14 +750,14 @@ public abstract class AbstractPoddArtifactManagerTest
         this.verifyLoadedArtifact(resultArtifactId, 7,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
-
+        
         boolean deleted = this.testArtifactManager.deleteArtifact(resultArtifactId);
         Assert.assertTrue("Should have deleted artifact successfully", deleted);
         
         deleted = this.testArtifactManager.deleteArtifact(resultArtifactId);
         Assert.assertFalse("Should fail as artifact no longer exists", deleted);
     }
-
+    
     /**
      * Test method for
      * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
@@ -822,9 +822,9 @@ public abstract class AbstractPoddArtifactManagerTest
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         
         final Object[][] testData =
-                { { "http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1", 87, false },
-                        { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 77, false },
-                        { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 65, true }, };
+                { { "http://purl.org/podd/basic-2-20130206/artifact:1#My_Treatment1", 86, false },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 76, false },
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 64, true }, };
         
         for(final Object[] element : testData)
         {
@@ -955,7 +955,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // verify:
         final Model artifactModel = this.testArtifactManager.exportArtifact(modifiedArtifactId, false);
-        Assert.assertEquals("Reduction in artifact size incorrect", 73, artifactModel.size());
+        Assert.assertEquals("Reduction in artifact size incorrect", 72, artifactModel.size());
         Assert.assertTrue("Object still exists as an object of some statement",
                 artifactModel.filter(null, null, PoddRdfConstants.VF.createURI(objectToDelete)).isEmpty());
         Assert.assertTrue("Object exists as a subject of some statement",
@@ -1047,6 +1047,37 @@ public abstract class AbstractPoddArtifactManagerTest
      * .
      */
     @Test
+    public final void testExportObjectMetadataWithArtifactOther() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        // prepare: upload a test artifact
+        final InputStream inputStream1 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        final InferredOWLOntologyID artifactIDv1 =
+                this.testArtifactManager.loadArtifact(inputStream1, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(artifactIDv1, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        this.internalTestExportObjectmetadata(artifactIDv1);
+        
+        final InputStream inputStream =
+                this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
+        final InferredOWLOntologyID unpublishedArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
+        this.verifyLoadedArtifact(unpublishedArtifactId, 14,
+                TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
+        
+        // Test that after the second artifact is added the numbers do not change
+        this.internalTestExportObjectmetadata(artifactIDv1);
+    }
+    
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#exportObjectMetadata(URI, java.io.OutputStream, RDFFormat, boolean, MetadataPolicy, InferredOWLOntologyID)}
+     * .
+     */
+    @Test
     public final void testExportObjectMetadataWithoutArtifact() throws Exception
     {
         this.loadSchemaOntologies();
@@ -1111,7 +1142,7 @@ public abstract class AbstractPoddArtifactManagerTest
                 { { "http://purl.org/podd/basic-1-20130206/object:2966", 6 },
                         { "http://purl.org/podd/basic-2-20130206/artifact:1#publication45", 0 },
                         { "http://purl.org/podd/basic-2-20130206/artifact:1#Demo-Genotype", 0 },
-                        { "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation", 3},
+                        { "http://purl.org/podd/basic-2-20130206/artifact:1#Demo_Investigation", 3 },
                         { "http://purl.org/podd/basic-2-20130206/artifact:1#SqueekeeMaterial", 1 },
                         { "http://purl.org/podd/ns/poddScience#WildType_NotApplicable", 0 }, };
         
@@ -1248,12 +1279,8 @@ public abstract class AbstractPoddArtifactManagerTest
         
         final InputStream inputStream =
                 this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT);
-        // MIME type should be either given by the user, detected from the content type on the
-        // request, or autodetected using the Any23 Mime Detector
-        final String mimeType = "application/rdf+xml";
-        final RDFFormat format = Rio.getParserFormatForMIMEType(mimeType, RDFFormat.RDFXML);
-        
-        final InferredOWLOntologyID unpublishedArtifactId = this.testArtifactManager.loadArtifact(inputStream, format);
+        final InferredOWLOntologyID unpublishedArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream, RDFFormat.RDFXML);
         this.verifyLoadedArtifact(unpublishedArtifactId, 7,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_INTERNAL_OBJECT_INFERRED_TRIPLES, false);
@@ -1796,8 +1823,8 @@ public abstract class AbstractPoddArtifactManagerTest
             // verify: a single PUBLICATION_STATUS in asserted ontology
             final List<Statement> publicationStatusStatementList =
                     Iterations.asList(nextRepositoryConnection.getStatements(null,
-                            PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, false, publishedArtifactId
-                                    .getVersionIRI().toOpenRDFURI()));
+                            PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, false,
+                            this.testRepositoryManager.getArtifactManagementGraph()));
             Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement.", 1,
                     publicationStatusStatementList.size());
             
@@ -2697,6 +2724,10 @@ public abstract class AbstractPoddArtifactManagerTest
             nextRepositoryConnection = this.testRepositoryManager.getRepository().getConnection();
             nextRepositoryConnection.begin();
             
+            if(nextRepositoryConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()) != assertedStatementCount)
+            {
+                DebugUtils.printContents(nextRepositoryConnection, inferredOntologyId.getVersionIRI().toOpenRDFURI());
+            }
             // verify: size of asserted graph
             Assert.assertEquals("Incorrect number of asserted statements for artifact", assertedStatementCount,
                     nextRepositoryConnection.size(inferredOntologyId.getVersionIRI().toOpenRDFURI()));
@@ -2709,23 +2740,6 @@ public abstract class AbstractPoddArtifactManagerTest
             this.verifyArtifactManagementGraphContents(nextRepositoryConnection, mgtGraphSize,
                     this.testRepositoryManager.getArtifactManagementGraph(), inferredOntologyId.getOntologyIRI(),
                     inferredOntologyId.getVersionIRI(), inferredOntologyId.getInferredOntologyIRI());
-            
-            // verify: a single PUBLICATION_STATUS in asserted ontology
-            final List<Statement> publicationStatusStatementList =
-                    Iterations.asList(nextRepositoryConnection.getStatements(null,
-                            PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS, null, false, inferredOntologyId
-                                    .getVersionIRI().toOpenRDFURI()));
-            Assert.assertEquals("Graph should have one HAS_PUBLICATION_STATUS statement", 1,
-                    publicationStatusStatementList.size());
-            
-            // verify: value of PUBLICATION_STATUS in asserted ontology
-            String publishedState = PoddRdfConstants.PODD_BASE_NOT_PUBLISHED.toString();
-            if(isPublished)
-            {
-                publishedState = PoddRdfConstants.PODD_BASE_PUBLISHED.toString();
-            }
-            Assert.assertEquals("Wrong publication status", publishedState, publicationStatusStatementList.get(0)
-                    .getObject().toString());
         }
         finally
         {
