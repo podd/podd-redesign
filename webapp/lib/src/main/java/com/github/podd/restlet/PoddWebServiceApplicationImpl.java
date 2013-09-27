@@ -377,7 +377,7 @@ public class PoddWebServiceApplicationImpl extends PoddWebServiceApplication
         router.attach(deleteArtifact, DeleteArtifactResourceImpl.class);
         
         // Add a route for the Attach File Reference page.
-        final String attachFileReference = PoddWebConstants.PATH_ATTACH_FILE_REF;
+        final String attachFileReference = PoddWebConstants.PATH_ATTACH_DATA_REF;
         this.log.debug("attaching File Reference Attach service to path={}", attachFileReference);
         router.attach(attachFileReference, FileReferenceAttachResourceImpl.class);
         

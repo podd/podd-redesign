@@ -152,7 +152,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
         
         try
         {
@@ -212,7 +212,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             Assert.assertFalse("Input DataReference could not be genereated", fileReferenceAsString.isEmpty());
             
             final ClientResource fileRefAttachClientResource =
-                    new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
             
             try
             {
@@ -269,7 +269,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                 this.loadTestArtifact(TestConstants.TEST_ARTIFACT_20130206, MediaType.APPLICATION_RDF_TURTLE);
         
         final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
         
         try
         {
@@ -328,7 +328,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
             Assert.assertFalse("Input DataReference could not be genereated", fileReferenceAsString.isEmpty());
             
             final ClientResource fileRefAttachClientResource =
-                    new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+                    new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
             
             try
             {
@@ -391,7 +391,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                         MediaType.APPLICATION_RDF_XML);
         
         final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
         
         try
         {
@@ -428,7 +428,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                 MediaType.APPLICATION_RDF_XML);
         
         final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
         
         try
         {
@@ -468,7 +468,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                         MediaType.APPLICATION_RDF_XML);
         
         final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
         
         // invoke without authentication
         try
@@ -503,7 +503,7 @@ public class FileReferenceAttachResourceImplTest extends AbstractResourceImplTes
                         MediaType.APPLICATION_RDF_XML);
         
         final ClientResource fileRefAttachClientResource =
-                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_FILE_REF));
+                new ClientResource(this.getUrl(PoddWebConstants.PATH_ATTACH_DATA_REF));
         
         // authentication is required as version IRI is checked AFTER authentication
         try

@@ -142,9 +142,9 @@ public interface PoddWebConstants
     public static final String PATH_ARTIFACT_ROLES = "artifact/roles";
     
     /**
-     * Path to the file reference attachment service
+     * Path to the data reference attachment service
      */
-    public static final String PATH_ATTACH_FILE_REF = "attachref";
+    public static final String PATH_ATTACH_DATA_REF = "artifact/attachdataref";
     
     /**
      * Path to the list data repositories service.
