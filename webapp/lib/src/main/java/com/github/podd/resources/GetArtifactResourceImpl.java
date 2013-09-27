@@ -269,6 +269,10 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         // Get label for the object type
         final PoddObjectLabel label = objectTypes.get(0);
         dataModel.put("objectType", label);
+        if(PoddRdfConstants.PODD_SCIENCE_PROJECT.equals(label.getObjectURI()))
+        {
+            dataModel.put("isProject", true);
+        }
         
         // populate the properties of the object
         final List<URI> orderedProperties =
@@ -281,11 +285,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         dataModel.put("versionIri", ontologyID.getVersionIRI().toOpenRDFURI());
         dataModel.put("propertyList", orderedProperties);
         dataModel.put("completeModel", allNeededStatementsForDisplay);
-        
-        if(PoddRdfConstants.PODD_SCIENCE_PROJECT.equals(label.getObjectURI()))
-        {
-            dataModel.put("isProject", true);
-        }
         
         final int childrenCount = this.getPoddArtifactManager().getChildObjects(ontologyID, objectUri).size();
         dataModel.put("childCount", childrenCount);
