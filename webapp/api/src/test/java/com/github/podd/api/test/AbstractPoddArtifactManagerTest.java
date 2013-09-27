@@ -92,6 +92,7 @@ import com.github.podd.api.purl.PoddPurlProcessorFactoryRegistry;
 import com.github.podd.exception.ArtifactModifyException;
 import com.github.podd.exception.DeleteArtifactException;
 import com.github.podd.exception.DisconnectedObjectException;
+import com.github.podd.exception.DuplicateArtifactIRIException;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.InconsistentOntologyException;
 import com.github.podd.exception.OntologyNotInProfileException;
@@ -1822,13 +1823,14 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#loadArtifact(java.io.InputStream, org.openrdf.rio.RDFFormat)}
      * .
      * 
-     * Tests loading two versions of the same artifact one after the other.
-     * 
+     * Tests loading two versions of the same artifact one after the other. This fails as the modified version
+     * should be "updated" and not "loaded". 
+     *  
      * The two source RDF files have PURLs instead of temporary URIs since they both need to be
      * identified as the same artifact.
      */
     @Test
-    public final void testLoadArtifactWithTwoVersionsOfSameArtifact() throws Exception
+    public final void testLoadArtifactWithSameArtifactTwiceFails() throws Exception
     {
         this.loadSchemaOntologies();
         
@@ -1844,17 +1846,16 @@ public abstract class AbstractPoddArtifactManagerTest
         // load 2nd artifact
         final InputStream inputStream4SecondArtifact =
                 this.getClass().getResourceAsStream("/test/artifacts/project-with-purls-v2.rdf");
-        final InferredOWLOntologyID secondArtifactId =
-                this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
-        
-        Assert.assertEquals("Both versions should have the same artifact ID", firstArtifactId.getOntologyIRI(),
-                secondArtifactId.getOntologyIRI());
-        
-        Assert.assertFalse("Two versions should NOT have the same Version IRI", firstArtifactId.getVersionIRI()
-                .toString().equals(secondArtifactId.getVersionIRI().toString()));
-        
-        this.verifyLoadedArtifact(secondArtifactId, 7, TestConstants.TEST_ARTIFACT_PURLS_v1_CONCRETE_TRIPLES,
-                TestConstants.TEST_ARTIFACT_PURLS_v1_INFERRED_TRIPLES, false);
+        try
+        {
+            this.testArtifactManager.loadArtifact(inputStream4SecondArtifact, RDFFormat.RDFXML);
+            Assert.fail("Should not allow a duplicate artifact to be loaded");
+        }
+        catch (DuplicateArtifactIRIException e)
+        {
+            Assert.assertEquals("Duplicate does not have expected ontology IRI", firstArtifactId.getOntologyIRI(),
+                    e.getDuplicateOntologyIRI());
+        }
     }
     
     /**
@@ -2498,8 +2499,12 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // upload another version of artifact
         final InputStream inputStream2 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
-        final InferredOWLOntologyID artifactIDv2 =
-                this.testArtifactManager.loadArtifact(inputStream2, RDFFormat.TURTLE);
+        final Model model = this.testArtifactManager.updateArtifact(artifactIDv1.getOntologyIRI().toOpenRDFURI(), artifactIDv1
+                .getVersionIRI().toOpenRDFURI(), Collections.<URI> emptyList(), inputStream2, RDFFormat.TURTLE,
+                UpdatePolicy.REPLACE_EXISTING, DanglingObjectPolicy.FORCE_CLEAN,
+                DataReferenceVerificationPolicy.DO_NOT_VERIFY);
+        final InferredOWLOntologyID artifactIDv2 = OntologyUtils.modelToOntologyIDs(model).get(0);
+        
         this.verifyLoadedArtifact(artifactIDv2, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
                 TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
         

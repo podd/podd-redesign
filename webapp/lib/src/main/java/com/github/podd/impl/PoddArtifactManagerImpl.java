@@ -79,6 +79,7 @@ import com.github.podd.api.purl.PoddPurlReference;
 import com.github.podd.exception.ArtifactModifyException;
 import com.github.podd.exception.DeleteArtifactException;
 import com.github.podd.exception.DisconnectedObjectException;
+import com.github.podd.exception.DuplicateArtifactIRIException;
 import com.github.podd.exception.EmptyOntologyException;
 import com.github.podd.exception.FileReferenceVerificationFailureException;
 import com.github.podd.exception.InconsistentOntologyException;
@@ -1214,6 +1215,10 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                             this.getSesameManager().getCurrentArtifactVersion(ontologyIRI,
                                     permanentRepositoryConnection,
                                     this.getRepositoryManager().getArtifactManagementGraph());
+                    if (currentManagedArtifactID != null)
+                    {
+                        throw new DuplicateArtifactIRIException(ontologyIRI, "This artifact is already managed");
+                    }
                 }
                 catch(final UnmanagedArtifactIRIException e)
                 {
@@ -1225,11 +1230,6 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 if(currentManagedArtifactID == null || currentManagedArtifactID.getVersionIRI() == null)
                 {
                     newVersionIRI = IRI.create(ontologyIRI.toString() + ":version:1");
-                }
-                else
-                {
-                    newVersionIRI =
-                            IRI.create(this.incrementVersion(currentManagedArtifactID.getVersionIRI().toString()));
                 }
                 
                 // set version IRI in temporary repository
@@ -1745,6 +1745,12 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             
             this.handleDanglingObjects(artifactID.getOntologyIRI(), tempRepositoryConnection, tempContext,
                     danglingObjectAction);
+            
+            // Remove any assertions that the user has made about publication status, as this
+            // information is a privileged operation that must be done through the designated API
+            // method
+            tempRepositoryConnection.remove((Resource)null, PoddRdfConstants.PODD_BASE_HAS_PUBLICATION_STATUS,
+                    (Resource)null, tempContext);
             
             final Set<PoddPurlReference> purls = this.handlePurls(tempRepositoryConnection, tempContext);
             

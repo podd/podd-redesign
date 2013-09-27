@@ -67,6 +67,7 @@ import org.semanticweb.owlapi.model.OWLException;
 import com.github.podd.api.DanglingObjectPolicy;
 import com.github.podd.api.DataReferenceVerificationPolicy;
 import com.github.podd.api.PoddArtifactManager;
+import com.github.podd.exception.DuplicateArtifactIRIException;
 import com.github.podd.exception.PoddException;
 import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.PoddSesameRealm;
@@ -378,6 +379,11 @@ public class UploadArtifactResourceImpl extends AbstractPoddResourceImpl
                 throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE,
                         "Could not find PODD Artifact Manager");
             }
+        }
+        catch (DuplicateArtifactIRIException e)
+        {
+            this.log.warn("Attempting to load duplicate artifact {}", e);
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Failed loading duplicate artifact to PODD", e);
         }
         catch(OpenRDFException | PoddException | IOException | OWLException e)
         {
