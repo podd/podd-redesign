@@ -702,6 +702,51 @@ public abstract class AbstractPoddArtifactManagerTest
      * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
      * .
      * 
+     * Issue #91: Tests that deleting an artifact clears it from the OWLOntologyManager's cache too.
+     * Loads a test artifact with PURLs (so that it has the same IRIs internally), deletes it and
+     * then loads it again.
+     */
+    @Test
+    public final void testDeleteArtifactClearsOntologyManager() throws Exception
+    {
+        this.loadSchemaOntologies();
+        
+        final InputStream inputStream = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        
+        final InferredOWLOntologyID resultArtifactId =
+                this.testArtifactManager.loadArtifact(inputStream, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(resultArtifactId, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+        
+        // invoke test method: DELETE artifact
+        Assert.assertTrue("Could not delete artifact", this.testArtifactManager.deleteArtifact(resultArtifactId));
+        
+        try
+        {
+            this.testArtifactManager.getArtifact(resultArtifactId.getOntologyIRI());
+            Assert.fail("Current contract is to throw an exception when someone tries to get an artifact that does not exist");
+        }
+        catch(final UnmanagedArtifactIRIException e)
+        {
+            Assert.assertNotNull("Exception did not contain the requested artifact IRI", e.getUnmanagedOntologyIRI());
+            Assert.assertEquals("IRI on the exception did not match our expected IRI",
+                    resultArtifactId.getOntologyIRI(), e.getUnmanagedOntologyIRI());
+        }
+        
+        // try to load same artifact again. will fail if the OWLOntologyManager's cache was not cleared
+        final InputStream inputStream2 = this.getClass().getResourceAsStream(TestConstants.TEST_ARTIFACT_20130206);
+        
+        final InferredOWLOntologyID resultArtifactId2 =
+                this.testArtifactManager.loadArtifact(inputStream2, RDFFormat.TURTLE);
+        this.verifyLoadedArtifact(resultArtifactId2, 7, TestConstants.TEST_ARTIFACT_BASIC_1_20130206_CONCRETE_TRIPLES,
+                TestConstants.TEST_ARTIFACT_BASIC_1_20130206_INFERRED_TRIPLES, false);
+    }
+
+    /**
+     * Test method for
+     * {@link com.github.podd.api.PoddArtifactManager#deleteArtifact(org.semanticweb.owlapi.model.OWLOntologyID)}
+     * .
+     * 
      * Tests that the artifact manager cannot delete a published artifact.
      */
     @Test

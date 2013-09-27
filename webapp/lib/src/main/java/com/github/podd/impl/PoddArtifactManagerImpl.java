@@ -206,10 +206,17 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             this.getSesameManager().deleteOntologies(requestedArtifactIds, connection,
                     this.getRepositoryManager().getArtifactManagementGraph());
             connection.commit();
+
+            // - ensure deleted ontologies are removed from the OWLOntologyManager's cache
+            for (InferredOWLOntologyID deletedOntologyId : requestedArtifactIds)
+            {
+                this.getOWLManager().removeCache(deletedOntologyId.getBaseOWLOntologyID());
+                this.getOWLManager().removeCache(deletedOntologyId.getInferredOWLOntologyID());
+            }
             
             return !requestedArtifactIds.isEmpty();
         }
-        catch(final OpenRDFException e)
+        catch(final OpenRDFException | OWLException e)
         {
             try
             {
@@ -239,6 +246,7 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
                 throw new DeleteArtifactException("Repository exception occurred", e, artifactId);
             }
         }
+        
     }
     
     @Override
@@ -1280,7 +1288,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // release resources
             if(inferredOWLOntologyID != null)
             {
-                this.getOWLManager().removeCache(inferredOWLOntologyID);
+                this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID());
+                this.getOWLManager().removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
             }
             
             try
