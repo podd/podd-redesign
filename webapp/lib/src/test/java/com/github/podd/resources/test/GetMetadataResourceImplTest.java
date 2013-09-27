@@ -90,7 +90,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify:
-            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 64);
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 85);
             
             Assert.assertEquals(
                     "GrowthConditions not found",
@@ -105,7 +105,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                     model.filter(PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"),
                             RDFS.LABEL, null).objects().size());
             
-            Assert.assertEquals("Unexpected no. of properties", 12,
+            Assert.assertEquals("Unexpected no. of properties", 16,
                     model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size());
             Assert.assertEquals("Expected no Do-Not-Display properties", 0,
                     model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
@@ -120,8 +120,8 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
     public void testGetChildrenWithProjectRdf() throws Exception
     {
         final Object[][] testData =
-                { { PoddRdfConstants.PODD_SCIENCE + "Project", 42, 7, 0 },
-                        { PoddRdfConstants.PODD_SCIENCE + "Investigation", 64, 12, 0 }, };
+                { { PoddRdfConstants.PODD_SCIENCE + "Project", 63, 11, 0 },
+                        { PoddRdfConstants.PODD_SCIENCE + "Investigation", 85, 16, 0 }, };
         
         for(final Object[] element : testData)
         {
@@ -224,11 +224,11 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_XML, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify: received contents are in RDF
-            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 151);
+            final Model model = this.assertRdf(results, RDFFormat.RDFXML, 156);
             
-            Assert.assertEquals("Unexpected no. of properties", 18,
+            Assert.assertEquals("Unexpected no. of properties", 19,
                     model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);
-            Assert.assertEquals("Expected no Do-Not-Display properties", 4,
+            Assert.assertEquals("Expected no Do-Not-Display properties", 3,
                     model.filter(null, PoddRdfConstants.PODD_BASE_DO_NOT_DISPLAY, null).size());
         }
         finally
@@ -293,7 +293,7 @@ public class GetMetadataResourceImplTest extends AbstractResourceImplTest
                             MediaType.APPLICATION_RDF_TURTLE, Status.SUCCESS_OK, this.testWithAdminPrivileges);
             
             // verify:
-            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 83);
+            final Model model = this.assertRdf(results, RDFFormat.TURTLE, 88);
             
             Assert.assertEquals("Unexpected no. of properties", 9,
                     model.filter(PoddRdfConstants.VF.createURI(objectType), null, null).size() - 1);

@@ -291,44 +291,44 @@ public abstract class AbstractPoddArtifactManagerTest
                                 MetadataPolicy.INCLUDE_ALL, 0, 0, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.INCLUDE_ALL, 139, 17, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 156, 19, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.EXCLUDE_CONTAINS, 83, 10, 0 },
+                                MetadataPolicy.EXCLUDE_CONTAINS, 88, 10, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), true,
-                                MetadataPolicy.INCLUDE_ALL, 283, 34, 14 },
+                                MetadataPolicy.INCLUDE_ALL, 293, 35, 13 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Project"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 42, 7, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 63, 11, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.INCLUDE_ALL, 82, 10, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 94, 12, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), true,
-                                MetadataPolicy.INCLUDE_ALL, 115, 15, 4 },
+                                MetadataPolicy.INCLUDE_ALL, 120, 16, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Publication"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 0, 0, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 21, 4, 0 },
                         
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.INCLUDE_ALL, 61, 8, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 73, 10, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), true,
-                                MetadataPolicy.INCLUDE_ALL, 94, 13, 4 },
+                                MetadataPolicy.INCLUDE_ALL, 99, 14, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Environment"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 12, 2, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 33, 6, 0 },
                         
                         // to expose issue #96 - add child Process has no fields
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
-                                MetadataPolicy.INCLUDE_ALL, 26, 4, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 38, 6, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), true,
-                                MetadataPolicy.INCLUDE_ALL, 59, 9, 4 },
+                                MetadataPolicy.INCLUDE_ALL, 64, 10, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 6, 1, 0 },
+                                MetadataPolicy.ONLY_CONTAINS, 27, 5, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_SCIENCE, "Process"), false,
                                 MetadataPolicy.EXCLUDE_CONTAINS, 18, 3, 0 },
                                 
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.INCLUDE_ALL, 77, 10, 0 },
+                                MetadataPolicy.INCLUDE_ALL, 89, 12, 0 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), true,
-                                MetadataPolicy.INCLUDE_ALL, 110, 15, 4 },
+                                MetadataPolicy.INCLUDE_ALL, 115, 16, 3 },
                         { PoddRdfConstants.VF.createURI(PoddRdfConstants.PODD_PLANT, "FieldConditions"), false,
-                                MetadataPolicy.ONLY_CONTAINS, 12, 2, 0 }, 
+                                MetadataPolicy.ONLY_CONTAINS, 33, 6, 0 }, 
                                 };
         
         for(final Object[] element : testData)
@@ -1698,7 +1698,7 @@ public abstract class AbstractPoddArtifactManagerTest
         
         // prepare: load poddScience v2
         final InferredOWLOntologyID inferredPScienceOntologyID =
-                this.loadInferStoreOntology("/test/ontologies/poddScienceV2.owl", RDFFormat.RDFXML, 1265, 218,
+                this.loadInferStoreOntology("/test/ontologies/poddScienceV2.owl", RDFFormat.RDFXML, 1265, 220,
                         this.testRepositoryConnection);
         this.testSesameManager.updateCurrentManagedSchemaOntologyVersion(inferredPScienceOntologyID, true,
                 this.testRepositoryConnection, this.schemaGraph);
