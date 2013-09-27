@@ -10,7 +10,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		podd.getDataRepositories(function(databank) {
-			$("attach_dataReference").append(podd.createDataRepositoriesList(databank, undefined, undefined, true));
+			$("#attach_dataReference").append(podd.createDataRepositoriesList(databank, undefined, undefined, true));
 		});
 	});
 </script>
