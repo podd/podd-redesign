@@ -58,15 +58,15 @@ import com.github.podd.utils.PoddWebConstants;
 
 /**
  * 
- * Attach a file reference to a PODD artifact
+ * Attach a data reference to a PODD artifact
  * 
  * @author kutila
  * 
  */
-public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
+public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
 {
     @Get
-    public Representation attachFileReferencePageHtml(final Representation entity) throws ResourceException
+    public Representation attachDataReferencePageHtml(final Representation entity) throws ResourceException
     {
         // check mandatory parameter: artifact IRI
         final String artifactUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_IDENTIFIER, true);
@@ -76,31 +76,26 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not submitted");
         }
         
-        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
-        
-        // check mandatory parameter: artifact version IRI
-        final String versionUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_ARTIFACT_VERSION_IDENTIFIER, true);
-        if(versionUri == null)
+        // check mandatory parameter: object IRI
+        final String objectUri = this.getQuery().getFirstValue(PoddWebConstants.KEY_OBJECT_IDENTIFIER, true);
+        if(objectUri == null)
         {
-            this.log.error("Artifact Version IRI not submitted");
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not submitted");
+            this.log.error("Object IRI not submitted");
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Object IRI not submitted");
         }
+        
+        this.checkAuthentication(PoddAction.ARTIFACT_EDIT, PoddRdfConstants.VF.createURI(artifactUri));
         
         InferredOWLOntologyID artifact;
         
         try
         {
-            artifact = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri), IRI.create(versionUri));
+            artifact = this.getPoddArtifactManager().getArtifact(IRI.create(artifactUri));
         }
         catch(UnmanagedArtifactIRIException e)
         {
             this.log.error("Artifact IRI not recognised");
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact IRI not recognised");
-        }
-        catch(UnmanagedArtifactVersionException e)
-        {
-            this.log.error("Artifact Version IRI not recognised");
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Artifact Version IRI not recognised");
         }
         
         this.log.info("attachFileRefHtml");
@@ -110,8 +105,9 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "attachdatareference.html.ftl");
-        dataModel.put("pageTitle", "TODO: Attach Data Reference");
+        dataModel.put("pageTitle", "Attach Data Reference");
         dataModel.put("artifact", artifact);
+        dataModel.put("object", objectUri);
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page
@@ -120,7 +116,7 @@ public class FileReferenceAttachResourceImpl extends AbstractPoddResourceImpl
     }
     
     @Post(":rdf|rj|ttl")
-    public Representation attachFileReferenceRdf(final Representation entity, final Variant variant)
+    public Representation attachDataReferenceRdf(final Representation entity, final Variant variant)
         throws ResourceException
     {
         // check mandatory parameter: artifact IRI

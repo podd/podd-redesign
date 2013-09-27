@@ -18,15 +18,12 @@ package com.github.podd.resources;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Model;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.restlet.data.MediaType;
@@ -252,32 +249,12 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             final Map<String, Object> dataModel, final boolean isPublished) throws OpenRDFException
     {
         
-        PoddObjectLabel theObject = null;
-        
-        if(objectToView != null && !objectToView.trim().isEmpty())
-        {
-            theObject =
-                    this.getPoddArtifactManager().getObjectLabel(ontologyID,
-                            PoddRdfConstants.VF.createURI(objectToView));
-        }
-        else
-        {
-            // find and set top-object of this artifact as the object to display
-            final List<PoddObjectLabel> topObjectLabels =
-                    this.getPoddArtifactManager().getTopObjectLabels(Arrays.asList(ontologyID));
-            if(topObjectLabels == null || topObjectLabels.size() != 1)
-            {
-                throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "There should be only 1 top object");
-            }
-            
-            theObject = topObjectLabels.get(0);
-        }
+        final PoddObjectLabel theObject = RestletUtils.getParentDetails(this.getPoddArtifactManager(), ontologyID, objectToView);
         // set title & description of object to display
         dataModel.put("poddObject", theObject);
-        
         final URI objectUri = theObject.getObjectURI();
         
-        this.populateParentDetails(ontologyID, objectUri, dataModel);
+        RestletUtils.populateParentDetails(this.getPoddArtifactManager(), ontologyID, objectUri, dataModel);
         
         // find the object's type
         final List<PoddObjectLabel> objectTypes = this.getPoddArtifactManager().getObjectTypes(ontologyID, objectUri);
@@ -343,70 +320,6 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         
         dataModel.put("util", new FreemarkerUtil());
         
-    }
-    
-    /**
-     * Populate the data model with info about the parent of the current object. If the given object
-     * does not have a parent (i.e. is a Top Object) the data model remains unchanged.
-     * 
-     * TODO: This method uses multiple API methods resulting in several SPARQL queries. Efficiency
-     * could be improved by either adding a new API method or modifying getParentDetails() to supply
-     * most of the required information.
-     * 
-     * @param ontologyID
-     * @param objectUri
-     *            The object whose parent details are required
-     * @param dataModel
-     * @throws OpenRDFException
-     */
-    private void populateParentDetails(final InferredOWLOntologyID ontologyID, final URI objectUri,
-            final Map<String, Object> dataModel) throws OpenRDFException
-    {
-        
-        final Model parentDetails = this.getPoddArtifactManager().getParentDetails(ontologyID, objectUri);
-        if(parentDetails.size() == 1)
-        {
-            final Statement statement = parentDetails.iterator().next();
-            
-            final Map<String, String> parentMap = new HashMap<>();
-            
-            final String parentUriString = statement.getSubject().stringValue();
-            parentMap.put("uri", parentUriString);
-            
-            final URI parentUri = PoddRdfConstants.VF.createURI(parentUriString);
-            final URI parentPredicateUri = PoddRdfConstants.VF.createURI(statement.getPredicate().stringValue());
-            
-            // - parent's Title
-            String parentLabel = "Missing Title";
-            final PoddObjectLabel objectLabel = this.getPoddArtifactManager().getObjectLabel(ontologyID, parentUri);
-            if(objectLabel != null)
-            {
-                parentLabel = objectLabel.getLabel();
-            }
-            parentMap.put("label", parentLabel);
-            
-            // - parent relationship Label
-            String predicateLabel = "Missing parent relationship";
-            final PoddObjectLabel predicateLabelModel =
-                    this.getPoddArtifactManager().getObjectLabel(ontologyID, parentPredicateUri);
-            if(predicateLabelModel != null)
-            {
-                predicateLabel = predicateLabelModel.getLabel();
-            }
-            parentMap.put("relationship", predicateLabel);
-            
-            // - parent's Type
-            String parentType = "Unknown Type";
-            final List<PoddObjectLabel> objectTypes =
-                    this.getPoddArtifactManager().getObjectTypes(ontologyID, parentUri);
-            if(objectTypes.size() > 0)
-            {
-                parentType = objectTypes.get(0).getLabel();
-            }
-            parentMap.put("type", parentType);
-            
-            dataModel.put("parentObject", parentMap);
-        }
     }
     
 }
