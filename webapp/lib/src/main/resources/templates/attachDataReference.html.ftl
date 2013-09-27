@@ -1,8 +1,7 @@
 
+<#include "parent_details.html.ftl"/>
 
-<h3 class="underlined_heading" id="startAttachDataReference">Attach Data Reference
-    <a href="javascript:animatedcollapse.toggle('attach_dataReference')" icon="toggle" title="Attach Data References" name="attach_dataReferences"></a>
-</h3>
+<h3 class="underlined_heading" id="startAttachDataReference">Attach Data Reference</h3>
 
 <div id="attach_dataReference">  <!-- Collapsible div -->
 	
@@ -10,10 +9,8 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		
-			
 		podd.getDataRepositories(function(databank) {
-			$("attach_dataReference").append(podd.populateDataRepositoriesList(databank));
+			$("attach_dataReference").append(podd.createDataRepositoriesList(databank));
 		);
 	});
 </script>

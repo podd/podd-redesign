@@ -53,6 +53,7 @@ import com.github.podd.restlet.PoddAction;
 import com.github.podd.restlet.RestletUtils;
 import com.github.podd.utils.InferredOWLOntologyID;
 import com.github.podd.utils.OntologyUtils;
+import com.github.podd.utils.PoddObjectLabel;
 import com.github.podd.utils.PoddRdfConstants;
 import com.github.podd.utils.PoddWebConstants;
 
@@ -103,11 +104,22 @@ public class DataReferenceAttachResourceImpl extends AbstractPoddResourceImpl
         
         this.log.info("authenticated user: {}", user);
         
+        PoddObjectLabel parentDetails;
+        try
+        {
+            parentDetails = RestletUtils.getParentDetails(getPoddArtifactManager(), artifact, objectUri);
+        }
+        catch(OpenRDFException e)
+        {
+            this.log.error("Could not find parent details", e);
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Could not find parent details", e);
+        }
+        
         final Map<String, Object> dataModel = RestletUtils.getBaseDataModel(this.getRequest());
         dataModel.put("contentTemplate", "attachdatareference.html.ftl");
         dataModel.put("pageTitle", "Attach Data Reference");
         dataModel.put("artifact", artifact);
-        dataModel.put("object", objectUri);
+        dataModel.put("parentObject", parentDetails);
         
         // Output the base template, with contentTemplate from the dataModel defining the
         // template to use for the content in the body of the page

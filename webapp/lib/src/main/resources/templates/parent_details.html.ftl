@@ -8,7 +8,7 @@
         <div class="legend">Parent Object Summary Information</div>
         <ol>
         <li><span class="bold">ID:</span>
-        	<a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${parentObject.uri?url}">${parentObject.uri!""}</a>
+        	<a href="${baseUrl}/artifact/base?artifacturi=${artifactUri?url}&amp;objecturi=${parentObject.uri!""?url}">${parentObject.uri!""}</a>
         </li>
         <li><span class="bold">Type: </span>${parentObject.type!""}</li>
         <li><span class="bold">Title: </span>${parentObject.label!""}</li>
