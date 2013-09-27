@@ -340,8 +340,7 @@ public final class RestletUtils
      * @throws OpenRDFException
      */
     public static Map<String, String> populateParentDetails(final PoddArtifactManager artifactManager,
-            final InferredOWLOntologyID ontologyID, final URI objectUri, final Map<String, Object> dataModel)
-        throws OpenRDFException
+            final InferredOWLOntologyID ontologyID, final URI objectUri) throws OpenRDFException
     {
         final Map<String, String> parentMap = new HashMap<>();
         

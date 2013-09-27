@@ -256,7 +256,7 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
         final URI objectUri = theObject.getObjectURI();
         
         Map<String, String> parentMap =
-                RestletUtils.populateParentDetails(this.getPoddArtifactManager(), ontologyID, objectUri, dataModel);
+                RestletUtils.populateParentDetails(this.getPoddArtifactManager(), ontologyID, objectUri);
         dataModel.put("parentObject", parentMap);
         
         // find the object's type
