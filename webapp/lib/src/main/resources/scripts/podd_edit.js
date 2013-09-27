@@ -292,10 +292,14 @@ podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentVal
     var myQuery = $.rdf({
         databank : nextDatabank
     })
+    // TODO: Get relevant metadata to reduce the number of repositories 
+    // based on the range and restrictions on propertyUri
     // Find the class
     .where('?pRepository rdf:type ?pClass')
     //
-    .where('?pRepository poddBase:hasAlias ?pAlias').optional('?pRepository rdfs:label ?pLabel');
+    .where('?pRepository poddBase:hasAlias ?pAlias')
+    //
+    .optional('?pRepository rdfs:label ?pLabel');
     var bindings = myQuery.select();
 
     if (bindings.length === 0) {
@@ -1090,7 +1094,7 @@ podd.createEditField = function(nextField, nextSchemaDatabank, nextArtifactDatab
  */
 podd.debug = function(message) {
     if (typeof console !== "undefined" && console.debug) {
-        console.debug('[DEBUG] ' + message);
+        console.debug(message);
     }
 };
 
@@ -1487,7 +1491,7 @@ podd.getCurrentVersionIri = function() {
  * List Data Repositories web service in RDF and sends the resulting data to the
  * callback.
  */
-podd.getDataRepositories = function(dataRepositoriesDatabank, successCallback) {
+podd.getDataRepositories = function(successCallback) {
     var requestUrl = podd.baseUrl + '/datarepositories/list';
 
     $.ajax({
@@ -1498,10 +1502,7 @@ podd.getDataRepositories = function(dataRepositoriesDatabank, successCallback) {
             podd.debug('[getDataRepositories] ### SUCCESS ### ');
             podd.debug(resultData);
 
-            if (typeof dataRepositoriesDatabank == "undefined") {
-                dataRepositoresDatabank = podd.newDatabank();
-            }
-
+            var dataRepositoriesDatabank = podd.newDatabank();
             dataRepositoriesDatabank.load(resultData);
 
             podd.debug('[getDataRepositories] Data Repositories Databank size = ' + dataRepositoriesDatabank.size());
