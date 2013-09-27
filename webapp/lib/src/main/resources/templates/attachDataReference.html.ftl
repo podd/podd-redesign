@@ -11,6 +11,6 @@
 	$(document).ready(function() {
 		podd.getDataRepositories(function(databank) {
 			$("attach_dataReference").append(podd.createDataRepositoriesList(databank));
-		);
+		});
 	});
 </script>
