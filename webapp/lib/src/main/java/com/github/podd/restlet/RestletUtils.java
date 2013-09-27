@@ -339,17 +339,16 @@ public final class RestletUtils
      * @param dataModel
      * @throws OpenRDFException
      */
-    public static void populateParentDetails(final PoddArtifactManager artifactManager,
+    public static Map<String, String> populateParentDetails(final PoddArtifactManager artifactManager,
             final InferredOWLOntologyID ontologyID, final URI objectUri, final Map<String, Object> dataModel)
         throws OpenRDFException
     {
+        final Map<String, String> parentMap = new HashMap<>();
         
         final Model parentDetails = artifactManager.getParentDetails(ontologyID, objectUri);
         if(parentDetails.size() == 1)
         {
             final Statement statement = parentDetails.iterator().next();
-            
-            final Map<String, String> parentMap = new HashMap<>();
             
             final String parentUriString = statement.getSubject().stringValue();
             parentMap.put("uri", parentUriString);
@@ -384,8 +383,9 @@ public final class RestletUtils
             }
             parentMap.put("type", parentType);
             
-            dataModel.put("parentObject", parentMap);
         }
+        
+        return parentMap;
     }
     
     /**

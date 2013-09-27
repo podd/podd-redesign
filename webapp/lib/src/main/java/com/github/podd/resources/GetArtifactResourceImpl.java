@@ -249,12 +249,15 @@ public class GetArtifactResourceImpl extends AbstractPoddResourceImpl
             final Map<String, Object> dataModel, final boolean isPublished) throws OpenRDFException
     {
         
-        final PoddObjectLabel theObject = RestletUtils.getParentDetails(this.getPoddArtifactManager(), ontologyID, objectToView);
+        final PoddObjectLabel theObject =
+                RestletUtils.getParentDetails(this.getPoddArtifactManager(), ontologyID, objectToView);
         // set title & description of object to display
         dataModel.put("poddObject", theObject);
         final URI objectUri = theObject.getObjectURI();
         
-        RestletUtils.populateParentDetails(this.getPoddArtifactManager(), ontologyID, objectUri, dataModel);
+        Map<String, String> parentMap =
+                RestletUtils.populateParentDetails(this.getPoddArtifactManager(), ontologyID, objectUri, dataModel);
+        dataModel.put("parentObject", parentMap);
         
         // find the object's type
         final List<PoddObjectLabel> objectTypes = this.getPoddArtifactManager().getObjectTypes(ontologyID, objectUri);
