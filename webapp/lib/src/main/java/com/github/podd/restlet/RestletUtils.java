@@ -350,11 +350,10 @@ public final class RestletUtils
         {
             final Statement statement = parentDetails.iterator().next();
             
-            final String parentUriString = statement.getSubject().stringValue();
-            parentMap.put("uri", parentUriString);
+            final URI parentUri = (URI)statement.getSubject();
+            final URI parentPredicateUri = statement.getPredicate();
             
-            final URI parentUri = PoddRdfConstants.VF.createURI(parentUriString);
-            final URI parentPredicateUri = PoddRdfConstants.VF.createURI(statement.getPredicate().stringValue());
+            parentMap.put("uri", parentUri.stringValue());
             
             // - parent's Title
             String parentLabel = "Missing Title";
@@ -365,15 +364,6 @@ public final class RestletUtils
             }
             parentMap.put("label", parentLabel);
             
-            // - parent relationship Label
-            String predicateLabel = "Missing parent relationship";
-            final PoddObjectLabel predicateLabelModel = artifactManager.getObjectLabel(ontologyID, parentPredicateUri);
-            if(predicateLabelModel != null)
-            {
-                predicateLabel = predicateLabelModel.getLabel();
-            }
-            parentMap.put("relationship", predicateLabel);
-            
             // - parent's Type
             String parentType = "Unknown Type";
             final List<PoddObjectLabel> objectTypes = artifactManager.getObjectTypes(ontologyID, parentUri);
@@ -383,6 +373,14 @@ public final class RestletUtils
             }
             parentMap.put("type", parentType);
             
+            // - parent relationship Label
+            String predicateLabel = "";
+            final PoddObjectLabel predicateLabelModel = artifactManager.getObjectLabel(ontologyID, parentPredicateUri);
+            if(predicateLabelModel != null)
+            {
+                predicateLabel = predicateLabelModel.getLabel();
+            }
+            parentMap.put("relationship", predicateLabel);
         }
         
         return parentMap;
