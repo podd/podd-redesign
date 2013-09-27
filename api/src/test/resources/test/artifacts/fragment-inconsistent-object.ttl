@@ -28,8 +28,8 @@
                
                poddScience:hasYear 2013 ;
 
-			   # This is invalid, domain of hasPublicationStatus is PoddTopObject 				
-			   poddBase:hasPublicationStatus poddBase:NotPublished ;
+			   # This is invalid, valid only with a PoddTopObject 				
+			   poddBase:hasPrincipalInvestigator <mailto:xavier.sirault@csiro.au> ;
                
                dcterms:creator <mailto:xavier.sirault@csiro.au> .
 
