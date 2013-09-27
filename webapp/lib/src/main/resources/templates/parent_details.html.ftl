@@ -1,4 +1,4 @@
-<#if parentObject??>
+<#if parentObject?? && parentObject.uri??>
 <h3 class="underlined_heading">Parent Details
     <a href="javascript:animatedcollapse.toggle('parent_details')" icon="toggle" title="View Parent Details"></a>
 </h3>
