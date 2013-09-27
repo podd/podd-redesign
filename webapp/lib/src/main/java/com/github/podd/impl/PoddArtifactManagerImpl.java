@@ -1837,7 +1837,8 @@ public class PoddArtifactManagerImpl implements PoddArtifactManager
             // release resources
             if(inferredOWLOntologyID != null)
             {
-                this.getOWLManager().removeCache(inferredOWLOntologyID);
+                this.getOWLManager().removeCache(inferredOWLOntologyID.getBaseOWLOntologyID());
+                this.getOWLManager().removeCache(inferredOWLOntologyID.getInferredOWLOntologyID());
             }
             
             if(tempRepositoryConnection != null && tempRepositoryConnection.isOpen())
