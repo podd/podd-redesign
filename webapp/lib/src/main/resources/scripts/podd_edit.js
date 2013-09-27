@@ -295,7 +295,7 @@ podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentVal
     // TODO: Get relevant metadata to reduce the number of repositories 
     // based on the range and restrictions on propertyUri
     // Find the class
-    .where('?pRepository rdf:type ?pClass')
+    .where('?pRepository rdf:type poddData:DataRepository')
     //
     .where('?pRepository poddBase:hasAlias ?pAlias')
     //
@@ -305,6 +305,8 @@ podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentVal
     if (bindings.length === 0) {
         podd.debug('Did not find any data repositories');
     }
+    
+    podd.debug(bindings);
     
     $.each(bindings, function(index, value) {
 
@@ -327,9 +329,10 @@ podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentVal
             // TODO: Does the following need to be "selected: selected"?
             selected : selectedVal
         });
-
+        podd.debug(option);
         select.append(option);
     });
+    podd.debug(select);
     return select;
 };
 
@@ -1932,7 +1935,7 @@ podd.newDatabank = function() {
     // nextDatabank.base("http://www.example.org/")
     nextDatabank.prefix("dcterms", "http://purl.org/dc/terms/");
     nextDatabank.prefix('poddBase', 'http://purl.org/podd/ns/poddBase#');
-    nextDatabank.prefix('poddDataRepositories', 'http://purl.org/podd/ns/dataRepository#');
+    nextDatabank.prefix('poddData', 'http://purl.org/podd/ns/dataRepository#');
     nextDatabank.prefix('poddUser', 'http://purl.org/podd/ns/poddUser#');
     nextDatabank.prefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
     nextDatabank.prefix('rdfs', 'http://www.w3.org/2000/01/rdf-schema#');
