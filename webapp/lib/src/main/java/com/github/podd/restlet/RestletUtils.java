@@ -324,7 +324,7 @@ public final class RestletUtils
     private RestletUtils()
     {
     }
-
+    
     /**
      * Populate the data model with info about the parent of the current object. If the given object
      * does not have a parent (i.e. is a Top Object) the data model remains unchanged.
@@ -339,8 +339,9 @@ public final class RestletUtils
      * @param dataModel
      * @throws OpenRDFException
      */
-    public static void populateParentDetails(final PoddArtifactManager artifactManager, final InferredOWLOntologyID ontologyID, final URI objectUri,
-            final Map<String, Object> dataModel) throws OpenRDFException
+    public static void populateParentDetails(final PoddArtifactManager artifactManager,
+            final InferredOWLOntologyID ontologyID, final URI objectUri, final Map<String, Object> dataModel)
+        throws OpenRDFException
     {
         
         final Model parentDetails = artifactManager.getParentDetails(ontologyID, objectUri);
@@ -367,8 +368,7 @@ public final class RestletUtils
             
             // - parent relationship Label
             String predicateLabel = "Missing parent relationship";
-            final PoddObjectLabel predicateLabelModel =
-                    artifactManager.getObjectLabel(ontologyID, parentPredicateUri);
+            final PoddObjectLabel predicateLabelModel = artifactManager.getObjectLabel(ontologyID, parentPredicateUri);
             if(predicateLabelModel != null)
             {
                 predicateLabel = predicateLabelModel.getLabel();
@@ -377,8 +377,7 @@ public final class RestletUtils
             
             // - parent's Type
             String parentType = "Unknown Type";
-            final List<PoddObjectLabel> objectTypes =
-                    artifactManager.getObjectTypes(ontologyID, parentUri);
+            final List<PoddObjectLabel> objectTypes = artifactManager.getObjectTypes(ontologyID, parentUri);
             if(objectTypes.size() > 0)
             {
                 parentType = objectTypes.get(0).getLabel();
@@ -388,14 +387,23 @@ public final class RestletUtils
             dataModel.put("parentObject", parentMap);
         }
     }
-
+    
     /**
+     * Finds the parent details given an object, which may be null, and the artifact that it
+     * expected to be found in.
+     * 
+     * @param artifactManager
+     *            The artifact manager.
      * @param ontologyID
+     *            The details of the artifact.
      * @param objectToView
-     * @param dataModel
-     * @return
+     *            If this is null, the top object will be found, otherwise, the details for this
+     *            object will be found if possible.
+     * @return The details for the parent object, including a label if possible and its URI.
      * @throws OpenRDFException
+     *             If there are errors getting the labels
      * @throws ResourceException
+     *             If there is more than one top object.
      */
     public static PoddObjectLabel getParentDetails(final PoddArtifactManager artifactManager,
             final InferredOWLOntologyID ontologyID, final String objectToView) throws OpenRDFException,
