@@ -1732,41 +1732,37 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
 /**
  * @memberOf podd
  * 
- * FIXME: This is severely broken. For example, if there is at least one rdfs:label 
- * in the artifact databank, this method finds "title" cardinality to have been met.
+ * Checks that the given object contains values for all mandatory properties.
+ * Cardinality information is available from podd.cardinalityList.
  * 
- * Checks that the given artifact databank contains values for all mandatory
- * properties. Cardinality information is available from podd.cardinalityList.
- * 
+ * @param objectUri
+ *            {string} URI for the current object that needs to be validated
  * @param nextDatabank
- *            {databank} Contains the artifact statements to be validated
- * @return {boolean} Indicating whether the artifact is valid or not
+ *            {databank} Contains the statements to be validated
+ * @return {boolean} Indicating whether the object is valid or not
  */
-podd.isValidArtifact = function(nextDatabank) {
+podd.isValidObject = function(objectUri, nextDatabank) {
     var valid = true;
 
-    $
-            .each(
-                    podd.cardinalityList,
-                    function(index, value) {
+	    $
+			.each(
+					podd.cardinalityList,
+					function(index, value) {
 
-                        if (typeof value.cardinality !== 'undefined'
-                                && (value.cardinality.toString() === CARD_ExactlyOne || value.cardinality.toString() === CARD_OneOrMany)) {
+						if (typeof value.cardinality !== 'undefined'
+								&& (value.cardinality.toString() === CARD_ExactlyOne || value.cardinality.toString() === CARD_OneOrMany)) {
 
-                            var myQuery = $.rdf({
-                                databank : nextDatabank
-                            }).where('?someObject <' + value.propertyUri + '> ?someValue');
-                            var bindings = myQuery.select();
-                            if (bindings.length === 0) {
-                                podd.updateErrorMessageList('Mandatory property ' + value.propertyLabel + ' is empty.');
-
-                                // TODO: display error next to the erroneous
-                                valid = false;
-                            } else {
-                            	podd.debug('[isValidArtifact] ' + value.propertyUri + ' has bindings: ' + bindings.length);
-                            }
-                        }
-                    });
+							var myQuery = $.rdf({
+								databank : nextDatabank
+							}).where(objectUri + ' <' + value.propertyUri + '> ?someValue');
+							var bindings = myQuery.select();
+							if (bindings.length === 0) {
+								podd.updateErrorMessageList('Mandatory property ' + value.propertyLabel + ' is empty.');
+								// TODO: display error next to the erroneous
+								valid = false;
+							}
+						}
+					});
     return valid;
 };
 
@@ -2377,7 +2373,7 @@ podd.submitPoddObjectUpdate = function(
 
     podd.emptyErrorMessages();
 
-    if (!podd.isValidArtifact(nextArtifactDatabank)) {
+    if (!podd.isValidObject(objectUri, nextArtifactDatabank)) {
         podd.debug('[updatePoddObject] Invalid artifact. Aborting submit.');
         return; // cannot continue submission
     }
