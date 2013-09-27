@@ -1732,6 +1732,9 @@ podd.initialiseNewTopObject = function(nextDatabank, artifactUri, objectUri) {
 /**
  * @memberOf podd
  * 
+ * FIXME: This is severely broken. For example, if there is at least one rdfs:label 
+ * in the artifact databank, this method finds "title" cardinality to have been met.
+ * 
  * Checks that the given artifact databank contains values for all mandatory
  * properties. Cardinality information is available from podd.cardinalityList.
  * 
@@ -1759,6 +1762,8 @@ podd.isValidArtifact = function(nextDatabank) {
 
                                 // TODO: display error next to the erroneous
                                 valid = false;
+                            } else {
+                            	podd.debug('[isValidArtifact] ' + value.propertyUri + ' has bindings: ' + bindings.length);
                             }
                         }
                     });
