@@ -54,6 +54,8 @@
 :localssh rdf:type dataRepository:DataRepository ,
                    dataRepository:SSHFileRepository ;
           
+          rdfs:label "Test ssh integration test repository" ;
+          
           dataRepository:hasDataRepositoryUsername "salt" ;
           
           dataRepository:hasDataRepositoryHost "localhost" ;
@@ -75,6 +77,8 @@
 
 :localsparql rdf:type dataRepository:DataRepository ,
                    dataRepository:SPARQLDataRepository ;
+          
+          rdfs:label "Test sparql integration test repository" ;
           
           dataRepository:hasDataRepositoryHost "localhost" ;
           
