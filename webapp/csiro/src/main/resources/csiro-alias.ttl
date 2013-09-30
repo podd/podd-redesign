@@ -1,17 +1,17 @@
-@prefix : <http://test.example.org/filerepositoryaliases#> .
+@prefix : <urn:podd-csiro:datarepositoryconfig:> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dataRepository: <http://purl.org/podd/ns/dataRepository#> .
-@base <http://test.example.org/filerepositoryaliases#defaultaliasfile> .
+@base <urn:podd-csiro:datarepositoryconfig:> .
 
-<http://test.example.org/filerepositoryaliases#defaultaliasfile> rdf:type owl:Ontology ;
+<urn:podd-csiro:datarepositoryconfig> rdf:type owl:Ontology ;
                                                                  
                                                                  owl:imports <http://purl.org/podd/ns/version/dataRepository/1> ;
                                                                  
-                                                                 owl:versionIRI <http://test.example.org/filerepositoryaliases:version:1> .
+                                                                 owl:versionIRI <urn:podd-csiro:datarepositoryconfig:version:1> .
 
 
 #################################################################
@@ -41,17 +41,9 @@
 #################################################################
 
 
-###  http://test.example.org/filerepositoryaliases#defaultaliasfile
-
-<http://test.example.org/filerepositoryaliases#defaultaliasfile> rdf:type owl:NamedIndividual ;
-                                                                 
-                                                                 dataRepository:hasRepositoryConfiguration :localssh .
-
-
-
 ###  http://test.example.org/filerepositoryaliases#localssh
 
-:localssh rdf:type dataRepository:DataRepository ,
+:csirossh rdf:type dataRepository:DataRepository ,
                    dataRepository:SSHFileRepository ;
           
           rdfs:label "SSH Server at CSIRO";
@@ -73,7 +65,7 @@
 
 ###  http://test.example.org/filerepositoryaliases#localsparql
 
-:localsparql rdf:type dataRepository:DataRepository ,
+:csirosparql rdf:type dataRepository:DataRepository ,
                    dataRepository:SPARQLDataRepository ;
           
           rdfs:label "SPARQL Server at CSIRO";
