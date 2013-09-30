@@ -337,7 +337,7 @@ podd.createDataRepositoriesList = function(nextDatabank, propertyUri, currentVal
     return select;
 };
 
-podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, saveButton, nextDatabank) {
+podd.addDataRepositoryHandler = function(dropDown, detailsDiv, nextDatabank) {
 
     dropDown.change(function(event) {
         var option = $('option:selected', this);
@@ -371,12 +371,12 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, sav
                     if (value.type.value == TYPE_SSH_DATA_REPOSITORY) {
                         found = true;
                         detailsDiv.empty();
-                        podd.createSSHFileReferenceForm(aliasString, detailsDiv, verifyButton, saveButton);
+                        podd.createSSHFileReferenceForm(aliasString, detailsDiv);
                     }
                     else if (value.type.value == TYPE_SPARQL_DATA_REPOSITORY) {
                         found = true;
                         detailsDiv.empty();
-                        podd.createSPARQLDataReferenceForm(aliasString, detailsDiv, verifyButton, saveButton);
+                        podd.createSPARQLDataReferenceForm(aliasString, detailsDiv);
                     }
                     else if (value.type.value == TYPE_DATA_REPOSITORY) {
                         // Ignore, as this is just the base type and is not valuable
@@ -396,21 +396,20 @@ podd.addDataRepositoryHandler = function(dropDown, detailsDiv, verifyButton, sav
 
 };
 
-podd.createSSHFileReferenceForm = function(aliasString, detailsDiv, verifyButton, saveButton) {
+podd.createSSHFileReferenceForm = function(aliasString, detailsDiv) {
 
     var fileName = $('<input name="filename"></input>');
 
     var path = $('<input name="path"></input>');
-
+    
+    var verifyButton = $('<button></button>');
+    var saveButton = $('<button></button>');
+    
     detailsDiv.append(fileName);
     detailsDiv.append(path);
-
-    // TODO: Support verification without saving
-    verifyButton.click(function(event) {
-        podd.debug("Clicked on verify SSH File Reference button");
-        podd.debug("TODO: Implement me");
-    });
-
+    detailsDiv.append(verifyButton);
+    detailsDiv.append(saveButton);
+    
     saveButton.click(function(event) {
         podd.debug("Clicked on save SSH File Reference button");
         var detailsDatabank = podd.newDatabank();
@@ -450,9 +449,15 @@ podd.createSSHFileReferenceForm = function(aliasString, detailsDiv, verifyButton
         }
     });
 
+    // TODO: Support verification without saving
+    verifyButton.click(function(event) {
+        podd.debug("Clicked on verify SSH File Reference button");
+        podd.debug("TODO: Implement me");
+    });
+
 };
 
-podd.createSPARQLDataReferenceForm = function(aliasString, detailsDiv, verifyButton, saveButton) {
+podd.createSPARQLDataReferenceForm = function(aliasString, detailsDiv) {
     podd.debug("TODO: Implement createSSHFileReferenceForm");
 };
 

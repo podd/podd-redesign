@@ -20,10 +20,6 @@
 	</div>
 	<div id="dataReferenceRepositoryDetails">
 	</div>
-	<div>
-		<a id="verifyDataReferenceDetails" href="#">Verify details</a>
-		<a id="saveDataReferenceDetails" href="#">Save</a>
-	</div>
 </div>  <!-- file_upload_div - Collapsible div -->
 
 </div>
@@ -35,7 +31,7 @@
 			var select = podd.createDataRepositoriesList(podd.dataRepositoryDatabank, undefined, undefined, true)
 			$("#dataReferenceRepositoryList").append(select);
 			// Update details when selection changes
-			podd.addDataRepositoryHandler(select, $("#dataReferenceRepositoryDetails"), $("#verifyDataReferenceDetails"), $("saveDataReferenceDetails"), podd.dataRepositoryDatabank);
+			podd.addDataRepositoryHandler(select, $("#dataReferenceRepositoryDetails"), podd.dataRepositoryDatabank);
 		});
 	});
 </script>
