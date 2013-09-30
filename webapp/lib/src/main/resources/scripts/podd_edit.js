@@ -485,11 +485,11 @@ podd.submitDataReferenceCreate = function(databank) {
     }));
     podd.debug("As JSON: " + modifiedTriples);
 
-    var requestUrl = podd.baseUrl + "/artifact/attachdataref?artifactUri=" + encodeUriComponent(podd.artifactIri)
-            + "&versionUri=" + encodeUriComponent(podd.versionIri) + "&objectUri=" + encodeUriComponent(podd.objectUri);
+    var requestUrl = podd.baseUrl + "/artifact/attachdataref?artifactUri=" + encodeURIComponent(podd.artifactIri)
+            + "&versionUri=" + encodeURIComponent(podd.versionIri) + "&objectUri=" + encodeURIComponent(podd.objectUri);
 
-    var redirectUrl = podd.baseUrl + "/artifact/base?artifactUri=" + encodeUriComponent(podd.artifactIri)
-            + "&objectUri=" + encodeUriComponent(podd.objectUri);
+    var redirectUrl = podd.baseUrl + "/artifact/base?artifactUri=" + encodeURIComponent(podd.artifactIri)
+            + "&objectUri=" + encodeURIComponent(podd.objectUri);
 
     $.ajax({
         url : requestUrl,
